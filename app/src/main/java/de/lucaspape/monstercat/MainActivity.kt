@@ -76,8 +76,8 @@ class MainActivity : AppCompatActivity() {
                     val json = JSONObject(response)
                     val jsonArray = json.getJSONArray("results")
 
-                    val from = arrayOf("shownLabel", "coverUrl")
-                    val to = arrayOf(R.id.txt, R.id.img)
+                    val from = arrayOf("shownTitle", "coverUrl")
+                    val to = arrayOf(R.id.title , R.id.cover)
 
                     val simpleAdapter = SimpleAdapter(baseContext, list, R.layout.list_single, from, to.toIntArray())
 
@@ -105,7 +105,7 @@ class MainActivity : AppCompatActivity() {
 
 
                         //drawableFromUrl(coverUrl + "?image_width=64")
-                        hashMap.put("shownLabel", title + " " + artist + " " + version)
+                        hashMap.put("shownTitle",  artist + " " + title + " " + version)
 
                         list.add(hashMap)
 
