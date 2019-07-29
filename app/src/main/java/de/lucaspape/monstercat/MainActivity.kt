@@ -1,6 +1,7 @@
 package de.lucaspape.monstercat
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
@@ -19,6 +20,8 @@ import android.widget.AdapterView.OnItemClickListener
 import android.os.StrictMode
 import android.graphics.BitmapFactory
 import android.graphics.Bitmap
+import android.os.AsyncTask
+import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.net.HttpURLConnection
@@ -50,10 +53,6 @@ class MainActivity : AppCompatActivity() {
         navView.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
 
 
-        //warning, this is bullshit
-        val policy = StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
-
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET)
             != PackageManager.PERMISSION_GRANTED) {
             println("Internet permission not granted!")
@@ -68,14 +67,21 @@ class MainActivity : AppCompatActivity() {
 
         val loadMax = 100
 
-        for(i in (0 until loadMax / 10)){
-            val url = "https://connect.monstercat.com/api/catalog/browse/?limit=10&skip=" + i
+        for(i in (0 until loadMax / 50)){
+            val url = "https://connect.monstercat.com/api/catalog/browse/?limit=50&skip=" + i
 
             val stringRequest = StringRequest(
                 Request.Method.GET, url,
                 Response.Listener<String> { response ->
                     val json = JSONObject(response)
                     val jsonArray = json.getJSONArray("results")
+
+                    val from = arrayOf("shownLabel", "coverUrl")
+                    val to = arrayOf(R.id.txt, R.id.img)
+
+                    val simpleAdapter = SimpleAdapter(baseContext, list, R.layout.list_single, from, to.toIntArray())
+
+                    musicList.adapter = simpleAdapter
 
                     for(k in (0 until jsonArray.length())){
                         val id = jsonArray.getJSONObject(k).getJSONObject("albums").getString("albumId")
@@ -86,15 +92,8 @@ class MainActivity : AppCompatActivity() {
 
                         val hashMap = HashMap<String,Any?>()
 
-                        val bmp = getBitmapFromURL(coverUrl + "?image_width=64")
-
-                        try {
-                            FileOutputStream(this.cacheDir.toString() + "/"  + title + version + ".png").use({ out ->
-                                bmp!!.compress(Bitmap.CompressFormat.PNG, 100, out) // bmp is your Bitmap instance
-                                // PNG is a lossless format, the compression factor (100) is ignored
-                            })
-                        } catch (e: IOException) {
-                            e.printStackTrace()
+                        if(!File(this.cacheDir.toString() + "/"  + title + version + ".png").exists()){
+                            downloadCover(coverUrl + "?image_width=64", this.cacheDir.toString() + "/"  + title + version + ".png", simpleAdapter).execute()
                         }
 
                         hashMap.put("id", id)
@@ -110,14 +109,11 @@ class MainActivity : AppCompatActivity() {
 
                         list.add(hashMap)
 
+                        simpleAdapter.notifyDataSetChanged()
+
                     }
 
-                    val from = arrayOf("shownLabel", "coverUrl")
-                    val to = arrayOf(R.id.txt, R.id.img)
 
-                    val simpleAdapter = SimpleAdapter(baseContext, list, R.layout.list_single, from, to.toIntArray())
-
-                    musicList.adapter = simpleAdapter
                 },
                 Response.ErrorListener { println("Error!") })
 
@@ -163,21 +159,46 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun getBitmapFromURL(src: String): Bitmap? {
-        try {
-            val url = URL(src)
-            val connection = url.openConnection() as HttpURLConnection
-            connection.doInput = true
-            connection.connect()
-            val input = connection.inputStream
-            return BitmapFactory.decodeStream(input)
-        } catch (e: IOException) {
-            // Log exception
+    class downloadCover(url:String, location:String, simpleAdapter: SimpleAdapter) : AsyncTask<Void, Void, String>() {
+        val url = url
+        val location = location
+        var simpleAdapter = simpleAdapter
+
+        override fun doInBackground(vararg params: Void?): String? {
+            try {
+
+                val url = URL(url)
+                val connection = url.openConnection() as HttpURLConnection
+                connection.doInput = true
+                connection.connect()
+                val input = connection.inputStream
+                val bitmap = BitmapFactory.decodeStream(input)
+
+                FileOutputStream(location).use({ out ->
+                    bitmap!!.compress(Bitmap.CompressFormat.PNG, 100, out) // bmp is your Bitmap instance
+                    // PNG is a lossless format, the compression factor (100) is ignored
+                })
+
+
+
+
+            } catch (e: IOException) {
+                // Log exception
+                return null
+            }
+
             return null
         }
 
+        override fun onPreExecute() {
+            super.onPreExecute()
+            // ...
+        }
+
+        override fun onPostExecute(result: String?) {
+            super.onPostExecute(result)
+            simpleAdapter.notifyDataSetChanged()
+        }
     }
-
-
 
 }
