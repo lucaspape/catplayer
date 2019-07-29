@@ -16,6 +16,14 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import org.json.JSONObject
 import android.widget.AdapterView.OnItemClickListener
+import android.os.StrictMode
+import android.graphics.BitmapFactory
+import android.graphics.Bitmap
+import java.io.FileOutputStream
+import java.io.IOException
+import java.net.HttpURLConnection
+import java.net.URL
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -41,6 +49,11 @@ class MainActivity : AppCompatActivity() {
 
         navView.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
 
+
+        //warning, this is bullshit
+        val policy = StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET)
             != PackageManager.PERMISSION_GRANTED) {
             println("Internet permission not granted!")
@@ -51,10 +64,12 @@ class MainActivity : AppCompatActivity() {
         val musicList = findViewById<ListView>(R.id.musiclistview)
         val list = ArrayList<HashMap<String,Any?>>()
 
+
+
         val loadMax = 100
 
-        for(i in (0 until loadMax/50)){
-            val url = "https://connect.monstercat.com/api/catalog/browse/?limit=50&skip=" + i
+        for(i in (0 until loadMax / 10)){
+            val url = "https://connect.monstercat.com/api/catalog/browse/?limit=10&skip=" + i
 
             val stringRequest = StringRequest(
                 Request.Method.GET, url,
@@ -71,15 +86,30 @@ class MainActivity : AppCompatActivity() {
 
                         val hashMap = HashMap<String,Any?>()
 
+                        val bmp = getBitmapFromURL(coverUrl + "?image_width=64")
+
+                        try {
+                            FileOutputStream(this.cacheDir.toString() + "/"  + title + version + ".png").use({ out ->
+                                bmp!!.compress(Bitmap.CompressFormat.PNG, 100, out) // bmp is your Bitmap instance
+                                // PNG is a lossless format, the compression factor (100) is ignored
+                            })
+                        } catch (e: IOException) {
+                            e.printStackTrace()
+                        }
+
                         hashMap.put("id", id)
                         hashMap.put("title", title)
                         hashMap.put("artist", artist)
-                        hashMap.put("coverUrl", coverUrl)
+                        hashMap.put("coverUrl", this.cacheDir.toString() + "/"  + title + version + ".png")
                         hashMap.put("version", version)
+                        //hashMap.put("coverBitmap", R.drawable.ic_home_black_24dp)
 
+
+                        //drawableFromUrl(coverUrl + "?image_width=64")
                         hashMap.put("shownLabel", title + " " + artist + " " + version)
 
                         list.add(hashMap)
+
                     }
 
                     val from = arrayOf("shownLabel", "coverUrl")
@@ -94,6 +124,7 @@ class MainActivity : AppCompatActivity() {
             // Add the request to the RequestQueue.
             queue.add(stringRequest)
         }
+
 
         val musicPlayer = MusicPlayer()
 
@@ -128,6 +159,25 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+
+
     }
+
+    fun getBitmapFromURL(src: String): Bitmap? {
+        try {
+            val url = URL(src)
+            val connection = url.openConnection() as HttpURLConnection
+            connection.doInput = true
+            connection.connect()
+            val input = connection.inputStream
+            return BitmapFactory.decodeStream(input)
+        } catch (e: IOException) {
+            // Log exception
+            return null
+        }
+
+    }
+
+
 
 }

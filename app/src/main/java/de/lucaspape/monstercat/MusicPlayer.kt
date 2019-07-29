@@ -2,6 +2,7 @@ package de.lucaspape.monstercat
 
 import android.media.AudioManager
 import android.media.MediaPlayer
+import java.lang.IndexOutOfBoundsException
 
 class MusicPlayer() {
     private var mediaPlayer = MediaPlayer()
@@ -33,10 +34,14 @@ class MusicPlayer() {
     fun next(){
         currentSong++
 
-        if(playList[currentSong].isEmpty()){
+        try{
+            if(playList[currentSong].isEmpty()){
+                stop()
+            }else{
+                play()
+            }
+        }catch (e:IndexOutOfBoundsException){
             stop()
-        }else{
-            play()
         }
     }
 
