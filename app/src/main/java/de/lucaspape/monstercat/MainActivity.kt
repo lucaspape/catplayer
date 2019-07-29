@@ -1,13 +1,9 @@
 package de.lucaspape.monstercat
 
 import android.Manifest
-import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
-import android.widget.AdapterView
-import android.widget.ListView
-import android.widget.SimpleAdapter
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -17,16 +13,15 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import org.json.JSONObject
 import android.widget.AdapterView.OnItemClickListener
-import android.os.StrictMode
 import android.graphics.BitmapFactory
 import android.graphics.Bitmap
 import android.os.AsyncTask
+import android.widget.*
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -61,9 +56,11 @@ class MainActivity : AppCompatActivity() {
         val queue = Volley.newRequestQueue(this)
 
         val musicList = findViewById<ListView>(R.id.musiclistview)
+        val currentSongText = findViewById<TextView>(R.id.songCurrent)
+        val playButton = findViewById<Button>(R.id.playButton)
+        val seekBar = findViewById<SeekBar>(R.id.seekBar)
+
         val list = ArrayList<HashMap<String,Any?>>()
-
-
 
         val loadMax = 100
 
@@ -101,18 +98,13 @@ class MainActivity : AppCompatActivity() {
                         hashMap.put("artist", artist)
                         hashMap.put("coverUrl", this.cacheDir.toString() + "/"  + title + version + ".png")
                         hashMap.put("version", version)
-                        //hashMap.put("coverBitmap", R.drawable.ic_home_black_24dp)
 
-
-                        //drawableFromUrl(coverUrl + "?image_width=64")
                         hashMap.put("shownTitle",  artist + " " + title + " " + version)
 
                         list.add(hashMap)
 
                         simpleAdapter.notifyDataSetChanged()
-
                     }
-
 
                 },
                 Response.ErrorListener { println("Error!") })
@@ -122,7 +114,7 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        val musicPlayer = MusicPlayer()
+        val musicPlayer = MusicPlayer(currentSongText, seekBar)
 
         musicList.onItemClickListener = object: OnItemClickListener{
             override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
@@ -145,7 +137,7 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         if(streamHash != ""){
-                            musicPlayer.addSong("https://s3.amazonaws.com/data.monstercat.com/blobs/" + streamHash)
+                            musicPlayer.addSong("https://s3.amazonaws.com/data.monstercat.com/blobs/" + streamHash, itemValue.get("artist") as String + " " + itemValue.get("title") as String + " " + itemValue.get("version") as String)
                         }
 
                     },
@@ -153,6 +145,10 @@ class MainActivity : AppCompatActivity() {
 
                 queue.add(streamHashRequest)
             }
+        }
+
+        playButton.setOnClickListener {
+            musicPlayer.toggleMusic()
         }
 
 
@@ -174,12 +170,9 @@ class MainActivity : AppCompatActivity() {
                 val input = connection.inputStream
                 val bitmap = BitmapFactory.decodeStream(input)
 
-                FileOutputStream(location).use({ out ->
-                    bitmap!!.compress(Bitmap.CompressFormat.PNG, 100, out) // bmp is your Bitmap instance
-                    // PNG is a lossless format, the compression factor (100) is ignored
-                })
-
-
+                FileOutputStream(location).use { out ->
+                    bitmap!!.compress(Bitmap.CompressFormat.PNG, 100, out)
+                }
 
 
             } catch (e: IOException) {
