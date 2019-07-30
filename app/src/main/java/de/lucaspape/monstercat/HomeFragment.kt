@@ -141,7 +141,7 @@ class HomeFragment : Fragment() {
         }
 
 
-        val musicCoverQueue = Volley.newRequestQueue(view.context)
+        val musicQueue = Volley.newRequestQueue(view.context)
         val currentSongText = view.findViewById<TextView>(R.id.songCurrent)
         val playButton = view.findViewById<ImageButton>(R.id.playButton)
         val backButton = view.findViewById<ImageButton>(R.id.backbutton)
@@ -197,7 +197,7 @@ class HomeFragment : Fragment() {
                     },
                     Response.ErrorListener { println("Error!") })
 
-                musicCoverQueue.add(streamHashRequest)
+                musicQueue.add(streamHashRequest)
             }
         }
 
