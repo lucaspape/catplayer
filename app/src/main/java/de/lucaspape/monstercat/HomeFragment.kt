@@ -7,10 +7,12 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.android.volley.Request
-import com.android.volley.Response
+import com.android.volley.*
+import com.android.volley.toolbox.HttpHeaderParser
+import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import org.json.JSONException
 import org.json.JSONObject
 import java.io.*
 import java.lang.Exception
@@ -145,6 +147,57 @@ class HomeFragment : Fragment() {
             }
         }
 
+        //LOGIN
+
+        val settings = Settings()
+        val username = settings.getSetting(view.context, "email")
+        val password = settings.getSetting(view.context, "password")
+
+        var sid = ""
+
+        if(username != null || password != null){
+            val loginPostParams = JSONObject()
+            loginPostParams.put("email", username)
+            loginPostParams.put("password", password)
+
+            val loginUrl = "https://connect.monstercat.com/v2/signin"
+
+
+            val loginPostRequest = object: JsonObjectRequest(Request.Method.POST,
+                loginUrl, loginPostParams, Response.Listener {response ->
+                    val headers = response.getJSONObject("headers")
+
+                    try{
+                        //get SID
+                        sid = headers.getString("Set-Cookie").substringBefore(';').replace("connect.sid=", "")
+                    }catch (e: JSONException){
+                        println(headers)
+                        println(e)
+                    }
+
+                }, Response.ErrorListener {error ->
+
+                })
+            {
+                override fun parseNetworkResponse(response: NetworkResponse?): Response<JSONObject> {
+                    try {
+                        val jsonResponse = JSONObject()
+                        jsonResponse.put("headers", JSONObject(response!!.headers as Map<*, *>))
+
+                        return Response.success(
+                            jsonResponse,
+                            HttpHeaderParser.parseCacheHeaders(response)
+                        )
+                    } catch (e: UnsupportedEncodingException) {
+
+                        return Response.error<JSONObject>(ParseError(e))
+                    }
+                }
+            }
+
+            val loginQueue = Volley.newRequestQueue(view.context)
+            loginQueue.add(loginPostRequest)
+        }
 
         val musicQueue = Volley.newRequestQueue(view.context)
         val currentSongText = view.findViewById<TextView>(R.id.songCurrent)
@@ -160,7 +213,7 @@ class HomeFragment : Fragment() {
 
                 val streamHashUrl =
                     "https://connect.monstercat.com/api/catalog/browse/?albumId=" + itemValue.get("id")
-                val streamHashRequest = StringRequest(
+                val streamHashRequest = object: StringRequest(
                     Request.Method.GET, streamHashUrl,
                     Response.Listener<String> { response ->
                         val json = JSONObject(response)
@@ -200,7 +253,17 @@ class HomeFragment : Fragment() {
                         }
 
                     },
-                    Response.ErrorListener { println("Error!") })
+                    Response.ErrorListener { println("Error!") }){
+                    @Throws(AuthFailureError::class)
+                    override fun getHeaders(): Map<String, String> {
+                        val params = HashMap<String, String>()
+                        if(sid != ""){
+                            params.put("Cookie", "connect.sid=" + sid)
+                        }
+
+                        return params
+                    }
+                }
 
                 musicQueue.add(streamHashRequest)
             }

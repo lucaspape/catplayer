@@ -13,6 +13,7 @@
             android:layout_marginTop="8dp"
             app:layout_constraintTop_toBottomOf="@+id/passwordInput"/>
     <EditText
+            android:hint="@string/username"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:inputType="textPersonName"
@@ -22,6 +23,7 @@
             app:layout_constraintStart_toStartOf="parent" android:layout_marginEnd="8dp"
             app:layout_constraintEnd_toEndOf="parent"/>
     <EditText
+            android:hint="@string/password"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:inputType="textPassword"
