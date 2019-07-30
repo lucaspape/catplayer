@@ -142,8 +142,10 @@ class PlaylistFragment : Fragment() {
                 }
             }
 
+            //TODO implement
             val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
 
+            //TODO sort
             playlistView.onItemClickListener = object : AdapterView.OnItemClickListener {
                 override fun onItemClick(adapterView: AdapterView<*>?, view: View?, position: Int, p3: Long) {
                     val itemValue = playlistView.getItemAtPosition(position) as HashMap<String, Any?>
