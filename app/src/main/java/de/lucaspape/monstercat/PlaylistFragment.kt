@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ListView
 import android.widget.SimpleAdapter
 import android.widget.Toast
@@ -16,9 +17,9 @@ import com.android.volley.Response
 import org.json.JSONObject
 import com.android.volley.ParseError
 import com.android.volley.toolbox.*
+import org.json.JSONArray
 import org.json.JSONException
 import java.io.UnsupportedEncodingException
-import java.lang.reflect.InvocationTargetException
 
 class PlaylistFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
@@ -101,6 +102,7 @@ class PlaylistFragment : Fragment() {
                 for(i in (0 until jsonArray.length())){
                     val playlistObject = jsonArray.getJSONObject(i)
                     val playlistName = playlistObject.getString("name")
+                    val playlistId = playlistObject.getString("_id")
 
                     val tracks = playlistObject.getJSONArray("tracks")
 
@@ -108,6 +110,7 @@ class PlaylistFragment : Fragment() {
                     playlistHashMap.put("playlistName", playlistName)
                     playlistHashMap.put("coverUrl", "")
                     playlistHashMap.put("titles", tracks)
+                    playlistHashMap.put("playlistId", playlistId)
 
                     list.add(playlistHashMap)
 
@@ -138,6 +141,64 @@ class PlaylistFragment : Fragment() {
             }
 
             val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
+
+            playlistView.onItemClickListener = object : AdapterView.OnItemClickListener {
+                override fun onItemClick(adapterView: AdapterView<*>?, view: View?, position: Int, p3: Long) {
+                    val itemValue = playlistView.getItemAtPosition(position) as HashMap<String, Any?>
+
+                    val playlistName = itemValue.get("playlistName")
+                    val playlistId = itemValue.get("playlistId")
+                    println(playlistName)
+
+                    val playlistTrackUrl = "https://connect.monstercat.com/api/catalog/browse/?playlistId=" + playlistId + "&skip=0&limit=50"
+                    val tracks = ArrayList<HashMap<String, Any?>>()
+
+                    val trackRequest = object: StringRequest(Request.Method.GET, playlistTrackUrl, Response.Listener<String>
+                    { response ->
+                        val jsonObject = JSONObject(response)
+                        val jsonArray = jsonObject.getJSONArray("results")
+
+                        for(i in (0 until jsonArray.length())){
+                            val playlistObject = jsonArray.getJSONObject(i)
+
+                            val title = playlistObject.getString("title")
+                            val version = playlistObject.getString("version")
+                            val artist = playlistObject.getString("artistsTitle")
+                            val coverUrl = playlistObject.getJSONObject("release").getString("coverUrl")
+
+                            val trackHashMap = HashMap<String, Any?>()
+                            trackHashMap.put("title", title)
+                            trackHashMap.put("version", version)
+                            trackHashMap.put("artist", artist)
+                            trackHashMap.put("coverUrl", coverUrl)
+
+
+                            tracks.add(trackHashMap)
+
+                            val fromTrack = arrayOf("title", "coverUrl")
+                            val toTrack = arrayOf(R.id.title, R.id.cover)
+
+                            simpleAdapter = SimpleAdapter(view!!.context, tracks, R.layout.list_single, fromTrack, toTrack.toIntArray())
+                            playlistView.adapter = simpleAdapter
+                        }
+                    }, Response.ErrorListener {error ->
+
+                    }
+                    ){
+                        @Throws(AuthFailureError::class)
+                        override fun getHeaders(): Map<String, String> {
+                            val params = HashMap<String, String>()
+                            params.put("Cookie", "connect.sid=" + sid)
+
+                            return params
+                        }
+                    }
+                    val titleQueue = Volley.newRequestQueue(view!!.context)
+                    titleQueue.add(trackRequest)
+
+                }
+
+            }
         }
     }
 
