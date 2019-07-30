@@ -18,6 +18,11 @@ import java.net.URL
 
 class MainActivity : AppCompatActivity() {
 
+    companion object{
+        @JvmStatic
+        var musicPlayer:MusicPlayer? = null
+    }
+
     private val onNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
             R.id.navigation_home -> {

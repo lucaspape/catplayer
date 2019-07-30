@@ -48,6 +48,31 @@ class MusicPlayer(private var context: Context, private var textView: TextView, 
         val NOTIFICATION_NEXT = "de.lucaspape.monstercat.next"
     }
 
+    fun setContext(context:Context){
+        this.context = context
+    }
+
+    fun setTextView(textView:TextView){
+        textView.text = this.textView.text
+        this.textView = textView
+    }
+
+    fun setSeekBar(seekBar: SeekBar){
+        seekBar.progress = this.seekBar.progress
+        seekBar.setOnSeekBarChangeListener(object:SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar:SeekBar, progress:Int, fromUser:Boolean) {
+                if (fromUser)
+                    mediaPlayer.seekTo(progress)
+            }
+            override fun onStartTrackingTouch(seekBar:SeekBar) {
+            }
+            override fun onStopTrackingTouch(seekBar:SeekBar) {
+            }
+        })
+
+        this.seekBar = seekBar
+    }
+
 
     fun play(){
         mediaPlayer.stop()

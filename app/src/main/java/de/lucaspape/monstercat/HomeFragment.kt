@@ -26,6 +26,8 @@ class HomeFragment : Fragment() {
 
     companion object {
         fun newInstance(): HomeFragment = HomeFragment()
+
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -206,7 +208,15 @@ class HomeFragment : Fragment() {
         val nextButton = view.findViewById<ImageButton>(R.id.nextbutton)
         val seekBar = view.findViewById<SeekBar>(R.id.seekBar)
 
-        val musicPlayer = MusicPlayer(view.context, currentSongText, seekBar)
+        if(MainActivity.musicPlayer == null){
+            MainActivity.musicPlayer = MusicPlayer(view.context, currentSongText, seekBar)
+        }else{
+            MainActivity.musicPlayer!!.setContext(view.context)
+            MainActivity.musicPlayer!!.setTextView(currentSongText)
+            MainActivity.musicPlayer!!.setSeekBar(seekBar)
+
+        }
+
         musicList.onItemClickListener = object : AdapterView.OnItemClickListener {
             override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 val itemValue = musicList.getItemAtPosition(p2) as HashMap<String, Any?>
@@ -239,7 +249,7 @@ class HomeFragment : Fragment() {
                         }
 
                         if (streamHash != "") {
-                            musicPlayer.addSong(
+                            MainActivity.musicPlayer!!.addSong(
                                 "https://s3.amazonaws.com/data.monstercat.com/blobs/" + streamHash,
                                 itemValue.get("artist") as String + " " + itemValue.get("title") as String + " " + itemValue.get(
                                     "version"
@@ -270,15 +280,15 @@ class HomeFragment : Fragment() {
         }
 
         playButton.setOnClickListener {
-            musicPlayer.toggleMusic()
+            MainActivity.musicPlayer!!.toggleMusic()
         }
 
         nextButton.setOnClickListener {
-            musicPlayer.next()
+            MainActivity.musicPlayer!!.next()
         }
 
         backButton.setOnClickListener {
-            musicPlayer.previous()
+            MainActivity.musicPlayer!!.previous()
         }
 
     }

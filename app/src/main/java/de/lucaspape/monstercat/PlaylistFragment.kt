@@ -180,6 +180,7 @@ class PlaylistFragment : Fragment() {
                                 trackHashMap.put("coverUrl", view.context.cacheDir.toString() + "/" + title + version + artist + ".png")
                                 trackHashMap.put("id", id)
                                 trackHashMap.put("streamHash", streamHash)
+                                trackHashMap.put("shownTitle", artist + " " + title + " " + version)
 
                                 tracks.add(trackHashMap)
 
@@ -213,9 +214,9 @@ class PlaylistFragment : Fragment() {
                     }else{
                         //do song things
 
-                        println("get song")
                         val url = "https://s3.amazonaws.com/data.monstercat.com/blobs/"  + itemValue.get("streamHash")
-                        println(url)
+                        val title = itemValue.get("shownTitle") as String
+                        MainActivity.musicPlayer!!.addSong(url, title)
 
                     }
 
