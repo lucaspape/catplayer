@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                                   xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+              android:layout_height="match_parent" xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:orientation="vertical">
+
+    <ListView
+            android:id="@+id/musiclistview"
+            android:layout_height="0dp"
+            android:layout_width="0dp"
+
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="8dp" app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp"
+            app:layout_constraintHorizontal_bias="0.497" android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/muscicbar" app:layout_constraintVertical_bias="0.033"/>
+
+    <androidx.appcompat.widget.Toolbar
+            android:layout_width="fill_parent"
+            android:layout_height="80dp"
+            android:background="@color/colorPlayerBackground"
+            android:theme="?attr/actionBarTheme"
+            android:minHeight="?attr/actionBarSize"
+            android:id="@+id/muscicbar" android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="parent" android:layout_marginTop="244dp"
+            app:layout_constraintTop_toTopOf="parent" app:layout_constraintVertical_bias="0.791"
+            android:layout_marginEnd="8dp" app:layout_constraintEnd_toEndOf="parent" android:layout_marginStart="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+
+            app:layout_constraintHorizontal_bias="1.0"/>
+
+    <TextView
+            android:text=""
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/songCurrent"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/muscicbar" app:layout_constraintStart_toStartOf="@+id/seekBar"
+            android:layout_marginStart="8dp" app:layout_constraintEnd_toEndOf="@+id/muscicbar"
+            android:layout_marginEnd="8dp"/>
+    <ImageButton
+            android:text="Button"
+            android:src="@drawable/pause"
+            android:layout_width="100px"
+            android:layout_height="100px"
+            android:id="@+id/playButton" app:layout_constraintEnd_toEndOf="@+id/muscicbar"
+            app:layout_constraintStart_toStartOf="@+id/muscicbar" app:layout_constraintTop_toTopOf="@+id/muscicbar"/>
+    <SeekBar
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/seekBar" app:layout_constraintStart_toStartOf="@+id/muscicbar"
+            app:layout_constraintEnd_toEndOf="@+id/muscicbar" android:layout_marginEnd="8dp"
+            app:layout_constraintHorizontal_bias="1.0"
+            android:layout_marginTop="2dp" app:layout_constraintTop_toBottomOf="@+id/playButton"
+            android:layout_marginBottom="10dp" app:layout_constraintBottom_toBottomOf="@+id/songCurrent"
+            app:layout_constraintVertical_bias="1.0"/>
+    <ImageButton
+            android:text="Button"
+            android:src="@drawable/previous"
+            android:layout_width="100px"
+            android:layout_height="100px"
+            android:id="@+id/backbutton"
+            app:layout_constraintTop_toTopOf="@+id/playButton"
+            app:layout_constraintBottom_toBottomOf="@+id/playButton"
+            app:layout_constraintEnd_toStartOf="@+id/playButton" android:layout_marginEnd="8dp"
+            app:layout_constraintStart_toStartOf="@+id/muscicbar" android:layout_marginStart="8dp"/>
+    <ImageButton
+            android:text="Button"
+            android:src="@drawable/next"
+            android:layout_width="100px"
+            android:layout_height="100px"
+            android:id="@+id/nextbutton" app:layout_constraintStart_toEndOf="@+id/playButton"
+            android:layout_marginStart="8dp" app:layout_constraintEnd_toEndOf="@+id/muscicbar"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/playButton"
+            app:layout_constraintTop_toTopOf="@+id/playButton"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

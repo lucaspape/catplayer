@@ -3,21 +3,15 @@ package de.lucaspape.monstercat
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.view.View
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.android.volley.Request
-import com.android.volley.Response
-import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import org.json.JSONObject
-import android.widget.AdapterView.OnItemClickListener
 import android.graphics.BitmapFactory
 import android.graphics.Bitmap
 import android.os.AsyncTask
 import android.widget.*
-import java.io.File
+import androidx.fragment.app.Fragment
 import java.io.FileOutputStream
 import java.io.IOException
 import java.net.HttpURLConnection
@@ -28,17 +22,34 @@ class MainActivity : AppCompatActivity() {
     private val onNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
             R.id.navigation_home -> {
+                val homeFragment = HomeFragment.newInstance()
+                openFragment(homeFragment)
+
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_dashboard -> {
+                val playlistFragment = PlaylistFragment.newInstance()
+                openFragment(playlistFragment)
+
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_notifications -> {
+                val settingsFragment = SettingsFragment.newInstance()
+                openFragment(settingsFragment)
+
                 return@OnNavigationItemSelectedListener true
             }
         }
         false
     }
+
+    private fun openFragment(fragment: Fragment) {
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.container, fragment)
+        transaction.addToBackStack(null)
+        transaction.commit()
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,125 +58,13 @@ class MainActivity : AppCompatActivity() {
 
         navView.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
 
-
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET)
             != PackageManager.PERMISSION_GRANTED) {
             println("Internet permission not granted!")
         }
 
-        val queue = Volley.newRequestQueue(this)
-
-        val musicList = findViewById<ListView>(R.id.musiclistview)
-        val currentSongText = findViewById<TextView>(R.id.songCurrent)
-        val playButton = findViewById<ImageButton>(R.id.playButton)
-        val backButton = findViewById<ImageButton>(R.id.backbutton)
-        val nextButton = findViewById<ImageButton>(R.id.nextbutton)
-        val seekBar = findViewById<SeekBar>(R.id.seekBar)
-
-        val list = ArrayList<HashMap<String,Any?>>()
-
-        val loadMax = 200
-
-        for(i in (0 until loadMax / 50)){
-            val url = "https://connect.monstercat.com/api/catalog/browse/?limit=50&skip=" + i*50
-
-            val stringRequest = StringRequest(
-                Request.Method.GET, url,
-                Response.Listener<String> { response ->
-                    val json = JSONObject(response)
-                    val jsonArray = json.getJSONArray("results")
-
-                    val from = arrayOf("shownTitle", "coverUrl")
-                    val to = arrayOf(R.id.title , R.id.cover)
-
-                    val simpleAdapter = SimpleAdapter(baseContext, list, R.layout.list_single, from, to.toIntArray())
-
-                    musicList.adapter = simpleAdapter
-
-                    for(k in (0 until jsonArray.length())){
-                        val id = jsonArray.getJSONObject(k).getJSONObject("albums").getString("albumId")
-                        val title = jsonArray.getJSONObject(k).getString("title")
-                        val artist = jsonArray.getJSONObject(k).getString("artistsTitle")
-                        val coverUrl = jsonArray.getJSONObject(k).getJSONObject("release").getString("coverUrl")
-                        val version = jsonArray.getJSONObject(k).getString("version")
-
-                        val hashMap = HashMap<String,Any?>()
-
-                        if(!File(this.cacheDir.toString() + "/"  + title + version + artist + ".png").exists()){
-                            downloadCover(coverUrl + "?image_width=64", this.cacheDir.toString() + "/"  + title + version + artist + ".png", simpleAdapter).execute()
-                        }
-
-                        hashMap.put("id", id)
-                        hashMap.put("title", title)
-                        hashMap.put("artist", artist)
-                        hashMap.put("coverUrl", this.cacheDir.toString() + "/"  + title + version + artist + ".png")
-                        hashMap.put("version", version)
-
-                        hashMap.put("shownTitle",  artist + " " + title + " " + version)
-
-                        list.add(hashMap)
-
-                        simpleAdapter.notifyDataSetChanged()
-                    }
-
-                },
-                Response.ErrorListener { println("Error!") })
-
-            // Add the request to the RequestQueue.
-            queue.add(stringRequest)
-        }
-
-
-        val musicPlayer = MusicPlayer(currentSongText, seekBar)
-
-        musicList.onItemClickListener = object: OnItemClickListener{
-            override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                val itemValue = musicList.getItemAtPosition(p2) as HashMap<String, Any?>
-
-                val streamHashUrl = "https://connect.monstercat.com/api/catalog/browse/?albumId=" + itemValue.get("id")
-                val streamHashRequest = StringRequest(
-                    Request.Method.GET, streamHashUrl,
-                    Response.Listener<String> { response ->
-                        val json = JSONObject(response)
-                        val jsonArray = json.getJSONArray("results")
-                        var streamHash = ""
-
-                        for(i in (0 until jsonArray.length())){
-                            val searchSong = itemValue.get("title") as String + itemValue.get("version") as String
-                            println("searchsong: " + searchSong)
-                            if(jsonArray.getJSONObject(i).getString("title") + jsonArray.getJSONObject(i).getString("version") == searchSong){
-                                if(jsonArray.getJSONObject(i).getBoolean("streamable")){
-                                    streamHash = jsonArray.getJSONObject(i).getJSONObject("albums").getString("streamHash")
-                                }else{
-                                    Toast.makeText(applicationContext, "Song not yet streamable!", Toast.LENGTH_SHORT).show()
-
-                                }
-                            }
-                        }
-
-                        if(streamHash != ""){
-                            musicPlayer.addSong("https://s3.amazonaws.com/data.monstercat.com/blobs/" + streamHash, itemValue.get("artist") as String + " " + itemValue.get("title") as String + " " + itemValue.get("version") as String)
-                            Toast.makeText(applicationContext, itemValue.get("title") as String + " " + itemValue.get("version") as String + " added to playlist!", Toast.LENGTH_SHORT).show()
-                        }
-
-                    },
-                    Response.ErrorListener { println("Error!") })
-
-                queue.add(streamHashRequest)
-            }
-        }
-
-        playButton.setOnClickListener {
-            musicPlayer.toggleMusic()
-        }
-
-        nextButton.setOnClickListener {
-            musicPlayer.next()
-        }
-
-        backButton.setOnClickListener {
-            musicPlayer.previous()
-        }
+        val homeFragment = HomeFragment.newInstance()
+        openFragment(homeFragment)
 
     }
 
