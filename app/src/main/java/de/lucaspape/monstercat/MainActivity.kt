@@ -6,7 +6,6 @@ import android.os.Bundle
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.android.volley.toolbox.Volley
 import android.graphics.BitmapFactory
 import android.graphics.Bitmap
 import android.os.AsyncTask
