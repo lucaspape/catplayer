@@ -206,7 +206,7 @@ class HomeFragment : Fragment() {
         val nextButton = view.findViewById<ImageButton>(R.id.nextbutton)
         val seekBar = view.findViewById<SeekBar>(R.id.seekBar)
 
-        val musicPlayer = MusicPlayer(currentSongText, seekBar)
+        val musicPlayer = MusicPlayer(view.context, currentSongText, seekBar)
         musicList.onItemClickListener = object : AdapterView.OnItemClickListener {
             override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 val itemValue = musicList.getItemAtPosition(p2) as HashMap<String, Any?>
