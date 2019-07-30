@@ -64,10 +64,10 @@ class MainActivity : AppCompatActivity() {
 
         val list = ArrayList<HashMap<String,Any?>>()
 
-        val loadMax = 100
+        val loadMax = 200
 
         for(i in (0 until loadMax / 50)){
-            val url = "https://connect.monstercat.com/api/catalog/browse/?limit=50&skip=" + i
+            val url = "https://connect.monstercat.com/api/catalog/browse/?limit=50&skip=" + i*50
 
             val stringRequest = StringRequest(
                 Request.Method.GET, url,
