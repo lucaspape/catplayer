@@ -98,7 +98,7 @@ class MainActivity : AppCompatActivity() {
                         hashMap.put("id", id)
                         hashMap.put("title", title)
                         hashMap.put("artist", artist)
-                        hashMap.put("coverUrl", this.cacheDir.toString() + "/"  + title + version + ".png")
+                        hashMap.put("coverUrl", this.cacheDir.toString() + "/"  + title + version + artist + ".png")
                         hashMap.put("version", version)
 
                         hashMap.put("shownTitle",  artist + " " + title + " " + version)
@@ -145,6 +145,7 @@ class MainActivity : AppCompatActivity() {
 
                         if(streamHash != ""){
                             musicPlayer.addSong("https://s3.amazonaws.com/data.monstercat.com/blobs/" + streamHash, itemValue.get("artist") as String + " " + itemValue.get("title") as String + " " + itemValue.get("version") as String)
+                            Toast.makeText(applicationContext, itemValue.get("title") as String + " " + itemValue.get("version") as String + " added to playlist!", Toast.LENGTH_SHORT).show()
                         }
 
                     },

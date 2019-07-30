@@ -6,9 +6,6 @@ import android.os.Handler
 import android.widget.SeekBar
 import android.widget.TextView
 import java.lang.IndexOutOfBoundsException
-import androidx.core.os.HandlerCompat.postDelayed
-
-
 
 class MusicPlayer(private var textView: TextView, private var seekBar: SeekBar) {
 
