@@ -91,8 +91,8 @@ class MainActivity : AppCompatActivity() {
 
                         val hashMap = HashMap<String,Any?>()
 
-                        if(!File(this.cacheDir.toString() + "/"  + title + version + ".png").exists()){
-                            downloadCover(coverUrl + "?image_width=64", this.cacheDir.toString() + "/"  + title + version + ".png", simpleAdapter).execute()
+                        if(!File(this.cacheDir.toString() + "/"  + title + version + artist + ".png").exists()){
+                            downloadCover(coverUrl + "?image_width=64", this.cacheDir.toString() + "/"  + title + version + artist + ".png", simpleAdapter).execute()
                         }
 
                         hashMap.put("id", id)
