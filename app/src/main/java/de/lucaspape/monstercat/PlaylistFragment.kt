@@ -19,6 +19,7 @@ import com.android.volley.ParseError
 import com.android.volley.toolbox.*
 import org.json.JSONArray
 import org.json.JSONException
+import java.io.File
 import java.io.UnsupportedEncodingException
 
 class PlaylistFragment : Fragment() {
@@ -111,6 +112,7 @@ class PlaylistFragment : Fragment() {
                     playlistHashMap.put("coverUrl", "")
                     playlistHashMap.put("titles", tracks)
                     playlistHashMap.put("playlistId", playlistId)
+                    playlistHashMap.put("type", "playlist")
 
                     list.add(playlistHashMap)
 
@@ -146,55 +148,76 @@ class PlaylistFragment : Fragment() {
                 override fun onItemClick(adapterView: AdapterView<*>?, view: View?, position: Int, p3: Long) {
                     val itemValue = playlistView.getItemAtPosition(position) as HashMap<String, Any?>
 
-                    val playlistName = itemValue.get("playlistName")
-                    val playlistId = itemValue.get("playlistId")
-                    println(playlistName)
-
-                    val playlistTrackUrl = "https://connect.monstercat.com/api/catalog/browse/?playlistId=" + playlistId + "&skip=0&limit=50"
-                    val tracks = ArrayList<HashMap<String, Any?>>()
-
-                    val trackRequest = object: StringRequest(Request.Method.GET, playlistTrackUrl, Response.Listener<String>
-                    { response ->
-                        val jsonObject = JSONObject(response)
-                        val jsonArray = jsonObject.getJSONArray("results")
-
-                        for(i in (0 until jsonArray.length())){
-                            val playlistObject = jsonArray.getJSONObject(i)
-
-                            val title = playlistObject.getString("title")
-                            val version = playlistObject.getString("version")
-                            val artist = playlistObject.getString("artistsTitle")
-                            val coverUrl = playlistObject.getJSONObject("release").getString("coverUrl")
-
-                            val trackHashMap = HashMap<String, Any?>()
-                            trackHashMap.put("title", title)
-                            trackHashMap.put("version", version)
-                            trackHashMap.put("artist", artist)
-                            trackHashMap.put("coverUrl", coverUrl)
-
-
-                            tracks.add(trackHashMap)
-
-                            val fromTrack = arrayOf("title", "coverUrl")
-                            val toTrack = arrayOf(R.id.title, R.id.cover)
-
-                            simpleAdapter = SimpleAdapter(view!!.context, tracks, R.layout.list_single, fromTrack, toTrack.toIntArray())
-                            playlistView.adapter = simpleAdapter
-                        }
-                    }, Response.ErrorListener {error ->
-
-                    }
-                    ){
-                        @Throws(AuthFailureError::class)
-                        override fun getHeaders(): Map<String, String> {
-                            val params = HashMap<String, String>()
-                            params.put("Cookie", "connect.sid=" + sid)
-
-                            return params
-                        }
-                    }
                     val titleQueue = Volley.newRequestQueue(view!!.context)
-                    titleQueue.add(trackRequest)
+
+                    if(itemValue.get("type") == "playlist"){
+                        val playlistName = itemValue.get("playlistName")
+                        val playlistId = itemValue.get("playlistId")
+                        println(playlistName)
+
+                        val playlistTrackUrl = "https://connect.monstercat.com/api/catalog/browse/?playlistId=" + playlistId + "&skip=0&limit=50"
+                        val tracks = ArrayList<HashMap<String, Any?>>()
+
+                        val trackRequest = object: StringRequest(Request.Method.GET, playlistTrackUrl, Response.Listener<String>
+                        { response ->
+                            val jsonObject = JSONObject(response)
+                            val jsonArray = jsonObject.getJSONArray("results")
+
+                            for(i in (0 until jsonArray.length())){
+                                val playlistObject = jsonArray.getJSONObject(i)
+
+                                val title = playlistObject.getString("title")
+                                val version = playlistObject.getString("version")
+                                val artist = playlistObject.getString("artistsTitle")
+                                val coverUrl = playlistObject.getJSONObject("release").getString("coverUrl")
+                                val id = playlistObject.getString("_id")
+                                val streamHash = playlistObject.getJSONObject("albums").getString("streamHash")
+
+                                val trackHashMap = HashMap<String, Any?>()
+                                trackHashMap.put("title", title)
+                                trackHashMap.put("version", version)
+                                trackHashMap.put("artist", artist)
+                                trackHashMap.put("coverUrl", view.context.cacheDir.toString() + "/" + title + version + artist + ".png")
+                                trackHashMap.put("id", id)
+                                trackHashMap.put("streamHash", streamHash)
+
+                                tracks.add(trackHashMap)
+
+                                if (!File(view.context.cacheDir.toString() + "/" + title + version + artist + ".png").exists()) {
+                                    MainActivity.downloadCover(
+                                        coverUrl + "?image_width=64",
+                                        view.context.cacheDir.toString() + "/" + title + version + artist + ".png", simpleAdapter
+                                    ).execute()
+                                }
+
+                                val fromTrack = arrayOf("title", "coverUrl")
+                                val toTrack = arrayOf(R.id.title, R.id.cover)
+
+                                simpleAdapter = SimpleAdapter(view!!.context, tracks, R.layout.list_single, fromTrack, toTrack.toIntArray())
+                                playlistView.adapter = simpleAdapter
+                            }
+                        }, Response.ErrorListener {error ->
+
+                        }
+                        ){
+                            @Throws(AuthFailureError::class)
+                            override fun getHeaders(): Map<String, String> {
+                                val params = HashMap<String, String>()
+                                params.put("Cookie", "connect.sid=" + sid)
+
+                                return params
+                            }
+                        }
+
+                        titleQueue.add(trackRequest)
+                    }else{
+                        //do song things
+
+                        println("get song")
+                        val url = "https://s3.amazonaws.com/data.monstercat.com/blobs/"  + itemValue.get("streamHash")
+                        println(url)
+
+                    }
 
                 }
 
