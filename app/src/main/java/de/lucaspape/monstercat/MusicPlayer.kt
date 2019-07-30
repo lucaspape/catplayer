@@ -1,19 +1,22 @@
 package de.lucaspape.monstercat
 
-import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Context.NOTIFICATION_SERVICE
+import android.content.Intent
+import android.content.IntentFilter
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Build
 import android.os.Handler
+import android.widget.RemoteViews
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.ContextCompat
 import java.lang.IndexOutOfBoundsException
 
 class MusicPlayer(private var context: Context, private var textView: TextView, private var seekBar: SeekBar) {
@@ -27,6 +30,24 @@ class MusicPlayer(private var context: Context, private var textView: TextView, 
     //notification var
     private val CHANNEL_ID = "Music Notification"
     private val NOTIFICATION_ID = 1
+
+    companion object{
+        @JvmStatic
+        val NOTIFICATION_PREVIOUS = "de.lucaspape.monstercat.previous"
+
+        @JvmStatic
+        val NOTIFICATION_DELETE = "de.lucaspape.monstercat.delete"
+
+        @JvmStatic
+        val NOTIFICATION_PAUSE = "de.lucaspape.monstercat.pause"
+
+        @JvmStatic
+        val NOTIFICATION_PLAY = "de.lucaspape.monstercat.play"
+
+        @JvmStatic
+        val NOTIFICATION_NEXT = "de.lucaspape.monstercat.next"
+    }
+
 
     fun play(){
         mediaPlayer.stop()
@@ -141,16 +162,28 @@ class MusicPlayer(private var context: Context, private var textView: TextView, 
 
     private fun showNotification(){
         createNotificationChannel()
+        val normalRemoteViews = RemoteViews(context.packageName, R.layout.notification_normal)
+        val expandedRemoteViews = RemoteViews(context.packageName, R.layout.notification_expanded)
+
         val notificationBuilder = NotificationCompat.Builder(context, CHANNEL_ID)
         notificationBuilder.setSmallIcon(R.drawable.ic_play_circle_filled_black_24dp)
-        notificationBuilder.setContentTitle("Monstercat")
-        notificationBuilder.setContentTitle("Notification (hint, its amazing)")
         notificationBuilder.setPriority(NotificationCompat.PRIORITY_LOW)
         notificationBuilder.setOngoing(true)
 
+        notificationBuilder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
+        notificationBuilder.setCustomContentView(normalRemoteViews)
+        notificationBuilder.setCustomBigContentView(expandedRemoteViews)
+
+        setListeners(expandedRemoteViews, context)
 
         val notificationManagerCompat = NotificationManagerCompat.from(context)
         notificationManagerCompat.notify(NOTIFICATION_ID, notificationBuilder.build())
+
+        context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_PREVIOUS))
+        context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_DELETE))
+        context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_PAUSE))
+        context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_PLAY))
+        context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_NEXT))
     }
 
     private fun createNotificationChannel(){
@@ -168,5 +201,47 @@ class MusicPlayer(private var context: Context, private var textView: TextView, 
 
         }
     }
+
+    fun setListeners(view:RemoteViews, context:Context){
+        val previous = Intent(NOTIFICATION_PREVIOUS)
+        val delete = Intent(NOTIFICATION_DELETE)
+        val pause = Intent(NOTIFICATION_PAUSE)
+        val play = Intent(NOTIFICATION_PLAY)
+        val next = Intent(NOTIFICATION_NEXT)
+
+        val pendingPrevious = PendingIntent.getBroadcast(context, 0, previous, PendingIntent.FLAG_CANCEL_CURRENT)
+        view.setOnClickPendingIntent(R.id.prevButton, pendingPrevious)
+
+        val pendingDelete = PendingIntent.getBroadcast(context, 0, delete, PendingIntent.FLAG_CANCEL_CURRENT)
+        view.setOnClickPendingIntent(R.id.closeButton, pendingDelete)
+
+        val pendingPause = PendingIntent.getBroadcast(context, 0, pause, PendingIntent.FLAG_CANCEL_CURRENT)
+        view.setOnClickPendingIntent(R.id.pauseButton, pendingPause)
+
+        val pendingPlay = PendingIntent.getBroadcast(context, 0, play, PendingIntent.FLAG_CANCEL_CURRENT)
+        view.setOnClickPendingIntent(R.id.playButton, pendingPlay)
+
+        val pendingNext = PendingIntent.getBroadcast(context, 0, next, PendingIntent.FLAG_CANCEL_CURRENT)
+        view.setOnClickPendingIntent(R.id.nextButton, pendingNext)
+    }
+
+    class IntentReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if(intent!!.action.equals(NOTIFICATION_PREVIOUS)){
+                println("prev")
+            }else if(intent.action.equals(NOTIFICATION_DELETE)){
+                println("del")
+            }else if(intent.action.equals(NOTIFICATION_PAUSE)){
+                println("pause")
+            }else if(intent.action.equals(NOTIFICATION_PLAY)){
+                val pauseButton = context
+                println("play")
+            }else if(intent.action.equals(NOTIFICATION_NEXT)){
+                println("next")
+            }
+        }
+    }
+
+
 
 }

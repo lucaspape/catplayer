@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="de.lucaspape.monstercat">
+          xmlns:tools="http://schemas.android.com/tools" package="de.lucaspape.monstercat">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -10,7 +10,18 @@
             android:label="@string/app_name"
             android:roundIcon="@drawable/ic_play_circle_filled_black_24dp"
             android:supportsRtl="true"
-            android:theme="@style/AppTheme">
+            android:theme="@style/AppTheme" tools:ignore="GoogleAppIndexingWarning">
+        <receiver android:name=".MusicPlayer$IntentReceiver">
+            <intent-filter>
+                <action android:name="de.lucaspape.monstercat.previous"/>
+                <action android:name="de.lucaspape.monstercat.delete"/>
+                <action android:name="de.lucaspape.monstercat.pause"/>
+                <action android:name="de.lucaspape.monstercat.play"/>
+                <action android:name="de.lucaspape.monstercat.next"/>
+                <action android:name="android.media.VOLUME_CHANGED_ACTION" />
+            </intent-filter>
+        </receiver>
+
         <activity
                 android:name=".MainActivity"
                 android:label="@string/app_name">
@@ -19,7 +30,10 @@
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+
+
         </activity>
+
     </application>
 
 </manifest>
