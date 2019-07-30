@@ -67,9 +67,15 @@ class MainActivity : AppCompatActivity() {
             println("Internet permission not granted!")
         }
 
+
         val homeFragment = HomeFragment.newInstance()
         openFragment(homeFragment)
 
+    }
+
+    override fun onBackPressed() {
+        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.nav_view)
+        bottomNavigationView.selectedItemId = R.id.navigation_home
     }
 
     class downloadCover(url:String, location:String, simpleAdapter: SimpleAdapter) : AsyncTask<Void, Void, String>() {

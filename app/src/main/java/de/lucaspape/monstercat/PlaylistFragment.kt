@@ -221,8 +221,9 @@ class PlaylistFragment : Fragment() {
                     }
 
                 }
-
             }
+
+
         }
     }
 
