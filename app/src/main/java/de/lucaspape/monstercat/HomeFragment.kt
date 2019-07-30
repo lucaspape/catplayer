@@ -59,6 +59,7 @@ class HomeFragment : Fragment() {
             var requestCount = 0
 
             val loadMax = 200
+            val tempList = Array<HashMap<String, Any?>>(loadMax, {HashMap<String, Any?>()})
             list = ArrayList<HashMap<String, Any?>>()
 
             //can only load 50 at a time
@@ -109,12 +110,7 @@ class HomeFragment : Fragment() {
                                 ).execute()
                             }
 
-                            list.add(hashMap)
-
-                            val oos = ObjectOutputStream(FileOutputStream(listFile))
-                            oos.writeObject(list)
-                            oos.flush()
-                            oos.close()
+                            tempList[i*50 + k] = hashMap
 
                         }
 
@@ -131,6 +127,15 @@ class HomeFragment : Fragment() {
             queue.addRequestFinishedListener<Any> {
                 finishedRequest++
                 if (finishedRequest == requestCount) {
+                    for(i in tempList.indices){
+                        list.add(tempList[i])
+                    }
+
+                    val oos = ObjectOutputStream(FileOutputStream(listFile))
+                    oos.writeObject(list)
+                    oos.flush()
+                    oos.close()
+
                     simpleAdapter = SimpleAdapter(view.context, list, R.layout.list_single, from, to.toIntArray())
                     simpleAdapter.notifyDataSetChanged()
                     musicList.adapter = simpleAdapter
