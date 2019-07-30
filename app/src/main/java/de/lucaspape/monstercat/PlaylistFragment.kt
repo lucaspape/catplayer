@@ -126,7 +126,6 @@ class PlaylistFragment : Fragment() {
                     queue.add(playlistRequest)
                     done = true
                 }
-
             }
 
             val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
