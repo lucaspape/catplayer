@@ -132,9 +132,14 @@ class MainActivity : AppCompatActivity() {
 
                         for(i in (0 until jsonArray.length())){
                             val searchSong = itemValue.get("title") as String + itemValue.get("version") as String
+                            println("searchsong: " + searchSong)
                             if(jsonArray.getJSONObject(i).getString("title") + jsonArray.getJSONObject(i).getString("version") == searchSong){
+                                if(jsonArray.getJSONObject(i).getBoolean("streamable")){
+                                    streamHash = jsonArray.getJSONObject(i).getJSONObject("albums").getString("streamHash")
+                                }else{
+                                    Toast.makeText(applicationContext, "Song not yet streamable!", Toast.LENGTH_SHORT).show()
 
-                                streamHash = jsonArray.getJSONObject(i).getJSONObject("albums").getString("streamHash")
+                                }
                             }
                         }
 
