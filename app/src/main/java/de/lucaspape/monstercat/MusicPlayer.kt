@@ -32,7 +32,7 @@ class MusicPlayer(private var textView: TextView, private var seekBar: SeekBar) 
             next()
         }
 
-        var seekbarUpdateHandler = Handler()
+        val seekbarUpdateHandler = Handler()
 
         val updateSeekBar = object : Runnable {
             override fun run() {

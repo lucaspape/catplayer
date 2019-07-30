@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ListView
 import android.widget.SimpleAdapter
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.android.volley.AuthFailureError
@@ -15,7 +16,9 @@ import com.android.volley.Response
 import org.json.JSONObject
 import com.android.volley.ParseError
 import com.android.volley.toolbox.*
+import org.json.JSONException
 import java.io.UnsupportedEncodingException
+import java.lang.reflect.InvocationTargetException
 
 class PlaylistFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
@@ -43,7 +46,8 @@ class PlaylistFragment : Fragment() {
         val password = settings.getSetting(view.context, "password")
 
         if(username == null || password == null){
-            println("password not set")
+            Toast.makeText(view.context, "Set your username and passwort in the settings!", Toast.LENGTH_SHORT)
+                .show()
         }else{
             val loginPostParams = JSONObject()
             loginPostParams.put("email", username)
@@ -56,8 +60,13 @@ class PlaylistFragment : Fragment() {
                 loginUrl, loginPostParams, Response.Listener {response ->
                     val headers = response.getJSONObject("headers")
 
-                    //get SID
-                    sid = headers.getString("Set-Cookie").substringBefore(';').replace("connect.sid=", "")
+                    try{
+                        //get SID
+                        sid = headers.getString("Set-Cookie").substringBefore(';').replace("connect.sid=", "")
+                    }catch (e: JSONException){
+                        println(headers)
+                        println(e)
+                    }
 
                 }, Response.ErrorListener {error ->
 
