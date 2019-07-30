@@ -57,7 +57,9 @@ class MainActivity : AppCompatActivity() {
 
         val musicList = findViewById<ListView>(R.id.musiclistview)
         val currentSongText = findViewById<TextView>(R.id.songCurrent)
-        val playButton = findViewById<Button>(R.id.playButton)
+        val playButton = findViewById<ImageButton>(R.id.playButton)
+        val backButton = findViewById<ImageButton>(R.id.backbutton)
+        val nextButton = findViewById<ImageButton>(R.id.nextbutton)
         val seekBar = findViewById<SeekBar>(R.id.seekBar)
 
         val list = ArrayList<HashMap<String,Any?>>()
@@ -151,7 +153,13 @@ class MainActivity : AppCompatActivity() {
             musicPlayer.toggleMusic()
         }
 
+        nextButton.setOnClickListener {
+            musicPlayer.next()
+        }
 
+        backButton.setOnClickListener {
+            musicPlayer.previous()
+        }
 
     }
 

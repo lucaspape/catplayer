@@ -93,6 +93,22 @@ class MusicPlayer(private var textView: TextView, private var seekBar: SeekBar) 
         }
     }
 
+    fun previous(){
+        if(currentSong != 0){
+            currentSong--
+
+            try{
+                if(playList[currentSong].isEmpty()){
+                    stop()
+                }else{
+                    play()
+                }
+            }catch (e:IndexOutOfBoundsException){
+                stop()
+            }
+        }
+    }
+
     fun addSong(url:String, title:String){
         playList.add(url)
         titleList.add(title)
