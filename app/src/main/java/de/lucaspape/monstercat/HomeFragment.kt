@@ -93,6 +93,11 @@ class HomeFragment : Fragment() {
 
                             }
 
+                            if(version == "null"){
+                                version = ""
+                            }
+
+
                             val hashMap = HashMap<String, Any?>()
 
                             hashMap.put("id", id)
@@ -232,7 +237,6 @@ class HomeFragment : Fragment() {
 
                         for (i in (0 until jsonArray.length())) {
                             val searchSong = itemValue.get("title") as String + itemValue.get("version") as String
-                            println("searchsong: " + searchSong)
                             if (jsonArray.getJSONObject(i).getString("title") + jsonArray.getJSONObject(i).getString(
                                     "version"
                                 ) == searchSong

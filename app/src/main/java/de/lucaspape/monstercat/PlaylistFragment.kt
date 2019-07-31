@@ -169,11 +169,15 @@ class PlaylistFragment : Fragment() {
                                 val playlistObject = jsonArray.getJSONObject(i)
 
                                 val title = playlistObject.getString("title")
-                                val version = playlistObject.getString("version")
+                                var version = playlistObject.getString("version")
                                 val artist = playlistObject.getString("artistsTitle")
                                 val coverUrl = playlistObject.getJSONObject("release").getString("coverUrl")
                                 val id = playlistObject.getString("_id")
                                 val streamHash = playlistObject.getJSONObject("albums").getString("streamHash")
+
+                                if(version == "null"){
+                                    version = ""
+                                }
 
                                 val trackHashMap = HashMap<String, Any?>()
                                 trackHashMap.put("title", title)
@@ -193,10 +197,10 @@ class PlaylistFragment : Fragment() {
                                     ).execute()
                                 }
 
-                                val fromTrack = arrayOf("title", "coverUrl")
+                                val fromTrack = arrayOf("shownTitle", "coverUrl")
                                 val toTrack = arrayOf(R.id.title, R.id.cover)
 
-                                simpleAdapter = SimpleAdapter(view!!.context, tracks, R.layout.list_single, fromTrack, toTrack.toIntArray())
+                                simpleAdapter = SimpleAdapter(view.context, tracks, R.layout.list_single, fromTrack, toTrack.toIntArray())
                                 playlistView.adapter = simpleAdapter
                             }
                         }, Response.ErrorListener {error ->
@@ -218,6 +222,13 @@ class PlaylistFragment : Fragment() {
 
                         val url = "https://s3.amazonaws.com/data.monstercat.com/blobs/"  + itemValue.get("streamHash")
                         val title = itemValue.get("shownTitle") as String
+
+                        Toast.makeText(
+                            view.context,
+                            itemValue.get("title") as String + " " + itemValue.get("version") as String + " added to playlist!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
                         MainActivity.musicPlayer!!.addSong(url, title)
 
                     }
