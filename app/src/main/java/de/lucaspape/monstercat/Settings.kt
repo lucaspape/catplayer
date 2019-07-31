@@ -43,9 +43,11 @@ class Settings(private val context: Context) {
 
     fun setDefaultSettings(overwrite: Boolean) {
         if (getSetting("audioQuality") == null) {
-            saveSetting("audioQuality", "mp3-320")
+            saveSetting("downloadType", "mp3")
+            saveSetting("downloadQuality", "320")
         } else if (overwrite) {
-            saveSetting("audioQuality", "mp3-320")
+            saveSetting("downloadType", "mp3")
+            saveSetting("downloadQuality", "320")
         }
 
     }

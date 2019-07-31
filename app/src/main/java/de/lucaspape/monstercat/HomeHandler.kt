@@ -1,8 +1,6 @@
 package de.lucaspape.monstercat
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.AsyncTask
 import android.view.View
 import android.widget.*
@@ -13,6 +11,7 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.model.LazyHeaders
 import com.bumptech.glide.request.target.Target
@@ -21,8 +20,6 @@ import org.json.JSONObject
 import java.io.*
 import java.lang.Exception
 import java.lang.reflect.InvocationTargetException
-import java.net.HttpURLConnection
-import java.net.URL
 
 class HomeHandler {
     private var sid = ""
@@ -75,7 +72,7 @@ class HomeHandler {
             for (i in (0 until loadMax / 50)) {
                 val url = "https://connect.monstercat.com/api/catalog/browse/?limit=50&skip=" + i * 50
 
-                val stringRequest = StringRequest(
+                val stringRequest = object: StringRequest(
                     Request.Method.GET, url,
                     Response.Listener<String> { response ->
                         val json = JSONObject(response)
@@ -88,6 +85,8 @@ class HomeHandler {
                             var coverUrl = ""
                             var version = ""
                             var songId = ""
+                            var downloadable = false
+                            var streamable = false
 
                             try {
                                 id = jsonArray.getJSONObject(k).getJSONObject("albums").getString("albumId")
@@ -96,6 +95,8 @@ class HomeHandler {
                                 coverUrl = jsonArray.getJSONObject(k).getJSONObject("release").getString("coverUrl")
                                 version = jsonArray.getJSONObject(k).getString("version")
                                 songId = jsonArray.getJSONObject(k).getString("_id")
+                                downloadable = jsonArray.getJSONObject(k).getBoolean("downloadable")
+                                streamable = jsonArray.getJSONObject(k).getBoolean("streamable")
                             } catch (e: InvocationTargetException) {
                             }
 
@@ -116,6 +117,8 @@ class HomeHandler {
 
                             hashMap.put("shownTitle", artist + " " + title + " " + version)
                             hashMap.put("songId", songId)
+                            hashMap.put("downloadable", downloadable)
+                            hashMap.put("streamable", streamable)
 
 
                             if (!File(view.context.cacheDir.toString() + "/" + title + version + artist + ".png").exists()) {
@@ -131,7 +134,17 @@ class HomeHandler {
                         }
 
                     },
-                    Response.ErrorListener { println("Error!") })
+                    Response.ErrorListener { println("Error!") }){
+                    @Throws(AuthFailureError::class)
+                    override fun getHeaders(): Map<String, String> {
+                        val params = HashMap<String, String>()
+                        if (sid != "") {
+                            params.put("Cookie", "connect.sid=" + sid)
+                        }
+
+                        return params
+                    }
+                }
 
                 // Add the request to the RequestQueue.
                 queue.add(stringRequest)
@@ -235,7 +248,9 @@ class HomeHandler {
                 val title = itemValue.get("title")
                 val artist = itemValue.get("artist")
                 val version = itemValue.get("version")
-                val downloadType = "mp3"
+
+                val settings = Settings(view.context)
+                val downloadType = settings.getSetting("downloadType")
 
                 val downloadLocation = view.context.filesDir.toString() + "/" + artist + title + version + "." + downloadType
 
@@ -331,29 +346,42 @@ class HomeHandler {
         val artist = listItem.get("artist")
         val coverUrl = listItem.get("coverUrl")
         val version = listItem.get("version")
-        val shownTitle = listItem.get("shownTitle")
+        val shownTitle = listItem.get("shownTitle") as String
+        val downloadable = listItem.get("downloadable") as Boolean
 
-        val downloadType = "mp3"
-        val downloadQuality = "320"
+        if(downloadable){
+            val settings = Settings(context)
 
-        val downloadUrl =
-            "https://connect.monstercat.com/api/release/" + albumId + "/download?method=download&type=" + downloadType + "_" +downloadQuality + "&track=" + id
+            val downloadType = settings.getSetting("downloadType")
+            val downloadQuality = settings.getSetting("downloadQuality")
 
-        val downloadLocation = context.filesDir.toString() + "/" + artist + title + version + "." + downloadType
-        if(!File(downloadLocation).exists()){
-            downloadSong(downloadUrl,downloadLocation , sid, context).execute()
+            val downloadUrl =
+                "https://connect.monstercat.com/api/release/" + albumId + "/download?method=download&type=" + downloadType + "_" +downloadQuality + "&track=" + id
+
+            val downloadLocation = context.filesDir.toString() + "/" + artist + title + version + "." + downloadType
+            if(!File(downloadLocation).exists()){
+                if(sid != ""){
+                    downloadSong(downloadUrl,downloadLocation, sid, shownTitle, context).execute()
+                }else{
+                    Toast.makeText(context, "Not signed in!", Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }else{
+                Toast.makeText(context, shownTitle + " already downloaded!", Toast.LENGTH_SHORT)
+                    .show()
+            }
         }else{
-            println("file already exists!")
+            Toast.makeText(context, shownTitle + " download not available!", Toast.LENGTH_SHORT)
+                .show()
         }
-
-
     }
 
-    class downloadSong(url:String, location:String, sid:String, context: Context) : AsyncTask<Void, Void, String>() {
+    class downloadSong(url:String, location:String, sid:String, shownTitle:String, context: Context) : AsyncTask<Void, Void, String>() {
         val url = url
         val location = location
         val context = context
         val sid = sid
+        val shownTitle = shownTitle
 
         override fun doInBackground(vararg params: Void?): String? {
             try {
@@ -362,28 +390,29 @@ class HomeHandler {
                     .addHeader("Cookie", "connect.sid=" + sid).build())
 
 
-                val downloadFile = Glide.with(context)
-                    .load(glideUrl)
-                    .downloadOnly(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
-                    .get()
+                try{
+                    val downloadFile = Glide.with(context)
+                        .load(glideUrl)
+                        .downloadOnly(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                        .get()
 
-                val destFile = File(location)
+                    val destFile = File(location)
 
-                val bufferedInputStream = BufferedInputStream(FileInputStream(downloadFile))
-                val bufferedOutputStream = BufferedOutputStream(FileOutputStream(destFile))
+                    val bufferedInputStream = BufferedInputStream(FileInputStream(downloadFile))
+                    val bufferedOutputStream = BufferedOutputStream(FileOutputStream(destFile))
 
-                val buffer = ByteArray(1024)
+                    val buffer = ByteArray(1024)
 
-                var len: Int
-                len = bufferedInputStream.read(buffer)
-                while (len > 0) {
-                    bufferedOutputStream.write(buffer, 0, len)
+                    var len: Int
                     len = bufferedInputStream.read(buffer)
+                    while (len > 0) {
+                        bufferedOutputStream.write(buffer, 0, len)
+                        len = bufferedInputStream.read(buffer)
+                    }
+                    bufferedOutputStream.flush()
+                    bufferedOutputStream.close()
+                }catch (e: GlideException){
                 }
-                bufferedOutputStream.flush()
-                bufferedOutputStream.close()
-
-                println("download complete!")
 
             } catch (e: IOException) {
                 // Log exception
@@ -400,6 +429,8 @@ class HomeHandler {
 
         override fun onPostExecute(result: String?) {
             super.onPostExecute(result)
+            Toast.makeText(context, shownTitle + " downloaded!", Toast.LENGTH_SHORT)
+                .show()
         }
     }
 
