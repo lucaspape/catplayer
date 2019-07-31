@@ -42,10 +42,10 @@ class PlaylistFragment : Fragment() {
         var simpleAdapter = SimpleAdapter(view.context, list, R.layout.list_single, from, to.toIntArray())
         playlistView.adapter = simpleAdapter
 
-        val settings = Settings()
+        val settings = Settings(view.context)
 
-        val username = settings.getSetting(view.context, "email")
-        val password = settings.getSetting(view.context, "password")
+        val username = settings.getSetting("email")
+        val password = settings.getSetting("password")
 
         if(username == null || password == null){
             Toast.makeText(view.context, "Set your username and passwort in the settings!", Toast.LENGTH_SHORT)

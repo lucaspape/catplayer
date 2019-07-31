@@ -28,9 +28,9 @@ class SettingsFragment: Fragment() {
             val username = usernameInput.text.toString()
             val password = passwordInput.text.toString()
 
-            val settings = Settings()
-            settings.saveSetting(view.context, "email", username)
-            settings.saveSetting(view.context, "password", password)
+            val settings = Settings(view.context)
+            settings.saveSetting("email", username)
+            settings.saveSetting("password", password)
 
             Toast.makeText(view.context, "Updated!", Toast.LENGTH_SHORT)
                 .show()
