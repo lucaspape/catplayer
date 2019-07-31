@@ -207,17 +207,18 @@ class HomeFragment : Fragment() {
         }
 
         val musicQueue = Volley.newRequestQueue(view.context)
-        val currentSongText = view.findViewById<TextView>(R.id.songCurrent)
+        val textview1 = view.findViewById<TextView>(R.id.songCurrent1)
+        val textview2 = view.findViewById<TextView>(R.id.songCurrent2)
         val playButton = view.findViewById<ImageButton>(R.id.playButton)
         val backButton = view.findViewById<ImageButton>(R.id.backbutton)
         val nextButton = view.findViewById<ImageButton>(R.id.nextbutton)
         val seekBar = view.findViewById<SeekBar>(R.id.seekBar)
 
         if(MainActivity.musicPlayer == null){
-            MainActivity.musicPlayer = MusicPlayer(view.context, currentSongText, seekBar)
+            MainActivity.musicPlayer = MusicPlayer(view.context, textview1, textview2, seekBar)
         }else{
             MainActivity.musicPlayer!!.setContext(view.context)
-            MainActivity.musicPlayer!!.setTextView(currentSongText)
+            MainActivity.musicPlayer!!.setTextView(textview1, textview2)
             MainActivity.musicPlayer!!.setSeekBar(seekBar)
 
         }

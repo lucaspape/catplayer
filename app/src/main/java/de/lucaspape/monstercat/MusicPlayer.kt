@@ -1,5 +1,6 @@
 package de.lucaspape.monstercat
 
+import android.animation.ValueAnimator
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -12,6 +13,10 @@ import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Build
 import android.os.Handler
+import android.text.method.ScrollingMovementMethod
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
+import android.view.animation.LinearInterpolator
 import android.widget.RemoteViews
 import android.widget.SeekBar
 import android.widget.TextView
@@ -19,7 +24,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import java.lang.IndexOutOfBoundsException
 
-class MusicPlayer(private var context: Context, private var textView: TextView, private var seekBar: SeekBar) {
+class MusicPlayer(private var context: Context, private var textView1: TextView, private var textView2:TextView, private var seekBar: SeekBar) {
 
     private var mediaPlayer = MediaPlayer()
     private var currentSong = 0
@@ -52,9 +57,11 @@ class MusicPlayer(private var context: Context, private var textView: TextView, 
         this.context = context
     }
 
-    fun setTextView(textView:TextView){
-        textView.text = this.textView.text
-        this.textView = textView
+    fun setTextView(textView1:TextView, textView2: TextView){
+        textView1.text = this.textView1.text
+        textView2.text = this.textView2.text
+        this.textView1 = textView1
+        this.textView2 = textView2
     }
 
     fun setSeekBar(seekBar: SeekBar){
@@ -85,7 +92,22 @@ class MusicPlayer(private var context: Context, private var textView: TextView, 
 
         playing = true
 
-        textView.text = titleList[currentSong]
+        textView1.text = titleList[currentSong] + "     "
+        textView2.text = titleList[currentSong] + "     "
+
+        val valueAnimator = ValueAnimator.ofFloat(0.0f, 1.0f)
+        valueAnimator.repeatCount = Animation.INFINITE
+        valueAnimator.interpolator = LinearInterpolator()
+        valueAnimator.setDuration(9000L)
+        valueAnimator.addUpdateListener { animation->
+            val progress = animation.getAnimatedValue() as Float
+            val width = textView1.width
+            val translationX = width * progress
+            textView1.translationX = translationX
+            textView2.translationX = translationX - width
+        }
+
+        valueAnimator.start()
 
         mediaPlayer.setOnCompletionListener {
             next()
@@ -120,7 +142,8 @@ class MusicPlayer(private var context: Context, private var textView: TextView, 
 
     fun stop(){
         playing = false
-        textView.text = ""
+        textView1.text = ""
+        textView2.text = ""
         mediaPlayer.stop()
     }
 
