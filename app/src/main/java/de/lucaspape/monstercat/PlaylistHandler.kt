@@ -1,5 +1,7 @@
 package de.lucaspape.monstercat
 
+import android.content.Context
+import android.os.AsyncTask
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ListView
@@ -11,15 +13,19 @@ import com.android.volley.toolbox.HttpHeaderParser
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.load.model.GlideUrl
+import com.bumptech.glide.load.model.LazyHeaders
+import com.bumptech.glide.request.target.Target
 import org.json.JSONException
 import org.json.JSONObject
-import java.io.File
-import java.io.UnsupportedEncodingException
+import java.io.*
 
 class PlaylistHandler {
     private var sid = ""
 
-    fun login(view:View, queue:RequestQueue){
+    fun login(view: View, queue: RequestQueue) {
         val settings = Settings(view.context)
 
         val username = settings.getSetting("email")
@@ -31,22 +37,21 @@ class PlaylistHandler {
 
         val loginUrl = "https://connect.monstercat.com/v2/signin"
 
-        val loginPostRequest = object: JsonObjectRequest(Request.Method.POST,
+        val loginPostRequest = object : JsonObjectRequest(Request.Method.POST,
             loginUrl, loginPostParams, Response.Listener { response ->
                 val headers = response.getJSONObject("headers")
 
-                try{
+                try {
                     //get SID
                     sid = headers.getString("Set-Cookie").substringBefore(';').replace("connect.sid=", "")
-                }catch (e: JSONException){
+                } catch (e: JSONException) {
                     println(headers)
                     println(e)
                 }
 
             }, Response.ErrorListener { error ->
 
-            })
-        {
+            }) {
             override fun parseNetworkResponse(response: NetworkResponse?): Response<JSONObject> {
                 try {
                     val jsonResponse = JSONObject()
@@ -66,7 +71,7 @@ class PlaylistHandler {
         queue.add(loginPostRequest)
     }
 
-    fun loadPlaylist(view:View, queue:RequestQueue){
+    fun loadPlaylist(view: View, queue: RequestQueue) {
         val list = ArrayList<HashMap<String, Any?>>()
         val playlistView = view.findViewById<ListView>(R.id.listview)
 
@@ -77,12 +82,12 @@ class PlaylistHandler {
 
         val playlistUrl = "https://connect.monstercat.com/v2/self/playlists"
 
-        val playlistRequest = object: StringRequest(Request.Method.GET, playlistUrl, Response.Listener<String>
+        val playlistRequest = object : StringRequest(Request.Method.GET, playlistUrl, Response.Listener<String>
         { response ->
             val jsonObject = JSONObject(response)
             val jsonArray = jsonObject.getJSONArray("results")
 
-            for(i in (0 until jsonArray.length())){
+            for (i in (0 until jsonArray.length())) {
                 val playlistObject = jsonArray.getJSONObject(i)
                 val playlistName = playlistObject.getString("name")
                 val playlistId = playlistObject.getString("_id")
@@ -102,10 +107,10 @@ class PlaylistHandler {
                 playlistView.adapter = simpleAdapter
                 println("well ok")
             }
-        }, Response.ErrorListener {error ->
+        }, Response.ErrorListener { error ->
 
         }
-        ){
+        ) {
             @Throws(AuthFailureError::class)
             override fun getHeaders(): Map<String, String> {
                 val params = HashMap<String, String>()
@@ -119,14 +124,14 @@ class PlaylistHandler {
 
         queue.addRequestFinishedListener<Any> {
             //request playlist
-            if(!done){
+            if (!done) {
                 queue.add(playlistRequest)
                 done = true
             }
         }
     }
 
-    fun registerListViewClick(view:View){
+    fun registerListViewClick(view: View) {
         //TODO sort
         val list = ArrayList<HashMap<String, Any?>>()
         val playlistView = view.findViewById<ListView>(R.id.listview)
@@ -142,84 +147,120 @@ class PlaylistHandler {
 
                 val titleQueue = Volley.newRequestQueue(view!!.context)
 
-                if(itemValue.get("type") == "playlist"){
+                if (itemValue.get("type") == "playlist") {
                     val playlistName = itemValue.get("playlistName")
                     val playlistId = itemValue.get("playlistId")
                     println(playlistName)
 
-                    val playlistTrackUrl = "https://connect.monstercat.com/api/catalog/browse/?playlistId=" + playlistId + "&skip=0&limit=50"
+                    val playlistTrackUrl =
+                        "https://connect.monstercat.com/api/catalog/browse/?playlistId=" + playlistId + "&skip=0&limit=50"
                     val tracks = ArrayList<HashMap<String, Any?>>()
 
-                    val trackRequest = object: StringRequest(Request.Method.GET, playlistTrackUrl, Response.Listener<String>
-                    { response ->
-                        val jsonObject = JSONObject(response)
-                        val jsonArray = jsonObject.getJSONArray("results")
+                    val trackRequest =
+                        object : StringRequest(Request.Method.GET, playlistTrackUrl, Response.Listener<String>
+                        { response ->
+                            val jsonObject = JSONObject(response)
+                            val jsonArray = jsonObject.getJSONArray("results")
 
-                        for(i in (0 until jsonArray.length())){
-                            val playlistObject = jsonArray.getJSONObject(i)
+                            for (i in (0 until jsonArray.length())) {
+                                val playlistObject = jsonArray.getJSONObject(i)
 
-                            val title = playlistObject.getString("title")
-                            var version = playlistObject.getString("version")
-                            val artist = playlistObject.getString("artistsTitle")
-                            val coverUrl = playlistObject.getJSONObject("release").getString("coverUrl")
-                            val id = playlistObject.getString("_id")
-                            val streamHash = playlistObject.getJSONObject("albums").getString("streamHash")
+                                val title = playlistObject.getString("title")
+                                var version = playlistObject.getString("version")
+                                val artist = playlistObject.getString("artistsTitle")
+                                val coverUrl = playlistObject.getJSONObject("release").getString("coverUrl")
+                                val id = playlistObject.getString("_id")
+                                val albumId = playlistObject.getJSONObject("albums").getString("albumId")
+                                val streamHash = playlistObject.getJSONObject("albums").getString("streamHash")
+                                val downloadable = playlistObject.getBoolean("downloadable")
+                                val streamable = playlistObject.getBoolean("streamable")
 
-                            if(version == "null"){
-                                version = ""
+
+                                if (version == "null") {
+                                    version = ""
+                                }
+
+                                val trackHashMap = HashMap<String, Any?>()
+                                trackHashMap.put("title", title)
+                                trackHashMap.put("version", version)
+                                trackHashMap.put("artist", artist)
+                                trackHashMap.put(
+                                    "coverUrl",
+                                    view.context.cacheDir.toString() + "/" + title + version + artist + ".png"
+                                )
+                                trackHashMap.put("id", id)
+                                trackHashMap.put("streamHash", streamHash)
+                                trackHashMap.put("shownTitle", artist + " " + title + " " + version)
+                                trackHashMap.put("downloadable", downloadable)
+                                trackHashMap.put("streamable", streamable)
+                                trackHashMap.put("albumId", albumId)
+
+                                tracks.add(trackHashMap)
+
+                                if (!File(view.context.cacheDir.toString() + "/" + title + version + artist + ".png").exists()) {
+                                    MainActivity.downloadCover(
+                                        coverUrl + "?image_width=64",
+                                        view.context.cacheDir.toString() + "/" + title + version + artist + ".png",
+                                        simpleAdapter
+                                    ).execute()
+                                }
+
+                                val fromTrack = arrayOf("shownTitle", "coverUrl")
+                                val toTrack = arrayOf(R.id.title, R.id.cover)
+
+                                simpleAdapter = SimpleAdapter(
+                                    view.context,
+                                    tracks,
+                                    R.layout.list_single,
+                                    fromTrack,
+                                    toTrack.toIntArray()
+                                )
+                                playlistView.adapter = simpleAdapter
                             }
+                        }, Response.ErrorListener { error ->
 
-                            val trackHashMap = HashMap<String, Any?>()
-                            trackHashMap.put("title", title)
-                            trackHashMap.put("version", version)
-                            trackHashMap.put("artist", artist)
-                            trackHashMap.put("coverUrl", view.context.cacheDir.toString() + "/" + title + version + artist + ".png")
-                            trackHashMap.put("id", id)
-                            trackHashMap.put("streamHash", streamHash)
-                            trackHashMap.put("shownTitle", artist + " " + title + " " + version)
+                        }
+                        ) {
+                            @Throws(AuthFailureError::class)
+                            override fun getHeaders(): Map<String, String> {
+                                val params = HashMap<String, String>()
+                                params.put("Cookie", "connect.sid=" + sid)
 
-                            tracks.add(trackHashMap)
-
-                            if (!File(view.context.cacheDir.toString() + "/" + title + version + artist + ".png").exists()) {
-                                MainActivity.downloadCover(
-                                    coverUrl + "?image_width=64",
-                                    view.context.cacheDir.toString() + "/" + title + version + artist + ".png", simpleAdapter
-                                ).execute()
+                                return params
                             }
-
-                            val fromTrack = arrayOf("shownTitle", "coverUrl")
-                            val toTrack = arrayOf(R.id.title, R.id.cover)
-
-                            simpleAdapter = SimpleAdapter(view.context, tracks, R.layout.list_single, fromTrack, toTrack.toIntArray())
-                            playlistView.adapter = simpleAdapter
                         }
-                    }, Response.ErrorListener {error ->
-
-                    }
-                    ){
-                        @Throws(AuthFailureError::class)
-                        override fun getHeaders(): Map<String, String> {
-                            val params = HashMap<String, String>()
-                            params.put("Cookie", "connect.sid=" + sid)
-
-                            return params
-                        }
-                    }
 
                     titleQueue.add(trackRequest)
-                }else{
+                } else {
                     //do song things
 
-                    val url = "https://s3.amazonaws.com/data.monstercat.com/blobs/"  + itemValue.get("streamHash")
-                    val title = itemValue.get("shownTitle") as String
+                    val artist = itemValue.get("artist")
+                    val title = itemValue.get("title") as String
+                    val version = itemValue.get("version")
 
-                    Toast.makeText(
-                        view.context,
-                        itemValue.get("title") as String + " " + itemValue.get("version") as String + " added to playlist!",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    val settings = Settings(view.context)
 
-                    MainActivity.musicPlayer!!.addSong(url, title)
+                    val downloadType = settings.getSetting("downloadType")
+
+                    val downloadLocation =
+                        view.context.filesDir.toString() + "/" + artist + title + version + "." + downloadType
+
+                    if (File(downloadLocation).exists()) {
+                        MainActivity.musicPlayer!!.addSong(downloadLocation, title)
+                    } else {
+                        if (itemValue.get("streamable") as Boolean) {
+                            val url =
+                                "https://s3.amazonaws.com/data.monstercat.com/blobs/" + itemValue.get("streamHash")
+
+                            Toast.makeText(
+                                view.context,
+                                title + " " + version as String + " added to playlist!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+
+                            MainActivity.musicPlayer!!.addSong(url, title)
+                        }
+                    }
 
                 }
 
@@ -228,7 +269,110 @@ class PlaylistHandler {
     }
 
     //TODO implement
-    fun registerPullRefresh(view:View){
+    fun registerPullRefresh(view: View) {
         val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
+    }
+
+    fun downloadSong(context: Context, listItem: HashMap<String, Any?>) {
+        val id = listItem.get("id")
+        val albumId = listItem.get("albumId")
+        val title = listItem.get("title")
+        val artist = listItem.get("artist")
+        val coverUrl = listItem.get("coverUrl")
+        val version = listItem.get("version")
+        val shownTitle = listItem.get("shownTitle") as String
+        val downloadable = listItem.get("downloadable") as Boolean
+
+        if (downloadable) {
+            val settings = Settings(context)
+
+            val downloadType = settings.getSetting("downloadType")
+            val downloadQuality = settings.getSetting("downloadQuality")
+
+            val downloadUrl =
+                "https://connect.monstercat.com/api/release/" + albumId + "/download?method=download&type=" + downloadType + "_" + downloadQuality + "&track=" + id
+
+            val downloadLocation = context.filesDir.toString() + "/" + artist + title + version + "." + downloadType
+            if (!File(downloadLocation).exists()) {
+                if (sid != "") {
+                    downloadSong(downloadUrl, downloadLocation, sid, shownTitle, context).execute()
+                } else {
+                    Toast.makeText(context, "Not signed in!", Toast.LENGTH_SHORT)
+                        .show()
+                }
+            } else {
+                Toast.makeText(context, shownTitle + " already downloaded!", Toast.LENGTH_SHORT)
+                    .show()
+            }
+        } else {
+            Toast.makeText(context, shownTitle + " download not available!", Toast.LENGTH_SHORT)
+                .show()
+        }
+    }
+
+    //TODO implement
+    fun downloadPlaylist(context: Context, listItem: HashMap<String, Any?>) {
+
+    }
+
+    class downloadSong(url: String, location: String, sid: String, shownTitle: String, context: Context) :
+        AsyncTask<Void, Void, String>() {
+        val url = url
+        val location = location
+        val context = context
+        val sid = sid
+        val shownTitle = shownTitle
+
+        override fun doInBackground(vararg params: Void?): String? {
+            try {
+
+                val glideUrl = GlideUrl(
+                    url, LazyHeaders.Builder()
+                        .addHeader("Cookie", "connect.sid=" + sid).build()
+                )
+
+
+                try {
+                    val downloadFile = Glide.with(context)
+                        .load(glideUrl)
+                        .downloadOnly(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                        .get()
+
+                    val destFile = File(location)
+
+                    val bufferedInputStream = BufferedInputStream(FileInputStream(downloadFile))
+                    val bufferedOutputStream = BufferedOutputStream(FileOutputStream(destFile))
+
+                    val buffer = ByteArray(1024)
+
+                    var len: Int
+                    len = bufferedInputStream.read(buffer)
+                    while (len > 0) {
+                        bufferedOutputStream.write(buffer, 0, len)
+                        len = bufferedInputStream.read(buffer)
+                    }
+                    bufferedOutputStream.flush()
+                    bufferedOutputStream.close()
+                } catch (e: GlideException) {
+                }
+
+            } catch (e: IOException) {
+                // Log exception
+                return null
+            }
+
+            return null
+        }
+
+        override fun onPreExecute() {
+            super.onPreExecute()
+            // ...
+        }
+
+        override fun onPostExecute(result: String?) {
+            super.onPostExecute(result)
+            Toast.makeText(context, shownTitle + " downloaded!", Toast.LENGTH_SHORT)
+                .show()
+        }
     }
 }
