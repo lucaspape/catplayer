@@ -67,10 +67,8 @@ class MainActivity : AppCompatActivity() {
             println("Internet permission not granted!")
         }
 
-
         val homeFragment = HomeFragment.newInstance()
         openFragment(homeFragment)
-
     }
 
     override fun onBackPressed() {

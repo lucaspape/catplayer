@@ -1,5 +1,9 @@
 package de.lucaspape.monstercat
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.os.AsyncTask
 import android.view.View
 import android.widget.*
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -8,16 +12,22 @@ import com.android.volley.toolbox.HttpHeaderParser
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.model.GlideUrl
+import com.bumptech.glide.load.model.LazyHeaders
+import com.bumptech.glide.request.target.Target
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.*
 import java.lang.Exception
 import java.lang.reflect.InvocationTargetException
+import java.net.HttpURLConnection
+import java.net.URL
 
-class HomeHandler{
+class HomeHandler {
     private var sid = ""
 
-    fun loadTitlesFromCache(view:View){
+    fun loadTitlesFromCache(view: View) {
         val musicList = view.findViewById<ListView>(R.id.musiclistview)
 
         var list = ArrayList<HashMap<String, Any?>>()
@@ -44,7 +54,7 @@ class HomeHandler{
         }
     }
 
-    fun registerPullRefresh(view:View){
+    fun registerPullRefresh(view: View) {
         val musicList = view.findViewById<ListView>(R.id.musiclistview)
         var list = ArrayList<HashMap<String, Any?>>()
         val queue = Volley.newRequestQueue(view.context)
@@ -58,7 +68,7 @@ class HomeHandler{
             var requestCount = 0
 
             val loadMax = 200
-            val tempList = Array<HashMap<String, Any?>>(loadMax, {HashMap<String, Any?>()})
+            val tempList = Array<HashMap<String, Any?>>(loadMax, { HashMap<String, Any?>() })
             list = ArrayList<HashMap<String, Any?>>()
 
             //can only load 50 at a time
@@ -77,6 +87,7 @@ class HomeHandler{
                             var artist = ""
                             var coverUrl = ""
                             var version = ""
+                            var songId = ""
 
                             try {
                                 id = jsonArray.getJSONObject(k).getJSONObject("albums").getString("albumId")
@@ -84,14 +95,13 @@ class HomeHandler{
                                 artist = jsonArray.getJSONObject(k).getString("artistsTitle")
                                 coverUrl = jsonArray.getJSONObject(k).getJSONObject("release").getString("coverUrl")
                                 version = jsonArray.getJSONObject(k).getString("version")
+                                songId = jsonArray.getJSONObject(k).getString("_id")
                             } catch (e: InvocationTargetException) {
-
                             }
 
-                            if(version == "null"){
+                            if (version == "null") {
                                 version = ""
                             }
-
 
                             val hashMap = HashMap<String, Any?>()
 
@@ -105,16 +115,18 @@ class HomeHandler{
                             hashMap.put("version", version)
 
                             hashMap.put("shownTitle", artist + " " + title + " " + version)
+                            hashMap.put("songId", songId)
 
 
                             if (!File(view.context.cacheDir.toString() + "/" + title + version + artist + ".png").exists()) {
                                 MainActivity.downloadCover(
                                     coverUrl + "?image_width=64",
-                                    view.context.cacheDir.toString() + "/" + title + version + artist + ".png", simpleAdapter
+                                    view.context.cacheDir.toString() + "/" + title + version + artist + ".png",
+                                    simpleAdapter
                                 ).execute()
                             }
 
-                            tempList[i*50 + k] = hashMap
+                            tempList[i * 50 + k] = hashMap
 
                         }
 
@@ -131,7 +143,7 @@ class HomeHandler{
             queue.addRequestFinishedListener<Any> {
                 finishedRequest++
                 if (finishedRequest == requestCount) {
-                    for(i in tempList.indices){
+                    for (i in tempList.indices) {
                         list.add(tempList[i])
                     }
 
@@ -150,12 +162,12 @@ class HomeHandler{
         }
     }
 
-    fun login(view:View){
+    fun login(view: View) {
         val settings = Settings(view.context)
         val username = settings.getSetting("email")
         val password = settings.getSetting("password")
 
-        if(username != null || password != null){
+        if (username != null || password != null) {
             val loginPostParams = JSONObject()
             loginPostParams.put("email", username)
             loginPostParams.put("password", password)
@@ -163,22 +175,21 @@ class HomeHandler{
             val loginUrl = "https://connect.monstercat.com/v2/signin"
 
 
-            val loginPostRequest = object: JsonObjectRequest(Request.Method.POST,
-                loginUrl, loginPostParams, Response.Listener {response ->
+            val loginPostRequest = object : JsonObjectRequest(Request.Method.POST,
+                loginUrl, loginPostParams, Response.Listener { response ->
                     val headers = response.getJSONObject("headers")
 
-                    try{
+                    try {
                         //get SID
                         sid = headers.getString("Set-Cookie").substringBefore(';').replace("connect.sid=", "")
-                    }catch (e: JSONException){
+                    } catch (e: JSONException) {
                         println(headers)
                         println(e)
                     }
 
-                }, Response.ErrorListener {error ->
+                }, Response.ErrorListener { error ->
 
-                })
-            {
+                }) {
                 override fun parseNetworkResponse(response: NetworkResponse?): Response<JSONObject> {
                     try {
                         val jsonResponse = JSONObject()
@@ -200,88 +211,102 @@ class HomeHandler{
         }
     }
 
-    fun registerListViewClick(view:View){
+    fun registerListViewClick(view: View) {
         val musicQueue = Volley.newRequestQueue(view.context)
         val textview1 = view.findViewById<TextView>(R.id.songCurrent1)
         val textview2 = view.findViewById<TextView>(R.id.songCurrent2)
 
         val musicList = view.findViewById<ListView>(R.id.musiclistview)
 
-
         val seekBar = view.findViewById<SeekBar>(R.id.seekBar)
 
-        if(MainActivity.musicPlayer == null){
+        if (MainActivity.musicPlayer == null) {
             MainActivity.musicPlayer = MusicPlayer(view.context, textview1, textview2, seekBar)
-        }else{
+        } else {
             MainActivity.musicPlayer!!.setContext(view.context)
             MainActivity.musicPlayer!!.setTextView(textview1, textview2)
             MainActivity.musicPlayer!!.setSeekBar(seekBar)
-
         }
 
         musicList.onItemClickListener = object : AdapterView.OnItemClickListener {
             override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 val itemValue = musicList.getItemAtPosition(p2) as HashMap<String, Any?>
 
-                val streamHashUrl =
-                    "https://connect.monstercat.com/api/catalog/browse/?albumId=" + itemValue.get("id")
-                val streamHashRequest = object: StringRequest(
-                    Request.Method.GET, streamHashUrl,
-                    Response.Listener<String> { response ->
-                        val json = JSONObject(response)
-                        val jsonArray = json.getJSONArray("results")
-                        var streamHash = ""
+                val title = itemValue.get("title")
+                val artist = itemValue.get("artist")
+                val version = itemValue.get("version")
+                val downloadType = "mp3"
 
-                        for (i in (0 until jsonArray.length())) {
-                            val searchSong = itemValue.get("title") as String + itemValue.get("version") as String
-                            if (jsonArray.getJSONObject(i).getString("title") + jsonArray.getJSONObject(i).getString(
-                                    "version"
-                                ) == searchSong
-                            ) {
-                                if (jsonArray.getJSONObject(i).getBoolean("streamable")) {
-                                    streamHash =
-                                        jsonArray.getJSONObject(i).getJSONObject("albums").getString("streamHash")
-                                } else {
-                                    Toast.makeText(view.context, "Song not yet streamable!", Toast.LENGTH_SHORT)
-                                        .show()
+                val downloadLocation = view.context.filesDir.toString() + "/" + artist + title + version + "." + downloadType
 
+                if(!File(downloadLocation).exists()){
+                    val streamHashUrl =
+                        "https://connect.monstercat.com/api/catalog/browse/?albumId=" + itemValue.get("id")
+                    val streamHashRequest = object : StringRequest(
+                        Request.Method.GET, streamHashUrl,
+                        Response.Listener<String> { response ->
+                            val json = JSONObject(response)
+                            val jsonArray = json.getJSONArray("results")
+                            var streamHash = ""
+
+                            for (i in (0 until jsonArray.length())) {
+                                val searchSong = itemValue.get("title") as String + itemValue.get("version") as String
+                                if (jsonArray.getJSONObject(i).getString("title") + jsonArray.getJSONObject(i).getString(
+                                        "version"
+                                    ) == searchSong
+                                ) {
+                                    if (jsonArray.getJSONObject(i).getBoolean("streamable")) {
+                                        streamHash =
+                                            jsonArray.getJSONObject(i).getJSONObject("albums").getString("streamHash")
+                                    } else {
+                                        Toast.makeText(view.context, "Song not yet streamable!", Toast.LENGTH_SHORT)
+                                            .show()
+                                    }
                                 }
                             }
-                        }
 
-                        if (streamHash != "") {
-                            MainActivity.musicPlayer!!.addSong(
-                                "https://s3.amazonaws.com/data.monstercat.com/blobs/" + streamHash,
-                                itemValue.get("artist") as String + " " + itemValue.get("title") as String + " " + itemValue.get(
-                                    "version"
-                                ) as String
-                            )
-                            Toast.makeText(
-                                view.context,
-                                itemValue.get("title") as String + " " + itemValue.get("version") as String + " added to playlist!",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
+                            if (streamHash != "") {
+                                MainActivity.musicPlayer!!.addSong(
+                                    "https://s3.amazonaws.com/data.monstercat.com/blobs/" + streamHash,
+                                    itemValue.get("artist") as String + " " + itemValue.get("title") as String + " " + itemValue.get(
+                                        "version"
+                                    ) as String
+                                )
+                                Toast.makeText(
+                                    view.context,
+                                    itemValue.get("title") as String + " " + itemValue.get("version") as String + " added to playlist!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
 
-                    },
-                    Response.ErrorListener { println("Error!") }){
-                    @Throws(AuthFailureError::class)
-                    override fun getHeaders(): Map<String, String> {
-                        val params = HashMap<String, String>()
-                        if(sid != ""){
-                            params.put("Cookie", "connect.sid=" + sid)
-                        }
+                        },
+                        Response.ErrorListener { println("Error!") }) {
+                        @Throws(AuthFailureError::class)
+                        override fun getHeaders(): Map<String, String> {
+                            val params = HashMap<String, String>()
+                            if (sid != "") {
+                                params.put("Cookie", "connect.sid=" + sid)
+                            }
 
-                        return params
+                            return params
+                        }
                     }
+
+                    musicQueue.add(streamHashRequest)
+                }else{
+                    MainActivity.musicPlayer!!.addSong(
+                        downloadLocation,
+                        itemValue.get("artist") as String + " " + itemValue.get("title") as String + " " + itemValue.get(
+                            "version"
+                        ) as String
+                    )
                 }
 
-                musicQueue.add(streamHashRequest)
             }
         }
     }
 
-    fun registerButtons(view:View){
+    fun registerButtons(view: View) {
         val playButton = view.findViewById<ImageButton>(R.id.playButton)
         val backButton = view.findViewById<ImageButton>(R.id.backbutton)
         val nextButton = view.findViewById<ImageButton>(R.id.nextbutton)
@@ -298,4 +323,84 @@ class HomeHandler{
             MainActivity.musicPlayer!!.previous()
         }
     }
+
+    fun downloadSong(context: Context, listItem: HashMap<String, Any?>) {
+        val id = listItem.get("songId")
+        val albumId = listItem.get("id")
+        val title = listItem.get("title")
+        val artist = listItem.get("artist")
+        val coverUrl = listItem.get("coverUrl")
+        val version = listItem.get("version")
+        val shownTitle = listItem.get("shownTitle")
+
+        val downloadType = "mp3"
+        val downloadQuality = "320"
+
+        val downloadUrl =
+            "https://connect.monstercat.com/api/release/" + albumId + "/download?method=download&type=" + downloadType + "_" +downloadQuality + "&track=" + id
+
+        val downloadLocation = context.filesDir.toString() + "/" + artist + title + version + "." + downloadType
+        if(!File(downloadLocation).exists()){
+            downloadSong(downloadUrl,downloadLocation , sid, context).execute()
+        }else{
+            println("file already exists!")
+        }
+
+
+    }
+
+    class downloadSong(url:String, location:String, sid:String, context: Context) : AsyncTask<Void, Void, String>() {
+        val url = url
+        val location = location
+        val context = context
+        val sid = sid
+
+        override fun doInBackground(vararg params: Void?): String? {
+            try {
+
+                val glideUrl = GlideUrl(url, LazyHeaders.Builder()
+                    .addHeader("Cookie", "connect.sid=" + sid).build())
+
+
+                val downloadFile = Glide.with(context)
+                    .load(glideUrl)
+                    .downloadOnly(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                    .get()
+
+                val destFile = File(location)
+
+                val bufferedInputStream = BufferedInputStream(FileInputStream(downloadFile))
+                val bufferedOutputStream = BufferedOutputStream(FileOutputStream(destFile))
+
+                val buffer = ByteArray(1024)
+
+                var len: Int
+                len = bufferedInputStream.read(buffer)
+                while (len > 0) {
+                    bufferedOutputStream.write(buffer, 0, len)
+                    len = bufferedInputStream.read(buffer)
+                }
+                bufferedOutputStream.flush()
+                bufferedOutputStream.close()
+
+                println("download complete!")
+
+            } catch (e: IOException) {
+                // Log exception
+                return null
+            }
+
+            return null
+        }
+
+        override fun onPreExecute() {
+            super.onPreExecute()
+            // ...
+        }
+
+        override fun onPostExecute(result: String?) {
+            super.onPostExecute(result)
+        }
+    }
+
 }
