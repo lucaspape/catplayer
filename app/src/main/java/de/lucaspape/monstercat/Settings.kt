@@ -5,7 +5,7 @@ import java.io.*
 
 class Settings{
     fun getSetting(context: Context, key:String):String?{
-        val settingsFile = File(context.cacheDir.toString() + "/settings.map")
+        val settingsFile = File(context.filesDir.toString() + "/settings.map")
         if(settingsFile.exists()){
             val ois = ObjectInputStream(FileInputStream(settingsFile))
             val settingsMap = ois.readObject() as HashMap<String, String>
@@ -19,7 +19,7 @@ class Settings{
     }
 
     fun saveSetting(context: Context, key:String, setting:String){
-        val settingsFile = File(context.cacheDir.toString() + "/settings.map")
+        val settingsFile = File(context.filesDir.toString() + "/settings.map")
         var settingsMap = HashMap<String, String>()
 
         if(settingsFile.exists()){
