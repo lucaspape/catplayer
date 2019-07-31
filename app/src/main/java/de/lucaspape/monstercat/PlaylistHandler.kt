@@ -21,6 +21,7 @@ import com.bumptech.glide.request.target.Target
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.*
+import java.lang.Exception
 
 class PlaylistHandler {
     private var sid = ""
@@ -150,8 +151,8 @@ class PlaylistHandler {
                 if (itemValue.get("type") == "playlist") {
                     val playlistName = itemValue.get("playlistName")
                     val playlistId = itemValue.get("playlistId")
-                    println(playlistName)
 
+                    //TODO this only downloads 50 tracks
                     val playlistTrackUrl =
                         "https://connect.monstercat.com/api/catalog/browse/?playlistId=" + playlistId + "&skip=0&limit=50"
                     val tracks = ArrayList<HashMap<String, Any?>>()
@@ -312,6 +313,150 @@ class PlaylistHandler {
 
     //TODO implement
     fun downloadPlaylist(context: Context, listItem: HashMap<String, Any?>) {
+        val downloadTracks = ArrayList<HashMap<String, Any?>>()
+
+        val settings = Settings(context)
+
+        val downloadType = settings.getSetting("downloadType")
+        val downloadQuality = settings.getSetting("downloadQuality")
+
+        val playlistDownloadQueue = Volley.newRequestQueue(context)
+
+        //request playlist
+
+        val playlistId = listItem.get("playlistId")
+
+        val playlistTrackUrl =
+            "https://connect.monstercat.com/api/catalog/browse/?playlistId=" + playlistId + "&skip=0&limit=50"
+
+
+        val trackRequest =
+            object : StringRequest(Request.Method.GET, playlistTrackUrl, Response.Listener<String>
+            { response ->
+                val jsonObject = JSONObject(response)
+                val jsonArray = jsonObject.getJSONArray("results")
+
+                for (i in (0 until jsonArray.length())) {
+                    val playlistObject = jsonArray.getJSONObject(i)
+
+                    val downloadable = playlistObject.getBoolean("downloadable") as Boolean
+
+                    if(downloadable){
+                        val title = playlistObject.getString("title")
+                        var version = playlistObject.getString("version")
+                        val artist = playlistObject.getString("artistsTitle")
+                        val coverUrl = playlistObject.getJSONObject("release").getString("coverUrl")
+                        val id = playlistObject.getString("_id")
+                        val albumId = playlistObject.getJSONObject("albums").getString("albumId")
+                        val downloadLocation = context.filesDir.toString() + "/" + artist + title + version + "." + downloadType
+
+
+                        if (version == "null") {
+                            version = ""
+                        }
+
+                        val downloadUrl =
+                            "https://connect.monstercat.com/api/release/" + albumId + "/download?method=download&type=" + downloadType + "_" + downloadQuality + "&track=" + id
+
+                        val hashMap = HashMap<String, Any?>()
+                        hashMap.put("title", title)
+                        hashMap.put("version", version)
+                        hashMap.put("artist", artist)
+                        hashMap.put("coverUrl", coverUrl)
+                        hashMap.put("id", id)
+                        hashMap.put("albumId", albumId)
+                        hashMap.put("downloadable", downloadable)
+                        hashMap.put("downloadUrl", downloadUrl)
+                        hashMap.put("downloadLocation", downloadLocation)
+
+                        downloadTracks.add(hashMap)
+                    }else{
+                        //fu no download for you
+                    }
+
+
+                }
+            }, Response.ErrorListener { error ->
+
+            }
+            ) {
+                @Throws(AuthFailureError::class)
+                override fun getHeaders(): Map<String, String> {
+                    val params = HashMap<String, String>()
+                    params.put("Cookie", "connect.sid=" + sid)
+
+                    return params
+                }
+            }
+
+        playlistDownloadQueue.addRequestFinishedListener<Any> {
+            try{
+                downloadSongArray(downloadTracks, sid, context).execute()
+            }catch (e: Exception){
+
+            }
+
+        }
+
+        playlistDownloadQueue.add(trackRequest)
+    }
+
+    class downloadSongArray(tracks: ArrayList<HashMap<String, Any?>>, sid:String, context:Context):AsyncTask<Void, Void, String>(){
+        val tracks = tracks
+        val sid = sid
+        var context = context
+
+        override fun doInBackground(vararg p0: Void?): String? {
+            for(i in tracks.indices){
+                try {
+
+                    val location = tracks[i].get("downloadLocation") as String
+                    val url = tracks[i].get("downloadUrl") as String
+
+                    val glideUrl = GlideUrl(
+                        url, LazyHeaders.Builder()
+                            .addHeader("Cookie", "connect.sid=" + sid).build()
+                    )
+
+                    try {
+                        val downloadFile = Glide.with(context)
+                            .load(glideUrl)
+                            .downloadOnly(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                            .get()
+
+                        val destFile = File(location)
+
+                        val bufferedInputStream = BufferedInputStream(FileInputStream(downloadFile))
+                        val bufferedOutputStream = BufferedOutputStream(FileOutputStream(destFile))
+
+                        val buffer = ByteArray(1024)
+
+                        var len: Int
+                        len = bufferedInputStream.read(buffer)
+                        while (len > 0) {
+                            bufferedOutputStream.write(buffer, 0, len)
+                            len = bufferedInputStream.read(buffer)
+                        }
+                        bufferedOutputStream.flush()
+                        bufferedOutputStream.close()
+                    } catch (e: Exception) {
+                    }
+
+                } catch (e: IOException) {
+                    // Log exception
+                    return null
+                }
+            }
+
+            return null
+        }
+
+        override fun onPostExecute(result: String?) {
+            super.onPostExecute(result)
+
+            Toast.makeText(context, "Download of playlist finished!", Toast.LENGTH_SHORT)
+                .show()
+        }
 
     }
 
