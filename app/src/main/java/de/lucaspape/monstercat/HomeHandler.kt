@@ -1,6 +1,8 @@
 package de.lucaspape.monstercat
 
 import android.content.Context
+import android.content.res.Resources
+import android.graphics.drawable.Drawable
 import android.media.Image
 import android.os.AsyncTask
 import android.view.View
@@ -21,6 +23,7 @@ import java.lang.Exception
 import java.lang.reflect.InvocationTargetException
 
 class HomeHandler {
+
     fun loadTitlesFromCache(view: View) {
         val musicList = view.findViewById<ListView>(R.id.musiclistview)
 
@@ -198,6 +201,7 @@ class HomeHandler {
         val textview2 = view.findViewById<TextView>(R.id.songCurrent2)
         val coverBarImageView = view.findViewById<ImageView>(R.id.barCoverImage)
         val musicToolBar = view.findViewById<androidx.appcompat.widget.Toolbar>(R.id.muscicbar)
+        val playButton = view.findViewById<ImageButton>(R.id.playButton)
 
         val musicList = view.findViewById<ListView>(R.id.musiclistview)
 
@@ -205,13 +209,14 @@ class HomeHandler {
 
         if (MainActivity.musicPlayer == null) {
             MainActivity.musicPlayer =
-                MusicPlayer(view.context, textview1, textview2, seekBar, coverBarImageView, musicToolBar)
+                MusicPlayer(view.context, textview1, textview2, seekBar, coverBarImageView, musicToolBar, playButton)
         } else {
             MainActivity.musicPlayer!!.setContext(view.context)
             MainActivity.musicPlayer!!.setTextView(textview1, textview2)
             MainActivity.musicPlayer!!.setSeekBar(seekBar)
             MainActivity.musicPlayer!!.setBarCoverImageView(coverBarImageView)
             MainActivity.musicPlayer!!.setMusicBar(musicToolBar)
+            MainActivity.musicPlayer!!.setPlayButton(playButton)
         }
 
         musicList.onItemClickListener = object : AdapterView.OnItemClickListener {
@@ -266,6 +271,7 @@ class HomeHandler {
                                         itemValue.get("title") as String + " " + itemValue.get("version") as String + " added to playlist!",
                                         Toast.LENGTH_SHORT
                                     ).show()
+
                                 }
 
                             },

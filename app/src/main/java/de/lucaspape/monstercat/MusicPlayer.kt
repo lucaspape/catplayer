@@ -41,7 +41,7 @@ import java.util.*
 import kotlin.Comparator
 import kotlin.collections.ArrayList
 
-class MusicPlayer(private var context: Context, private var textView1: TextView, private var textView2:TextView ,private var seekBar: SeekBar, private var barCoverImage:ImageView, private var musicBar:androidx.appcompat.widget.Toolbar) {
+class MusicPlayer(private var context: Context, private var textView1: TextView, private var textView2:TextView ,private var seekBar: SeekBar, private var barCoverImage:ImageView, private var musicBar:androidx.appcompat.widget.Toolbar, private var playButton:ImageButton) {
 
     private var mediaPlayer = MediaPlayer()
     private var currentSong = 0
@@ -109,6 +109,11 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         musicBar = toolbar
     }
 
+    fun setPlayButton(button:ImageButton){
+        button.setImageDrawable(playButton.drawable)
+        playButton = button
+    }
+
     fun play(){
         mediaPlayer.stop()
         mediaPlayer = MediaPlayer()
@@ -172,9 +177,10 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
             }
 
             showNotification(titleList[currentSong], artistList[currentSong], coverList[currentSong], true)
+            playButton.setImageDrawable(context.resources.getDrawable(R.drawable.ic_pause_black_24dp))
         }catch (e: IndexOutOfBoundsException){
             //Something bad happend, resetting
-            MainActivity.musicPlayer = MusicPlayer(context, textView1, textView2, seekBar, barCoverImage, musicBar)
+            MainActivity.musicPlayer = MusicPlayer(context, textView1, textView2, seekBar, barCoverImage, musicBar, playButton)
         }
     }
 
@@ -182,15 +188,18 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         playing = false
         textView1.text = ""
         textView2.text = ""
+        playButton.setImageDrawable(context.resources.getDrawable(R.drawable.ic_play_arrow_black_24dp))
         mediaPlayer.stop()
     }
 
     fun pause(){
         mediaPlayer.pause()
         showNotification(titleList[currentSong], artistList[currentSong], coverList[currentSong], false)
+        playButton.setImageDrawable(context.resources.getDrawable(R.drawable.ic_play_arrow_black_24dp))
         playing = false
     }
 
+    //TODO catch index out of bounds exc
     fun resume(){
         val length = mediaPlayer.currentPosition
 
@@ -198,7 +207,7 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         mediaPlayer.start()
 
         showNotification(titleList[currentSong], artistList[currentSong], coverList[currentSong], true)
-
+        playButton.setImageDrawable(context.resources.getDrawable(R.drawable.ic_pause_black_24dp))
         playing = true
     }
 
