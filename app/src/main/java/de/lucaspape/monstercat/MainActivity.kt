@@ -88,10 +88,10 @@ class MainActivity : AppCompatActivity() {
 
         override fun doInBackground(vararg p0: Void?): String? {
             for(i in covers.indices){
-                val primaryResolution = covers[i].get("primaryRes") as Int
-                val secondaryResolution = covers[i].get("secondaryRes") as Int
+                val primaryResolution = covers[i].get("primaryRes") as String
+                val secondaryResolution = covers[i].get("secondaryRes") as String
 
-                val url = URL(covers[i].get("coverUrl") as String + "?image_width=" + primaryResolution.toString())
+                val url = URL(covers[i].get("coverUrl") as String + "?image_width=" + primaryResolution)
                 val location = covers[i].get("location") as String
 
                 println("Downloading... " + url.toString())
@@ -106,7 +106,7 @@ class MainActivity : AppCompatActivity() {
                     primaryBitmap!!.compress(Bitmap.CompressFormat.PNG, 100, out)
                 }
 
-                val secondaryBitmap = Bitmap.createScaledBitmap(primaryBitmap, secondaryResolution, secondaryResolution, false)
+                val secondaryBitmap = Bitmap.createScaledBitmap(primaryBitmap, secondaryResolution.toInt(), secondaryResolution.toInt(), false)
 
                 FileOutputStream(location + secondaryResolution.toString()).use { out ->
                     secondaryBitmap!!.compress(Bitmap.CompressFormat.PNG, 100, out)

@@ -56,6 +56,11 @@ class HomeHandler {
         val to = arrayOf(R.id.title, R.id.cover)
         var simpleAdapter = SimpleAdapter(view.context, list, R.layout.list_single, from, to.toIntArray())
 
+        val settings = Settings(view.context)
+
+        val primaryResolution = settings.getSetting("primaryCoverResolution")
+        val secondaryResolution = settings.getSetting("secondaryCoverResolution")
+
         val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
         swipeRefreshLayout.setOnRefreshListener {
             var requestCount = 0
@@ -74,9 +79,6 @@ class HomeHandler {
                     Response.Listener<String> { response ->
                         val json = JSONObject(response)
                         val jsonArray = json.getJSONArray("results")
-
-                        val primaryResolution = 512
-                        val secondaryResolution = 64
 
                         for (k in (0 until jsonArray.length())) {
                             var id = ""
@@ -127,7 +129,7 @@ class HomeHandler {
                             hashMap.put("streamable", streamable)
 
 
-                            if (!File(view.context.cacheDir.toString() + "/" + title + version + artist + ".png" + primaryResolution.toString()).exists()) {
+                            if (!File(view.context.cacheDir.toString() + "/" + title + version + artist + ".png" + primaryResolution).exists()) {
                                 val coverHashMap = HashMap<String, Any?>()
 
                                 coverHashMap.put("primaryRes", primaryResolution)
