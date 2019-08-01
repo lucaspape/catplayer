@@ -6,8 +6,6 @@ import android.view.View
 import android.widget.*
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.android.volley.*
-import com.android.volley.toolbox.HttpHeaderParser
-import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
@@ -15,15 +13,13 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.model.LazyHeaders
 import com.bumptech.glide.request.target.Target
-import org.json.JSONException
+import de.lucaspape.monstercat.MainActivity.Companion.sid
 import org.json.JSONObject
 import java.io.*
 import java.lang.Exception
 import java.lang.reflect.InvocationTargetException
 
 class HomeHandler {
-    private var sid = ""
-
     fun loadTitlesFromCache(view: View) {
         val musicList = view.findViewById<ListView>(R.id.musiclistview)
 
@@ -172,55 +168,6 @@ class HomeHandler {
                     swipeRefreshLayout.isRefreshing = false
                 }
             }
-        }
-    }
-
-    fun login(view: View) {
-        val settings = Settings(view.context)
-        val username = settings.getSetting("email")
-        val password = settings.getSetting("password")
-
-        if (username != null || password != null) {
-            val loginPostParams = JSONObject()
-            loginPostParams.put("email", username)
-            loginPostParams.put("password", password)
-
-            val loginUrl = "https://connect.monstercat.com/v2/signin"
-
-
-            val loginPostRequest = object : JsonObjectRequest(Request.Method.POST,
-                loginUrl, loginPostParams, Response.Listener { response ->
-                    val headers = response.getJSONObject("headers")
-
-                    try {
-                        //get SID
-                        sid = headers.getString("Set-Cookie").substringBefore(';').replace("connect.sid=", "")
-                    } catch (e: JSONException) {
-                        println(headers)
-                        println(e)
-                    }
-
-                }, Response.ErrorListener { error ->
-
-                }) {
-                override fun parseNetworkResponse(response: NetworkResponse?): Response<JSONObject> {
-                    try {
-                        val jsonResponse = JSONObject()
-                        jsonResponse.put("headers", JSONObject(response!!.headers as Map<*, *>))
-
-                        return Response.success(
-                            jsonResponse,
-                            HttpHeaderParser.parseCacheHeaders(response)
-                        )
-                    } catch (e: UnsupportedEncodingException) {
-
-                        return Response.error<JSONObject>(ParseError(e))
-                    }
-                }
-            }
-
-            val loginQueue = Volley.newRequestQueue(view.context)
-            loginQueue.add(loginPostRequest)
         }
     }
 

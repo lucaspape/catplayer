@@ -33,11 +33,7 @@ class PlaylistFragment : Fragment() {
             Toast.makeText(view.context, "Set your username and passwort in the settings!", Toast.LENGTH_SHORT)
                 .show()
         }else{
-            val queue = Volley.newRequestQueue(view.context)
-
-            playlistHandler.login(view, queue)
-
-            playlistHandler.loadPlaylist(view, queue)
+            playlistHandler.loadPlaylist(view)
 
             playlistHandler.registerPullRefresh(view)
 

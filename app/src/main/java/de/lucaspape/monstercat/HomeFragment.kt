@@ -28,7 +28,6 @@ class HomeFragment : Fragment() {
 
         homeHandler.registerPullRefresh(view)
 
-        homeHandler.login(view)
 
         homeHandler.registerListViewClick(view)
 

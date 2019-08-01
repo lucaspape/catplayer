@@ -21,6 +21,8 @@ class MainActivity : AppCompatActivity() {
     companion object{
         @JvmStatic
         var musicPlayer:MusicPlayer? = null
+        @JvmStatic
+        var sid = ""
     }
 
     private val onNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
@@ -66,6 +68,9 @@ class MainActivity : AppCompatActivity() {
             != PackageManager.PERMISSION_GRANTED) {
             println("Internet permission not granted!")
         }
+
+        val auth = Auth()
+        auth.login(this)
 
         val homeFragment = HomeFragment.newInstance()
         openFragment(homeFragment)
