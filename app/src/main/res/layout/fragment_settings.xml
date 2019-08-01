@@ -5,7 +5,7 @@
               android:orientation="vertical">
 
     <Button
-            android:text="Add Account"
+            android:text="@string/addaccount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/add_account" app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="8dp"

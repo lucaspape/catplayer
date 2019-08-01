@@ -385,7 +385,6 @@ class HomeHandler {
                         .addHeader("Cookie", "connect.sid=" + sid).build()
                 )
 
-
                 try {
                     val downloadFile = Glide.with(context)
                         .load(glideUrl)
