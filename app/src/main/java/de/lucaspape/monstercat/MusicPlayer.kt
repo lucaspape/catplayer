@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Context.NOTIFICATION_SERVICE
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.BitmapFactory
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
@@ -25,6 +26,7 @@ import android.widget.TextView
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
+import java.io.File
 import java.lang.IndexOutOfBoundsException
 
 class MusicPlayer(private var context: Context, private var textView1: TextView, private var textView2:TextView ,private var seekBar: SeekBar) {
@@ -222,7 +224,12 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         val normalRemoteViews = RemoteViews(context.packageName, R.layout.notification_normal)
         val expandedRemoteViews = RemoteViews(context.packageName, R.layout.notification_expanded)
 
-        expandedRemoteViews.setImageViewUri(R.id.coverimageview, Uri.parse(coverUrl))
+        val coverFile = File(coverUrl)
+        if(coverFile.exists()){
+            val bitmap = BitmapFactory.decodeFile(coverFile.absolutePath)
+            expandedRemoteViews.setImageViewBitmap(R.id.coverimageview, bitmap)
+        }
+        
         expandedRemoteViews.setTextViewText(R.id.songname, titleName)
 
         val notificationBuilder = NotificationCompat.Builder(context, CHANNEL_ID)
