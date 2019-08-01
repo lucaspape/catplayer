@@ -160,7 +160,10 @@ class PlaylistHandler {
                 if(done >= todo){
 
                     for(i in tempList.indices){
-                        list.add(tempList[i])
+                        if(!tempList[i].isEmpty()){
+                            list.add(tempList[i])
+                        }
+
                     }
 
                     MainActivity.downloadCoverArray(coverDownloadList, simpleAdapter).execute()
@@ -194,7 +197,7 @@ class PlaylistHandler {
             for(i in (0 .. (trackCount/50) +1)){
                 val playlistTrackUrl =
                     "https://connect.monstercat.com/api/catalog/browse/?playlistId=" + playlistId + "&skip=" + (i*50).toString() + "&limit=50"
-
+                println("https://connect.monstercat.com/api/catalog/browse/?playlistId=" + playlistId + "&skip=" + (i*50).toString() + "&limit=50")
                 val trackRequest =
                     object : StringRequest(Request.Method.GET, playlistTrackUrl, Response.Listener<String>
                     { response ->
@@ -205,55 +208,56 @@ class PlaylistHandler {
                             val playlistObject = jsonArray.getJSONObject(k)
 
                             val title = playlistObject.getString("title")
-                            var version = playlistObject.getString("version")
-                            val artist = playlistObject.getString("artistsTitle")
-                            val coverUrl = playlistObject.getJSONObject("release").getString("coverUrl")
-                            val id = playlistObject.getString("_id")
-                            val albumId = playlistObject.getJSONObject("albums").getString("albumId")
-                            val streamHash = playlistObject.getJSONObject("albums").getString("streamHash")
-                            val downloadable = playlistObject.getBoolean("downloadable")
-                            val streamable = playlistObject.getBoolean("streamable")
+
+                            if(title != "null"){
+                                var version = playlistObject.getString("version")
+                                val artist = playlistObject.getString("artistsTitle")
+                                val coverUrl = playlistObject.getJSONObject("release").getString("coverUrl")
+                                val id = playlistObject.getString("_id")
+                                val albumId = playlistObject.getJSONObject("albums").getString("albumId")
+                                val streamHash = playlistObject.getJSONObject("albums").getString("streamHash")
+                                val downloadable = playlistObject.getBoolean("downloadable")
+                                val streamable = playlistObject.getBoolean("streamable")
 
 
-                            if (version == "null") {
-                                version = ""
+                                if (version == "null") {
+                                    version = ""
+                                }
+
+                                val trackHashMap = HashMap<String, Any?>()
+                                trackHashMap.put("title", title)
+                                trackHashMap.put("version", version)
+                                trackHashMap.put("artist", artist)
+                                trackHashMap.put("coverUrl", coverUrl)
+                                trackHashMap.put("id", id)
+                                trackHashMap.put("streamHash", streamHash)
+                                trackHashMap.put("shownTitle", artist + " " + title + " " + version)
+                                trackHashMap.put("downloadable", downloadable)
+                                trackHashMap.put("streamable", streamable)
+                                trackHashMap.put("albumId", albumId)
+
+                                trackHashMap.put(
+                                    "primaryImage",
+                                    view.context.cacheDir.toString() + "/" + title + version + artist + ".png" + primaryResolution.toString()
+                                )
+
+                                trackHashMap.put(
+                                    "secondaryImage",
+                                    view.context.cacheDir.toString() + "/" + title + version + artist + ".png" + secondaryResolution.toString()
+                                )
+
+                                if (!File(view.context.cacheDir.toString() + "/" + title + version + artist + ".png" + primaryResolution).exists()) {
+                                    val coverHashMap = HashMap<String, Any?>()
+
+                                    coverHashMap.put("primaryRes", primaryResolution)
+                                    coverHashMap.put("secondaryRes", secondaryResolution)
+                                    coverHashMap.put("coverUrl", coverUrl)
+                                    coverHashMap.put("location", view.context.cacheDir.toString() + "/" + title + version + artist + ".png")
+                                    coverDownloadList.add(coverHashMap)
+                                }
+
+                                tempList[i*50 + k] = trackHashMap
                             }
-
-                            val trackHashMap = HashMap<String, Any?>()
-                            trackHashMap.put("title", title)
-                            trackHashMap.put("version", version)
-                            trackHashMap.put("artist", artist)
-                            trackHashMap.put("coverUrl", coverUrl)
-                            trackHashMap.put("id", id)
-                            trackHashMap.put("streamHash", streamHash)
-                            trackHashMap.put("shownTitle", artist + " " + title + " " + version)
-                            trackHashMap.put("downloadable", downloadable)
-                            trackHashMap.put("streamable", streamable)
-                            trackHashMap.put("albumId", albumId)
-
-                            trackHashMap.put(
-                                "primaryImage",
-                                view.context.cacheDir.toString() + "/" + title + version + artist + ".png" + primaryResolution.toString()
-                            )
-
-                            trackHashMap.put(
-                                "secondaryImage",
-                                view.context.cacheDir.toString() + "/" + title + version + artist + ".png" + secondaryResolution.toString()
-                            )
-
-                            if (!File(view.context.cacheDir.toString() + "/" + title + version + artist + ".png" + primaryResolution).exists()) {
-                                val coverHashMap = HashMap<String, Any?>()
-
-                                coverHashMap.put("primaryRes", primaryResolution)
-                                coverHashMap.put("secondaryRes", secondaryResolution)
-                                coverHashMap.put("coverUrl", coverUrl)
-                                coverHashMap.put("location", view.context.cacheDir.toString() + "/" + title + version + artist + ".png")
-                                coverDownloadList.add(coverHashMap)
-                            }
-
-                            tempList[i*50 + k] = trackHashMap
-
-
                         }
                     }, Response.ErrorListener { error ->
 
@@ -281,8 +285,6 @@ class PlaylistHandler {
     }
 
     fun registerListViewClick(view: View) {
-        //TODO sort
-
         val playlistView = view.findViewById<ListView>(R.id.listview)
 
 
@@ -332,7 +334,6 @@ class PlaylistHandler {
         }
     }
 
-    //TODO implement
     fun registerPullRefresh(view: View) {
         val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
         swipeRefreshLayout.setOnRefreshListener {
@@ -345,6 +346,7 @@ class PlaylistHandler {
 
                 loadPlaylist(view)
             }else{
+                println(view.context.cacheDir.toString() + "/" + currentPlaylist.get("playlistId") + ".list")
                 File(view.context.cacheDir.toString() + "/" + currentPlaylist.get("playlistId") + ".list").delete()
                 loadPlaylistTracks(view, currentPlaylist, listView)
             }

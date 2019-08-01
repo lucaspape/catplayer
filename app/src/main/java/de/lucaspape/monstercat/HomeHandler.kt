@@ -51,8 +51,7 @@ class HomeHandler {
             musicList.adapter = simpleAdapter
         }
     }
-
-    //TODO fix not loading
+    
     fun registerPullRefresh(view: View) {
         val musicList = view.findViewById<ListView>(R.id.musiclistview)
         var list = ArrayList<HashMap<String, Any?>>()
@@ -82,7 +81,10 @@ class HomeHandler {
                 finishedRequest++
                 if (finishedRequest == requestCount) {
                     for (i in tempList.indices) {
-                        list.add(tempList[i])
+                        if(!tempList[i].isEmpty()){
+                            list.add(tempList[i])
+                        }
+
                     }
 
                     //download cover arts
@@ -101,7 +103,7 @@ class HomeHandler {
                     swipeRefreshLayout.isRefreshing = false
                 }
             }
-            
+
             //can only load 50 at a time
             for (i in (0 until loadMax / 50)) {
                 val url = "https://connect.monstercat.com/api/catalog/browse/?limit=50&skip=" + i * 50
