@@ -21,49 +21,52 @@ class Auth {
         val username = settings.getSetting("email")
         val password = settings.getSetting("password")
 
-        val loginPostParams = JSONObject()
-        loginPostParams.put("email", username)
-        loginPostParams.put("password", password)
+        if(username != null && password != null) {
+            val loginPostParams = JSONObject()
+            loginPostParams.put("email", username)
+            loginPostParams.put("password", password)
 
-        val loginUrl = "https://connect.monstercat.com/v2/signin"
+            val loginUrl = "https://connect.monstercat.com/v2/signin"
 
-        val loginPostRequest = object : JsonObjectRequest(Request.Method.POST,
-            loginUrl, loginPostParams, Response.Listener { response ->
-                val headers = response.getJSONObject("headers")
+            val loginPostRequest = object : JsonObjectRequest(Request.Method.POST,
+                loginUrl, loginPostParams, Response.Listener { response ->
+                    val headers = response.getJSONObject("headers")
 
-                try {
-                    //get SID
-                    sid = headers.getString("Set-Cookie").substringBefore(';').replace("connect.sid=", "")
-                    Toast.makeText(
-                        context,
-                        "Login successful",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                } catch (e: JSONException) {
-                    println(headers)
-                    println(e)
-                }
+                    try {
+                        //get SID
+                        sid = headers.getString("Set-Cookie").substringBefore(';').replace("connect.sid=", "")
+                        Toast.makeText(
+                            context,
+                            "Login successful",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } catch (e: JSONException) {
+                        println(headers)
+                        println(e)
+                    }
 
-            }, Response.ErrorListener { error ->
+                }, Response.ErrorListener { error ->
 
-            }) {
-            override fun parseNetworkResponse(response: NetworkResponse?): Response<JSONObject> {
-                try {
-                    val jsonResponse = JSONObject()
-                    jsonResponse.put("headers", JSONObject(response!!.headers as Map<*, *>))
+                }) {
+                override fun parseNetworkResponse(response: NetworkResponse?): Response<JSONObject> {
+                    try {
+                        val jsonResponse = JSONObject()
+                        jsonResponse.put("headers", JSONObject(response!!.headers as Map<*, *>))
 
-                    return Response.success(
-                        jsonResponse,
-                        HttpHeaderParser.parseCacheHeaders(response)
-                    )
-                } catch (e: UnsupportedEncodingException) {
+                        return Response.success(
+                            jsonResponse,
+                            HttpHeaderParser.parseCacheHeaders(response)
+                        )
+                    } catch (e: UnsupportedEncodingException) {
 
-                    return Response.error<JSONObject>(ParseError(e))
+                        return Response.error<JSONObject>(ParseError(e))
+                    }
                 }
             }
+
+            val loginQueue = Volley.newRequestQueue(context)
+            loginQueue.add(loginPostRequest)
         }
 
-        val loginQueue = Volley.newRequestQueue(context)
-        loginQueue.add(loginPostRequest)
     }
 }

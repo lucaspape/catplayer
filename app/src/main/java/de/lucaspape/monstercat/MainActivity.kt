@@ -1,6 +1,7 @@
 package de.lucaspape.monstercat
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -81,10 +82,44 @@ class MainActivity : AppCompatActivity() {
         bottomNavigationView.selectedItemId = R.id.navigation_home
     }
 
+    class downloadCoverArray(covers: ArrayList<HashMap<String, Any?>>, simpleAdapter: SimpleAdapter):AsyncTask<Void, Void, String>(){
+        val covers = covers
+        val simpleAdapter = simpleAdapter
+
+        override fun doInBackground(vararg p0: Void?): String? {
+            for(i in covers.indices){
+                val url = URL(covers[i].get("coverUrl") as String)
+                val location = covers[i].get("location") as String
+
+                println("Downloading... " + url.toString())
+
+                val connection = url.openConnection() as HttpURLConnection
+                connection.doInput = true
+                connection.connect()
+                val input = connection.inputStream
+                val bitmap = BitmapFactory.decodeStream(input)
+
+                FileOutputStream(location).use { out ->
+                    bitmap!!.compress(Bitmap.CompressFormat.PNG, 100, out)
+                }
+
+                println("Finished download!")
+            }
+
+            return null
+        }
+
+        override fun onPostExecute(result: String?) {
+            super.onPostExecute(result)
+            simpleAdapter.notifyDataSetChanged()
+        }
+
+    }
+
     class downloadCover(url:String, location:String, simpleAdapter: SimpleAdapter) : AsyncTask<Void, Void, String>() {
         val url = url
         val location = location
-        var simpleAdapter = simpleAdapter
+        val simpleAdapter = simpleAdapter
 
         override fun doInBackground(vararg params: Void?): String? {
             try {

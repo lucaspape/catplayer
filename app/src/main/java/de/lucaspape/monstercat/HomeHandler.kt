@@ -61,6 +61,7 @@ class HomeHandler {
             var requestCount = 0
 
             val loadMax = 200
+            val coverDownloadList = ArrayList<HashMap<String, Any?>>()
             val tempList = Array<HashMap<String, Any?>>(loadMax, { HashMap<String, Any?>() })
             list = ArrayList<HashMap<String, Any?>>()
 
@@ -118,11 +119,10 @@ class HomeHandler {
 
 
                             if (!File(view.context.cacheDir.toString() + "/" + title + version + artist + ".png").exists()) {
-                                MainActivity.downloadCover(
-                                    coverUrl + "?image_width=64",
-                                    view.context.cacheDir.toString() + "/" + title + version + artist + ".png",
-                                    simpleAdapter
-                                ).execute()
+                                val coverHashMap = HashMap<String, Any?>()
+                                coverHashMap.put("coverUrl", coverUrl + "?image_width=512")
+                                coverHashMap.put("location", view.context.cacheDir.toString() + "/" + title + version + artist + ".png")
+                                coverDownloadList.add(coverHashMap)
                             }
 
                             tempList[i * 50 + k] = hashMap
@@ -155,6 +155,8 @@ class HomeHandler {
                     for (i in tempList.indices) {
                         list.add(tempList[i])
                     }
+
+                    MainActivity.downloadCoverArray(coverDownloadList, simpleAdapter).execute()
 
                     val oos = ObjectOutputStream(FileOutputStream(listFile))
                     oos.writeObject(list)
