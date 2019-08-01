@@ -229,7 +229,7 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
             val bitmap = BitmapFactory.decodeFile(coverFile.absolutePath)
             expandedRemoteViews.setImageViewBitmap(R.id.coverimageview, bitmap)
         }
-        
+
         expandedRemoteViews.setTextViewText(R.id.songname, titleName)
 
         val notificationBuilder = NotificationCompat.Builder(context, CHANNEL_ID)
