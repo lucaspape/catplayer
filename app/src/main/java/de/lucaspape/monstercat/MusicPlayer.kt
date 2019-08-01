@@ -30,6 +30,7 @@ import android.widget.TextView
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompatExtras
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
 import androidx.palette.graphics.Palette
 import java.io.File
@@ -232,19 +233,31 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
 
     private fun showNotification(titleName:String, coverUrl: String, playing:Boolean){
         createNotificationChannel()
-        val normalRemoteViews = RemoteViews(context.packageName, R.layout.notification_normal)
-        val expandedRemoteViews = RemoteViews(context.packageName, R.layout.notification_expanded)
 
         var backgroundColor = Color.WHITE
+        val expandedRemoteViews:RemoteViews
 
         val coverFile = File(coverUrl)
         if(coverFile.exists()){
             val bitmap = BitmapFactory.decodeFile(coverFile.absolutePath)
+            backgroundColor = getDominantColor(bitmap)
+
+            if(getTextColor(backgroundColor) == Color.WHITE){
+                expandedRemoteViews = RemoteViews(context.packageName, R.layout.notification_expanded_white)
+                expandedRemoteViews.setTextColor(R.id.songname, Color.WHITE)
+            }else{
+                expandedRemoteViews = RemoteViews(context.packageName, R.layout.notification_expanded)
+                expandedRemoteViews.setTextColor(R.id.songname, Color.BLACK)
+            }
+
             expandedRemoteViews.setImageViewBitmap(R.id.coverimageview, bitmap)
 
-            backgroundColor = getDominantColor(bitmap)
             expandedRemoteViews.setInt(R.id.notificationlayout, "setBackgroundColor", backgroundColor)
+        }else{
+            expandedRemoteViews = RemoteViews(context.packageName, R.layout.notification_expanded)
         }
+
+        val normalRemoteViews = RemoteViews(context.packageName, R.layout.notification_normal)
 
         expandedRemoteViews.setTextViewText(R.id.songname, titleName)
 
@@ -261,10 +274,8 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         notificationBuilder.setPriority(NotificationCompat.PRIORITY_LOW)
         notificationBuilder.setOngoing(true)
 
-        notificationBuilder.setColorized(true)
-        notificationBuilder.color = backgroundColor
-
-        expandedRemoteViews.setTextColor(R.id.songname, getTextColor(backgroundColor))
+        //notificationBuilder.setColorized(true)
+        //notificationBuilder.color = backgroundColor
 
         notificationBuilder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
         notificationBuilder.setCustomContentView(normalRemoteViews)
