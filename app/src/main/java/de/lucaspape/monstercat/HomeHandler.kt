@@ -195,6 +195,7 @@ class HomeHandler {
                 val title = itemValue.get("title")
                 val artist = itemValue.get("artist")
                 val version = itemValue.get("version")
+                val coverUrl = itemValue.get("coverUrl")
 
                 val streamable = itemValue.get("streamable") as Boolean
 
@@ -232,7 +233,7 @@ class HomeHandler {
                                         "https://s3.amazonaws.com/data.monstercat.com/blobs/" + streamHash,
                                         itemValue.get("artist") as String + " " + itemValue.get("title") as String + " " + itemValue.get(
                                             "version"
-                                        ) as String
+                                        ) as String, coverUrl as String
                                     )
                                     Toast.makeText(
                                         view.context,
@@ -260,7 +261,7 @@ class HomeHandler {
                             downloadLocation,
                             itemValue.get("artist") as String + " " + itemValue.get("title") as String + " " + itemValue.get(
                                 "version"
-                            ) as String
+                            ) as String, coverUrl as String
                         )
                     }
                 } else {

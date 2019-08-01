@@ -11,25 +11,29 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.media.AudioManager
 import android.media.MediaPlayer
+import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.text.method.ScrollingMovementMethod
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.view.animation.LinearInterpolator
+import android.widget.ImageView
 import android.widget.RemoteViews
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.net.toUri
 import java.lang.IndexOutOfBoundsException
 
-class MusicPlayer(private var context: Context, private var textView1: TextView, private var textView2:TextView, private var seekBar: SeekBar) {
+class MusicPlayer(private var context: Context, private var textView1: TextView, private var textView2:TextView ,private var seekBar: SeekBar) {
 
     private var mediaPlayer = MediaPlayer()
     private var currentSong = 0
     private var playList = ArrayList<String>()
     private var titleList = ArrayList<String>()
+    private var coverList = ArrayList<String>()
     private var playing = false
 
     //notification var
@@ -79,7 +83,6 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
 
         this.seekBar = seekBar
     }
-
 
     fun play(){
         mediaPlayer.stop()
@@ -136,7 +139,8 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
             }
         })
 
-        showNotification()
+        println(coverList[currentSong])
+        showNotification(titleList[currentSong], coverList[currentSong])
 
     }
 
@@ -191,9 +195,10 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         }
     }
 
-    fun addSong(url:String, title:String){
+    fun addSong(url:String, title:String, coverUrl:String){
         playList.add(url)
         titleList.add(title)
+        coverList.add(coverUrl)
 
         if(!playing){
             play()
@@ -208,10 +213,13 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         }
     }
 
-    private fun showNotification(){
+    private fun showNotification(titleName:String, coverUrl: String){
         createNotificationChannel()
         val normalRemoteViews = RemoteViews(context.packageName, R.layout.notification_normal)
         val expandedRemoteViews = RemoteViews(context.packageName, R.layout.notification_expanded)
+
+        expandedRemoteViews.setImageViewUri(R.id.coverimageview, Uri.parse(coverUrl))
+        expandedRemoteViews.setTextViewText(R.id.songname, titleName)
 
         val notificationBuilder = NotificationCompat.Builder(context, CHANNEL_ID)
         notificationBuilder.setSmallIcon(R.drawable.ic_play_circle_filled_black_24dp)
@@ -276,16 +284,18 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
     class IntentReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if(intent!!.action.equals(NOTIFICATION_PREVIOUS)){
-                println("prev")
+                MainActivity.musicPlayer!!.previous()
             }else if(intent.action.equals(NOTIFICATION_DELETE)){
+                val notificationManager = context!!.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                notificationManager.cancel(MainActivity.musicPlayer!!.NOTIFICATION_ID)
+                MainActivity.musicPlayer!!.pause()
                 println("del")
             }else if(intent.action.equals(NOTIFICATION_PAUSE)){
-                println("pause")
+                MainActivity.musicPlayer!!.pause()
             }else if(intent.action.equals(NOTIFICATION_PLAY)){
-                val pauseButton = context
-                println("play")
+                MainActivity.musicPlayer!!.toggleMusic()
             }else if(intent.action.equals(NOTIFICATION_NEXT)){
-                println("next")
+                MainActivity.musicPlayer!!.next()
             }
         }
     }

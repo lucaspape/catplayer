@@ -181,6 +181,7 @@ class PlaylistHandler {
                     val artist = itemValue.get("artist")
                     val title = itemValue.get("title") as String
                     val version = itemValue.get("version")
+                    val coverUrl = itemValue.get("coverUrl") as String
 
                     val settings = Settings(view.context)
 
@@ -190,7 +191,7 @@ class PlaylistHandler {
                         view.context.filesDir.toString() + "/" + artist + title + version + "." + downloadType
 
                     if (File(downloadLocation).exists()) {
-                        MainActivity.musicPlayer!!.addSong(downloadLocation, title)
+                        MainActivity.musicPlayer!!.addSong(downloadLocation, title, coverUrl)
                     } else {
                         if (itemValue.get("streamable") as Boolean) {
                             val url =
@@ -202,7 +203,7 @@ class PlaylistHandler {
                                 Toast.LENGTH_SHORT
                             ).show()
 
-                            MainActivity.musicPlayer!!.addSong(url, title)
+                            MainActivity.musicPlayer!!.addSong(url, title, coverUrl)
                         }
                     }
 
