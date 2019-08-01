@@ -76,6 +76,32 @@ class HomeHandler {
             val tempList = Array<HashMap<String, Any?>>(loadMax, { HashMap<String, Any?>() })
             list = ArrayList<HashMap<String, Any?>>()
 
+            //wait for all request to finish and sort
+            var finishedRequest = 0
+            queue.addRequestFinishedListener<Any> {
+                finishedRequest++
+                if (finishedRequest == requestCount) {
+                    for (i in tempList.indices) {
+                        list.add(tempList[i])
+                    }
+
+                    //download cover arts
+                    MainActivity.downloadCoverArray(coverDownloadList, simpleAdapter).execute()
+
+                    val oos = ObjectOutputStream(FileOutputStream(listFile))
+                    oos.writeObject(list)
+                    oos.flush()
+                    oos.close()
+
+                    //update listview
+                    simpleAdapter = SimpleAdapter(view.context, list, R.layout.list_single, from, to.toIntArray())
+                    simpleAdapter.notifyDataSetChanged()
+                    musicList.adapter = simpleAdapter
+
+                    swipeRefreshLayout.isRefreshing = false
+                }
+            }
+            
             //can only load 50 at a time
             for (i in (0 until loadMax / 50)) {
                 val url = "https://connect.monstercat.com/api/catalog/browse/?limit=50&skip=" + i * 50
@@ -170,31 +196,7 @@ class HomeHandler {
 
             }
 
-            //wait for all request to finish and sort
-            var finishedRequest = 0
-            queue.addRequestFinishedListener<Any> {
-                finishedRequest++
-                if (finishedRequest == requestCount) {
-                    for (i in tempList.indices) {
-                        list.add(tempList[i])
-                    }
 
-                    //download cover arts
-                    MainActivity.downloadCoverArray(coverDownloadList, simpleAdapter).execute()
-
-                    val oos = ObjectOutputStream(FileOutputStream(listFile))
-                    oos.writeObject(list)
-                    oos.flush()
-                    oos.close()
-
-                    //update listview
-                    simpleAdapter = SimpleAdapter(view.context, list, R.layout.list_single, from, to.toIntArray())
-                    simpleAdapter.notifyDataSetChanged()
-                    musicList.adapter = simpleAdapter
-
-                    swipeRefreshLayout.isRefreshing = false
-                }
-            }
         }
     }
 
