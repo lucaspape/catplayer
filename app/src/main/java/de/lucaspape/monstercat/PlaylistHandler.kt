@@ -149,6 +149,8 @@ class PlaylistHandler {
 
             currentPlaylist = itemValue
         }else{
+            val tempList = Array<HashMap<String, Any?>>(trackCount, { HashMap<String, Any?>() })
+
             val todo = (trackCount/50) + 1
             var done = 0
 
@@ -156,6 +158,11 @@ class PlaylistHandler {
                 done ++
 
                 if(done >= todo){
+
+                    for(i in tempList.indices){
+                        list.add(tempList[i])
+                    }
+
                     MainActivity.downloadCoverArray(coverDownloadList, simpleAdapter).execute()
                     currentPlaylist = itemValue
 
@@ -194,8 +201,8 @@ class PlaylistHandler {
                         val jsonObject = JSONObject(response)
                         val jsonArray = jsonObject.getJSONArray("results")
 
-                        for (i in (0 until jsonArray.length())) {
-                            val playlistObject = jsonArray.getJSONObject(i)
+                        for (k in (0 until jsonArray.length())) {
+                            val playlistObject = jsonArray.getJSONObject(k)
 
                             val title = playlistObject.getString("title")
                             var version = playlistObject.getString("version")
@@ -234,8 +241,6 @@ class PlaylistHandler {
                                 view.context.cacheDir.toString() + "/" + title + version + artist + ".png" + secondaryResolution.toString()
                             )
 
-                            list.add(trackHashMap)
-
                             if (!File(view.context.cacheDir.toString() + "/" + title + version + artist + ".png" + primaryResolution).exists()) {
                                 val coverHashMap = HashMap<String, Any?>()
 
@@ -245,6 +250,8 @@ class PlaylistHandler {
                                 coverHashMap.put("location", view.context.cacheDir.toString() + "/" + title + version + artist + ".png")
                                 coverDownloadList.add(coverHashMap)
                             }
+
+                            tempList[i*50 + k] = trackHashMap
 
 
                         }
