@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.*
 import android.widget.AdapterView
 import android.widget.ListView
-import androidx.core.view.get
 import androidx.fragment.app.Fragment
 
 class HomeFragment : Fragment() {
@@ -28,11 +27,9 @@ class HomeFragment : Fragment() {
 
         homeHandler.registerPullRefresh(view)
 
-
         homeHandler.registerListViewClick(view)
 
         homeHandler.registerButtons(view)
-
 
         registerForContextMenu(listView)
     }
