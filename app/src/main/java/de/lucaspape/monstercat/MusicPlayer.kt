@@ -1,6 +1,7 @@
 package de.lucaspape.monstercat
 
 import android.animation.ValueAnimator
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -9,7 +10,9 @@ import android.content.Context
 import android.content.Context.NOTIFICATION_SERVICE
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
@@ -25,10 +28,15 @@ import android.widget.RemoteViews
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationCompatExtras
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
+import androidx.palette.graphics.Palette
 import java.io.File
 import java.lang.IndexOutOfBoundsException
+import java.util.*
+import kotlin.Comparator
+import kotlin.collections.ArrayList
 
 class MusicPlayer(private var context: Context, private var textView1: TextView, private var textView2:TextView ,private var seekBar: SeekBar) {
 
@@ -143,7 +151,6 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
                 }
             })
 
-            println(coverList[currentSong])
             showNotification(titleList[currentSong], coverList[currentSong], true)
         }catch (e: IndexOutOfBoundsException){
             //Something bad happend, resetting
@@ -228,10 +235,15 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         val normalRemoteViews = RemoteViews(context.packageName, R.layout.notification_normal)
         val expandedRemoteViews = RemoteViews(context.packageName, R.layout.notification_expanded)
 
+        var backgroundColor = Color.WHITE
+
         val coverFile = File(coverUrl)
         if(coverFile.exists()){
             val bitmap = BitmapFactory.decodeFile(coverFile.absolutePath)
             expandedRemoteViews.setImageViewBitmap(R.id.coverimageview, bitmap)
+
+            backgroundColor = getDominantColor(bitmap)
+            expandedRemoteViews.setInt(R.id.notificationlayout, "setBackgroundColor", backgroundColor)
         }
 
         expandedRemoteViews.setTextViewText(R.id.songname, titleName)
@@ -248,6 +260,9 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         notificationBuilder.setSmallIcon(R.drawable.ic_play_circle_filled_black_24dp)
         notificationBuilder.setPriority(NotificationCompat.PRIORITY_LOW)
         notificationBuilder.setOngoing(true)
+
+        notificationBuilder.setColorized(true)
+        notificationBuilder.color = backgroundColor
 
         notificationBuilder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
         notificationBuilder.setCustomContentView(normalRemoteViews)
@@ -322,6 +337,18 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         }
     }
 
+    fun getDominantColor(bitmap: Bitmap):Int{
+        val swatchesTemp = Palette.from(bitmap).generate().swatches
+        val swatches = ArrayList<Palette.Swatch>(swatchesTemp)
+
+        Collections.sort(swatches, object:Comparator<Palette.Swatch>{
+            override fun compare(swatch1:Palette.Swatch, swatch2:Palette.Swatch):Int{
+                return swatch2.population - swatch1.population
+            }
+        })
+
+        return if (swatches.size > 0) swatches.get(0).getRgb() else Color.WHITE
+    }
 
 
 }

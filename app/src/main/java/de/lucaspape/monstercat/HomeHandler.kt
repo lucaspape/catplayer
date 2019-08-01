@@ -47,6 +47,7 @@ class HomeHandler {
         }
     }
 
+    //TODO fix not loading
     fun registerPullRefresh(view: View) {
         val musicList = view.findViewById<ListView>(R.id.musiclistview)
         var list = ArrayList<HashMap<String, Any?>>()
