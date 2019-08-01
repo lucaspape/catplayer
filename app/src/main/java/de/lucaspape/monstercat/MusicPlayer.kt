@@ -13,6 +13,8 @@ import android.content.IntentFilter
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.ColorDrawable
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.media.session.MediaSession
@@ -26,10 +28,7 @@ import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.view.animation.LinearInterpolator
-import android.widget.ImageView
-import android.widget.RemoteViews
-import android.widget.SeekBar
-import android.widget.TextView
+import android.widget.*
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompatExtras
 import androidx.core.app.NotificationManagerCompat
@@ -42,7 +41,7 @@ import java.util.*
 import kotlin.Comparator
 import kotlin.collections.ArrayList
 
-class MusicPlayer(private var context: Context, private var textView1: TextView, private var textView2:TextView ,private var seekBar: SeekBar) {
+class MusicPlayer(private var context: Context, private var textView1: TextView, private var textView2:TextView ,private var seekBar: SeekBar, private var barCoverImage:ImageView, private var musicBar:androidx.appcompat.widget.Toolbar) {
 
     private var mediaPlayer = MediaPlayer()
     private var currentSong = 0
@@ -97,6 +96,16 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         })
 
         this.seekBar = seekBar
+    }
+
+    fun setBarCoverImageView(imageView: ImageView){
+        imageView.setImageDrawable(barCoverImage.drawable)
+        this.barCoverImage = imageView
+    }
+
+    fun setMusicBar(toolbar:androidx.appcompat.widget.Toolbar){
+        toolbar.setBackgroundColor((musicBar.background as ColorDrawable).color)
+        musicBar = toolbar
     }
 
     fun play(){
@@ -155,10 +164,16 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
                 }
             })
 
+            val coverFile = File(coverList[currentSong])
+            if(coverFile.exists()){
+                val bitmap = BitmapFactory.decodeFile(coverFile.absolutePath)
+                barCoverImage.setImageBitmap(bitmap)
+            }
+
             showNotification(titleList[currentSong], coverList[currentSong], true)
         }catch (e: IndexOutOfBoundsException){
             //Something bad happend, resetting
-            MainActivity.musicPlayer = MusicPlayer(context, textView1, textView2, seekBar)
+            MainActivity.musicPlayer = MusicPlayer(context, textView1, textView2, seekBar, barCoverImage, musicBar)
         }
     }
 
@@ -282,7 +297,7 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
             //notificationBuilder.color = backgroundColor
 
             notificationBuilder.setStyle(Notification.DecoratedCustomViewStyle())
-            notificationBuilder.setCustomContentView(normalRemoteViews)
+            //notificationBuilder.setCustomContentView(normalRemoteViews)
             notificationBuilder.setCustomBigContentView(expandedRemoteViews)
 
             val mediaSession = MediaSession(context, "de.lucaspape.monstercat.music")

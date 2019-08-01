@@ -1,6 +1,7 @@
 package de.lucaspape.monstercat
 
 import android.content.Context
+import android.media.Image
 import android.os.AsyncTask
 import android.view.View
 import android.widget.*
@@ -192,17 +193,21 @@ class HomeHandler {
         val musicQueue = Volley.newRequestQueue(view.context)
         val textview1 = view.findViewById<TextView>(R.id.songCurrent1)
         val textview2 = view.findViewById<TextView>(R.id.songCurrent2)
+        val coverBarImageView = view.findViewById<ImageView>(R.id.barCoverImage)
+        val musicToolBar = view.findViewById<androidx.appcompat.widget.Toolbar>(R.id.muscicbar)
 
         val musicList = view.findViewById<ListView>(R.id.musiclistview)
 
         val seekBar = view.findViewById<SeekBar>(R.id.seekBar)
 
         if (MainActivity.musicPlayer == null) {
-            MainActivity.musicPlayer = MusicPlayer(view.context, textview1, textview2, seekBar)
+            MainActivity.musicPlayer = MusicPlayer(view.context, textview1, textview2, seekBar,coverBarImageView, musicToolBar)
         } else {
             MainActivity.musicPlayer!!.setContext(view.context)
             MainActivity.musicPlayer!!.setTextView(textview1, textview2)
             MainActivity.musicPlayer!!.setSeekBar(seekBar)
+            MainActivity.musicPlayer!!.setBarCoverImageView(coverBarImageView)
+            MainActivity.musicPlayer!!.setMusicBar(musicToolBar)
         }
 
         musicList.onItemClickListener = object : AdapterView.OnItemClickListener {
