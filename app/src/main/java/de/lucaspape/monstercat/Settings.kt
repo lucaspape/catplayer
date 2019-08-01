@@ -45,10 +45,14 @@ class Settings(private val context: Context) {
         if (getSetting("audioQuality") == null) {
             saveSetting("downloadType", "mp3")
             saveSetting("downloadQuality", "320")
-        } else if(getSetting("primaryCoverResolution") == null){
+        }
+
+        if(getSetting("primaryCoverResolution") == null){
             saveSetting("primaryCoverResolution", "512")
             saveSetting("secondaryCoverResolution", "64")
-        } else if (overwrite) {
+        }
+
+        if (overwrite) {
             saveSetting("downloadType", "mp3")
             saveSetting("downloadQuality", "320")
 

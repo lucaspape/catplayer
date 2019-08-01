@@ -83,6 +83,11 @@ class PlaylistHandler {
         val from = arrayOf("playlistName", "coverUrl")
         val to = arrayOf(R.id.title, R.id.cover)
 
+        val settings = Settings(view.context)
+
+        val primaryResolution = settings.getSetting("primaryCoverResolution")
+        val secondaryResolution = settings.getSetting("secondaryCoverResolution")
+
         var simpleAdapter = SimpleAdapter(view.context, list, R.layout.list_single, from, to.toIntArray())
 
         playlistView.onItemClickListener = object : AdapterView.OnItemClickListener {
@@ -94,6 +99,8 @@ class PlaylistHandler {
                 if (itemValue.get("type") == "playlist") {
                     val playlistName = itemValue.get("playlistName")
                     val playlistId = itemValue.get("playlistId")
+
+                    val coverDownloadList = ArrayList<HashMap<String, Any?>>()
 
                     //TODO this only downloads 50 tracks
                     val playlistTrackUrl =
@@ -128,10 +135,7 @@ class PlaylistHandler {
                                 trackHashMap.put("title", title)
                                 trackHashMap.put("version", version)
                                 trackHashMap.put("artist", artist)
-                                trackHashMap.put(
-                                    "coverUrl",
-                                    view.context.cacheDir.toString() + "/" + title + version + artist + ".png"
-                                )
+                                trackHashMap.put("coverUrl", coverUrl)
                                 trackHashMap.put("id", id)
                                 trackHashMap.put("streamHash", streamHash)
                                 trackHashMap.put("shownTitle", artist + " " + title + " " + version)
@@ -139,17 +143,29 @@ class PlaylistHandler {
                                 trackHashMap.put("streamable", streamable)
                                 trackHashMap.put("albumId", albumId)
 
+                                trackHashMap.put(
+                                    "primaryImage",
+                                    view.context.cacheDir.toString() + "/" + title + version + artist + ".png" + secondaryResolution.toString()
+                                )
+
+                                trackHashMap.put(
+                                    "secondaryImage",
+                                    view.context.cacheDir.toString() + "/" + title + version + artist + ".png" + secondaryResolution.toString()
+                                )
+
                                 tracks.add(trackHashMap)
 
-                                if (!File(view.context.cacheDir.toString() + "/" + title + version + artist + ".png").exists()) {
-                                    MainActivity.downloadCover(
-                                        coverUrl + "?image_width=64",
-                                        view.context.cacheDir.toString() + "/" + title + version + artist + ".png",
-                                        simpleAdapter
-                                    ).execute()
+                                if (!File(view.context.cacheDir.toString() + "/" + title + version + artist + ".png" + primaryResolution).exists()) {
+                                    val coverHashMap = HashMap<String, Any?>()
+
+                                    coverHashMap.put("primaryRes", primaryResolution)
+                                    coverHashMap.put("secondaryRes", secondaryResolution)
+                                    coverHashMap.put("coverUrl", coverUrl)
+                                    coverHashMap.put("location", view.context.cacheDir.toString() + "/" + title + version + artist + ".png")
+                                    coverDownloadList.add(coverHashMap)
                                 }
 
-                                val fromTrack = arrayOf("shownTitle", "coverUrl")
+                                val fromTrack = arrayOf("shownTitle", "secondaryImage")
                                 val toTrack = arrayOf(R.id.title, R.id.cover)
 
                                 simpleAdapter = SimpleAdapter(
@@ -174,6 +190,10 @@ class PlaylistHandler {
                             }
                         }
 
+                    titleQueue.addRequestFinishedListener<Any> {
+                        MainActivity.downloadCoverArray(coverDownloadList, simpleAdapter).execute()
+                    }
+
                     titleQueue.add(trackRequest)
                 } else {
                     //do song things
@@ -181,7 +201,9 @@ class PlaylistHandler {
                     val artist = itemValue.get("artist")
                     val title = itemValue.get("title") as String
                     val version = itemValue.get("version")
+                    val shownTitle = itemValue.get("shownTitle") as String
                     val coverUrl = itemValue.get("coverUrl") as String
+                    val primaryCoverImage = itemValue.get("primaryImage") as String
 
                     val settings = Settings(view.context)
 
@@ -203,7 +225,7 @@ class PlaylistHandler {
                                 Toast.LENGTH_SHORT
                             ).show()
 
-                            MainActivity.musicPlayer!!.addSong(url, title, coverUrl)
+                            MainActivity.musicPlayer!!.addSong(url, shownTitle, primaryCoverImage)
                         }
                     }
 
@@ -272,7 +294,6 @@ class PlaylistHandler {
 
         val playlistTrackUrl =
             "https://connect.monstercat.com/api/catalog/browse/?playlistId=" + playlistId + "&skip=0&limit=50"
-
 
         val trackRequest =
             object : StringRequest(Request.Method.GET, playlistTrackUrl, Response.Listener<String>
