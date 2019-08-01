@@ -26,7 +26,7 @@ class HomeHandler {
         var list = ArrayList<HashMap<String, Any?>>()
         val listFile = File(view.context.cacheDir.toString() + "/" + "songs.list")
 
-        val from = arrayOf("shownTitle", "coverUrl")
+        val from = arrayOf("shownTitle", "secondaryImage")
         val to = arrayOf(R.id.title, R.id.cover)
 
         var simpleAdapter = SimpleAdapter(view.context, list, R.layout.list_single, from, to.toIntArray())
@@ -52,7 +52,7 @@ class HomeHandler {
         var list = ArrayList<HashMap<String, Any?>>()
         val queue = Volley.newRequestQueue(view.context)
         val listFile = File(view.context.cacheDir.toString() + "/" + "songs.list")
-        val from = arrayOf("shownTitle", "coverUrl")
+        val from = arrayOf("shownTitle", "secondaryImage")
         val to = arrayOf(R.id.title, R.id.cover)
         var simpleAdapter = SimpleAdapter(view.context, list, R.layout.list_single, from, to.toIntArray())
 
@@ -74,6 +74,9 @@ class HomeHandler {
                     Response.Listener<String> { response ->
                         val json = JSONObject(response)
                         val jsonArray = json.getJSONArray("results")
+
+                        val primaryResolution = 512
+                        val secondaryResolution = 64
 
                         for (k in (0 until jsonArray.length())) {
                             var id = ""
@@ -107,9 +110,15 @@ class HomeHandler {
                             hashMap.put("title", title)
                             hashMap.put("artist", artist)
                             hashMap.put(
-                                "coverUrl",
-                                view.context.cacheDir.toString() + "/" + title + version + artist + ".png"
+                                "primaryImage",
+                                view.context.cacheDir.toString() + "/" + title + version + artist + ".png" + secondaryResolution.toString()
                             )
+
+                            hashMap.put(
+                                "secondaryImage",
+                                view.context.cacheDir.toString() + "/" + title + version + artist + ".png" + secondaryResolution.toString()
+                            )
+
                             hashMap.put("version", version)
 
                             hashMap.put("shownTitle", artist + " " + title + " " + version)
@@ -118,9 +127,12 @@ class HomeHandler {
                             hashMap.put("streamable", streamable)
 
 
-                            if (!File(view.context.cacheDir.toString() + "/" + title + version + artist + ".png").exists()) {
+                            if (!File(view.context.cacheDir.toString() + "/" + title + version + artist + ".png" + primaryResolution.toString()).exists()) {
                                 val coverHashMap = HashMap<String, Any?>()
-                                coverHashMap.put("coverUrl", coverUrl + "?image_width=512")
+
+                                coverHashMap.put("primaryRes", primaryResolution)
+                                coverHashMap.put("secondaryRes", secondaryResolution)
+                                coverHashMap.put("coverUrl", coverUrl)
                                 coverHashMap.put("location", view.context.cacheDir.toString() + "/" + title + version + artist + ".png")
                                 coverDownloadList.add(coverHashMap)
                             }
@@ -197,7 +209,8 @@ class HomeHandler {
                 val title = itemValue.get("title")
                 val artist = itemValue.get("artist")
                 val version = itemValue.get("version")
-                val coverUrl = itemValue.get("coverUrl")
+
+                val coverImage = itemValue.get("primaryImage")
 
                 val streamable = itemValue.get("streamable") as Boolean
 
@@ -235,7 +248,7 @@ class HomeHandler {
                                         "https://s3.amazonaws.com/data.monstercat.com/blobs/" + streamHash,
                                         itemValue.get("artist") as String + " " + itemValue.get("title") as String + " " + itemValue.get(
                                             "version"
-                                        ) as String, coverUrl as String
+                                        ) as String, coverImage as String
                                     )
                                     Toast.makeText(
                                         view.context,
@@ -263,7 +276,7 @@ class HomeHandler {
                             downloadLocation,
                             itemValue.get("artist") as String + " " + itemValue.get("title") as String + " " + itemValue.get(
                                 "version"
-                            ) as String, coverUrl as String
+                            ) as String, coverImage as String
                         )
                     }
                 } else {
@@ -297,7 +310,6 @@ class HomeHandler {
         val albumId = listItem.get("id")
         val title = listItem.get("title")
         val artist = listItem.get("artist")
-        val coverUrl = listItem.get("coverUrl")
         val version = listItem.get("version")
         val shownTitle = listItem.get("shownTitle") as String
         val downloadable = listItem.get("downloadable") as Boolean
