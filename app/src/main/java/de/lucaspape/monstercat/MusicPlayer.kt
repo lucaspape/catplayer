@@ -264,6 +264,8 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         notificationBuilder.setColorized(true)
         notificationBuilder.color = backgroundColor
 
+        expandedRemoteViews.setTextColor(R.id.songname, getTextColor(backgroundColor))
+
         notificationBuilder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
         notificationBuilder.setCustomContentView(normalRemoteViews)
         notificationBuilder.setCustomBigContentView(expandedRemoteViews)
@@ -348,6 +350,16 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         })
 
         return if (swatches.size > 0) swatches.get(0).getRgb() else Color.WHITE
+    }
+
+    fun getTextColor(background:Int):Int{
+        val backgroundRed = Color.red(background)
+        val backgroundGreen = Color.green(background)
+        val backgroundBlue = Color.blue(background)
+
+        val luma = ((0.299 * backgroundRed) + (0.587 * backgroundGreen) + (0.114 * backgroundBlue)) / 255;
+
+        return if (luma > 0.5) Color.BLACK else Color.WHITE
     }
 
 
