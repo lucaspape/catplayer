@@ -106,7 +106,7 @@
             app:layout_constraintEnd_toStartOf="@+id/backbutton" android:layout_marginEnd="8dp"
             app:layout_constraintTop_toTopOf="@+id/playButton"
             app:layout_constraintStart_toStartOf="@+id/muscicbar" android:layout_marginStart="8dp"
-            app:layout_constraintBottom_toBottomOf="@+id/playButton" app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintVertical_bias="1.0"/>
+            app:layout_constraintBottom_toBottomOf="@+id/playButton" app:layout_constraintHorizontal_bias="0.103"
+    />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
