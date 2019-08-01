@@ -27,6 +27,8 @@ class HomeFragment : Fragment() {
 
         homeHandler.registerPullRefresh(view)
 
+        homeHandler.setupMusicPlayer(view)
+
         homeHandler.registerListViewClick(view)
 
         homeHandler.registerButtons(view)
@@ -37,8 +39,7 @@ class HomeFragment : Fragment() {
     override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenu.ContextMenuInfo?) {
         super.onCreateContextMenu(menu, v, menuInfo)
 
-        //TODO replace string
-        menu!!.add(0, v!!.id, 0, "Download")
+        menu!!.add(0, v!!.id, 0, getString(R.string.download))
     }
 
     override fun onContextItemSelected(item: MenuItem?): Boolean {
@@ -47,8 +48,7 @@ class HomeFragment : Fragment() {
 
         val listItem = listView!!.getItemAtPosition(position) as HashMap<String, Any?>
 
-        //TODO replace string
-        if(item.title == "Download"){
+        if(item.title == getString(R.string.download)){
             homeHandler.downloadSong(context!!, listItem)
         }
 

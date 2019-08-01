@@ -16,6 +16,7 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.model.LazyHeaders
 import com.bumptech.glide.request.target.Target
+import de.lucaspape.monstercat.MainActivity.Companion.loggedIn
 import de.lucaspape.monstercat.MainActivity.Companion.sid
 import org.json.JSONObject
 import java.io.*
@@ -23,6 +24,7 @@ import java.lang.Exception
 
 class PlaylistHandler {
 
+    //TODO caching
     fun loadPlaylist(view: View) {
         val list = ArrayList<HashMap<String, Any?>>()
         val playlistView = view.findViewById<ListView>(R.id.listview)
@@ -65,14 +67,16 @@ class PlaylistHandler {
             @Throws(AuthFailureError::class)
             override fun getHeaders(): Map<String, String> {
                 val params = HashMap<String, String>()
-                params.put("Cookie", "connect.sid=" + sid)
+                if(loggedIn){
+                    params.put("Cookie", "connect.sid=" + sid)
+                }
 
                 return params
             }
         }
+
         val queue = Volley.newRequestQueue(view.context)
         queue.add(playlistRequest)
-
     }
 
     fun registerListViewClick(view: View) {
@@ -184,7 +188,9 @@ class PlaylistHandler {
                             @Throws(AuthFailureError::class)
                             override fun getHeaders(): Map<String, String> {
                                 val params = HashMap<String, String>()
-                                params.put("Cookie", "connect.sid=" + sid)
+                                if(loggedIn){
+                                    params.put("Cookie", "connect.sid=" + sid)
+                                }
 
                                 return params
                             }
@@ -241,12 +247,12 @@ class PlaylistHandler {
     }
 
     fun downloadSong(context: Context, listItem: HashMap<String, Any?>) {
-        val id = listItem.get("id")
-        val albumId = listItem.get("albumId")
-        val title = listItem.get("title")
-        val artist = listItem.get("artist")
-        val coverUrl = listItem.get("coverUrl")
-        val version = listItem.get("version")
+        val id = listItem.get("id") as String
+        val albumId = listItem.get("albumId") as String
+        val title = listItem.get("title") as String
+        val artist = listItem.get("artist") as String
+        val coverUrl = listItem.get("coverUrl") as String
+        val version = listItem.get("version") as String
         val shownTitle = listItem.get("shownTitle") as String
         val downloadable = listItem.get("downloadable") as Boolean
 
@@ -277,7 +283,6 @@ class PlaylistHandler {
         }
     }
 
-    //TODO implement
     fun downloadPlaylist(context: Context, listItem: HashMap<String, Any?>) {
         val downloadTracks = ArrayList<HashMap<String, Any?>>()
 
@@ -348,7 +353,9 @@ class PlaylistHandler {
                 @Throws(AuthFailureError::class)
                 override fun getHeaders(): Map<String, String> {
                     val params = HashMap<String, String>()
-                    params.put("Cookie", "connect.sid=" + sid)
+                    if(loggedIn){
+                        params.put("Cookie", "connect.sid=" + sid)
+                    }
 
                     return params
                 }

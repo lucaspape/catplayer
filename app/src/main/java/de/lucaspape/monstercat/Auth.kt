@@ -9,6 +9,7 @@ import com.android.volley.Response
 import com.android.volley.toolbox.HttpHeaderParser
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
+import de.lucaspape.monstercat.MainActivity.Companion.loggedIn
 import de.lucaspape.monstercat.MainActivity.Companion.sid
 import org.json.JSONException
 import org.json.JSONObject
@@ -35,14 +36,14 @@ class Auth {
                     try {
                         //get SID
                         sid = headers.getString("Set-Cookie").substringBefore(';').replace("connect.sid=", "")
+
                         Toast.makeText(
                             context,
                             "Login successful",
                             Toast.LENGTH_SHORT
                         ).show()
+
                     } catch (e: JSONException) {
-                        println(headers)
-                        println(e)
                     }
 
                 }, Response.ErrorListener { error ->
@@ -64,7 +65,16 @@ class Auth {
                 }
             }
 
+
             val loginQueue = Volley.newRequestQueue(context)
+
+            loginQueue.addRequestFinishedListener<Any> {
+                if(sid != ""){
+                    loggedIn = true
+                }
+            }
+
+            //add to queue
             loginQueue.add(loginPostRequest)
         }
 

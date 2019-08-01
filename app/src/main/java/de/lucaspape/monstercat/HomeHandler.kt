@@ -1,9 +1,6 @@
 package de.lucaspape.monstercat
 
 import android.content.Context
-import android.content.res.Resources
-import android.graphics.drawable.Drawable
-import android.media.Image
 import android.os.AsyncTask
 import android.view.View
 import android.widget.*
@@ -16,12 +13,16 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.model.LazyHeaders
 import com.bumptech.glide.request.target.Target
+import de.lucaspape.monstercat.MainActivity.Companion.loggedIn
 import de.lucaspape.monstercat.MainActivity.Companion.sid
 import org.json.JSONObject
 import java.io.*
 import java.lang.Exception
 import java.lang.reflect.InvocationTargetException
 
+/**
+ * Does everything for the home page
+ */
 class HomeHandler {
 
     fun loadTitlesFromCache(view: View) {
@@ -156,20 +157,20 @@ class HomeHandler {
                     @Throws(AuthFailureError::class)
                     override fun getHeaders(): Map<String, String> {
                         val params = HashMap<String, String>()
-                        if (sid != "") {
+                        if (loggedIn) {
                             params.put("Cookie", "connect.sid=" + sid)
                         }
-
                         return params
                     }
                 }
 
-                // Add the request to the RequestQueue.
+                // Add the request to the RequestQueue
                 queue.add(stringRequest)
                 requestCount++
 
             }
 
+            //wait for all request to finish and sort
             var finishedRequest = 0
             queue.addRequestFinishedListener<Any> {
                 finishedRequest++
@@ -178,6 +179,7 @@ class HomeHandler {
                         list.add(tempList[i])
                     }
 
+                    //download cover arts
                     MainActivity.downloadCoverArray(coverDownloadList, simpleAdapter).execute()
 
                     val oos = ObjectOutputStream(FileOutputStream(listFile))
@@ -185,6 +187,7 @@ class HomeHandler {
                     oos.flush()
                     oos.close()
 
+                    //update listview
                     simpleAdapter = SimpleAdapter(view.context, list, R.layout.list_single, from, to.toIntArray())
                     simpleAdapter.notifyDataSetChanged()
                     musicList.adapter = simpleAdapter
@@ -195,18 +198,15 @@ class HomeHandler {
         }
     }
 
-    fun registerListViewClick(view: View) {
-        val musicQueue = Volley.newRequestQueue(view.context)
+    fun setupMusicPlayer(view: View) {
         val textview1 = view.findViewById<TextView>(R.id.songCurrent1)
         val textview2 = view.findViewById<TextView>(R.id.songCurrent2)
         val coverBarImageView = view.findViewById<ImageView>(R.id.barCoverImage)
         val musicToolBar = view.findViewById<androidx.appcompat.widget.Toolbar>(R.id.muscicbar)
         val playButton = view.findViewById<ImageButton>(R.id.playButton)
-
-        val musicList = view.findViewById<ListView>(R.id.musiclistview)
-
         val seekBar = view.findViewById<SeekBar>(R.id.seekBar)
 
+        //setup musicPlayer
         if (MainActivity.musicPlayer == null) {
             MainActivity.musicPlayer =
                 MusicPlayer(view.context, textview1, textview2, seekBar, coverBarImageView, musicToolBar, playButton)
@@ -218,23 +218,28 @@ class HomeHandler {
             MainActivity.musicPlayer!!.setMusicBar(musicToolBar)
             MainActivity.musicPlayer!!.setPlayButton(playButton)
         }
+    }
+
+    fun registerListViewClick(view: View) {
+        val musicQueue = Volley.newRequestQueue(view.context)
+        val musicList = view.findViewById<ListView>(R.id.musiclistview)
 
         musicList.onItemClickListener = object : AdapterView.OnItemClickListener {
             override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 val itemValue = musicList.getItemAtPosition(p2) as HashMap<String, Any?>
 
-                val title = itemValue.get("title")
-                val artist = itemValue.get("artist")
-                val version = itemValue.get("version")
+                val title = itemValue.get("title") as String
+                val artist = itemValue.get("artist") as String
+                val version = itemValue.get("version") as String
 
-                val coverImage = itemValue.get("primaryImage")
+                val coverImage = itemValue.get("primaryImage") as String
 
                 val streamable = itemValue.get("streamable") as Boolean
 
-                if (streamable) {
-                    val settings = Settings(view.context)
-                    val downloadType = settings.getSetting("downloadType")
+                val settings = Settings(view.context)
+                val downloadType = settings.getSetting("downloadType")
 
+                if (streamable) {
                     val downloadLocation =
                         view.context.filesDir.toString() + "/" + artist + title + version + "." + downloadType
 
@@ -246,11 +251,13 @@ class HomeHandler {
                             Response.Listener<String> { response ->
                                 val json = JSONObject(response)
                                 val jsonArray = json.getJSONArray("results")
+
+                                //trying to retreive streamHash
                                 var streamHash = ""
 
+                                //search entire album for corrent song
                                 for (i in (0 until jsonArray.length())) {
-                                    val searchSong =
-                                        itemValue.get("title") as String + itemValue.get("version") as String
+                                    val searchSong = title + version
                                     if (jsonArray.getJSONObject(i).getString("title") + jsonArray.getJSONObject(i).getString(
                                             "version"
                                         ) == searchSong
@@ -263,12 +270,14 @@ class HomeHandler {
                                 if (streamHash != "") {
                                     MainActivity.musicPlayer!!.addSong(
                                         "https://s3.amazonaws.com/data.monstercat.com/blobs/" + streamHash,
-                                        title as String + " " + version as String,
-                                        artist as String, coverImage as String
+                                        title + " " + version,
+                                        artist,
+                                        coverImage
                                     )
+
                                     Toast.makeText(
                                         view.context,
-                                        itemValue.get("title") as String + " " + itemValue.get("version") as String + " added to playlist!",
+                                        title + " " + version + " added to playlist!",
                                         Toast.LENGTH_SHORT
                                     ).show()
 
@@ -279,10 +288,9 @@ class HomeHandler {
                             @Throws(AuthFailureError::class)
                             override fun getHeaders(): Map<String, String> {
                                 val params = HashMap<String, String>()
-                                if (sid != "") {
+                                if (loggedIn) {
                                     params.put("Cookie", "connect.sid=" + sid)
                                 }
-
                                 return params
                             }
                         }
@@ -291,9 +299,7 @@ class HomeHandler {
                     } else {
                         MainActivity.musicPlayer!!.addSong(
                             downloadLocation,
-                            itemValue.get("title") as String + " " + itemValue.get(
-                                "version"
-                            ) as String, artist as String, coverImage as String
+                            title + " " + version, artist, coverImage
                         )
                     }
                 } else {
@@ -323,11 +329,14 @@ class HomeHandler {
     }
 
     fun downloadSong(context: Context, listItem: HashMap<String, Any?>) {
-        val id = listItem.get("songId")
-        val albumId = listItem.get("id")
-        val title = listItem.get("title")
-        val artist = listItem.get("artist")
-        val version = listItem.get("version")
+        val id = listItem.get("songId") as String
+
+        //TODO albumid == id is confusing
+        val albumId = listItem.get("id") as String
+
+        val title = listItem.get("title") as String
+        val artist = listItem.get("artist") as String
+        val version = listItem.get("version") as String
         val shownTitle = listItem.get("shownTitle") as String
         val downloadable = listItem.get("downloadable") as Boolean
 
@@ -360,6 +369,8 @@ class HomeHandler {
 
     class downloadSong(url: String, location: String, sid: String, shownTitle: String, context: Context) :
         AsyncTask<Void, Void, String>() {
+
+        //yeah this is not great
         val url = url
         val location = location
         val context = context

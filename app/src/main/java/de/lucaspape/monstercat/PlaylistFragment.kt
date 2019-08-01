@@ -6,7 +6,6 @@ import android.widget.AdapterView
 import android.widget.ListView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.android.volley.toolbox.Volley
 
 class PlaylistFragment : Fragment() {
     private val playlistHandler = PlaylistHandler()
@@ -46,8 +45,7 @@ class PlaylistFragment : Fragment() {
     override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenu.ContextMenuInfo?) {
         super.onCreateContextMenu(menu, v, menuInfo)
 
-        //TODO replace string
-        menu!!.add(0, v!!.id, 0, "Download")
+        menu!!.add(0, v!!.id, 0, getString(R.string.download))
     }
 
     override fun onContextItemSelected(item: MenuItem?): Boolean {
@@ -56,8 +54,7 @@ class PlaylistFragment : Fragment() {
 
         val listItem = playlistView!!.getItemAtPosition(position) as HashMap<String, Any?>
 
-        //TODO replace string
-        if(item.title == "Download"){
+        if(item.title == getString(R.string.download)){
             if(listItem.get("type") == "playlist"){
                 playlistHandler.downloadPlaylist(context!!, listItem)
             }else{

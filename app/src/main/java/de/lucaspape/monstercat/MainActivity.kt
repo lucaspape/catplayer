@@ -24,6 +24,8 @@ class MainActivity : AppCompatActivity() {
         var musicPlayer:MusicPlayer? = null
         @JvmStatic
         var sid = ""
+        @JvmStatic
+        var loggedIn = false
     }
 
     private val onNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
