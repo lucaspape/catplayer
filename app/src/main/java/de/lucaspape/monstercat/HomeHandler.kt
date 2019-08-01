@@ -113,7 +113,7 @@ class HomeHandler {
                             hashMap.put("artist", artist)
                             hashMap.put(
                                 "primaryImage",
-                                view.context.cacheDir.toString() + "/" + title + version + artist + ".png" + secondaryResolution.toString()
+                                view.context.cacheDir.toString() + "/" + title + version + artist + ".png" + primaryResolution.toString()
                             )
 
                             hashMap.put(

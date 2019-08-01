@@ -145,7 +145,7 @@ class PlaylistHandler {
 
                                 trackHashMap.put(
                                     "primaryImage",
-                                    view.context.cacheDir.toString() + "/" + title + version + artist + ".png" + secondaryResolution.toString()
+                                    view.context.cacheDir.toString() + "/" + title + version + artist + ".png" + primaryResolution.toString()
                                 )
 
                                 trackHashMap.put(
