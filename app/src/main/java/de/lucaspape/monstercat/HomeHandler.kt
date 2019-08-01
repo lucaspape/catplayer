@@ -137,7 +137,10 @@ class HomeHandler {
                                 coverHashMap.put("primaryRes", primaryResolution)
                                 coverHashMap.put("secondaryRes", secondaryResolution)
                                 coverHashMap.put("coverUrl", coverUrl)
-                                coverHashMap.put("location", view.context.cacheDir.toString() + "/" + title + version + artist + ".png")
+                                coverHashMap.put(
+                                    "location",
+                                    view.context.cacheDir.toString() + "/" + title + version + artist + ".png"
+                                )
                                 coverDownloadList.add(coverHashMap)
                             }
 
@@ -201,7 +204,8 @@ class HomeHandler {
         val seekBar = view.findViewById<SeekBar>(R.id.seekBar)
 
         if (MainActivity.musicPlayer == null) {
-            MainActivity.musicPlayer = MusicPlayer(view.context, textview1, textview2, seekBar,coverBarImageView, musicToolBar)
+            MainActivity.musicPlayer =
+                MusicPlayer(view.context, textview1, textview2, seekBar, coverBarImageView, musicToolBar)
         } else {
             MainActivity.musicPlayer!!.setContext(view.context)
             MainActivity.musicPlayer!!.setTextView(textview1, textview2)
@@ -254,9 +258,8 @@ class HomeHandler {
                                 if (streamHash != "") {
                                     MainActivity.musicPlayer!!.addSong(
                                         "https://s3.amazonaws.com/data.monstercat.com/blobs/" + streamHash,
-                                        itemValue.get("artist") as String + " " + itemValue.get("title") as String + " " + itemValue.get(
-                                            "version"
-                                        ) as String, coverImage as String
+                                        title as String + " " + version as String,
+                                        artist as String, coverImage as String
                                     )
                                     Toast.makeText(
                                         view.context,
@@ -282,9 +285,9 @@ class HomeHandler {
                     } else {
                         MainActivity.musicPlayer!!.addSong(
                             downloadLocation,
-                            itemValue.get("artist") as String + " " + itemValue.get("title") as String + " " + itemValue.get(
+                            itemValue.get("title") as String + " " + itemValue.get(
                                 "version"
-                            ) as String, coverImage as String
+                            ) as String, artist as String, coverImage as String
                         )
                     }
                 } else {

@@ -48,6 +48,7 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
     private var playList = ArrayList<String>()
     private var titleList = ArrayList<String>()
     private var coverList = ArrayList<String>()
+    private var artistList = ArrayList<String>()
     private var playing = false
 
     //notification var
@@ -170,7 +171,7 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
                 barCoverImage.setImageBitmap(bitmap)
             }
 
-            showNotification(titleList[currentSong], coverList[currentSong], true)
+            showNotification(titleList[currentSong], artistList[currentSong], coverList[currentSong], true)
         }catch (e: IndexOutOfBoundsException){
             //Something bad happend, resetting
             MainActivity.musicPlayer = MusicPlayer(context, textView1, textView2, seekBar, barCoverImage, musicBar)
@@ -186,7 +187,7 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
 
     fun pause(){
         mediaPlayer.pause()
-        showNotification(titleList[currentSong], coverList[currentSong], false)
+        showNotification(titleList[currentSong], artistList[currentSong], coverList[currentSong], false)
         playing = false
     }
 
@@ -196,7 +197,7 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         mediaPlayer.seekTo(length)
         mediaPlayer.start()
 
-        showNotification(titleList[currentSong], coverList[currentSong], true)
+        showNotification(titleList[currentSong], artistList[currentSong], coverList[currentSong], true)
 
         playing = true
     }
@@ -231,10 +232,11 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         }
     }
 
-    fun addSong(url:String, title:String, coverUrl:String){
+    fun addSong(url:String, title:String, artistName: String , coverUrl:String){
         playList.add(url)
         titleList.add(title)
         coverList.add(coverUrl)
+        artistList.add(artistName)
 
         if(!playing){
             play()
@@ -249,12 +251,13 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         }
     }
 
-    private fun showNotificationAndroidO(titleName:String, coverUrl: String, playing:Boolean){
+    private fun showNotificationAndroidO(titleName:String, artistName:String ,coverUrl: String, playing:Boolean){
         if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O){
             createNotificationChannel()
 
             var backgroundColor = Color.WHITE
             val expandedRemoteViews:RemoteViews
+            //val normalRemoteViews = RemoteViews(context.packageName, R.layout.notification_normal)
 
             val coverFile = File(coverUrl)
             if(coverFile.exists()){
@@ -264,9 +267,11 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
                 if(getTextColor(backgroundColor) == Color.WHITE){
                     expandedRemoteViews = RemoteViews(context.packageName, R.layout.notification_expanded_white)
                     expandedRemoteViews.setTextColor(R.id.songname, Color.WHITE)
+                    expandedRemoteViews.setTextColor(R.id.artistname, Color.WHITE)
                 }else{
                     expandedRemoteViews = RemoteViews(context.packageName, R.layout.notification_expanded)
                     expandedRemoteViews.setTextColor(R.id.songname, Color.BLACK)
+                    expandedRemoteViews.setTextColor(R.id.artistname, Color.BLACK)
                 }
 
                 expandedRemoteViews.setImageViewBitmap(R.id.coverimageview, bitmap)
@@ -276,8 +281,7 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
                 expandedRemoteViews = RemoteViews(context.packageName, R.layout.notification_expanded)
             }
 
-            val normalRemoteViews = RemoteViews(context.packageName, R.layout.notification_normal)
-
+            expandedRemoteViews.setTextViewText(R.id.artistname, artistName)
             expandedRemoteViews.setTextViewText(R.id.songname, titleName)
 
             if(playing){
@@ -319,11 +323,12 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
     }
 
     //android < sdk 26
-    private fun showNotification(titleName:String, coverUrl: String, playing:Boolean){
+    private fun showNotification(titleName:String, artistName:String, coverUrl: String, playing:Boolean){
         if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O){
             createNotificationChannel()
 
             var backgroundColor = Color.WHITE
+            val normalRemoteViews = RemoteViews(context.packageName, R.layout.notification_normal)
             val expandedRemoteViews:RemoteViews
 
             val coverFile = File(coverUrl)
@@ -334,9 +339,11 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
                 if(getTextColor(backgroundColor) == Color.WHITE){
                     expandedRemoteViews = RemoteViews(context.packageName, R.layout.notification_expanded_white)
                     expandedRemoteViews.setTextColor(R.id.songname, Color.WHITE)
+                    expandedRemoteViews.setTextColor(R.id.artistname, Color.WHITE)
                 }else{
                     expandedRemoteViews = RemoteViews(context.packageName, R.layout.notification_expanded)
                     expandedRemoteViews.setTextColor(R.id.songname, Color.BLACK)
+                    expandedRemoteViews.setTextColor(R.id.artistname, Color.BLACK)
                 }
 
                 expandedRemoteViews.setImageViewBitmap(R.id.coverimageview, bitmap)
@@ -346,8 +353,7 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
                 expandedRemoteViews = RemoteViews(context.packageName, R.layout.notification_expanded)
             }
 
-            val normalRemoteViews = RemoteViews(context.packageName, R.layout.notification_normal)
-
+            expandedRemoteViews.setTextViewText(R.id.songname, titleName)
             expandedRemoteViews.setTextViewText(R.id.songname, titleName)
 
             if(playing){
@@ -381,7 +387,7 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
             context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_PLAY))
             context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_NEXT))
         }else{
-            showNotificationAndroidO(titleName, coverUrl, playing)
+            showNotificationAndroidO(titleName, artistName, coverUrl, playing)
         }
     }
 
