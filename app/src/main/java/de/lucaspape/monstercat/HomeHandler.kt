@@ -51,7 +51,7 @@ class HomeHandler {
             musicList.adapter = simpleAdapter
         }
     }
-    
+
     fun registerPullRefresh(view: View) {
         val musicList = view.findViewById<ListView>(R.id.musiclistview)
         var list = ArrayList<HashMap<String, Any?>>()

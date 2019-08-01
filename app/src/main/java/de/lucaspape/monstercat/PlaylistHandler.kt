@@ -149,6 +149,7 @@ class PlaylistHandler {
 
             currentPlaylist = itemValue
         }else{
+            //TODO fix last 2 songs not visible
             val tempList = Array<HashMap<String, Any?>>(trackCount, { HashMap<String, Any?>() })
 
             val todo = (trackCount/50) + 1
@@ -194,7 +195,7 @@ class PlaylistHandler {
                 }
             }
 
-            for(i in (0 .. (trackCount/50) +1)){
+            for(i in (0 .. (trackCount/50))){
                 val playlistTrackUrl =
                     "https://connect.monstercat.com/api/catalog/browse/?playlistId=" + playlistId + "&skip=" + (i*50).toString() + "&limit=50"
                 println("https://connect.monstercat.com/api/catalog/browse/?playlistId=" + playlistId + "&skip=" + (i*50).toString() + "&limit=50")
