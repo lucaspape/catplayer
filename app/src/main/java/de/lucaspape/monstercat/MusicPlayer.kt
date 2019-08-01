@@ -16,6 +16,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.text.method.ScrollingMovementMethod
+import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.view.animation.LinearInterpolator
@@ -143,7 +144,7 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
             })
 
             println(coverList[currentSong])
-            showNotification(titleList[currentSong], coverList[currentSong])
+            showNotification(titleList[currentSong], coverList[currentSong], true)
         }catch (e: IndexOutOfBoundsException){
             //Something bad happend, resetting
             MainActivity.musicPlayer = MusicPlayer(context, textView1, textView2, seekBar)
@@ -159,6 +160,7 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
 
     fun pause(){
         mediaPlayer.pause()
+        showNotification(titleList[currentSong], coverList[currentSong], false)
         playing = false
     }
 
@@ -167,6 +169,8 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
 
         mediaPlayer.seekTo(length)
         mediaPlayer.start()
+
+        showNotification(titleList[currentSong], coverList[currentSong], true)
 
         playing = true
     }
@@ -219,7 +223,7 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         }
     }
 
-    private fun showNotification(titleName:String, coverUrl: String){
+    private fun showNotification(titleName:String, coverUrl: String, playing:Boolean){
         createNotificationChannel()
         val normalRemoteViews = RemoteViews(context.packageName, R.layout.notification_normal)
         val expandedRemoteViews = RemoteViews(context.packageName, R.layout.notification_expanded)
@@ -231,6 +235,14 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         }
 
         expandedRemoteViews.setTextViewText(R.id.songname, titleName)
+
+        if(playing){
+            expandedRemoteViews.setViewVisibility(R.id.playButton, View.GONE)
+            expandedRemoteViews.setViewVisibility(R.id.pauseButton, View.VISIBLE)
+        }else{
+            expandedRemoteViews.setViewVisibility(R.id.playButton, View.VISIBLE)
+            expandedRemoteViews.setViewVisibility(R.id.pauseButton, View.GONE)
+        }
 
         val notificationBuilder = NotificationCompat.Builder(context, CHANNEL_ID)
         notificationBuilder.setSmallIcon(R.drawable.ic_play_circle_filled_black_24dp)
@@ -300,11 +312,10 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
                 val notificationManager = context!!.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                 notificationManager.cancel(MainActivity.musicPlayer!!.NOTIFICATION_ID)
                 MainActivity.musicPlayer!!.pause()
-                println("del")
             }else if(intent.action.equals(NOTIFICATION_PAUSE)){
                 MainActivity.musicPlayer!!.pause()
             }else if(intent.action.equals(NOTIFICATION_PLAY)){
-                MainActivity.musicPlayer!!.toggleMusic()
+                MainActivity.musicPlayer!!.resume()
             }else if(intent.action.equals(NOTIFICATION_NEXT)){
                 MainActivity.musicPlayer!!.next()
             }
