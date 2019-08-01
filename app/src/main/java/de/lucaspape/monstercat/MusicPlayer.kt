@@ -95,53 +95,57 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
 
         playing = true
 
-        textView1.text = titleList[currentSong] + "     "
-        textView2.text = titleList[currentSong] + "     "
+        try {
+            textView1.text = titleList[currentSong] + "     "
+            textView2.text = titleList[currentSong] + "     "
 
-        val valueAnimator = ValueAnimator.ofFloat(0.0f, 1.0f)
-        valueAnimator.repeatCount = Animation.INFINITE
-        valueAnimator.interpolator = LinearInterpolator()
-        valueAnimator.setDuration(9000L)
-        valueAnimator.addUpdateListener { animation->
-            val progress = animation.getAnimatedValue() as Float
-            val width = textView1.width
-            val translationX = width * progress
-            textView1.translationX = translationX
-            textView2.translationX = translationX - width
+            val valueAnimator = ValueAnimator.ofFloat(0.0f, 1.0f)
+            valueAnimator.repeatCount = Animation.INFINITE
+            valueAnimator.interpolator = LinearInterpolator()
+            valueAnimator.setDuration(9000L)
+            valueAnimator.addUpdateListener { animation->
+                val progress = animation.getAnimatedValue() as Float
+                val width = textView1.width
+                val translationX = width * progress
+                textView1.translationX = translationX
+                textView2.translationX = translationX - width
+            }
+
+            valueAnimator.start()
+
+            mediaPlayer.setOnCompletionListener {
+                next()
+            }
+
+            val seekbarUpdateHandler = Handler()
+
+            val updateSeekBar = object : Runnable {
+                override fun run() {
+                    seekBar.max = mediaPlayer.duration
+                    seekBar.setProgress(mediaPlayer.getCurrentPosition())
+                    seekbarUpdateHandler.postDelayed(this, 50)
+                }
+            }
+
+            seekbarUpdateHandler.postDelayed(updateSeekBar, 0)
+
+            seekBar.setOnSeekBarChangeListener(object:SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(seekBar:SeekBar, progress:Int, fromUser:Boolean) {
+                    if (fromUser)
+                        mediaPlayer.seekTo(progress)
+                }
+                override fun onStartTrackingTouch(seekBar:SeekBar) {
+                }
+                override fun onStopTrackingTouch(seekBar:SeekBar) {
+                }
+            })
+
+            println(coverList[currentSong])
+            showNotification(titleList[currentSong], coverList[currentSong])
+        }catch (e: IndexOutOfBoundsException){
+            //Something bad happend, resetting
+            MainActivity.musicPlayer = MusicPlayer(context, textView1, textView2, seekBar)
         }
-
-        valueAnimator.start()
-
-        mediaPlayer.setOnCompletionListener {
-            next()
-        }
-
-        val seekbarUpdateHandler = Handler()
-
-        val updateSeekBar = object : Runnable {
-            override fun run() {
-                seekBar.max = mediaPlayer.duration
-                seekBar.setProgress(mediaPlayer.getCurrentPosition())
-                seekbarUpdateHandler.postDelayed(this, 50)
-            }
-        }
-
-        seekbarUpdateHandler.postDelayed(updateSeekBar, 0)
-
-        seekBar.setOnSeekBarChangeListener(object:SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar:SeekBar, progress:Int, fromUser:Boolean) {
-                if (fromUser)
-                    mediaPlayer.seekTo(progress)
-            }
-            override fun onStartTrackingTouch(seekBar:SeekBar) {
-            }
-            override fun onStopTrackingTouch(seekBar:SeekBar) {
-            }
-        })
-
-        println(coverList[currentSong])
-        showNotification(titleList[currentSong], coverList[currentSong])
-
     }
 
     fun stop(){
