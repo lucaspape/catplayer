@@ -15,9 +15,12 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.media.AudioManager
 import android.media.MediaPlayer
+import android.media.session.MediaSession
 import android.net.Uri
 import android.os.Build
 import android.os.Handler
+import android.provider.Settings
+import android.support.v4.media.session.MediaSessionCompat
 import android.text.method.ScrollingMovementMethod
 import android.view.View
 import android.view.animation.Animation
@@ -231,66 +234,140 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         }
     }
 
-    private fun showNotification(titleName:String, coverUrl: String, playing:Boolean){
-        createNotificationChannel()
+    private fun showNotificationAndroidO(titleName:String, coverUrl: String, playing:Boolean){
+        if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O){
+            createNotificationChannel()
 
-        var backgroundColor = Color.WHITE
-        val expandedRemoteViews:RemoteViews
+            var backgroundColor = Color.WHITE
+            val expandedRemoteViews:RemoteViews
 
-        val coverFile = File(coverUrl)
-        if(coverFile.exists()){
-            val bitmap = BitmapFactory.decodeFile(coverFile.absolutePath)
-            backgroundColor = getDominantColor(bitmap)
+            val coverFile = File(coverUrl)
+            if(coverFile.exists()){
+                val bitmap = BitmapFactory.decodeFile(coverFile.absolutePath)
+                backgroundColor = getDominantColor(bitmap)
 
-            if(getTextColor(backgroundColor) == Color.WHITE){
-                expandedRemoteViews = RemoteViews(context.packageName, R.layout.notification_expanded_white)
-                expandedRemoteViews.setTextColor(R.id.songname, Color.WHITE)
+                if(getTextColor(backgroundColor) == Color.WHITE){
+                    expandedRemoteViews = RemoteViews(context.packageName, R.layout.notification_expanded_white)
+                    expandedRemoteViews.setTextColor(R.id.songname, Color.WHITE)
+                }else{
+                    expandedRemoteViews = RemoteViews(context.packageName, R.layout.notification_expanded)
+                    expandedRemoteViews.setTextColor(R.id.songname, Color.BLACK)
+                }
+
+                expandedRemoteViews.setImageViewBitmap(R.id.coverimageview, bitmap)
+
+                expandedRemoteViews.setInt(R.id.notificationlayout, "setBackgroundColor", backgroundColor)
             }else{
                 expandedRemoteViews = RemoteViews(context.packageName, R.layout.notification_expanded)
-                expandedRemoteViews.setTextColor(R.id.songname, Color.BLACK)
             }
 
-            expandedRemoteViews.setImageViewBitmap(R.id.coverimageview, bitmap)
+            val normalRemoteViews = RemoteViews(context.packageName, R.layout.notification_normal)
 
-            expandedRemoteViews.setInt(R.id.notificationlayout, "setBackgroundColor", backgroundColor)
-        }else{
-            expandedRemoteViews = RemoteViews(context.packageName, R.layout.notification_expanded)
+            expandedRemoteViews.setTextViewText(R.id.songname, titleName)
+
+            if(playing){
+                expandedRemoteViews.setViewVisibility(R.id.playButton, View.GONE)
+                expandedRemoteViews.setViewVisibility(R.id.pauseButton, View.VISIBLE)
+            }else{
+                expandedRemoteViews.setViewVisibility(R.id.playButton, View.VISIBLE)
+                expandedRemoteViews.setViewVisibility(R.id.pauseButton, View.GONE)
+            }
+
+            val notificationBuilder = Notification.Builder(context, CHANNEL_ID)
+            notificationBuilder.setSmallIcon(R.drawable.ic_play_circle_filled_black_24dp)
+            notificationBuilder.setPriority(Notification.PRIORITY_LOW)
+            notificationBuilder.setOngoing(true)
+
+            //notificationBuilder.setColorized(true)
+            //notificationBuilder.color = backgroundColor
+
+            notificationBuilder.setStyle(Notification.DecoratedCustomViewStyle())
+            notificationBuilder.setCustomContentView(normalRemoteViews)
+            notificationBuilder.setCustomBigContentView(expandedRemoteViews)
+
+            val mediaSession = MediaSession(context, "de.lucaspape.monstercat.music")
+
+            notificationBuilder.setStyle(Notification.MediaStyle()
+                .setMediaSession(mediaSession.sessionToken))
+
+            setListeners(expandedRemoteViews, context)
+
+            val notificationManagerCompat = NotificationManagerCompat.from(context)
+            notificationManagerCompat.notify(NOTIFICATION_ID, notificationBuilder.build())
+
+            context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_PREVIOUS))
+            context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_DELETE))
+            context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_PAUSE))
+            context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_PLAY))
+            context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_NEXT))
         }
+    }
 
-        val normalRemoteViews = RemoteViews(context.packageName, R.layout.notification_normal)
+    //android < sdk 26
+    private fun showNotification(titleName:String, coverUrl: String, playing:Boolean){
+        if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O){
+            createNotificationChannel()
 
-        expandedRemoteViews.setTextViewText(R.id.songname, titleName)
+            var backgroundColor = Color.WHITE
+            val expandedRemoteViews:RemoteViews
 
-        if(playing){
-            expandedRemoteViews.setViewVisibility(R.id.playButton, View.GONE)
-            expandedRemoteViews.setViewVisibility(R.id.pauseButton, View.VISIBLE)
+            val coverFile = File(coverUrl)
+            if(coverFile.exists()){
+                val bitmap = BitmapFactory.decodeFile(coverFile.absolutePath)
+                backgroundColor = getDominantColor(bitmap)
+
+                if(getTextColor(backgroundColor) == Color.WHITE){
+                    expandedRemoteViews = RemoteViews(context.packageName, R.layout.notification_expanded_white)
+                    expandedRemoteViews.setTextColor(R.id.songname, Color.WHITE)
+                }else{
+                    expandedRemoteViews = RemoteViews(context.packageName, R.layout.notification_expanded)
+                    expandedRemoteViews.setTextColor(R.id.songname, Color.BLACK)
+                }
+
+                expandedRemoteViews.setImageViewBitmap(R.id.coverimageview, bitmap)
+
+                expandedRemoteViews.setInt(R.id.notificationlayout, "setBackgroundColor", backgroundColor)
+            }else{
+                expandedRemoteViews = RemoteViews(context.packageName, R.layout.notification_expanded)
+            }
+
+            val normalRemoteViews = RemoteViews(context.packageName, R.layout.notification_normal)
+
+            expandedRemoteViews.setTextViewText(R.id.songname, titleName)
+
+            if(playing){
+                expandedRemoteViews.setViewVisibility(R.id.playButton, View.GONE)
+                expandedRemoteViews.setViewVisibility(R.id.pauseButton, View.VISIBLE)
+            }else{
+                expandedRemoteViews.setViewVisibility(R.id.playButton, View.VISIBLE)
+                expandedRemoteViews.setViewVisibility(R.id.pauseButton, View.GONE)
+            }
+
+            val notificationBuilder = NotificationCompat.Builder(context, CHANNEL_ID)
+            notificationBuilder.setSmallIcon(R.drawable.ic_play_circle_filled_black_24dp)
+            notificationBuilder.setPriority(NotificationCompat.PRIORITY_LOW)
+            notificationBuilder.setOngoing(true)
+
+            //notificationBuilder.setColorized(true)
+            //notificationBuilder.color = backgroundColor
+
+            notificationBuilder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            notificationBuilder.setCustomContentView(normalRemoteViews)
+            notificationBuilder.setCustomBigContentView(expandedRemoteViews)
+
+            setListeners(expandedRemoteViews, context)
+
+            val notificationManagerCompat = NotificationManagerCompat.from(context)
+            notificationManagerCompat.notify(NOTIFICATION_ID, notificationBuilder.build())
+
+            context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_PREVIOUS))
+            context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_DELETE))
+            context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_PAUSE))
+            context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_PLAY))
+            context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_NEXT))
         }else{
-            expandedRemoteViews.setViewVisibility(R.id.playButton, View.VISIBLE)
-            expandedRemoteViews.setViewVisibility(R.id.pauseButton, View.GONE)
+            showNotificationAndroidO(titleName, coverUrl, playing)
         }
-
-        val notificationBuilder = NotificationCompat.Builder(context, CHANNEL_ID)
-        notificationBuilder.setSmallIcon(R.drawable.ic_play_circle_filled_black_24dp)
-        notificationBuilder.setPriority(NotificationCompat.PRIORITY_LOW)
-        notificationBuilder.setOngoing(true)
-
-        //notificationBuilder.setColorized(true)
-        //notificationBuilder.color = backgroundColor
-
-        notificationBuilder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
-        notificationBuilder.setCustomContentView(normalRemoteViews)
-        notificationBuilder.setCustomBigContentView(expandedRemoteViews)
-
-        setListeners(expandedRemoteViews, context)
-
-        val notificationManagerCompat = NotificationManagerCompat.from(context)
-        notificationManagerCompat.notify(NOTIFICATION_ID, notificationBuilder.build())
-
-        context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_PREVIOUS))
-        context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_DELETE))
-        context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_PAUSE))
-        context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_PLAY))
-        context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_NEXT))
     }
 
     private fun createNotificationChannel(){
