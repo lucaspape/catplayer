@@ -161,3 +161,6 @@ lint/outputs/
 lint/tmp/
 
 # lint/reports/
+
+#MacOS Files
+*.DS_Store
