@@ -28,7 +28,6 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.palette.graphics.Palette
 import java.io.File
 import java.lang.IndexOutOfBoundsException
-import java.util.*
 import kotlin.Comparator
 import kotlin.collections.ArrayList
 
@@ -43,8 +42,8 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
     private var playing = false
 
     //notification var
-    private val CHANNEL_ID = "Music Notification"
-    private val NOTIFICATION_ID = 1
+    private val channelID = "Music Notification"
+    private val notificationID = 1
 
     companion object{
         @JvmStatic
@@ -105,7 +104,7 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         playButton = button
     }
 
-    fun play(){
+    private fun play(){
         mediaPlayer.stop()
         mediaPlayer = MediaPlayer()
 
@@ -117,15 +116,15 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         playing = true
 
         try {
-            textView1.text = titleList[currentSong] + "     "
-            textView2.text = titleList[currentSong] + "     "
+            textView1.text = titleList[currentSong]
+            textView2.text = titleList[currentSong]
 
             val valueAnimator = ValueAnimator.ofFloat(0.0f, 1.0f)
             valueAnimator.repeatCount = Animation.INFINITE
             valueAnimator.interpolator = LinearInterpolator()
-            valueAnimator.setDuration(9000L)
+            valueAnimator.duration = 9000L
             valueAnimator.addUpdateListener { animation->
-                val progress = animation.getAnimatedValue() as Float
+                val progress = animation.animatedValue as Float
                 val width = textView1.width
                 val translationX = width * progress
                 textView1.translationX = translationX
@@ -143,7 +142,7 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
             val updateSeekBar = object : Runnable {
                 override fun run() {
                     seekBar.max = mediaPlayer.duration
-                    seekBar.setProgress(mediaPlayer.getCurrentPosition())
+                    seekBar.progress = mediaPlayer.currentPosition
                     seekbarUpdateHandler.postDelayed(this, 50)
                 }
             }
@@ -175,7 +174,7 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         }
     }
 
-    fun stop(){
+    private fun stop(){
         playing = false
         textView1.text = ""
         textView2.text = ""
@@ -252,10 +251,10 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
     }
 
     private fun showNotificationAndroidO(titleName:String, artistName:String ,coverUrl: String, playing:Boolean){
-        if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O){
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             createNotificationChannel()
 
-            var backgroundColor = Color.WHITE
+            val backgroundColor: Int
             val expandedRemoteViews:RemoteViews
             //val normalRemoteViews = RemoteViews(context.packageName, R.layout.notification_normal)
 
@@ -292,7 +291,7 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
                 expandedRemoteViews.setViewVisibility(R.id.pauseButton, View.GONE)
             }
 
-            val notificationBuilder = Notification.Builder(context, CHANNEL_ID)
+            val notificationBuilder = Notification.Builder(context, channelID)
             notificationBuilder.setSmallIcon(R.drawable.ic_play_circle_filled_black_24dp)
             notificationBuilder.setPriority(Notification.PRIORITY_LOW)
             notificationBuilder.setOngoing(true)
@@ -300,19 +299,19 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
             //notificationBuilder.setColorized(true)
             //notificationBuilder.color = backgroundColor
 
-            notificationBuilder.setStyle(Notification.DecoratedCustomViewStyle())
+            notificationBuilder.style = Notification.DecoratedCustomViewStyle()
             //notificationBuilder.setCustomContentView(normalRemoteViews)
             notificationBuilder.setCustomBigContentView(expandedRemoteViews)
 
             val mediaSession = MediaSession(context, "de.lucaspape.monstercat.music")
 
-            notificationBuilder.setStyle(Notification.MediaStyle()
-                .setMediaSession(mediaSession.sessionToken))
+            notificationBuilder.style = Notification.MediaStyle()
+                .setMediaSession(mediaSession.sessionToken)
 
             setListeners(expandedRemoteViews, context)
 
             val notificationManagerCompat = NotificationManagerCompat.from(context)
-            notificationManagerCompat.notify(NOTIFICATION_ID, notificationBuilder.build())
+            notificationManagerCompat.notify(notificationID, notificationBuilder.build())
 
             context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_PREVIOUS))
             context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_DELETE))
@@ -324,10 +323,10 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
 
     //android < sdk 26
     private fun showNotification(titleName:String, artistName:String, coverUrl: String, playing:Boolean){
-        if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O){
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.O){
             createNotificationChannel()
 
-            var backgroundColor = Color.WHITE
+            val backgroundColor: Int
             val normalRemoteViews = RemoteViews(context.packageName, R.layout.notification_normal)
             val expandedRemoteViews:RemoteViews
 
@@ -364,9 +363,9 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
                 expandedRemoteViews.setViewVisibility(R.id.pauseButton, View.GONE)
             }
 
-            val notificationBuilder = NotificationCompat.Builder(context, CHANNEL_ID)
+            val notificationBuilder = NotificationCompat.Builder(context, channelID)
             notificationBuilder.setSmallIcon(R.drawable.ic_play_circle_filled_black_24dp)
-            notificationBuilder.setPriority(NotificationCompat.PRIORITY_LOW)
+            notificationBuilder.priority = NotificationCompat.PRIORITY_LOW
             notificationBuilder.setOngoing(true)
 
             //notificationBuilder.setColorized(true)
@@ -379,7 +378,7 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
             setListeners(expandedRemoteViews, context)
 
             val notificationManagerCompat = NotificationManagerCompat.from(context)
-            notificationManagerCompat.notify(NOTIFICATION_ID, notificationBuilder.build())
+            notificationManagerCompat.notify(notificationID, notificationBuilder.build())
 
             context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_PREVIOUS))
             context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_DELETE))
@@ -397,7 +396,7 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
             val channelDescription = "Handy dandy description"
             val importance = NotificationManager.IMPORTANCE_LOW
 
-            val notificationChannel = NotificationChannel(CHANNEL_ID, channelName, importance)
+            val notificationChannel = NotificationChannel(channelID, channelName, importance)
 
             notificationChannel.description = channelDescription
 
@@ -407,7 +406,7 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         }
     }
 
-    fun setListeners(view:RemoteViews, context:Context){
+    private fun setListeners(view:RemoteViews, context:Context){
         val previous = Intent(NOTIFICATION_PREVIOUS)
         val delete = Intent(NOTIFICATION_DELETE)
         val pause = Intent(NOTIFICATION_PAUSE)
@@ -432,41 +431,35 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
 
     class IntentReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            if(intent!!.action.equals(NOTIFICATION_PREVIOUS)){
-                MainActivity.musicPlayer!!.previous()
-            }else if(intent.action.equals(NOTIFICATION_DELETE)){
-                val notificationManager = context!!.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                notificationManager.cancel(MainActivity.musicPlayer!!.NOTIFICATION_ID)
-                MainActivity.musicPlayer!!.pause()
-            }else if(intent.action.equals(NOTIFICATION_PAUSE)){
-                MainActivity.musicPlayer!!.pause()
-            }else if(intent.action.equals(NOTIFICATION_PLAY)){
-                MainActivity.musicPlayer!!.resume()
-            }else if(intent.action.equals(NOTIFICATION_NEXT)){
-                MainActivity.musicPlayer!!.next()
+            when {
+                intent!!.action.equals(NOTIFICATION_PREVIOUS) -> MainActivity.musicPlayer!!.previous()
+                intent.action.equals(NOTIFICATION_DELETE) -> {
+                    val notificationManager = context!!.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+                    notificationManager.cancel(MainActivity.musicPlayer!!.notificationID)
+                    MainActivity.musicPlayer!!.pause()
+                }
+                intent.action.equals(NOTIFICATION_PAUSE) -> MainActivity.musicPlayer!!.pause()
+                intent.action.equals(NOTIFICATION_PLAY) -> MainActivity.musicPlayer!!.resume()
+                intent.action.equals(NOTIFICATION_NEXT) -> MainActivity.musicPlayer!!.next()
             }
         }
     }
 
-    fun getDominantColor(bitmap: Bitmap):Int{
+    private fun getDominantColor(bitmap: Bitmap):Int{
         val swatchesTemp = Palette.from(bitmap).generate().swatches
         val swatches = ArrayList<Palette.Swatch>(swatchesTemp)
 
-        Collections.sort(swatches, object:Comparator<Palette.Swatch>{
-            override fun compare(swatch1:Palette.Swatch, swatch2:Palette.Swatch):Int{
-                return swatch2.population - swatch1.population
-            }
-        })
+        swatches.sortWith(Comparator { swatch1, swatch2 -> swatch2.population - swatch1.population })
 
-        return if (swatches.size > 0) swatches.get(0).getRgb() else Color.WHITE
+        return if (swatches.size > 0) swatches[0].rgb else Color.WHITE
     }
 
-    fun getTextColor(background:Int):Int{
+    private fun getTextColor(background:Int):Int{
         val backgroundRed = Color.red(background)
         val backgroundGreen = Color.green(background)
         val backgroundBlue = Color.blue(background)
 
-        val luma = ((0.299 * backgroundRed) + (0.587 * backgroundGreen) + (0.114 * backgroundBlue)) / 255;
+        val luma = ((0.299 * backgroundRed) + (0.587 * backgroundGreen) + (0.114 * backgroundBlue)) / 255
 
         return if (luma > 0.5) Color.BLACK else Color.WHITE
     }

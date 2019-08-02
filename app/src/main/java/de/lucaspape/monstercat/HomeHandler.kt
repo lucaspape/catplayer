@@ -72,8 +72,8 @@ class HomeHandler {
 
             val loadMax = 200
             val coverDownloadList = ArrayList<HashMap<String, Any?>>()
-            val tempList = Array<HashMap<String, Any?>>(loadMax, { HashMap<String, Any?>() })
-            list = ArrayList<HashMap<String, Any?>>()
+            val tempList = Array(loadMax) { HashMap<String, Any?>() }
+            list = ArrayList()
 
             //wait for all request to finish and sort
             var finishedRequest = 0
@@ -81,14 +81,14 @@ class HomeHandler {
                 finishedRequest++
                 if (finishedRequest == requestCount) {
                     for (i in tempList.indices) {
-                        if(!tempList[i].isEmpty()){
+                        if (tempList[i].isNotEmpty()) {
                             list.add(tempList[i])
                         }
 
                     }
 
                     //download cover arts
-                    MainActivity.downloadCoverArray(coverDownloadList, simpleAdapter).execute()
+                    MainActivity.DownloadCoverArray(coverDownloadList, simpleAdapter).execute()
 
                     val oos = ObjectOutputStream(FileOutputStream(listFile))
                     oos.writeObject(list)
@@ -109,7 +109,7 @@ class HomeHandler {
                 val url = view.context.getString(R.string.loadSongsUrl) + "?limit=50&skip=" + i * 50
 
                 val stringRequest = object : StringRequest(
-                    Request.Method.GET, url,
+                    Method.GET, url,
                     Response.Listener<String> { response ->
                         val json = JSONObject(response)
                         val jsonArray = json.getJSONArray("results")
@@ -142,37 +142,31 @@ class HomeHandler {
 
                             val hashMap = HashMap<String, Any?>()
 
-                            hashMap.put("id", id)
-                            hashMap.put("title", title)
-                            hashMap.put("artist", artist)
-                            hashMap.put(
-                                "primaryImage",
+                            hashMap["id"] = id
+                            hashMap["title"] = title
+                            hashMap["artist"] = artist
+                            hashMap["primaryImage"] =
                                 view.context.cacheDir.toString() + "/" + title + version + artist + ".png" + primaryResolution.toString()
-                            )
 
-                            hashMap.put(
-                                "secondaryImage",
+                            hashMap["secondaryImage"] =
                                 view.context.cacheDir.toString() + "/" + title + version + artist + ".png" + secondaryResolution.toString()
-                            )
 
-                            hashMap.put("version", version)
+                            hashMap["version"] = version
 
-                            hashMap.put("shownTitle", artist + " " + title + " " + version)
-                            hashMap.put("songId", songId)
-                            hashMap.put("downloadable", downloadable)
-                            hashMap.put("streamable", streamable)
+                            hashMap["shownTitle"] = "$artist $title $version"
+                            hashMap["songId"] = songId
+                            hashMap["downloadable"] = downloadable
+                            hashMap["streamable"] = streamable
 
 
                             if (!File(view.context.cacheDir.toString() + "/" + title + version + artist + ".png" + primaryResolution).exists()) {
                                 val coverHashMap = HashMap<String, Any?>()
 
-                                coverHashMap.put("primaryRes", primaryResolution)
-                                coverHashMap.put("secondaryRes", secondaryResolution)
-                                coverHashMap.put("coverUrl", coverUrl)
-                                coverHashMap.put(
-                                    "location",
+                                coverHashMap["primaryRes"] = primaryResolution
+                                coverHashMap["secondaryRes"] = secondaryResolution
+                                coverHashMap["coverUrl"] = coverUrl
+                                coverHashMap["location"] =
                                     view.context.cacheDir.toString() + "/" + title + version + artist + ".png"
-                                )
                                 coverDownloadList.add(coverHashMap)
                             }
 
@@ -186,7 +180,7 @@ class HomeHandler {
                     override fun getHeaders(): Map<String, String> {
                         val params = HashMap<String, String>()
                         if (loggedIn) {
-                            params.put("Cookie", "connect.sid=" + sid)
+                            params["Cookie"] = "connect.sid=$sid"
                         }
                         return params
                     }
@@ -232,13 +226,13 @@ class HomeHandler {
             override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 val itemValue = musicList.getItemAtPosition(p2) as HashMap<String, Any?>
 
-                val title = itemValue.get("title") as String
-                val artist = itemValue.get("artist") as String
-                val version = itemValue.get("version") as String
+                val title = itemValue["title"] as String
+                val artist = itemValue["artist"] as String
+                val version = itemValue["version"] as String
 
-                val coverImage = itemValue.get("primaryImage") as String
+                val coverImage = itemValue["primaryImage"] as String
 
-                val streamable = itemValue.get("streamable") as Boolean
+                val streamable = itemValue["streamable"] as Boolean
 
                 val settings = Settings(view.context)
                 val downloadType = settings.getSetting("downloadType")
@@ -249,9 +243,9 @@ class HomeHandler {
 
                     if (!File(downloadLocation).exists()) {
                         val streamHashUrl =
-                            view.context.getString(R.string.loadSongsUrl) +"?albumId=" + itemValue.get("id")
+                            view.context.getString(R.string.loadSongsUrl) + "?albumId=" + itemValue["id"]
                         val streamHashRequest = object : StringRequest(
-                            Request.Method.GET, streamHashUrl,
+                            Method.GET, streamHashUrl,
                             Response.Listener<String> { response ->
                                 val json = JSONObject(response)
                                 val jsonArray = json.getJSONArray("results")
@@ -274,13 +268,16 @@ class HomeHandler {
                                 if (streamHash != "") {
                                     MainActivity.musicPlayer!!.addSong(
                                         view.context.getString(R.string.songStreamUrl) + streamHash,
-                                        title + " " + version,
+                                        "$title $version",
                                         artist,
                                         coverImage
                                     )
 
                                     Toast.makeText(
-                                        view.context, view.context.getString(R.string.songAddedToPlaylistMsg, title + " " + version),
+                                        view.context, view.context.getString(
+                                            R.string.songAddedToPlaylistMsg,
+                                            "$title $version"
+                                        ),
                                         Toast.LENGTH_SHORT
                                     ).show()
 
@@ -292,7 +289,7 @@ class HomeHandler {
                             override fun getHeaders(): Map<String, String> {
                                 val params = HashMap<String, String>()
                                 if (loggedIn) {
-                                    params.put("Cookie", "connect.sid=" + sid)
+                                    params["Cookie"] = "connect.sid=$sid"
                                 }
                                 return params
                             }
@@ -302,11 +299,16 @@ class HomeHandler {
                     } else {
                         MainActivity.musicPlayer!!.addSong(
                             downloadLocation,
-                            title + " " + version, artist, coverImage
+                            "$title $version", artist, coverImage
                         )
                     }
                 } else {
-                    Toast.makeText(view.context, view.context.getString(R.string.streamNotAvailableMsg, title + " " + version), Toast.LENGTH_SHORT)
+                    Toast.makeText(
+                        view.context, view.context.getString(
+                            R.string.streamNotAvailableMsg,
+                            "$title $version"
+                        ), Toast.LENGTH_SHORT
+                    )
                         .show()
                 }
             }
@@ -332,16 +334,16 @@ class HomeHandler {
     }
 
     fun downloadSong(context: Context, listItem: HashMap<String, Any?>) {
-        val id = listItem.get("songId") as String
+        val id = listItem["songId"] as String
 
         //TODO albumid == id is confusing
-        val albumId = listItem.get("id") as String
+        val albumId = listItem["id"] as String
 
-        val title = listItem.get("title") as String
-        val artist = listItem.get("artist") as String
-        val version = listItem.get("version") as String
-        val shownTitle = listItem.get("shownTitle") as String
-        val downloadable = listItem.get("downloadable") as Boolean
+        val title = listItem["title"] as String
+        val artist = listItem["artist"] as String
+        val version = listItem["version"] as String
+        val shownTitle = listItem["shownTitle"] as String
+        val downloadable = listItem["downloadable"] as Boolean
 
         if (downloadable) {
             val settings = Settings(context)
@@ -355,13 +357,17 @@ class HomeHandler {
             val downloadLocation = context.filesDir.toString() + "/" + artist + title + version + "." + downloadType
             if (!File(downloadLocation).exists()) {
                 if (sid != "") {
-                    downloadSong(downloadUrl, downloadLocation, sid, shownTitle, context).execute()
+                    DownloadSong(downloadUrl, downloadLocation, sid, shownTitle, context).execute()
                 } else {
                     Toast.makeText(context, context.getString(R.string.userNotSignedInMsg), Toast.LENGTH_SHORT)
                         .show()
                 }
             } else {
-                Toast.makeText(context, context.getString(R.string.alreadyDownloadedMsg, shownTitle), Toast.LENGTH_SHORT)
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.alreadyDownloadedMsg, shownTitle),
+                    Toast.LENGTH_SHORT
+                )
                     .show()
             }
         } else {
@@ -370,22 +376,18 @@ class HomeHandler {
         }
     }
 
-    class downloadSong(url: String, location: String, sid: String, shownTitle: String, context: Context) :
+    class DownloadSong(//yeah this is not great
+        private val url: String, private val location: String, private val sid: String,
+        private val shownTitle: String, val context: Context
+    ) :
         AsyncTask<Void, Void, String>() {
-
-        //yeah this is not great
-        val url = url
-        val location = location
-        val context = context
-        val sid = sid
-        val shownTitle = shownTitle
 
         override fun doInBackground(vararg params: Void?): String? {
             try {
 
                 val glideUrl = GlideUrl(
                     url, LazyHeaders.Builder()
-                        .addHeader("Cookie", "connect.sid=" + sid).build()
+                        .addHeader("Cookie", "connect.sid=$sid").build()
                 )
 
                 try {
@@ -418,11 +420,6 @@ class HomeHandler {
             }
 
             return null
-        }
-
-        override fun onPreExecute() {
-            super.onPreExecute()
-            // ...
         }
 
         override fun onPostExecute(result: String?) {

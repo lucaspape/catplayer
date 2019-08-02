@@ -83,19 +83,19 @@ class MainActivity : AppCompatActivity() {
         bottomNavigationView.selectedItemId = R.id.navigation_home
     }
 
-    class downloadCoverArray(covers: ArrayList<HashMap<String, Any?>>, simpleAdapter: SimpleAdapter):AsyncTask<Void, Void, String>(){
-        val covers = covers
-        val simpleAdapter = simpleAdapter
+    class DownloadCoverArray(private val covers: ArrayList<HashMap<String, Any?>>,
+                             private val simpleAdapter: SimpleAdapter
+    ):AsyncTask<Void, Void, String>(){
 
         override fun doInBackground(vararg p0: Void?): String? {
             for(i in covers.indices){
-                val primaryResolution = covers[i].get("primaryRes") as String
-                val secondaryResolution = covers[i].get("secondaryRes") as String
+                val primaryResolution = covers[i]["primaryRes"] as String
+                val secondaryResolution = covers[i]["secondaryRes"] as String
 
-                val url = URL(covers[i].get("coverUrl") as String + "?image_width=" + primaryResolution)
-                val location = covers[i].get("location") as String
+                val url = URL(covers[i]["coverUrl"] as String + "?image_width=" + primaryResolution)
+                val location = covers[i]["location"] as String
 
-                println("Downloading... " + url.toString())
+                println("Downloading... $url")
 
                 val connection = url.openConnection() as HttpURLConnection
                 connection.doInput = true
@@ -103,13 +103,13 @@ class MainActivity : AppCompatActivity() {
                 val input = connection.inputStream
                 val primaryBitmap = BitmapFactory.decodeStream(input)
 
-                FileOutputStream(location + primaryResolution.toString()).use { out ->
+                FileOutputStream(location + primaryResolution).use { out ->
                     primaryBitmap!!.compress(Bitmap.CompressFormat.PNG, 100, out)
                 }
 
                 val secondaryBitmap = Bitmap.createScaledBitmap(primaryBitmap, secondaryResolution.toInt(), secondaryResolution.toInt(), false)
 
-                FileOutputStream(location + secondaryResolution.toString()).use { out ->
+                FileOutputStream(location + secondaryResolution).use { out ->
                     secondaryBitmap!!.compress(Bitmap.CompressFormat.PNG, 100, out)
                 }
 
@@ -126,10 +126,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    class downloadCover(url:String, location:String, simpleAdapter: SimpleAdapter) : AsyncTask<Void, Void, String>() {
-        val url = url
-        val location = location
-        val simpleAdapter = simpleAdapter
+    class DownloadCover(private val url: String, private val location: String, private val simpleAdapter: SimpleAdapter) : AsyncTask<Void, Void, String>() {
 
         override fun doInBackground(vararg params: Void?): String? {
             try {
@@ -152,11 +149,6 @@ class MainActivity : AppCompatActivity() {
             }
 
             return null
-        }
-
-        override fun onPreExecute() {
-            super.onPreExecute()
-            // ...
         }
 
         override fun onPostExecute(result: String?) {

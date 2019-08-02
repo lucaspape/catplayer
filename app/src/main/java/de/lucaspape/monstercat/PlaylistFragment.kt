@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 
 class PlaylistFragment : Fragment() {
     private val playlistHandler = PlaylistHandler()
-    var playlistView:ListView? = null
+    private var playlistView:ListView? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
         inflater.inflate(R.layout.fragment_playlist, container, false)
@@ -55,7 +55,7 @@ class PlaylistFragment : Fragment() {
         val listItem = playlistView!!.getItemAtPosition(position) as HashMap<String, Any?>
 
         if(item.title == getString(R.string.download)){
-            if(listItem.get("type") == "playlist"){
+            if(listItem["type"] == "playlist"){
                 playlistHandler.downloadPlaylist(context!!, listItem)
             }else{
                 playlistHandler.downloadSong(context!!, listItem)

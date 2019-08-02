@@ -15,4 +15,6 @@
     <string name="userNotSignedInMsg">Not signed in!</string>
     <string name="downloadSuccessfulMsg">%1$s downloaded!</string>
     <string name="downloadPlaylistSuccessfulMsg">%1$s downloaded successful!</string>
+    <string name="loginSuccessfulMsg">Logged in!</string>
+    <string name="loginFailedMsg">Login failed!</string>
 </resources>

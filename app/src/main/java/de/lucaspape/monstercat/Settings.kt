@@ -11,14 +11,14 @@ class Settings(private val context: Context) {
 
     fun getSetting(key: String): String? {
         val settingsFile = File(context.getString(R.string.settingsFile, context.filesDir.toString()))
-        if (settingsFile.exists()) {
+        return if (settingsFile.exists()) {
             val ois = ObjectInputStream(FileInputStream(settingsFile))
             val settingsMap = ois.readObject() as HashMap<String, String>
             ois.close()
 
-            return settingsMap.get(key)
+            settingsMap[key]
         } else {
-            return null
+            null
         }
 
     }
@@ -33,7 +33,7 @@ class Settings(private val context: Context) {
             ois.close()
         }
 
-        settingsMap.put(key, setting)
+        settingsMap[key] = setting
 
         val oos = ObjectOutputStream(FileOutputStream(settingsFile))
         oos.writeObject(settingsMap)
@@ -41,7 +41,7 @@ class Settings(private val context: Context) {
         oos.close()
     }
 
-    fun setDefaultSettings(overwrite: Boolean) {
+    private fun setDefaultSettings(overwrite: Boolean) {
         if (getSetting("audioQuality") == null) {
             saveSetting("downloadType", "mp3")
             saveSetting("downloadQuality", "320")

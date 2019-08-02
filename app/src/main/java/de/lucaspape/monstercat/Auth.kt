@@ -4,7 +4,6 @@ import android.content.Context
 import android.widget.Toast
 import com.android.volley.NetworkResponse
 import com.android.volley.ParseError
-import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.HttpHeaderParser
 import com.android.volley.toolbox.JsonObjectRequest
@@ -29,7 +28,8 @@ class Auth {
 
             val loginUrl = context.getString(R.string.loginUrl)
 
-            val loginPostRequest = object : JsonObjectRequest(Request.Method.POST,
+            val loginPostRequest = object : JsonObjectRequest(
+                Method.POST,
                 loginUrl, loginPostParams, Response.Listener { response ->
                     val headers = response.getJSONObject("headers")
 
@@ -39,7 +39,7 @@ class Auth {
 
                         Toast.makeText(
                             context,
-                            "Login successful",
+                            context.getString(R.string.loginSuccessfulMsg),
                             Toast.LENGTH_SHORT
                         ).show()
 
@@ -47,20 +47,26 @@ class Auth {
                     }
 
                 }, Response.ErrorListener { error ->
+                    println(error)
 
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.loginFailedMsg),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }) {
                 override fun parseNetworkResponse(response: NetworkResponse?): Response<JSONObject> {
-                    try {
+                    return try {
                         val jsonResponse = JSONObject()
                         jsonResponse.put("headers", JSONObject(response!!.headers as Map<*, *>))
 
-                        return Response.success(
+                        Response.success(
                             jsonResponse,
                             HttpHeaderParser.parseCacheHeaders(response)
                         )
                     } catch (e: UnsupportedEncodingException) {
 
-                        return Response.error<JSONObject>(ParseError(e))
+                        Response.error(ParseError(e))
                     }
                 }
             }
