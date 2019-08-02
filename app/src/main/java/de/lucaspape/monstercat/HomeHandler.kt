@@ -29,7 +29,7 @@ class HomeHandler {
         val musicList = view.findViewById<ListView>(R.id.musiclistview)
 
         var list = ArrayList<HashMap<String, Any?>>()
-        val listFile = File(view.context.cacheDir.toString() + "/" + "songs.list")
+        val listFile = File(view.context.getString(R.string.homeTitlesCacheFile, view.context.cacheDir.toString()))
 
         val from = arrayOf("shownTitle", "secondaryImage")
         val to = arrayOf(R.id.title, R.id.cover)
@@ -56,7 +56,7 @@ class HomeHandler {
         val musicList = view.findViewById<ListView>(R.id.musiclistview)
         var list = ArrayList<HashMap<String, Any?>>()
         val queue = Volley.newRequestQueue(view.context)
-        val listFile = File(view.context.cacheDir.toString() + "/" + "songs.list")
+        val listFile = File(view.context.getString(R.string.homeTitlesCacheFile, view.context.cacheDir.toString()))
         val from = arrayOf("shownTitle", "secondaryImage")
         val to = arrayOf(R.id.title, R.id.cover)
         var simpleAdapter = SimpleAdapter(view.context, list, R.layout.list_single, from, to.toIntArray())

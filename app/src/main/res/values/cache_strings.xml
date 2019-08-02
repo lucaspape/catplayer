@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="homeTitlesCacheFile" translatable="false">%1$s/songs.list</string>
+    <string name="playlistCacheFile" translatable="false">%1$s/playlists.list</string>
+    <string name="playlistTracksCacheFile" translatable="false">%1$s/%2$s.list</string>
+</resources>

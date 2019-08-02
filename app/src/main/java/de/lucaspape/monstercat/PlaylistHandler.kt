@@ -36,7 +36,7 @@ class PlaylistHandler {
 
         var simpleAdapter = SimpleAdapter(view.context, list, R.layout.list_single, from, to.toIntArray())
 
-        val playlistCacheFile = File(view.context.cacheDir.toString() + "/playlists.list")
+        val playlistCacheFile = File(view.context.getString(R.string.playlistCacheFile, view.context.cacheDir.toString()))
 
         if(!playlistCacheFile.exists()){
             val playlistUrl = view.context.getString(R.string.playlistUrl)
@@ -127,7 +127,7 @@ class PlaylistHandler {
 
         val coverDownloadList = ArrayList<HashMap<String, Any?>>()
 
-        val playlistTrackCacheFile = File(view.context.cacheDir.toString() + "/" + playlistId + ".list")
+        val playlistTrackCacheFile = File(view.context.getString(R.string.playlistTracksCacheFile, view.context.cacheDir.toString(), playlistId))
 
         if(playlistTrackCacheFile.exists()){
             val ois = ObjectInputStream(FileInputStream(playlistTrackCacheFile))
@@ -340,13 +340,10 @@ class PlaylistHandler {
             val listViewItem = listView.getItemAtPosition(0) as HashMap<String, Any?>
 
             if(listViewItem.get("type") == "playlist"){
-                val playlistCacheFile = File(view.context.cacheDir.toString() + "/playlists.list")
-                playlistCacheFile.delete()
-
+                File(view.context.getString(R.string.playlistCacheFile, view.context.cacheDir.toString())).delete()
                 loadPlaylist(view)
             }else{
-                println(view.context.cacheDir.toString() + "/" + currentPlaylist.get("playlistId") + ".list")
-                File(view.context.cacheDir.toString() + "/" + currentPlaylist.get("playlistId") + ".list").delete()
+                File(view.context.getString(R.string.playlistTracksCacheFile, view.context.cacheDir.toString(), currentPlaylist.get("playlistId"))).delete()
                 loadPlaylistTracks(view, currentPlaylist, listView)
             }
         }

@@ -13,5 +13,5 @@
     <string name="streamNotAvailableMsg">%1$s is not available for streaming.</string>
     <string name="userNotSignedInMsg">Not signed in!</string>
     <string name="downloadSuccessfulMsg">%1$s downloaded!</string>
-    <string name="downloadPlaylistSuccessfulMsg">%1$p downloaded successful!</string>
+    <string name="downloadPlaylistSuccessfulMsg">%1$s downloaded successful!</string>
 </resources>
