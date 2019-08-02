@@ -22,6 +22,7 @@ import de.lucaspape.monstercat.MainActivity.Companion.sid
 import org.json.JSONObject
 import java.io.*
 import java.lang.Exception
+import java.lang.IndexOutOfBoundsException
 
 class PlaylistHandler {
 
@@ -77,7 +78,7 @@ class PlaylistHandler {
                 override fun getHeaders(): Map<String, String> {
                     val params = HashMap<String, String>()
                     if (loggedIn) {
-                        params["Cookie"] = "connect.sid=$sid"
+                        params.put("Cookie", "connect.sid=" + sid)
                     }
 
                     return params
@@ -334,20 +335,27 @@ class PlaylistHandler {
         val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
         swipeRefreshLayout.setOnRefreshListener {
             val listView = view.findViewById<ListView>(R.id.listview)
-            val listViewItem = listView.getItemAtPosition(0) as HashMap<String, Any?>
+            val listViewItem:HashMap<String, Any?>
 
-            if (listViewItem["type"] == "playlist") {
+            try {
+                listViewItem = listView.getItemAtPosition(0) as HashMap<String, Any?>
+                if (listViewItem["type"] == "playlist") {
+                    File(view.context.getString(R.string.playlistCacheFile, view.context.cacheDir.toString())).delete()
+                    loadPlaylist(view)
+                } else {
+                    File(
+                        view.context.getString(
+                            R.string.playlistTracksCacheFile, view.context.cacheDir.toString(),
+                            currentPlaylist["playlistId"]
+                        )
+                    ).delete()
+                    loadPlaylistTracks(view, currentPlaylist, listView)
+                }
+            }catch (e:IndexOutOfBoundsException){
                 File(view.context.getString(R.string.playlistCacheFile, view.context.cacheDir.toString())).delete()
                 loadPlaylist(view)
-            } else {
-                File(
-                    view.context.getString(
-                        R.string.playlistTracksCacheFile, view.context.cacheDir.toString(),
-                        currentPlaylist["playlistId"]
-                    )
-                ).delete()
-                loadPlaylistTracks(view, currentPlaylist, listView)
             }
+
         }
     }
 

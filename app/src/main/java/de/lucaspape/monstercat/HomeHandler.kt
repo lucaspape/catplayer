@@ -40,7 +40,9 @@ class HomeHandler {
         if (listFile.exists()) {
             try {
                 val ois = ObjectInputStream(FileInputStream(listFile))
+
                 list = ois.readObject() as ArrayList<HashMap<String, Any?>>
+
                 ois.close()
             } catch (e: Exception) {
                 println(e)
