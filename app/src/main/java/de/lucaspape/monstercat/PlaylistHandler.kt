@@ -39,7 +39,7 @@ class PlaylistHandler {
         val playlistCacheFile = File(view.context.cacheDir.toString() + "/playlists.list")
 
         if(!playlistCacheFile.exists()){
-            val playlistUrl = "https://connect.monstercat.com/v2/self/playlists"
+            val playlistUrl = view.context.getString(R.string.playlistUrl)
 
             val playlistRequest = object : StringRequest(Request.Method.GET, playlistUrl, Response.Listener<String>
             { response ->
@@ -197,8 +197,7 @@ class PlaylistHandler {
 
             for(i in (0 .. (trackCount/50))){
                 val playlistTrackUrl =
-                    "https://connect.monstercat.com/api/catalog/browse/?playlistId=" + playlistId + "&skip=" + (i*50).toString() + "&limit=50"
-                println("https://connect.monstercat.com/api/catalog/browse/?playlistId=" + playlistId + "&skip=" + (i*50).toString() + "&limit=50")
+                    view.context.getString(R.string.loadSongsUrl) + "?playlistId=" + playlistId + "&skip=" + (i*50).toString() + "&limit=50"
                 val trackRequest =
                     object : StringRequest(Request.Method.GET, playlistTrackUrl, Response.Listener<String>
                     { response ->
@@ -317,7 +316,7 @@ class PlaylistHandler {
                     } else {
                         if (itemValue.get("streamable") as Boolean) {
                             val url =
-                                "https://s3.amazonaws.com/data.monstercat.com/blobs/" + itemValue.get("streamHash")
+                                view.context.getString(R.string.songStreamUrl) + itemValue.get("streamHash")
 
                             Toast.makeText(
                                 view.context,
@@ -371,7 +370,7 @@ class PlaylistHandler {
             val downloadQuality = settings.getSetting("downloadQuality")
 
             val downloadUrl =
-                "https://connect.monstercat.com/api/release/" + albumId + "/download?method=download&type=" + downloadType + "_" + downloadQuality + "&track=" + id
+                context.getString(R.string.songDownloadUrl) + albumId + "/download?method=download&type=" + downloadType + "_" + downloadQuality + "&track=" + id
 
             val downloadLocation = context.filesDir.toString() + "/" + artist + title + version + "." + downloadType
             if (!File(downloadLocation).exists()) {
@@ -406,7 +405,7 @@ class PlaylistHandler {
         val playlistId = listItem.get("playlistId")
 
         val playlistTrackUrl =
-            "https://connect.monstercat.com/api/catalog/browse/?playlistId=" + playlistId + "&skip=0&limit=50"
+            context.getString(R.string.loadSongsUrl) + "?playlistId=" + playlistId + "&skip=0&limit=50"
 
         val trackRequest =
             object : StringRequest(Request.Method.GET, playlistTrackUrl, Response.Listener<String>
@@ -434,7 +433,7 @@ class PlaylistHandler {
                         }
 
                         val downloadUrl =
-                            "https://connect.monstercat.com/api/release/" + albumId + "/download?method=download&type=" + downloadType + "_" + downloadQuality + "&track=" + id
+                            context.getString(R.string.songDownloadUrl) + albumId + "/download?method=download&type=" + downloadType + "_" + downloadQuality + "&track=" + id
 
                         val hashMap = HashMap<String, Any?>()
                         hashMap.put("title", title)

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="loginUrl">https://connect.monstercat.com/v2/signin</string>
+    <string name="loadSongsUrl">https://connect.monstercat.com/api/catalog/browse/</string>
+    <string name="songStreamUrl">https://s3.amazonaws.com/data.monstercat.com/blobs/</string>
+    <string name="songDownloadUrl">"https://connect.monstercat.com/api/release/</string>
+    <string name="playlistUrl">https://connect.monstercat.com/v2/self/playlists/</string>
+</resources>

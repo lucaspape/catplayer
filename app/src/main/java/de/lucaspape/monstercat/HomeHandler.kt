@@ -106,7 +106,7 @@ class HomeHandler {
 
             //can only load 50 at a time
             for (i in (0 until loadMax / 50)) {
-                val url = "https://connect.monstercat.com/api/catalog/browse/?limit=50&skip=" + i * 50
+                val url = view.context.getString(R.string.loadSongsUrl) + "?limit=50&skip=" + i * 50
 
                 val stringRequest = object : StringRequest(
                     Request.Method.GET, url,
@@ -249,7 +249,7 @@ class HomeHandler {
 
                     if (!File(downloadLocation).exists()) {
                         val streamHashUrl =
-                            "https://connect.monstercat.com/api/catalog/browse/?albumId=" + itemValue.get("id")
+                            view.context.getString(R.string.loadSongsUrl) +"?albumId=" + itemValue.get("id")
                         val streamHashRequest = object : StringRequest(
                             Request.Method.GET, streamHashUrl,
                             Response.Listener<String> { response ->
@@ -273,7 +273,7 @@ class HomeHandler {
 
                                 if (streamHash != "") {
                                     MainActivity.musicPlayer!!.addSong(
-                                        "https://s3.amazonaws.com/data.monstercat.com/blobs/" + streamHash,
+                                        view.context.getString(R.string.songStreamUrl) + streamHash,
                                         title + " " + version,
                                         artist,
                                         coverImage
@@ -351,7 +351,7 @@ class HomeHandler {
             val downloadQuality = settings.getSetting("downloadQuality")
 
             val downloadUrl =
-                "https://connect.monstercat.com/api/release/" + albumId + "/download?method=download&type=" + downloadType + "_" + downloadQuality + "&track=" + id
+                context.getString(R.string.songDownloadUrl) + albumId + "/download?method=download&type=" + downloadType + "_" + downloadQuality + "&track=" + id
 
             val downloadLocation = context.filesDir.toString() + "/" + artist + title + version + "." + downloadType
             if (!File(downloadLocation).exists()) {

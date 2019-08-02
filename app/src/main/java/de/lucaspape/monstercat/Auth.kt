@@ -27,7 +27,7 @@ class Auth {
             loginPostParams.put("email", username)
             loginPostParams.put("password", password)
 
-            val loginUrl = "https://connect.monstercat.com/v2/signin"
+            val loginUrl = context.getString(R.string.loginUrl)
 
             val loginPostRequest = object : JsonObjectRequest(Request.Method.POST,
                 loginUrl, loginPostParams, Response.Listener { response ->
