@@ -31,7 +31,7 @@ class SettingsFragment: Fragment() {
             settings.saveSetting("email", username)
             settings.saveSetting("password", password)
 
-            Toast.makeText(view.context, "Updated! Please restart app to take effect.", Toast.LENGTH_SHORT)
+            Toast.makeText(view.context, view.context.getString(R.string.settingsUpdatedMsg), Toast.LENGTH_SHORT)
                 .show()
         }
     }

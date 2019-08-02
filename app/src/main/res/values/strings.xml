@@ -16,4 +16,6 @@
     <string name="downloadPlaylistSuccessfulMsg">%1$s downloaded successful!</string>
     <string name="loginSuccessfulMsg">Logged in!</string>
     <string name="loginFailedMsg">Login failed!</string>
+    <string name="settingsUpdatedMsg">Settings updated! Please restart app to take effect.</string>
+    <string name="setUsernamePasswordSettingsMsg">Please set your username and password in the settings!</string>
 </resources>

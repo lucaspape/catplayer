@@ -29,7 +29,7 @@ class PlaylistFragment : Fragment() {
         val password = settings.getSetting("password")
 
         if(username == null || password == null){
-            Toast.makeText(view.context, "Set your username and passwort in the settings!", Toast.LENGTH_SHORT)
+            Toast.makeText(view.context, view.context.getString(R.string.setUsernamePasswordSettingsMsg), Toast.LENGTH_SHORT)
                 .show()
         }else{
             playlistHandler.loadPlaylist(view)
