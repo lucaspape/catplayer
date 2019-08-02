@@ -280,8 +280,7 @@ class HomeHandler {
                                     )
 
                                     Toast.makeText(
-                                        view.context,
-                                        title + " " + version + " added to playlist!",
+                                        view.context, view.context.getString(R.string.songAddedToPlaylistMsg, title + " " + version),
                                         Toast.LENGTH_SHORT
                                     ).show()
 
@@ -307,7 +306,7 @@ class HomeHandler {
                         )
                     }
                 } else {
-                    Toast.makeText(view.context, "Song not yet streamable!", Toast.LENGTH_SHORT)
+                    Toast.makeText(view.context, view.context.getString(R.string.streamNotAvailableMsg, title + " " + version), Toast.LENGTH_SHORT)
                         .show()
                 }
             }
@@ -358,15 +357,15 @@ class HomeHandler {
                 if (sid != "") {
                     downloadSong(downloadUrl, downloadLocation, sid, shownTitle, context).execute()
                 } else {
-                    Toast.makeText(context, "Not signed in!", Toast.LENGTH_SHORT)
+                    Toast.makeText(context, context.getString(R.string.userNotSignedInMsg), Toast.LENGTH_SHORT)
                         .show()
                 }
             } else {
-                Toast.makeText(context, shownTitle + " already downloaded!", Toast.LENGTH_SHORT)
+                Toast.makeText(context, context.getString(R.string.alreadyDownloadedMsg, shownTitle), Toast.LENGTH_SHORT)
                     .show()
             }
         } else {
-            Toast.makeText(context, shownTitle + " download not available!", Toast.LENGTH_SHORT)
+            Toast.makeText(context, context.getString(R.string.downloadNotAvailableMsg, shownTitle), Toast.LENGTH_SHORT)
                 .show()
         }
     }
@@ -428,7 +427,7 @@ class HomeHandler {
 
         override fun onPostExecute(result: String?) {
             super.onPostExecute(result)
-            Toast.makeText(context, shownTitle + " downloaded!", Toast.LENGTH_SHORT)
+            Toast.makeText(context, context.getString(R.string.downloadSuccessfulMsg, shownTitle), Toast.LENGTH_SHORT)
                 .show()
         }
     }

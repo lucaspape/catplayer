@@ -287,7 +287,6 @@ class PlaylistHandler {
     fun registerListViewClick(view: View) {
         val playlistView = view.findViewById<ListView>(R.id.listview)
 
-
         playlistView.onItemClickListener = object : AdapterView.OnItemClickListener {
             override fun onItemClick(adapterView: AdapterView<*>?, view: View?, position: Int, p3: Long) {
                 val itemValue = playlistView.getItemAtPosition(position) as HashMap<String, Any?>
@@ -299,7 +298,7 @@ class PlaylistHandler {
 
                     val artist = itemValue.get("artist") as String
                     val title = itemValue.get("title") as String
-                    val version = itemValue.get("version")
+                    val version = itemValue.get("version") as String
                     val shownTitle = itemValue.get("shownTitle") as String
                     val coverUrl = itemValue.get("coverUrl") as String
                     val primaryCoverImage = itemValue.get("primaryImage") as String
@@ -320,7 +319,7 @@ class PlaylistHandler {
 
                             Toast.makeText(
                                 view.context,
-                                title + " " + version as String + " added to playlist!",
+                                view.context.getString(R.string.songAddedToPlaylistMsg, title + " " + version),
                                 Toast.LENGTH_SHORT
                             ).show()
 
@@ -377,15 +376,15 @@ class PlaylistHandler {
                 if (sid != "") {
                     downloadSong(downloadUrl, downloadLocation, sid, shownTitle, context).execute()
                 } else {
-                    Toast.makeText(context, "Not signed in!", Toast.LENGTH_SHORT)
+                    Toast.makeText(context, context.getString(R.string.userNotSignedInMsg), Toast.LENGTH_SHORT)
                         .show()
                 }
             } else {
-                Toast.makeText(context, shownTitle + " already downloaded!", Toast.LENGTH_SHORT)
+                Toast.makeText(context, context.getString(R.string.alreadyDownloadedMsg, shownTitle), Toast.LENGTH_SHORT)
                     .show()
             }
         } else {
-            Toast.makeText(context, shownTitle + " download not available!", Toast.LENGTH_SHORT)
+            Toast.makeText(context, context.getString(R.string.downloadNotAvailableMsg, shownTitle), Toast.LENGTH_SHORT)
                 .show()
         }
     }
@@ -402,7 +401,8 @@ class PlaylistHandler {
 
         //request playlist
 
-        val playlistId = listItem.get("playlistId")
+        val playlistId = listItem.get("playlistId") as String
+        val playlistName = listItem.get("playlistName") as String
 
         val playlistTrackUrl =
             context.getString(R.string.loadSongsUrl) + "?playlistId=" + playlistId + "&skip=0&limit=50"
@@ -470,7 +470,7 @@ class PlaylistHandler {
 
         playlistDownloadQueue.addRequestFinishedListener<Any> {
             try{
-                downloadSongArray(downloadTracks, sid, context).execute()
+                downloadSongArray(downloadTracks, playlistName, sid, context).execute()
             }catch (e: Exception){
 
             }
@@ -480,9 +480,10 @@ class PlaylistHandler {
         playlistDownloadQueue.add(trackRequest)
     }
 
-    class downloadSongArray(tracks: ArrayList<HashMap<String, Any?>>, sid:String, context:Context):AsyncTask<Void, Void, String>(){
+    class downloadSongArray(tracks: ArrayList<HashMap<String, Any?>>, playlistName:String, sid:String, context:Context):AsyncTask<Void, Void, String>(){
         val tracks = tracks
         val sid = sid
+        val playlistName = playlistName
         var context = context
 
         override fun doInBackground(vararg p0: Void?): String? {
@@ -533,7 +534,7 @@ class PlaylistHandler {
         override fun onPostExecute(result: String?) {
             super.onPostExecute(result)
 
-            Toast.makeText(context, "Download of playlist finished!", Toast.LENGTH_SHORT)
+            Toast.makeText(context, context.getString(R.string.downloadPlaylistSuccessfulMsg, playlistName), Toast.LENGTH_SHORT)
                 .show()
         }
 
@@ -595,7 +596,7 @@ class PlaylistHandler {
 
         override fun onPostExecute(result: String?) {
             super.onPostExecute(result)
-            Toast.makeText(context, shownTitle + " downloaded!", Toast.LENGTH_SHORT)
+            Toast.makeText(context, context.getString(R.string.downloadSuccessfulMsg, shownTitle), Toast.LENGTH_SHORT)
                 .show()
         }
     }
