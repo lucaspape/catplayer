@@ -18,4 +18,5 @@
     <string name="loginFailedMsg">Login failed!</string>
     <string name="settingsUpdatedMsg">Settings updated! Please restart app to take effect.</string>
     <string name="setUsernamePasswordSettingsMsg">Please set your username and password in the settings!</string>
+    <string name="playNext">Play Next</string>
 </resources>

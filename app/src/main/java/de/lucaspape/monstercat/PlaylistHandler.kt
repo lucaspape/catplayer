@@ -311,7 +311,7 @@ class PlaylistHandler {
                         listViewView.context.filesDir.toString() + "/" + artist + title + version + "." + downloadType
 
                     if (File(downloadLocation).exists()) {
-                        MainActivity.musicPlayer!!.addSong(downloadLocation, title, artist, primaryCoverImage)
+                        MainActivity.musicPlayer!!.playNow(downloadLocation, title, artist, primaryCoverImage)
                     } else {
                         if (itemValue["streamable"] as Boolean) {
                             val url =
@@ -323,7 +323,7 @@ class PlaylistHandler {
                                 Toast.LENGTH_SHORT
                             ).show()
 
-                            MainActivity.musicPlayer!!.addSong(url, shownTitle, artist, primaryCoverImage)
+                            MainActivity.musicPlayer!!.playNow(url, shownTitle, artist, primaryCoverImage)
                         }
                     }
 

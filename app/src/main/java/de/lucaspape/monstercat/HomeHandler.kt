@@ -2,6 +2,7 @@ package de.lucaspape.monstercat
 
 import android.content.Context
 import android.os.AsyncTask
+import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -221,99 +222,121 @@ class HomeHandler {
     }
 
     fun registerListViewClick(view: View) {
-        val musicQueue = Volley.newRequestQueue(view.context)
         val musicList = view.findViewById<ListView>(R.id.musiclistview)
 
         musicList.onItemClickListener = object : AdapterView.OnItemClickListener {
             override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 val itemValue = musicList.getItemAtPosition(p2) as HashMap<String, Any?>
+                playSong(view.context, itemValue, false)
 
-                val title = itemValue["title"] as String
-                val artist = itemValue["artist"] as String
-                val version = itemValue["version"] as String
+            }
+        }
+    }
 
-                val coverImage = itemValue["primaryImage"] as String
+    fun playSong(context: Context, itemValue: HashMap<String, Any?>, playAfter: Boolean){
+        val musicQueue = Volley.newRequestQueue(context)
+        val title = itemValue["title"] as String
+        val artist = itemValue["artist"] as String
+        val version = itemValue["version"] as String
 
-                val streamable = itemValue["streamable"] as Boolean
+        val coverImage = itemValue["primaryImage"] as String
 
-                val settings = Settings(view.context)
-                val downloadType = settings.getSetting("downloadType")
+        val streamable = itemValue["streamable"] as Boolean
 
-                if (streamable) {
-                    val downloadLocation =
-                        view.context.filesDir.toString() + "/" + artist + title + version + "." + downloadType
+        val settings = Settings(context)
+        val downloadType = settings.getSetting("downloadType")
 
-                    if (!File(downloadLocation).exists()) {
-                        val streamHashUrl =
-                            view.context.getString(R.string.loadSongsUrl) + "?albumId=" + itemValue["id"]
-                        val streamHashRequest = object : StringRequest(
-                            Method.GET, streamHashUrl,
-                            Response.Listener<String> { response ->
-                                val json = JSONObject(response)
-                                val jsonArray = json.getJSONArray("results")
+        if (streamable) {
+            val downloadLocation =
+                context.filesDir.toString() + "/" + artist + title + version + "." + downloadType
 
-                                //trying to retreive streamHash
-                                var streamHash = ""
+            if (!File(downloadLocation).exists()) {
+                val streamHashUrl =
+                    context.getString(R.string.loadSongsUrl) + "?albumId=" + itemValue["id"]
+                val streamHashRequest = object : StringRequest(
+                    Method.GET, streamHashUrl,
+                    Response.Listener<String> { response ->
+                        val json = JSONObject(response)
+                        val jsonArray = json.getJSONArray("results")
 
-                                //search entire album for corrent song
-                                for (i in (0 until jsonArray.length())) {
-                                    val searchSong = title + version
-                                    if (jsonArray.getJSONObject(i).getString("title") + jsonArray.getJSONObject(i).getString(
-                                            "version"
-                                        ) == searchSong
-                                    ) {
-                                        streamHash =
-                                            jsonArray.getJSONObject(i).getJSONObject("albums").getString("streamHash")
-                                    }
-                                }
+                        //trying to retreive streamHash
+                        var streamHash = ""
 
-                                if (streamHash != "") {
-                                    MainActivity.musicPlayer!!.addSong(
-                                        view.context.getString(R.string.songStreamUrl) + streamHash,
-                                        "$title $version",
-                                        artist,
-                                        coverImage
-                                    )
-
-                                    Toast.makeText(
-                                        view.context, view.context.getString(
-                                            R.string.songAddedToPlaylistMsg,
-                                            "$title $version"
-                                        ),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-
-                                }
-
-                            },
-                            Response.ErrorListener { println("Error!") }) {
-                            @Throws(AuthFailureError::class)
-                            override fun getHeaders(): Map<String, String> {
-                                val params = HashMap<String, String>()
-                                if (loggedIn) {
-                                    params["Cookie"] = "connect.sid=$sid"
-                                }
-                                return params
+                        //search entire album for corrent song
+                        for (i in (0 until jsonArray.length())) {
+                            val searchSong = title + version
+                            if (jsonArray.getJSONObject(i).getString("title") + jsonArray.getJSONObject(i).getString(
+                                    "version"
+                                ) == searchSong
+                            ) {
+                                streamHash =
+                                    jsonArray.getJSONObject(i).getJSONObject("albums").getString("streamHash")
                             }
                         }
 
-                        musicQueue.add(streamHashRequest)
-                    } else {
-                        MainActivity.musicPlayer!!.addSong(
-                            downloadLocation,
-                            "$title $version", artist, coverImage
-                        )
+                        if (streamHash != "") {
+                            if(playAfter){
+                                MainActivity.musicPlayer!!.addSong(
+                                    context.getString(R.string.songStreamUrl) + streamHash,
+                                    "$title $version",
+                                    artist,
+                                    coverImage
+                                )
+                            }else{
+                                MainActivity.musicPlayer!!.playNow(
+                                    context.getString(R.string.songStreamUrl) + streamHash,
+                                    "$title $version",
+                                    artist,
+                                    coverImage
+                                )
+                            }
+
+
+                            Toast.makeText(
+                                context, context.getString(
+                                    R.string.songAddedToPlaylistMsg,
+                                    "$title $version"
+                                ),
+                                Toast.LENGTH_SHORT
+                            ).show()
+
+                        }
+
+                    },
+                    Response.ErrorListener { println("Error!") }) {
+                    @Throws(AuthFailureError::class)
+                    override fun getHeaders(): Map<String, String> {
+                        val params = HashMap<String, String>()
+                        if (loggedIn) {
+                            params["Cookie"] = "connect.sid=$sid"
+                        }
+                        return params
                     }
-                } else {
-                    Toast.makeText(
-                        view.context, view.context.getString(
-                            R.string.streamNotAvailableMsg,
-                            "$title $version"
-                        ), Toast.LENGTH_SHORT
-                    )
-                        .show()
                 }
+
+                musicQueue.add(streamHashRequest)
+            } else {
+                if(playAfter){
+                    MainActivity.musicPlayer!!.addSong(
+                        downloadLocation,
+                        "$title $version", artist, coverImage
+                    )
+                }else{
+                    MainActivity.musicPlayer!!.playNow(
+                        downloadLocation,
+                        "$title $version", artist, coverImage
+                    )
+                }
+
             }
+        } else {
+            Toast.makeText(
+                context, context.getString(
+                    R.string.streamNotAvailableMsg,
+                    "$title $version"
+                ), Toast.LENGTH_SHORT
+            )
+                .show()
         }
     }
 

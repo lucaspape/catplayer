@@ -35,7 +35,7 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
 
     private var mediaPlayer = MediaPlayer()
     private var currentSong = 0
-    private var playList = ArrayList<HashMap<String, Any?>>()
+    private var playList = ArrayList<HashMap<String, Any?>>(1)
     private var playing = false
 
     //notification var
@@ -102,7 +102,18 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
     }
 
     private fun play(){
-        val song = playList[currentSong]
+        val song:HashMap<String, Any?>
+
+        try{
+            if(playList[currentSong].isNotEmpty()){
+                song = playList[currentSong]
+            }else{
+                return
+            }
+        }catch (e: IndexOutOfBoundsException){
+            return
+        }
+
 
         val url = song["url"] as String
         val title = song["title"] as String
@@ -192,14 +203,14 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         val title = song["title"] as String
         val artist = song["artist"] as String
         val coverUrl = song["coverUrl"] as String
-        
+
         mediaPlayer.pause()
         showNotification(title, artist, coverUrl, false)
         playButton.setImageDrawable(context.resources.getDrawable(R.drawable.ic_play_arrow_black_24dp))
         playing = false
     }
 
-    //TODO catch index out of bounds exc
+    //TODO catch index out of bounds exc fix seek in wrong state
     fun resume(){
         val song = playList[currentSong]
 
@@ -218,17 +229,17 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
     }
 
     fun next(){
-        currentSong++
-
-        try{
-            if(playList[currentSong].isEmpty()){
-                stop()
-            }else{
+        try {
+            if (playList[currentSong + 1].isNotEmpty()) {
+                currentSong++
                 play()
+            } else {
+                stop()
             }
-        }catch (e:IndexOutOfBoundsException){
+        }catch (e: IndexOutOfBoundsException){
             stop()
         }
+
     }
 
     fun previous(){
@@ -253,8 +264,17 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         song["title"] = title
         song["artist"] = artistName
         song["coverUrl"] = coverUrl
+        song["playNow"] = true
 
-        playList.add(song)
+        try{
+            playList.add(currentSong+1, song)
+            currentSong++
+        }catch (e:IndexOutOfBoundsException){
+            playList.add(song)
+        }
+
+
+        play()
     }
 
     fun addSong(url:String, title:String, artistName: String , coverUrl:String){
@@ -265,10 +285,6 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         song["coverUrl"] = coverUrl
 
         playList.add(song)
-
-        if(!playing){
-            play()
-        }
     }
 
     fun toggleMusic(){
