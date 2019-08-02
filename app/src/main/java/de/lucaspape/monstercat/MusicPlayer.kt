@@ -37,6 +37,7 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
     private var currentSong = 0
     private var playList = ArrayList<HashMap<String, Any?>>(1)
     private var playing = false
+    private var paused = false
 
     //notification var
     private val channelID = "Music Notification"
@@ -208,9 +209,9 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         showNotification(title, artist, coverUrl, false)
         playButton.setImageDrawable(context.resources.getDrawable(R.drawable.ic_play_arrow_black_24dp))
         playing = false
+        paused = true
     }
 
-    //TODO catch index out of bounds exc fix seek in wrong state
     fun resume(){
         val song = playList[currentSong]
 
@@ -218,10 +219,17 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         val artist = song["artist"] as String
         val coverUrl = song["coverUrl"] as String
 
+
         val length = mediaPlayer.currentPosition
 
-        mediaPlayer.seekTo(length)
-        mediaPlayer.start()
+        if(paused){
+            mediaPlayer.seekTo(length)
+            mediaPlayer.start()
+
+            paused = false
+        }else{
+            play()
+        }
 
         showNotification(title, artist, coverUrl, true)
         playButton.setImageDrawable(context.resources.getDrawable(R.drawable.ic_pause_black_24dp))
