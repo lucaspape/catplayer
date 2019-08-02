@@ -295,40 +295,51 @@ class PlaylistHandler {
                 if (itemValue["type"] == "playlist") {
                     loadPlaylistTracks(listViewView!!, itemValue, playlistView)
                 } else {
-                    //do song things
-
-                    val artist = itemValue["artist"] as String
-                    val title = itemValue["title"] as String
-                    val version = itemValue["version"] as String
-                    val shownTitle = itemValue["shownTitle"] as String
-                    val primaryCoverImage = itemValue["primaryImage"] as String
-
-                    val settings = Settings(listViewView!!.context)
-
-                    val downloadType = settings.getSetting("downloadType")
-
-                    val downloadLocation =
-                        listViewView.context.filesDir.toString() + "/" + artist + title + version + "." + downloadType
-
-                    if (File(downloadLocation).exists()) {
-                        MainActivity.musicPlayer!!.playNow(downloadLocation, title, artist, primaryCoverImage)
-                    } else {
-                        if (itemValue["streamable"] as Boolean) {
-                            val url =
-                                listViewView.context.getString(R.string.songStreamUrl) + itemValue["streamHash"]
-
-                            Toast.makeText(
-                                listViewView.context,
-                                listViewView.context.getString(R.string.songAddedToPlaylistMsg, "$title $version"),
-                                Toast.LENGTH_SHORT
-                            ).show()
-
-                            MainActivity.musicPlayer!!.playNow(url, shownTitle, artist, primaryCoverImage)
-                        }
-                    }
-
+                    playSong(view.context, itemValue, false)
                 }
             }
+    }
+
+    fun playSong(context: Context, itemValue: HashMap<String, Any?>, playAfter:Boolean){
+
+        val artist = itemValue["artist"] as String
+        val title = itemValue["title"] as String
+        val version = itemValue["version"] as String
+        val shownTitle = itemValue["shownTitle"] as String
+        val primaryCoverImage = itemValue["primaryImage"] as String
+
+        val settings = Settings(context)
+
+        val downloadType = settings.getSetting("downloadType")
+
+        val downloadLocation =
+            context.filesDir.toString() + "/" + artist + title + version + "." + downloadType
+
+        if (File(downloadLocation).exists()) {
+            if(playAfter){
+                MainActivity.musicPlayer!!.addSong(downloadLocation, title, artist, primaryCoverImage)
+            }else{
+                MainActivity.musicPlayer!!.playNow(downloadLocation, title, artist, primaryCoverImage)
+            }
+
+        } else {
+            if (itemValue["streamable"] as Boolean) {
+                val url =
+                    context.getString(R.string.songStreamUrl) + itemValue["streamHash"]
+
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.songAddedToPlaylistMsg, "$title $version"),
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                if(playAfter){
+                    MainActivity.musicPlayer!!.addSong(url, title, artist, primaryCoverImage)
+                }else{
+                    MainActivity.musicPlayer!!.playNow(url, title, artist, primaryCoverImage)
+                }
+            }
+        }
     }
 
     fun registerPullRefresh(view: View) {

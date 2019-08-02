@@ -46,6 +46,7 @@ class PlaylistFragment : Fragment() {
         super.onCreateContextMenu(menu, v, menuInfo)
 
         menu!!.add(0, v!!.id, 0, getString(R.string.download))
+        menu.add(0, v.id, 0, getString(R.string.playNext))
     }
 
     override fun onContextItemSelected(item: MenuItem?): Boolean {
@@ -61,6 +62,8 @@ class PlaylistFragment : Fragment() {
                 playlistHandler.downloadSong(context!!, listItem)
             }
 
+        }else if(item.title == getString(R.string.playNext)){
+            playlistHandler.playSong(context!!, listItem, true)
         }
 
         return super.onContextItemSelected(item)
