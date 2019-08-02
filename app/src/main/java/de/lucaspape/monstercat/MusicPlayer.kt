@@ -35,10 +35,7 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
 
     private var mediaPlayer = MediaPlayer()
     private var currentSong = 0
-    private var playList = ArrayList<String>()
-    private var titleList = ArrayList<String>()
-    private var coverList = ArrayList<String>()
-    private var artistList = ArrayList<String>()
+    private var playList = ArrayList<HashMap<String, Any?>>()
     private var playing = false
 
     //notification var
@@ -105,19 +102,26 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
     }
 
     private fun play(){
+        val song = playList[currentSong]
+
+        val url = song["url"] as String
+        val title = song["title"] as String
+        val artist = song["artist"] as String
+        val coverUrl = song["coverUrl"] as String
+
         mediaPlayer.stop()
         mediaPlayer = MediaPlayer()
 
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC)
-        mediaPlayer.setDataSource(playList[currentSong])
+        mediaPlayer.setDataSource(url)
         mediaPlayer.prepare()
         mediaPlayer.start()
 
         playing = true
 
         try {
-            textView1.text = titleList[currentSong]
-            textView2.text = titleList[currentSong]
+            textView1.text = title
+            textView2.text = title
 
             val valueAnimator = ValueAnimator.ofFloat(0.0f, 1.0f)
             valueAnimator.repeatCount = Animation.INFINITE
@@ -160,13 +164,13 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
                 }
             })
 
-            val coverFile = File(coverList[currentSong])
+            val coverFile = File(coverUrl)
             if(coverFile.exists()){
                 val bitmap = BitmapFactory.decodeFile(coverFile.absolutePath)
                 barCoverImage.setImageBitmap(bitmap)
             }
 
-            showNotification(titleList[currentSong], artistList[currentSong], coverList[currentSong], true)
+            showNotification(title, artist, coverUrl, true)
             playButton.setImageDrawable(context.resources.getDrawable(R.drawable.ic_pause_black_24dp))
         }catch (e: IndexOutOfBoundsException){
             //Something bad happend, resetting
@@ -183,20 +187,32 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
     }
 
     fun pause(){
+        val song = playList[currentSong]
+
+        val title = song["title"] as String
+        val artist = song["artist"] as String
+        val coverUrl = song["coverUrl"] as String
+        
         mediaPlayer.pause()
-        showNotification(titleList[currentSong], artistList[currentSong], coverList[currentSong], false)
+        showNotification(title, artist, coverUrl, false)
         playButton.setImageDrawable(context.resources.getDrawable(R.drawable.ic_play_arrow_black_24dp))
         playing = false
     }
 
     //TODO catch index out of bounds exc
     fun resume(){
+        val song = playList[currentSong]
+
+        val title = song["title"] as String
+        val artist = song["artist"] as String
+        val coverUrl = song["coverUrl"] as String
+
         val length = mediaPlayer.currentPosition
 
         mediaPlayer.seekTo(length)
         mediaPlayer.start()
 
-        showNotification(titleList[currentSong], artistList[currentSong], coverList[currentSong], true)
+        showNotification(title, artist, coverUrl, true)
         playButton.setImageDrawable(context.resources.getDrawable(R.drawable.ic_pause_black_24dp))
         playing = true
     }
@@ -231,11 +247,24 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         }
     }
 
+    fun playNow(url:String, title:String, artistName: String , coverUrl:String){
+        val song = HashMap<String, Any?>()
+        song["url"] = url
+        song["title"] = title
+        song["artist"] = artistName
+        song["coverUrl"] = coverUrl
+
+        playList.add(song)
+    }
+
     fun addSong(url:String, title:String, artistName: String , coverUrl:String){
-        playList.add(url)
-        titleList.add(title)
-        coverList.add(coverUrl)
-        artistList.add(artistName)
+        val song = HashMap<String, Any?>()
+        song["url"] = url
+        song["title"] = title
+        song["artist"] = artistName
+        song["coverUrl"] = coverUrl
+
+        playList.add(song)
 
         if(!playing){
             play()
