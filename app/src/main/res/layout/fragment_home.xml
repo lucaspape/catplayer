@@ -33,7 +33,7 @@
             android:background="@color/colorPlayerBackground"
             android:theme="?attr/actionBarTheme"
             android:minHeight="?attr/actionBarSize"
-            android:id="@+id/muscicbar" android:layout_marginBottom="70dp"
+            android:id="@+id/muscicbar" android:layout_marginBottom="78dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
