@@ -1,6 +1,8 @@
 package de.lucaspape.monstercat
 
+import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.os.AsyncTask
 import android.view.MenuItem
 import android.view.View
@@ -399,6 +401,18 @@ class HomeHandler {
             Toast.makeText(context, context.getString(R.string.downloadNotAvailableMsg, shownTitle), Toast.LENGTH_SHORT)
                 .show()
         }
+    }
+
+    //TODO implement
+    fun addSongToPlaylist(context: Context, itemValue: HashMap<String, Any?>){
+        val testdata = arrayOf("first", "second", "third", "fourth")
+
+        val alertDialogBuilder = AlertDialog.Builder(context)
+        alertDialogBuilder.setTitle("Pick playlist")
+        alertDialogBuilder.setItems(testdata) { dialogInterface, i ->
+
+        }
+        alertDialogBuilder.show()
     }
 
     class DownloadSong(//yeah this is not great

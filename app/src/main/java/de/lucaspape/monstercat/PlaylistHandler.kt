@@ -152,7 +152,6 @@ class PlaylistHandler {
 
             currentPlaylist = itemValue
         } else {
-            //TODO fix last 2 songs not visible
             val tempList = Array<HashMap<String, Any?>>(trackCount) { HashMap() }
 
             val todo = (trackCount / 50) + 1

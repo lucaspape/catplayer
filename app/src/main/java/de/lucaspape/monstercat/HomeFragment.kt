@@ -41,6 +41,7 @@ class HomeFragment : Fragment() {
 
         menu!!.add(0, v!!.id, 0, getString(R.string.download))
         menu.add(0, v.id, 0, getString(R.string.playNext))
+        menu.add(0, v.id, 0, getString(R.string.addToPlaylist))
     }
 
     override fun onContextItemSelected(item: MenuItem?): Boolean {
@@ -53,6 +54,8 @@ class HomeFragment : Fragment() {
             homeHandler.downloadSong(context!!, listItem)
         }else if(item.title == getString(R.string.playNext)){
             homeHandler.playSong(context!!, listItem, true)
+        }else if(item.title == getString(R.string.addToPlaylist)){
+            homeHandler.addSongToPlaylist(context!!,listItem)
         }
 
         return super.onContextItemSelected(item)
