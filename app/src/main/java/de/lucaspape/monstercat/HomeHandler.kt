@@ -91,7 +91,7 @@ class HomeHandler {
                     }
 
                     //download cover arts
-                    MainActivity.DownloadCoverArray(coverDownloadList, simpleAdapter).execute()
+                    DownloadCoverArray(coverDownloadList, simpleAdapter).execute()
 
                     val oos = ObjectOutputStream(FileOutputStream(listFile))
                     oos.writeObject(list)
@@ -453,5 +453,7 @@ class HomeHandler {
                 .show()
         }
     }
+
+
 
 }

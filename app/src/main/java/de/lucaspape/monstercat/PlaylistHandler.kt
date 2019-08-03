@@ -170,7 +170,7 @@ class PlaylistHandler {
 
                     }
 
-                    MainActivity.DownloadCoverArray(coverDownloadList, simpleAdapter).execute()
+                    DownloadCoverArray(coverDownloadList, simpleAdapter).execute()
                     currentPlaylist = itemValue
 
                     val oos = ObjectOutputStream(FileOutputStream(playlistTrackCacheFile))
