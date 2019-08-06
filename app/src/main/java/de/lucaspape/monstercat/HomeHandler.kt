@@ -404,7 +404,7 @@ class HomeHandler {
                 .show()
         }
     }
-    
+
     fun addSongToPlaylist(context: Context, itemValue: HashMap<String, Any?>){
         var playlistNames = arrayOfNulls<String>(0)
         var playlistIds = arrayOfNulls<String>(0)
@@ -452,15 +452,13 @@ class HomeHandler {
 
         queue.addRequestFinishedListener<Any> {
             val alertDialogBuilder = AlertDialog.Builder(context)
-            alertDialogBuilder.setTitle("Pick playlist")
-            alertDialogBuilder.setItems(playlistNames) { dialogInterface, i ->
+            alertDialogBuilder.setTitle(context.getString(R.string.pickPlaylistMsg))
+            alertDialogBuilder.setItems(playlistNames) { _, i ->
                 println(playlistNames[i])
                 val playlistPatchUrl = context.getString(R.string.playlistUrl) + playlistIds[i]
                 val patchParams = JSONObject()
 
                 val trackArray = tracksArrays[i]
-
-                println(trackArray)
 
                 val patchedArray = arrayOfNulls<JSONObject>(trackArray!!.length() + 1)
 
@@ -476,10 +474,8 @@ class HomeHandler {
 
                 patchParams.put("tracks", JSONArray(patchedArray))
 
-                println(patchParams)
-
                 val patchRequest = object:JsonObjectRequest(Method.PATCH, playlistPatchUrl, patchParams, Response.Listener {
-
+                    //TODO reload playlist
                 }, Response.ErrorListener {
 
                 }){
@@ -494,7 +490,7 @@ class HomeHandler {
                 }
 
                 val addToPlaylistQueue = Volley.newRequestQueue(context)
-                addToPlaylistQueue.addRequestFinishedListener<Any> { println("Done!") }
+                addToPlaylistQueue.addRequestFinishedListener<Any> { //TODO add msg }
                 addToPlaylistQueue.add(patchRequest)
             }
             alertDialogBuilder.show()
