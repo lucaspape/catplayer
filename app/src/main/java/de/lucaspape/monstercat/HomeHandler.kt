@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.*
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.android.volley.*
+import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
@@ -18,6 +19,7 @@ import com.bumptech.glide.load.model.LazyHeaders
 import com.bumptech.glide.request.target.Target
 import de.lucaspape.monstercat.MainActivity.Companion.loggedIn
 import de.lucaspape.monstercat.MainActivity.Companion.sid
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.*
 import java.lang.Exception
@@ -402,17 +404,103 @@ class HomeHandler {
                 .show()
         }
     }
-
-    //TODO implement
+    
     fun addSongToPlaylist(context: Context, itemValue: HashMap<String, Any?>){
-        val testdata = arrayOf("first", "second", "third", "fourth")
+        var playlistNames = arrayOfNulls<String>(0)
+        var playlistIds = arrayOfNulls<String>(0)
+        var tracksArrays = arrayOfNulls<JSONArray>(0)
 
-        val alertDialogBuilder = AlertDialog.Builder(context)
-        alertDialogBuilder.setTitle("Pick playlist")
-        alertDialogBuilder.setItems(testdata) { dialogInterface, i ->
+        val queue = Volley.newRequestQueue(context)
 
+        //get all playlists
+        val playlistUrl = context.getString(R.string.playlistsUrl)
+
+        val playlistRequest = object:StringRequest(playlistUrl,
+            Response.Listener { response ->
+                val jsonObject = JSONObject(response)
+                val jsonArray = jsonObject.getJSONArray("results")
+
+                playlistNames = arrayOfNulls<String>(jsonArray.length())
+                playlistIds = arrayOfNulls<String>(jsonArray.length())
+                tracksArrays = arrayOfNulls<JSONArray>(jsonArray.length())
+
+                for(i in (0 until jsonArray.length())){
+                    val playlistObject = jsonArray.getJSONObject(i)
+
+                    val playlistName = playlistObject.getString("name")
+                    val playlistId = playlistObject.getString("_id")
+                    val trackArray = playlistObject.getJSONArray("tracks")
+
+                    playlistNames[i] = playlistName
+                    playlistIds[i] = playlistId
+                    tracksArrays[i] = trackArray
+                }
+            },
+
+            Response.ErrorListener { error ->
+
+            }){
+            @Throws(AuthFailureError::class)
+            override fun getHeaders(): Map<String, String> {
+                val params = HashMap<String, String>()
+                if (loggedIn) {
+                    params["Cookie"] = "connect.sid=$sid"
+                }
+                return params
+            }
         }
-        alertDialogBuilder.show()
+
+        queue.addRequestFinishedListener<Any> {
+            val alertDialogBuilder = AlertDialog.Builder(context)
+            alertDialogBuilder.setTitle("Pick playlist")
+            alertDialogBuilder.setItems(playlistNames) { dialogInterface, i ->
+                println(playlistNames[i])
+                val playlistPatchUrl = context.getString(R.string.playlistUrl) + playlistIds[i]
+                val patchParams = JSONObject()
+
+                val trackArray = tracksArrays[i]
+
+                println(trackArray)
+
+                val patchedArray = arrayOfNulls<JSONObject>(trackArray!!.length() + 1)
+
+                for(k in (0 until trackArray.length())){
+                    patchedArray[k] = trackArray[k] as JSONObject
+                }
+
+                val songJsonObject = JSONObject()
+                songJsonObject.put("releaseId", itemValue["id"])
+                songJsonObject.put("trackId", itemValue["songId"])
+
+                patchedArray[trackArray.length()] = songJsonObject
+
+                patchParams.put("tracks", JSONArray(patchedArray))
+
+                println(patchParams)
+
+                val patchRequest = object:JsonObjectRequest(Method.PATCH, playlistPatchUrl, patchParams, Response.Listener {
+
+                }, Response.ErrorListener {
+
+                }){
+                    @Throws(AuthFailureError::class)
+                    override fun getHeaders(): Map<String, String> {
+                        val params = HashMap<String, String>()
+                        if (loggedIn) {
+                            params["Cookie"] = "connect.sid=$sid"
+                        }
+                        return params
+                    }
+                }
+
+                val addToPlaylistQueue = Volley.newRequestQueue(context)
+                addToPlaylistQueue.addRequestFinishedListener<Any> { println("Done!") }
+                addToPlaylistQueue.add(patchRequest)
+            }
+            alertDialogBuilder.show()
+        }
+
+        queue.add(playlistRequest)
     }
 
     class DownloadSong(//yeah this is not great

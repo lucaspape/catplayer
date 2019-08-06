@@ -4,5 +4,6 @@
     <string name="loadSongsUrl" translatable="false">https://connect.monstercat.com/api/catalog/browse/</string>
     <string name="songStreamUrl" translatable="false">https://s3.amazonaws.com/data.monstercat.com/blobs/</string>
     <string name="songDownloadUrl" translatable="false">"https://connect.monstercat.com/api/release/</string>
-    <string name="playlistUrl" translatable="false">https://connect.monstercat.com/v2/self/playlists</string>
+    <string name="playlistsUrl" translatable="false">https://connect.monstercat.com/v2/self/playlists</string>
+    <string name="playlistUrl" translatable="false">https://connect.monstercat.com/v2/playlist/</string>
 </resources>

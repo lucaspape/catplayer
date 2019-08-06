@@ -41,7 +41,7 @@ class PlaylistHandler {
             File(view.context.getString(R.string.playlistCacheFile, view.context.cacheDir.toString()))
 
         if (!playlistCacheFile.exists()) {
-            val playlistUrl = view.context.getString(R.string.playlistUrl)
+            val playlistUrl = view.context.getString(R.string.playlistsUrl)
 
             val playlistRequest = object : StringRequest(
                 Method.GET, playlistUrl, Response.Listener<String>
