@@ -490,7 +490,9 @@ class HomeHandler {
                 }
 
                 val addToPlaylistQueue = Volley.newRequestQueue(context)
-                addToPlaylistQueue.addRequestFinishedListener<Any> { //TODO add msg }
+                addToPlaylistQueue.addRequestFinishedListener<Any> { //TODO add msg
+                }
+                
                 addToPlaylistQueue.add(patchRequest)
             }
             alertDialogBuilder.show()
