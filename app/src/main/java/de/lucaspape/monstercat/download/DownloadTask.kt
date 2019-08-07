@@ -26,7 +26,9 @@ class DownloadTask(private val context: Context) : AsyncTask<Void, Void, String>
                     val location = song["location"] as String
 
                     if(MainActivity.loggedIn){
+                        MainActivity.downloadHandler!!.showNotification(context)
                         downloadSong(url, location, MainActivity.sid, context)
+                        MainActivity.downloadHandler!!.hideNotification(context)
                     }
 
                     downloadedSongs++
@@ -34,7 +36,9 @@ class DownloadTask(private val context: Context) : AsyncTask<Void, Void, String>
                     val songArrayList = DownloadHandler.downloadArrayListList[downloadedSongArrays]
 
                     if(MainActivity.loggedIn){
+                        MainActivity.downloadHandler!!.showNotification(context)
                         downloadSongArray(songArrayList, MainActivity.sid, context)
+                        MainActivity.downloadHandler!!.hideNotification(context)
                     }
                     downloadedSongArrays++
                 }
@@ -49,8 +53,6 @@ class DownloadTask(private val context: Context) : AsyncTask<Void, Void, String>
 
     private fun downloadSong(url: String, location: String, sid: String, context: Context) {
         try {
-            MainActivity.downloadHandler!!.showNotification(context)
-
             val glideUrl = GlideUrl(
                 url, LazyHeaders.Builder()
                     .addHeader("Cookie", "connect.sid=$sid").build()
