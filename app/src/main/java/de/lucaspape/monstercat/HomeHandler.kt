@@ -68,17 +68,12 @@ class HomeHandler {
         val to = arrayOf(R.id.title, R.id.cover)
         var simpleAdapter = SimpleAdapter(view.context, list, R.layout.list_single, from, to.toIntArray())
 
-        val settings = Settings(view.context)
-
-        val primaryResolution = settings.getSetting("primaryCoverResolution")
-        val secondaryResolution = settings.getSetting("secondaryCoverResolution")
-
         val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
         swipeRefreshLayout.setOnRefreshListener {
             var requestCount = 0
 
             val loadMax = 200
-            val coverDownloadList = ArrayList<HashMap<String, Any?>>()
+            val coverDownloadList = ArrayList<HashMap<String, Any?>?>()
             val tempList = Array(loadMax) { HashMap<String, Any?>() }
             list = ArrayList()
 
@@ -122,61 +117,10 @@ class HomeHandler {
                         val jsonArray = json.getJSONArray("results")
 
                         for (k in (0 until jsonArray.length())) {
-                            var id = ""
-                            var title = ""
-                            var artist = ""
-                            var coverUrl = ""
-                            var version = ""
-                            var songId = ""
-                            var downloadable = false
-                            var streamable = false
+                            val jsonParser = JSONParser()
+                            val hashMap = jsonParser.parseCatalogSongsToHashMap(jsonArray.getJSONObject(k), view.context)
 
-                            try {
-                                id = jsonArray.getJSONObject(k).getJSONObject("albums").getString("albumId")
-                                title = jsonArray.getJSONObject(k).getString("title")
-                                artist = jsonArray.getJSONObject(k).getString("artistsTitle")
-                                coverUrl = jsonArray.getJSONObject(k).getJSONObject("release").getString("coverUrl")
-                                version = jsonArray.getJSONObject(k).getString("version")
-                                songId = jsonArray.getJSONObject(k).getString("_id")
-                                downloadable = jsonArray.getJSONObject(k).getBoolean("downloadable")
-                                streamable = jsonArray.getJSONObject(k).getBoolean("streamable")
-                            } catch (e: InvocationTargetException) {
-                            }
-
-                            if (version == "null") {
-                                version = ""
-                            }
-
-                            val hashMap = HashMap<String, Any?>()
-
-                            hashMap["id"] = id
-                            hashMap["title"] = title
-                            hashMap["artist"] = artist
-                            hashMap["primaryImage"] =
-                                view.context.cacheDir.toString() + "/" + title + version + artist + ".png" + primaryResolution.toString()
-
-                            hashMap["secondaryImage"] =
-                                view.context.cacheDir.toString() + "/" + title + version + artist + ".png" + secondaryResolution.toString()
-
-                            hashMap["version"] = version
-
-                            hashMap["shownTitle"] = "$artist $title $version"
-                            hashMap["songId"] = songId
-                            hashMap["downloadable"] = downloadable
-                            hashMap["streamable"] = streamable
-
-
-                            if (!File(view.context.cacheDir.toString() + "/" + title + version + artist + ".png" + primaryResolution).exists()) {
-                                val coverHashMap = HashMap<String, Any?>()
-
-                                coverHashMap["primaryRes"] = primaryResolution
-                                coverHashMap["secondaryRes"] = secondaryResolution
-                                coverHashMap["coverUrl"] = coverUrl
-                                coverHashMap["location"] =
-                                    view.context.cacheDir.toString() + "/" + title + version + artist + ".png"
-                                coverDownloadList.add(coverHashMap)
-                            }
-
+                            coverDownloadList.add(jsonParser.parseCoverToHashMap(hashMap, view.context))
                             tempList[i * 50 + k] = hashMap
 
                         }
@@ -460,17 +404,8 @@ class HomeHandler {
 
                 val trackArray = tracksArrays[i]
 
-                val patchedArray = arrayOfNulls<JSONObject>(trackArray!!.length() + 1)
-
-                for(k in (0 until trackArray.length())){
-                    patchedArray[k] = trackArray[k] as JSONObject
-                }
-
-                val songJsonObject = JSONObject()
-                songJsonObject.put("releaseId", itemValue["id"])
-                songJsonObject.put("trackId", itemValue["songId"])
-
-                patchedArray[trackArray.length()] = songJsonObject
+                val jsonParser = JSONParser()
+                val patchedArray = jsonParser.parsePatchedPlaylist(trackArray!!, itemValue)
 
                 patchParams.put("tracks", JSONArray(patchedArray))
 
