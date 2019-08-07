@@ -33,6 +33,9 @@ import java.lang.IndexOutOfBoundsException
 import kotlin.Comparator
 import kotlin.collections.ArrayList
 
+/**
+ * This class is meant to be static
+ */
 class MusicPlayer(private var context: Context, private var textView1: TextView, private var textView2:TextView ,private var seekBar: SeekBar, private var barCoverImage:ImageView, private var musicBar:androidx.appcompat.widget.Toolbar, private var playButton:ImageButton) {
 
     private var mediaPlayer = MediaPlayer()

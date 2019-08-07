@@ -9,11 +9,11 @@ import com.android.volley.*
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import de.lucaspape.monstercat.*
+import de.lucaspape.monstercat.MainActivity
 import de.lucaspape.monstercat.MainActivity.Companion.loggedIn
 import de.lucaspape.monstercat.MainActivity.Companion.sid
+import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.download.DownloadCoverArray
-import de.lucaspape.monstercat.download.DownloadSong
 import de.lucaspape.monstercat.json.JSONParser
 import de.lucaspape.monstercat.music.MusicPlayer
 import de.lucaspape.monstercat.settings.Settings
@@ -339,7 +339,7 @@ class HomeHandler {
             val downloadLocation = context.filesDir.toString() + "/" + artist + title + version + "." + downloadType
             if (!File(downloadLocation).exists()) {
                 if (sid != "") {
-                    DownloadSong(downloadUrl, downloadLocation, sid, shownTitle, context).execute()
+                    MainActivity.downloadHandler!!.addSong(downloadUrl, downloadLocation, shownTitle)
                 } else {
                     Toast.makeText(context, context.getString(R.string.userNotSignedInMsg), Toast.LENGTH_SHORT)
                         .show()

@@ -17,8 +17,6 @@ import de.lucaspape.monstercat.MainActivity.Companion.sid
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.settings.Settings
 import de.lucaspape.monstercat.download.DownloadCoverArray
-import de.lucaspape.monstercat.download.DownloadSong
-import de.lucaspape.monstercat.download.DownloadSongArray
 import org.json.JSONObject
 import java.io.*
 import java.lang.Exception
@@ -332,7 +330,7 @@ class PlaylistHandler {
             val downloadLocation = context.filesDir.toString() + "/" + artist + title + version + "." + downloadType
             if (!File(downloadLocation).exists()) {
                 if (sid != "") {
-                    DownloadSong(downloadUrl, downloadLocation, sid, shownTitle, context).execute()
+                    MainActivity.downloadHandler!!.addSong(downloadUrl, downloadLocation, shownTitle)
                 } else {
                     Toast.makeText(context, context.getString(R.string.userNotSignedInMsg), Toast.LENGTH_SHORT)
                         .show()
@@ -399,7 +397,7 @@ class PlaylistHandler {
 
         playlistDownloadQueue.addRequestFinishedListener<Any> {
             try {
-                DownloadSongArray(downloadTracks, playlistName, sid, context).execute()
+                MainActivity.downloadHandler!!.addSongArray(downloadTracks)
             } catch (e: Exception) {
 
             }

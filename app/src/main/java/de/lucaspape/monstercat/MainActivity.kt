@@ -8,6 +8,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import de.lucaspape.monstercat.auth.Auth
+import de.lucaspape.monstercat.download.DownloadHandler
+import de.lucaspape.monstercat.download.DownloadTask
 import de.lucaspape.monstercat.fragments.HomeFragment
 import de.lucaspape.monstercat.fragments.PlaylistFragment
 import de.lucaspape.monstercat.fragments.SettingsFragment
@@ -16,6 +18,8 @@ import de.lucaspape.monstercat.music.MusicPlayer
 class MainActivity : AppCompatActivity() {
 
     companion object{
+        @JvmStatic
+        var downloadHandler:DownloadHandler? = null
         @JvmStatic
         var musicPlayer: MusicPlayer? = null
         @JvmStatic
@@ -73,6 +77,9 @@ class MainActivity : AppCompatActivity() {
 
         val homeFragment = HomeFragment.newInstance()
         openFragment(homeFragment)
+
+        downloadHandler = DownloadHandler()
+        DownloadTask(this).execute()
     }
 
     override fun onBackPressed() {
