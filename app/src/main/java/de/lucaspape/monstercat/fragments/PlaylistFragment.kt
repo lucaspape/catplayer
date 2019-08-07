@@ -1,4 +1,4 @@
-package de.lucaspape.monstercat
+package de.lucaspape.monstercat.fragments
 
 import android.os.Bundle
 import android.view.*
@@ -6,6 +6,9 @@ import android.widget.AdapterView
 import android.widget.ListView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import de.lucaspape.monstercat.handlers.PlaylistHandler
+import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.settings.Settings
 
 class PlaylistFragment : Fragment() {
     private val playlistHandler = PlaylistHandler()
@@ -15,7 +18,8 @@ class PlaylistFragment : Fragment() {
         inflater.inflate(R.layout.fragment_playlist, container, false)
 
     companion object {
-        fun newInstance(): PlaylistFragment = PlaylistFragment()
+        fun newInstance(): PlaylistFragment =
+            PlaylistFragment()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

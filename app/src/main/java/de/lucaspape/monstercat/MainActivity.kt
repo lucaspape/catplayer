@@ -6,21 +6,18 @@ import android.os.Bundle
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import android.graphics.BitmapFactory
-import android.graphics.Bitmap
-import android.os.AsyncTask
-import android.widget.*
 import androidx.fragment.app.Fragment
-import java.io.FileOutputStream
-import java.io.IOException
-import java.net.HttpURLConnection
-import java.net.URL
+import de.lucaspape.monstercat.auth.Auth
+import de.lucaspape.monstercat.fragments.HomeFragment
+import de.lucaspape.monstercat.fragments.PlaylistFragment
+import de.lucaspape.monstercat.fragments.SettingsFragment
+import de.lucaspape.monstercat.music.MusicPlayer
 
 class MainActivity : AppCompatActivity() {
 
     companion object{
         @JvmStatic
-        var musicPlayer:MusicPlayer? = null
+        var musicPlayer: MusicPlayer? = null
         @JvmStatic
         var sid = ""
         @JvmStatic

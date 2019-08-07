@@ -1,4 +1,4 @@
-package de.lucaspape.monstercat
+package de.lucaspape.monstercat.download
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory

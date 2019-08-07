@@ -1,6 +1,8 @@
-package de.lucaspape.monstercat
+package de.lucaspape.monstercat.json
 
 import android.content.Context
+import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.settings.Settings
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File

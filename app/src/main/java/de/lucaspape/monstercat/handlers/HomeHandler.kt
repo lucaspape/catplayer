@@ -1,4 +1,4 @@
-package de.lucaspape.monstercat
+package de.lucaspape.monstercat.handlers
 
 import android.app.AlertDialog
 import android.content.Context
@@ -9,10 +9,14 @@ import com.android.volley.*
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import de.lucaspape.monstercat.*
 import de.lucaspape.monstercat.MainActivity.Companion.loggedIn
 import de.lucaspape.monstercat.MainActivity.Companion.sid
-import de.lucaspape.monstercat.de.lucaspape.monstercat.download.DownloadCoverArray
-import de.lucaspape.monstercat.de.lucaspape.monstercat.download.DownloadSong
+import de.lucaspape.monstercat.download.DownloadCoverArray
+import de.lucaspape.monstercat.download.DownloadSong
+import de.lucaspape.monstercat.json.JSONParser
+import de.lucaspape.monstercat.music.MusicPlayer
+import de.lucaspape.monstercat.settings.Settings
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.*
@@ -94,7 +98,8 @@ class HomeHandler {
                     oos.close()
 
                     //update listview
-                    simpleAdapter = SimpleAdapter(view.context, list, R.layout.list_single, from, to.toIntArray())
+                    simpleAdapter = SimpleAdapter(view.context, list,
+                        R.layout.list_single, from, to.toIntArray())
                     simpleAdapter.notifyDataSetChanged()
                     musicList.adapter = simpleAdapter
 
@@ -154,7 +159,15 @@ class HomeHandler {
         //setup musicPlayer
         if (MainActivity.musicPlayer == null) {
             MainActivity.musicPlayer =
-                MusicPlayer(view.context, textview1, textview2, seekBar, coverBarImageView, musicToolBar, playButton)
+                MusicPlayer(
+                    view.context,
+                    textview1,
+                    textview2,
+                    seekBar,
+                    coverBarImageView,
+                    musicToolBar,
+                    playButton
+                )
         } else {
             MainActivity.musicPlayer!!.setContext(view.context)
             MainActivity.musicPlayer!!.setTextView(textview1, textview2)

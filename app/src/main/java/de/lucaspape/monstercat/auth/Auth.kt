@@ -1,4 +1,4 @@
-package de.lucaspape.monstercat
+package de.lucaspape.monstercat.auth
 
 import android.content.Context
 import android.widget.Toast
@@ -10,6 +10,8 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.MainActivity.Companion.loggedIn
 import de.lucaspape.monstercat.MainActivity.Companion.sid
+import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.settings.Settings
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException

@@ -1,4 +1,4 @@
-package de.lucaspape.monstercat
+package de.lucaspape.monstercat.download
 
 class DownloadHandler{
     fun downloadSong(){

@@ -1,6 +1,7 @@
-package de.lucaspape.monstercat
+package de.lucaspape.monstercat.settings
 
 import android.content.Context
+import de.lucaspape.monstercat.R
 import java.io.*
 
 class Settings(private val context: Context) {

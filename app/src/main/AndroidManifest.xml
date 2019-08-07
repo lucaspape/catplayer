@@ -11,7 +11,7 @@
             android:roundIcon="@drawable/ic_play_circle_filled_black_24dp"
             android:supportsRtl="true"
             android:theme="@style/AppTheme" tools:ignore="GoogleAppIndexingWarning">
-        <receiver android:name=".MusicPlayer$IntentReceiver">
+        <receiver android:name=".music.MusicPlayer$IntentReceiver">
             <intent-filter>
                 <action android:name="de.lucaspape.monstercat.previous"/>
                 <action android:name="de.lucaspape.monstercat.delete"/>

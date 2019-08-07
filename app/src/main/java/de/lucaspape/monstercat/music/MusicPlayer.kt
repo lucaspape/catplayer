@@ -1,4 +1,4 @@
-package de.lucaspape.monstercat
+package de.lucaspape.monstercat.music
 
 import android.animation.ValueAnimator
 import android.app.Notification
@@ -26,6 +26,8 @@ import android.widget.*
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.palette.graphics.Palette
+import de.lucaspape.monstercat.MainActivity
+import de.lucaspape.monstercat.R
 import java.io.File
 import java.lang.IndexOutOfBoundsException
 import kotlin.Comparator
@@ -186,7 +188,15 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
             playButton.setImageDrawable(context.resources.getDrawable(R.drawable.ic_pause_black_24dp))
         }catch (e: IndexOutOfBoundsException){
             //Something bad happend, resetting
-            MainActivity.musicPlayer = MusicPlayer(context, textView1, textView2, seekBar, barCoverImage, musicBar, playButton)
+            MainActivity.musicPlayer = MusicPlayer(
+                context,
+                textView1,
+                textView2,
+                seekBar,
+                barCoverImage,
+                musicBar,
+                playButton
+            )
         }
     }
 
@@ -317,11 +327,15 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
                 backgroundColor = getDominantColor(bitmap)
 
                 if(getTextColor(backgroundColor) == Color.WHITE){
-                    expandedRemoteViews = RemoteViews(context.packageName, R.layout.notification_expanded_white)
+                    expandedRemoteViews = RemoteViews(context.packageName,
+                        R.layout.notification_expanded_white
+                    )
                     expandedRemoteViews.setTextColor(R.id.songname, Color.WHITE)
                     expandedRemoteViews.setTextColor(R.id.artistname, Color.WHITE)
                 }else{
-                    expandedRemoteViews = RemoteViews(context.packageName, R.layout.notification_expanded)
+                    expandedRemoteViews = RemoteViews(context.packageName,
+                        R.layout.notification_expanded
+                    )
                     expandedRemoteViews.setTextColor(R.id.songname, Color.BLACK)
                     expandedRemoteViews.setTextColor(R.id.artistname, Color.BLACK)
                 }
@@ -330,7 +344,9 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
 
                 expandedRemoteViews.setInt(R.id.notificationlayout, "setBackgroundColor", backgroundColor)
             }else{
-                expandedRemoteViews = RemoteViews(context.packageName, R.layout.notification_expanded)
+                expandedRemoteViews = RemoteViews(context.packageName,
+                    R.layout.notification_expanded
+                )
             }
 
             expandedRemoteViews.setTextViewText(R.id.artistname, artistName)
@@ -380,7 +396,9 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
             createNotificationChannel()
 
             val backgroundColor: Int
-            val normalRemoteViews = RemoteViews(context.packageName, R.layout.notification_normal)
+            val normalRemoteViews = RemoteViews(context.packageName,
+                R.layout.notification_normal
+            )
             val expandedRemoteViews:RemoteViews
 
             val coverFile = File(coverUrl)
@@ -389,11 +407,15 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
                 backgroundColor = getDominantColor(bitmap)
 
                 if(getTextColor(backgroundColor) == Color.WHITE){
-                    expandedRemoteViews = RemoteViews(context.packageName, R.layout.notification_expanded_white)
+                    expandedRemoteViews = RemoteViews(context.packageName,
+                        R.layout.notification_expanded_white
+                    )
                     expandedRemoteViews.setTextColor(R.id.songname, Color.WHITE)
                     expandedRemoteViews.setTextColor(R.id.artistname, Color.WHITE)
                 }else{
-                    expandedRemoteViews = RemoteViews(context.packageName, R.layout.notification_expanded)
+                    expandedRemoteViews = RemoteViews(context.packageName,
+                        R.layout.notification_expanded
+                    )
                     expandedRemoteViews.setTextColor(R.id.songname, Color.BLACK)
                     expandedRemoteViews.setTextColor(R.id.artistname, Color.BLACK)
                 }
@@ -402,7 +424,9 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
 
                 expandedRemoteViews.setInt(R.id.notificationlayout, "setBackgroundColor", backgroundColor)
             }else{
-                expandedRemoteViews = RemoteViews(context.packageName, R.layout.notification_expanded)
+                expandedRemoteViews = RemoteViews(context.packageName,
+                    R.layout.notification_expanded
+                )
             }
 
             expandedRemoteViews.setTextViewText(R.id.songname, titleName)

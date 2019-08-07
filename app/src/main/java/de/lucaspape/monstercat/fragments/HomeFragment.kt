@@ -1,10 +1,12 @@
-package de.lucaspape.monstercat
+package de.lucaspape.monstercat.fragments
 
 import android.os.Bundle
 import android.view.*
 import android.widget.AdapterView
 import android.widget.ListView
 import androidx.fragment.app.Fragment
+import de.lucaspape.monstercat.handlers.HomeHandler
+import de.lucaspape.monstercat.R
 
 class HomeFragment : Fragment() {
     private var listView:ListView? = null
@@ -15,7 +17,8 @@ class HomeFragment : Fragment() {
     }
 
     companion object {
-        fun newInstance(): HomeFragment = HomeFragment()
+        fun newInstance(): HomeFragment =
+            HomeFragment()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -1,7 +1,6 @@
-package de.lucaspape.monstercat
+package de.lucaspape.monstercat.handlers
 
 import android.content.Context
-import android.os.AsyncTask
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ListView
@@ -11,11 +10,15 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import de.lucaspape.monstercat.json.JSONParser
+import de.lucaspape.monstercat.MainActivity
 import de.lucaspape.monstercat.MainActivity.Companion.loggedIn
 import de.lucaspape.monstercat.MainActivity.Companion.sid
-import de.lucaspape.monstercat.de.lucaspape.monstercat.download.DownloadCoverArray
-import de.lucaspape.monstercat.de.lucaspape.monstercat.download.DownloadSong
-import de.lucaspape.monstercat.de.lucaspape.monstercat.download.DownloadSongArray
+import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.settings.Settings
+import de.lucaspape.monstercat.download.DownloadCoverArray
+import de.lucaspape.monstercat.download.DownloadSong
+import de.lucaspape.monstercat.download.DownloadSongArray
 import org.json.JSONObject
 import java.io.*
 import java.lang.Exception
@@ -50,7 +53,8 @@ class PlaylistHandler {
                         val jsonParser = JSONParser()
                         list.add(jsonParser.parsePlaylistToHashMap(jsonArray.getJSONObject(i)))
 
-                        simpleAdapter = SimpleAdapter(view.context, list, R.layout.list_single, from, to.toIntArray())
+                        simpleAdapter = SimpleAdapter(view.context, list,
+                            R.layout.list_single, from, to.toIntArray())
                         playlistView.adapter = simpleAdapter
                     }
                 }, Response.ErrorListener { error ->
@@ -370,7 +374,8 @@ class PlaylistHandler {
                     for (i in (0 until jsonArray.length())) {
                         val playlistObject = jsonArray.getJSONObject(i)
 
-                        val trackHashMap = JSONParser().parseDownloadPlaylistTracksToHashMap(playlistObject, context)
+                        val trackHashMap = JSONParser()
+                            .parseDownloadPlaylistTracksToHashMap(playlistObject, context)
 
                         if(trackHashMap != null){
                             downloadTracks.add(trackHashMap)
