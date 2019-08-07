@@ -2,9 +2,6 @@ package de.lucaspape.monstercat
 
 import android.app.AlertDialog
 import android.content.Context
-import android.content.DialogInterface
-import android.os.AsyncTask
-import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -12,18 +9,14 @@ import com.android.volley.*
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.load.model.GlideUrl
-import com.bumptech.glide.load.model.LazyHeaders
-import com.bumptech.glide.request.target.Target
 import de.lucaspape.monstercat.MainActivity.Companion.loggedIn
 import de.lucaspape.monstercat.MainActivity.Companion.sid
+import de.lucaspape.monstercat.de.lucaspape.monstercat.download.DownloadCoverArray
+import de.lucaspape.monstercat.de.lucaspape.monstercat.download.DownloadSong
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.*
 import java.lang.Exception
-import java.lang.reflect.InvocationTargetException
 
 /**
  * Does everything for the home page
@@ -90,7 +83,10 @@ class HomeHandler {
                     }
 
                     //download cover arts
-                    DownloadCoverArray(coverDownloadList, simpleAdapter).execute()
+                    DownloadCoverArray(
+                        coverDownloadList,
+                        simpleAdapter
+                    ).execute()
 
                     val oos = ObjectOutputStream(FileOutputStream(listFile))
                     oos.writeObject(list)
@@ -436,58 +432,7 @@ class HomeHandler {
         queue.add(playlistRequest)
     }
 
-    class DownloadSong(//yeah this is not great
-        private val url: String, private val location: String, private val sid: String,
-        private val shownTitle: String, val context: Context
-    ) :
-        AsyncTask<Void, Void, String>() {
 
-        override fun doInBackground(vararg params: Void?): String? {
-            try {
-
-                val glideUrl = GlideUrl(
-                    url, LazyHeaders.Builder()
-                        .addHeader("Cookie", "connect.sid=$sid").build()
-                )
-
-                try {
-                    val downloadFile = Glide.with(context)
-                        .load(glideUrl)
-                        .downloadOnly(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
-                        .get()
-
-                    val destFile = File(location)
-
-                    val bufferedInputStream = BufferedInputStream(FileInputStream(downloadFile))
-                    val bufferedOutputStream = BufferedOutputStream(FileOutputStream(destFile))
-
-                    val buffer = ByteArray(1024)
-
-                    var len: Int
-                    len = bufferedInputStream.read(buffer)
-                    while (len > 0) {
-                        bufferedOutputStream.write(buffer, 0, len)
-                        len = bufferedInputStream.read(buffer)
-                    }
-                    bufferedOutputStream.flush()
-                    bufferedOutputStream.close()
-                } catch (e: GlideException) {
-                }
-
-            } catch (e: IOException) {
-                // Log exception
-                return null
-            }
-
-            return null
-        }
-
-        override fun onPostExecute(result: String?) {
-            super.onPostExecute(result)
-            Toast.makeText(context, context.getString(R.string.downloadSuccessfulMsg, shownTitle), Toast.LENGTH_SHORT)
-                .show()
-        }
-    }
 
 
 
