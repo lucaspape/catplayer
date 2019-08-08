@@ -5,6 +5,7 @@ import android.view.*
 import android.widget.AdapterView
 import android.widget.ListView
 import androidx.fragment.app.Fragment
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import de.lucaspape.monstercat.handlers.HomeHandler
 import de.lucaspape.monstercat.R
 
@@ -26,7 +27,9 @@ class HomeFragment : Fragment() {
 
         listView = view.findViewById<ListView>(R.id.musiclistview)
 
-        homeHandler.loadTitlesFromCache(view)
+        if(!homeHandler.loadTitlesFromCache(view)){
+            homeHandler.refresh(view)
+        }
 
         homeHandler.registerPullRefresh(view)
 

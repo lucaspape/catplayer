@@ -28,7 +28,7 @@ import java.lang.ref.WeakReference
  */
 class HomeHandler {
 
-    fun loadTitlesFromCache(view: View) {
+    fun loadTitlesFromCache(view: View):Boolean {
         val musicList = view.findViewById<ListView>(R.id.musiclistview)
 
         var list = ArrayList<HashMap<String, Any?>>()
@@ -54,10 +54,18 @@ class HomeHandler {
             simpleAdapter = SimpleAdapter(view.context, list, R.layout.list_single, from, to.toIntArray())
             simpleAdapter.notifyDataSetChanged()
             musicList.adapter = simpleAdapter
+
+            return true
+        }else{
+            return false
         }
     }
 
-    fun registerPullRefresh(view: View) {
+    fun refresh(view:View){
+        val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
+
+        swipeRefreshLayout.isRefreshing = true
+
         val musicList = view.findViewById<ListView>(R.id.musiclistview)
         var list = ArrayList<HashMap<String, Any?>>()
         val queue = Volley.newRequestQueue(view.context)
@@ -66,87 +74,93 @@ class HomeHandler {
         val to = arrayOf(R.id.title, R.id.cover)
         var simpleAdapter = SimpleAdapter(view.context, list, R.layout.list_single, from, to.toIntArray())
 
-        val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
-        swipeRefreshLayout.setOnRefreshListener {
-            var requestCount = 0
+        var requestCount = 0
 
-            val loadMax = 200
-            val coverDownloadList = ArrayList<HashMap<String, Any?>?>()
-            val tempList = Array(loadMax) { HashMap<String, Any?>() }
-            list = ArrayList()
+        val loadMax = 200
+        val coverDownloadList = ArrayList<HashMap<String, Any?>?>()
+        val tempList = Array(loadMax) { HashMap<String, Any?>() }
+        list = ArrayList()
 
-            //wait for all request to finish and sort
-            var finishedRequest = 0
-            queue.addRequestFinishedListener<Any> {
-                finishedRequest++
-                if (finishedRequest == requestCount) {
-                    for (i in tempList.indices) {
-                        if (tempList[i].isNotEmpty()) {
-                            list.add(tempList[i])
-                        }
+        //wait for all request to finish and sort
+        var finishedRequest = 0
+        queue.addRequestFinishedListener<Any> {
+            finishedRequest++
+            if (finishedRequest == requestCount) {
+                for (i in tempList.indices) {
+                    if (tempList[i].isNotEmpty()) {
+                        list.add(tempList[i])
+                    }
+
+                }
+
+                //download cover arts
+                DownloadCoverArray(
+                    coverDownloadList,
+                    simpleAdapter
+                ).execute()
+
+                val oos = ObjectOutputStream(FileOutputStream(listFile))
+                oos.writeObject(list)
+                oos.flush()
+                oos.close()
+
+                //update listview
+                simpleAdapter = SimpleAdapter(view.context, list,
+                    R.layout.list_single, from, to.toIntArray())
+                simpleAdapter.notifyDataSetChanged()
+                musicList.adapter = simpleAdapter
+
+                swipeRefreshLayout.isRefreshing = false
+            }
+        }
+
+        //can only load 50 at a time
+        for (i in (0 until loadMax / 50)) {
+            val url = view.context.getString(R.string.loadSongsUrl) + "?limit=50&skip=" + i * 50
+
+            val stringRequest = object : StringRequest(
+                Method.GET, url,
+                Response.Listener<String> { response ->
+                    val json = JSONObject(response)
+                    val jsonArray = json.getJSONArray("results")
+
+                    for (k in (0 until jsonArray.length())) {
+                        val jsonParser = JSONParser()
+                        val hashMap = jsonParser.parseCatalogSongsToHashMap(jsonArray.getJSONObject(k), view.context)
+
+                        coverDownloadList.add(jsonParser.parseCoverToHashMap(hashMap, view.context))
+                        tempList[i * 50 + k] = hashMap
 
                     }
 
-                    //download cover arts
-                    DownloadCoverArray(
-                        coverDownloadList,
-                        simpleAdapter
-                    ).execute()
-
-                    val oos = ObjectOutputStream(FileOutputStream(listFile))
-                    oos.writeObject(list)
-                    oos.flush()
-                    oos.close()
-
-                    //update listview
-                    simpleAdapter = SimpleAdapter(view.context, list,
-                        R.layout.list_single, from, to.toIntArray())
-                    simpleAdapter.notifyDataSetChanged()
-                    musicList.adapter = simpleAdapter
-
-                    swipeRefreshLayout.isRefreshing = false
-                }
-            }
-
-            //can only load 50 at a time
-            for (i in (0 until loadMax / 50)) {
-                val url = view.context.getString(R.string.loadSongsUrl) + "?limit=50&skip=" + i * 50
-
-                val stringRequest = object : StringRequest(
-                    Method.GET, url,
-                    Response.Listener<String> { response ->
-                        val json = JSONObject(response)
-                        val jsonArray = json.getJSONArray("results")
-
-                        for (k in (0 until jsonArray.length())) {
-                            val jsonParser = JSONParser()
-                            val hashMap = jsonParser.parseCatalogSongsToHashMap(jsonArray.getJSONObject(k), view.context)
-
-                            coverDownloadList.add(jsonParser.parseCoverToHashMap(hashMap, view.context))
-                            tempList[i * 50 + k] = hashMap
-
-                        }
-
-                    },
-                    Response.ErrorListener { println("Error!") }) {
-                    @Throws(AuthFailureError::class)
-                    override fun getHeaders(): Map<String, String> {
-                        val params = HashMap<String, String>()
-                        if (loggedIn) {
-                            params["Cookie"] = "connect.sid=$sid"
-                        }
-                        return params
+                },
+                Response.ErrorListener { println("Error!") }) {
+                @Throws(AuthFailureError::class)
+                override fun getHeaders(): Map<String, String> {
+                    val params = HashMap<String, String>()
+                    if (loggedIn) {
+                        params["Cookie"] = "connect.sid=$sid"
                     }
+                    return params
                 }
-
-                // Add the request to the RequestQueue
-                queue.add(stringRequest)
-                requestCount++
-
             }
 
+            // Add the request to the RequestQueue
+            queue.add(stringRequest)
+            requestCount++
 
         }
+    }
+
+    fun registerPullRefresh(view: View) {
+
+        val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
+
+        swipeRefreshLayout.setOnRefreshListener{
+            refresh(view)
+        }
+
+
     }
 
     fun setupMusicPlayer(view: View) {
