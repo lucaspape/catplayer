@@ -36,7 +36,15 @@ import kotlin.collections.ArrayList
 /**
  * This class is meant to be static
  */
-class MusicPlayer(private var context: Context, private var textView1: TextView, private var textView2:TextView ,private var seekBar: SeekBar, private var barCoverImage:ImageView, private var musicBar:androidx.appcompat.widget.Toolbar, private var playButton:ImageButton) {
+class MusicPlayer(
+    private var context: Context,
+    private var textView1: TextView,
+    private var textView2: TextView,
+    private var seekBar: SeekBar,
+    private var barCoverImage: ImageView,
+    private var musicBar: androidx.appcompat.widget.Toolbar,
+    private var playButton: ImageButton
+) {
 
     private var mediaPlayer = MediaPlayer()
     private var currentSong = 0
@@ -48,7 +56,7 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
     private val channelID = "Music Notification"
     private val notificationID = 1
 
-    companion object{
+    companion object {
         @JvmStatic
         val NOTIFICATION_PREVIOUS = "de.lucaspape.monstercat.previous"
 
@@ -65,58 +73,60 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         val NOTIFICATION_NEXT = "de.lucaspape.monstercat.next"
     }
 
-    fun setContext(context:Context){
+    fun setContext(context: Context) {
         this.context = context
     }
 
-    fun setTextView(textView1:TextView, textView2: TextView){
+    fun setTextView(textView1: TextView, textView2: TextView) {
         textView1.text = this.textView1.text
         textView2.text = this.textView2.text
         this.textView1 = textView1
         this.textView2 = textView2
     }
 
-    fun setSeekBar(seekBar: SeekBar){
+    fun setSeekBar(seekBar: SeekBar) {
         seekBar.progress = this.seekBar.progress
-        seekBar.setOnSeekBarChangeListener(object:SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar:SeekBar, progress:Int, fromUser:Boolean) {
+        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 if (fromUser)
                     mediaPlayer.seekTo(progress)
             }
-            override fun onStartTrackingTouch(seekBar:SeekBar) {
+
+            override fun onStartTrackingTouch(seekBar: SeekBar) {
             }
-            override fun onStopTrackingTouch(seekBar:SeekBar) {
+
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
             }
         })
 
         this.seekBar = seekBar
     }
 
-    fun setBarCoverImageView(imageView: ImageView){
+    fun setBarCoverImageView(imageView: ImageView) {
         imageView.setImageDrawable(barCoverImage.drawable)
         this.barCoverImage = imageView
     }
 
-    fun setMusicBar(toolbar:androidx.appcompat.widget.Toolbar){
+    fun setMusicBar(toolbar: androidx.appcompat.widget.Toolbar) {
         toolbar.setBackgroundColor((musicBar.background as ColorDrawable).color)
         musicBar = toolbar
     }
 
-    fun setPlayButton(button:ImageButton){
+    fun setPlayButton(button: ImageButton) {
         button.setImageDrawable(playButton.drawable)
         playButton = button
     }
 
-    private fun play(){
-        val song:HashMap<String, Any?>
+    private fun play() {
+        val song: HashMap<String, Any?>
 
-        try{
-            if(playList[currentSong].isNotEmpty()){
+        try {
+            if (playList[currentSong].isNotEmpty()) {
                 song = playList[currentSong]
-            }else{
+            } else {
                 return
             }
-        }catch (e: IndexOutOfBoundsException){
+        } catch (e: IndexOutOfBoundsException) {
             return
         }
 
@@ -144,7 +154,7 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
             valueAnimator.repeatCount = Animation.INFINITE
             valueAnimator.interpolator = LinearInterpolator()
             valueAnimator.duration = 9000L
-            valueAnimator.addUpdateListener { animation->
+            valueAnimator.addUpdateListener { animation ->
                 val progress = animation.animatedValue as Float
                 val width = textView1.width
                 val translationX = width * progress
@@ -170,26 +180,28 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
 
             seekbarUpdateHandler.postDelayed(updateSeekBar, 0)
 
-            seekBar.setOnSeekBarChangeListener(object:SeekBar.OnSeekBarChangeListener {
-                override fun onProgressChanged(seekBar:SeekBar, progress:Int, fromUser:Boolean) {
+            seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                     if (fromUser)
                         mediaPlayer.seekTo(progress)
                 }
-                override fun onStartTrackingTouch(seekBar:SeekBar) {
+
+                override fun onStartTrackingTouch(seekBar: SeekBar) {
                 }
-                override fun onStopTrackingTouch(seekBar:SeekBar) {
+
+                override fun onStopTrackingTouch(seekBar: SeekBar) {
                 }
             })
 
             val coverFile = File(coverUrl)
-            if(coverFile.exists()){
+            if (coverFile.exists()) {
                 val bitmap = BitmapFactory.decodeFile(coverFile.absolutePath)
                 barCoverImage.setImageBitmap(bitmap)
             }
 
             showNotification(title, artist, coverUrl, true)
             playButton.setImageDrawable(context.resources.getDrawable(R.drawable.ic_pause_black_24dp))
-        }catch (e: IndexOutOfBoundsException){
+        } catch (e: IndexOutOfBoundsException) {
             //Something bad happend, resetting
             MainActivity.musicPlayer = MusicPlayer(
                 context,
@@ -203,7 +215,7 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         }
     }
 
-    private fun stop(){
+    private fun stop() {
         playing = false
         textView1.text = ""
         textView2.text = ""
@@ -211,8 +223,8 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         mediaPlayer.stop()
     }
 
-    fun pause(){
-        try{
+    fun pause() {
+        try {
             val song = playList[currentSong]
 
             val title = song["title"] as String
@@ -224,13 +236,13 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
             playButton.setImageDrawable(context.resources.getDrawable(R.drawable.ic_play_arrow_black_24dp))
             playing = false
             paused = true
-        }catch (e:IndexOutOfBoundsException){
+        } catch (e: IndexOutOfBoundsException) {
 
         }
     }
 
-    fun resume(){
-        try{
+    fun resume() {
+        try {
             val song = playList[currentSong]
 
             val title = song["title"] as String
@@ -239,24 +251,24 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
 
             val length = mediaPlayer.currentPosition
 
-            if(paused){
+            if (paused) {
                 mediaPlayer.seekTo(length)
                 mediaPlayer.start()
 
                 paused = false
-            }else{
+            } else {
                 play()
             }
 
             showNotification(title, artist, coverUrl, true)
             playButton.setImageDrawable(context.resources.getDrawable(R.drawable.ic_pause_black_24dp))
             playing = true
-        }catch(e:IndexOutOfBoundsException){
+        } catch (e: IndexOutOfBoundsException) {
 
         }
     }
 
-    fun next(){
+    fun next() {
         try {
             if (playList[currentSong + 1].isNotEmpty()) {
                 currentSong++
@@ -264,29 +276,29 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
             } else {
                 stop()
             }
-        }catch (e: IndexOutOfBoundsException){
+        } catch (e: IndexOutOfBoundsException) {
             stop()
         }
 
     }
 
-    fun previous(){
-        if(currentSong != 0){
+    fun previous() {
+        if (currentSong != 0) {
             currentSong--
 
-            try{
-                if(playList[currentSong].isEmpty()){
+            try {
+                if (playList[currentSong].isEmpty()) {
                     stop()
-                }else{
+                } else {
                     play()
                 }
-            }catch (e:IndexOutOfBoundsException){
+            } catch (e: IndexOutOfBoundsException) {
                 stop()
             }
         }
     }
 
-    fun playNow(url:String, title:String, artistName: String , coverUrl:String){
+    fun playNow(url: String, title: String, artistName: String, coverUrl: String) {
         val song = HashMap<String, Any?>()
         song["url"] = url
         song["title"] = title
@@ -294,10 +306,10 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         song["coverUrl"] = coverUrl
         song["playNow"] = true
 
-        try{
-            playList.add(currentSong+1, song)
+        try {
+            playList.add(currentSong + 1, song)
             currentSong++
-        }catch (e:IndexOutOfBoundsException){
+        } catch (e: IndexOutOfBoundsException) {
             playList.add(song)
         }
 
@@ -305,7 +317,7 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         play()
     }
 
-    fun addSong(url:String, title:String, artistName: String , coverUrl:String){
+    fun addSong(url: String, title: String, artistName: String, coverUrl: String) {
         val song = HashMap<String, Any?>()
         song["url"] = url
         song["title"] = title
@@ -315,35 +327,37 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         playList.add(song)
     }
 
-    fun toggleMusic(){
-        if(playing){
+    fun toggleMusic() {
+        if (playing) {
             pause()
-        }else{
+        } else {
             resume()
         }
     }
 
-    private fun showNotificationAndroidO(titleName:String, artistName:String ,coverUrl: String, playing:Boolean){
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+    private fun showNotificationAndroidO(titleName: String, artistName: String, coverUrl: String, playing: Boolean) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel()
 
             val backgroundColor: Int
-            val expandedRemoteViews:RemoteViews
+            val expandedRemoteViews: RemoteViews
             //val normalRemoteViews = RemoteViews(context.packageName, R.layout.notification_normal)
 
             val coverFile = File(coverUrl)
-            if(coverFile.exists()){
+            if (coverFile.exists()) {
                 val bitmap = BitmapFactory.decodeFile(coverFile.absolutePath)
                 backgroundColor = getDominantColor(bitmap)
 
-                if(getTextColor(backgroundColor) == Color.WHITE){
-                    expandedRemoteViews = RemoteViews(context.packageName,
+                if (getTextColor(backgroundColor) == Color.WHITE) {
+                    expandedRemoteViews = RemoteViews(
+                        context.packageName,
                         R.layout.notification_expanded_white
                     )
                     expandedRemoteViews.setTextColor(R.id.songname, Color.WHITE)
                     expandedRemoteViews.setTextColor(R.id.artistname, Color.WHITE)
-                }else{
-                    expandedRemoteViews = RemoteViews(context.packageName,
+                } else {
+                    expandedRemoteViews = RemoteViews(
+                        context.packageName,
                         R.layout.notification_expanded
                     )
                     expandedRemoteViews.setTextColor(R.id.songname, Color.BLACK)
@@ -353,8 +367,9 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
                 expandedRemoteViews.setImageViewBitmap(R.id.coverimageview, bitmap)
 
                 expandedRemoteViews.setInt(R.id.notificationlayout, "setBackgroundColor", backgroundColor)
-            }else{
-                expandedRemoteViews = RemoteViews(context.packageName,
+            } else {
+                expandedRemoteViews = RemoteViews(
+                    context.packageName,
                     R.layout.notification_expanded
                 )
             }
@@ -362,10 +377,10 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
             expandedRemoteViews.setTextViewText(R.id.artistname, artistName)
             expandedRemoteViews.setTextViewText(R.id.songname, titleName)
 
-            if(playing){
+            if (playing) {
                 expandedRemoteViews.setViewVisibility(R.id.playButton, View.GONE)
                 expandedRemoteViews.setViewVisibility(R.id.pauseButton, View.VISIBLE)
-            }else{
+            } else {
                 expandedRemoteViews.setViewVisibility(R.id.playButton, View.VISIBLE)
                 expandedRemoteViews.setViewVisibility(R.id.pauseButton, View.GONE)
             }
@@ -401,29 +416,32 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
     }
 
     //android < sdk 26
-    private fun showNotification(titleName:String, artistName:String, coverUrl: String, playing:Boolean){
-        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.O){
+    private fun showNotification(titleName: String, artistName: String, coverUrl: String, playing: Boolean) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             createNotificationChannel()
 
             val backgroundColor: Int
-            val normalRemoteViews = RemoteViews(context.packageName,
+            val normalRemoteViews = RemoteViews(
+                context.packageName,
                 R.layout.notification_normal
             )
-            val expandedRemoteViews:RemoteViews
+            val expandedRemoteViews: RemoteViews
 
             val coverFile = File(coverUrl)
-            if(coverFile.exists()){
+            if (coverFile.exists()) {
                 val bitmap = BitmapFactory.decodeFile(coverFile.absolutePath)
                 backgroundColor = getDominantColor(bitmap)
 
-                if(getTextColor(backgroundColor) == Color.WHITE){
-                    expandedRemoteViews = RemoteViews(context.packageName,
+                if (getTextColor(backgroundColor) == Color.WHITE) {
+                    expandedRemoteViews = RemoteViews(
+                        context.packageName,
                         R.layout.notification_expanded_white
                     )
                     expandedRemoteViews.setTextColor(R.id.songname, Color.WHITE)
                     expandedRemoteViews.setTextColor(R.id.artistname, Color.WHITE)
-                }else{
-                    expandedRemoteViews = RemoteViews(context.packageName,
+                } else {
+                    expandedRemoteViews = RemoteViews(
+                        context.packageName,
                         R.layout.notification_expanded
                     )
                     expandedRemoteViews.setTextColor(R.id.songname, Color.BLACK)
@@ -433,8 +451,9 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
                 expandedRemoteViews.setImageViewBitmap(R.id.coverimageview, bitmap)
 
                 expandedRemoteViews.setInt(R.id.notificationlayout, "setBackgroundColor", backgroundColor)
-            }else{
-                expandedRemoteViews = RemoteViews(context.packageName,
+            } else {
+                expandedRemoteViews = RemoteViews(
+                    context.packageName,
                     R.layout.notification_expanded
                 )
             }
@@ -442,10 +461,10 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
             expandedRemoteViews.setTextViewText(R.id.songname, titleName)
             expandedRemoteViews.setTextViewText(R.id.songname, titleName)
 
-            if(playing){
+            if (playing) {
                 expandedRemoteViews.setViewVisibility(R.id.playButton, View.GONE)
                 expandedRemoteViews.setViewVisibility(R.id.pauseButton, View.VISIBLE)
-            }else{
+            } else {
                 expandedRemoteViews.setViewVisibility(R.id.playButton, View.VISIBLE)
                 expandedRemoteViews.setViewVisibility(R.id.pauseButton, View.GONE)
             }
@@ -472,13 +491,13 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
             context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_PAUSE))
             context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_PLAY))
             context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_NEXT))
-        }else{
+        } else {
             showNotificationAndroidO(titleName, artistName, coverUrl, playing)
         }
     }
 
-    private fun createNotificationChannel(){
-        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O){
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channelName = "Music Notification"
             val channelDescription = "Handy dandy description"
             val importance = NotificationManager.IMPORTANCE_LOW
@@ -493,7 +512,7 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         }
     }
 
-    private fun setListeners(view:RemoteViews, context:Context){
+    private fun setListeners(view: RemoteViews, context: Context) {
         val previous = Intent(NOTIFICATION_PREVIOUS)
         val delete = Intent(NOTIFICATION_DELETE)
         val pause = Intent(NOTIFICATION_PAUSE)
@@ -532,7 +551,7 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         }
     }
 
-    private fun getDominantColor(bitmap: Bitmap):Int{
+    private fun getDominantColor(bitmap: Bitmap): Int {
         val swatchesTemp = Palette.from(bitmap).generate().swatches
         val swatches = ArrayList<Palette.Swatch>(swatchesTemp)
 
@@ -541,7 +560,7 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
         return if (swatches.size > 0) swatches[0].rgb else Color.WHITE
     }
 
-    private fun getTextColor(background:Int):Int{
+    private fun getTextColor(background: Int): Int {
         val backgroundRed = Color.red(background)
         val backgroundGreen = Color.green(background)
         val backgroundBlue = Color.blue(background)

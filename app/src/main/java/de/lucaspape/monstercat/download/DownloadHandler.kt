@@ -33,11 +33,11 @@ class DownloadHandler {
         downloadList.add(downloadTrack)
     }
 
-    fun addSongArray(array:ArrayList<HashMap<String, Any?>>){
+    fun addSongArray(array: ArrayList<HashMap<String, Any?>>) {
         downloadArrayListList.add(array)
     }
 
-    fun showNotification(shownTitle: String, progress:Int, max:Int, indeterminate:Boolean, context: Context){
+    fun showNotification(shownTitle: String, progress: Int, max: Int, indeterminate: Boolean, context: Context) {
         createNotificationChannel(context)
 
         val notificationBuilder = NotificationCompat.Builder(context, channelID)

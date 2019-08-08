@@ -9,7 +9,6 @@ import com.bumptech.glide.load.model.LazyHeaders
 import com.bumptech.glide.request.target.Target
 import de.lucaspape.monstercat.MainActivity
 import java.io.*
-import java.lang.Exception
 import java.lang.IndexOutOfBoundsException
 
 class DownloadTask(private val context: Context) : AsyncTask<Void, Void, String>() {
@@ -18,19 +17,19 @@ class DownloadTask(private val context: Context) : AsyncTask<Void, Void, String>
         var downloadedSongs = 0
         var downloadedSongArrays = 0
 
-        while(true){
-            try{
-                if(DownloadHandler.downloadList[downloadedSongs].isNotEmpty()){
+        while (true) {
+            try {
+                if (DownloadHandler.downloadList[downloadedSongs].isNotEmpty()) {
                     val song = DownloadHandler.downloadList[downloadedSongs]
                     val url = song["url"] as String
                     val location = song["location"] as String
                     val shownTitle = song["shownTitle"] as String
 
-                    if(MainActivity.loggedIn){
+                    if (MainActivity.loggedIn) {
                         MainActivity.downloadHandler!!.showNotification(shownTitle, 0, 0, true, context)
                         var downloaded = false
 
-                        while(!downloaded){
+                        while (!downloaded) {
                             downloaded = downloadSong(url, location, MainActivity.sid, context)
                         }
 
@@ -38,27 +37,33 @@ class DownloadTask(private val context: Context) : AsyncTask<Void, Void, String>
                     }
                     downloadedSongs++
                 }
-            }catch(e:IndexOutOfBoundsException){
+            } catch (e: IndexOutOfBoundsException) {
             }
 
-            try{
-                if(DownloadHandler.downloadArrayListList[downloadedSongArrays].isNotEmpty()){
+            try {
+                if (DownloadHandler.downloadArrayListList[downloadedSongArrays].isNotEmpty()) {
                     val songArrayList = DownloadHandler.downloadArrayListList[downloadedSongArrays]
 
-                    if(MainActivity.loggedIn){
-                        MainActivity.downloadHandler!!.showNotification("", 0, songArrayList.size,false, context)
+                    if (MainActivity.loggedIn) {
+                        MainActivity.downloadHandler!!.showNotification("", 0, songArrayList.size, false, context)
 
-                        for(i in songArrayList.indices){
+                        for (i in songArrayList.indices) {
                             val song = songArrayList[i]
                             val url = song["downloadUrl"] as String
                             val location = song["downloadLocation"] as String
                             val shownTitle = song["shownTitle"] as String
 
-                            MainActivity.downloadHandler!!.showNotification(shownTitle, i, songArrayList.size,false, context)
+                            MainActivity.downloadHandler!!.showNotification(
+                                shownTitle,
+                                i,
+                                songArrayList.size,
+                                false,
+                                context
+                            )
 
                             var downloaded = false
 
-                            while(!downloaded){
+                            while (!downloaded) {
                                 downloaded = downloadSong(url, location, MainActivity.sid, context)
                             }
                         }
@@ -68,15 +73,15 @@ class DownloadTask(private val context: Context) : AsyncTask<Void, Void, String>
                     }
                     downloadedSongArrays++
                 }
-            }catch(e:IndexOutOfBoundsException){
+            } catch (e: IndexOutOfBoundsException) {
 
             }
-            
+
             Thread.sleep(500)
         }
     }
 
-    private fun downloadSong(url: String, location: String, sid: String, context: Context):Boolean {
+    private fun downloadSong(url: String, location: String, sid: String, context: Context): Boolean {
         try {
             val glideUrl = GlideUrl(
                 url, LazyHeaders.Builder()

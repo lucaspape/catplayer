@@ -165,12 +165,12 @@ class JSONParser {
                 context.cacheDir.toString() + "/" + title + version + artist + ".png" + secondaryResolution.toString()
 
             return trackHashMap
-        }else{
+        } else {
             return null
         }
     }
 
-    fun parsePlaylistTrackCoverToHashMap(hashMap: HashMap<String, Any?>, context: Context):HashMap<String, Any?>?{
+    fun parsePlaylistTrackCoverToHashMap(hashMap: HashMap<String, Any?>, context: Context): HashMap<String, Any?>? {
         val settings = Settings(context)
 
         val title = hashMap["title"]
@@ -190,12 +190,12 @@ class JSONParser {
             coverHashMap["location"] =
                 context.cacheDir.toString() + "/" + title + version + artist + ".png"
             return coverHashMap
-        }else{
+        } else {
             return null
         }
     }
 
-    fun parseDownloadPlaylistTracksToHashMap(jsonObject: JSONObject, context:Context):HashMap<String, Any?>?{
+    fun parseDownloadPlaylistTracksToHashMap(jsonObject: JSONObject, context: Context): HashMap<String, Any?>? {
         val settings = Settings(context)
 
         val downloadType = settings.getSetting("downloadType")

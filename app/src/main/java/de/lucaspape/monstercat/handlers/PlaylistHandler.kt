@@ -51,8 +51,10 @@ class PlaylistHandler {
                         val jsonParser = JSONParser()
                         list.add(jsonParser.parsePlaylistToHashMap(jsonArray.getJSONObject(i)))
 
-                        simpleAdapter = SimpleAdapter(view.context, list,
-                            R.layout.list_single, from, to.toIntArray())
+                        simpleAdapter = SimpleAdapter(
+                            view.context, list,
+                            R.layout.list_single, from, to.toIntArray()
+                        )
                         playlistView.adapter = simpleAdapter
                     }
                 }, Response.ErrorListener { error ->
@@ -196,8 +198,13 @@ class PlaylistHandler {
                                 val jsonParser = JSONParser()
                                 val trackHashMap = jsonParser.parsePlaylistTracksToHashMap(playlistObject, view.context)
 
-                                if(trackHashMap != null){
-                                    coverDownloadList.add(jsonParser.parsePlaylistTrackCoverToHashMap(trackHashMap, view.context))
+                                if (trackHashMap != null) {
+                                    coverDownloadList.add(
+                                        jsonParser.parsePlaylistTrackCoverToHashMap(
+                                            trackHashMap,
+                                            view.context
+                                        )
+                                    )
                                     tempList[i * 50 + k] = trackHashMap
                                 }
                             }
@@ -375,7 +382,7 @@ class PlaylistHandler {
                         val trackHashMap = JSONParser()
                             .parseDownloadPlaylistTracksToHashMap(playlistObject, context)
 
-                        if(trackHashMap != null){
+                        if (trackHashMap != null) {
                             downloadTracks.add(trackHashMap)
                         }
 
@@ -406,8 +413,6 @@ class PlaylistHandler {
 
         playlistDownloadQueue.add(trackRequest)
     }
-
-
 
 
 }
