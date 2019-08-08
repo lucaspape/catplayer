@@ -28,7 +28,12 @@ class DownloadTask(private val context: Context) : AsyncTask<Void, Void, String>
 
                     if(MainActivity.loggedIn){
                         MainActivity.downloadHandler!!.showNotification(shownTitle, 0, 0, true, context)
-                        downloadSong(url, location, MainActivity.sid, context)
+                        var downloaded = false
+
+                        while(!downloaded){
+                            downloaded = downloadSong(url, location, MainActivity.sid, context)
+                        }
+
                         MainActivity.downloadHandler!!.hideNotification(context)
                     }
                     downloadedSongs++
@@ -51,7 +56,11 @@ class DownloadTask(private val context: Context) : AsyncTask<Void, Void, String>
 
                             MainActivity.downloadHandler!!.showNotification(shownTitle, i, songArrayList.size,false, context)
 
-                            downloadSong(url, location, MainActivity.sid, context)
+                            var downloaded = false
+
+                            while(!downloaded){
+                                downloaded = downloadSong(url, location, MainActivity.sid, context)
+                            }
                         }
 
                         MainActivity.downloadHandler!!.hideNotification(context)
@@ -62,13 +71,12 @@ class DownloadTask(private val context: Context) : AsyncTask<Void, Void, String>
             }catch(e:IndexOutOfBoundsException){
 
             }
-
-
+            
             Thread.sleep(500)
         }
     }
 
-    private fun downloadSong(url: String, location: String, sid: String, context: Context) {
+    private fun downloadSong(url: String, location: String, sid: String, context: Context):Boolean {
         try {
             val glideUrl = GlideUrl(
                 url, LazyHeaders.Builder()
@@ -96,57 +104,14 @@ class DownloadTask(private val context: Context) : AsyncTask<Void, Void, String>
                 }
                 bufferedOutputStream.flush()
                 bufferedOutputStream.close()
+
+                return true
             } catch (e: GlideException) {
+                return false
             }
 
         } catch (e: IOException) {
-            // Log exception
+            return false
         }
     }
-
-    private fun downloadSongArray(
-        tracks: ArrayList<HashMap<String, Any?>>,
-        sid: String, context: Context
-    ) {
-        for (i in tracks.indices) {
-            try {
-
-                val location = tracks[i]["downloadLocation"] as String
-                val url = tracks[i]["downloadUrl"] as String
-
-                val glideUrl = GlideUrl(
-                    url, LazyHeaders.Builder()
-                        .addHeader("Cookie", "connect.sid=$sid").build()
-                )
-
-                try {
-                    val downloadFile = Glide.with(context)
-                        .load(glideUrl)
-                        .downloadOnly(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
-                        .get()
-
-                    val destFile = File(location)
-
-                    val bufferedInputStream = BufferedInputStream(FileInputStream(downloadFile))
-                    val bufferedOutputStream = BufferedOutputStream(FileOutputStream(destFile))
-
-                    val buffer = ByteArray(1024)
-
-                    var len: Int
-                    len = bufferedInputStream.read(buffer)
-                    while (len > 0) {
-                        bufferedOutputStream.write(buffer, 0, len)
-                        len = bufferedInputStream.read(buffer)
-                    }
-                    bufferedOutputStream.flush()
-                    bufferedOutputStream.close()
-                } catch (e: Exception) {
-                }
-
-            } catch (e: IOException) {
-                // Log exception
-            }
-        }
-    }
-
 }
