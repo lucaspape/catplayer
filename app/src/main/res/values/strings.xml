@@ -21,4 +21,7 @@
     <string name="playNext">Play Next</string>
     <string name="addToPlaylist">Add to playlist..</string>
     <string name="pickPlaylistMsg">Pick a playlist:</string>
+    <string name="reviewPrivacyPolicyMsg">Please review our privacy policy at: %1$s</string>
+    <string name="privacyPolicy">Privacy Policy</string>
+    <string name="ok">OK</string>
 </resources>

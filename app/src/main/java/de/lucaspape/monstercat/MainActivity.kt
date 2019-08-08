@@ -1,8 +1,13 @@
 package de.lucaspape.monstercat
 
 import android.Manifest
+import android.app.AlertDialog
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.method.LinkMovementMethod
+import android.text.util.Linkify
+import android.widget.TextView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -14,6 +19,7 @@ import de.lucaspape.monstercat.fragments.HomeFragment
 import de.lucaspape.monstercat.fragments.PlaylistFragment
 import de.lucaspape.monstercat.fragments.SettingsFragment
 import de.lucaspape.monstercat.music.MusicPlayer
+import de.lucaspape.monstercat.settings.Settings
 
 class MainActivity : AppCompatActivity() {
 
@@ -80,6 +86,24 @@ class MainActivity : AppCompatActivity() {
 
         downloadHandler = DownloadHandler()
         DownloadTask(this).execute()
+
+        val settings = Settings(this)
+        if(settings.getSetting("privacypolicy") != "1.0"){
+            val textView = TextView(this)
+            val spannableString = SpannableString(getString(R.string.reviewPrivacyPolicyMsg, getString(R.string.privacypolicyUrl)))
+
+            Linkify.addLinks(spannableString, Linkify.WEB_URLS)
+            textView.text = spannableString
+            textView.movementMethod = LinkMovementMethod.getInstance()
+
+            val alertDialogBuilder = AlertDialog.Builder(this)
+            alertDialogBuilder.setTitle(getString(R.string.privacyPolicy))
+            alertDialogBuilder.setCancelable(true)
+            alertDialogBuilder.setPositiveButton(getString(R.string.ok), null)
+            alertDialogBuilder.setView(textView)
+            alertDialogBuilder.show()
+            settings.saveSetting("privacypolicy", "1.0")
+        }
     }
 
     override fun onBackPressed() {
