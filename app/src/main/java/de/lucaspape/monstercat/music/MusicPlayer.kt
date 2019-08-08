@@ -30,6 +30,7 @@ import de.lucaspape.monstercat.MainActivity
 import de.lucaspape.monstercat.R
 import java.io.File
 import java.lang.IndexOutOfBoundsException
+import java.lang.ref.WeakReference
 import kotlin.Comparator
 import kotlin.collections.ArrayList
 
@@ -37,7 +38,7 @@ import kotlin.collections.ArrayList
  * This class is meant to be static
  */
 class MusicPlayer(
-    private var context: Context,
+    private var weakReference: WeakReference<Context>,
     private var textView1: TextView,
     private var textView2: TextView,
     private var seekBar: SeekBar,
@@ -73,8 +74,8 @@ class MusicPlayer(
         val NOTIFICATION_NEXT = "de.lucaspape.monstercat.next"
     }
 
-    fun setContext(context: Context) {
-        this.context = context
+    fun setReference(reference: WeakReference<Context>) {
+        this.weakReference = reference
     }
 
     fun setTextView(textView1: TextView, textView2: TextView) {
@@ -118,6 +119,7 @@ class MusicPlayer(
     }
 
     private fun play() {
+        val context = weakReference.get()!!
         val song: HashMap<String, Any?>
 
         try {
@@ -204,7 +206,7 @@ class MusicPlayer(
         } catch (e: IndexOutOfBoundsException) {
             //Something bad happend, resetting
             MainActivity.musicPlayer = MusicPlayer(
-                context,
+                weakReference,
                 textView1,
                 textView2,
                 seekBar,
@@ -216,6 +218,7 @@ class MusicPlayer(
     }
 
     private fun stop() {
+        val context = weakReference.get()!!
         playing = false
         textView1.text = ""
         textView2.text = ""
@@ -224,6 +227,8 @@ class MusicPlayer(
     }
 
     fun pause() {
+        val context = weakReference.get()!!
+
         try {
             val song = playList[currentSong]
 
@@ -242,6 +247,8 @@ class MusicPlayer(
     }
 
     fun resume() {
+        val context = weakReference.get()!!
+
         try {
             val song = playList[currentSong]
 
@@ -337,6 +344,8 @@ class MusicPlayer(
 
     private fun showNotificationAndroidO(titleName: String, artistName: String, coverUrl: String, playing: Boolean) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val context = weakReference.get()!!
+
             createNotificationChannel()
 
             val backgroundColor: Int
@@ -418,6 +427,8 @@ class MusicPlayer(
     //android < sdk 26
     private fun showNotification(titleName: String, artistName: String, coverUrl: String, playing: Boolean) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            val context = weakReference.get()!!
+
             createNotificationChannel()
 
             val backgroundColor: Int
@@ -498,6 +509,8 @@ class MusicPlayer(
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val context = weakReference.get()!!
+
             val channelName = "Music Notification"
             val channelDescription = "Handy dandy description"
             val importance = NotificationManager.IMPORTANCE_LOW

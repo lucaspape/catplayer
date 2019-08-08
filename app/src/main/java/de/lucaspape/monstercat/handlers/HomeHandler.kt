@@ -21,6 +21,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.*
 import java.lang.Exception
+import java.lang.ref.WeakReference
 
 /**
  * Does everything for the home page
@@ -156,11 +157,13 @@ class HomeHandler {
         val playButton = view.findViewById<ImageButton>(R.id.playButton)
         val seekBar = view.findViewById<SeekBar>(R.id.seekBar)
 
+        val weakReference = WeakReference(view.context)
+
         //setup musicPlayer
         if (MainActivity.musicPlayer == null) {
             MainActivity.musicPlayer =
                 MusicPlayer(
-                    view.context,
+                    weakReference,
                     textview1,
                     textview2,
                     seekBar,
@@ -169,7 +172,7 @@ class HomeHandler {
                     playButton
                 )
         } else {
-            MainActivity.musicPlayer!!.setContext(view.context)
+            MainActivity.musicPlayer!!.setReference(weakReference)
             MainActivity.musicPlayer!!.setTextView(textview1, textview2)
             MainActivity.musicPlayer!!.setSeekBar(seekBar)
             MainActivity.musicPlayer!!.setBarCoverImageView(coverBarImageView)
@@ -444,9 +447,4 @@ class HomeHandler {
 
         queue.add(playlistRequest)
     }
-
-
-
-
-
 }

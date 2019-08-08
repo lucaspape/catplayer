@@ -20,6 +20,7 @@ import de.lucaspape.monstercat.fragments.PlaylistFragment
 import de.lucaspape.monstercat.fragments.SettingsFragment
 import de.lucaspape.monstercat.music.MusicPlayer
 import de.lucaspape.monstercat.settings.Settings
+import java.lang.ref.WeakReference
 
 class MainActivity : AppCompatActivity() {
 
@@ -85,8 +86,10 @@ class MainActivity : AppCompatActivity() {
         openFragment(homeFragment)
 
         downloadHandler = DownloadHandler()
-        DownloadTask(this).execute()
+        val weakReference = WeakReference(applicationContext)
+        DownloadTask(weakReference).execute()
 
+        //for new privacy policy change version number
         val settings = Settings(this)
         if(settings.getSetting("privacypolicy") != "1.0"){
             val textView = TextView(this)

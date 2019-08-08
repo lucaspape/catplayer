@@ -10,9 +10,13 @@ import com.bumptech.glide.request.target.Target
 import de.lucaspape.monstercat.MainActivity
 import java.io.*
 import java.lang.IndexOutOfBoundsException
+import java.lang.ref.WeakReference
 
-class DownloadTask(private val context: Context) : AsyncTask<Void, Void, String>() {
+class DownloadTask(private val weakReference: WeakReference<Context>) : AsyncTask<Void, Void, String>() {
+
     override fun doInBackground(vararg p0: Void?): String? {
+
+        val context = weakReference.get()!!
 
         var downloadedSongs = 0
         var downloadedSongArrays = 0
