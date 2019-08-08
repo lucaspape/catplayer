@@ -3,19 +3,10 @@ package de.lucaspape.monstercat.download
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.os.AsyncTask
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.load.model.GlideUrl
-import com.bumptech.glide.load.model.LazyHeaders
-import com.bumptech.glide.request.target.Target
-import de.lucaspape.monstercat.MainActivity
 import de.lucaspape.monstercat.R
-import java.io.*
-import java.lang.Exception
 
 /**
  * This class is meant to be static
@@ -46,14 +37,16 @@ class DownloadHandler {
         downloadArrayListList.add(array)
     }
 
-    fun showNotification(context: Context) {
+    fun showNotification(shownTitle: String, progress:Int, max:Int, indeterminate:Boolean, context: Context){
         createNotificationChannel(context)
 
         val notificationBuilder = NotificationCompat.Builder(context, channelID)
-        notificationBuilder.setContentTitle("Downloading something idk dont ask me")
+        notificationBuilder.setContentTitle(shownTitle)
         notificationBuilder.setSmallIcon(R.drawable.ic_play_circle_filled_black_24dp)
         notificationBuilder.priority = NotificationCompat.PRIORITY_LOW
         notificationBuilder.setOngoing(true)
+
+        notificationBuilder.setProgress(max, progress, indeterminate)
 
         val notificationManagerCompat = NotificationManagerCompat.from(context)
         notificationManagerCompat.notify(notificationID, notificationBuilder.build())

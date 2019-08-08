@@ -231,6 +231,7 @@ class JSONParser {
             hashMap["downloadable"] = downloadable
             hashMap["downloadUrl"] = downloadUrl
             hashMap["downloadLocation"] = downloadLocation
+            hashMap["shownTitle"] = "$artist $title $version"
 
             return hashMap
         } else {

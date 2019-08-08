@@ -24,21 +24,38 @@ class DownloadTask(private val context: Context) : AsyncTask<Void, Void, String>
                     val song = DownloadHandler.downloadList[downloadedSongs]
                     val url = song["url"] as String
                     val location = song["location"] as String
+                    val shownTitle = song["shownTitle"] as String
 
                     if(MainActivity.loggedIn){
-                        MainActivity.downloadHandler!!.showNotification(context)
+                        MainActivity.downloadHandler!!.showNotification(shownTitle, 0, 0, true, context)
                         downloadSong(url, location, MainActivity.sid, context)
                         MainActivity.downloadHandler!!.hideNotification(context)
                     }
-
                     downloadedSongs++
-                }else if(DownloadHandler.downloadArrayListList[downloadedSongArrays].isNotEmpty()){
+                }
+            }catch(e:IndexOutOfBoundsException){
+            }
+
+            try{
+                if(DownloadHandler.downloadArrayListList[downloadedSongArrays].isNotEmpty()){
                     val songArrayList = DownloadHandler.downloadArrayListList[downloadedSongArrays]
 
                     if(MainActivity.loggedIn){
-                        MainActivity.downloadHandler!!.showNotification(context)
-                        downloadSongArray(songArrayList, MainActivity.sid, context)
+                        MainActivity.downloadHandler!!.showNotification("", 0, songArrayList.size,false, context)
+
+                        for(i in songArrayList.indices){
+                            val song = songArrayList[i]
+                            val url = song["downloadUrl"] as String
+                            val location = song["downloadLocation"] as String
+                            val shownTitle = song["shownTitle"] as String
+
+                            MainActivity.downloadHandler!!.showNotification(shownTitle, i, songArrayList.size,false, context)
+
+                            downloadSong(url, location, MainActivity.sid, context)
+                        }
+
                         MainActivity.downloadHandler!!.hideNotification(context)
+
                     }
                     downloadedSongArrays++
                 }
