@@ -212,41 +212,48 @@ class MusicPlayer(private var context: Context, private var textView1: TextView,
     }
 
     fun pause(){
-        val song = playList[currentSong]
+        try{
+            val song = playList[currentSong]
 
-        val title = song["title"] as String
-        val artist = song["artist"] as String
-        val coverUrl = song["coverUrl"] as String
+            val title = song["title"] as String
+            val artist = song["artist"] as String
+            val coverUrl = song["coverUrl"] as String
 
-        mediaPlayer.pause()
-        showNotification(title, artist, coverUrl, false)
-        playButton.setImageDrawable(context.resources.getDrawable(R.drawable.ic_play_arrow_black_24dp))
-        playing = false
-        paused = true
+            mediaPlayer.pause()
+            showNotification(title, artist, coverUrl, false)
+            playButton.setImageDrawable(context.resources.getDrawable(R.drawable.ic_play_arrow_black_24dp))
+            playing = false
+            paused = true
+        }catch (e:IndexOutOfBoundsException){
+
+        }
     }
 
     fun resume(){
-        val song = playList[currentSong]
+        try{
+            val song = playList[currentSong]
 
-        val title = song["title"] as String
-        val artist = song["artist"] as String
-        val coverUrl = song["coverUrl"] as String
+            val title = song["title"] as String
+            val artist = song["artist"] as String
+            val coverUrl = song["coverUrl"] as String
 
+            val length = mediaPlayer.currentPosition
 
-        val length = mediaPlayer.currentPosition
+            if(paused){
+                mediaPlayer.seekTo(length)
+                mediaPlayer.start()
 
-        if(paused){
-            mediaPlayer.seekTo(length)
-            mediaPlayer.start()
+                paused = false
+            }else{
+                play()
+            }
 
-            paused = false
-        }else{
-            play()
+            showNotification(title, artist, coverUrl, true)
+            playButton.setImageDrawable(context.resources.getDrawable(R.drawable.ic_pause_black_24dp))
+            playing = true
+        }catch(e:IndexOutOfBoundsException){
+
         }
-
-        showNotification(title, artist, coverUrl, true)
-        playButton.setImageDrawable(context.resources.getDrawable(R.drawable.ic_pause_black_24dp))
-        playing = true
     }
 
     fun next(){
