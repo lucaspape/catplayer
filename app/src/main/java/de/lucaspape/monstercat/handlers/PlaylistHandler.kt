@@ -52,20 +52,18 @@ class PlaylistHandler {
                         val jsonParser = JSONParser()
                         list.add(jsonParser.parsePlaylistToHashMap(jsonArray.getJSONObject(i)))
 
-                        Thread(Runnable {
-                            for(k in list.indices){
-                                val trackHashMap = list[k]
-                                val coverHashMap = jsonParser.parsePlaylistTrackCoverToHashMap(
-                                    trackHashMap,
-                                    view.context
-                                )
-                                if (coverHashMap != null) {
-                                    coverDownloadList.add(coverHashMap)
-                                }
+                        for (k in list.indices) {
+                            val trackHashMap = list[k]
+                            val coverHashMap = jsonParser.parsePlaylistTrackCoverToHashMap(
+                                trackHashMap,
+                                view.context
+                            )
+                            if (coverHashMap != null) {
+                                coverDownloadList.add(coverHashMap)
                             }
+                        }
 
-                            MainActivity.downloadHandler!!.addCoverArray(coverDownloadList)
-                        }).start()
+                        MainActivity.downloadHandler!!.addCoverArray(coverDownloadList)
 
                         simpleAdapter = SimpleAdapter(
                             view.context, list,
