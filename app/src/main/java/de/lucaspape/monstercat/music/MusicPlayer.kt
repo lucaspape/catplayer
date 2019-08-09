@@ -554,8 +554,8 @@ class MusicPlayer(
                 intent!!.action.equals(NOTIFICATION_PREVIOUS) -> MainActivity.musicPlayer!!.previous()
                 intent.action.equals(NOTIFICATION_DELETE) -> {
                     val notificationManager = context!!.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-                    notificationManager.cancel(MainActivity.musicPlayer!!.notificationID)
                     MainActivity.musicPlayer!!.pause()
+                    notificationManager.cancel(MainActivity.musicPlayer!!.notificationID)
                 }
                 intent.action.equals(NOTIFICATION_PAUSE) -> MainActivity.musicPlayer!!.pause()
                 intent.action.equals(NOTIFICATION_PLAY) -> MainActivity.musicPlayer!!.resume()
