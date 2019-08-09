@@ -3,7 +3,6 @@
           xmlns:tools="http://schemas.android.com/tools" package="de.lucaspape.monstercat">
 
     <uses-permission android:name="android.permission.INTERNET" />
-
     <application
             android:allowBackup="false"
             android:icon="@drawable/ic_play_circle_filled_black_24dp"
@@ -26,6 +25,7 @@
                 android:name=".MainActivity"
                 android:label="@string/app_name"
                 android:screenOrientation="portrait">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 

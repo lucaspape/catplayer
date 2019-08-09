@@ -24,4 +24,10 @@
     <string name="reviewPrivacyPolicyMsg">Please review our privacy policy at: %1$s</string>
     <string name="privacyPolicy">Privacy Policy</string>
     <string name="ok">OK</string>
+    <string name="playButton">Play</string>
+    <string name="pauseButton">Pause</string>
+    <string name="nextButton">Next</string>
+    <string name="prevButton">Previous</string>
+    <string name="coverImage">Cover</string>
+    <string name="closeButton">Close</string>
 </resources>
