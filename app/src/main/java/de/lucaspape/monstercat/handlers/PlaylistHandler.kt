@@ -40,6 +40,8 @@ class PlaylistHandler {
         if (!playlistCacheFile.exists()) {
             val playlistUrl = view.context.getString(R.string.playlistsUrl)
 
+            val coverDownloadList = ArrayList<HashMap<String, Any?>>()
+
             val playlistRequest = object : StringRequest(
                 Method.GET, playlistUrl, Response.Listener<String>
                 { response ->
@@ -49,6 +51,21 @@ class PlaylistHandler {
                     for (i in (0 until jsonArray.length())) {
                         val jsonParser = JSONParser()
                         list.add(jsonParser.parsePlaylistToHashMap(jsonArray.getJSONObject(i)))
+
+                        Thread(Runnable {
+                            for(k in list.indices){
+                                val trackHashMap = list[k]
+                                val coverHashMap = jsonParser.parsePlaylistTrackCoverToHashMap(
+                                    trackHashMap,
+                                    view.context
+                                )
+                                if (coverHashMap != null) {
+                                    coverDownloadList.add(coverHashMap)
+                                }
+                            }
+
+                            MainActivity.downloadHandler!!.addCoverArray(coverDownloadList)
+                        }).start()
 
                         simpleAdapter = SimpleAdapter(
                             view.context, list,
