@@ -59,7 +59,7 @@ class HomeHandler {
                         }
                     }
 
-                    for(k in list.indices){
+                    for (k in list.indices) {
                         val trackHashMap = list[k]
                         val coverHashMap = jsonParser.parsePlaylistTrackCoverToHashMap(
                             trackHashMap,
@@ -153,13 +153,10 @@ class HomeHandler {
                         val jsonParser = JSONParser()
                         val hashMap = jsonParser.parseCatalogSongsToHashMap(jsonArray.getJSONObject(k), view.context)
 
-                        Thread(Runnable {
-                            val coverHashMap = jsonParser.parseCoverToHashMap(hashMap, view.context)
-                            if (coverHashMap != null) {
-                                coverDownloadList.add(coverHashMap)
-                            }
-                        }).start()
-
+                        val coverHashMap = jsonParser.parseCoverToHashMap(hashMap, view.context)
+                        if (coverHashMap != null) {
+                            coverDownloadList.add(coverHashMap)
+                        }
 
                         tempList[i * 50 + k] = hashMap
 
