@@ -13,7 +13,6 @@ import de.lucaspape.monstercat.MainActivity
 import de.lucaspape.monstercat.MainActivity.Companion.loggedIn
 import de.lucaspape.monstercat.MainActivity.Companion.sid
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.download.DownloadCoverArray
 import de.lucaspape.monstercat.json.JSONParser
 import de.lucaspape.monstercat.music.MusicPlayer
 import de.lucaspape.monstercat.settings.Settings
@@ -77,7 +76,7 @@ class HomeHandler {
         var requestCount = 0
 
         val loadMax = 200
-        val coverDownloadList = ArrayList<HashMap<String, Any?>?>()
+        val coverDownloadList = ArrayList<HashMap<String, Any?>>()
         val tempList = Array(loadMax) { HashMap<String, Any?>() }
         list = ArrayList()
 
@@ -94,10 +93,7 @@ class HomeHandler {
                 }
 
                 //download cover arts
-                DownloadCoverArray(
-                    coverDownloadList,
-                    simpleAdapter
-                ).execute()
+                MainActivity.downloadHandler!!.addCoverArray(coverDownloadList)
 
                 val oos = ObjectOutputStream(FileOutputStream(listFile))
                 oos.writeObject(list)
@@ -128,7 +124,11 @@ class HomeHandler {
                         val jsonParser = JSONParser()
                         val hashMap = jsonParser.parseCatalogSongsToHashMap(jsonArray.getJSONObject(k), view.context)
 
-                        coverDownloadList.add(jsonParser.parseCoverToHashMap(hashMap, view.context))
+                        val coverHashMap = jsonParser.parseCoverToHashMap(hashMap, view.context)
+                        if(coverHashMap != null){
+                            coverDownloadList.add(coverHashMap)
+                        }
+
                         tempList[i * 50 + k] = hashMap
 
                     }

@@ -16,7 +16,6 @@ import de.lucaspape.monstercat.MainActivity.Companion.loggedIn
 import de.lucaspape.monstercat.MainActivity.Companion.sid
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.settings.Settings
-import de.lucaspape.monstercat.download.DownloadCoverArray
 import org.json.JSONObject
 import java.io.*
 import java.lang.Exception
@@ -109,7 +108,7 @@ class PlaylistHandler {
         val to = arrayOf(R.id.title, R.id.cover)
         var simpleAdapter = SimpleAdapter(view.context, list, R.layout.list_single, from, to.toIntArray())
 
-        val coverDownloadList = ArrayList<HashMap<String, Any?>?>()
+        val coverDownloadList = ArrayList<HashMap<String, Any?>>()
 
         val playlistTrackCacheFile =
             File(view.context.getString(R.string.playlistTracksCacheFile, view.context.cacheDir.toString(), playlistId))
@@ -151,10 +150,8 @@ class PlaylistHandler {
 
                     }
 
-                    DownloadCoverArray(
-                        coverDownloadList,
-                        simpleAdapter
-                    ).execute()
+                    MainActivity.downloadHandler!!.addCoverArray(coverDownloadList)
+
                     currentPlaylist = itemValue
 
                     val oos = ObjectOutputStream(FileOutputStream(playlistTrackCacheFile))
@@ -199,12 +196,14 @@ class PlaylistHandler {
                                 val trackHashMap = jsonParser.parsePlaylistTracksToHashMap(playlistObject, view.context)
 
                                 if (trackHashMap != null) {
-                                    coverDownloadList.add(
-                                        jsonParser.parsePlaylistTrackCoverToHashMap(
-                                            trackHashMap,
-                                            view.context
-                                        )
+                                    val coverHashMap = jsonParser.parsePlaylistTrackCoverToHashMap(
+                                        trackHashMap,
+                                        view.context
                                     )
+                                    if (coverHashMap != null) {
+                                        coverDownloadList.add(coverHashMap)
+                                    }
+
                                     tempList[i * 50 + k] = trackHashMap
                                 }
                             }
