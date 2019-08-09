@@ -202,7 +202,7 @@ class MusicPlayer(
             }
 
             showNotification(title, artist, coverUrl, true)
-            playButton.setImageDrawable(context.resources.getDrawable(R.drawable.ic_pause_black_24dp))
+            playButton.setImageDrawable(context.resources.getDrawable(R.drawable.ic_pause_white_24dp))
         } catch (e: IndexOutOfBoundsException) {
             //Something bad happend, resetting
             MainActivity.musicPlayer = MusicPlayer(
@@ -222,7 +222,7 @@ class MusicPlayer(
         playing = false
         textView1.text = ""
         textView2.text = ""
-        playButton.setImageDrawable(context.resources.getDrawable(R.drawable.ic_play_arrow_black_24dp))
+        playButton.setImageDrawable(context.resources.getDrawable(R.drawable.ic_play_arrow_white_24dp))
         mediaPlayer.stop()
     }
 
@@ -238,7 +238,7 @@ class MusicPlayer(
 
             mediaPlayer.pause()
             showNotification(title, artist, coverUrl, false)
-            playButton.setImageDrawable(context.resources.getDrawable(R.drawable.ic_play_arrow_black_24dp))
+            playButton.setImageDrawable(context.resources.getDrawable(R.drawable.ic_play_arrow_white_24dp))
             playing = false
             paused = true
         } catch (e: IndexOutOfBoundsException) {
@@ -268,7 +268,7 @@ class MusicPlayer(
             }
 
             showNotification(title, artist, coverUrl, true)
-            playButton.setImageDrawable(context.resources.getDrawable(R.drawable.ic_pause_black_24dp))
+            playButton.setImageDrawable(context.resources.getDrawable(R.drawable.ic_pause_white_24dp))
             playing = true
         } catch (e: IndexOutOfBoundsException) {
 

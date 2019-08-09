@@ -48,7 +48,7 @@
             app:layout_constraintBottom_toBottomOf="@+id/muscicbar"
             app:layout_constraintStart_toStartOf="@+id/muscicbar" app:layout_constraintEnd_toEndOf="@+id/muscicbar"
             app:layout_constraintHorizontal_bias="0.498"
-            android:maxLines="1"/>
+            android:maxLines="1" android:textColor="#FFFFFF"/>
 
     <TextView
             android:text=""
@@ -58,11 +58,11 @@
             app:layout_constraintBottom_toBottomOf="@+id/muscicbar"
             app:layout_constraintStart_toStartOf="@+id/muscicbar" app:layout_constraintEnd_toEndOf="@+id/muscicbar"
             app:layout_constraintHorizontal_bias="0.498"
-            android:maxLines="1"/>
+            android:maxLines="1" android:textColor="#FFFFFF"/>
 
 
     <ImageButton
-            android:src="@drawable/ic_play_arrow_black_24dp"
+            android:src="@drawable/ic_play_arrow_white_24dp"
             android:background="@null"
             android:layout_width="50dp"
             android:layout_height="50dp"
@@ -82,7 +82,7 @@
             app:layout_constraintTop_toTopOf="@+id/muscicbar"/>
 
     <ImageButton
-            android:src="@drawable/ic_skip_previous_black_24dp"
+            android:src="@drawable/ic_skip_previous_white_24dp"
             android:background="@null"
             android:layout_width="48dp"
             android:layout_height="48dp"
@@ -94,7 +94,7 @@
             app:layout_constraintHorizontal_bias="1.0" android:contentDescription="@string/prevButton"/>
 
     <ImageButton
-            android:src="@drawable/ic_skip_next_black_24dp"
+            android:src="@drawable/ic_skip_next_white_24dp"
             android:background="@null"
             android:layout_width="48dp"
             android:layout_height="48dp"
