@@ -166,6 +166,7 @@ class PlaylistHandler {
                     }
 
                     MainActivity.downloadHandler!!.addCoverArray(coverDownloadList)
+                    println("added: " + coverDownloadList)
 
                     currentPlaylist = itemValue
 

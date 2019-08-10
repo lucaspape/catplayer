@@ -13,7 +13,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import de.lucaspape.monstercat.auth.Auth
-import de.lucaspape.monstercat.download.DownloadCoverTask
 import de.lucaspape.monstercat.download.DownloadHandler
 import de.lucaspape.monstercat.download.DownloadTask
 import de.lucaspape.monstercat.fragments.HomeFragment
@@ -87,9 +86,9 @@ class MainActivity : AppCompatActivity() {
         openFragment(homeFragment)
 
         downloadHandler = DownloadHandler()
+
         val weakReference = WeakReference(applicationContext)
         DownloadTask(weakReference).execute()
-        DownloadCoverTask(weakReference).execute()
 
         //for new privacy policy change version number
         val settings = Settings(this)
