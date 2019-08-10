@@ -11,35 +11,53 @@ class Settings(private val context: Context) {
     }
 
     fun getSetting(key: String): String? {
-        val settingsFile = File(context.getString(R.string.settingsFile, context.filesDir.toString()))
-        return if (settingsFile.exists()) {
-            val ois = ObjectInputStream(FileInputStream(settingsFile))
-            val settingsMap = ois.readObject() as HashMap<String, String>
-            ois.close()
+        try {
+            return try{
+                val settingsFile = File(context.getString(R.string.settingsFile, context.filesDir.toString()))
+                if (settingsFile.exists()) {
+                    val ois = ObjectInputStream(FileInputStream(settingsFile))
+                    val settingsMap = ois.readObject() as HashMap<String, String>
+                    ois.close()
 
-            settingsMap[key]
-        } else {
-            null
+                    settingsMap[key]
+                } else {
+                    null
+                }
+            }catch(e: EOFException){
+                //ah shit, here we go again
+                getSetting(key)
+            }
+        }catch (e: StreamCorruptedException){
+            return getSetting(key)
         }
 
     }
 
     fun saveSetting(key: String, setting: String) {
-        val settingsFile = File(context.getString(R.string.settingsFile, context.filesDir.toString()))
-        var settingsMap = HashMap<String, String>()
+        try{
+            try {
+                val settingsFile = File(context.getString(R.string.settingsFile, context.filesDir.toString()))
+                var settingsMap = HashMap<String, String>()
 
-        if (settingsFile.exists()) {
-            val ois = ObjectInputStream(FileInputStream(settingsFile))
-            settingsMap = ois.readObject() as HashMap<String, String>
-            ois.close()
+                if (settingsFile.exists()) {
+                    val ois = ObjectInputStream(FileInputStream(settingsFile))
+                    settingsMap = ois.readObject() as HashMap<String, String>
+                    ois.close()
+                }
+
+                settingsMap[key] = setting
+
+                val oos = ObjectOutputStream(FileOutputStream(settingsFile))
+                oos.writeObject(settingsMap)
+                oos.flush()
+                oos.close()
+            }catch (e:EOFException){
+                //ah shit, here we go again
+                saveSetting(key, setting)
+            }
+        }catch(e: StreamCorruptedException){
+            saveSetting(key, setting)
         }
-
-        settingsMap[key] = setting
-
-        val oos = ObjectOutputStream(FileOutputStream(settingsFile))
-        oos.writeObject(settingsMap)
-        oos.flush()
-        oos.close()
     }
 
     private fun setDefaultSettings(overwrite: Boolean) {

@@ -10,6 +10,7 @@ import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.model.LazyHeaders
 import com.bumptech.glide.request.target.Target
 import de.lucaspape.monstercat.MainActivity
+import de.lucaspape.monstercat.R
 import java.io.*
 import java.lang.IndexOutOfBoundsException
 import java.lang.ref.WeakReference
@@ -94,7 +95,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) : AsyncTas
                 if(DownloadHandler.downloadCoverList[downloadedCovers].isNotEmpty()){
                     val cover = DownloadHandler.downloadCoverList[downloadedCovers]
 
-                    MainActivity.downloadHandler!!.showNotification("Downloading cover images", 0, 0, true, context)
+                    MainActivity.downloadHandler!!.showNotification(context.getString(R.string.downloadingCoversMsg), 0, 0, true, context)
 
                     val url = cover["coverUrl"] as String
                     val location = cover["location"] as String
@@ -115,7 +116,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) : AsyncTas
                     val coverArray = DownloadHandler.downloadCoverArrayListList[downloadedCoverArrays]
 
                     for(i in coverArray.indices){
-                        MainActivity.downloadHandler!!.showNotification("Downloading cover images", i, coverArray.size, false, context)
+                        MainActivity.downloadHandler!!.showNotification(context.getString(R.string.downloadingCoversMsg), i, coverArray.size, false, context)
 
                         val cover = coverArray[i]
 

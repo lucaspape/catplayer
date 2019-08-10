@@ -42,22 +42,24 @@ class HomeHandler {
         val coverDownloadList = ArrayList<HashMap<String, Any?>>()
 
         if (listFile.exists()) {
-            try {
-                val ois = ObjectInputStream(FileInputStream(listFile))
 
-                list = ois.readObject() as ArrayList<HashMap<String, Any?>>
 
-                ois.close()
+            val ois = ObjectInputStream(FileInputStream(listFile))
 
-                val jsonParser = JSONParser()
+            list = ois.readObject() as ArrayList<HashMap<String, Any?>>
 
-                for (i in list.indices) {
-                    val coverHashMap = jsonParser.parseCoverToHashMap(list[i], view.context)
-                    if (coverHashMap != null) {
-                        coverDownloadList.add(coverHashMap)
-                    }
+            ois.close()
+
+            val jsonParser = JSONParser()
+
+            for (i in list.indices) {
+                val coverHashMap = jsonParser.parseCoverToHashMap(list[i], view.context)
+                if (coverHashMap != null) {
+                    coverDownloadList.add(coverHashMap)
                 }
+            }
 
+            Thread(Runnable {
                 for (k in list.indices) {
                     val trackHashMap = list[k]
                     val coverHashMap = jsonParser.parsePlaylistTrackCoverToHashMap(
@@ -70,10 +72,7 @@ class HomeHandler {
                 }
 
                 MainActivity.downloadHandler!!.addCoverArray(coverDownloadList)
-
-            } catch (e: Exception) {
-                println(e)
-            }
+            }).start()
 
             simpleAdapter = SimpleAdapter(view.context, list, R.layout.list_single, from, to.toIntArray())
             simpleAdapter.notifyDataSetChanged()
@@ -83,6 +82,7 @@ class HomeHandler {
         } else {
             return false
         }
+
     }
 
     fun refresh(view: View) {
@@ -151,10 +151,12 @@ class HomeHandler {
                         val jsonParser = JSONParser()
                         val hashMap = jsonParser.parseCatalogSongsToHashMap(jsonArray.getJSONObject(k), view.context)
 
-                        val coverHashMap = jsonParser.parseCoverToHashMap(hashMap, view.context)
-                        if (coverHashMap != null) {
-                            coverDownloadList.add(coverHashMap)
-                        }
+                        Thread(Runnable {
+                            val coverHashMap = jsonParser.parseCoverToHashMap(hashMap, view.context)
+                            if (coverHashMap != null) {
+                                coverDownloadList.add(coverHashMap)
+                            }
+                        }).start()
 
                         tempList[i * 50 + k] = hashMap
 
