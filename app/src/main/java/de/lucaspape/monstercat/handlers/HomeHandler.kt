@@ -19,30 +19,24 @@ import de.lucaspape.monstercat.settings.Settings
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.*
-import java.lang.Exception
 import java.lang.ref.WeakReference
+
 
 /**
  * Does everything for the home page
  */
 class HomeHandler {
 
+    var currentListView = ArrayList<HashMap<String, Any?>>()
+    var simpleAdapter:SimpleAdapter? = null
+
     fun loadTitlesFromCache(view: View): Boolean {
-        val musicList = view.findViewById<ListView>(R.id.musiclistview)
-
-        var list = ArrayList<HashMap<String, Any?>>()
+        var list: ArrayList<HashMap<String, Any?>>
         val listFile = File(view.context.getString(R.string.homeTitlesCacheFile, view.context.cacheDir.toString()))
-
-        val from = arrayOf("shownTitle", "secondaryImage")
-        val to = arrayOf(R.id.title, R.id.cover)
-
-        var simpleAdapter = SimpleAdapter(view.context, list, R.layout.list_single, from, to.toIntArray())
-        musicList.adapter = simpleAdapter
 
         val coverDownloadList = ArrayList<HashMap<String, Any?>>()
 
         if (listFile.exists()) {
-
 
             val ois = ObjectInputStream(FileInputStream(listFile))
 
@@ -59,24 +53,22 @@ class HomeHandler {
                 }
             }
 
-            Thread(Runnable {
-                for (k in list.indices) {
-                    val trackHashMap = list[k]
-                    val coverHashMap = jsonParser.parsePlaylistTrackCoverToHashMap(
-                        trackHashMap,
-                        view.context
-                    )
-                    if (coverHashMap != null) {
-                        coverDownloadList.add(coverHashMap)
-                    }
+            for (k in list.indices) {
+                val trackHashMap = list[k]
+                val coverHashMap = jsonParser.parsePlaylistTrackCoverToHashMap(
+                    trackHashMap,
+                    view.context
+                )
+                if (coverHashMap != null) {
+                    coverDownloadList.add(coverHashMap)
                 }
+            }
 
-                MainActivity.downloadHandler!!.addCoverArray(coverDownloadList)
-            }).start()
+            MainActivity.downloadHandler!!.addCoverArray(coverDownloadList)
 
-            simpleAdapter = SimpleAdapter(view.context, list, R.layout.list_single, from, to.toIntArray())
-            simpleAdapter.notifyDataSetChanged()
-            musicList.adapter = simpleAdapter
+            currentListView = list
+
+            updateListView(view)
 
             return true
         } else {
@@ -85,18 +77,30 @@ class HomeHandler {
 
     }
 
+    fun redrawListView(view:View){
+        val musicList = view.findViewById<ListView>(R.id.musiclistview)
+        simpleAdapter!!.notifyDataSetChanged()
+        musicList.invalidateViews()
+        musicList.refreshDrawableState()
+    }
+
+    fun updateListView(view: View){
+        val musicList = view.findViewById<ListView>(R.id.musiclistview)
+
+        val from = arrayOf("shownTitle", "secondaryImage")
+        val to = arrayOf(R.id.title, R.id.cover)
+        simpleAdapter = SimpleAdapter(view.context, currentListView, R.layout.list_single, from, to.toIntArray())
+        musicList.adapter = simpleAdapter
+    }
+
     fun refresh(view: View) {
         val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
 
         swipeRefreshLayout.isRefreshing = true
 
-        val musicList = view.findViewById<ListView>(R.id.musiclistview)
-        var list = ArrayList<HashMap<String, Any?>>()
+        var list: ArrayList<HashMap<String, Any?>>
         val queue = Volley.newRequestQueue(view.context)
         val listFile = File(view.context.getString(R.string.homeTitlesCacheFile, view.context.cacheDir.toString()))
-        val from = arrayOf("shownTitle", "secondaryImage")
-        val to = arrayOf(R.id.title, R.id.cover)
-        var simpleAdapter = SimpleAdapter(view.context, list, R.layout.list_single, from, to.toIntArray())
 
         var requestCount = 0
 
@@ -125,13 +129,8 @@ class HomeHandler {
                 oos.flush()
                 oos.close()
 
-                //update listview
-                simpleAdapter = SimpleAdapter(
-                    view.context, list,
-                    R.layout.list_single, from, to.toIntArray()
-                )
-                simpleAdapter.notifyDataSetChanged()
-                musicList.adapter = simpleAdapter
+                currentListView = list
+                updateListView(view)
 
                 swipeRefreshLayout.isRefreshing = false
             }
@@ -151,12 +150,10 @@ class HomeHandler {
                         val jsonParser = JSONParser()
                         val hashMap = jsonParser.parseCatalogSongsToHashMap(jsonArray.getJSONObject(k), view.context)
 
-                        Thread(Runnable {
-                            val coverHashMap = jsonParser.parseCoverToHashMap(hashMap, view.context)
-                            if (coverHashMap != null) {
-                                coverDownloadList.add(coverHashMap)
-                            }
-                        }).start()
+                        val coverHashMap = jsonParser.parseCoverToHashMap(hashMap, view.context)
+                        if (coverHashMap != null) {
+                            coverDownloadList.add(coverHashMap)
+                        }
 
                         tempList[i * 50 + k] = hashMap
 

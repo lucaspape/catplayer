@@ -46,10 +46,10 @@ class JSONParser {
         hashMap["title"] = title
         hashMap["artist"] = artist
         hashMap["primaryImage"] =
-            context.cacheDir.toString() + "/" + title + version + artist + ".png" + primaryResolution.toString()
+            context.filesDir.toString() + "/" + title + version + artist + ".png" + primaryResolution.toString()
 
         hashMap["secondaryImage"] =
-            context.cacheDir.toString() + "/" + title + version + artist + ".png" + secondaryResolution.toString()
+            context.filesDir.toString() + "/" + title + version + artist + ".png" + secondaryResolution.toString()
 
         hashMap["version"] = version
 
@@ -73,14 +73,14 @@ class JSONParser {
         val artist = hashMap["artist"]
         val coverUrl = hashMap["coverUrl"]
 
-        if (!File(context.cacheDir.toString() + "/" + title + version + artist + ".png" + primaryResolution).exists()) {
+        if (!File(context.filesDir.toString() + "/" + title + version + artist + ".png" + primaryResolution).exists()) {
             val coverHashMap = HashMap<String, Any?>()
 
             coverHashMap["primaryRes"] = primaryResolution
             coverHashMap["secondaryRes"] = secondaryResolution
             coverHashMap["coverUrl"] = coverUrl
             coverHashMap["location"] =
-                context.cacheDir.toString() + "/" + title + version + artist + ".png"
+                context.filesDir.toString() + "/" + title + version + artist + ".png"
 
             return coverHashMap
 
@@ -159,10 +159,10 @@ class JSONParser {
             trackHashMap["albumId"] = albumId
 
             trackHashMap["primaryImage"] =
-                context.cacheDir.toString() + "/" + title + version + artist + ".png" + primaryResolution.toString()
+                context.filesDir.toString() + "/" + title + version + artist + ".png" + primaryResolution.toString()
 
             trackHashMap["secondaryImage"] =
-                context.cacheDir.toString() + "/" + title + version + artist + ".png" + secondaryResolution.toString()
+                context.filesDir.toString() + "/" + title + version + artist + ".png" + secondaryResolution.toString()
 
             return trackHashMap
         } else {
@@ -181,17 +181,17 @@ class JSONParser {
         val primaryResolution = settings.getSetting("primaryCoverResolution")
         val secondaryResolution = settings.getSetting("secondaryCoverResolution")
 
-        if (!File(context.cacheDir.toString() + "/" + title + version + artist + ".png" + primaryResolution).exists()) {
+        return if (!File(context.filesDir.toString() + "/" + title + version + artist + ".png" + primaryResolution).exists()) {
             val coverHashMap = HashMap<String, Any?>()
 
             coverHashMap["primaryRes"] = primaryResolution
             coverHashMap["secondaryRes"] = secondaryResolution
             coverHashMap["coverUrl"] = coverUrl
             coverHashMap["location"] =
-                context.cacheDir.toString() + "/" + title + version + artist + ".png"
-            return coverHashMap
+                context.filesDir.toString() + "/" + title + version + artist + ".png"
+            coverHashMap
         } else {
-            return null
+            null
         }
     }
 

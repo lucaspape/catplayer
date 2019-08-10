@@ -14,7 +14,7 @@ import de.lucaspape.monstercat.R
 class DownloadHandler {
     //notification var
     private val channelID = "Download Notification"
-    private val notificationID = 1
+    private val notificationID = 2
 
     companion object {
         @JvmStatic

@@ -198,8 +198,6 @@ class DownloadTask(private val weakReference: WeakReference<Context>) : AsyncTas
                 FileOutputStream(location + secondaryRes).use { out ->
                     secondaryBitmap!!.compress(Bitmap.CompressFormat.PNG, 100, out)
                 }
-
-                println(location)
             }
 
             return true

@@ -8,6 +8,9 @@ import androidx.fragment.app.Fragment
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import de.lucaspape.monstercat.handlers.HomeHandler
 import de.lucaspape.monstercat.R
+import android.os.Looper
+import android.os.Handler
+
 
 class HomeFragment : Fragment() {
     private var listView:ListView? = null
@@ -27,6 +30,8 @@ class HomeFragment : Fragment() {
 
         listView = view.findViewById<ListView>(R.id.musiclistview)
 
+        homeHandler.updateListView(view)
+
         if(!homeHandler.loadTitlesFromCache(view)){
             homeHandler.refresh(view)
         }
@@ -40,6 +45,15 @@ class HomeFragment : Fragment() {
         homeHandler.registerButtons(view)
 
         registerForContextMenu(listView)
+
+        Thread(Runnable {
+            while(true){
+                Handler(Looper.getMainLooper()).post(Runnable { homeHandler.redrawListView(view) })
+                Thread.sleep(1000)
+            }
+
+        }).start()
+
     }
 
     override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenu.ContextMenuInfo?) {
