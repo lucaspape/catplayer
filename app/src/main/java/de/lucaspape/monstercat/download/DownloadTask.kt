@@ -94,6 +94,8 @@ class DownloadTask(private val weakReference: WeakReference<Context>) : AsyncTas
                 if(DownloadHandler.downloadCoverList[downloadedCovers].isNotEmpty()){
                     val cover = DownloadHandler.downloadCoverList[downloadedCovers]
 
+                    MainActivity.downloadHandler!!.showNotification("Downloading cover images", 0, 0, true, context)
+
                     val url = cover["coverUrl"] as String
                     val location = cover["location"] as String
 
@@ -101,6 +103,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) : AsyncTas
                     val secondaryRes = cover["secondaryRes"] as String
 
                     downloadCover(url, location, primaryRes, secondaryRes)
+                    MainActivity.downloadHandler!!.hideNotification(context)
                 }
 
                 downloadedCovers++
@@ -112,6 +115,8 @@ class DownloadTask(private val weakReference: WeakReference<Context>) : AsyncTas
                     val coverArray = DownloadHandler.downloadCoverArrayListList[downloadedCoverArrays]
 
                     for(i in coverArray.indices){
+                        MainActivity.downloadHandler!!.showNotification("Downloading cover images", i, coverArray.size, false, context)
+
                         val cover = coverArray[i]
 
                         val url = cover["coverUrl"] as String
@@ -122,12 +127,14 @@ class DownloadTask(private val weakReference: WeakReference<Context>) : AsyncTas
 
                         downloadCover(url, location, primaryRes, secondaryRes)
                     }
+
+                    MainActivity.downloadHandler!!.hideNotification(context)
                 }
 
                 downloadedCoverArrays++
             }catch(e:IndexOutOfBoundsException){
             }
-            
+
             Thread.sleep(100)
         }
     }
