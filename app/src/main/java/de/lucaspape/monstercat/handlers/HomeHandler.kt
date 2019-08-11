@@ -145,6 +145,7 @@ class HomeHandler {
 
             swipeRefreshLayout.isRefreshing = false
 
+            //download cover art
             MainActivity.downloadHandler!!.addCoverArray(currentListViewData)
         } else {
             val requestQueue = Volley.newRequestQueue(view.context)
@@ -232,7 +233,7 @@ class HomeHandler {
     fun playSong(song: HashMap<String, Any?>, playNow: Boolean, context: Context) {
         val settings = Settings(context)
         val downloadType = settings.getSetting("downloadType")
-
+        
         //check if song is already downloaded
         val songDownloadLocation =
             context.filesDir.toString() + "/" + song["artist"] + song["title"] + song["version"] + "." + downloadType
@@ -243,14 +244,14 @@ class HomeHandler {
                     songDownloadLocation,
                     song["artist"] as String + song["title"] as String,
                     song["artist"] as String,
-                    song["coverLocation"] as String
+                    song["primaryImage"] as String
                 )
             } else {
                 MainActivity.musicPlayer!!.addSong(
                     songDownloadLocation,
                     song["artist"] as String + song["title"] as String,
                     song["artist"] as String,
-                    song["coverLocation"] as String
+                    song["primaryImage"] as String
                 )
             }
 
@@ -276,14 +277,14 @@ class HomeHandler {
                                     context.getString(R.string.songStreamUrl) + streamHash,
                                     song["artist"] as String + song["title"] as String,
                                     song["artist"] as String,
-                                    song["coverLocation"] as String
+                                    song["primaryImage"] as String
                                 )
                             } else {
                                 MainActivity.musicPlayer!!.addSong(
                                     context.getString(R.string.songStreamUrl) + streamHash,
                                     song["artist"] as String + song["title"] as String,
                                     song["artist"] as String,
-                                    song["coverLocation"] as String
+                                    song["primaryImage"] as String
                                 )
                             }
                         } else {
