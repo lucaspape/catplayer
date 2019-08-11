@@ -36,11 +36,11 @@ class PlaylistFragment : Fragment() {
             Toast.makeText(view.context, view.context.getString(R.string.setUsernamePasswordSettingsMsg), Toast.LENGTH_SHORT)
                 .show()
         }else{
-            playlistHandler.loadPlaylist(view)
+            playlistHandler.setupListView(view)
 
-            playlistHandler.registerPullRefresh(view)
+            playlistHandler.registerListeners(view)
 
-            playlistHandler.registerListViewClick(view)
+            playlistHandler.loadPlaylist(view, false)
 
             registerForContextMenu(playlistView)
         }

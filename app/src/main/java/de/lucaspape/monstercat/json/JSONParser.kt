@@ -166,6 +166,12 @@ class JSONParser {
             trackHashMap["secondaryImage"] =
                 context.filesDir.toString() + "/" + title + version + artist + ".png" + secondaryResolution.toString()
 
+            trackHashMap["primaryRes"] = primaryResolution
+            trackHashMap["secondaryRes"] = secondaryResolution
+            trackHashMap["coverUrl"] = coverUrl
+            trackHashMap["coverLocation"] =
+                context.filesDir.toString() + "/" + title + version + artist + ".png"
+
             return trackHashMap
         } else {
             return null

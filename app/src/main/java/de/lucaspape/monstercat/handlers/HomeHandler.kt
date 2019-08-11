@@ -233,7 +233,7 @@ class HomeHandler {
     fun playSong(song: HashMap<String, Any?>, playNow: Boolean, context: Context) {
         val settings = Settings(context)
         val downloadType = settings.getSetting("downloadType")
-        
+
         //check if song is already downloaded
         val songDownloadLocation =
             context.filesDir.toString() + "/" + song["artist"] + song["title"] + song["version"] + "." + downloadType
@@ -242,14 +242,14 @@ class HomeHandler {
             if (playNow) {
                 MainActivity.musicPlayer!!.playNow(
                     songDownloadLocation,
-                    song["artist"] as String + song["title"] as String,
+                    song["title"] as String + " " + song["version"] as String,
                     song["artist"] as String,
                     song["primaryImage"] as String
                 )
             } else {
                 MainActivity.musicPlayer!!.addSong(
                     songDownloadLocation,
-                    song["artist"] as String + song["title"] as String,
+                    song["title"] as String + " " + song["version"] as String,
                     song["artist"] as String,
                     song["primaryImage"] as String
                 )
@@ -275,14 +275,14 @@ class HomeHandler {
                             if (playNow) {
                                 MainActivity.musicPlayer!!.playNow(
                                     context.getString(R.string.songStreamUrl) + streamHash,
-                                    song["artist"] as String + song["title"] as String,
+                                    song["title"] as String + " " + song["version"] as String,
                                     song["artist"] as String,
                                     song["primaryImage"] as String
                                 )
                             } else {
                                 MainActivity.musicPlayer!!.addSong(
                                     context.getString(R.string.songStreamUrl) + streamHash,
-                                    song["artist"] as String + song["title"] as String,
+                                    song["title"] as String + " " + song["version"] as String,
                                     song["artist"] as String,
                                     song["primaryImage"] as String
                                 )
@@ -325,20 +325,13 @@ class HomeHandler {
                 if (sid != "") {
                     MainActivity.downloadHandler!!.addSong(downloadUrl, downloadLocation, song["shownTitle"] as String)
                 } else {
-                    Toast.makeText(context, context.getString(R.string.userNotSignedInMsg), Toast.LENGTH_SHORT)
-                        .show()
+                    //not signed in
                 }
             } else {
-                Toast.makeText(
-                    context,
-                    context.getString(R.string.alreadyDownloadedMsg, song["shownTitle"] as String),
-                    Toast.LENGTH_SHORT
-                )
-                    .show()
+                //already downloaded
             }
         } else {
-            Toast.makeText(context, context.getString(R.string.downloadNotAvailableMsg, song["shownTitle"] as String), Toast.LENGTH_SHORT)
-                .show()
+            //not available
         }
     }
 

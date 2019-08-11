@@ -5,12 +5,8 @@ import android.view.*
 import android.widget.AdapterView
 import android.widget.ListView
 import androidx.fragment.app.Fragment
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import de.lucaspape.monstercat.handlers.HomeHandler
 import de.lucaspape.monstercat.R
-import android.os.Looper
-import android.os.Handler
-
 
 class HomeFragment : Fragment() {
     private var listView:ListView? = null
