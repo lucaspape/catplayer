@@ -91,11 +91,17 @@ class DownloadTask(private val weakReference: WeakReference<Context>) : AsyncTas
             } catch (e: IndexOutOfBoundsException) {
             }
 
-            try{
-                if(DownloadHandler.downloadCoverList[downloadedCovers].isNotEmpty()){
+            try {
+                if (DownloadHandler.downloadCoverList[downloadedCovers].isNotEmpty()) {
                     val cover = DownloadHandler.downloadCoverList[downloadedCovers]
 
-                    MainActivity.downloadHandler!!.showNotification(context.getString(R.string.downloadingCoversMsg), 0, 0, true, context)
+                    MainActivity.downloadHandler!!.showNotification(
+                        context.getString(R.string.downloadingCoversMsg),
+                        0,
+                        0,
+                        true,
+                        context
+                    )
 
                     val url = cover["coverUrl"] as String
                     val location = cover["coverLocation"] as String
@@ -108,15 +114,21 @@ class DownloadTask(private val weakReference: WeakReference<Context>) : AsyncTas
                 }
 
                 downloadedCovers++
-            }catch(e:IndexOutOfBoundsException){
+            } catch (e: IndexOutOfBoundsException) {
             }
 
             try {
-                if(DownloadHandler.downloadCoverArrayListList[downloadedCoverArrays].isNotEmpty()){
+                if (DownloadHandler.downloadCoverArrayListList[downloadedCoverArrays].isNotEmpty()) {
                     val coverArray = DownloadHandler.downloadCoverArrayListList[downloadedCoverArrays]
 
-                    for(i in coverArray.indices){
-                        MainActivity.downloadHandler!!.showNotification(context.getString(R.string.downloadingCoversMsg), i, coverArray.size, false, context)
+                    for (i in coverArray.indices) {
+                        MainActivity.downloadHandler!!.showNotification(
+                            context.getString(R.string.downloadingCoversMsg),
+                            i,
+                            coverArray.size,
+                            false,
+                            context
+                        )
 
                         val cover = coverArray[i]
 
@@ -133,7 +145,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) : AsyncTas
                 }
 
                 downloadedCoverArrays++
-            }catch(e:IndexOutOfBoundsException){
+            } catch (e: IndexOutOfBoundsException) {
             }
 
             Thread.sleep(100)
@@ -179,9 +191,14 @@ class DownloadTask(private val weakReference: WeakReference<Context>) : AsyncTas
         }
     }
 
-    private fun downloadCover(downloadUrl: String, location: String, primaryRes:String, secondaryRes:String):Boolean{
+    private fun downloadCover(
+        downloadUrl: String,
+        location: String,
+        primaryRes: String,
+        secondaryRes: String
+    ): Boolean {
         try {
-            if(!File(location + primaryRes).exists() || !File(location + secondaryRes).exists()){
+            if (!File(location + primaryRes).exists() || !File(location + secondaryRes).exists()) {
                 val url = URL("$downloadUrl?image_width=$primaryRes")
                 val connection = url.openConnection() as HttpURLConnection
                 connection.doInput = true
@@ -193,7 +210,8 @@ class DownloadTask(private val weakReference: WeakReference<Context>) : AsyncTas
                     primaryBitmap!!.compress(Bitmap.CompressFormat.PNG, 100, out)
                 }
 
-                val secondaryBitmap = Bitmap.createScaledBitmap(primaryBitmap, secondaryRes.toInt(), secondaryRes.toInt(), false)
+                val secondaryBitmap =
+                    Bitmap.createScaledBitmap(primaryBitmap, secondaryRes.toInt(), secondaryRes.toInt(), false)
 
                 FileOutputStream(location + secondaryRes).use { out ->
                     secondaryBitmap!!.compress(Bitmap.CompressFormat.PNG, 100, out)

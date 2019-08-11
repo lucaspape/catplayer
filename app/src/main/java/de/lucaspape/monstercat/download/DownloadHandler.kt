@@ -24,10 +24,10 @@ class DownloadHandler {
         val downloadArrayListList = ArrayList<ArrayList<HashMap<String, Any?>>>()
 
         @JvmStatic
-        val downloadCoverList = ArrayList<HashMap<String,Any?>>()
+        val downloadCoverList = ArrayList<HashMap<String, Any?>>()
 
         @JvmStatic
-        val downloadCoverArrayListList = ArrayList<ArrayList<HashMap<String,Any?>>>()
+        val downloadCoverArrayListList = ArrayList<ArrayList<HashMap<String, Any?>>>()
     }
 
     fun addSong(url: String, location: String, shownTitle: String) {
@@ -43,7 +43,7 @@ class DownloadHandler {
         downloadArrayListList.add(array)
     }
 
-    fun addCover(url: String, location: String, primaryRes:String, secondaryRes:String){
+    fun addCover(url: String, location: String, primaryRes: String, secondaryRes: String) {
         val cover = HashMap<String, Any?>()
         cover["coverUrl"] = url
         cover["location"] = location
@@ -53,7 +53,7 @@ class DownloadHandler {
         downloadCoverList.add(cover)
     }
 
-    fun addCoverArray(covers: ArrayList<HashMap<String, Any?>>){
+    fun addCoverArray(covers: ArrayList<HashMap<String, Any?>>) {
         downloadCoverArrayListList.add(covers)
     }
 

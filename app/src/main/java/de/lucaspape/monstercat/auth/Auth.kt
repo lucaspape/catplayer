@@ -17,13 +17,13 @@ import org.json.JSONObject
 import java.io.UnsupportedEncodingException
 
 class Auth {
-    fun login(context:Context){
+    fun login(context: Context) {
         val settings = Settings(context)
 
         val username = settings.getSetting("email")
         val password = settings.getSetting("password")
 
-        if(username != null && password != null) {
+        if (username != null && password != null) {
             val loginPostParams = JSONObject()
             loginPostParams.put("email", username)
             loginPostParams.put("password", password)
@@ -77,7 +77,7 @@ class Auth {
             val loginQueue = Volley.newRequestQueue(context)
 
             loginQueue.addRequestFinishedListener<Any> {
-                if(sid != ""){
+                if (sid != "") {
                     loggedIn = true
                 }
             }

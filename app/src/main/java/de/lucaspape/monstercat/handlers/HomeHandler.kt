@@ -40,7 +40,7 @@ class HomeHandler {
         //setup auto reload
         Thread(Runnable {
             while (true) {
-                Handler(Looper.getMainLooper()).post(Runnable { redrawListView(view) })
+                Handler(Looper.getMainLooper()).post({ redrawListView(view) })
                 Thread.sleep(1000)
             }
 
@@ -107,12 +107,12 @@ class HomeHandler {
         val musicList = view.findViewById<ListView>(R.id.musiclistview)
         musicList.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
             val itemValue = musicList.getItemAtPosition(position) as HashMap<String, Any?>
-            playSong(itemValue,true, view.context)
+            playSong(itemValue, true, view.context)
         }
 
     }
 
-    fun redrawListView(view: View) {
+    private fun redrawListView(view: View) {
         val musicList = view.findViewById<ListView>(R.id.musiclistview)
         simpleAdapter!!.notifyDataSetChanged()
         musicList.invalidateViews()
@@ -122,7 +122,7 @@ class HomeHandler {
     /**
      * Updates content
      */
-    fun updateListView(view: View) {
+    private fun updateListView(view: View) {
         val musicList = view.findViewById<ListView>(R.id.musiclistview)
 
         val from = arrayOf("shownTitle", "secondaryImage")
@@ -154,7 +154,7 @@ class HomeHandler {
             val loadMax = 200
 
             //used to sort list
-            val tempList = arrayOfNulls<HashMap<String,Any?>>(loadMax)
+            val tempList = arrayOfNulls<HashMap<String, Any?>>(loadMax)
 
             //if all finished continue
             var finishedRequests = 0
@@ -170,7 +170,7 @@ class HomeHandler {
 
                     for (i in tempList.indices) {
                         if (tempList[i] != null) {
-                            if(tempList.isNotEmpty()){
+                            if (tempList.isNotEmpty()) {
                                 sortedList.add(tempList[i]!!)
                             }
                         }
@@ -304,7 +304,7 @@ class HomeHandler {
                 }
 
                 streamHashQueue.add(hashRequest)
-            }else{
+            } else {
                 //fu no song for u
             }
         }
@@ -320,7 +320,8 @@ class HomeHandler {
             val downloadUrl =
                 context.getString(R.string.songDownloadUrl) + song["albumId"] as String + "/download?method=download&type=" + downloadType + "_" + downloadQuality + "&track=" + song["id"] as String
 
-            val downloadLocation = context.filesDir.toString() + "/" + song["artist"] as String + song["title"] as String + song["version"] as String + "." + downloadType
+            val downloadLocation =
+                context.filesDir.toString() + "/" + song["artist"] as String + song["title"] as String + song["version"] as String + "." + downloadType
             if (!File(downloadLocation).exists()) {
                 if (sid != "") {
                     MainActivity.downloadHandler!!.addSong(downloadUrl, downloadLocation, song["shownTitle"] as String)
@@ -367,7 +368,7 @@ class HomeHandler {
                 }
             },
 
-            Response.ErrorListener { error ->
+            Response.ErrorListener { _ ->
 
             }) {
             @Throws(AuthFailureError::class)

@@ -12,7 +12,7 @@ class Settings(private val context: Context) {
 
     fun getSetting(key: String): String? {
         try {
-            return try{
+            return try {
                 val settingsFile = File(context.getString(R.string.settingsFile, context.filesDir.toString()))
                 if (settingsFile.exists()) {
                     val ois = ObjectInputStream(FileInputStream(settingsFile))
@@ -23,18 +23,18 @@ class Settings(private val context: Context) {
                 } else {
                     null
                 }
-            }catch(e: EOFException){
+            } catch (e: EOFException) {
                 //ah shit, here we go again
                 getSetting(key)
             }
-        }catch (e: StreamCorruptedException){
+        } catch (e: StreamCorruptedException) {
             return getSetting(key)
         }
 
     }
 
     fun saveSetting(key: String, setting: String) {
-        try{
+        try {
             try {
                 val settingsFile = File(context.getString(R.string.settingsFile, context.filesDir.toString()))
                 var settingsMap = HashMap<String, String>()
@@ -51,11 +51,11 @@ class Settings(private val context: Context) {
                 oos.writeObject(settingsMap)
                 oos.flush()
                 oos.close()
-            }catch (e:EOFException){
+            } catch (e: EOFException) {
                 //ah shit, here we go again
                 saveSetting(key, setting)
             }
-        }catch(e: StreamCorruptedException){
+        } catch (e: StreamCorruptedException) {
             saveSetting(key, setting)
         }
     }
@@ -66,7 +66,7 @@ class Settings(private val context: Context) {
             saveSetting("downloadQuality", "320")
         }
 
-        if(getSetting("primaryCoverResolution") == null){
+        if (getSetting("primaryCoverResolution") == null) {
             saveSetting("primaryCoverResolution", "512")
             saveSetting("secondaryCoverResolution", "64")
         }

@@ -5,7 +5,6 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.settings.Settings
 import org.json.JSONArray
 import org.json.JSONObject
-import java.io.File
 import java.lang.reflect.InvocationTargetException
 
 class JSONParser {
@@ -85,9 +84,9 @@ class JSONParser {
             }
         }
 
-        return if(streamHash == ""){
+        return if (streamHash == "") {
             null
-        }else{
+        } else {
             streamHash
         }
     }
@@ -175,31 +174,6 @@ class JSONParser {
             return trackHashMap
         } else {
             return null
-        }
-    }
-
-    fun parsePlaylistTrackCoverToHashMap(hashMap: HashMap<String, Any?>, context: Context): HashMap<String, Any?>? {
-        val settings = Settings(context)
-
-        val title = hashMap["title"]
-        val version = hashMap["version"]
-        val artist = hashMap["artist"]
-        val coverUrl = hashMap["coverUrl"]
-
-        val primaryResolution = settings.getSetting("primaryCoverResolution")
-        val secondaryResolution = settings.getSetting("secondaryCoverResolution")
-
-        return if (!File(context.filesDir.toString() + "/" + title + version + artist + ".png" + primaryResolution).exists()) {
-            val coverHashMap = HashMap<String, Any?>()
-
-            coverHashMap["primaryRes"] = primaryResolution
-            coverHashMap["secondaryRes"] = secondaryResolution
-            coverHashMap["coverUrl"] = coverUrl
-            coverHashMap["coverLocation"] =
-                context.filesDir.toString() + "/" + title + version + artist + ".png"
-            coverHashMap
-        } else {
-            null
         }
     }
 

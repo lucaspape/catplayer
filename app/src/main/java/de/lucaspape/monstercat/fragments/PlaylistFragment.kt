@@ -12,7 +12,7 @@ import de.lucaspape.monstercat.settings.Settings
 
 class PlaylistFragment : Fragment() {
     private val playlistHandler = PlaylistHandler()
-    private var playlistView:ListView? = null
+    private var playlistView: ListView? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
         inflater.inflate(R.layout.fragment_playlist, container, false)
@@ -32,10 +32,14 @@ class PlaylistFragment : Fragment() {
         val username = settings.getSetting("email")
         val password = settings.getSetting("password")
 
-        if(username == null || password == null){
-            Toast.makeText(view.context, view.context.getString(R.string.setUsernamePasswordSettingsMsg), Toast.LENGTH_SHORT)
+        if (username == null || password == null) {
+            Toast.makeText(
+                view.context,
+                view.context.getString(R.string.setUsernamePasswordSettingsMsg),
+                Toast.LENGTH_SHORT
+            )
                 .show()
-        }else{
+        } else {
             playlistHandler.setupListView(view)
 
             playlistHandler.registerListeners(view)
@@ -59,14 +63,14 @@ class PlaylistFragment : Fragment() {
 
         val listItem = playlistView!!.getItemAtPosition(position) as HashMap<String, Any?>
 
-        if(item.title == getString(R.string.download)){
-            if(listItem["type"] == "playlist"){
+        if (item.title == getString(R.string.download)) {
+            if (listItem["type"] == "playlist") {
                 playlistHandler.downloadPlaylist(context!!, listItem)
-            }else{
+            } else {
                 playlistHandler.downloadSong(context!!, listItem)
             }
 
-        }else if(item.title == getString(R.string.playNext)){
+        } else if (item.title == getString(R.string.playNext)) {
             playlistHandler.playSong(context!!, listItem, true)
         }
 

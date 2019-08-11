@@ -9,7 +9,7 @@ import de.lucaspape.monstercat.handlers.HomeHandler
 import de.lucaspape.monstercat.R
 
 class HomeFragment : Fragment() {
-    private var listView:ListView? = null
+    private var listView: ListView? = null
     private val homeHandler = HomeHandler()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -48,12 +48,10 @@ class HomeFragment : Fragment() {
 
         val listItem = listView!!.getItemAtPosition(position) as HashMap<String, Any?>
 
-        if(item.title == getString(R.string.download)){
-            homeHandler.downloadSong(listItem, context!!)
-        }else if(item.title == getString(R.string.playNext)){
-            homeHandler.playSong(listItem, false, context!!)
-        }else if(item.title == getString(R.string.addToPlaylist)){
-            homeHandler.addSongToPlaylist(listItem, context!!)
+        when {
+            item.title == getString(R.string.download) -> homeHandler.downloadSong(listItem, context!!)
+            item.title == getString(R.string.playNext) -> homeHandler.playSong(listItem, false, context!!)
+            item.title == getString(R.string.addToPlaylist) -> homeHandler.addSongToPlaylist(listItem, context!!)
         }
 
         return super.onContextItemSelected(item)

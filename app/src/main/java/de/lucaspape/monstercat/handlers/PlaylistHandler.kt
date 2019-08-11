@@ -28,8 +28,8 @@ class PlaylistHandler {
 
     private var currentListData = ArrayList<HashMap<String, Any?>>()
     private var currentPlaylist = HashMap<String, Any?>()
-    var simpleAdapter: SimpleAdapter? = null
-    var isPlaylist = false
+    private var simpleAdapter: SimpleAdapter? = null
+    private var isPlaylist = false
 
     fun setupListView(view: View) {
         updateListView(view, true)
@@ -38,7 +38,7 @@ class PlaylistHandler {
         //setup auto reload
         Thread(Runnable {
             while (true) {
-                Handler(Looper.getMainLooper()).post(Runnable { redrawListView(view) })
+                Handler(Looper.getMainLooper()).post { redrawListView(view) }
                 Thread.sleep(1000)
             }
 
@@ -49,12 +49,12 @@ class PlaylistHandler {
         val playlistView = view.findViewById<ListView>(R.id.listview)
 
         playlistView.onItemClickListener =
-            AdapterView.OnItemClickListener { _, listViewView, position, _ ->
+            AdapterView.OnItemClickListener { _, _, position, _ ->
                 val itemValue = playlistView.getItemAtPosition(position) as HashMap<String, Any?>
 
                 if (itemValue["type"] == "playlist") {
                     currentPlaylist = itemValue
-                    loadPlaylistTracks(view, itemValue, false)
+                    loadPlaylistTracks(view, false)
                 } else {
                     playSong(view.context, itemValue, false)
                 }
@@ -70,7 +70,7 @@ class PlaylistHandler {
                 if (listViewItem["type"] == "playlist") {
                     loadPlaylist(view, true)
                 } else {
-                    loadPlaylistTracks(view, listViewItem, true)
+                    loadPlaylistTracks(view, true)
                 }
             } catch (e: IndexOutOfBoundsException) {
                 loadPlaylist(view, true)
@@ -142,7 +142,7 @@ class PlaylistHandler {
                 override fun getHeaders(): Map<String, String> {
                     val params = HashMap<String, String>()
                     if (loggedIn) {
-                        params.put("Cookie", "connect.sid=" + sid)
+                        params["Cookie"] = "connect.sid=$sid"
                     }
 
                     return params
@@ -159,14 +159,15 @@ class PlaylistHandler {
         }
     }
 
-    private fun loadPlaylistTracks(view: View, playlist: HashMap<String, Any?>, force: Boolean) {
+    private fun loadPlaylistTracks(view: View, force: Boolean) {
         val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
         swipeRefreshLayout.isRefreshing = true
 
         val cache = Cache("playlistTrackCache", view.context)
 
         if (isPlaylist) {
-            val playlistTrackCache = cache.load(currentPlaylist["playlistId"] as String) as ArrayList<HashMap<String, Any?>>?
+            val playlistTrackCache =
+                cache.load(currentPlaylist["playlistId"] as String) as ArrayList<HashMap<String, Any?>>?
 
             if (playlistTrackCache != null && !force) {
                 currentListData = playlistTrackCache
