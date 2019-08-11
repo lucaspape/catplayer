@@ -9,6 +9,7 @@ import java.io.File
 import java.lang.reflect.InvocationTargetException
 
 class JSONParser {
+
     fun parseCatalogSongsToHashMap(jsonObject: JSONObject, context: Context): HashMap<String, Any?> {
         val settings = Settings(context)
 
@@ -16,21 +17,21 @@ class JSONParser {
         val secondaryResolution = settings.getSetting("secondaryCoverResolution")
 
         var id = ""
+        var albumId = ""
         var title = ""
         var artist = ""
         var coverUrl = ""
         var version = ""
-        var songId = ""
         var downloadable = false
         var streamable = false
 
         try {
-            id = jsonObject.getJSONObject("albums").getString("albumId")
+            albumId = jsonObject.getJSONObject("albums").getString("albumId")
             title = jsonObject.getString("title")
             artist = jsonObject.getString("artistsTitle")
             coverUrl = jsonObject.getJSONObject("release").getString("coverUrl")
             version = jsonObject.getString("version")
-            songId = jsonObject.getString("_id")
+            id = jsonObject.getString("_id")
             downloadable = jsonObject.getBoolean("downloadable")
             streamable = jsonObject.getBoolean("streamable")
         } catch (e: InvocationTargetException) {
@@ -42,7 +43,7 @@ class JSONParser {
 
         val hashMap = HashMap<String, Any?>()
 
-        hashMap["id"] = id
+        hashMap["albumId"] = albumId
         hashMap["title"] = title
         hashMap["artist"] = artist
         hashMap["primaryImage"] =
@@ -54,40 +55,41 @@ class JSONParser {
         hashMap["version"] = version
 
         hashMap["shownTitle"] = "$artist $title $version"
-        hashMap["songId"] = songId
+        hashMap["id"] = id
         hashMap["downloadable"] = downloadable
         hashMap["streamable"] = streamable
         hashMap["coverUrl"] = coverUrl
 
+        hashMap["primaryRes"] = primaryResolution
+        hashMap["secondaryRes"] = secondaryResolution
+        hashMap["coverUrl"] = coverUrl
+        hashMap["coverLocation"] =
+            context.filesDir.toString() + "/" + title + version + artist + ".png"
+
         return hashMap
     }
 
-    fun parseCoverToHashMap(hashMap: HashMap<String, Any?>, context: Context): HashMap<String, Any?>? {
-        val settings = Settings(context)
+    fun parseObjectToStreamHash(jsonObject: JSONObject, song: HashMap<String, Any?>): String? {
+        val jsonArray = jsonObject.getJSONArray("results")
 
-        val primaryResolution = settings.getSetting("primaryCoverResolution")
-        val secondaryResolution = settings.getSetting("secondaryCoverResolution")
+        var streamHash = ""
+        val searchSong = song["title"] as String + song["version"] as String
 
-        val title = hashMap["title"]
-        val version = hashMap["version"]
-        val artist = hashMap["artist"]
-        val coverUrl = hashMap["coverUrl"]
-
-        if (!File(context.filesDir.toString() + "/" + title + version + artist + ".png" + primaryResolution).exists()) {
-            val coverHashMap = HashMap<String, Any?>()
-
-            coverHashMap["primaryRes"] = primaryResolution
-            coverHashMap["secondaryRes"] = secondaryResolution
-            coverHashMap["coverUrl"] = coverUrl
-            coverHashMap["location"] =
-                context.filesDir.toString() + "/" + title + version + artist + ".png"
-
-            return coverHashMap
-
-        } else {
-            return null
+        for (i in (0 until jsonArray.length())) {
+            if (jsonArray.getJSONObject(i).getString("title") + jsonArray.getJSONObject(i).getString(
+                    "version"
+                ) == searchSong
+            ) {
+                streamHash =
+                    jsonArray.getJSONObject(i).getJSONObject("albums").getString("streamHash")
+            }
         }
 
+        return if(streamHash == ""){
+            null
+        }else{
+            streamHash
+        }
     }
 
     fun parsePatchedPlaylist(trackArray: JSONArray, songItem: HashMap<String, Any?>): Array<JSONObject?> {
@@ -98,8 +100,8 @@ class JSONParser {
         }
 
         val songJsonObject = JSONObject()
-        songJsonObject.put("releaseId", songItem["id"])
-        songJsonObject.put("trackId", songItem["songId"])
+        songJsonObject.put("releaseId", songItem["albumId"])
+        songJsonObject.put("trackId", songItem["id"])
 
         patchedArray[trackArray.length()] = songJsonObject
 
@@ -187,7 +189,7 @@ class JSONParser {
             coverHashMap["primaryRes"] = primaryResolution
             coverHashMap["secondaryRes"] = secondaryResolution
             coverHashMap["coverUrl"] = coverUrl
-            coverHashMap["location"] =
+            coverHashMap["coverLocation"] =
                 context.filesDir.toString() + "/" + title + version + artist + ".png"
             coverHashMap
         } else {

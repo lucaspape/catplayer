@@ -28,32 +28,14 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        homeHandler.setupListView(view)
+        homeHandler.registerListeners(view)
+        homeHandler.setupMusicPlayer(view)
+        homeHandler.loadSongList(view, false)
+
         listView = view.findViewById<ListView>(R.id.musiclistview)
 
-        homeHandler.updateListView(view)
-
-        if(!homeHandler.loadTitlesFromCache(view)){
-            homeHandler.refresh(view)
-        }
-
-        homeHandler.registerPullRefresh(view)
-
-        homeHandler.setupMusicPlayer(view)
-
-        homeHandler.registerListViewClick(view)
-
-        homeHandler.registerButtons(view)
-
         registerForContextMenu(listView)
-
-        Thread(Runnable {
-            while(true){
-                Handler(Looper.getMainLooper()).post(Runnable { homeHandler.redrawListView(view) })
-                Thread.sleep(1000)
-            }
-
-        }).start()
-
     }
 
     override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenu.ContextMenuInfo?) {
@@ -71,11 +53,11 @@ class HomeFragment : Fragment() {
         val listItem = listView!!.getItemAtPosition(position) as HashMap<String, Any?>
 
         if(item.title == getString(R.string.download)){
-            homeHandler.downloadSong(context!!, listItem)
+            homeHandler.downloadSong(listItem, context!!)
         }else if(item.title == getString(R.string.playNext)){
-            homeHandler.playSong(context!!, listItem, true)
+            homeHandler.playSong(listItem, false, context!!)
         }else if(item.title == getString(R.string.addToPlaylist)){
-            homeHandler.addSongToPlaylist(context!!,listItem)
+            homeHandler.addSongToPlaylist(listItem, context!!)
         }
 
         return super.onContextItemSelected(item)

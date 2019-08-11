@@ -98,7 +98,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) : AsyncTas
                     MainActivity.downloadHandler!!.showNotification(context.getString(R.string.downloadingCoversMsg), 0, 0, true, context)
 
                     val url = cover["coverUrl"] as String
-                    val location = cover["location"] as String
+                    val location = cover["coverLocation"] as String
 
                     val primaryRes = cover["primaryRes"] as String
                     val secondaryRes = cover["secondaryRes"] as String
@@ -121,7 +121,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) : AsyncTas
                         val cover = coverArray[i]
 
                         val url = cover["coverUrl"] as String
-                        val location = cover["location"] as String
+                        val location = cover["coverLocation"] as String
 
                         val primaryRes = cover["primaryRes"] as String
                         val secondaryRes = cover["secondaryRes"] as String
