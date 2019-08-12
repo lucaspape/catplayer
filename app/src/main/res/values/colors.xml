@@ -3,6 +3,7 @@
     <color name="colorPrimary">#3d3d3d</color>
     <color name="colorPrimaryDark">#000000</color>
     <color name="colorAccent">#b0b0b0</color>
+    <color name="black">#000000</color>
 
     <color name="colorPlayerBackground">#3d3d3d</color>
 </resources>
