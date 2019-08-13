@@ -15,6 +15,7 @@ import java.io.*
 import java.lang.IndexOutOfBoundsException
 import java.lang.ref.WeakReference
 import java.net.HttpURLConnection
+import java.net.URISyntaxException
 import java.net.URL
 
 class DownloadTask(private val weakReference: WeakReference<Context>) : AsyncTask<Void, Void, String>() {
@@ -154,10 +155,16 @@ class DownloadTask(private val weakReference: WeakReference<Context>) : AsyncTas
 
     private fun downloadSong(url: String, location: String, sid: String, context: Context): Boolean {
         try {
-            val glideUrl = GlideUrl(
-                url, LazyHeaders.Builder()
-                    .addHeader("Cookie", "connect.sid=$sid").build()
-            )
+            val glideUrl:GlideUrl
+
+            try{
+                glideUrl = GlideUrl(
+                    url, LazyHeaders.Builder()
+                        .addHeader("Cookie", "connect.sid=$sid").build()
+                )
+            }catch(e:URISyntaxException){
+                return false
+            }
 
             try {
                 val downloadFile = Glide.with(context)
