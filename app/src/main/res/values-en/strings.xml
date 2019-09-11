@@ -32,4 +32,5 @@
     <string name="coverImage">Cover</string>
     <string name="closeButton">Close</string>
     <string name="downloadingCoversMsg">Downloading Cover Images</string>
+    <string name="catalogView">Catalog View</string>
 </resources>
