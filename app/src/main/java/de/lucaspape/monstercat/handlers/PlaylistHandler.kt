@@ -18,6 +18,8 @@ import de.lucaspape.monstercat.MainActivity.Companion.loggedIn
 import de.lucaspape.monstercat.MainActivity.Companion.sid
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.cache.Cache
+import de.lucaspape.monstercat.music.addSong
+import de.lucaspape.monstercat.music.playNow
 import de.lucaspape.monstercat.settings.Settings
 import org.json.JSONObject
 import java.io.*
@@ -271,9 +273,9 @@ class PlaylistHandler {
 
         if (File(downloadLocation).exists()) {
             if (playAfter) {
-                MainActivity.musicPlayer!!.addSong(downloadLocation, title, artist, primaryCoverImage)
+                addSong(downloadLocation, title, artist, primaryCoverImage)
             } else {
-                MainActivity.musicPlayer!!.playNow(downloadLocation, title, artist, primaryCoverImage)
+                playNow(downloadLocation, title, artist, primaryCoverImage)
             }
 
         } else {
@@ -288,9 +290,9 @@ class PlaylistHandler {
                 ).show()
 
                 if (playAfter) {
-                    MainActivity.musicPlayer!!.addSong(url, title, artist, primaryCoverImage)
+                    addSong(url, title, artist, primaryCoverImage)
                 } else {
-                    MainActivity.musicPlayer!!.playNow(url, title, artist, primaryCoverImage)
+                    playNow(url, title, artist, primaryCoverImage)
                 }
             }
         }

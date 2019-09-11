@@ -17,13 +17,12 @@ import de.lucaspape.monstercat.MainActivity.Companion.sid
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.cache.Cache
 import de.lucaspape.monstercat.json.JSONParser
-import de.lucaspape.monstercat.music.MusicPlayer
+import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.settings.Settings
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.*
 import java.lang.ref.WeakReference
-
 
 /**
  * Does everything for the home page
@@ -58,25 +57,13 @@ class HomeHandler {
         val weakReference = WeakReference(view.context)
 
         //setup musicPlayer
-        if (MainActivity.musicPlayer == null) {
-            MainActivity.musicPlayer =
-                MusicPlayer(
-                    weakReference,
-                    textview1,
-                    textview2,
-                    seekBar,
-                    coverBarImageView,
-                    musicToolBar,
-                    playButton
-                )
-        } else {
-            MainActivity.musicPlayer!!.setReference(weakReference)
-            MainActivity.musicPlayer!!.setTextView(textview1, textview2)
-            MainActivity.musicPlayer!!.setSeekBar(seekBar)
-            MainActivity.musicPlayer!!.setBarCoverImageView(coverBarImageView)
-            MainActivity.musicPlayer!!.setMusicBar(musicToolBar)
-            MainActivity.musicPlayer!!.setPlayButton(playButton)
-        }
+
+        contextReference = (weakReference)
+        setTextView(textview1, textview2)
+        setSeekBar(seekBar)
+        setBarCoverImageView(coverBarImageView)
+        setMusicBar(musicToolBar)
+        setPlayButton(playButton)
     }
 
     fun registerListeners(view: View) {
@@ -92,15 +79,15 @@ class HomeHandler {
         val nextButton = view.findViewById<ImageButton>(R.id.nextbutton)
 
         playButton.setOnClickListener {
-            MainActivity.musicPlayer!!.toggleMusic()
+            toggleMusic()
         }
 
         nextButton.setOnClickListener {
-            MainActivity.musicPlayer!!.next()
+            next()
         }
 
         backButton.setOnClickListener {
-            MainActivity.musicPlayer!!.previous()
+            previous()
         }
 
         //click on list
@@ -127,7 +114,13 @@ class HomeHandler {
 
         val from = arrayOf("shownTitle", "secondaryImage")
         val to = arrayOf(R.id.title, R.id.cover)
-        simpleAdapter = SimpleAdapter(view.context, currentListViewData, R.layout.list_single, from, to.toIntArray())
+        simpleAdapter = SimpleAdapter(
+            view.context,
+            currentListViewData,
+            R.layout.list_single,
+            from,
+            to.toIntArray()
+        )
         musicList.adapter = simpleAdapter
     }
 
@@ -192,7 +185,8 @@ class HomeHandler {
             }
 
             for (i in (0 until loadMax / 50)) {
-                val requestUrl = view.context.getString(R.string.loadSongsUrl) + "?limit=50&skip=" + i * 50
+                val requestUrl =
+                    view.context.getString(R.string.loadSongsUrl) + "?limit=50&skip=" + i * 50
 
                 val listRequest = object : StringRequest(
                     Method.GET, requestUrl, Response.Listener { response ->
@@ -203,7 +197,10 @@ class HomeHandler {
                         for (k in (0 until jsonArray.length())) {
                             val jsonParser = JSONParser()
                             val hashMap =
-                                jsonParser.parseCatalogSongsToHashMap(jsonArray.getJSONObject(k), view.context)
+                                jsonParser.parseCatalogSongsToHashMap(
+                                    jsonArray.getJSONObject(k),
+                                    view.context
+                                )
 
                             tempList[i * 50 + k] = hashMap
                         }
@@ -240,14 +237,14 @@ class HomeHandler {
 
         if (File(songDownloadLocation).exists()) {
             if (playNow) {
-                MainActivity.musicPlayer!!.playNow(
+                playNow(
                     songDownloadLocation,
                     song["title"] as String + " " + song["version"] as String,
                     song["artist"] as String,
                     song["primaryImage"] as String
                 )
             } else {
-                MainActivity.musicPlayer!!.addSong(
+                addSong(
                     songDownloadLocation,
                     song["title"] as String + " " + song["version"] as String,
                     song["artist"] as String,
@@ -273,14 +270,14 @@ class HomeHandler {
 
                         if (streamHash != null) {
                             if (playNow) {
-                                MainActivity.musicPlayer!!.playNow(
+                                playNow(
                                     context.getString(R.string.songStreamUrl) + streamHash,
                                     song["title"] as String + " " + song["version"] as String,
                                     song["artist"] as String,
                                     song["primaryImage"] as String
                                 )
                             } else {
-                                MainActivity.musicPlayer!!.addSong(
+                                addSong(
                                     context.getString(R.string.songStreamUrl) + streamHash,
                                     song["title"] as String + " " + song["version"] as String,
                                     song["artist"] as String,
@@ -324,7 +321,11 @@ class HomeHandler {
                 context.filesDir.toString() + "/" + song["artist"] as String + song["title"] as String + song["version"] as String + "." + downloadType
             if (!File(downloadLocation).exists()) {
                 if (sid != "") {
-                    MainActivity.downloadHandler!!.addSong(downloadUrl, downloadLocation, song["shownTitle"] as String)
+                    MainActivity.downloadHandler!!.addSong(
+                        downloadUrl,
+                        downloadLocation,
+                        song["shownTitle"] as String
+                    )
                 } else {
                     //not signed in
                 }
@@ -397,11 +398,16 @@ class HomeHandler {
                 patchParams.put("tracks", JSONArray(patchedArray))
 
                 val patchRequest =
-                    object : JsonObjectRequest(Method.PATCH, playlistPatchUrl, patchParams, Response.Listener {
-                        //TODO reload playlist
-                    }, Response.ErrorListener {
+                    object : JsonObjectRequest(
+                        Method.PATCH,
+                        playlistPatchUrl,
+                        patchParams,
+                        Response.Listener {
+                            //TODO reload playlist
+                        },
+                        Response.ErrorListener {
 
-                    }) {
+                        }) {
                         @Throws(AuthFailureError::class)
                         override fun getHeaders(): Map<String, String> {
                             val params = HashMap<String, String>()

@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.AlertDialog
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.os.Handler
 import android.text.SpannableString
 import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
@@ -19,7 +18,6 @@ import de.lucaspape.monstercat.download.DownloadTask
 import de.lucaspape.monstercat.fragments.HomeFragment
 import de.lucaspape.monstercat.fragments.PlaylistFragment
 import de.lucaspape.monstercat.fragments.SettingsFragment
-import de.lucaspape.monstercat.music.MusicPlayer
 import de.lucaspape.monstercat.settings.Settings
 import java.lang.ref.WeakReference
 
@@ -28,8 +26,6 @@ class MainActivity : AppCompatActivity() {
     companion object{
         @JvmStatic
         var downloadHandler:DownloadHandler? = null
-        @JvmStatic
-        var musicPlayer: MusicPlayer? = null
         @JvmStatic
         var sid = ""
         @JvmStatic
