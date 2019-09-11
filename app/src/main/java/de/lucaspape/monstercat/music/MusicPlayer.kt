@@ -26,9 +26,7 @@ import android.widget.*
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.palette.graphics.Palette
-import de.lucaspape.monstercat.MainActivity
 import de.lucaspape.monstercat.R
-import org.w3c.dom.Text
 import java.io.File
 import java.lang.IndexOutOfBoundsException
 import java.lang.NullPointerException
@@ -68,8 +66,8 @@ fun setTextView(newTextView1: TextView, newTextView2: TextView) {
 
     }
 
-    textView1Reference = WeakReference<TextView>(newTextView1)
-    textView2Reference = WeakReference<TextView>(newTextView2)
+    textView1Reference = WeakReference(newTextView1)
+    textView2Reference = WeakReference(newTextView2)
 }
 
 fun setSeekBar(newSeekBar: SeekBar) {
@@ -92,7 +90,7 @@ fun setSeekBar(newSeekBar: SeekBar) {
         }
     })
 
-    seekBarReference = WeakReference<SeekBar>(newSeekBar)
+    seekBarReference = WeakReference(newSeekBar)
 }
 
 fun setBarCoverImageView(newImageView: ImageView) {
@@ -102,7 +100,7 @@ fun setBarCoverImageView(newImageView: ImageView) {
 
     }
 
-    barCoverImageReference = WeakReference<ImageView>(newImageView)
+    barCoverImageReference = WeakReference(newImageView)
 }
 
 fun setMusicBar(newToolbar: androidx.appcompat.widget.Toolbar) {
@@ -111,7 +109,7 @@ fun setMusicBar(newToolbar: androidx.appcompat.widget.Toolbar) {
     }catch(e: NullPointerException){
 
     }
-    musicBarReference = WeakReference<androidx.appcompat.widget.Toolbar>(newToolbar)
+    musicBarReference = WeakReference(newToolbar)
 }
 
 fun setPlayButton(newPlayButton: ImageButton) {
@@ -121,11 +119,10 @@ fun setPlayButton(newPlayButton: ImageButton) {
 
     }
 
-    playButtonReference = WeakReference<ImageButton>(newPlayButton)
+    playButtonReference = WeakReference(newPlayButton)
 }
 
 private fun play() {
-    //  val context = weakReference.get()!!
     val song: HashMap<String, Any?>
 
     try {
