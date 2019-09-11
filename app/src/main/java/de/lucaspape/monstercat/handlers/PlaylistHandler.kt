@@ -18,6 +18,7 @@ import de.lucaspape.monstercat.MainActivity.Companion.loggedIn
 import de.lucaspape.monstercat.MainActivity.Companion.sid
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.cache.Cache
+import de.lucaspape.monstercat.music.Song
 import de.lucaspape.monstercat.music.addSong
 import de.lucaspape.monstercat.music.playNow
 import de.lucaspape.monstercat.settings.Settings
@@ -272,27 +273,22 @@ class PlaylistHandler {
             context.filesDir.toString() + "/" + artist + title + version + "." + downloadType
 
         if (File(downloadLocation).exists()) {
+            itemValue["songDownloadLocation"] = downloadLocation
             if (playAfter) {
-                addSong(downloadLocation, title, artist, primaryCoverImage)
+                addSong(Song(itemValue))
             } else {
-                playNow(downloadLocation, title, artist, primaryCoverImage)
+                playNow(Song(itemValue))
             }
 
         } else {
             if (itemValue["streamable"] as Boolean) {
-                val url =
-                    context.getString(R.string.songStreamUrl) + itemValue["streamHash"]
 
-                Toast.makeText(
-                    context,
-                    context.getString(R.string.songAddedToPlaylistMsg, "$title $version"),
-                    Toast.LENGTH_SHORT
-                ).show()
+                itemValue["songStreamLocation"] = context.getString(R.string.songStreamUrl) + itemValue["streamHash"]
 
                 if (playAfter) {
-                    addSong(url, title, artist, primaryCoverImage)
+                    addSong(Song(itemValue))
                 } else {
-                    playNow(url, title, artist, primaryCoverImage)
+                    playNow(Song(itemValue))
                 }
             }
         }

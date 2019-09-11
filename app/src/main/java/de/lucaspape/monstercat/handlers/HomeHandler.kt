@@ -236,20 +236,11 @@ class HomeHandler {
             context.filesDir.toString() + "/" + song["artist"] + song["title"] + song["version"] + "." + downloadType
 
         if (File(songDownloadLocation).exists()) {
+            song["songDownloadLocation"] = songDownloadLocation
             if (playNow) {
-                playNow(
-                    songDownloadLocation,
-                    song["title"] as String + " " + song["version"] as String,
-                    song["artist"] as String,
-                    song["primaryImage"] as String
-                )
+                playNow(Song(song))
             } else {
-                addSong(
-                    songDownloadLocation,
-                    song["title"] as String + " " + song["version"] as String,
-                    song["artist"] as String,
-                    song["primaryImage"] as String
-                )
+                addSong(Song(song))
             }
 
         } else {
@@ -269,20 +260,11 @@ class HomeHandler {
                         val streamHash = jsonParser.parseObjectToStreamHash(jsonObject, song)
 
                         if (streamHash != null) {
+                            song["songStreamLocation"] = context.getString(R.string.songStreamUrl) + streamHash
                             if (playNow) {
-                                playNow(
-                                    context.getString(R.string.songStreamUrl) + streamHash,
-                                    song["title"] as String + " " + song["version"] as String,
-                                    song["artist"] as String,
-                                    song["primaryImage"] as String
-                                )
+                                playNow(Song(song))
                             } else {
-                                addSong(
-                                    context.getString(R.string.songStreamUrl) + streamHash,
-                                    song["title"] as String + " " + song["version"] as String,
-                                    song["artist"] as String,
-                                    song["primaryImage"] as String
-                                )
+                                addSong(Song(song))
                             }
                         } else {
                             //could not find song

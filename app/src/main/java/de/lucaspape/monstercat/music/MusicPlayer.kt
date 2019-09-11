@@ -44,7 +44,7 @@ private var playButtonReference: WeakReference<ImageButton>? = null
 
 private var mediaPlayer = MediaPlayer()
 private var currentSong = 0
-private var playList = ArrayList<HashMap<String, Any?>>(1)
+private var playList = ArrayList<Song>(1)
 private var playing = false
 private var paused = false
 
@@ -59,10 +59,10 @@ const val NOTIFICATION_PLAY = "de.lucaspape.monstercat.play"
 const val NOTIFICATION_NEXT = "de.lucaspape.monstercat.next"
 
 fun setTextView(newTextView1: TextView, newTextView2: TextView) {
-    try{
+    try {
         newTextView1.text = textView1Reference!!.get()!!.text
         newTextView2.text = textView2Reference!!.get()!!.text
-    }catch(e: NullPointerException){
+    } catch (e: NullPointerException) {
 
     }
 
@@ -71,9 +71,9 @@ fun setTextView(newTextView1: TextView, newTextView2: TextView) {
 }
 
 fun setSeekBar(newSeekBar: SeekBar) {
-    try{
+    try {
         newSeekBar.progress = seekBarReference!!.get()!!.progress
-    }catch(e: NullPointerException){
+    } catch (e: NullPointerException) {
 
     }
 
@@ -94,9 +94,9 @@ fun setSeekBar(newSeekBar: SeekBar) {
 }
 
 fun setBarCoverImageView(newImageView: ImageView) {
-    try{
+    try {
         newImageView.setImageDrawable(barCoverImageReference!!.get()!!.drawable)
-    }catch(e: NullPointerException){
+    } catch (e: NullPointerException) {
 
     }
 
@@ -104,18 +104,18 @@ fun setBarCoverImageView(newImageView: ImageView) {
 }
 
 fun setMusicBar(newToolbar: androidx.appcompat.widget.Toolbar) {
-    try{
+    try {
         newToolbar.setBackgroundColor((musicBarReference!!.get()!!.background as ColorDrawable).color)
-    }catch(e: NullPointerException){
+    } catch (e: NullPointerException) {
 
     }
     musicBarReference = WeakReference(newToolbar)
 }
 
 fun setPlayButton(newPlayButton: ImageButton) {
-    try{
+    try {
         newPlayButton.setImageDrawable(playButtonReference!!.get()!!.drawable)
-    }catch(e: NullPointerException){
+    } catch (e: NullPointerException) {
 
     }
 
@@ -123,23 +123,12 @@ fun setPlayButton(newPlayButton: ImageButton) {
 }
 
 private fun play() {
-    val song: HashMap<String, Any?>
+    val song = playList[currentSong]
 
-    try {
-        if (playList[currentSong].isNotEmpty()) {
-            song = playList[currentSong]
-        } else {
-            return
-        }
-    } catch (e: IndexOutOfBoundsException) {
-        return
-    }
-
-
-    val url = song["url"] as String
-    val title = song["title"] as String
-    val artist = song["artist"] as String
-    val coverUrl = song["coverUrl"] as String
+    val url = song.getUrl()
+    val title = song.title
+    val artist = song.artist
+    val coverUrl = song.coverLocation
 
     mediaPlayer.stop()
     mediaPlayer = MediaPlayer()
@@ -227,9 +216,9 @@ fun pause() {
     try {
         val song = playList[currentSong]
 
-        val title = song["title"] as String
-        val artist = song["artist"] as String
-        val coverUrl = song["coverUrl"] as String
+        val title = song.title
+        val artist = song.artist
+        val coverUrl = song.coverLocation
 
         mediaPlayer.pause()
         showNotification(title, artist, coverUrl, false)
@@ -247,9 +236,9 @@ fun resume() {
     try {
         val song = playList[currentSong]
 
-        val title = song["title"] as String
-        val artist = song["artist"] as String
-        val coverUrl = song["coverUrl"] as String
+        val title = song.title
+        val artist = song.artist
+        val coverUrl = song.coverLocation
 
         val length = mediaPlayer.currentPosition
 
@@ -271,16 +260,8 @@ fun resume() {
 }
 
 fun next() {
-    try {
-        if (playList[currentSong + 1].isNotEmpty()) {
-            currentSong++
-            play()
-        } else {
-            stop()
-        }
-    } catch (e: IndexOutOfBoundsException) {
-        stop()
-    }
+    currentSong++
+    play()
 
 }
 
@@ -288,26 +269,11 @@ fun previous() {
     if (currentSong != 0) {
         currentSong--
 
-        try {
-            if (playList[currentSong].isEmpty()) {
-                stop()
-            } else {
-                play()
-            }
-        } catch (e: IndexOutOfBoundsException) {
-            stop()
-        }
+        play()
     }
 }
 
-fun playNow(url: String, title: String, artistName: String, coverUrl: String) {
-    val song = HashMap<String, Any?>()
-    song["url"] = url
-    song["title"] = title
-    song["artist"] = artistName
-    song["coverUrl"] = coverUrl
-    song["playNow"] = true
-
+fun playNow(song:Song) {
     try {
         playList.add(currentSong + 1, song)
         currentSong++
@@ -319,13 +285,7 @@ fun playNow(url: String, title: String, artistName: String, coverUrl: String) {
     play()
 }
 
-fun addSong(url: String, title: String, artistName: String, coverUrl: String) {
-    val song = HashMap<String, Any?>()
-    song["url"] = url
-    song["title"] = title
-    song["artist"] = artistName
-    song["coverUrl"] = coverUrl
-
+fun addSong(song:Song) {
     playList.add(song)
 }
 
