@@ -29,21 +29,24 @@ class HomeFragment : Fragment() {
         homeHandler.setupMusicPlayer(view)
         homeHandler.loadSongList(view, false)
 
-        listView = view.findViewById<ListView>(R.id.musiclistview)
+        listView = view.findViewById(R.id.musiclistview)
 
-        registerForContextMenu(listView)
+        registerForContextMenu(listView as ListView)
     }
 
-    override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenu.ContextMenuInfo?) {
+    override fun onCreateContextMenu(
+        menu: ContextMenu,
+        v: View,
+        menuInfo: ContextMenu.ContextMenuInfo?
+    ) {
         super.onCreateContextMenu(menu, v, menuInfo)
-
-        menu!!.add(0, v!!.id, 0, getString(R.string.download))
+        menu.add(0, v.id, 0, getString(R.string.download))
         menu.add(0, v.id, 0, getString(R.string.playNext))
         menu.add(0, v.id, 0, getString(R.string.addToPlaylist))
     }
 
-    override fun onContextItemSelected(item: MenuItem?): Boolean {
-        val adapterContextInfo = item!!.menuInfo as AdapterView.AdapterContextMenuInfo
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+        val adapterContextInfo = item.menuInfo as AdapterView.AdapterContextMenuInfo
         val position = adapterContextInfo.position
 
         val listItem = listView!!.getItemAtPosition(position) as HashMap<String, Any?>
@@ -55,6 +58,7 @@ class HomeFragment : Fragment() {
         }
 
         return super.onContextItemSelected(item)
-
     }
+
+
 }
