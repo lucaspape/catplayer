@@ -11,6 +11,8 @@ import com.bumptech.glide.load.model.LazyHeaders
 import com.bumptech.glide.request.target.Target
 import de.lucaspape.monstercat.MainActivity
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.auth.sid
+import de.lucaspape.monstercat.auth.loggedIn
 import java.io.*
 import java.lang.IndexOutOfBoundsException
 import java.lang.ref.WeakReference
@@ -38,12 +40,12 @@ class DownloadTask(private val weakReference: WeakReference<Context>) : AsyncTas
                     val location = song["location"] as String
                     val shownTitle = song["shownTitle"] as String
 
-                    if (MainActivity.loggedIn) {
+                    if (loggedIn) {
                         MainActivity.downloadHandler!!.showNotification(shownTitle, 0, 0, true, context)
                         var downloaded = false
 
                         while (!downloaded) {
-                            downloaded = downloadSong(url, location, MainActivity.sid, context)
+                            downloaded = downloadSong(url, location, sid, context)
                         }
 
                         MainActivity.downloadHandler!!.hideNotification(context)
@@ -58,7 +60,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) : AsyncTas
                 if (DownloadHandler.downloadArrayListList[downloadedSongArrays].isNotEmpty()) {
                     val songArrayList = DownloadHandler.downloadArrayListList[downloadedSongArrays]
 
-                    if (MainActivity.loggedIn) {
+                    if (loggedIn) {
                         MainActivity.downloadHandler!!.showNotification("", 0, songArrayList.size, false, context)
 
                         for (i in songArrayList.indices) {
@@ -78,7 +80,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) : AsyncTas
                             var downloaded = false
 
                             while (!downloaded) {
-                                downloaded = downloadSong(url, location, MainActivity.sid, context)
+                                downloaded = downloadSong(url, location, sid, context)
                             }
                         }
 

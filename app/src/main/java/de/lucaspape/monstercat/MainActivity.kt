@@ -18,6 +18,7 @@ import de.lucaspape.monstercat.download.DownloadTask
 import de.lucaspape.monstercat.fragments.HomeFragment
 import de.lucaspape.monstercat.fragments.PlaylistFragment
 import de.lucaspape.monstercat.fragments.SettingsFragment
+import de.lucaspape.monstercat.music.createMediaSession
 import de.lucaspape.monstercat.settings.Settings
 import java.lang.ref.WeakReference
 
@@ -26,10 +27,6 @@ class MainActivity : AppCompatActivity() {
     companion object{
         @JvmStatic
         var downloadHandler:DownloadHandler? = null
-        @JvmStatic
-        var sid = ""
-        @JvmStatic
-        var loggedIn = false
     }
 
     private val onNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
@@ -76,6 +73,8 @@ class MainActivity : AppCompatActivity() {
             != PackageManager.PERMISSION_GRANTED) {
             println("Internet permission not granted!")
         }
+
+        createMediaSession(WeakReference(this))
 
         val auth = Auth()
         auth.login(this)

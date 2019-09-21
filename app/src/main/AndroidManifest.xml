@@ -9,14 +9,13 @@
             android:label="@string/app_name"
             android:supportsRtl="true"
             android:theme="@style/AppTheme" tools:ignore="GoogleAppIndexingWarning">
-        <receiver android:name=".music.MusicPlayer$IntentReceiver">
+        <receiver android:name=".music.IntentReceiver">
             <intent-filter>
                 <action android:name="de.lucaspape.monstercat.previous"/>
                 <action android:name="de.lucaspape.monstercat.delete"/>
                 <action android:name="de.lucaspape.monstercat.pause"/>
                 <action android:name="de.lucaspape.monstercat.play"/>
                 <action android:name="de.lucaspape.monstercat.next"/>
-                <action android:name="android.media.VOLUME_CHANGED_ACTION" />
             </intent-filter>
         </receiver>
 

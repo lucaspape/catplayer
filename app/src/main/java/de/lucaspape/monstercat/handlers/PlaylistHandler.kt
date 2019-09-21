@@ -14,9 +14,9 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.json.JSONParser
 import de.lucaspape.monstercat.MainActivity
-import de.lucaspape.monstercat.MainActivity.Companion.loggedIn
-import de.lucaspape.monstercat.MainActivity.Companion.sid
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.auth.sid
+import de.lucaspape.monstercat.auth.loggedIn
 import de.lucaspape.monstercat.cache.Cache
 import de.lucaspape.monstercat.music.Song
 import de.lucaspape.monstercat.music.addSong
