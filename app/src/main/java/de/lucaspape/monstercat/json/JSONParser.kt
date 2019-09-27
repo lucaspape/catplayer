@@ -68,6 +68,29 @@ class JSONParser {
         return hashMap
     }
 
+    fun parseAlbumViewToHashMap(jsonObject: JSONObject, context: Context): HashMap<String, Any?>{
+        val settings = Settings(context)
+        val primaryResolution = settings.getSetting("primaryCoverResolution")
+        val secondaryResolution = settings.getSetting("secondaryCoverResolution")
+
+        val hashMap = HashMap<String, Any?>()
+
+        hashMap["id"] = jsonObject.getString("_id")
+        hashMap["title"] = jsonObject.getString("title")
+        hashMap["artist"] = jsonObject.getString("renderedArtists")
+        hashMap["coverUrl"] = jsonObject.getString("coverUrl")
+        hashMap["coverLocation"] = context.filesDir.toString() + "/" + jsonObject.getString("_id") + ".png"
+        hashMap["primaryRes"] = primaryResolution
+        hashMap["secondaryRes"] = secondaryResolution
+        hashMap["primaryImage"] =
+            context.filesDir.toString() + "/" + jsonObject.getString("_id") + ".png" + primaryResolution.toString()
+
+        hashMap["secondaryImage"] =
+            context.filesDir.toString() + "/" + jsonObject.getString("_id") + ".png" + secondaryResolution.toString()
+
+        return hashMap
+    }
+
     fun parseObjectToStreamHash(jsonObject: JSONObject, song: HashMap<String, Any?>): String? {
         val jsonArray = jsonObject.getJSONArray("results")
 

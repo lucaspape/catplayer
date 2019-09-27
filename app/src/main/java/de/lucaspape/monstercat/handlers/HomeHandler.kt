@@ -362,10 +362,6 @@ class HomeHandler {
 
         val requestQueue = Volley.newRequestQueue(view.context)
 
-        val settings = Settings(view.context)
-        val primaryResolution = settings.getSetting("primaryCoverResolution")
-        val secondaryResolution = settings.getSetting("secondaryCoverResolution")
-
         val tempList = arrayOfNulls<HashMap<String, Any?>>(loadMax)
 
         val cache = Cache("homeCache", view.context)
@@ -425,24 +421,11 @@ class HomeHandler {
                         val jsonArray = json.getJSONArray("results")
 
                         for (k in (0 until jsonArray.length())) {
-                            val albumHashMap = HashMap<String, Any?>()
-
                             val jsonObject = jsonArray.getJSONObject(k)
 
-                            albumHashMap["id"] = jsonObject.getString("_id")
-                            albumHashMap["title"] = jsonObject.getString("title")
-                            albumHashMap["artist"] = jsonObject.getString("renderedArtists")
-                            albumHashMap["coverUrl"] = jsonObject.getString("coverUrl")
-                            albumHashMap["coverLocation"] = view.context.filesDir.toString() + "/" + jsonObject.getString("_id") + ".png"
-                            albumHashMap["primaryRes"] = primaryResolution
-                            albumHashMap["secondaryRes"] = secondaryResolution
-                            albumHashMap["primaryImage"] =
-                                view.context.filesDir.toString() + "/" + jsonObject.getString("_id") + ".png" + primaryResolution.toString()
-
-                            albumHashMap["secondaryImage"] =
-                                view.context.filesDir.toString() + "/" + jsonObject.getString("_id") + ".png" + secondaryResolution.toString()
-
-                            tempList[i * 50 + k] = (albumHashMap)
+                            val jsonParser = JSONParser()
+                            
+                            tempList[i * 50 + k] = (jsonParser.parseAlbumViewToHashMap(jsonObject, view.context))
                         }
                     },
                     Response.ErrorListener { }
