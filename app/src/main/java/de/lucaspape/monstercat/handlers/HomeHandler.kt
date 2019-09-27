@@ -31,6 +31,9 @@ class HomeHandler {
 
     var currentListViewData = ArrayList<HashMap<String, Any?>>()
 
+    //maximum songs loaded
+    val loadMax = 200
+
     var simpleAdapter: SimpleAdapter? = null
     var albumView = true
 
@@ -169,14 +172,12 @@ class HomeHandler {
 
             updateListView(view)
             redrawListView(view)
-            
+
             swipeRefreshLayout.isRefreshing = false
 
             //download cover art
             MainActivity.downloadHandler!!.addCoverArray(currentListViewData)
-
         }
-
 
         val requestUrl =
             view.context.getString(R.string.loadSongsUrl) + "?albumId=" + albumId
@@ -211,10 +212,7 @@ class HomeHandler {
             }
         }
 
-
         requestQueue.add(listRequest)
-
-
     }
 
     private fun redrawListView(view: View) {
@@ -274,9 +272,6 @@ class HomeHandler {
             MainActivity.downloadHandler!!.addCoverArray(currentListViewData)
         } else {
             val requestQueue = Volley.newRequestQueue(view.context)
-
-            //maximum songs loaded
-            val loadMax = 200
 
             //used to sort list
             val tempList = arrayOfNulls<HashMap<String, Any?>>(loadMax)
@@ -358,47 +353,85 @@ class HomeHandler {
     }
 
     fun loadAlbumList(view: View, forceReload: Boolean) {
-        val requestQueue = Volley.newRequestQueue(view.context)
+        val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
+        swipeRefreshLayout.isRefreshing = true
 
-        val i = 0
+        val requestQueue = Volley.newRequestQueue(view.context)
 
         val settings = Settings(view.context)
         val primaryResolution = settings.getSetting("primaryCoverResolution")
+        val secondaryResolution = settings.getSetting("secondaryCoverResolution")
 
-        val tempList = ArrayList<HashMap<String, Any?>>()
+        val tempList = arrayOfNulls<HashMap<String, Any?>>(loadMax)
 
-        val requestUrl = view.context.getString(R.string.loadAlbumsUrl) + "?limit=50&skip=" + i * 50
-        val albumsRequest = StringRequest(
-            Request.Method.GET, requestUrl,
-            Response.Listener { response ->
-                val json = JSONObject(response)
-                val jsonArray = json.getJSONArray("results")
-
-                for (k in (0 until jsonArray.length())) {
-                    val albumHashMap = HashMap<String, Any?>()
-
-                    val jsonObject = jsonArray.getJSONObject(k)
-
-                    albumHashMap["id"] = jsonObject.getString("_id")
-                    albumHashMap["title"] = jsonObject.getString("title")
-                    albumHashMap["artist"] = jsonObject.getString("renderedArtists")
-                    albumHashMap["primaryImage"] =
-                        view.context.filesDir.toString() + "/" + jsonObject.getString("_id") + ".png" + primaryResolution.toString()
-
-                    tempList.add(albumHashMap)
-                }
-            },
-            Response.ErrorListener { }
-        )
+        //if all finished continue
+        var finishedRequests = 0
+        var totalRequestsCount = 0
 
         requestQueue.addRequestFinishedListener<Any?> {
-            currentListViewData = tempList
-            updateListView(view)
-            redrawListView(view)
+            finishedRequests++
+
+            //check if all done
+            if (finishedRequests >= totalRequestsCount) {
+
+                val sortedList = ArrayList<HashMap<String, Any?>>()
+
+                for (i in tempList.indices) {
+                    if (tempList[i] != null) {
+                        if (tempList.isNotEmpty()) {
+                            sortedList.add(tempList[i]!!)
+                        }
+                    }
+                }
+
+                currentListViewData = sortedList
+                updateListView(view)
+                redrawListView(view)
+
+                swipeRefreshLayout.isRefreshing = false
+
+                //download cover art
+                MainActivity.downloadHandler!!.addCoverArray(currentListViewData)
+
+            }
+
         }
 
-        requestQueue.add(albumsRequest)
+        for (i in (0 until loadMax / 50)) {
+            val requestUrl = view.context.getString(R.string.loadAlbumsUrl) + "?limit=50&skip=" + i * 50
+            val albumsRequest = StringRequest(
+                Request.Method.GET, requestUrl,
+                Response.Listener { response ->
+                    val json = JSONObject(response)
+                    val jsonArray = json.getJSONArray("results")
 
+                    for (k in (0 until jsonArray.length())) {
+                        val albumHashMap = HashMap<String, Any?>()
+
+                        val jsonObject = jsonArray.getJSONObject(k)
+
+                        albumHashMap["id"] = jsonObject.getString("_id")
+                        albumHashMap["title"] = jsonObject.getString("title")
+                        albumHashMap["artist"] = jsonObject.getString("renderedArtists")
+                        albumHashMap["coverUrl"] = jsonObject.getString("coverUrl")
+                        albumHashMap["coverLocation"] = view.context.filesDir.toString() + "/" + jsonObject.getString("_id") + ".png"
+                        albumHashMap["primaryRes"] = primaryResolution
+                        albumHashMap["secondaryRes"] = secondaryResolution
+                        albumHashMap["primaryImage"] =
+                            view.context.filesDir.toString() + "/" + jsonObject.getString("_id") + ".png" + primaryResolution.toString()
+
+                        albumHashMap["secondaryImage"] =
+                            view.context.filesDir.toString() + "/" + jsonObject.getString("_id") + ".png" + secondaryResolution.toString()
+
+                        tempList[i * 50 + k] = (albumHashMap)
+                    }
+                },
+                Response.ErrorListener { }
+            )
+
+            totalRequestsCount++
+            requestQueue.add(albumsRequest)
+        }
     }
 
     fun playSong(song: HashMap<String, Any?>, playNow: Boolean, context: Context) {
