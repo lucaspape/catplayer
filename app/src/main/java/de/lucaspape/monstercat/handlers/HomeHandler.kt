@@ -424,7 +424,7 @@ class HomeHandler {
                             val jsonObject = jsonArray.getJSONObject(k)
 
                             val jsonParser = JSONParser()
-                            
+
                             tempList[i * 50 + k] = (jsonParser.parseAlbumViewToHashMap(jsonObject, view.context))
                         }
                     },
