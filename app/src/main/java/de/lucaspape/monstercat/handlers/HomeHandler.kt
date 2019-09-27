@@ -91,7 +91,11 @@ class HomeHandler {
         //refresh
         val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
         swipeRefreshLayout.setOnRefreshListener {
-            loadSongList(view, true)
+            if(albumView){
+                loadAlbumList(view, true)
+            }else{
+                loadSongList(view, true)
+            }
         }
 
         //music control buttons
@@ -364,73 +368,99 @@ class HomeHandler {
 
         val tempList = arrayOfNulls<HashMap<String, Any?>>(loadMax)
 
-        //if all finished continue
-        var finishedRequests = 0
-        var totalRequestsCount = 0
+        val cache = Cache("homeCache", view.context)
+        val loadedCache = cache.load("albumListView") as ArrayList<HashMap<String,Any?>>?
 
-        requestQueue.addRequestFinishedListener<Any?> {
-            finishedRequests++
+        if(loadedCache != null && !forceReload){
+            currentListViewData = loadedCache as ArrayList<HashMap<String, Any?>>
+            updateListView(view)
+            redrawListView(view)
 
-            //check if all done
-            if (finishedRequests >= totalRequestsCount) {
+            swipeRefreshLayout.isRefreshing = false
 
-                val sortedList = ArrayList<HashMap<String, Any?>>()
+            //download cover art
+            MainActivity.downloadHandler!!.addCoverArray(currentListViewData)
+        }else{
+            //if all finished continue
+            var finishedRequests = 0
+            var totalRequestsCount = 0
 
-                for (i in tempList.indices) {
-                    if (tempList[i] != null) {
-                        if (tempList.isNotEmpty()) {
-                            sortedList.add(tempList[i]!!)
+            requestQueue.addRequestFinishedListener<Any?> {
+                finishedRequests++
+
+                //check if all done
+                if (finishedRequests >= totalRequestsCount) {
+
+                    val sortedList = ArrayList<HashMap<String, Any?>>()
+
+                    for (i in tempList.indices) {
+                        if (tempList[i] != null) {
+                            if (tempList.isNotEmpty()) {
+                                sortedList.add(tempList[i]!!)
+                            }
                         }
                     }
+
+                    cache.save("albumListView", sortedList)
+
+                    currentListViewData = sortedList
+                    updateListView(view)
+                    redrawListView(view)
+
+                    swipeRefreshLayout.isRefreshing = false
+
+                    //download cover art
+                    MainActivity.downloadHandler!!.addCoverArray(currentListViewData)
+
                 }
-
-                currentListViewData = sortedList
-                updateListView(view)
-                redrawListView(view)
-
-                swipeRefreshLayout.isRefreshing = false
-
-                //download cover art
-                MainActivity.downloadHandler!!.addCoverArray(currentListViewData)
 
             }
 
-        }
+            for (i in (0 until loadMax / 50)) {
+                val requestUrl = view.context.getString(R.string.loadAlbumsUrl) + "?limit=50&skip=" + i * 50
+                val albumsRequest = object: StringRequest(
+                    Request.Method.GET, requestUrl,
+                    Response.Listener { response ->
+                        val json = JSONObject(response)
+                        val jsonArray = json.getJSONArray("results")
 
-        for (i in (0 until loadMax / 50)) {
-            val requestUrl = view.context.getString(R.string.loadAlbumsUrl) + "?limit=50&skip=" + i * 50
-            val albumsRequest = StringRequest(
-                Request.Method.GET, requestUrl,
-                Response.Listener { response ->
-                    val json = JSONObject(response)
-                    val jsonArray = json.getJSONArray("results")
+                        for (k in (0 until jsonArray.length())) {
+                            val albumHashMap = HashMap<String, Any?>()
 
-                    for (k in (0 until jsonArray.length())) {
-                        val albumHashMap = HashMap<String, Any?>()
+                            val jsonObject = jsonArray.getJSONObject(k)
 
-                        val jsonObject = jsonArray.getJSONObject(k)
+                            albumHashMap["id"] = jsonObject.getString("_id")
+                            albumHashMap["title"] = jsonObject.getString("title")
+                            albumHashMap["artist"] = jsonObject.getString("renderedArtists")
+                            albumHashMap["coverUrl"] = jsonObject.getString("coverUrl")
+                            albumHashMap["coverLocation"] = view.context.filesDir.toString() + "/" + jsonObject.getString("_id") + ".png"
+                            albumHashMap["primaryRes"] = primaryResolution
+                            albumHashMap["secondaryRes"] = secondaryResolution
+                            albumHashMap["primaryImage"] =
+                                view.context.filesDir.toString() + "/" + jsonObject.getString("_id") + ".png" + primaryResolution.toString()
 
-                        albumHashMap["id"] = jsonObject.getString("_id")
-                        albumHashMap["title"] = jsonObject.getString("title")
-                        albumHashMap["artist"] = jsonObject.getString("renderedArtists")
-                        albumHashMap["coverUrl"] = jsonObject.getString("coverUrl")
-                        albumHashMap["coverLocation"] = view.context.filesDir.toString() + "/" + jsonObject.getString("_id") + ".png"
-                        albumHashMap["primaryRes"] = primaryResolution
-                        albumHashMap["secondaryRes"] = secondaryResolution
-                        albumHashMap["primaryImage"] =
-                            view.context.filesDir.toString() + "/" + jsonObject.getString("_id") + ".png" + primaryResolution.toString()
+                            albumHashMap["secondaryImage"] =
+                                view.context.filesDir.toString() + "/" + jsonObject.getString("_id") + ".png" + secondaryResolution.toString()
 
-                        albumHashMap["secondaryImage"] =
-                            view.context.filesDir.toString() + "/" + jsonObject.getString("_id") + ".png" + secondaryResolution.toString()
-
-                        tempList[i * 50 + k] = (albumHashMap)
+                            tempList[i * 50 + k] = (albumHashMap)
+                        }
+                    },
+                    Response.ErrorListener { }
+                ){
+                    //add authentication
+                    @Throws(AuthFailureError::class)
+                    override fun getHeaders(): Map<String, String> {
+                        val params = HashMap<String, String>()
+                        if (loggedIn) {
+                            params["Cookie"] = "connect.sid=$sid"
+                        }
+                        return params
                     }
-                },
-                Response.ErrorListener { }
-            )
+                }
 
-            totalRequestsCount++
-            requestQueue.add(albumsRequest)
+                totalRequestsCount++
+                requestQueue.add(albumsRequest)
+            }
         }
     }
 
