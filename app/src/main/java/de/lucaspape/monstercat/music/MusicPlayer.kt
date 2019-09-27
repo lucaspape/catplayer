@@ -15,10 +15,15 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.media.AudioManager
+import android.media.MediaMetadata
 import android.media.MediaPlayer
 import android.media.session.MediaSession
+import android.media.session.PlaybackState
 import android.os.Build
 import android.os.Handler
+import android.support.v4.media.MediaMetadataCompat
+import android.support.v4.media.session.MediaSessionCompat
+import android.support.v4.media.session.PlaybackStateCompat
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
@@ -58,6 +63,62 @@ const val NOTIFICATION_PAUSE = "de.lucaspape.monstercat.pause"
 const val NOTIFICATION_PLAY = "de.lucaspape.monstercat.play"
 const val NOTIFICATION_NEXT = "de.lucaspape.monstercat.next"
 
+private var mediaSession:MediaSession? = null
+
+class NoisyReceiver:BroadcastReceiver(){
+    override fun onReceive(context: Context?, intent: Intent?) {
+        if (intent!!.action == AudioManager.ACTION_AUDIO_BECOMING_NOISY) {
+            pause()
+        }
+    }
+}
+
+fun createMediaSession(context:WeakReference<Context>){
+    mediaSession = MediaSession(context.get()!!, "de.lucaspape.monstercat.music")
+
+    val intentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
+    context.get()!!.registerReceiver(NoisyReceiver(), intentFilter)
+
+    mediaSession!!.setCallback(object: MediaSession.Callback(){
+
+
+        override fun onPause() {
+            pause()
+        }
+
+        override fun onPlay() {
+            if(paused){
+                resume()
+            }else{
+                play()
+            }
+            context.get()!!.registerReceiver(NoisyReceiver(), intentFilter)
+        }
+
+        override fun onSkipToNext() {
+            next()
+        }
+
+        override fun onSkipToPrevious() {
+            previous()
+        }
+
+        override fun onStop() {
+            stop()
+            context.get()!!.unregisterReceiver(NoisyReceiver())
+        }
+
+    })
+    
+
+    mediaSession!!.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS)
+    mediaSession!!.setFlags(MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS)
+    mediaSession!!.isActive = true
+}
+
+/**
+ * UI update methods
+ */
 fun setTextView(newTextView1: TextView, newTextView2: TextView) {
     try {
         newTextView1.text = textView1Reference!!.get()!!.text
@@ -122,82 +183,115 @@ fun setPlayButton(newPlayButton: ImageButton) {
     playButtonReference = WeakReference(newPlayButton)
 }
 
+/**
+ * Music control methods
+ */
+
 private fun play() {
-    val song = playList[currentSong]
+    try {
+        val song = playList[currentSong]
 
-    val url = song.getUrl()
-    val title = song.title
-    val artist = song.artist
-    val coverUrl = song.coverLocation
+        val url = song.getUrl()
+        val title = song.title
+        val artist = song.artist
+        val coverUrl = song.coverLocation
 
-    mediaPlayer.stop()
-    mediaPlayer = MediaPlayer()
+        val mediaMetadata = MediaMetadata.Builder()
+        mediaMetadata.putString(MediaMetadata.METADATA_KEY_ARTIST, artist)
+        mediaMetadata.putString(MediaMetadata.METADATA_KEY_TITLE, title)
 
-    mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC)
-    mediaPlayer.setDataSource(url)
-    mediaPlayer.prepare()
-    mediaPlayer.start()
+        mediaPlayer.stop()
+        mediaPlayer = MediaPlayer()
 
-    playing = true
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC)
+        mediaPlayer.setDataSource(url)
+        mediaPlayer.prepare()
+        mediaPlayer.start()
 
-    textView1Reference!!.get()!!.text = title
-    textView2Reference!!.get()!!.text = title
+        playing = true
 
-    val valueAnimator = ValueAnimator.ofFloat(0.0f, 1.0f)
-    valueAnimator.repeatCount = Animation.INFINITE
-    valueAnimator.interpolator = LinearInterpolator()
-    valueAnimator.duration = 9000L
-    valueAnimator.addUpdateListener { animation ->
-        val progress = animation.animatedValue as Float
-        val width = textView1Reference!!.get()!!.width
-        val translationX = width * progress
-        textView1Reference!!.get()!!.translationX = translationX
-        textView2Reference!!.get()!!.translationX = translationX - width
-    }
+        textView1Reference!!.get()!!.text = title
+        textView2Reference!!.get()!!.text = title
+        textView2Reference!!.get()!!.text = title
 
-    valueAnimator.start()
-
-    mediaPlayer.setOnCompletionListener {
-        next()
-    }
-
-    val seekbarUpdateHandler = Handler()
-
-    val updateSeekBar = object : Runnable {
-        override fun run() {
-            seekBarReference!!.get()!!.max = mediaPlayer.duration
-            seekBarReference!!.get()!!.progress = mediaPlayer.currentPosition
-            seekbarUpdateHandler.postDelayed(this, 50)
-        }
-    }
-
-    seekbarUpdateHandler.postDelayed(updateSeekBar, 0)
-
-    seekBarReference!!.get()!!.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-        override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-            if (fromUser)
-                mediaPlayer.seekTo(progress)
+        val valueAnimator = ValueAnimator.ofFloat(0.0f, 1.0f)
+        valueAnimator.repeatCount = Animation.INFINITE
+        valueAnimator.interpolator = LinearInterpolator()
+        valueAnimator.duration = 9000L
+        valueAnimator.addUpdateListener { animation ->
+            val progress = animation.animatedValue as Float
+            val width = textView1Reference!!.get()!!.width
+            val translationX = width * progress
+            textView1Reference!!.get()!!.translationX = translationX
+            textView2Reference!!.get()!!.translationX = translationX - width
         }
 
-        override fun onStartTrackingTouch(seekBar: SeekBar) {
+        valueAnimator.start()
+
+        mediaPlayer.setOnCompletionListener {
+            next()
         }
 
-        override fun onStopTrackingTouch(seekBar: SeekBar) {
+        val seekbarUpdateHandler = Handler()
+
+        val updateSeekBar = object : Runnable {
+            override fun run() {
+                seekBarReference!!.get()!!.max = mediaPlayer.duration
+                seekBarReference!!.get()!!.progress = mediaPlayer.currentPosition
+                seekbarUpdateHandler.postDelayed(this, 50)
+            }
         }
-    })
 
-    val coverFile = File(coverUrl)
-    if (coverFile.exists()) {
-        val bitmap = BitmapFactory.decodeFile(coverFile.absolutePath)
-        barCoverImageReference!!.get()!!.setImageBitmap(bitmap)
-    }
+        seekbarUpdateHandler.postDelayed(updateSeekBar, 0)
 
-    showNotification(title, artist, coverUrl, true)
-    playButtonReference!!.get()!!.setImageDrawable(
-        contextReference!!.get()!!.resources.getDrawable(
-            R.drawable.ic_pause_white_24dp
+        seekBarReference!!.get()!!.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                val stateBuilder = PlaybackState.Builder()
+
+                val state:Int = if(playing){
+                    PlaybackState.STATE_PLAYING
+                }else{
+                    PlaybackState.STATE_PAUSED
+                }
+
+                stateBuilder.setState(state, progress.toLong(), 1.0f)
+                stateBuilder.setActions(PlaybackState.ACTION_PLAY)
+                stateBuilder.setActions(PlaybackState.ACTION_PAUSE)
+                stateBuilder.setActions(PlaybackState.ACTION_SKIP_TO_NEXT)
+                stateBuilder.setActions(PlaybackState.ACTION_SKIP_TO_PREVIOUS)
+                stateBuilder.setActions(PlaybackState.ACTION_STOP)
+                stateBuilder.setActions(PlaybackState.ACTION_PLAY_PAUSE)
+                mediaSession!!.setPlaybackState(stateBuilder.build())
+
+                if (fromUser)
+                    mediaPlayer.seekTo(progress)
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
+            }
+        })
+
+        val coverFile = File(coverUrl)
+        if (coverFile.exists()) {
+            val bitmap = BitmapFactory.decodeFile(coverFile.absolutePath)
+            barCoverImageReference!!.get()!!.setImageBitmap(bitmap)
+            mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, bitmap)
+            mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ART, bitmap)
+        }
+
+        mediaSession!!.setMetadata(mediaMetadata.build())
+        showNotification(title, artist, coverUrl, true)
+        playButtonReference!!.get()!!.setImageDrawable(
+            contextReference!!.get()!!.resources.getDrawable(
+                R.drawable.ic_pause_white_24dp
+            )
         )
-    )
+    }catch (e: IndexOutOfBoundsException){
+
+    }
 
 }
 
@@ -297,6 +391,9 @@ fun toggleMusic() {
     }
 }
 
+/**
+ * Notification
+ */
 private fun showNotificationAndroidO(
     titleName: String,
     artistName: String,
@@ -370,10 +467,8 @@ private fun showNotificationAndroidO(
         //notificationBuilder.setCustomContentView(normalRemoteViews)
         notificationBuilder.setCustomBigContentView(expandedRemoteViews)
 
-        val mediaSession = MediaSession(context, "de.lucaspape.monstercat.music")
-
         notificationBuilder.style = Notification.MediaStyle()
-            .setMediaSession(mediaSession.sessionToken)
+            .setMediaSession(mediaSession!!.sessionToken)
 
         setListeners(expandedRemoteViews, context)
 
