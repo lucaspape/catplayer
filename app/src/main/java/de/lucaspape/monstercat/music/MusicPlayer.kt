@@ -109,7 +109,7 @@ fun createMediaSession(context:WeakReference<Context>){
         }
 
     })
-    
+
 
     mediaSession!!.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS)
     mediaSession!!.setFlags(MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS)
@@ -407,7 +407,6 @@ private fun showNotificationAndroidO(
 
         val backgroundColor: Int
         val expandedRemoteViews: RemoteViews
-        //val normalRemoteViews = RemoteViews(context.packageName, R.layout.notification_normal)
 
         val coverFile = File(coverUrl)
         if (coverFile.exists()) {
@@ -464,7 +463,6 @@ private fun showNotificationAndroidO(
         //notificationBuilder.color = backgroundColor
 
         notificationBuilder.style = Notification.DecoratedCustomViewStyle()
-        //notificationBuilder.setCustomContentView(normalRemoteViews)
         notificationBuilder.setCustomBigContentView(expandedRemoteViews)
 
         notificationBuilder.style = Notification.MediaStyle()
@@ -496,10 +494,7 @@ private fun showNotification(
         createNotificationChannel()
 
         val backgroundColor: Int
-        val normalRemoteViews = RemoteViews(
-            context.packageName,
-            R.layout.notification_normal
-        )
+
         val expandedRemoteViews: RemoteViews
 
         val coverFile = File(coverUrl)
@@ -557,7 +552,6 @@ private fun showNotification(
         //notificationBuilder.color = backgroundColor
 
         notificationBuilder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
-        notificationBuilder.setCustomContentView(normalRemoteViews)
         notificationBuilder.setCustomBigContentView(expandedRemoteViews)
 
         setListeners(expandedRemoteViews, context)

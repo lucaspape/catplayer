@@ -35,7 +35,7 @@ class HomeHandler {
     val loadMax = 200
 
     var simpleAdapter: SimpleAdapter? = null
-    var albumView = true
+    var albumView = false
 
     fun setupListView(view: View) {
         updateListView(view)
