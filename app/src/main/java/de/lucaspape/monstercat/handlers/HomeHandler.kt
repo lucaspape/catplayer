@@ -30,7 +30,9 @@ import java.lang.ref.WeakReference
 class HomeHandler {
 
     var currentListViewData = ArrayList<HashMap<String, Any?>>()
+
     var simpleAdapter: SimpleAdapter? = null
+    var albumView = true
 
     fun setupListView(view: View) {
         updateListView(view)
@@ -44,6 +46,15 @@ class HomeHandler {
             }
 
         }).start()
+    }
+
+    fun setupSpinner(view:View){
+        val viewSelector = view.findViewById<Spinner>(R.id.viewSelector)
+
+        val selectorItems = arrayOf(view.context.getString(R.string.catalogView), view.context.getString(R.string.albumView))
+        val arrayAdapter = ArrayAdapter<Any?>(view.context, R.layout.support_simple_spinner_dropdown_item ,selectorItems)
+
+        viewSelector.adapter = arrayAdapter
     }
 
     fun setupMusicPlayer(view: View) {
@@ -97,6 +108,30 @@ class HomeHandler {
             playSong(itemValue, true, view.context)
         }
 
+        val viewSelector = view.findViewById<Spinner>(R.id.viewSelector)
+        viewSelector.onItemSelectedListener = object:AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                albumView = false
+                updateListView(view)
+            }
+
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                v: View?,
+                position: Int,
+                id: Long
+            ) {
+                when{
+                    viewSelector.getItemAtPosition(position) == "Catalog View" -> albumView = false
+                    viewSelector.getItemAtPosition(position) == "Album View" -> albumView = true
+                }
+
+                updateListView(view)
+            }
+        }
+
+
+
     }
 
     private fun redrawListView(view: View) {
@@ -112,16 +147,30 @@ class HomeHandler {
     private fun updateListView(view: View) {
         val musicList = view.findViewById<ListView>(R.id.musiclistview)
 
-        val from = arrayOf("shownTitle", "secondaryImage")
-        val to = arrayOf(R.id.title, R.id.cover)
-        simpleAdapter = SimpleAdapter(
-            view.context,
-            currentListViewData,
-            R.layout.list_single,
-            from,
-            to.toIntArray()
-        )
-        musicList.adapter = simpleAdapter
+        if(albumView){
+            val from = arrayOf("shownTitle", "primaryImage")
+            val to = arrayOf(R.id.description, R.id.cover)
+            simpleAdapter = SimpleAdapter(
+                view.context,
+                currentListViewData,
+                R.layout.list_album_view,
+                from,
+                to.toIntArray()
+            )
+            musicList.adapter = simpleAdapter
+        }else{
+            val from = arrayOf("shownTitle", "secondaryImage")
+            val to = arrayOf(R.id.title, R.id.cover)
+            simpleAdapter = SimpleAdapter(
+                view.context,
+                currentListViewData,
+                R.layout.list_single,
+                from,
+                to.toIntArray()
+            )
+            musicList.adapter = simpleAdapter
+        }
+
     }
 
     fun loadSongList(view: View, forceReload: Boolean) {

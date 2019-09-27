@@ -25,6 +25,7 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         homeHandler.setupListView(view)
+        homeHandler.setupSpinner(view)
         homeHandler.registerListeners(view)
         homeHandler.setupMusicPlayer(view)
         homeHandler.loadSongList(view, false)
