@@ -2,6 +2,7 @@
 <resources>
     <string name="loginUrl" translatable="false">https://connect.monstercat.com/v2/signin</string>
     <string name="loadSongsUrl" translatable="false">https://connect.monstercat.com/api/catalog/browse/</string>
+    <string name="loadAlbumsUrl" translatable="false">https://connect.monstercat.com/api/catalog/release/</string>
     <string name="songStreamUrl" translatable="false">https://s3.amazonaws.com/data.monstercat.com/blobs/</string>
     <string name="songDownloadUrl" translatable="false">"https://connect.monstercat.com/api/release/</string>
     <string name="playlistsUrl" translatable="false">https://connect.monstercat.com/v2/self/playlists</string>

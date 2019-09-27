@@ -46,10 +46,10 @@ class JSONParser {
         hashMap["title"] = title
         hashMap["artist"] = artist
         hashMap["primaryImage"] =
-            context.filesDir.toString() + "/" + title + version + artist + ".png" + primaryResolution.toString()
+            context.filesDir.toString() + "/" + albumId + ".png" + primaryResolution.toString()
 
         hashMap["secondaryImage"] =
-            context.filesDir.toString() + "/" + title + version + artist + ".png" + secondaryResolution.toString()
+            context.filesDir.toString() + "/" + albumId + ".png" + secondaryResolution.toString()
 
         hashMap["version"] = version
 
@@ -63,7 +63,7 @@ class JSONParser {
         hashMap["secondaryRes"] = secondaryResolution
         hashMap["coverUrl"] = coverUrl
         hashMap["coverLocation"] =
-            context.filesDir.toString() + "/" + title + version + artist + ".png"
+            context.filesDir.toString() + "/" + albumId + ".png"
 
         return hashMap
     }
@@ -160,16 +160,16 @@ class JSONParser {
             trackHashMap["albumId"] = albumId
 
             trackHashMap["primaryImage"] =
-                context.filesDir.toString() + "/" + title + version + artist + ".png" + primaryResolution.toString()
+                context.filesDir.toString() + "/" + albumId + ".png" + primaryResolution.toString()
 
             trackHashMap["secondaryImage"] =
-                context.filesDir.toString() + "/" + title + version + artist + ".png" + secondaryResolution.toString()
+                context.filesDir.toString() + "/" + albumId + ".png" + secondaryResolution.toString()
 
             trackHashMap["primaryRes"] = primaryResolution
             trackHashMap["secondaryRes"] = secondaryResolution
             trackHashMap["coverUrl"] = coverUrl
             trackHashMap["coverLocation"] =
-                context.filesDir.toString() + "/" + title + version + artist + ".png"
+                context.filesDir.toString() + "/" + albumId + ".png"
 
             return trackHashMap
         } else {

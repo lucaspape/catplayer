@@ -48,11 +48,18 @@ class HomeHandler {
         }).start()
     }
 
-    fun setupSpinner(view:View){
+    fun setupSpinner(view: View) {
         val viewSelector = view.findViewById<Spinner>(R.id.viewSelector)
 
-        val selectorItems = arrayOf(view.context.getString(R.string.catalogView), view.context.getString(R.string.albumView))
-        val arrayAdapter = ArrayAdapter<Any?>(view.context, R.layout.support_simple_spinner_dropdown_item ,selectorItems)
+        val selectorItems = arrayOf(
+            view.context.getString(R.string.catalogView),
+            view.context.getString(R.string.albumView)
+        )
+        val arrayAdapter = ArrayAdapter<Any?>(
+            view.context,
+            R.layout.support_simple_spinner_dropdown_item,
+            selectorItems
+        )
 
         viewSelector.adapter = arrayAdapter
     }
@@ -104,12 +111,17 @@ class HomeHandler {
         //click on list
         val musicList = view.findViewById<ListView>(R.id.musiclistview)
         musicList.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
-            val itemValue = musicList.getItemAtPosition(position) as HashMap<String, Any?>
-            playSong(itemValue, true, view.context)
+            if (albumView) {
+                val itemValue = musicList.getItemAtPosition(position) as HashMap<String, Any?>
+                loadAlbum(view, itemValue)
+            } else {
+                val itemValue = musicList.getItemAtPosition(position) as HashMap<String, Any?>
+                playSong(itemValue, true, view.context)
+            }
         }
 
         val viewSelector = view.findViewById<Spinner>(R.id.viewSelector)
-        viewSelector.onItemSelectedListener = object:AdapterView.OnItemSelectedListener {
+        viewSelector.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 albumView = false
                 updateListView(view)
@@ -121,15 +133,86 @@ class HomeHandler {
                 position: Int,
                 id: Long
             ) {
-                when{
+                when {
                     viewSelector.getItemAtPosition(position) == "Catalog View" -> albumView = false
                     viewSelector.getItemAtPosition(position) == "Album View" -> albumView = true
                 }
 
-                updateListView(view)
+                if (albumView) {
+                    loadAlbumList(view, false)
+                } else {
+                    loadSongList(view, false)
+                }
             }
         }
 
+
+    }
+
+    private fun loadAlbum(view: View, itemValue: HashMap<String, Any?>) {
+        val albumId = itemValue["id"]
+
+        val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
+        swipeRefreshLayout.isRefreshing = true
+
+        val requestQueue = Volley.newRequestQueue(view.context)
+
+        //used to sort list
+        val tempList = ArrayList<HashMap<String, Any?>>()
+
+
+        requestQueue.addRequestFinishedListener<Any> {
+
+            //display list
+            currentListViewData = tempList
+            albumView = false
+
+            updateListView(view)
+            redrawListView(view)
+            
+            swipeRefreshLayout.isRefreshing = false
+
+            //download cover art
+            MainActivity.downloadHandler!!.addCoverArray(currentListViewData)
+
+        }
+
+
+        val requestUrl =
+            view.context.getString(R.string.loadSongsUrl) + "?albumId=" + albumId
+
+        val listRequest = object : StringRequest(
+            Method.GET, requestUrl, Response.Listener { response ->
+                val json = JSONObject(response)
+                val jsonArray = json.getJSONArray("results")
+
+                //parse every single song into list
+                for (k in (0 until jsonArray.length())) {
+                    val jsonParser = JSONParser()
+                    val hashMap =
+                        jsonParser.parseCatalogSongsToHashMap(
+                            jsonArray.getJSONObject(k),
+                            view.context
+                        )
+
+                    tempList.add(hashMap)
+                }
+
+            }, Response.ErrorListener { }
+        ) {
+            //add authentication
+            @Throws(AuthFailureError::class)
+            override fun getHeaders(): Map<String, String> {
+                val params = HashMap<String, String>()
+                if (loggedIn) {
+                    params["Cookie"] = "connect.sid=$sid"
+                }
+                return params
+            }
+        }
+
+
+        requestQueue.add(listRequest)
 
 
     }
@@ -147,8 +230,8 @@ class HomeHandler {
     private fun updateListView(view: View) {
         val musicList = view.findViewById<ListView>(R.id.musiclistview)
 
-        if(albumView){
-            val from = arrayOf("shownTitle", "primaryImage")
+        if (albumView) {
+            val from = arrayOf("title", "primaryImage")
             val to = arrayOf(R.id.description, R.id.cover)
             simpleAdapter = SimpleAdapter(
                 view.context,
@@ -158,7 +241,7 @@ class HomeHandler {
                 to.toIntArray()
             )
             musicList.adapter = simpleAdapter
-        }else{
+        } else {
             val from = arrayOf("shownTitle", "secondaryImage")
             val to = arrayOf(R.id.title, R.id.cover)
             simpleAdapter = SimpleAdapter(
@@ -270,9 +353,51 @@ class HomeHandler {
                 totalRequestsCount++
                 requestQueue.add(listRequest)
             }
-
-
         }
+
+    }
+
+    fun loadAlbumList(view: View, forceReload: Boolean) {
+        val requestQueue = Volley.newRequestQueue(view.context)
+
+        val i = 0
+
+        val settings = Settings(view.context)
+        val primaryResolution = settings.getSetting("primaryCoverResolution")
+
+        val tempList = ArrayList<HashMap<String, Any?>>()
+
+        val requestUrl = view.context.getString(R.string.loadAlbumsUrl) + "?limit=50&skip=" + i * 50
+        val albumsRequest = StringRequest(
+            Request.Method.GET, requestUrl,
+            Response.Listener { response ->
+                val json = JSONObject(response)
+                val jsonArray = json.getJSONArray("results")
+
+                for (k in (0 until jsonArray.length())) {
+                    val albumHashMap = HashMap<String, Any?>()
+
+                    val jsonObject = jsonArray.getJSONObject(k)
+
+                    albumHashMap["id"] = jsonObject.getString("_id")
+                    albumHashMap["title"] = jsonObject.getString("title")
+                    albumHashMap["artist"] = jsonObject.getString("renderedArtists")
+                    albumHashMap["primaryImage"] =
+                        view.context.filesDir.toString() + "/" + jsonObject.getString("_id") + ".png" + primaryResolution.toString()
+
+                    tempList.add(albumHashMap)
+                }
+            },
+            Response.ErrorListener { }
+        )
+
+        requestQueue.addRequestFinishedListener<Any?> {
+            currentListViewData = tempList
+            updateListView(view)
+            redrawListView(view)
+        }
+
+        requestQueue.add(albumsRequest)
 
     }
 
@@ -309,7 +434,8 @@ class HomeHandler {
                         val streamHash = jsonParser.parseObjectToStreamHash(jsonObject, song)
 
                         if (streamHash != null) {
-                            song["songStreamLocation"] = context.getString(R.string.songStreamUrl) + streamHash
+                            song["songStreamLocation"] =
+                                context.getString(R.string.songStreamUrl) + streamHash
                             if (playNow) {
                                 playNow(Song(song))
                             } else {
