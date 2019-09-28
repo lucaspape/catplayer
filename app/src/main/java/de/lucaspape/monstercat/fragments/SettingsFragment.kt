@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.auth.Auth
 import de.lucaspape.monstercat.settings.Settings
 
 class SettingsFragment : Fragment() {
@@ -34,8 +35,8 @@ class SettingsFragment : Fragment() {
             settings.saveSetting("email", username)
             settings.saveSetting("password", password)
 
-            Toast.makeText(view.context, view.context.getString(R.string.settingsUpdatedMsg), Toast.LENGTH_SHORT)
-                .show()
+            val auth = Auth()
+            auth.login(view.context)
         }
     }
 }

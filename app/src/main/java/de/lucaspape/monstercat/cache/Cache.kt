@@ -18,6 +18,10 @@ class Cache(name: String, context: Context) {
         saveCache()
     }
 
+    fun delete(){
+        cacheFile.delete()
+    }
+
     private fun loadCache() {
         if (cacheFile.exists()) {
             val ois = ObjectInputStream(FileInputStream(cacheFile))

@@ -9,6 +9,7 @@ import com.android.volley.toolbox.HttpHeaderParser
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.cache.Cache
 import de.lucaspape.monstercat.settings.Settings
 import org.json.JSONException
 import org.json.JSONObject
@@ -39,6 +40,10 @@ class Auth {
                     try {
                         //get SID
                         sid = headers.getString("Set-Cookie").substringBefore(';').replace("connect.sid=", "")
+
+                        //clear cache
+                        Cache("homeCache", context).delete()
+                        Cache("playlistCache", context).delete()
 
                         Toast.makeText(
                             context,
