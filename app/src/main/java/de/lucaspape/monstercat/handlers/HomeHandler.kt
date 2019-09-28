@@ -331,6 +331,8 @@ class HomeHandler {
             var finishedRequests = 0
             var totalRequestsCount = 0
 
+            var requests = ArrayList<StringRequest>()
+
             requestQueue.addRequestFinishedListener<Any> {
                 finishedRequests++
 
@@ -359,6 +361,8 @@ class HomeHandler {
 
                     //download cover art
                     MainActivity.downloadHandler!!.addCoverArray(currentListViewData)
+                }else{
+                    requestQueue.add(requests[finishedRequests])
                 }
             }
 
@@ -397,8 +401,10 @@ class HomeHandler {
                 }
 
                 totalRequestsCount++
-                requestQueue.add(listRequest)
+                requests.add(listRequest)
             }
+
+            requestQueue.add(requests[finishedRequests])
         }
 
     }
@@ -428,6 +434,8 @@ class HomeHandler {
             var finishedRequests = 0
             var totalRequestsCount = 0
 
+            val requests = ArrayList<StringRequest>()
+
             requestQueue.addRequestFinishedListener<Any?> {
                 finishedRequests++
 
@@ -455,6 +463,8 @@ class HomeHandler {
                     //download cover art
                     MainActivity.downloadHandler!!.addCoverArray(currentListViewData)
 
+                }else{
+                    requestQueue.add(requests[finishedRequests])
                 }
 
             }
@@ -489,8 +499,11 @@ class HomeHandler {
                 }
 
                 totalRequestsCount++
-                requestQueue.add(albumsRequest)
+
+                requests.add(albumsRequest)
             }
+
+            requestQueue.add(requests[finishedRequests])
         }
     }
 
