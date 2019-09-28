@@ -2,6 +2,7 @@ package de.lucaspape.monstercat
 
 import android.Manifest
 import android.app.AlertDialog
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.SpannableString
@@ -13,11 +14,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import de.lucaspape.monstercat.auth.Auth
+import de.lucaspape.monstercat.cache.Cache
 import de.lucaspape.monstercat.download.DownloadHandler
 import de.lucaspape.monstercat.download.DownloadTask
 import de.lucaspape.monstercat.fragments.HomeFragment
 import de.lucaspape.monstercat.fragments.PlaylistFragment
 import de.lucaspape.monstercat.fragments.SettingsFragment
+import de.lucaspape.monstercat.handlers.HomeHandler
 import de.lucaspape.monstercat.music.createMediaSession
 import de.lucaspape.monstercat.settings.Settings
 import java.lang.ref.WeakReference
@@ -79,6 +82,12 @@ class MainActivity : AppCompatActivity() {
         val auth = Auth()
         auth.login(this)
 
+        val cache = Cache("homeCache", this)
+        val loadedCache = cache.load("albumViewSelected")
+        if(loadedCache != null){
+            HomeHandler.albumViewSelected = loadedCache as Boolean
+        }
+
         val homeFragment = HomeFragment.newInstance()
         openFragment(homeFragment)
 
@@ -110,6 +119,8 @@ class MainActivity : AppCompatActivity() {
     override fun onBackPressed() {
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.nav_view)
         bottomNavigationView.selectedItemId = R.id.navigation_home
+
+        HomeHandler.albumView = HomeHandler.albumViewSelected
     }
 
 }

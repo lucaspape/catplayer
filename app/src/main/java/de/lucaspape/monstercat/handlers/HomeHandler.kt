@@ -32,10 +32,16 @@ class HomeHandler {
     var currentListViewData = ArrayList<HashMap<String, Any?>>()
 
     //maximum songs loaded
-    val loadMax = 200
+    private val loadMax = 200
 
-    var simpleAdapter: SimpleAdapter? = null
-    var albumView = false
+    private var simpleAdapter: SimpleAdapter? = null
+
+
+    companion object{
+        @JvmStatic var albumViewSelected = false
+        @JvmStatic var albumView = false
+    }
+
 
     fun setupListView(view: View) {
         updateListView(view)
@@ -128,9 +134,25 @@ class HomeHandler {
         }
 
         val viewSelector = view.findViewById<Spinner>(R.id.viewSelector)
+
+        if(albumViewSelected){
+            viewSelector.setSelection(1)
+        }else{
+            viewSelector.setSelection(0)
+        }
+
+        val cache = Cache("homeCache", view.context)
+        cache.save("albumViewSelected", albumViewSelected)
+
         viewSelector.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                albumView = false
+
+                if(albumViewSelected){
+                    viewSelector.setSelection(1)
+                }else{
+                    viewSelector.setSelection(0)
+                }
+
                 updateListView(view)
             }
 
@@ -141,8 +163,16 @@ class HomeHandler {
                 id: Long
             ) {
                 when {
-                    viewSelector.getItemAtPosition(position) == "Catalog View" -> albumView = false
-                    viewSelector.getItemAtPosition(position) == "Album View" -> albumView = true
+                    viewSelector.getItemAtPosition(position) == "Catalog View" -> {
+                        albumView = false
+                        albumViewSelected  = false
+                        cache.save("albumViewSelected", albumViewSelected)
+                    }
+                    viewSelector.getItemAtPosition(position) == "Album View" -> {
+                        albumView = true
+                        albumViewSelected  = true
+                        cache.save("albumViewSelected", albumViewSelected)
+                    }
                 }
 
                 if (albumView) {
@@ -152,10 +182,11 @@ class HomeHandler {
                 }
             }
         }
-
-
     }
 
+    /**
+     * Load single album
+     */
     private fun loadAlbum(view: View, itemValue: HashMap<String, Any?>) {
         val albumId = itemValue["id"]
 
