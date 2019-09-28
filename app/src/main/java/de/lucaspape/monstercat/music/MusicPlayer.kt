@@ -21,9 +21,6 @@ import android.media.session.MediaSession
 import android.media.session.PlaybackState
 import android.os.Build
 import android.os.Handler
-import android.support.v4.media.MediaMetadataCompat
-import android.support.v4.media.session.MediaSessionCompat
-import android.support.v4.media.session.PlaybackStateCompat
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
@@ -81,7 +78,6 @@ fun createMediaSession(context:WeakReference<Context>){
 
     mediaSession!!.setCallback(object: MediaSession.Callback(){
 
-
         override fun onPause() {
             pause()
         }
@@ -92,7 +88,6 @@ fun createMediaSession(context:WeakReference<Context>){
             }else{
                 play()
             }
-            context.get()!!.registerReceiver(NoisyReceiver(), intentFilter)
         }
 
         override fun onSkipToNext() {
@@ -105,7 +100,19 @@ fun createMediaSession(context:WeakReference<Context>){
 
         override fun onStop() {
             stop()
-            context.get()!!.unregisterReceiver(NoisyReceiver())
+        }
+
+        override fun onSeekTo(pos: Long) {
+            mediaPlayer.seekTo(pos.toInt())
+        }
+
+        override fun onFastForward() {
+            mediaPlayer.seekTo(mediaPlayer.duration)
+        }
+
+        override fun onRewind() {
+            super.onRewind()
+            mediaPlayer.seekTo(0)
         }
 
     })
@@ -196,10 +203,6 @@ private fun play() {
         val artist = song.artist
         val coverUrl = song.coverLocation
 
-        val mediaMetadata = MediaMetadata.Builder()
-        mediaMetadata.putString(MediaMetadata.METADATA_KEY_ARTIST, artist)
-        mediaMetadata.putString(MediaMetadata.METADATA_KEY_TITLE, title)
-
         mediaPlayer.stop()
         mediaPlayer = MediaPlayer()
 
@@ -238,6 +241,8 @@ private fun play() {
             override fun run() {
                 seekBarReference!!.get()!!.max = mediaPlayer.duration
                 seekBarReference!!.get()!!.progress = mediaPlayer.currentPosition
+                setPlayerState(mediaPlayer.currentPosition.toLong())
+
                 seekbarUpdateHandler.postDelayed(this, 50)
             }
         }
@@ -246,25 +251,9 @@ private fun play() {
 
         seekBarReference!!.get()!!.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                val stateBuilder = PlaybackState.Builder()
-
-                val state:Int = if(playing){
-                    PlaybackState.STATE_PLAYING
-                }else{
-                    PlaybackState.STATE_PAUSED
-                }
-
-                stateBuilder.setState(state, progress.toLong(), 1.0f)
-                stateBuilder.setActions(PlaybackState.ACTION_PLAY)
-                stateBuilder.setActions(PlaybackState.ACTION_PAUSE)
-                stateBuilder.setActions(PlaybackState.ACTION_SKIP_TO_NEXT)
-                stateBuilder.setActions(PlaybackState.ACTION_SKIP_TO_PREVIOUS)
-                stateBuilder.setActions(PlaybackState.ACTION_STOP)
-                stateBuilder.setActions(PlaybackState.ACTION_PLAY_PAUSE)
-                mediaSession!!.setPlaybackState(stateBuilder.build())
-
                 if (fromUser)
                     mediaPlayer.seekTo(progress)
+                    setPlayerState(progress.toLong())
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar) {
@@ -278,21 +267,54 @@ private fun play() {
         if (coverFile.exists()) {
             val bitmap = BitmapFactory.decodeFile(coverFile.absolutePath)
             barCoverImageReference!!.get()!!.setImageBitmap(bitmap)
-            mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, bitmap)
-            mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ART, bitmap)
+            setSongMetadata(artist, title, bitmap, mediaPlayer.duration.toLong())
+        }else{
+            setSongMetadata(artist, title, null, mediaPlayer.duration.toLong())
         }
 
-        mediaSession!!.setMetadata(mediaMetadata.build())
         showNotification(title, artist, coverUrl, true)
         playButtonReference!!.get()!!.setImageDrawable(
             contextReference!!.get()!!.resources.getDrawable(
                 R.drawable.ic_pause_white_24dp
             )
         )
+
+
     }catch (e: IndexOutOfBoundsException){
 
     }
+}
 
+private fun setPlayerState(progress:Long){
+    val stateBuilder = PlaybackState.Builder()
+
+    val state:Int = if(playing){
+        PlaybackState.STATE_PLAYING
+    }else{
+        PlaybackState.STATE_PAUSED
+    }
+
+    stateBuilder.setState(state, progress, 1.0f)
+    stateBuilder.setActions(PlaybackState.ACTION_PLAY +
+            PlaybackState.ACTION_PAUSE +
+            PlaybackState.ACTION_SKIP_TO_NEXT +
+            PlaybackState.ACTION_SKIP_TO_PREVIOUS +
+            PlaybackState.ACTION_STOP +
+            PlaybackState.ACTION_PLAY_PAUSE +
+            PlaybackState.ACTION_SEEK_TO +
+            PlaybackState.ACTION_FAST_FORWARD +
+            PlaybackState.ACTION_REWIND)
+    mediaSession!!.setPlaybackState(stateBuilder.build())
+}
+
+private fun setSongMetadata(artist:String, title:String, coverImage:Bitmap?, duration:Long){
+    val mediaMetadata = MediaMetadata.Builder()
+    mediaMetadata.putString(MediaMetadata.METADATA_KEY_ARTIST, artist)
+    mediaMetadata.putString(MediaMetadata.METADATA_KEY_TITLE, title)
+    mediaMetadata.putLong(MediaMetadata.METADATA_KEY_DURATION, duration)
+    mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, coverImage)
+    mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ART, coverImage)
+    mediaSession!!.setMetadata(mediaMetadata.build())
 }
 
 private fun stop() {
