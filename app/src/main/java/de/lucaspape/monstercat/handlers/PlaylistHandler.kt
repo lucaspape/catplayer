@@ -185,6 +185,8 @@ class PlaylistHandler {
         var finishedRequests = 0
         var totalRequestsCount = 0
 
+        val requests = ArrayList<StringRequest>()
+
         val playlistTrackRequestQueue = Volley.newRequestQueue(view.context)
 
         val tempList = arrayOfNulls<HashMap<String, Any?>>(currentPlaylist["trackCount"] as Int)
@@ -216,6 +218,8 @@ class PlaylistHandler {
 
                 //download cover art
                 MainActivity.downloadHandler!!.addCoverArray(currentListData)
+            }else{
+                playlistTrackRequestQueue.add(requests[finishedRequests])
             }
         }
 
@@ -252,10 +256,10 @@ class PlaylistHandler {
             }
 
             totalRequestsCount++
-            playlistTrackRequestQueue.add(playlistTrackRequest)
-
-
+            requests.add(playlistTrackRequest)
         }
+        playlistTrackRequestQueue.add(requests[finishedRequests])
+
     }
 
     fun playSong(context: Context, itemValue: HashMap<String, Any?>, playAfter: Boolean) {
