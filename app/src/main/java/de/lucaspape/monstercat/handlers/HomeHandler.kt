@@ -97,7 +97,7 @@ class HomeHandler {
         //refresh
         val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
         swipeRefreshLayout.setOnRefreshListener {
-            if(albumView){
+            if(albumView) {
                 loadAlbumList(view, true)
             }else{
                 loadSongList(view, true)
@@ -126,7 +126,7 @@ class HomeHandler {
         musicList.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
             if (albumView) {
                 val itemValue = musicList.getItemAtPosition(position) as HashMap<String, Any?>
-                loadAlbum(view, itemValue)
+                loadAlbum(view, itemValue, false)
             } else {
                 val itemValue = musicList.getItemAtPosition(position) as HashMap<String, Any?>
                 playSong(itemValue, true, view.context)
@@ -187,8 +187,8 @@ class HomeHandler {
     /**
      * Load single album
      */
-    private fun loadAlbum(view: View, itemValue: HashMap<String, Any?>) {
-        val albumId = itemValue["id"]
+    private fun loadAlbum(view: View, itemValue: HashMap<String, Any?>, forceReload: Boolean) {
+        val albumId = itemValue["id"] as String
 
         val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
         swipeRefreshLayout.isRefreshing = true
@@ -198,11 +198,11 @@ class HomeHandler {
         //used to sort list
         val tempList = ArrayList<HashMap<String, Any?>>()
 
+        val cache = Cache("homeCache", view.context)
+        val albumCache = cache.load(albumId)
 
-        requestQueue.addRequestFinishedListener<Any> {
-
-            //display list
-            currentListViewData = tempList
+        if(albumCache != null && !forceReload){
+            currentListViewData = albumCache as ArrayList<HashMap<String, Any?>>
             albumView = false
 
             updateListView(view)
@@ -212,42 +212,58 @@ class HomeHandler {
 
             //download cover art
             MainActivity.downloadHandler!!.addCoverArray(currentListViewData)
-        }
+        }else{
+            requestQueue.addRequestFinishedListener<Any> {
+                cache.save(albumId, tempList)
 
-        val requestUrl =
-            view.context.getString(R.string.loadSongsUrl) + "?albumId=" + albumId
+                //display list
+                currentListViewData = tempList
+                albumView = false
 
-        val listRequest = object : StringRequest(
-            Method.GET, requestUrl, Response.Listener { response ->
-                val json = JSONObject(response)
-                val jsonArray = json.getJSONArray("results")
+                updateListView(view)
+                redrawListView(view)
 
-                //parse every single song into list
-                for (k in (0 until jsonArray.length())) {
-                    val jsonParser = JSONParser()
-                    val hashMap =
-                        jsonParser.parseCatalogSongsToHashMap(
-                            jsonArray.getJSONObject(k),
-                            view.context
-                        )
+                swipeRefreshLayout.isRefreshing = false
 
-                    tempList.add(hashMap)
-                }
-
-            }, Response.ErrorListener { }
-        ) {
-            //add authentication
-            @Throws(AuthFailureError::class)
-            override fun getHeaders(): Map<String, String> {
-                val params = HashMap<String, String>()
-                if (loggedIn) {
-                    params["Cookie"] = "connect.sid=$sid"
-                }
-                return params
+                //download cover art
+                MainActivity.downloadHandler!!.addCoverArray(currentListViewData)
             }
-        }
 
-        requestQueue.add(listRequest)
+            val requestUrl =
+                view.context.getString(R.string.loadSongsUrl) + "?albumId=" + albumId
+
+            val listRequest = object : StringRequest(
+                Method.GET, requestUrl, Response.Listener { response ->
+                    val json = JSONObject(response)
+                    val jsonArray = json.getJSONArray("results")
+
+                    //parse every single song into list
+                    for (k in (0 until jsonArray.length())) {
+                        val jsonParser = JSONParser()
+                        val hashMap =
+                            jsonParser.parseCatalogSongsToHashMap(
+                                jsonArray.getJSONObject(k),
+                                view.context
+                            )
+
+                        tempList.add(hashMap)
+                    }
+
+                }, Response.ErrorListener { }
+            ) {
+                //add authentication
+                @Throws(AuthFailureError::class)
+                override fun getHeaders(): Map<String, String> {
+                    val params = HashMap<String, String>()
+                    if (loggedIn) {
+                        params["Cookie"] = "connect.sid=$sid"
+                    }
+                    return params
+                }
+            }
+
+            requestQueue.add(listRequest)
+        }
     }
 
     private fun redrawListView(view: View) {

@@ -29,7 +29,12 @@ class HomeFragment : Fragment() {
         homeHandler.setupSpinner(view)
         homeHandler.registerListeners(view)
         homeHandler.setupMusicPlayer(view)
-        homeHandler.loadSongList(view, false)
+
+        if(HomeHandler.albumViewSelected){
+            homeHandler.loadAlbumList(view, false)
+        }else{
+            homeHandler.loadSongList(view, false)
+        }
 
         listView = view.findViewById(R.id.musiclistview)
 
