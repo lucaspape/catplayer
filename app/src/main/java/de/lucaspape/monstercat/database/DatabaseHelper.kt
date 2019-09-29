@@ -4,9 +4,6 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import android.R.id
-import android.provider.ContactsContract.CommonDataKinds.Note
-import de.lucaspape.monstercat.music.Song
 
 
 class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
@@ -26,13 +23,17 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         db!!.execSQL(SongListView.CREATE_TABLE)
     }
 
-    fun insertSong(song:String, artist:String):Long{
+    fun insertSong(songId:String, title: String, version:String, albumId:String, artist: String, coverUrl:String):Long{
         val db = writableDatabase
 
         val values = ContentValues()
 
-        values.put(SongListView.COLUMN_SONG, song)
+        values.put(SongListView.COLUMN_SONG_ID, songId)
+        values.put(SongListView.COLUMN_TITLE, title)
+        values.put(SongListView.COLUMN_VERSION, version)
+        values.put(SongListView.COLUMN_ALBUM_ID, albumId)
         values.put(SongListView.COLUMN_ARTIST, artist)
+        values.put(SongListView.COLUMN_COVER_URL, coverUrl)
 
         val id = db.insert(SongListView.TABLE_NAME, null, values)
         db.close()
@@ -42,15 +43,26 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     fun getSong(id:Long):SongListView{
         val db = readableDatabase
 
-        val cursor = db.query(SongListView.TABLE_NAME, arrayOf(SongListView.COLUMN_ID, SongListView.COLUMN_SONG, SongListView.COLUMN_ARTIST),
+        val cursor = db.query(SongListView.TABLE_NAME, arrayOf(
+            SongListView.COLUMN_ID,
+            SongListView.COLUMN_SONG_ID,
+            SongListView.COLUMN_TITLE,
+            SongListView.COLUMN_VERSION,
+            SongListView.COLUMN_ALBUM_ID,
+            SongListView.COLUMN_ARTIST,
+            SongListView.COLUMN_COVER_URL),
             SongListView.COLUMN_ID + "=?",
             arrayOf(id.toString()), null, null, null, null)
 
         cursor?.moveToFirst()
 
         val songListView = SongListView(cursor.getInt(cursor.getColumnIndex(SongListView.COLUMN_ID)),
-            cursor.getString(cursor.getColumnIndex(SongListView.COLUMN_SONG)),
-            cursor.getString(cursor.getColumnIndex(SongListView.COLUMN_ARTIST)))
+            cursor.getString(cursor.getColumnIndex(SongListView.COLUMN_SONG_ID)),
+            cursor.getString(cursor.getColumnIndex(SongListView.COLUMN_TITLE)),
+            cursor.getString(cursor.getColumnIndex(SongListView.COLUMN_VERSION)),
+            cursor.getString(cursor.getColumnIndex(SongListView.COLUMN_ALBUM_ID)),
+            cursor.getString(cursor.getColumnIndex(SongListView.COLUMN_ARTIST)),
+            cursor.getString(cursor.getColumnIndex(SongListView.COLUMN_COVER_URL)))
 
         cursor.close()
 
@@ -70,8 +82,12 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             do{
                 val songListView = SongListView()
                 songListView.id = cursor.getInt(cursor.getColumnIndex(SongListView.COLUMN_ID))
-                songListView.song = cursor.getString(cursor.getColumnIndex(SongListView.COLUMN_SONG))
+                songListView.songId = cursor.getString(cursor.getColumnIndex(SongListView.COLUMN_SONG_ID))
+                songListView.title = cursor.getString(cursor.getColumnIndex(SongListView.COLUMN_TITLE))
+                songListView.version = cursor.getString(cursor.getColumnIndex(SongListView.COLUMN_VERSION))
+                songListView.albumId = cursor.getString(cursor.getColumnIndex(SongListView.COLUMN_ALBUM_ID))
                 songListView.artist = cursor.getString(cursor.getColumnIndex(SongListView.COLUMN_ARTIST))
+                songListView.coverUrl = cursor.getString(cursor.getColumnIndex(SongListView.COLUMN_COVER_URL))
 
                 songs.add(songListView)
             } while (cursor.moveToNext())

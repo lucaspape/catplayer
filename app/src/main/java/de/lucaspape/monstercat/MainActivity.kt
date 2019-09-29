@@ -79,14 +79,6 @@ class MainActivity : AppCompatActivity() {
             println("Internet permission not granted!")
         }
 
-        val databaseHelper = DatabaseHelper(this)
-      //  val id = databaseHelper.insertSong("Testsong", "Testartist")
-
-        val getSong = databaseHelper.getSong(2)
-        println(getSong.artist)
-        println(getSong.song)
-        println(getSong.id)
-
         createMediaSession(WeakReference(this))
 
         val auth = Auth()

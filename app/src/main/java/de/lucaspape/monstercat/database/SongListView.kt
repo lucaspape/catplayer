@@ -4,24 +4,40 @@ class SongListView() {
     companion object{
         @JvmStatic val TABLE_NAME = "songlistview"
         @JvmStatic val COLUMN_ID = "id"
-        @JvmStatic val COLUMN_SONG = "song"
+        @JvmStatic val COLUMN_SONG_ID = "songid"
+        @JvmStatic val COLUMN_TITLE = "title"
+        @JvmStatic val COLUMN_VERSION = "version"
+        @JvmStatic val COLUMN_ALBUM_ID = "albumid"
         @JvmStatic val COLUMN_ARTIST = "artist"
+        @JvmStatic val COLUMN_COVER_URL = "coverurl"
 
         @JvmStatic val CREATE_TABLE =
             "CREATE TABLE " + TABLE_NAME + " (" +
                     COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    COLUMN_SONG + " TEXT," +
-                    COLUMN_ARTIST + " TEXT" +
+                    COLUMN_SONG_ID + " TEXT," +
+                    COLUMN_TITLE + " TEXT," +
+                    COLUMN_VERSION + " TEXT," +
+                    COLUMN_ALBUM_ID + " TEXT," +
+                    COLUMN_ARTIST + " TEXT," +
+                    COLUMN_COVER_URL + " TEXT" +
                     ")"
     }
 
     var id: Int = 0
-    var song: String = ""
+    var songId: String = ""
+    var title: String = ""
+    var version: String = ""
+    var albumId = ""
     var artist: String = ""
+    var coverUrl:String = ""
 
-    constructor(id: Int, song: String, artist: String) : this(){
+    constructor(id: Int, songId:String, title: String, version:String, albumId:String, artist: String, coverUrl:String) : this(){
         this.id = id
-        this.song = song
+        this.songId = songId
+        this.title = title
+        this.version = version
+        this.albumId = albumId
         this.artist = artist
+        this.coverUrl = coverUrl
     }
 }

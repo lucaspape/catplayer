@@ -16,6 +16,7 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.sid
 import de.lucaspape.monstercat.auth.loggedIn
 import de.lucaspape.monstercat.cache.Cache
+import de.lucaspape.monstercat.database.DatabaseHelper
 import de.lucaspape.monstercat.json.JSONParser
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.settings.Settings
@@ -309,6 +310,11 @@ class HomeHandler {
         val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
         swipeRefreshLayout.isRefreshing = true
 
+        val settings = Settings(view.context)
+
+        val primaryResolution = settings.getSetting("primaryCoverResolution")
+        val secondaryResolution = settings.getSetting("secondaryCoverResolution")
+
         val cache = Cache("homeCache", view.context)
         val loadedCache = cache.load("listView")
         println(loadedCache)
@@ -325,8 +331,7 @@ class HomeHandler {
         } else {
             val requestQueue = Volley.newRequestQueue(view.context)
 
-            //used to sort list
-            val tempList = arrayOfNulls<HashMap<String, Any?>>(loadMax)
+            val dbIds = ArrayList<Long>()
 
             //if all finished continue
             var finishedRequests = 0
@@ -340,18 +345,30 @@ class HomeHandler {
                 //check if all done
                 if (finishedRequests >= totalRequestsCount) {
 
-                    val sortedList = ArrayList<HashMap<String, Any?>>()
+                    val databaseHelper = DatabaseHelper(view.context)
+                    val songList = databaseHelper.getAllSongs()
 
-                    for (i in tempList.indices) {
-                        if (tempList[i] != null) {
-                            if (tempList.isNotEmpty()) {
-                                sortedList.add(tempList[i]!!)
-                            }
-                        }
+                    val dbSongs = ArrayList<HashMap<String, Any?>>()
+
+                    for(song in songList){
+                        val listHashMap = HashMap<String, Any?>()
+                        listHashMap["title"] = song.title
+                        listHashMap["version"] = song.version
+                        listHashMap["id"] = song.songId
+                        listHashMap["albumId"] = song.albumId
+                        listHashMap["artist"] = song.artist
+                        listHashMap["shownTitle"] = song.title + song.version
+                        listHashMap["coverUrl"] = song.coverUrl
+                        listHashMap["coverLocation"] = view.context.filesDir.toString() + "/" + song.albumId + ".png"
+                        listHashMap["primaryRes"] = primaryResolution
+                        listHashMap["secondaryRes"] = secondaryResolution
+                        listHashMap["primaryImage"] = view.context.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution.toString()
+                        listHashMap["secondaryImage"] = view.context.filesDir.toString() + "/" + song.albumId + ".png" + secondaryResolution.toString()
+                        dbSongs.add(listHashMap)
                     }
 
                     //display list
-                    currentListViewData = sortedList
+                    currentListViewData = dbSongs
                     updateListView(view)
                     redrawListView(view)
 
@@ -379,13 +396,9 @@ class HomeHandler {
                         //parse every single song into list
                         for (k in (0 until jsonArray.length())) {
                             val jsonParser = JSONParser()
-                            val hashMap =
-                                jsonParser.parseCatalogSongsToHashMap(
-                                    jsonArray.getJSONObject(k),
-                                    view.context
-                                )
 
-                            tempList[i * 50 + k] = hashMap
+                            val dbId = jsonParser.parseCatalogSongsToDB(jsonArray.getJSONObject(k), view.context)
+                            dbIds.add(dbId)
                         }
 
                     }, Response.ErrorListener { }
@@ -526,7 +539,7 @@ class HomeHandler {
 
         } else {
             //check if song can be streamed
-            if (song["streamable"] as Boolean) {
+          //  if (song["streamable"] as Boolean) {
                 val streamHashQueue = Volley.newRequestQueue(context)
 
                 //get stream hash
@@ -565,9 +578,9 @@ class HomeHandler {
                 }
 
                 streamHashQueue.add(hashRequest)
-            } else {
+          //  } else {
                 //fu no song for u
-            }
+          //  }
         }
     }
 

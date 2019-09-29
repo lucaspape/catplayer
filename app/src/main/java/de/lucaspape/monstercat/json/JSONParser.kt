@@ -2,6 +2,7 @@ package de.lucaspape.monstercat.json
 
 import android.content.Context
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.database.DatabaseHelper
 import de.lucaspape.monstercat.settings.Settings
 import org.json.JSONArray
 import org.json.JSONObject
@@ -66,6 +67,43 @@ class JSONParser {
             context.filesDir.toString() + "/" + albumId + ".png"
 
         return hashMap
+    }
+
+    fun parseCatalogSongsToDB(jsonObject: JSONObject, context: Context):Long{
+        val settings = Settings(context)
+
+        val primaryResolution = settings.getSetting("primaryCoverResolution")
+        val secondaryResolution = settings.getSetting("secondaryCoverResolution")
+
+        var id = ""
+        var albumId = ""
+        var title = ""
+        var artist = ""
+        var coverUrl = ""
+        var version = ""
+        var downloadable = false
+        var streamable = false
+
+        try {
+            albumId = jsonObject.getJSONObject("albums").getString("albumId")
+            title = jsonObject.getString("title")
+            artist = jsonObject.getString("artistsTitle")
+            coverUrl = jsonObject.getJSONObject("release").getString("coverUrl")
+            version = jsonObject.getString("version")
+            id = jsonObject.getString("_id")
+            downloadable = jsonObject.getBoolean("downloadable")
+            streamable = jsonObject.getBoolean("streamable")
+        } catch (e: InvocationTargetException) {
+        }
+
+        if (version == "null") {
+            version = ""
+        }
+
+        val databaseHelper = DatabaseHelper(context)
+        val dbId = databaseHelper.insertSong(id, title, version, albumId, artist, coverUrl)
+        return dbId
+
     }
 
     fun parseAlbumViewToHashMap(jsonObject: JSONObject, context: Context): HashMap<String, Any?>{
