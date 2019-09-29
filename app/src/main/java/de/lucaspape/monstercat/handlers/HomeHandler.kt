@@ -190,11 +190,6 @@ class HomeHandler {
     private fun loadAlbum(view: View, itemValue: HashMap<String, Any?>, forceReload: Boolean) {
         val albumId = itemValue["id"] as String
 
-        val settings = Settings(view.context)
-
-        val primaryResolution = settings.getSetting("primaryCoverResolution")
-        val secondaryResolution = settings.getSetting("secondaryCoverResolution")
-
         val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
         swipeRefreshLayout.isRefreshing = true
 
@@ -211,20 +206,8 @@ class HomeHandler {
             val dbSongs = ArrayList<HashMap<String, Any?>>()
 
             for(song in songList){
-                val listHashMap = HashMap<String, Any?>()
-                listHashMap["title"] = song.title
-                listHashMap["version"] = song.version
-                listHashMap["id"] = song.songId
-                listHashMap["albumId"] = song.albumId
-                listHashMap["artist"] = song.artist
-                listHashMap["shownTitle"] = song.title + song.version
-                listHashMap["coverUrl"] = song.coverUrl
-                listHashMap["coverLocation"] = view.context.filesDir.toString() + "/" + song.albumId + ".png"
-                listHashMap["primaryRes"] = primaryResolution
-                listHashMap["secondaryRes"] = secondaryResolution
-                listHashMap["primaryImage"] = view.context.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution.toString()
-                listHashMap["secondaryImage"] = view.context.filesDir.toString() + "/" + song.albumId + ".png" + secondaryResolution.toString()
-                dbSongs.add(listHashMap)
+                val jsonParser = JSONParser()
+                dbSongs.add(jsonParser.parseSongToHashMap(view.context, song))
             }
 
             currentListViewData = dbSongs
@@ -244,20 +227,8 @@ class HomeHandler {
                 songList = songDatabaseHelper.getAlbumSongs(albumId)
 
                 for(song in songList){
-                    val listHashMap = HashMap<String, Any?>()
-                    listHashMap["title"] = song.title
-                    listHashMap["version"] = song.version
-                    listHashMap["id"] = song.songId
-                    listHashMap["albumId"] = song.albumId
-                    listHashMap["artist"] = song.artist
-                    listHashMap["shownTitle"] = song.title + song.version
-                    listHashMap["coverUrl"] = song.coverUrl
-                    listHashMap["coverLocation"] = view.context.filesDir.toString() + "/" + song.albumId + ".png"
-                    listHashMap["primaryRes"] = primaryResolution
-                    listHashMap["secondaryRes"] = secondaryResolution
-                    listHashMap["primaryImage"] = view.context.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution.toString()
-                    listHashMap["secondaryImage"] = view.context.filesDir.toString() + "/" + song.albumId + ".png" + secondaryResolution.toString()
-                    dbSongs.add(listHashMap)
+                    val jsonParser = JSONParser()
+                    dbSongs.add(jsonParser.parseSongToHashMap(view.context, song))
                 }
 
                 //display list
@@ -372,20 +343,8 @@ class HomeHandler {
             }
 
             for(song in songList){
-                val listHashMap = HashMap<String, Any?>()
-                listHashMap["title"] = song.title
-                listHashMap["version"] = song.version
-                listHashMap["id"] = song.songId
-                listHashMap["albumId"] = song.albumId
-                listHashMap["artist"] = song.artist
-                listHashMap["shownTitle"] = song.title + song.version
-                listHashMap["coverUrl"] = song.coverUrl
-                listHashMap["coverLocation"] = view.context.filesDir.toString() + "/" + song.albumId + ".png"
-                listHashMap["primaryRes"] = primaryResolution
-                listHashMap["secondaryRes"] = secondaryResolution
-                listHashMap["primaryImage"] = view.context.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution.toString()
-                listHashMap["secondaryImage"] = view.context.filesDir.toString() + "/" + song.albumId + ".png" + secondaryResolution.toString()
-                dbSongs.add(listHashMap)
+                val jsonParser = JSONParser()
+                dbSongs.add(jsonParser.parseSongToHashMap(view.context, song))
             }
 
             //display list
@@ -435,20 +394,8 @@ class HomeHandler {
                     }
 
                     for(song in songList){
-                        val listHashMap = HashMap<String, Any?>()
-                        listHashMap["title"] = song.title
-                        listHashMap["version"] = song.version
-                        listHashMap["id"] = song.songId
-                        listHashMap["albumId"] = song.albumId
-                        listHashMap["artist"] = song.artist
-                        listHashMap["shownTitle"] = song.title + song.version
-                        listHashMap["coverUrl"] = song.coverUrl
-                        listHashMap["coverLocation"] = view.context.filesDir.toString() + "/" + song.albumId + ".png"
-                        listHashMap["primaryRes"] = primaryResolution
-                        listHashMap["secondaryRes"] = secondaryResolution
-                        listHashMap["primaryImage"] = view.context.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution.toString()
-                        listHashMap["secondaryImage"] = view.context.filesDir.toString() + "/" + song.albumId + ".png" + secondaryResolution.toString()
-                        dbSongs.add(listHashMap)
+                        val jsonParser = JSONParser()
+                        dbSongs.add(jsonParser.parseSongToHashMap(view.context, song))
                     }
 
                     //display list
@@ -510,11 +457,6 @@ class HomeHandler {
         val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
         swipeRefreshLayout.isRefreshing = true
 
-        val settings = Settings(view.context)
-
-        val primaryResolution = settings.getSetting("primaryCoverResolution")
-        val secondaryResolution = settings.getSetting("secondaryCoverResolution")
-
         val requestQueue = Volley.newRequestQueue(view.context)
 
         val tempList = arrayOfNulls<Long>(loadMax)
@@ -526,18 +468,8 @@ class HomeHandler {
             val sortedList = ArrayList<HashMap<String, Any?>>()
 
             for(album in albumList){
-                val listHashMap = HashMap<String, Any?>()
-                listHashMap["title"] = album.title
-                listHashMap["id"] = album.albumId
-                listHashMap["artist"] = album.artist
-                listHashMap["coverUrl"] = album.coverUrl
-                listHashMap["coverLocation"] = view.context.filesDir.toString() + "/" + album.albumId + ".png"
-                listHashMap["primaryRes"] = primaryResolution
-                listHashMap["secondaryRes"] = secondaryResolution
-                listHashMap["primaryImage"] = view.context.filesDir.toString() + "/" + album.albumId + ".png" + primaryResolution.toString()
-                listHashMap["secondaryImage"] = view.context.filesDir.toString() + "/" + album.albumId + ".png" + secondaryResolution.toString()
-
-                sortedList.add(listHashMap)
+                val jsonParser = JSONParser()
+                sortedList.add(jsonParser.parseAlbumToHashMap(view.context, album))
             }
 
             currentListViewData = sortedList
@@ -572,19 +504,8 @@ class HomeHandler {
                     val sortedList = ArrayList<HashMap<String, Any?>>()
 
                     for(album in albums){
-
-                        val listHashMap = HashMap<String, Any?>()
-                        listHashMap["title"] = album.title
-                        listHashMap["id"] = album.albumId
-                        listHashMap["artist"] = album.artist
-                        listHashMap["coverUrl"] = album.coverUrl
-                        listHashMap["coverLocation"] = view.context.filesDir.toString() + "/" + album.albumId + ".png"
-                        listHashMap["primaryRes"] = primaryResolution
-                        listHashMap["secondaryRes"] = secondaryResolution
-                        listHashMap["primaryImage"] = view.context.filesDir.toString() + "/" + album.albumId + ".png" + primaryResolution.toString()
-                        listHashMap["secondaryImage"] = view.context.filesDir.toString() + "/" + album.albumId + ".png" + secondaryResolution.toString()
-
-                        sortedList.add(listHashMap)
+                        val jsonParser = JSONParser()
+                        sortedList.add(jsonParser.parseAlbumToHashMap(view.context, album))
                     }
 
                     currentListViewData = sortedList

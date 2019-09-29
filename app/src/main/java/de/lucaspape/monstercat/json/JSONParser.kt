@@ -2,6 +2,7 @@ package de.lucaspape.monstercat.json
 
 import android.content.Context
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.database.Album
 import de.lucaspape.monstercat.database.AlbumDatabaseHelper
 import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.database.SongDatabaseHelper
@@ -12,79 +13,56 @@ import java.lang.reflect.InvocationTargetException
 
 class JSONParser {
 
-    fun parseCatalogSongsToHashMap(jsonObject: JSONObject, context: Context): HashMap<String, Any?> {
+    fun parseSongToHashMap(context: Context, song:Song):HashMap<String,Any?>{
         val settings = Settings(context)
 
         val primaryResolution = settings.getSetting("primaryCoverResolution")
         val secondaryResolution = settings.getSetting("secondaryCoverResolution")
 
-        var id = ""
-        var albumId = ""
-        var title = ""
-        var artist = ""
-        var coverUrl = ""
-        var version = ""
-        var downloadable = false
-        var streamable = false
-
-        try {
-            albumId = jsonObject.getJSONObject("albums").getString("albumId")
-            title = jsonObject.getString("title")
-            artist = jsonObject.getString("artistsTitle")
-            coverUrl = jsonObject.getJSONObject("release").getString("coverUrl")
-            version = jsonObject.getString("version")
-            id = jsonObject.getString("_id")
-            downloadable = jsonObject.getBoolean("downloadable")
-            streamable = jsonObject.getBoolean("streamable")
-        } catch (e: InvocationTargetException) {
-        }
-
-        if (version == "null") {
-            version = ""
-        }
-
         val hashMap = HashMap<String, Any?>()
-
-        hashMap["albumId"] = albumId
-        hashMap["title"] = title
-        hashMap["artist"] = artist
-        hashMap["primaryImage"] =
-            context.filesDir.toString() + "/" + albumId + ".png" + primaryResolution.toString()
-
-        hashMap["secondaryImage"] =
-            context.filesDir.toString() + "/" + albumId + ".png" + secondaryResolution.toString()
-
-        hashMap["version"] = version
-
-        hashMap["shownTitle"] = "$artist $title $version"
-        hashMap["id"] = id
-        hashMap["downloadable"] = downloadable
-        hashMap["streamable"] = streamable
-        hashMap["coverUrl"] = coverUrl
-
+        hashMap["title"] = song.title
+        hashMap["version"] = song.version
+        hashMap["id"] = song.songId
+        hashMap["albumId"] = song.albumId
+        hashMap["artist"] = song.artist
+        hashMap["shownTitle"] = song.title + song.version
+        hashMap["coverUrl"] = song.coverUrl
+        hashMap["coverLocation"] = context.filesDir.toString() + "/" + song.albumId + ".png"
         hashMap["primaryRes"] = primaryResolution
         hashMap["secondaryRes"] = secondaryResolution
-        hashMap["coverUrl"] = coverUrl
-        hashMap["coverLocation"] =
-            context.filesDir.toString() + "/" + albumId + ".png"
+        hashMap["primaryImage"] = context.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution.toString()
+        hashMap["secondaryImage"] = context.filesDir.toString() + "/" + song.albumId + ".png" + secondaryResolution.toString()
+
+        return hashMap
+    }
+
+    fun parseAlbumToHashMap(context: Context, album:Album):HashMap<String, Any?>{
+        val settings = Settings(context)
+
+        val primaryResolution = settings.getSetting("primaryCoverResolution")
+        val secondaryResolution = settings.getSetting("secondaryCoverResolution")
+
+        val hashMap = HashMap<String, Any?>()
+        hashMap["title"] = album.title
+        hashMap["id"] = album.albumId
+        hashMap["artist"] = album.artist
+        hashMap["coverUrl"] = album.coverUrl
+        hashMap["coverLocation"] = context.filesDir.toString() + "/" + album.albumId + ".png"
+        hashMap["primaryRes"] = primaryResolution
+        hashMap["secondaryRes"] = secondaryResolution
+        hashMap["primaryImage"] = context.filesDir.toString() + "/" + album.albumId + ".png" + primaryResolution.toString()
+        hashMap["secondaryImage"] = context.filesDir.toString() + "/" + album.albumId + ".png" + secondaryResolution.toString()
 
         return hashMap
     }
 
     fun parseCatalogSongToDB(jsonObject: JSONObject, context: Context):Long{
-        val settings = Settings(context)
-
-        val primaryResolution = settings.getSetting("primaryCoverResolution")
-        val secondaryResolution = settings.getSetting("secondaryCoverResolution")
-
         var id = ""
         var albumId = ""
         var title = ""
         var artist = ""
         var coverUrl = ""
         var version = ""
-        var downloadable = false
-        var streamable = false
 
         try {
             albumId = jsonObject.getJSONObject("albums").getString("albumId")
@@ -93,8 +71,6 @@ class JSONParser {
             coverUrl = jsonObject.getJSONObject("release").getString("coverUrl")
             version = jsonObject.getString("version")
             id = jsonObject.getString("_id")
-            downloadable = jsonObject.getBoolean("downloadable")
-            streamable = jsonObject.getBoolean("streamable")
         } catch (e: InvocationTargetException) {
         }
 
@@ -103,63 +79,24 @@ class JSONParser {
         }
 
         val databaseHelper = SongDatabaseHelper(context)
-        if(databaseHelper.getSong(id) == null){
-            val dbId = databaseHelper.insertSong(id, title, version, albumId, artist, coverUrl)
-            return dbId
+        return if(databaseHelper.getSong(id) == null){
+            databaseHelper.insertSong(id, title, version, albumId, artist, coverUrl)
         }else{
-            return databaseHelper.getSong(id)!!.id.toLong()
+            databaseHelper.getSong(id)!!.id.toLong()
         }
-
-    }
-
-
-    fun parseAlbumViewToHashMap(jsonObject: JSONObject, context: Context): HashMap<String, Any?>{
-        val settings = Settings(context)
-        val primaryResolution = settings.getSetting("primaryCoverResolution")
-        val secondaryResolution = settings.getSetting("secondaryCoverResolution")
-
-        val hashMap = HashMap<String, Any?>()
-
-        hashMap["id"] = jsonObject.getString("_id")
-        hashMap["title"] = jsonObject.getString("title")
-        hashMap["artist"] = jsonObject.getString("renderedArtists")
-        hashMap["coverUrl"] = jsonObject.getString("coverUrl")
-        hashMap["coverLocation"] = context.filesDir.toString() + "/" + jsonObject.getString("_id") + ".png"
-        hashMap["primaryRes"] = primaryResolution
-        hashMap["secondaryRes"] = secondaryResolution
-        hashMap["primaryImage"] =
-            context.filesDir.toString() + "/" + jsonObject.getString("_id") + ".png" + primaryResolution.toString()
-
-        hashMap["secondaryImage"] =
-            context.filesDir.toString() + "/" + jsonObject.getString("_id") + ".png" + secondaryResolution.toString()
-
-        return hashMap
     }
 
     fun parseAlbumToDB(jsonObject: JSONObject, context: Context): Long{
-        val settings = Settings(context)
-        val primaryResolution = settings.getSetting("primaryCoverResolution")
-        val secondaryResolution = settings.getSetting("secondaryCoverResolution")
-
         val id = jsonObject.getString("_id")
         val title = jsonObject.getString("title")
         val artist = jsonObject.getString("renderedArtists")
         val coverUrl= jsonObject.getString("coverUrl")
-        val coverLocation = context.filesDir.toString() + "/" + jsonObject.getString("_id") + ".png"
-        val primaryRes = primaryResolution
-        val secondaryRes = secondaryResolution
-        val primaryImage =
-            context.filesDir.toString() + "/" + jsonObject.getString("_id") + ".png" + primaryResolution.toString()
-
-        val secondaryImage =
-            context.filesDir.toString() + "/" + jsonObject.getString("_id") + ".png" + secondaryResolution.toString()
 
         val databaseHelper = AlbumDatabaseHelper(context)
-        if(databaseHelper.getAlbum(id) == null){
-            val dbId = databaseHelper.insertAlbum(id, title, artist, coverUrl)
-            return dbId
+        return if(databaseHelper.getAlbum(id) == null){
+            databaseHelper.insertAlbum(id, title, artist, coverUrl)
         }else{
-            return databaseHelper.getAlbum(id)!!.id.toLong()
+            databaseHelper.getAlbum(id)!!.id.toLong()
         }
     }
 
