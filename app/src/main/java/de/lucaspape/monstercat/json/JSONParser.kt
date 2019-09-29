@@ -3,6 +3,7 @@ package de.lucaspape.monstercat.json
 import android.content.Context
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.AlbumDatabaseHelper
+import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.database.SongDatabaseHelper
 import de.lucaspape.monstercat.settings.Settings
 import org.json.JSONArray
@@ -162,11 +163,11 @@ class JSONParser {
         }
     }
 
-    fun parseObjectToStreamHash(jsonObject: JSONObject, song: HashMap<String, Any?>): String? {
+    fun parseObjectToStreamHash(jsonObject: JSONObject, song: Song): String? {
         val jsonArray = jsonObject.getJSONArray("results")
 
         var streamHash = ""
-        val searchSong = song["title"] as String + song["version"] as String
+        val searchSong = song.title + song.version
 
         for (i in (0 until jsonArray.length())) {
             if (jsonArray.getJSONObject(i).getString("title") + jsonArray.getJSONObject(i).getString(

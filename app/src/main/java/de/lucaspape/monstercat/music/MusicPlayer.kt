@@ -30,6 +30,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.palette.graphics.Palette
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.Song
+import de.lucaspape.monstercat.settings.Settings
 import java.io.File
 import java.lang.IndexOutOfBoundsException
 import java.lang.NullPointerException
@@ -196,19 +197,22 @@ fun setPlayButton(newPlayButton: ImageButton) {
  */
 
 private fun play() {
+    val settings = Settings(contextReference!!.get()!!)
+    val primaryResolution = settings.getSetting("primaryCoverResolution")
+
     try {
         val song = playList[currentSong]
 
-       // val url = song.getUrl()
+        val url = song.getUrl()
         val title = song.title
         val artist = song.artist
-       // val coverUrl = song.coverLocation
+        val coverUrl = contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
 
         mediaPlayer.stop()
         mediaPlayer = MediaPlayer()
 
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC)
-       // mediaPlayer.setDataSource(url)
+        mediaPlayer.setDataSource(url)
         mediaPlayer.prepare()
         mediaPlayer.start()
 
@@ -264,16 +268,16 @@ private fun play() {
             }
         })
 
-     //   val coverFile = File(coverUrl)
-       // if (coverFile.exists()) {
-       //     val bitmap = BitmapFactory.decodeFile(coverFile.absolutePath)
-       //     barCoverImageReference!!.get()!!.setImageBitmap(bitmap)
-       //     setSongMetadata(artist, title, bitmap, mediaPlayer.duration.toLong())
-       // }else{
-       //     setSongMetadata(artist, title, null, mediaPlayer.duration.toLong())
-       // }
+        val coverFile = File(coverUrl)
+        if (coverFile.exists()) {
+            val bitmap = BitmapFactory.decodeFile(coverFile.absolutePath)
+            barCoverImageReference!!.get()!!.setImageBitmap(bitmap)
+            setSongMetadata(artist, title, bitmap, mediaPlayer.duration.toLong())
+        }else{
+            setSongMetadata(artist, title, null, mediaPlayer.duration.toLong())
+        }
 
-       // showNotification(title, artist, coverUrl, true)
+        showNotification(title, artist, coverUrl, true)
         playButtonReference!!.get()!!.setImageDrawable(
             contextReference!!.get()!!.resources.getDrawable(
                 R.drawable.ic_pause_white_24dp
@@ -329,16 +333,18 @@ private fun stop() {
 
 fun pause() {
     val context = contextReference!!.get()!!
+    val settings = Settings(context)
+    val primaryResolution = settings.getSetting("primaryCoverResolution")
 
     try {
         val song = playList[currentSong]
 
         val title = song.title
         val artist = song.artist
-      //  val coverUrl = song.coverLocation
+        val coverUrl = context.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
 
         mediaPlayer.pause()
-        //showNotification(title, artist, coverUrl, false)
+        showNotification(title, artist, coverUrl, false)
         playButtonReference!!.get()!!.setImageDrawable(context.resources.getDrawable(R.drawable.ic_play_arrow_white_24dp))
         playing = false
         paused = true
@@ -349,13 +355,15 @@ fun pause() {
 
 fun resume() {
     val context = contextReference!!.get()!!
+    val settings = Settings(context)
+    val primaryResolution = settings.getSetting("primaryCoverResolution")
 
     try {
         val song = playList[currentSong]
 
         val title = song.title
         val artist = song.artist
-       // val coverUrl = song.coverLocation
+        val coverUrl = context.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
 
         val length = mediaPlayer.currentPosition
 
@@ -368,7 +376,7 @@ fun resume() {
             play()
         }
 
-       // showNotification(title, artist, coverUrl, true)
+        showNotification(title, artist, coverUrl, true)
         playButtonReference!!.get()!!.setImageDrawable(context.resources.getDrawable(R.drawable.ic_pause_white_24dp))
         playing = true
     } catch (e: IndexOutOfBoundsException) {

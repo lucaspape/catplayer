@@ -23,6 +23,7 @@ class Song() {
                     ")"
     }
 
+    //stored in SQL
     var id: Int = 0
     var songId: String = ""
     var title: String = ""
@@ -30,6 +31,9 @@ class Song() {
     var albumId = ""
     var artist: String = ""
     var coverUrl:String = ""
+
+    var downloadLocation:String = ""
+    var streamLocation:String = ""
 
     constructor(id: Int, songId:String, title: String, version:String, albumId:String, artist: String, coverUrl:String) : this(){
         this.id = id
@@ -39,5 +43,13 @@ class Song() {
         this.albumId = albumId
         this.artist = artist
         this.coverUrl = coverUrl
+    }
+
+    fun getUrl():String{
+        return if(downloadLocation != ""){
+            downloadLocation
+        }else{
+            streamLocation
+        }
     }
 }

@@ -130,7 +130,7 @@ class HomeHandler {
                 loadAlbum(view, itemValue, false)
             } else {
                 val itemValue = musicList.getItemAtPosition(position) as HashMap<String, Any?>
-                playSong(itemValue, true, view.context)
+                playSong(itemValue["id"] as String, true, view.context)
             }
         }
 
@@ -624,30 +624,34 @@ class HomeHandler {
         }
     }
 
-    fun playSong(song: HashMap<String, Any?>, playNow: Boolean, context: Context) {
+    fun playSong(songId:String, playNow: Boolean, context: Context) {
         val settings = Settings(context)
         val downloadType = settings.getSetting("downloadType")
 
-        //check if song is already downloaded
-        val songDownloadLocation =
-            context.filesDir.toString() + "/" + song["artist"] + song["title"] + song["version"] + "." + downloadType
+        val songDatabaseHelper = SongDatabaseHelper(context)
+        val song = songDatabaseHelper.getSong(songId)
 
-        if (File(songDownloadLocation).exists()) {
-            song["songDownloadLocation"] = songDownloadLocation
-            if (playNow) {
-               // playNow(Song(song))
+        if(song != null){
+            //check if song is already downloaded
+            val songDownloadLocation =
+                context.filesDir.toString() + "/" + song.artist + song.title + song.version + "." + downloadType
+
+            if (File(songDownloadLocation).exists()) {
+                song.downloadLocation = songDownloadLocation
+                        if (playNow) {
+                            playNow(song)
+                        } else {
+                            addSong(song)
+                        }
+
             } else {
-               // addSong(Song(song))
-            }
-
-        } else {
-            //check if song can be streamed
-          //  if (song["streamable"] as Boolean) {
+                //check if song can be streamed
+                //  if (song["streamable"] as Boolean) {
                 val streamHashQueue = Volley.newRequestQueue(context)
 
                 //get stream hash
                 val streamHashUrl =
-                    context.getString(R.string.loadSongsUrl) + "?albumId=" + song["albumId"]
+                    context.getString(R.string.loadSongsUrl) + "?albumId=" + song.albumId
 
                 val hashRequest = object : StringRequest(Method.GET, streamHashUrl,
                     Response.Listener { response ->
@@ -657,12 +661,12 @@ class HomeHandler {
                         val streamHash = jsonParser.parseObjectToStreamHash(jsonObject, song)
 
                         if (streamHash != null) {
-                            song["songStreamLocation"] =
+                            song.streamLocation =
                                 context.getString(R.string.songStreamUrl) + streamHash
                             if (playNow) {
-                              //  playNow(Song(song))
+                                  playNow(song)
                             } else {
-                              //  addSong(Song(song))
+                                  addSong(song)
                             }
                         } else {
                             //could not find song
@@ -681,10 +685,15 @@ class HomeHandler {
                 }
 
                 streamHashQueue.add(hashRequest)
-          //  } else {
+                //  } else {
                 //fu no song for u
-          //  }
+                //  }
+            }
         }
+
+
+
+
     }
 
     fun downloadSong(song: HashMap<String, Any?>, context: Context) {
