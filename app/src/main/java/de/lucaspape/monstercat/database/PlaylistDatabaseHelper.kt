@@ -6,6 +6,7 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
+import java.lang.IllegalStateException
 import java.lang.IndexOutOfBoundsException
 
 class PlaylistDatabaseHelper (context:Context): SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION){
@@ -68,13 +69,15 @@ class PlaylistDatabaseHelper (context:Context): SQLiteOpenHelper(context, DATABA
             cursor = db.query(Playlist.TABLE_NAME, arrayOf(
                 Playlist.COLUMN_ID,
                 Playlist.COLUMN_PLAYLIST_ID,
-                Playlist.COLUMN_NAME),
-                Song.COLUMN_SONG_ID + "=?",
+                Playlist.COLUMN_NAME,
+                Playlist.COLUMN_TRACK_COUNT),
+                Playlist.COLUMN_PLAYLIST_ID + "=?",
                 arrayOf(playlistId), null, null, null, null)
 
             cursor?.moveToFirst()
 
             try {
+
                 val playlist = Playlist(cursor.getInt(cursor.getColumnIndex(Playlist.COLUMN_ID)),
                     cursor.getString(cursor.getColumnIndex(Playlist.COLUMN_PLAYLIST_ID)),
                     cursor.getString(cursor.getColumnIndex(Playlist.COLUMN_NAME)),

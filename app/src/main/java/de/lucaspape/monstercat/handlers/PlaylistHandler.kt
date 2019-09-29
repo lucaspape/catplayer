@@ -17,7 +17,12 @@ import de.lucaspape.monstercat.MainActivity
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.sid
 import de.lucaspape.monstercat.auth.loggedIn
+import de.lucaspape.monstercat.database.PlaylistDataDatabaseHelper
 import de.lucaspape.monstercat.database.PlaylistDatabaseHelper
+import de.lucaspape.monstercat.database.Song
+import de.lucaspape.monstercat.database.SongDatabaseHelper
+import de.lucaspape.monstercat.music.addSong
+import de.lucaspape.monstercat.music.playNow
 import de.lucaspape.monstercat.settings.Settings
 import org.json.JSONObject
 import java.io.*
@@ -180,14 +185,14 @@ class PlaylistHandler {
         swipeRefreshLayout.isRefreshing = true
 
         if (isPlaylist) {
-            if (!force) {
+           // if (!force) {
                 //currentListData = playlistTrackCache
-                isPlaylist = false
-                updateListView(view, false)
-                redrawListView(view)
-                swipeRefreshLayout.isRefreshing = false
-                return
-            }
+            //    isPlaylist = false
+            //    updateListView(view, false)
+            //    redrawListView(view)
+            //    swipeRefreshLayout.isRefreshing = false
+            //    return
+          //  }
         }
 
         var finishedRequests = 0
@@ -197,7 +202,7 @@ class PlaylistHandler {
 
         val playlistTrackRequestQueue = Volley.newRequestQueue(view.context)
 
-        val tempList = arrayOfNulls<HashMap<String, Any?>>(currentPlaylist["trackCount"] as Int)
+        val tempList = arrayOfNulls<Long>(currentPlaylist["trackCount"] as Int)
 
         playlistTrackRequestQueue.addRequestFinishedListener<Any> {
             finishedRequests++
@@ -205,11 +210,19 @@ class PlaylistHandler {
             if (finishedRequests >= totalRequestsCount) {
                 val sortedList = ArrayList<HashMap<String, Any?>>()
 
-                for (i in tempList.indices) {
-                    if (tempList[i] != null) {
-                        if (tempList.isNotEmpty()) {
-                            sortedList.add(tempList[i]!!)
-                        }
+                val playlistDataDatabaseHelper = PlaylistDataDatabaseHelper(view.context, currentPlaylist["playlistId"] as String)
+
+                val playlistDatas = playlistDataDatabaseHelper.getAllData()
+
+                val songDatabaseHelper = SongDatabaseHelper(view.context)
+
+                val jsonParser = JSONParser()
+
+                for(playlistData in playlistDatas){
+                    val song = songDatabaseHelper.getSong(playlistData.songId)
+                    if(song != null){
+                        val hashMap = jsonParser.parseSongToHashMap(view.context, song)
+                        sortedList.add(hashMap)
                     }
                 }
 
@@ -241,10 +254,12 @@ class PlaylistHandler {
                         val playlistObject = jsonArray.getJSONObject(k)
 
                         val jsonParser = JSONParser()
-                        val trackHashMap = jsonParser.parsePlaylistTracksToHashMap(playlistObject, view.context)
 
-                        if (trackHashMap != null) {
-                            tempList[i * 50 + k] = trackHashMap
+                      //  val trackHashMap = jsonParser.parsePlaylistTracksToHashMap(playlistObject, view.context)
+
+                        val id = jsonParser.parsePlaylistTrackToDB(currentPlaylist["playlistId"] as String, playlistObject, view.context)
+                        if (id != null) {
+                            tempList[i * 50 + k] = id
                         }
                     }
                 },
@@ -281,24 +296,27 @@ class PlaylistHandler {
         val downloadLocation =
             context.filesDir.toString() + "/" + artist + title + version + "." + downloadType
 
-        if (File(downloadLocation).exists()) {
-            itemValue["songDownloadLocation"] = downloadLocation
-            if (playAfter) {
-           //     addSong(Song(itemValue))
-            } else {
-          //      playNow(Song(itemValue))
-            }
+        val songDatabaseHelper = SongDatabaseHelper(context)
+        val song = songDatabaseHelper.getSong(itemValue["id"] as String)
 
-        } else {
-            if (itemValue["streamable"] as Boolean) {
-
-                itemValue["songStreamLocation"] = context.getString(R.string.songStreamUrl) + itemValue["streamHash"]
-
+        if(song != null){
+            if (File(downloadLocation).exists()) {
+                song.downloadLocation = downloadLocation
                 if (playAfter) {
-                 //   addSong(Song(itemValue))
+                    addSong(song)
                 } else {
-                 //   playNow(Song(itemValue))
+                    playNow(song)
                 }
+
+            } else {
+
+                    song.streamLocation = context.getString(R.string.songStreamUrl) + itemValue["streamHash"]
+                    if (playAfter) {
+                        addSong(song)
+                    } else {
+                        playNow(song)
+                    }
+
             }
         }
     }

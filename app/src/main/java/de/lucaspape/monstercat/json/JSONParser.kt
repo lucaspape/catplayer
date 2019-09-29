@@ -157,6 +157,7 @@ class JSONParser {
 
         val databaseHelper = PlaylistDatabaseHelper(context)
         return if(databaseHelper.getPlaylist(playlistId) == null){
+            println("Playlist does not exist!")
             databaseHelper.insertPlaylist(playlistId, playlistName, playlistTrackCount)
         }else{
             databaseHelper.getPlaylist(playlistId)!!.id.toLong()
@@ -211,6 +212,41 @@ class JSONParser {
 
             return trackHashMap
         } else {
+            return null
+        }
+    }
+
+    fun parsePlaylistTrackToDB(playlistId:String, jsonObject: JSONObject, context: Context):Long?{
+        val title = jsonObject.getString("title")
+
+        if (title != "null") {
+            var version = jsonObject.getString("version")
+            val artist = jsonObject.getString("artistsTitle")
+            val coverUrl = jsonObject.getJSONObject("release").getString("coverUrl")
+            val id = jsonObject.getString("_id")
+            val albumId = jsonObject.getJSONObject("albums").getString("albumId")
+            val streamHash = jsonObject.getJSONObject("albums").getString("streamHash")
+
+            if (version == "null") {
+                version = ""
+            }
+
+            val song = Song()
+            song.title = title
+            song.artist = artist
+            song.coverUrl = coverUrl
+            song.version = version
+            song.albumId = albumId
+            song.songId = id
+            song.streamLocation = context.getString(R.string.songStreamUrl) + streamHash
+
+            val databaseHelper = PlaylistDataDatabaseHelper(context, playlistId)
+            return if(databaseHelper.getPlaylistData(id) == null){
+                databaseHelper.insertSongId(id)
+            }else{
+                databaseHelper.getPlaylistData(id)!!.id.toLong()
+            }
+        }else{
             return null
         }
     }
