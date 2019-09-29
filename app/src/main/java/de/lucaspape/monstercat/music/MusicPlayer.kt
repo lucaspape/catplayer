@@ -76,15 +76,18 @@ fun createMediaSession(context:WeakReference<Context>){
     mediaSession = MediaSession(context.get()!!, "de.lucaspape.monstercat.music")
 
     val intentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
-   // context.get()!!.registerReceiver(NoisyReceiver(), intentFilter)
+
 
     mediaSession!!.setCallback(object: MediaSession.Callback(){
 
         override fun onPause() {
+            context.get()!!.unregisterReceiver(NoisyReceiver())
             pause()
         }
 
         override fun onPlay() {
+            context.get()!!.registerReceiver(NoisyReceiver(), intentFilter)
+
             if(paused){
                 resume()
             }else{
@@ -101,6 +104,7 @@ fun createMediaSession(context:WeakReference<Context>){
         }
 
         override fun onStop() {
+            context.get()!!.unregisterReceiver(NoisyReceiver())
             stop()
         }
 
