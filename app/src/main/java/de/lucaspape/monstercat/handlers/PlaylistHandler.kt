@@ -18,7 +18,6 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.sid
 import de.lucaspape.monstercat.auth.loggedIn
 import de.lucaspape.monstercat.cache.Cache
-import de.lucaspape.monstercat.music.Song
 import de.lucaspape.monstercat.music.addSong
 import de.lucaspape.monstercat.music.playNow
 import de.lucaspape.monstercat.settings.Settings
@@ -279,9 +278,9 @@ class PlaylistHandler {
         if (File(downloadLocation).exists()) {
             itemValue["songDownloadLocation"] = downloadLocation
             if (playAfter) {
-                addSong(Song(itemValue))
+           //     addSong(Song(itemValue))
             } else {
-                playNow(Song(itemValue))
+          //      playNow(Song(itemValue))
             }
 
         } else {
@@ -290,9 +289,9 @@ class PlaylistHandler {
                 itemValue["songStreamLocation"] = context.getString(R.string.songStreamUrl) + itemValue["streamHash"]
 
                 if (playAfter) {
-                    addSong(Song(itemValue))
+                 //   addSong(Song(itemValue))
                 } else {
-                    playNow(Song(itemValue))
+                 //   playNow(Song(itemValue))
                 }
             }
         }

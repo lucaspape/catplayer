@@ -2,7 +2,8 @@ package de.lucaspape.monstercat.json
 
 import android.content.Context
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.database.DatabaseHelper
+import de.lucaspape.monstercat.database.AlbumDatabaseHelper
+import de.lucaspape.monstercat.database.SongDatabaseHelper
 import de.lucaspape.monstercat.settings.Settings
 import org.json.JSONArray
 import org.json.JSONObject
@@ -69,7 +70,7 @@ class JSONParser {
         return hashMap
     }
 
-    fun parseCatalogSongsToDB(jsonObject: JSONObject, context: Context):Long{
+    fun parseCatalogSongToDB(jsonObject: JSONObject, context: Context):Long{
         val settings = Settings(context)
 
         val primaryResolution = settings.getSetting("primaryCoverResolution")
@@ -100,11 +101,16 @@ class JSONParser {
             version = ""
         }
 
-        val databaseHelper = DatabaseHelper(context)
-        val dbId = databaseHelper.insertSong(id, title, version, albumId, artist, coverUrl)
-        return dbId
+        val databaseHelper = SongDatabaseHelper(context)
+        if(databaseHelper.getSong(id) == null){
+            val dbId = databaseHelper.insertSong(id, title, version, albumId, artist, coverUrl)
+            return dbId
+        }else{
+            return databaseHelper.getSong(id)!!.id.toLong()
+        }
 
     }
+
 
     fun parseAlbumViewToHashMap(jsonObject: JSONObject, context: Context): HashMap<String, Any?>{
         val settings = Settings(context)
@@ -127,6 +133,33 @@ class JSONParser {
             context.filesDir.toString() + "/" + jsonObject.getString("_id") + ".png" + secondaryResolution.toString()
 
         return hashMap
+    }
+
+    fun parseAlbumToDB(jsonObject: JSONObject, context: Context): Long{
+        val settings = Settings(context)
+        val primaryResolution = settings.getSetting("primaryCoverResolution")
+        val secondaryResolution = settings.getSetting("secondaryCoverResolution")
+
+        val id = jsonObject.getString("_id")
+        val title = jsonObject.getString("title")
+        val artist = jsonObject.getString("renderedArtists")
+        val coverUrl= jsonObject.getString("coverUrl")
+        val coverLocation = context.filesDir.toString() + "/" + jsonObject.getString("_id") + ".png"
+        val primaryRes = primaryResolution
+        val secondaryRes = secondaryResolution
+        val primaryImage =
+            context.filesDir.toString() + "/" + jsonObject.getString("_id") + ".png" + primaryResolution.toString()
+
+        val secondaryImage =
+            context.filesDir.toString() + "/" + jsonObject.getString("_id") + ".png" + secondaryResolution.toString()
+
+        val databaseHelper = AlbumDatabaseHelper(context)
+        if(databaseHelper.getAlbum(id) == null){
+            val dbId = databaseHelper.insertAlbum(id, title, artist, coverUrl)
+            return dbId
+        }else{
+            return databaseHelper.getAlbum(id)!!.id.toLong()
+        }
     }
 
     fun parseObjectToStreamHash(jsonObject: JSONObject, song: HashMap<String, Any?>): String? {

@@ -2,7 +2,6 @@ package de.lucaspape.monstercat
 
 import android.Manifest
 import android.app.AlertDialog
-import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.SpannableString
@@ -15,8 +14,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import de.lucaspape.monstercat.auth.Auth
 import de.lucaspape.monstercat.cache.Cache
-import de.lucaspape.monstercat.database.DatabaseHelper
-import de.lucaspape.monstercat.database.SongListView
 import de.lucaspape.monstercat.download.DownloadHandler
 import de.lucaspape.monstercat.download.DownloadTask
 import de.lucaspape.monstercat.fragments.HomeFragment

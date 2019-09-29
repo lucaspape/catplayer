@@ -1,8 +1,8 @@
 package de.lucaspape.monstercat.database
 
-class SongListView() {
+class Song() {
     companion object{
-        @JvmStatic val TABLE_NAME = "songlistview"
+        @JvmStatic val TABLE_NAME = "Song"
         @JvmStatic val COLUMN_ID = "id"
         @JvmStatic val COLUMN_SONG_ID = "songid"
         @JvmStatic val COLUMN_TITLE = "title"

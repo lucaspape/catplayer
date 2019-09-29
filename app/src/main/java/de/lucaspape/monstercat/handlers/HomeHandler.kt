@@ -16,7 +16,7 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.sid
 import de.lucaspape.monstercat.auth.loggedIn
 import de.lucaspape.monstercat.cache.Cache
-import de.lucaspape.monstercat.database.DatabaseHelper
+import de.lucaspape.monstercat.database.*
 import de.lucaspape.monstercat.json.JSONParser
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.settings.Settings
@@ -191,19 +191,22 @@ class HomeHandler {
     private fun loadAlbum(view: View, itemValue: HashMap<String, Any?>, forceReload: Boolean) {
         val albumId = itemValue["id"] as String
 
+        val settings = Settings(view.context)
+
+        val primaryResolution = settings.getSetting("primaryCoverResolution")
+        val secondaryResolution = settings.getSetting("secondaryCoverResolution")
+
         val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
         swipeRefreshLayout.isRefreshing = true
 
         val requestQueue = Volley.newRequestQueue(view.context)
 
         //used to sort list
-        val tempList = ArrayList<HashMap<String, Any?>>()
+        val tempList = ArrayList<Long>()
 
-        val cache = Cache("homeCache", view.context)
-        val albumCache = cache.load(albumId)
 
-        if(albumCache != null && !forceReload){
-            currentListViewData = albumCache as ArrayList<HashMap<String, Any?>>
+        if(forceReload){
+           // currentListViewData = albumCache as ArrayList<HashMap<String, Any?>>
             albumView = false
 
             updateListView(view)
@@ -215,10 +218,31 @@ class HomeHandler {
             MainActivity.downloadHandler!!.addCoverArray(currentListViewData)
         }else{
             requestQueue.addRequestFinishedListener<Any> {
-                cache.save(albumId, tempList)
+
+                val dbSongs = ArrayList<HashMap<String, Any?>>()
+
+                val songDatabaseHelper = SongDatabaseHelper(view.context)
+                val songList = songDatabaseHelper.getAlbumSongs(albumId)
+
+                for(song in songList){
+                    val listHashMap = HashMap<String, Any?>()
+                    listHashMap["title"] = song.title
+                    listHashMap["version"] = song.version
+                    listHashMap["id"] = song.songId
+                    listHashMap["albumId"] = song.albumId
+                    listHashMap["artist"] = song.artist
+                    listHashMap["shownTitle"] = song.title + song.version
+                    listHashMap["coverUrl"] = song.coverUrl
+                    listHashMap["coverLocation"] = view.context.filesDir.toString() + "/" + song.albumId + ".png"
+                    listHashMap["primaryRes"] = primaryResolution
+                    listHashMap["secondaryRes"] = secondaryResolution
+                    listHashMap["primaryImage"] = view.context.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution.toString()
+                    listHashMap["secondaryImage"] = view.context.filesDir.toString() + "/" + song.albumId + ".png" + secondaryResolution.toString()
+                    dbSongs.add(listHashMap)
+                }
 
                 //display list
-                currentListViewData = tempList
+                currentListViewData = dbSongs
                 albumView = false
 
                 updateListView(view)
@@ -241,13 +265,13 @@ class HomeHandler {
                     //parse every single song into list
                     for (k in (0 until jsonArray.length())) {
                         val jsonParser = JSONParser()
-                        val hashMap =
-                            jsonParser.parseCatalogSongsToHashMap(
+                        val songId =
+                            jsonParser.parseCatalogSongToDB(
                                 jsonArray.getJSONObject(k),
                                 view.context
                             )
 
-                        tempList.add(hashMap)
+                        tempList.add(songId)
                     }
 
                 }, Response.ErrorListener { }
@@ -315,12 +339,39 @@ class HomeHandler {
         val primaryResolution = settings.getSetting("primaryCoverResolution")
         val secondaryResolution = settings.getSetting("secondaryCoverResolution")
 
-        val cache = Cache("homeCache", view.context)
-        val loadedCache = cache.load("listView")
-        println(loadedCache)
+        if (!forceReload) {
+            val dbSongs = ArrayList<HashMap<String, Any?>>()
 
-        if (loadedCache != null && !forceReload) {
-            currentListViewData = loadedCache as ArrayList<HashMap<String, Any?>>
+            val catalogSongsDatabaseHelper = CatalogSongsDatabaseHelper(view.context)
+
+            val songIdList = catalogSongsDatabaseHelper.getAllSongs()
+            val songDatabaseHelper = SongDatabaseHelper(view.context)
+            val songList = ArrayList<Song>()
+
+            for(song in songIdList){
+                songList.add(songDatabaseHelper.getSong(song.songId))
+            }
+
+            for(song in songList){
+                val listHashMap = HashMap<String, Any?>()
+                listHashMap["title"] = song.title
+                listHashMap["version"] = song.version
+                listHashMap["id"] = song.songId
+                listHashMap["albumId"] = song.albumId
+                listHashMap["artist"] = song.artist
+                listHashMap["shownTitle"] = song.title + song.version
+                listHashMap["coverUrl"] = song.coverUrl
+                listHashMap["coverLocation"] = view.context.filesDir.toString() + "/" + song.albumId + ".png"
+                listHashMap["primaryRes"] = primaryResolution
+                listHashMap["secondaryRes"] = secondaryResolution
+                listHashMap["primaryImage"] = view.context.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution.toString()
+                listHashMap["secondaryImage"] = view.context.filesDir.toString() + "/" + song.albumId + ".png" + secondaryResolution.toString()
+                dbSongs.add(listHashMap)
+            }
+
+            //display list
+            currentListViewData = dbSongs
+
             updateListView(view)
             redrawListView(view)
 
@@ -337,6 +388,8 @@ class HomeHandler {
             var finishedRequests = 0
             var totalRequestsCount = 0
 
+            val sortedList = arrayOfNulls<Long>(loadMax)
+
             val requests = ArrayList<StringRequest>()
 
             requestQueue.addRequestFinishedListener<Any> {
@@ -344,11 +397,25 @@ class HomeHandler {
 
                 //check if all done
                 if (finishedRequests >= totalRequestsCount) {
-
-                    val databaseHelper = DatabaseHelper(view.context)
-                    val songList = databaseHelper.getAllSongs()
-
                     val dbSongs = ArrayList<HashMap<String, Any?>>()
+
+                    val catalogSongsDatabaseHelper = CatalogSongsDatabaseHelper(view.context)
+
+                    for(i in sortedList){
+                        if(i != null){
+                            if(catalogSongsDatabaseHelper.getCatalogSong(i) == null){
+                                catalogSongsDatabaseHelper.insertSong(i)
+                            }
+                        }
+                    }
+
+                    val songIdList = catalogSongsDatabaseHelper.getAllSongs()
+                    val songDatabaseHelper = SongDatabaseHelper(view.context)
+                    val songList = ArrayList<Song>()
+
+                    for(song in songIdList){
+                        songList.add(songDatabaseHelper.getSong(song.songId))
+                    }
 
                     for(song in songList){
                         val listHashMap = HashMap<String, Any?>()
@@ -374,9 +441,6 @@ class HomeHandler {
 
                     swipeRefreshLayout.isRefreshing = false
 
-                    //save to cache
-                    cache.save("listView", currentListViewData)
-
                     //download cover art
                     MainActivity.downloadHandler!!.addCoverArray(currentListViewData)
                 }else{
@@ -397,8 +461,10 @@ class HomeHandler {
                         for (k in (0 until jsonArray.length())) {
                             val jsonParser = JSONParser()
 
-                            val dbId = jsonParser.parseCatalogSongsToDB(jsonArray.getJSONObject(k), view.context)
+                            val dbId = jsonParser.parseCatalogSongToDB(jsonArray.getJSONObject(k), view.context)
                             dbIds.add(dbId)
+
+                            sortedList[i * 50 + k] = dbId
                         }
 
                     }, Response.ErrorListener { }
@@ -427,15 +493,39 @@ class HomeHandler {
         val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
         swipeRefreshLayout.isRefreshing = true
 
+        val settings = Settings(view.context)
+
+        val primaryResolution = settings.getSetting("primaryCoverResolution")
+        val secondaryResolution = settings.getSetting("secondaryCoverResolution")
+
         val requestQueue = Volley.newRequestQueue(view.context)
 
-        val tempList = arrayOfNulls<HashMap<String, Any?>>(loadMax)
+        val tempList = arrayOfNulls<Long>(loadMax)
 
-        val cache = Cache("homeCache", view.context)
-        val loadedCache = cache.load("albumListView") as ArrayList<HashMap<String,Any?>>?
+        if(!forceReload){
 
-        if(loadedCache != null && !forceReload){
-            currentListViewData = loadedCache as ArrayList<HashMap<String, Any?>>
+            val albumDatabaseHelper = AlbumDatabaseHelper(view.context)
+            val albumList = albumDatabaseHelper.getAllAlbums()
+
+            val sortedList = ArrayList<HashMap<String, Any?>>()
+
+            for(album in albumList){
+                val listHashMap = HashMap<String, Any?>()
+                listHashMap["title"] = album.title
+                listHashMap["id"] = album.albumId
+                listHashMap["artist"] = album.artist
+                listHashMap["coverUrl"] = album.coverUrl
+                listHashMap["coverLocation"] = view.context.filesDir.toString() + "/" + album.albumId + ".png"
+                listHashMap["primaryRes"] = primaryResolution
+                listHashMap["secondaryRes"] = secondaryResolution
+                listHashMap["primaryImage"] = view.context.filesDir.toString() + "/" + album.albumId + ".png" + primaryResolution.toString()
+                listHashMap["secondaryImage"] = view.context.filesDir.toString() + "/" + album.albumId + ".png" + secondaryResolution.toString()
+
+                sortedList.add(listHashMap)
+            }
+
+            currentListViewData = sortedList
+
             updateListView(view)
             redrawListView(view)
 
@@ -455,18 +545,32 @@ class HomeHandler {
 
                 //check if all done
                 if (finishedRequests >= totalRequestsCount) {
+                    val albumList = ArrayList<Album>()
+                    val albumDatabaseHelper = AlbumDatabaseHelper(view.context)
 
-                    val sortedList = ArrayList<HashMap<String, Any?>>()
-
-                    for (i in tempList.indices) {
-                        if (tempList[i] != null) {
-                            if (tempList.isNotEmpty()) {
-                                sortedList.add(tempList[i]!!)
-                            }
+                    for(i in tempList){
+                        if(i != null){
+                            albumList.add(albumDatabaseHelper.getAlbum(i))
                         }
                     }
 
-                    cache.save("albumListView", sortedList)
+                    val sortedList = ArrayList<HashMap<String, Any?>>()
+
+                    for(album in albumList){
+
+                        val listHashMap = HashMap<String, Any?>()
+                        listHashMap["title"] = album.title
+                        listHashMap["id"] = album.albumId
+                        listHashMap["artist"] = album.artist
+                        listHashMap["coverUrl"] = album.coverUrl
+                        listHashMap["coverLocation"] = view.context.filesDir.toString() + "/" + album.albumId + ".png"
+                        listHashMap["primaryRes"] = primaryResolution
+                        listHashMap["secondaryRes"] = secondaryResolution
+                        listHashMap["primaryImage"] = view.context.filesDir.toString() + "/" + album.albumId + ".png" + primaryResolution.toString()
+                        listHashMap["secondaryImage"] = view.context.filesDir.toString() + "/" + album.albumId + ".png" + secondaryResolution.toString()
+
+                        sortedList.add(listHashMap)
+                    }
 
                     currentListViewData = sortedList
                     updateListView(view)
@@ -495,8 +599,7 @@ class HomeHandler {
                             val jsonObject = jsonArray.getJSONObject(k)
 
                             val jsonParser = JSONParser()
-
-                            tempList[i * 50 + k] = (jsonParser.parseAlbumViewToHashMap(jsonObject, view.context))
+                            tempList[i * 50 + k] = jsonParser.parseAlbumToDB(jsonObject, view.context)
                         }
                     },
                     Response.ErrorListener { }
@@ -532,9 +635,9 @@ class HomeHandler {
         if (File(songDownloadLocation).exists()) {
             song["songDownloadLocation"] = songDownloadLocation
             if (playNow) {
-                playNow(Song(song))
+               // playNow(Song(song))
             } else {
-                addSong(Song(song))
+               // addSong(Song(song))
             }
 
         } else {
@@ -557,9 +660,9 @@ class HomeHandler {
                             song["songStreamLocation"] =
                                 context.getString(R.string.songStreamUrl) + streamHash
                             if (playNow) {
-                                playNow(Song(song))
+                              //  playNow(Song(song))
                             } else {
-                                addSong(Song(song))
+                              //  addSong(Song(song))
                             }
                         } else {
                             //could not find song
