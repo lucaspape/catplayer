@@ -2,10 +2,7 @@ package de.lucaspape.monstercat.json
 
 import android.content.Context
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.database.Album
-import de.lucaspape.monstercat.database.AlbumDatabaseHelper
-import de.lucaspape.monstercat.database.Song
-import de.lucaspape.monstercat.database.SongDatabaseHelper
+import de.lucaspape.monstercat.database.*
 import de.lucaspape.monstercat.settings.Settings
 import org.json.JSONArray
 import org.json.JSONObject
@@ -139,22 +136,31 @@ class JSONParser {
         return patchedArray
     }
 
-    fun parsePlaylistToHashMap(jsonObject: JSONObject): HashMap<String, Any?> {
+    fun parsePlaylistToHashMap(playlist: Playlist): HashMap<String, Any?> {
+        val playlistHashMap = HashMap<String, Any?>()
+        playlistHashMap["playlistName"] = playlist.playlistName
+        playlistHashMap["coverUrl"] = ""
+        playlistHashMap["titles"] = null
+        playlistHashMap["playlistId"] = playlist.playlistId
+        playlistHashMap["type"] = "playlist"
+        playlistHashMap["trackCount"] = playlist.trackCount
+
+        return playlistHashMap
+    }
+
+    fun parsePlaylistToDB(context: Context, jsonObject: JSONObject):Long{
+        val tracks = jsonObject.getJSONArray("tracks").toString()
+
         val playlistName = jsonObject.getString("name") as String
         val playlistId = jsonObject.getString("_id") as String
         val playlistTrackCount = jsonObject.getJSONArray("tracks").length()
 
-        val tracks = jsonObject.getJSONArray("tracks").toString()
-
-        val playlistHashMap = HashMap<String, Any?>()
-        playlistHashMap["playlistName"] = playlistName
-        playlistHashMap["coverUrl"] = ""
-        playlistHashMap["titles"] = tracks
-        playlistHashMap["playlistId"] = playlistId
-        playlistHashMap["type"] = "playlist"
-        playlistHashMap["trackCount"] = playlistTrackCount
-
-        return playlistHashMap
+        val databaseHelper = PlaylistDatabaseHelper(context)
+        return if(databaseHelper.getPlaylist(playlistId) == null){
+            databaseHelper.insertPlaylist(playlistId, playlistName, playlistTrackCount)
+        }else{
+            databaseHelper.getPlaylist(playlistId)!!.id.toLong()
+        }
     }
 
     fun parsePlaylistTracksToHashMap(jsonObject: JSONObject, context: Context): HashMap<String, Any?>? {

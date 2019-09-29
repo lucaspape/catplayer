@@ -17,6 +17,7 @@ import de.lucaspape.monstercat.MainActivity
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.sid
 import de.lucaspape.monstercat.auth.loggedIn
+import de.lucaspape.monstercat.database.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.settings.Settings
 import org.json.JSONObject
 import java.io.*
@@ -106,7 +107,18 @@ class PlaylistHandler {
         swipeRefreshLayout.isRefreshing = true
 
         if (!force) {
-           // currentListData = playlistViewCache
+            val jsonParser = JSONParser()
+            val playlistDatabaseHelper = PlaylistDatabaseHelper(view.context)
+            val playlists = playlistDatabaseHelper.getAllPlaylists()
+
+            val playlistHashMaps = ArrayList<HashMap<String, Any?>>()
+
+            for(playlist in playlists){
+                playlistHashMaps.add(jsonParser.parsePlaylistToHashMap(playlist))
+            }
+
+            currentListData = playlistHashMaps
+
             updateListView(view, true)
             redrawListView(view)
             swipeRefreshLayout.isRefreshing = false
@@ -121,15 +133,24 @@ class PlaylistHandler {
                     val jsonObject = JSONObject(response)
                     val jsonArray = jsonObject.getJSONArray("results")
 
-                    val list = ArrayList<HashMap<String, Any?>>()
+                    val list = ArrayList<Long>()
 
                     val jsonParser = JSONParser()
 
                     for (i in (0 until jsonArray.length())) {
-                        list.add(jsonParser.parsePlaylistToHashMap(jsonArray.getJSONObject(i)))
+                        list.add(jsonParser.parsePlaylistToDB(view.context, jsonArray.getJSONObject(i)))
                     }
 
-                    currentListData = list
+                    val playlistDatabaseHelper = PlaylistDatabaseHelper(view.context)
+                    val playlists = playlistDatabaseHelper.getAllPlaylists()
+
+                    val playlistHashMaps = ArrayList<HashMap<String, Any?>>()
+
+                    for(playlist in playlists){
+                        playlistHashMaps.add(jsonParser.parsePlaylistToHashMap(playlist))
+                    }
+
+                    currentListData = playlistHashMaps
                     updateListView(view, true)
                     redrawListView(view)
                 },
