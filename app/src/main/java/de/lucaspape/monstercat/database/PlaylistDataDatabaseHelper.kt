@@ -31,23 +31,7 @@ class PlaylistDataDatabaseHelper (context:Context, var playlistId:String) : SQLi
     fun insertSongId(songId:String):Long{
         val db = writableDatabase
 
-        val c = db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null)
-
-        if (c.moveToFirst()) {
-            while (!c.isAfterLast()) {
-                println(c.getString(0))
-                c.moveToNext()
-            }
-        }
-
-        c.close()
-
-
-
         val playlistData = PlaylistData(playlistId)
-
-
-
         val values = ContentValues()
 
         values.put(PlaylistData.COLUMN_SONG_ID, songId)
