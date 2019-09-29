@@ -33,7 +33,7 @@ class HomeFragment : Fragment() {
         if(HomeHandler.albumViewSelected){
            // homeHandler.loadAlbumList(view, false)
         }else{
-          //  homeHandler.loadSongList(view, false)
+           // homeHandler.loadSongList(view, false)
 
             listView = view.findViewById(R.id.musiclistview)
             registerForContextMenu(listView as ListView)

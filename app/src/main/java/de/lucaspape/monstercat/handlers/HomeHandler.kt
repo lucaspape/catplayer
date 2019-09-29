@@ -204,9 +204,32 @@ class HomeHandler {
         //used to sort list
         val tempList = ArrayList<Long>()
 
+        val songDatabaseHelper = SongDatabaseHelper(view.context)
+        var songList = songDatabaseHelper.getAlbumSongs(albumId)
 
-        if(forceReload){
+        if(!forceReload && songList.isNotEmpty()){
            // currentListViewData = albumCache as ArrayList<HashMap<String, Any?>>
+            val dbSongs = ArrayList<HashMap<String, Any?>>()
+
+            for(song in songList){
+                val listHashMap = HashMap<String, Any?>()
+                listHashMap["title"] = song.title
+                listHashMap["version"] = song.version
+                listHashMap["id"] = song.songId
+                listHashMap["albumId"] = song.albumId
+                listHashMap["artist"] = song.artist
+                listHashMap["shownTitle"] = song.title + song.version
+                listHashMap["coverUrl"] = song.coverUrl
+                listHashMap["coverLocation"] = view.context.filesDir.toString() + "/" + song.albumId + ".png"
+                listHashMap["primaryRes"] = primaryResolution
+                listHashMap["secondaryRes"] = secondaryResolution
+                listHashMap["primaryImage"] = view.context.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution.toString()
+                listHashMap["secondaryImage"] = view.context.filesDir.toString() + "/" + song.albumId + ".png" + secondaryResolution.toString()
+                dbSongs.add(listHashMap)
+            }
+
+            currentListViewData = dbSongs
+
             albumView = false
 
             updateListView(view)
@@ -218,11 +241,8 @@ class HomeHandler {
             MainActivity.downloadHandler!!.addCoverArray(currentListViewData)
         }else{
             requestQueue.addRequestFinishedListener<Any> {
-
                 val dbSongs = ArrayList<HashMap<String, Any?>>()
-
-                val songDatabaseHelper = SongDatabaseHelper(view.context)
-                val songList = songDatabaseHelper.getAlbumSongs(albumId)
+                songList = songDatabaseHelper.getAlbumSongs(albumId)
 
                 for(song in songList){
                     val listHashMap = HashMap<String, Any?>()
@@ -339,12 +359,12 @@ class HomeHandler {
         val primaryResolution = settings.getSetting("primaryCoverResolution")
         val secondaryResolution = settings.getSetting("secondaryCoverResolution")
 
-        if (!forceReload) {
+        val catalogSongsDatabaseHelper = CatalogSongsDatabaseHelper(view.context)
+        var songIdList = catalogSongsDatabaseHelper.getAllSongs()
+
+        if (!forceReload && songIdList.isNotEmpty()) {
             val dbSongs = ArrayList<HashMap<String, Any?>>()
 
-            val catalogSongsDatabaseHelper = CatalogSongsDatabaseHelper(view.context)
-
-            val songIdList = catalogSongsDatabaseHelper.getAllSongs()
             val songDatabaseHelper = SongDatabaseHelper(view.context)
             val songList = ArrayList<Song>()
 
@@ -399,8 +419,6 @@ class HomeHandler {
                 if (finishedRequests >= totalRequestsCount) {
                     val dbSongs = ArrayList<HashMap<String, Any?>>()
 
-                    val catalogSongsDatabaseHelper = CatalogSongsDatabaseHelper(view.context)
-
                     for(i in sortedList){
                         if(i != null){
                             if(catalogSongsDatabaseHelper.getCatalogSong(i) == null){
@@ -409,7 +427,7 @@ class HomeHandler {
                         }
                     }
 
-                    val songIdList = catalogSongsDatabaseHelper.getAllSongs()
+                    songIdList = catalogSongsDatabaseHelper.getAllSongs()
                     val songDatabaseHelper = SongDatabaseHelper(view.context)
                     val songList = ArrayList<Song>()
 
@@ -502,11 +520,10 @@ class HomeHandler {
 
         val tempList = arrayOfNulls<Long>(loadMax)
 
-        if(!forceReload){
+        val albumDatabaseHelper = AlbumDatabaseHelper(view.context)
+        var albumList = albumDatabaseHelper.getAllAlbums()
 
-            val albumDatabaseHelper = AlbumDatabaseHelper(view.context)
-            val albumList = albumDatabaseHelper.getAllAlbums()
-
+        if(!forceReload && albumList.isNotEmpty()){
             val sortedList = ArrayList<HashMap<String, Any?>>()
 
             for(album in albumList){
@@ -545,18 +562,17 @@ class HomeHandler {
 
                 //check if all done
                 if (finishedRequests >= totalRequestsCount) {
-                    val albumList = ArrayList<Album>()
-                    val albumDatabaseHelper = AlbumDatabaseHelper(view.context)
+                    val albums = ArrayList<Album>()
 
                     for(i in tempList){
                         if(i != null){
-                            albumList.add(albumDatabaseHelper.getAlbum(i))
+                            albums.add(albumDatabaseHelper.getAlbum(i))
                         }
                     }
 
                     val sortedList = ArrayList<HashMap<String, Any?>>()
 
-                    for(album in albumList){
+                    for(album in albums){
 
                         val listHashMap = HashMap<String, Any?>()
                         listHashMap["title"] = album.title
@@ -775,7 +791,6 @@ class HomeHandler {
             val alertDialogBuilder = AlertDialog.Builder(context)
             alertDialogBuilder.setTitle(context.getString(R.string.pickPlaylistMsg))
             alertDialogBuilder.setItems(playlistNames) { _, i ->
-                println(playlistNames[i])
                 val playlistPatchUrl = context.getString(R.string.playlistUrl) + playlistIds[i]
                 val patchParams = JSONObject()
 
