@@ -15,6 +15,8 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import de.lucaspape.monstercat.auth.Auth
 import de.lucaspape.monstercat.cache.Cache
+import de.lucaspape.monstercat.database.DatabaseHelper
+import de.lucaspape.monstercat.database.SongListView
 import de.lucaspape.monstercat.download.DownloadHandler
 import de.lucaspape.monstercat.download.DownloadTask
 import de.lucaspape.monstercat.fragments.HomeFragment
@@ -76,6 +78,14 @@ class MainActivity : AppCompatActivity() {
             != PackageManager.PERMISSION_GRANTED) {
             println("Internet permission not granted!")
         }
+
+        val databaseHelper = DatabaseHelper(this)
+      //  val id = databaseHelper.insertSong("Testsong", "Testartist")
+
+        val getSong = databaseHelper.getSong(2)
+        println(getSong.artist)
+        println(getSong.song)
+        println(getSong.id)
 
         createMediaSession(WeakReference(this))
 

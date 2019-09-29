@@ -311,6 +311,7 @@ class HomeHandler {
 
         val cache = Cache("homeCache", view.context)
         val loadedCache = cache.load("listView")
+        println(loadedCache)
 
         if (loadedCache != null && !forceReload) {
             currentListViewData = loadedCache as ArrayList<HashMap<String, Any?>>
@@ -331,7 +332,7 @@ class HomeHandler {
             var finishedRequests = 0
             var totalRequestsCount = 0
 
-            var requests = ArrayList<StringRequest>()
+            val requests = ArrayList<StringRequest>()
 
             requestQueue.addRequestFinishedListener<Any> {
                 finishedRequests++
