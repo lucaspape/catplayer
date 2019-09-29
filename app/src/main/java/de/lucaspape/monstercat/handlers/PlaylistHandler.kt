@@ -17,9 +17,6 @@ import de.lucaspape.monstercat.MainActivity
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.sid
 import de.lucaspape.monstercat.auth.loggedIn
-import de.lucaspape.monstercat.cache.Cache
-import de.lucaspape.monstercat.music.addSong
-import de.lucaspape.monstercat.music.playNow
 import de.lucaspape.monstercat.settings.Settings
 import org.json.JSONObject
 import java.io.*
@@ -108,11 +105,8 @@ class PlaylistHandler {
 
         swipeRefreshLayout.isRefreshing = true
 
-        val cache = Cache("playlistCache", view.context)
-        val playlistViewCache = cache.load("playlistView") as ArrayList<HashMap<String, Any?>>?
-
-        if (playlistViewCache != null && !force) {
-            currentListData = playlistViewCache
+        if (!force) {
+           // currentListData = playlistViewCache
             updateListView(view, true)
             redrawListView(view)
             swipeRefreshLayout.isRefreshing = false
@@ -152,7 +146,6 @@ class PlaylistHandler {
             }
 
             playlistRequestQueue.addRequestFinishedListener<Any> {
-                cache.save("playlistView", currentListData)
                 swipeRefreshLayout.isRefreshing = false
                 isPlaylist = true
             }
@@ -165,14 +158,9 @@ class PlaylistHandler {
         val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
         swipeRefreshLayout.isRefreshing = true
 
-        val cache = Cache("playlistTrackCache", view.context)
-
         if (isPlaylist) {
-            val playlistTrackCache =
-                cache.load(currentPlaylist["playlistId"] as String) as ArrayList<HashMap<String, Any?>>?
-
-            if (playlistTrackCache != null && !force) {
-                currentListData = playlistTrackCache
+            if (!force) {
+                //currentListData = playlistTrackCache
                 isPlaylist = false
                 updateListView(view, false)
                 redrawListView(view)
@@ -211,9 +199,6 @@ class PlaylistHandler {
                 redrawListView(view)
 
                 swipeRefreshLayout.isRefreshing = false
-
-                //save to cache
-                cache.save(currentPlaylist["playlistId"] as String, currentListData)
 
                 //download cover art
                 MainActivity.downloadHandler!!.addCoverArray(currentListData)

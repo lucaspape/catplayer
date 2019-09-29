@@ -7,7 +7,6 @@ import android.widget.ListView
 import androidx.fragment.app.Fragment
 import de.lucaspape.monstercat.handlers.HomeHandler
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.cache.Cache
 
 class HomeFragment : Fragment() {
     private var listView: ListView? = null

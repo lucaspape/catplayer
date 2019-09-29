@@ -15,7 +15,6 @@ import de.lucaspape.monstercat.MainActivity
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.sid
 import de.lucaspape.monstercat.auth.loggedIn
-import de.lucaspape.monstercat.cache.Cache
 import de.lucaspape.monstercat.database.*
 import de.lucaspape.monstercat.json.JSONParser
 import de.lucaspape.monstercat.music.*
@@ -142,8 +141,8 @@ class HomeHandler {
             viewSelector.setSelection(0)
         }
 
-        val cache = Cache("homeCache", view.context)
-        cache.save("albumViewSelected", albumViewSelected)
+        val settings = Settings(view.context)
+        settings.saveSetting("albumViewSelected", albumViewSelected.toString())
 
         viewSelector.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -167,12 +166,12 @@ class HomeHandler {
                     viewSelector.getItemAtPosition(position) == "Catalog View" -> {
                         albumView = false
                         albumViewSelected  = false
-                        cache.save("albumViewSelected", albumViewSelected)
+                        settings.saveSetting("albumViewSelected", albumViewSelected.toString())
                     }
                     viewSelector.getItemAtPosition(position) == "Album View" -> {
                         albumView = true
                         albumViewSelected  = true
-                        cache.save("albumViewSelected", albumViewSelected)
+                        settings.saveSetting("albumViewSelected", albumViewSelected.toString())
                     }
                 }
 

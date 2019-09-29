@@ -13,7 +13,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import de.lucaspape.monstercat.auth.Auth
-import de.lucaspape.monstercat.cache.Cache
 import de.lucaspape.monstercat.download.DownloadHandler
 import de.lucaspape.monstercat.download.DownloadTask
 import de.lucaspape.monstercat.fragments.HomeFragment
@@ -78,13 +77,14 @@ class MainActivity : AppCompatActivity() {
 
         createMediaSession(WeakReference(this))
 
+        val settings = Settings(this)
+
         val auth = Auth()
         auth.login(this)
 
-        val cache = Cache("homeCache", this)
-        val loadedCache = cache.load("albumViewSelected")
-        if(loadedCache != null){
-            HomeHandler.albumViewSelected = loadedCache as Boolean
+
+        if(settings.getSetting("albumViewSelected") != null){
+            HomeHandler.albumViewSelected = settings.getSetting("albumView") == true.toString()
         }
 
         val homeFragment = HomeFragment.newInstance()
@@ -96,7 +96,6 @@ class MainActivity : AppCompatActivity() {
         DownloadTask(weakReference).execute()
 
         //for new privacy policy change version number
-        val settings = Settings(this)
         if(settings.getSetting("privacypolicy") != "1.0"){
             val textView = TextView(this)
             val spannableString = SpannableString(getString(R.string.reviewPrivacyPolicyMsg, getString(R.string.privacypolicyUrl)))
