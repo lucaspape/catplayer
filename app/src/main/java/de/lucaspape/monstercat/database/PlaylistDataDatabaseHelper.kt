@@ -8,44 +8,37 @@ import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
 import java.lang.IndexOutOfBoundsException
 
-class PlaylistDataDatabaseHelper (context:Context, var playlistId:String) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION){
+class PlaylistDataDatabaseHelper (context:Context, var playlistId:String) : SQLiteOpenHelper(context, "playlists_data_db_" + playlistId, null, DATABASE_VERSION){
 
     companion object{
         @JvmStatic private val DATABASE_VERSION = 1
-        @JvmStatic private val DATABASE_NAME = "playlists_data_db"
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        val playlistData = PlaylistData(playlistId)
-
-        db!!.execSQL("DROP TABLE IF EXISTS " + playlistData.TABLE_NAME)
+        db!!.execSQL("DROP TABLE IF EXISTS " + PlaylistData.TABLE_NAME)
         onCreate(db)
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
-        val playlistData = PlaylistData(playlistId)
-        println(playlistData.CREATE_TABLE)
-        db!!.execSQL(playlistData.CREATE_TABLE)
+        db!!.execSQL(PlaylistData.CREATE_TABLE)
     }
 
-    fun insertSongId(songId:String):Long{
+    fun insertSongId(songId:Long):Long{
         val db = writableDatabase
 
-        val playlistData = PlaylistData(playlistId)
         val values = ContentValues()
-
+        
         values.put(PlaylistData.COLUMN_SONG_ID, songId)
 
-        val id = db.insert(playlistData.TABLE_NAME, null, values)
+        val id = db.insert(PlaylistData.TABLE_NAME, null, values)
         db.close()
         return id
     }
 
     fun getPlaylistData(id:Long):PlaylistData{
-        val playlistData = PlaylistData(playlistId)
         val db = readableDatabase
 
-        val cursor = db.query(playlistData.TABLE_NAME, arrayOf(
+        val cursor = db.query(PlaylistData.TABLE_NAME, arrayOf(
             PlaylistData.COLUMN_ID,
             PlaylistData.COLUMN_SONG_ID),
             Playlist.COLUMN_ID + "=?",
@@ -53,8 +46,8 @@ class PlaylistDataDatabaseHelper (context:Context, var playlistId:String) : SQLi
 
         cursor?.moveToFirst()
 
-        val newPlaylistData = PlaylistData(playlistId, cursor.getInt(cursor.getColumnIndex(PlaylistData.COLUMN_ID)),
-            cursor.getString(cursor.getColumnIndex(PlaylistData.COLUMN_SONG_ID)))
+        val newPlaylistData = PlaylistData(cursor.getInt(cursor.getColumnIndex(PlaylistData.COLUMN_ID)),
+            cursor.getLong(cursor.getColumnIndex(PlaylistData.COLUMN_SONG_ID)))
 
         cursor.close()
 
@@ -62,13 +55,11 @@ class PlaylistDataDatabaseHelper (context:Context, var playlistId:String) : SQLi
     }
 
     fun getPlaylistData(songId: String):PlaylistData?{
-        val playlistData = PlaylistData(playlistId)
-
         val db = readableDatabase
         val cursor: Cursor
 
         try{
-            cursor = db.query(playlistData.TABLE_NAME, arrayOf(
+            cursor = db.query(PlaylistData.TABLE_NAME, arrayOf(
                 PlaylistData.COLUMN_ID,
                 PlaylistData.COLUMN_SONG_ID),
                 Song.COLUMN_SONG_ID + "=?",
@@ -77,8 +68,8 @@ class PlaylistDataDatabaseHelper (context:Context, var playlistId:String) : SQLi
             cursor?.moveToFirst()
 
             try {
-                val newPlaylistData = PlaylistData(playlistId, cursor.getInt(cursor.getColumnIndex(Playlist.COLUMN_ID)),
-                    cursor.getString(cursor.getColumnIndex(PlaylistData.COLUMN_SONG_ID)))
+                val newPlaylistData = PlaylistData(cursor.getInt(cursor.getColumnIndex(Playlist.COLUMN_ID)),
+                    cursor.getLong(cursor.getColumnIndex(PlaylistData.COLUMN_SONG_ID)))
 
                 cursor.close()
 
@@ -95,10 +86,9 @@ class PlaylistDataDatabaseHelper (context:Context, var playlistId:String) : SQLi
     }
 
     fun getAllData():List<PlaylistData>{
-        val playlistData = PlaylistData(playlistId)
         val playlistDatas:ArrayList<PlaylistData> = ArrayList()
 
-        val selectQuery = "SELECT * FROM " + playlistData.TABLE_NAME + " ORDER BY " +
+        val selectQuery = "SELECT * FROM " + PlaylistData.TABLE_NAME + " ORDER BY " +
                 PlaylistData.COLUMN_ID + " DESC"
 
         val db = writableDatabase
@@ -106,9 +96,9 @@ class PlaylistDataDatabaseHelper (context:Context, var playlistId:String) : SQLi
 
         if(cursor.moveToFirst()){
             do{
-                val newPlaylistData = PlaylistData(playlistId)
+                val newPlaylistData = PlaylistData()
                 newPlaylistData.id = cursor.getInt(cursor.getColumnIndex(PlaylistData.COLUMN_ID))
-                newPlaylistData.songId = cursor.getString(cursor.getColumnIndex(PlaylistData.COLUMN_SONG_ID))
+                newPlaylistData.songId = cursor.getLong(cursor.getColumnIndex(PlaylistData.COLUMN_SONG_ID))
 
                 playlistDatas.add(newPlaylistData)
             } while (cursor.moveToNext())
@@ -121,8 +111,7 @@ class PlaylistDataDatabaseHelper (context:Context, var playlistId:String) : SQLi
     }
 
     fun getPlaylistDataCount():Int{
-        val playlistData = PlaylistData(playlistId)
-        val countQuery = "SELECT * FROM " + playlistData.TABLE_NAME
+        val countQuery = "SELECT * FROM " + PlaylistData.TABLE_NAME
         val db = readableDatabase
         val cursor = db.rawQuery(countQuery, null)
 
@@ -134,9 +123,8 @@ class PlaylistDataDatabaseHelper (context:Context, var playlistId:String) : SQLi
 
 
     fun deletePlaylistData(dPlaylistData: PlaylistData){
-        val playlistData = PlaylistData(playlistId)
         val db = writableDatabase
-        db.delete(playlistData.TABLE_NAME, PlaylistData.COLUMN_ID + " = ?", arrayOf(dPlaylistData.id.toString()))
+        db.delete(PlaylistData.TABLE_NAME, PlaylistData.COLUMN_ID + " = ?", arrayOf(dPlaylistData.id.toString()))
         db.close()
     }
 

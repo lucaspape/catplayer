@@ -28,8 +28,8 @@ class PlaylistHandler {
 
     private var simpleAdapter: SimpleAdapter? = null
 
-    private var currentPlaylistId:String? = null
-    private var currentPlaylistTrackCount:Int? = null
+    private var currentPlaylistId: String? = null
+    private var currentPlaylistTrackCount: Int? = null
 
     fun setupListView(view: View) {
         updateListView(view)
@@ -62,11 +62,11 @@ class PlaylistHandler {
         playlistList.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
             val itemValue = playlistList.getItemAtPosition(position) as HashMap<String, Any?>
 
-            if(listViewDataIsPlaylistView){
+            if (listViewDataIsPlaylistView) {
                 currentPlaylistId = itemValue["playlistId"] as String
                 currentPlaylistTrackCount = itemValue["trackCount"] as Int
                 loadPlaylistTracks(view, false, currentPlaylistId!!, currentPlaylistTrackCount!!)
-            }else{
+            } else {
                 val songId = itemValue["id"] as String
                 playSongFromId(view.context, songId, true)
             }
@@ -124,7 +124,12 @@ class PlaylistHandler {
                     val jsonParser = JSONParser()
 
                     for (i in (0 until jsonArray.length())) {
-                        list.add(jsonParser.parsePlaylistToDB(view.context, jsonArray.getJSONObject(i)))
+                        list.add(
+                            jsonParser.parsePlaylistToDB(
+                                view.context,
+                                jsonArray.getJSONObject(i)
+                            )
+                        )
                     }
 
                     val playlistDatabaseHelper = PlaylistDatabaseHelper(view.context)
@@ -132,7 +137,7 @@ class PlaylistHandler {
 
                     val playlistHashMaps = ArrayList<HashMap<String, Any?>>()
 
-                    for(playlist in playlists){
+                    for (playlist in playlists) {
                         playlistHashMaps.add(jsonParser.parsePlaylistToHashMap(playlist))
                     }
 
@@ -161,11 +166,11 @@ class PlaylistHandler {
         }
     }
 
-    fun loadPlaylistTracks(view: View, forceReload: Boolean, playlistId:String, trackCount:Int) {
+    fun loadPlaylistTracks(view: View, forceReload: Boolean, playlistId: String, trackCount: Int) {
         val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
         swipeRefreshLayout.isRefreshing = true
 
-        if(!forceReload){
+        if (!forceReload) {
             val sortedList = ArrayList<HashMap<String, Any?>>()
 
             val playlistDataDatabaseHelper = PlaylistDataDatabaseHelper(view.context, playlistId)
@@ -176,9 +181,9 @@ class PlaylistHandler {
 
             val jsonParser = JSONParser()
 
-            for(playlistData in playlistDatas){
+            for (playlistData in playlistDatas) {
                 val song = songDatabaseHelper.getSong(playlistData.songId)
-                if(song != null){
+                if (song != null) {
                     val hashMap = jsonParser.parseSongToHashMap(view.context, song)
                     sortedList.add(hashMap)
                 }
@@ -194,7 +199,7 @@ class PlaylistHandler {
 
             //download cover art
             MainActivity.downloadHandler!!.addCoverArray(currentListViewData)
-        }else{
+        } else {
             var finishedRequests = 0
             var totalRequestsCount = 0
 
@@ -210,7 +215,8 @@ class PlaylistHandler {
                 if (finishedRequests >= totalRequestsCount) {
                     val sortedList = ArrayList<HashMap<String, Any?>>()
 
-                    val playlistDataDatabaseHelper = PlaylistDataDatabaseHelper(view.context, playlistId)
+                    val playlistDataDatabaseHelper =
+                        PlaylistDataDatabaseHelper(view.context, playlistId)
 
                     val playlistDatas = playlistDataDatabaseHelper.getAllData()
 
@@ -218,12 +224,13 @@ class PlaylistHandler {
 
                     val jsonParser = JSONParser()
 
-                    for(playlistData in playlistDatas){
+                    for (playlistData in playlistDatas) {
                         val song = songDatabaseHelper.getSong(playlistData.songId)
-                        if(song != null){
-                            val hashMap = jsonParser.parseSongToHashMap(view.context, song)
-                            sortedList.add(hashMap)
-                        }
+
+                        val hashMap = jsonParser.parseSongToHashMap(view.context, song)
+                        sortedList.add(hashMap)
+                        println(hashMap)
+
                     }
 
                     //display list
@@ -236,7 +243,7 @@ class PlaylistHandler {
 
                     //download cover art
                     MainActivity.downloadHandler!!.addCoverArray(currentListViewData)
-                }else{
+                } else {
                     playlistTrackRequestQueue.add(requests[finishedRequests])
                 }
             }
@@ -257,7 +264,11 @@ class PlaylistHandler {
 
                             //  val trackHashMap = jsonParser.parsePlaylistTracksToHashMap(playlistObject, view.context)
 
-                            val id = jsonParser.parsePlaylistTrackToDB(playlistId, playlistObject, view.context)
+                            val id = jsonParser.parsePlaylistTrackToDB(
+                                playlistId,
+                                playlistObject,
+                                view.context
+                            )
                             if (id != null) {
                                 tempList[i * 50 + k] = id
                             }

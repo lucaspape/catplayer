@@ -252,9 +252,9 @@ class JSONParser {
 
             val databaseHelper = PlaylistDataDatabaseHelper(context, playlistId)
             return if(databaseHelper.getPlaylistData(songid.toString()) == null){
-                databaseHelper.insertSongId(songid.toString())
+                databaseHelper.insertSongId(songid)
             }else{
-                databaseHelper.getPlaylistData(songid.toString())!!.id.toLong()
+                databaseHelper.getPlaylistData(songid).id.toLong()
             }
         }else{
             return null
