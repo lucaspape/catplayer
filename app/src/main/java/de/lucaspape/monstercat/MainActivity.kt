@@ -2,7 +2,9 @@ package de.lucaspape.monstercat
 
 import android.Manifest
 import android.app.AlertDialog
+import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.media.AudioManager
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.method.LinkMovementMethod
@@ -19,6 +21,8 @@ import de.lucaspape.monstercat.fragments.HomeFragment
 import de.lucaspape.monstercat.fragments.PlaylistFragment
 import de.lucaspape.monstercat.fragments.SettingsFragment
 import de.lucaspape.monstercat.handlers.HomeHandler
+import de.lucaspape.monstercat.music.NoisyReceiver
+import de.lucaspape.monstercat.music.contextReference
 import de.lucaspape.monstercat.music.createMediaSession
 import de.lucaspape.monstercat.settings.Settings
 import java.lang.ref.WeakReference
@@ -77,6 +81,9 @@ class MainActivity : AppCompatActivity() {
 
         createMediaSession(WeakReference(this))
 
+        val intentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
+        registerReceiver(NoisyReceiver(), intentFilter)
+
         val settings = Settings(this)
 
         val auth = Auth()
@@ -119,6 +126,11 @@ class MainActivity : AppCompatActivity() {
         bottomNavigationView.selectedItemId = R.id.navigation_home
 
         HomeHandler.albumView = HomeHandler.albumViewSelected
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(NoisyReceiver())
     }
 
 }

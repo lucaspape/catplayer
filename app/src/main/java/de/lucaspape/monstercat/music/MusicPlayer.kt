@@ -73,9 +73,6 @@ class NoisyReceiver:BroadcastReceiver(){
 }
 
 fun createMediaSession(context:WeakReference<Context>){
-    val intentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
-    contextReference!!.get()!!.registerReceiver(NoisyReceiver(), intentFilter)
-
     mediaSession = MediaSession(context.get()!!, "de.lucaspape.monstercat.music")
 
     mediaSession!!.setCallback(object: MediaSession.Callback(){
@@ -124,6 +121,7 @@ fun createMediaSession(context:WeakReference<Context>){
     mediaSession!!.setFlags(MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS)
     mediaSession!!.isActive = true
 }
+
 
 /**
  * UI update methods
