@@ -107,7 +107,22 @@ class PlaylistHandler {
         val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
         swipeRefreshLayout.isRefreshing = true
 
-        if (!forceReload) {
+        val playlistDatabaseHelper = PlaylistDatabaseHelper(view.context)
+        var playlists = playlistDatabaseHelper.getAllPlaylists()
+
+        if (!forceReload && playlists.isNotEmpty()) {
+            val jsonParser = JSONParser()
+
+            val playlistHashMaps = ArrayList<HashMap<String, Any?>>()
+
+            for (playlist in playlists) {
+                playlistHashMaps.add(jsonParser.parsePlaylistToHashMap(playlist))
+            }
+
+            currentListViewData = playlistHashMaps
+            updateListView(view)
+            redrawListView(view)
+
             swipeRefreshLayout.isRefreshing = false
         } else {
             val playlistRequestQueue = Volley.newRequestQueue(view.context)
@@ -132,8 +147,7 @@ class PlaylistHandler {
                         )
                     }
 
-                    val playlistDatabaseHelper = PlaylistDatabaseHelper(view.context)
-                    val playlists = playlistDatabaseHelper.getAllPlaylists()
+                    playlists = playlistDatabaseHelper.getAllPlaylists()
 
                     val playlistHashMaps = ArrayList<HashMap<String, Any?>>()
 
@@ -170,12 +184,13 @@ class PlaylistHandler {
         val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
         swipeRefreshLayout.isRefreshing = true
 
-        if (!forceReload) {
+        val playlistDataDatabaseHelper = PlaylistDataDatabaseHelper(view.context, playlistId)
+        var playlistDatas = playlistDataDatabaseHelper.getAllData()
+
+        if (!forceReload && playlistDatas.isNotEmpty()) {
             val sortedList = ArrayList<HashMap<String, Any?>>()
 
-            val playlistDataDatabaseHelper = PlaylistDataDatabaseHelper(view.context, playlistId)
-
-            val playlistDatas = playlistDataDatabaseHelper.getAllData()
+            playlistDatas = playlistDataDatabaseHelper.getAllData()
 
             val songDatabaseHelper = SongDatabaseHelper(view.context)
 
@@ -183,10 +198,10 @@ class PlaylistHandler {
 
             for (playlistData in playlistDatas) {
                 val song = songDatabaseHelper.getSong(playlistData.songId)
-                if (song != null) {
-                    val hashMap = jsonParser.parseSongToHashMap(view.context, song)
-                    sortedList.add(hashMap)
-                }
+
+                val hashMap = jsonParser.parseSongToHashMap(view.context, song)
+                sortedList.add(hashMap)
+
             }
 
             //display list
@@ -215,10 +230,7 @@ class PlaylistHandler {
                 if (finishedRequests >= totalRequestsCount) {
                     val sortedList = ArrayList<HashMap<String, Any?>>()
 
-                    val playlistDataDatabaseHelper =
-                        PlaylistDataDatabaseHelper(view.context, playlistId)
-
-                    val playlistDatas = playlistDataDatabaseHelper.getAllData()
+                    playlistDatas = playlistDataDatabaseHelper.getAllData()
 
                     val songDatabaseHelper = SongDatabaseHelper(view.context)
 
@@ -229,8 +241,6 @@ class PlaylistHandler {
 
                         val hashMap = jsonParser.parseSongToHashMap(view.context, song)
                         sortedList.add(hashMap)
-                        println(hashMap)
-
                     }
 
                     //display list

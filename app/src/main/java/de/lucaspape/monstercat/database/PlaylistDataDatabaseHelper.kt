@@ -27,7 +27,7 @@ class PlaylistDataDatabaseHelper (context:Context, var playlistId:String) : SQLi
         val db = writableDatabase
 
         val values = ContentValues()
-        
+
         values.put(PlaylistData.COLUMN_SONG_ID, songId)
 
         val id = db.insert(PlaylistData.TABLE_NAME, null, values)
