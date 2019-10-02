@@ -73,6 +73,9 @@ class NoisyReceiver:BroadcastReceiver(){
 }
 
 fun createMediaSession(context:WeakReference<Context>){
+    val intentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
+    contextReference!!.get()!!.registerReceiver(NoisyReceiver(), intentFilter)
+
     mediaSession = MediaSession(context.get()!!, "de.lucaspape.monstercat.music")
 
     mediaSession!!.setCallback(object: MediaSession.Callback(){
@@ -196,9 +199,6 @@ fun setPlayButton(newPlayButton: ImageButton) {
 private fun play() {
     val settings = Settings(contextReference!!.get()!!)
     val primaryResolution = settings.getSetting("primaryCoverResolution")
-
-    val intentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
-    contextReference!!.get()!!.registerReceiver(NoisyReceiver(), intentFilter)
 
     try {
         val song = playList[currentSong]
@@ -324,7 +324,6 @@ private fun setSongMetadata(artist:String, title:String, coverImage:Bitmap?, dur
 
 private fun stop() {
     val context = contextReference!!.get()!!
-    context.unregisterReceiver(NoisyReceiver())
     playing = false
     textView1Reference!!.get()!!.text = ""
     textView2Reference!!.get()!!.text = ""
@@ -334,7 +333,6 @@ private fun stop() {
 
 fun pause() {
     val context = contextReference!!.get()!!
-    context.unregisterReceiver(NoisyReceiver())
     val settings = Settings(context)
     val primaryResolution = settings.getSetting("primaryCoverResolution")
 
