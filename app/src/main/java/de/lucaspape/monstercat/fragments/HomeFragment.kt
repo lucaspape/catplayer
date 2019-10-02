@@ -7,6 +7,9 @@ import android.widget.ListView
 import androidx.fragment.app.Fragment
 import de.lucaspape.monstercat.handlers.HomeHandler
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.handlers.addSongToPlaylist
+import de.lucaspape.monstercat.handlers.downloadSong
+import de.lucaspape.monstercat.handlers.playSongFromId
 
 class HomeFragment : Fragment() {
     private var listView: ListView? = null
@@ -57,9 +60,9 @@ class HomeFragment : Fragment() {
         val listItem = listView!!.getItemAtPosition(position) as HashMap<String, Any?>
 
         when {
-            item.title == getString(R.string.download) -> homeHandler.downloadSong(listItem, context!!)
-            item.title == getString(R.string.playNext) -> homeHandler.playSong(listItem["id"].toString(), false, context!!)
-            item.title == getString(R.string.addToPlaylist) -> homeHandler.addSongToPlaylist(listItem, context!!)
+            item.title == getString(R.string.download) -> downloadSong(context!!, listItem["id"] as String)
+            item.title == getString(R.string.playNext) -> playSongFromId(context!!, listItem["id"].toString(), false)
+            item.title == getString(R.string.addToPlaylist) -> addSongToPlaylist(listItem, context!!)
         }
 
         return super.onContextItemSelected(item)

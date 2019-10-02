@@ -7,37 +7,32 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ListView
 import android.widget.SimpleAdapter
-import android.widget.Toast
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.android.volley.*
+import com.android.volley.AuthFailureError
+import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import de.lucaspape.monstercat.json.JSONParser
 import de.lucaspape.monstercat.MainActivity
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.auth.sid
 import de.lucaspape.monstercat.auth.loggedIn
+import de.lucaspape.monstercat.auth.sid
 import de.lucaspape.monstercat.database.PlaylistDataDatabaseHelper
 import de.lucaspape.monstercat.database.PlaylistDatabaseHelper
-import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.database.SongDatabaseHelper
-import de.lucaspape.monstercat.music.addSong
-import de.lucaspape.monstercat.music.playNow
-import de.lucaspape.monstercat.settings.Settings
+import de.lucaspape.monstercat.json.JSONParser
 import org.json.JSONObject
-import java.io.*
-import java.lang.Exception
-import java.lang.IndexOutOfBoundsException
 
 class PlaylistHandler {
+    var currentListViewData = ArrayList<HashMap<String, Any?>>()
+    var listViewDataIsPlaylistView = true
 
-    private var currentListData = ArrayList<HashMap<String, Any?>>()
-    private var currentPlaylist = HashMap<String, Any?>()
     private var simpleAdapter: SimpleAdapter? = null
-    private var isPlaylist = false
+
+    private var currentPlaylistId:String? = null
+    private var currentPlaylistTrackCount:Int? = null
 
     fun setupListView(view: View) {
-        updateListView(view, true)
+        updateListView(view)
         redrawListView(view)
 
         //setup auto reload
@@ -51,83 +46,69 @@ class PlaylistHandler {
     }
 
     fun registerListeners(view: View) {
-        val playlistView = view.findViewById<ListView>(R.id.listview)
+        //click on list
+        val playlistList = view.findViewById<ListView>(R.id.playlistView)
 
-        playlistView.onItemClickListener =
-            AdapterView.OnItemClickListener { _, _, position, _ ->
-                val itemValue = playlistView.getItemAtPosition(position) as HashMap<String, Any?>
-
-                if (itemValue["type"] == "playlist") {
-                    currentPlaylist = itemValue
-                    loadPlaylistTracks(view, false)
-                } else {
-                    playSong(view.context, itemValue, false)
-                }
-            }
-
-        val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
+        //refresh
+        val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
         swipeRefreshLayout.setOnRefreshListener {
-            val listView = view.findViewById<ListView>(R.id.listview)
-            val listViewItem: HashMap<String, Any?>
-
-            try {
-                listViewItem = listView.getItemAtPosition(0) as HashMap<String, Any?>
-                if (listViewItem["type"] == "playlist") {
-                    loadPlaylist(view, true)
-                } else {
-                    loadPlaylistTracks(view, true)
-                }
-            } catch (e: IndexOutOfBoundsException) {
+            if (listViewDataIsPlaylistView) {
                 loadPlaylist(view, true)
+            } else {
+                loadPlaylistTracks(view, true, currentPlaylistId!!, currentPlaylistTrackCount!!)
             }
+        }
 
+        playlistList.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
+            val itemValue = playlistList.getItemAtPosition(position) as HashMap<String, Any?>
+
+            if(listViewDataIsPlaylistView){
+                currentPlaylistId = itemValue["playlistId"] as String
+                currentPlaylistTrackCount = itemValue["trackCount"] as Int
+                loadPlaylistTracks(view, false, currentPlaylistId!!, currentPlaylistTrackCount!!)
+            }else{
+                val songId = itemValue["id"] as String
+                playSongFromId(view.context, songId, true)
+            }
         }
     }
 
-    fun redrawListView(view: View) {
-        val playlistView = view.findViewById<ListView>(R.id.listview)
-        simpleAdapter!!.notifyDataSetChanged()
-        playlistView.invalidateViews()
-        playlistView.refreshDrawableState()
-    }
-
-    fun updateListView(view: View, playlist: Boolean) {
-        val playlistView = view.findViewById<ListView>(R.id.listview)
+    fun updateListView(view: View) {
+        val playlistList = view.findViewById<ListView>(R.id.playlistView)
 
         var from = arrayOf("shownTitle", "secondaryImage")
         var to = arrayOf(R.id.title, R.id.cover)
 
-        if (playlist) {
+        if (listViewDataIsPlaylistView) {
             from = arrayOf("playlistName", "coverUrl")
             to = arrayOf(R.id.title, R.id.cover)
         }
 
-        simpleAdapter = SimpleAdapter(view.context, currentListData, R.layout.list_single, from, to.toIntArray())
-        playlistView.adapter = simpleAdapter
+        simpleAdapter = SimpleAdapter(
+            view.context,
+            currentListViewData,
+            R.layout.list_single,
+            from,
+            to.toIntArray()
+        )
+
+        playlistList.adapter = simpleAdapter
+
     }
 
-    fun loadPlaylist(view: View, force: Boolean) {
-        val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
+    private fun redrawListView(view: View) {
+        val playlistList = view.findViewById<ListView>(R.id.playlistView)
+        simpleAdapter!!.notifyDataSetChanged()
+        playlistList.invalidateViews()
+        playlistList.refreshDrawableState()
+    }
 
+    fun loadPlaylist(view: View, forceReload: Boolean) {
+        val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
         swipeRefreshLayout.isRefreshing = true
 
-        if (!force) {
-            val jsonParser = JSONParser()
-            val playlistDatabaseHelper = PlaylistDatabaseHelper(view.context)
-            val playlists = playlistDatabaseHelper.getAllPlaylists()
-
-            val playlistHashMaps = ArrayList<HashMap<String, Any?>>()
-
-            for(playlist in playlists){
-                playlistHashMaps.add(jsonParser.parsePlaylistToHashMap(playlist))
-            }
-
-            currentListData = playlistHashMaps
-
-            updateListView(view, true)
-            redrawListView(view)
+        if (!forceReload) {
             swipeRefreshLayout.isRefreshing = false
-            isPlaylist = true
         } else {
             val playlistRequestQueue = Volley.newRequestQueue(view.context)
 
@@ -155,8 +136,8 @@ class PlaylistHandler {
                         playlistHashMaps.add(jsonParser.parsePlaylistToHashMap(playlist))
                     }
 
-                    currentListData = playlistHashMaps
-                    updateListView(view, true)
+                    currentListViewData = playlistHashMaps
+                    updateListView(view)
                     redrawListView(view)
                 },
                 Response.ErrorListener { }) {
@@ -173,251 +154,131 @@ class PlaylistHandler {
 
             playlistRequestQueue.addRequestFinishedListener<Any> {
                 swipeRefreshLayout.isRefreshing = false
-                isPlaylist = true
+                listViewDataIsPlaylistView = true
             }
 
             playlistRequestQueue.add(playlistRequest)
         }
     }
 
-    private fun loadPlaylistTracks(view: View, force: Boolean) {
-        val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
+    fun loadPlaylistTracks(view: View, forceReload: Boolean, playlistId:String, trackCount:Int) {
+        val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
         swipeRefreshLayout.isRefreshing = true
 
-        if (isPlaylist) {
-           // if (!force) {
-                //currentListData = playlistTrackCache
-            //    isPlaylist = false
-            //    updateListView(view, false)
-            //    redrawListView(view)
-            //    swipeRefreshLayout.isRefreshing = false
-            //    return
-          //  }
-        }
+        if(!forceReload){
+            val sortedList = ArrayList<HashMap<String, Any?>>()
 
-        var finishedRequests = 0
-        var totalRequestsCount = 0
+            val playlistDataDatabaseHelper = PlaylistDataDatabaseHelper(view.context, playlistId)
 
-        val requests = ArrayList<StringRequest>()
+            val playlistDatas = playlistDataDatabaseHelper.getAllData()
 
-        val playlistTrackRequestQueue = Volley.newRequestQueue(view.context)
+            val songDatabaseHelper = SongDatabaseHelper(view.context)
 
-        val tempList = arrayOfNulls<Long>(currentPlaylist["trackCount"] as Int)
+            val jsonParser = JSONParser()
 
-        playlistTrackRequestQueue.addRequestFinishedListener<Any> {
-            finishedRequests++
-
-            if (finishedRequests >= totalRequestsCount) {
-                val sortedList = ArrayList<HashMap<String, Any?>>()
-
-                val playlistDataDatabaseHelper = PlaylistDataDatabaseHelper(view.context, currentPlaylist["playlistId"] as String)
-
-                val playlistDatas = playlistDataDatabaseHelper.getAllData()
-
-                val songDatabaseHelper = SongDatabaseHelper(view.context)
-
-                val jsonParser = JSONParser()
-
-                for(playlistData in playlistDatas){
-                    val song = songDatabaseHelper.getSong(playlistData.songId)
-                    if(song != null){
-                        val hashMap = jsonParser.parseSongToHashMap(view.context, song)
-                        sortedList.add(hashMap)
-                    }
+            for(playlistData in playlistDatas){
+                val song = songDatabaseHelper.getSong(playlistData.songId)
+                if(song != null){
+                    val hashMap = jsonParser.parseSongToHashMap(view.context, song)
+                    sortedList.add(hashMap)
                 }
-
-                //display list
-                currentListData = sortedList
-                isPlaylist = false
-                updateListView(view, false)
-                redrawListView(view)
-
-                swipeRefreshLayout.isRefreshing = false
-
-                //download cover art
-                MainActivity.downloadHandler!!.addCoverArray(currentListData)
-            }else{
-                playlistTrackRequestQueue.add(requests[finishedRequests])
             }
-        }
 
-        for (i in (0..(currentPlaylist["trackCount"] as Int / 50))) {
-            val playlistTrackUrl =
-                view.context.getString(R.string.loadSongsUrl) + "?playlistId=" + currentPlaylist["playlistId"] as String + "&skip=" + (i * 50).toString() + "&limit=50"
+            //display list
+            currentListViewData = sortedList
+            listViewDataIsPlaylistView = false
+            updateListView(view)
+            redrawListView(view)
 
-            val playlistTrackRequest = object : StringRequest(Method.GET, playlistTrackUrl,
-                Response.Listener { response ->
-                    val jsonObject = JSONObject(response)
-                    val jsonArray = jsonObject.getJSONArray("results")
+            swipeRefreshLayout.isRefreshing = false
 
-                    for (k in (0 until jsonArray.length())) {
-                        val playlistObject = jsonArray.getJSONObject(k)
+            //download cover art
+            MainActivity.downloadHandler!!.addCoverArray(currentListViewData)
+        }else{
+            var finishedRequests = 0
+            var totalRequestsCount = 0
 
-                        val jsonParser = JSONParser()
+            val requests = ArrayList<StringRequest>()
 
-                      //  val trackHashMap = jsonParser.parsePlaylistTracksToHashMap(playlistObject, view.context)
+            val playlistTrackRequestQueue = Volley.newRequestQueue(view.context)
 
-                        val id = jsonParser.parsePlaylistTrackToDB(currentPlaylist["playlistId"] as String, playlistObject, view.context)
-                        if (id != null) {
-                            tempList[i * 50 + k] = id
+            val tempList = arrayOfNulls<Long>(trackCount)
+
+            playlistTrackRequestQueue.addRequestFinishedListener<Any> {
+                finishedRequests++
+
+                if (finishedRequests >= totalRequestsCount) {
+                    val sortedList = ArrayList<HashMap<String, Any?>>()
+
+                    val playlistDataDatabaseHelper = PlaylistDataDatabaseHelper(view.context, playlistId)
+
+                    val playlistDatas = playlistDataDatabaseHelper.getAllData()
+
+                    val songDatabaseHelper = SongDatabaseHelper(view.context)
+
+                    val jsonParser = JSONParser()
+
+                    for(playlistData in playlistDatas){
+                        val song = songDatabaseHelper.getSong(playlistData.songId)
+                        if(song != null){
+                            val hashMap = jsonParser.parseSongToHashMap(view.context, song)
+                            sortedList.add(hashMap)
                         }
                     }
-                },
-                Response.ErrorListener { }) {
-                @Throws(AuthFailureError::class)
-                override fun getHeaders(): Map<String, String> {
-                    val params = HashMap<String, String>()
-                    if (loggedIn) {
-                        params["Cookie"] = "connect.sid=$sid"
-                    }
 
-                    return params
+                    //display list
+                    currentListViewData = sortedList
+                    listViewDataIsPlaylistView = false
+                    updateListView(view)
+                    redrawListView(view)
+
+                    swipeRefreshLayout.isRefreshing = false
+
+                    //download cover art
+                    MainActivity.downloadHandler!!.addCoverArray(currentListViewData)
+                }else{
+                    playlistTrackRequestQueue.add(requests[finishedRequests])
                 }
             }
 
-            totalRequestsCount++
-            requests.add(playlistTrackRequest)
-        }
-        playlistTrackRequestQueue.add(requests[finishedRequests])
+            for (i in (0..(trackCount as Int / 50))) {
+                val playlistTrackUrl =
+                    view.context.getString(R.string.loadSongsUrl) + "?playlistId=" + playlistId + "&skip=" + (i * 50).toString() + "&limit=50"
 
-    }
+                val playlistTrackRequest = object : StringRequest(Method.GET, playlistTrackUrl,
+                    Response.Listener { response ->
+                        val jsonObject = JSONObject(response)
+                        val jsonArray = jsonObject.getJSONArray("results")
 
-    fun playSong(context: Context, itemValue: HashMap<String, Any?>, playAfter: Boolean) {
+                        for (k in (0 until jsonArray.length())) {
+                            val playlistObject = jsonArray.getJSONObject(k)
 
-        val artist = itemValue["artist"] as String
-        val title = itemValue["title"] as String
-        val version = itemValue["version"] as String
-        val primaryCoverImage = itemValue["primaryImage"] as String
+                            val jsonParser = JSONParser()
 
-        val settings = Settings(context)
+                            //  val trackHashMap = jsonParser.parsePlaylistTracksToHashMap(playlistObject, view.context)
 
-        val downloadType = settings.getSetting("downloadType")
-
-        val downloadLocation =
-            context.filesDir.toString() + "/" + artist + title + version + "." + downloadType
-
-        val songDatabaseHelper = SongDatabaseHelper(context)
-        val song = songDatabaseHelper.getSong(itemValue["id"] as String)
-
-        if(song != null){
-            if (File(downloadLocation).exists()) {
-                song.downloadLocation = downloadLocation
-                if (playAfter) {
-                    addSong(song)
-                } else {
-                    playNow(song)
-                }
-
-            } else {
-
-                    song.streamLocation = context.getString(R.string.songStreamUrl) + itemValue["streamHash"]
-                    if (playAfter) {
-                        addSong(song)
-                    } else {
-                        playNow(song)
-                    }
-
-            }
-        }
-    }
-
-    fun downloadSong(context: Context, listItem: HashMap<String, Any?>) {
-        val id = listItem["id"] as String
-        val albumId = listItem["albumId"] as String
-        val title = listItem["title"] as String
-        val artist = listItem["artist"] as String
-        val version = listItem["version"] as String
-        val shownTitle = listItem["shownTitle"] as String
-        val downloadable = listItem["downloadable"] as Boolean
-
-        if (downloadable) {
-            val settings = Settings(context)
-
-            val downloadType = settings.getSetting("downloadType")
-            val downloadQuality = settings.getSetting("downloadQuality")
-
-            val downloadUrl =
-                context.getString(R.string.songDownloadUrl) + albumId + "/download?method=download&type=" + downloadType + "_" + downloadQuality + "&track=" + id
-
-            val downloadLocation = context.filesDir.toString() + "/" + artist + title + version + "." + downloadType
-            if (!File(downloadLocation).exists()) {
-                if (sid != "") {
-                    MainActivity.downloadHandler!!.addSong(downloadUrl, downloadLocation, shownTitle)
-                } else {
-                    Toast.makeText(context, context.getString(R.string.userNotSignedInMsg), Toast.LENGTH_SHORT)
-                        .show()
-                }
-            } else {
-                Toast.makeText(
-                    context,
-                    context.getString(R.string.alreadyDownloadedMsg, shownTitle),
-                    Toast.LENGTH_SHORT
-                )
-                    .show()
-            }
-        } else {
-            Toast.makeText(context, context.getString(R.string.downloadNotAvailableMsg, shownTitle), Toast.LENGTH_SHORT)
-                .show()
-        }
-    }
-
-    fun downloadPlaylist(context: Context, listItem: HashMap<String, Any?>) {
-        val downloadTracks = ArrayList<HashMap<String, Any?>>()
-
-        val playlistDownloadQueue = Volley.newRequestQueue(context)
-
-        //request playlist
-
-        val playlistId = listItem["playlistId"] as String
-        val playlistName = listItem["playlistName"] as String
-
-        val playlistTrackUrl =
-            context.getString(R.string.loadSongsUrl) + "?playlistId=" + playlistId + "&skip=0&limit=50"
-
-        val trackRequest =
-            object : StringRequest(
-                Method.GET, playlistTrackUrl, Response.Listener<String>
-                { response ->
-                    val jsonObject = JSONObject(response)
-                    val jsonArray = jsonObject.getJSONArray("results")
-
-                    for (i in (0 until jsonArray.length())) {
-                        val playlistObject = jsonArray.getJSONObject(i)
-
-                        val trackHashMap = JSONParser()
-                            .parseDownloadPlaylistTracksToHashMap(playlistObject, context)
-
-                        if (trackHashMap != null) {
-                            downloadTracks.add(trackHashMap)
+                            val id = jsonParser.parsePlaylistTrackToDB(playlistId, playlistObject, view.context)
+                            if (id != null) {
+                                tempList[i * 50 + k] = id
+                            }
+                        }
+                    },
+                    Response.ErrorListener { }) {
+                    @Throws(AuthFailureError::class)
+                    override fun getHeaders(): Map<String, String> {
+                        val params = HashMap<String, String>()
+                        if (loggedIn) {
+                            params["Cookie"] = "connect.sid=$sid"
                         }
 
+                        return params
                     }
-                }, Response.ErrorListener { error ->
-                    println(error)
                 }
-            ) {
-                @Throws(AuthFailureError::class)
-                override fun getHeaders(): Map<String, String> {
-                    val params = HashMap<String, String>()
-                    if (loggedIn) {
-                        params["Cookie"] = "connect.sid=$sid"
-                    }
 
-                    return params
-                }
+                totalRequestsCount++
+                requests.add(playlistTrackRequest)
             }
-
-        playlistDownloadQueue.addRequestFinishedListener<Any> {
-            try {
-                MainActivity.downloadHandler!!.addSongArray(downloadTracks)
-            } catch (e: Exception) {
-
-            }
-
+            playlistTrackRequestQueue.add(requests[finishedRequests])
         }
-
-        playlistDownloadQueue.add(trackRequest)
     }
-
-
 }

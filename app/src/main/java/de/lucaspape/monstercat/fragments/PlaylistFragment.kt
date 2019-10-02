@@ -8,6 +8,9 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import de.lucaspape.monstercat.handlers.PlaylistHandler
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.handlers.downloadPlaylist
+import de.lucaspape.monstercat.handlers.downloadSong
+import de.lucaspape.monstercat.handlers.playSongFromId
 import de.lucaspape.monstercat.settings.Settings
 
 class PlaylistFragment : Fragment() {
@@ -25,7 +28,7 @@ class PlaylistFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        playlistView = view.findViewById<ListView>(R.id.listview)
+        playlistView = view.findViewById<ListView>(R.id.playlistView)
 
         val settings = Settings(view.context)
 
@@ -69,13 +72,13 @@ class PlaylistFragment : Fragment() {
 
         if (item.title == getString(R.string.download)) {
             if (listItem["type"] == "playlist") {
-                playlistHandler.downloadPlaylist(context!!, listItem)
+                downloadPlaylist(context!!, listItem["playlistId"] as String)
             } else {
-                playlistHandler.downloadSong(context!!, listItem)
+                downloadSong(context!!, listItem["id"] as String)
             }
 
         } else if (item.title == getString(R.string.playNext)) {
-            playlistHandler.playSong(context!!, listItem, true)
+            playSongFromId(context!!, listItem["id"] as String, false)
         }
 
         return super.onContextItemSelected(item)

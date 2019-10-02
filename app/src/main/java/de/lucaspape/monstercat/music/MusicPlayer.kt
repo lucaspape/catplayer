@@ -75,19 +75,13 @@ class NoisyReceiver:BroadcastReceiver(){
 fun createMediaSession(context:WeakReference<Context>){
     mediaSession = MediaSession(context.get()!!, "de.lucaspape.monstercat.music")
 
-    val intentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
-
-
     mediaSession!!.setCallback(object: MediaSession.Callback(){
 
         override fun onPause() {
-            context.get()!!.unregisterReceiver(NoisyReceiver())
             pause()
         }
 
         override fun onPlay() {
-            context.get()!!.registerReceiver(NoisyReceiver(), intentFilter)
-
             if(paused){
                 resume()
             }else{
@@ -104,7 +98,6 @@ fun createMediaSession(context:WeakReference<Context>){
         }
 
         override fun onStop() {
-            context.get()!!.unregisterReceiver(NoisyReceiver())
             stop()
         }
 
@@ -203,6 +196,9 @@ fun setPlayButton(newPlayButton: ImageButton) {
 private fun play() {
     val settings = Settings(contextReference!!.get()!!)
     val primaryResolution = settings.getSetting("primaryCoverResolution")
+
+    val intentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
+    contextReference!!.get()!!.registerReceiver(NoisyReceiver(), intentFilter)
 
     try {
         val song = playList[currentSong]
@@ -328,6 +324,7 @@ private fun setSongMetadata(artist:String, title:String, coverImage:Bitmap?, dur
 
 private fun stop() {
     val context = contextReference!!.get()!!
+    context.unregisterReceiver(NoisyReceiver())
     playing = false
     textView1Reference!!.get()!!.text = ""
     textView2Reference!!.get()!!.text = ""
@@ -337,6 +334,7 @@ private fun stop() {
 
 fun pause() {
     val context = contextReference!!.get()!!
+    context.unregisterReceiver(NoisyReceiver())
     val settings = Settings(context)
     val primaryResolution = settings.getSetting("primaryCoverResolution")
 
@@ -376,6 +374,9 @@ fun resume() {
             mediaPlayer.start()
 
             paused = false
+
+            val intentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
+            context.registerReceiver(NoisyReceiver(), intentFilter)
         } else {
             play()
         }

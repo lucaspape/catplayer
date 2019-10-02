@@ -240,11 +240,21 @@ class JSONParser {
             song.songId = id
             song.streamLocation = context.getString(R.string.songStreamUrl) + streamHash
 
-            val databaseHelper = PlaylistDataDatabaseHelper(context, playlistId)
-            return if(databaseHelper.getPlaylistData(id) == null){
-                databaseHelper.insertSongId(id)
+            val songDatabaseHelper = SongDatabaseHelper(context)
+
+            val songid:Long
+
+            if(songDatabaseHelper.getSong(id) == null){
+                songid = songDatabaseHelper.insertSong(id, title, version, albumId, artist, coverUrl)
             }else{
-                databaseHelper.getPlaylistData(id)!!.id.toLong()
+                songid = songDatabaseHelper.getSong(id)!!.id.toLong()
+            }
+
+            val databaseHelper = PlaylistDataDatabaseHelper(context, playlistId)
+            return if(databaseHelper.getPlaylistData(songid.toString()) == null){
+                databaseHelper.insertSongId(songid.toString())
+            }else{
+                databaseHelper.getPlaylistData(songid.toString())!!.id.toLong()
             }
         }else{
             return null
