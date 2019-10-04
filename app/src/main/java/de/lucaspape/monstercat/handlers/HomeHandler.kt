@@ -13,6 +13,7 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.sid
 import de.lucaspape.monstercat.auth.loggedIn
 import de.lucaspape.monstercat.database.*
+import de.lucaspape.monstercat.download.addDownloadCoverArray
 import de.lucaspape.monstercat.json.JSONParser
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.settings.Settings
@@ -246,7 +247,7 @@ class HomeHandler {
             swipeRefreshLayout.isRefreshing = false
 
             //download cover art
-            MainActivity.downloadHandler!!.addCoverArray(currentListViewData)
+            addDownloadCoverArray(currentListViewData)
         } else {
             val requestQueue = Volley.newRequestQueue(view.context)
 
@@ -296,7 +297,7 @@ class HomeHandler {
                     swipeRefreshLayout.isRefreshing = false
 
                     //download cover art
-                    MainActivity.downloadHandler!!.addCoverArray(currentListViewData)
+                    addDownloadCoverArray(currentListViewData)
                 }else{
                     requestQueue.add(requests[finishedRequests])
                 }
@@ -370,7 +371,7 @@ class HomeHandler {
             swipeRefreshLayout.isRefreshing = false
 
             //download cover art
-            MainActivity.downloadHandler!!.addCoverArray(currentListViewData)
+            addDownloadCoverArray(currentListViewData)
         }else{
             //if all finished continue
             var finishedRequests = 0
@@ -405,7 +406,7 @@ class HomeHandler {
                     swipeRefreshLayout.isRefreshing = false
 
                     //download cover art
-                    MainActivity.downloadHandler!!.addCoverArray(currentListViewData)
+                    addDownloadCoverArray(currentListViewData)
 
                 }else{
                     requestQueue.add(requests[finishedRequests])
@@ -486,7 +487,7 @@ class HomeHandler {
             swipeRefreshLayout.isRefreshing = false
 
             //download cover art
-            MainActivity.downloadHandler!!.addCoverArray(currentListViewData)
+            addDownloadCoverArray(currentListViewData)
         }else{
             requestQueue.addRequestFinishedListener<Any> {
                 val dbSongs = ArrayList<HashMap<String, Any?>>()
@@ -507,7 +508,7 @@ class HomeHandler {
                 swipeRefreshLayout.isRefreshing = false
 
                 //download cover art
-                MainActivity.downloadHandler!!.addCoverArray(currentListViewData)
+                addDownloadCoverArray(currentListViewData)
             }
 
             val requestUrl =

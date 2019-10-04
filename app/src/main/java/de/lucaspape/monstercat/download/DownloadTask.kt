@@ -9,7 +9,6 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.model.LazyHeaders
 import com.bumptech.glide.request.target.Target
-import de.lucaspape.monstercat.activities.MainActivity
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.sid
 import de.lucaspape.monstercat.auth.loggedIn
@@ -35,21 +34,21 @@ class DownloadTask(private val weakReference: WeakReference<Context>) : AsyncTas
 
         while (true) {
             try {
-                if (DownloadHandler.downloadList[downloadedSongs].isNotEmpty()) {
-                    val song = DownloadHandler.downloadList[downloadedSongs]
+                if (downloadList[downloadedSongs].isNotEmpty()) {
+                    val song = downloadList[downloadedSongs]
                     val url = song["url"] as String
                     val location = song["location"] as String
                     val shownTitle = song["shownTitle"] as String
 
                     if (loggedIn) {
-                        MainActivity.downloadHandler!!.showNotification(shownTitle, 0, 0, true, context)
+                        showDownloadNotification(shownTitle, 0, 0, true, context)
                         var downloaded = false
 
                         while (!downloaded) {
                             downloaded = downloadSong(url, location, sid, context)
                         }
 
-                        MainActivity.downloadHandler!!.hideNotification(context)
+                        hideDownloadNotification(context)
                     }
 
                 }
@@ -58,11 +57,11 @@ class DownloadTask(private val weakReference: WeakReference<Context>) : AsyncTas
             }
 
             try {
-                if (DownloadHandler.downloadArrayListList[downloadedSongArrays].isNotEmpty()) {
-                    val songArrayList = DownloadHandler.downloadArrayListList[downloadedSongArrays]
+                if (downloadArrayListList[downloadedSongArrays].isNotEmpty()) {
+                    val songArrayList = downloadArrayListList[downloadedSongArrays]
 
                     if (loggedIn) {
-                        MainActivity.downloadHandler!!.showNotification("", 0, songArrayList.size, false, context)
+                        showDownloadNotification("", 0, songArrayList.size, false, context)
 
                         for (i in songArrayList.indices) {
                             val song = songArrayList[i]
@@ -70,7 +69,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) : AsyncTas
                             val location = song["downloadLocation"] as String
                             val shownTitle = song["shownTitle"] as String
 
-                            MainActivity.downloadHandler!!.showNotification(
+                            showDownloadNotification(
                                 shownTitle,
                                 i,
                                 songArrayList.size,
@@ -85,7 +84,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) : AsyncTas
                             }
                         }
 
-                        MainActivity.downloadHandler!!.hideNotification(context)
+                        hideDownloadNotification(context)
 
                     }
 
@@ -96,10 +95,10 @@ class DownloadTask(private val weakReference: WeakReference<Context>) : AsyncTas
             }
 
             try {
-                if (DownloadHandler.downloadCoverList[downloadedCovers].isNotEmpty()) {
-                    val cover = DownloadHandler.downloadCoverList[downloadedCovers]
+                if (downloadCoverList[downloadedCovers].isNotEmpty()) {
+                    val cover = downloadCoverList[downloadedCovers]
 
-                    MainActivity.downloadHandler!!.showNotification(
+                    showDownloadNotification(
                         context.getString(R.string.downloadingCoversMsg),
                         0,
                         0,
@@ -114,7 +113,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) : AsyncTas
                     val secondaryRes = cover["secondaryRes"] as String
 
                     downloadCover(url, location, primaryRes, secondaryRes)
-                    MainActivity.downloadHandler!!.hideNotification(context)
+                    hideDownloadNotification(context)
                 }
 
                 downloadedCovers++
@@ -122,11 +121,11 @@ class DownloadTask(private val weakReference: WeakReference<Context>) : AsyncTas
             }
 
             try {
-                if (DownloadHandler.downloadCoverArrayListList[downloadedCoverArrays].isNotEmpty()) {
-                    val coverArray = DownloadHandler.downloadCoverArrayListList[downloadedCoverArrays]
+                if (downloadCoverArrayListList[downloadedCoverArrays].isNotEmpty()) {
+                    val coverArray = downloadCoverArrayListList[downloadedCoverArrays]
 
                     for (i in coverArray.indices) {
-                        MainActivity.downloadHandler!!.showNotification(
+                        showDownloadNotification(
                             context.getString(R.string.downloadingCoversMsg),
                             i,
                             coverArray.size,
@@ -145,7 +144,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) : AsyncTas
                         downloadCover(url, location, primaryRes, secondaryRes)
                     }
 
-                    MainActivity.downloadHandler!!.hideNotification(context)
+                    hideDownloadNotification(context)
                 }
 
                 downloadedCoverArrays++

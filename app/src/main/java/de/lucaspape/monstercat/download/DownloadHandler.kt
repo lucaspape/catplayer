@@ -8,89 +8,84 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import de.lucaspape.monstercat.R
 
-/**
- * This class is meant to be static
- */
-class DownloadHandler {
-    //notification var
-    private val channelID = "Download Notification"
-    private val notificationID = 2
+//notification var
+private val channelID = "Download Notification"
+private val notificationID = 2
 
-    companion object {
-        @JvmStatic
-        val downloadList = ArrayList<HashMap<String, Any?>>()
+val downloadList = ArrayList<HashMap<String, Any?>>()
+val downloadArrayListList = ArrayList<ArrayList<HashMap<String, Any?>>>()
+val downloadCoverList = ArrayList<HashMap<String, Any?>>()
+val downloadCoverArrayListList = ArrayList<ArrayList<HashMap<String, Any?>>>()
 
-        @JvmStatic
-        val downloadArrayListList = ArrayList<ArrayList<HashMap<String, Any?>>>()
+fun addDownloadSong(url: String, location: String, shownTitle: String) {
+    val downloadTrack = HashMap<String, Any?>()
+    downloadTrack["url"] = url
+    downloadTrack["location"] = location
+    downloadTrack["shownTitle"] = shownTitle
 
-        @JvmStatic
-        val downloadCoverList = ArrayList<HashMap<String, Any?>>()
+    downloadList.add(downloadTrack)
+}
 
-        @JvmStatic
-        val downloadCoverArrayListList = ArrayList<ArrayList<HashMap<String, Any?>>>()
-    }
+fun addDownloadSongArray(array: ArrayList<HashMap<String, Any?>>) {
+    downloadArrayListList.add(array)
+}
 
-    fun addSong(url: String, location: String, shownTitle: String) {
-        val downloadTrack = HashMap<String, Any?>()
-        downloadTrack["url"] = url
-        downloadTrack["location"] = location
-        downloadTrack["shownTitle"] = shownTitle
+fun addDownloadCover(url: String, location: String, primaryRes: String, secondaryRes: String) {
+    val cover = HashMap<String, Any?>()
+    cover["coverUrl"] = url
+    cover["location"] = location
+    cover["primaryRes"] = primaryRes
+    cover["secondaryRes"] = secondaryRes
 
-        downloadList.add(downloadTrack)
-    }
+    downloadCoverList.add(cover)
+}
 
-    fun addSongArray(array: ArrayList<HashMap<String, Any?>>) {
-        downloadArrayListList.add(array)
-    }
+fun addDownloadCoverArray(covers: ArrayList<HashMap<String, Any?>>) {
+    downloadCoverArrayListList.add(covers)
+}
 
-    fun addCover(url: String, location: String, primaryRes: String, secondaryRes: String) {
-        val cover = HashMap<String, Any?>()
-        cover["coverUrl"] = url
-        cover["location"] = location
-        cover["primaryRes"] = primaryRes
-        cover["secondaryRes"] = secondaryRes
+fun showDownloadNotification(
+    shownTitle: String,
+    progress: Int,
+    max: Int,
+    indeterminate: Boolean,
+    context: Context
+) {
+    createDownloadNotificationChannel(context)
 
-        downloadCoverList.add(cover)
-    }
+    val notificationBuilder = NotificationCompat.Builder(context, channelID)
+    notificationBuilder.setContentTitle(shownTitle)
+    notificationBuilder.setSmallIcon(R.drawable.ic_play_circle_filled_black_24dp)
+    notificationBuilder.priority = NotificationCompat.PRIORITY_LOW
+    notificationBuilder.setOngoing(true)
 
-    fun addCoverArray(covers: ArrayList<HashMap<String, Any?>>) {
-        downloadCoverArrayListList.add(covers)
-    }
+    notificationBuilder.setProgress(max, progress, indeterminate)
 
-    fun showNotification(shownTitle: String, progress: Int, max: Int, indeterminate: Boolean, context: Context) {
-        createNotificationChannel(context)
+    val notificationManagerCompat = NotificationManagerCompat.from(context)
+    notificationManagerCompat.notify(notificationID, notificationBuilder.build())
+}
 
-        val notificationBuilder = NotificationCompat.Builder(context, channelID)
-        notificationBuilder.setContentTitle(shownTitle)
-        notificationBuilder.setSmallIcon(R.drawable.ic_play_circle_filled_black_24dp)
-        notificationBuilder.priority = NotificationCompat.PRIORITY_LOW
-        notificationBuilder.setOngoing(true)
+fun hideDownloadNotification(context: Context) {
+    val notificationManager =
+        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    notificationManager.cancel(notificationID)
+}
 
-        notificationBuilder.setProgress(max, progress, indeterminate)
+private fun createDownloadNotificationChannel(context: Context) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val channelName = "Download Notification"
+        val channelDescription = "Handy dandy description"
+        val importance = NotificationManager.IMPORTANCE_LOW
 
-        val notificationManagerCompat = NotificationManagerCompat.from(context)
-        notificationManagerCompat.notify(notificationID, notificationBuilder.build())
-    }
+        val notificationChannel = NotificationChannel(channelID, channelName, importance)
 
-    fun hideNotification(context: Context) {
-        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.cancel(notificationID)
-    }
+        notificationChannel.description = channelDescription
 
-    private fun createNotificationChannel(context: Context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channelName = "Download Notification"
-            val channelDescription = "Handy dandy description"
-            val importance = NotificationManager.IMPORTANCE_LOW
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(notificationChannel)
 
-            val notificationChannel = NotificationChannel(channelID, channelName, importance)
-
-            notificationChannel.description = channelDescription
-
-            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(notificationChannel)
-
-        }
     }
 }
+
 

@@ -2,7 +2,6 @@ package de.lucaspape.monstercat.activities
 
 import android.Manifest
 import android.app.AlertDialog
-import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.media.AudioManager
@@ -10,7 +9,6 @@ import android.os.Bundle
 import android.text.SpannableString
 import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
-import android.widget.ImageButton
 import android.widget.TextView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
@@ -18,7 +16,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.Auth
-import de.lucaspape.monstercat.download.DownloadHandler
 import de.lucaspape.monstercat.download.DownloadTask
 import de.lucaspape.monstercat.fragments.HomeFragment
 import de.lucaspape.monstercat.fragments.PlaylistFragment
@@ -29,11 +26,6 @@ import de.lucaspape.monstercat.settings.Settings
 import java.lang.ref.WeakReference
 
 class MainActivity : AppCompatActivity() {
-
-    companion object{
-        @JvmStatic
-        var downloadHandler:DownloadHandler? = null
-    }
 
     private val onNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
@@ -90,8 +82,6 @@ class MainActivity : AppCompatActivity() {
 
         val homeFragment = HomeFragment.newInstance()
         openFragment(homeFragment)
-
-        downloadHandler = DownloadHandler()
 
         val weakReference = WeakReference(applicationContext)
         DownloadTask(weakReference).execute()

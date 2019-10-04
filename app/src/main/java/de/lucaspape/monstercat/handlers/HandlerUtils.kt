@@ -13,6 +13,7 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.loggedIn
 import de.lucaspape.monstercat.auth.sid
 import de.lucaspape.monstercat.database.*
+import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.json.JSONParser
 import de.lucaspape.monstercat.music.addSong
 import de.lucaspape.monstercat.settings.Settings
@@ -110,7 +111,7 @@ fun downloadSong(context: Context, song:Song) {
 
     if (!File(downloadLocation).exists()) {
         if (sid != "") {
-            MainActivity.downloadHandler!!.addSong(downloadUrl, downloadLocation, song.title + song.version)
+            addDownloadSong(downloadUrl, downloadLocation, song.title + song.version)
         }else{
             Toast.makeText(context, context.getString(R.string.userNotSignedInMsg), Toast.LENGTH_SHORT)
                 .show()

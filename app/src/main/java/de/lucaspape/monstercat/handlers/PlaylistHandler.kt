@@ -18,6 +18,7 @@ import de.lucaspape.monstercat.auth.sid
 import de.lucaspape.monstercat.database.PlaylistDataDatabaseHelper
 import de.lucaspape.monstercat.database.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.SongDatabaseHelper
+import de.lucaspape.monstercat.download.addDownloadCoverArray
 import de.lucaspape.monstercat.json.JSONParser
 import org.json.JSONObject
 
@@ -220,7 +221,7 @@ class PlaylistHandler {
             swipeRefreshLayout.isRefreshing = false
 
             //download cover art
-            MainActivity.downloadHandler!!.addCoverArray(currentListViewData)
+            addDownloadCoverArray(currentListViewData)
         } else {
             //load playlists again, trackcount could have changed
             loadPlaylist(view, true, false)
@@ -262,7 +263,7 @@ class PlaylistHandler {
                     swipeRefreshLayout.isRefreshing = false
 
                     //download cover art
-                    MainActivity.downloadHandler!!.addCoverArray(currentListViewData)
+                    addDownloadCoverArray(currentListViewData)
                 } else {
                     playlistTrackRequestQueue.add(requests[finishedRequests])
                 }
