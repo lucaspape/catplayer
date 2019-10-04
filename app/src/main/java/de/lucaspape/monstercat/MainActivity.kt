@@ -127,10 +127,4 @@ class MainActivity : AppCompatActivity() {
 
         HomeHandler.albumView = HomeHandler.albumViewSelected
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        unregisterReceiver(NoisyReceiver())
-    }
-
 }

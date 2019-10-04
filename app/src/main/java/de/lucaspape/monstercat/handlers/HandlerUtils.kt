@@ -2,14 +2,17 @@ package de.lucaspape.monstercat.handlers
 
 import android.app.AlertDialog
 import android.content.Context
+import android.widget.Toast
 import com.android.volley.AuthFailureError
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import de.lucaspape.monstercat.MainActivity
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.loggedIn
 import de.lucaspape.monstercat.auth.sid
+import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.database.SongDatabaseHelper
 import de.lucaspape.monstercat.json.JSONParser
 import de.lucaspape.monstercat.music.addSong
@@ -85,11 +88,34 @@ fun playSongFromId(context: Context, songId:String, playNow: Boolean) {
 
 //TODO implement
 fun downloadPlaylist(context: Context, playlistId: String) {
-
 }
 
-//TODO implement
-fun downloadSong(context: Context, songId:String) {
+fun downloadSong(context: Context, song:Song) {
+    val settings = Settings(context)
+
+    val downloadType = settings.getSetting("downloadType")
+    val downloadQuality = settings.getSetting("downloadQuality")
+
+    val downloadUrl =
+        context.getString(R.string.songDownloadUrl) + song.albumId + "/download?method=download&type=" + downloadType + "_" + downloadQuality + "&track=" + song.songId
+
+    val downloadLocation = context.filesDir.toString() + "/" + song.artist + song.title + song.version + "." + downloadType
+
+    if (!File(downloadLocation).exists()) {
+        if (sid != "") {
+            MainActivity.downloadHandler!!.addSong(downloadUrl, downloadLocation, song.title + song.version)
+        }else{
+            Toast.makeText(context, context.getString(R.string.userNotSignedInMsg), Toast.LENGTH_SHORT)
+                .show()
+        }
+    }else{
+        Toast.makeText(
+            context,
+            context.getString(R.string.alreadyDownloadedMsg, song.title + song.version),
+            Toast.LENGTH_SHORT
+        )
+            .show()
+    }
 
 }
 

@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import de.lucaspape.monstercat.handlers.PlaylistHandler
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.database.SongDatabaseHelper
 import de.lucaspape.monstercat.handlers.downloadPlaylist
 import de.lucaspape.monstercat.handlers.downloadSong
 import de.lucaspape.monstercat.handlers.playSongFromId
@@ -74,7 +75,12 @@ class PlaylistFragment : Fragment() {
             if (listItem["type"] == "playlist") {
                 downloadPlaylist(context!!, listItem["playlistId"] as String)
             } else {
-                downloadSong(context!!, listItem["id"] as String)
+                val songDatabaseHelper = SongDatabaseHelper(view!!.context)
+                val song = songDatabaseHelper.getSong(listItem["id"] as String)
+
+                if(song != null){
+                    downloadSong(context!!, song)
+                }
             }
 
         } else if (item.title == getString(R.string.playNext)) {
