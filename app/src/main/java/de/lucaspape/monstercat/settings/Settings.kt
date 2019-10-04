@@ -7,7 +7,7 @@ import java.io.*
 class Settings(private val context: Context) {
 
     init {
-        setDefaultSettings(true)
+        setDefaultSettings(false)
     }
 
     fun getSetting(key: String): String? {
@@ -71,12 +71,28 @@ class Settings(private val context: Context) {
             saveSetting("secondaryCoverResolution", "64")
         }
 
+        if(getSetting("streamOverMobile") == null){
+            saveSetting("streamOverMobile", "false")
+        }
+
+        if(getSetting("downloadOverMobile") == null){
+            saveSetting("downloadOverMobile", "false")
+        }
+
+        if(getSetting("downloadCoversOverMobile") == null){
+            saveSetting("downloadCoversOverMobile", "false")
+        }
+
         if (overwrite) {
             saveSetting("downloadType", "mp3")
             saveSetting("downloadQuality", "320")
 
             saveSetting("primaryCoverResolution", "512")
             saveSetting("secondaryCoverResolution", "64")
+
+            saveSetting("streamOverMobile", "false")
+            saveSetting("downloadOverMobile", "false")
+            saveSetting("downloadCoversOverMobile", "false")
         }
 
     }

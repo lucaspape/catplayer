@@ -33,4 +33,8 @@
     <string name="downloadingCoversMsg">Downloading Cover Images</string>
     <string name="catalogView">Catalog View</string>
     <string name="albumView">Album View</string>
+    <string name="allowStreamMobile">Allow streaming over mobile data</string>
+    <string name="allowDownloadMobile">Allow downloading over mobile data</string>
+    <string name="allowCoverDownloadMobile">Allow cover downloads over mobile data</string>
+    <string name="settingsDescription">Settings</string>
 </resources>

@@ -18,6 +18,7 @@ import android.media.MediaMetadata
 import android.media.MediaPlayer
 import android.media.session.MediaSession
 import android.media.session.PlaybackState
+import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Handler
 import android.view.View
@@ -194,8 +195,19 @@ fun setPlayButton(newPlayButton: ImageButton) {
 private fun play() {
     try {
         val song = playList[currentSong]
-
+        val settings = Settings(contextReference!!.get()!!)
         val url = song.getUrl()
+
+        val connectivityManager =
+            contextReference!!.get()!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
+
+        if (!File(url).exists()) {
+            if (wifi != null && !wifi.isConnected && settings.getSetting("streamOverMobile") != "true") {
+                println("DONT STREAM")
+                return
+            }
+        }
 
         mediaPlayer.stop()
         mediaPlayer = MediaPlayer()
@@ -205,7 +217,6 @@ private fun play() {
         mediaPlayer.prepareAsync()
 
         mediaPlayer.setOnPreparedListener {
-            val settings = Settings(contextReference!!.get()!!)
             val primaryResolution = settings.getSetting("primaryCoverResolution")
 
             mediaPlayer.start()

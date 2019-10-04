@@ -96,6 +96,7 @@ class MainActivity : AppCompatActivity() {
 
             Linkify.addLinks(spannableString, Linkify.WEB_URLS)
             textView.text = spannableString
+            textView.setTextSize(18f)
             textView.movementMethod = LinkMovementMethod.getInstance()
 
             val alertDialogBuilder = AlertDialog.Builder(this)
@@ -104,7 +105,11 @@ class MainActivity : AppCompatActivity() {
             alertDialogBuilder.setPositiveButton(getString(R.string.ok), null)
             alertDialogBuilder.setView(textView)
             alertDialogBuilder.show()
-            settings.saveSetting("privacypolicy", "1.0")
+
+            alertDialogBuilder.setOnDismissListener {
+                settings.saveSetting("privacypolicy", "1.0")
+            }
+
         }
     }
 }
