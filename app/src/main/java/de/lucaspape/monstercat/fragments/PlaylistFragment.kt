@@ -48,7 +48,7 @@ class PlaylistFragment : Fragment() {
 
             playlistHandler.registerListeners(view)
 
-            playlistHandler.loadPlaylist(view, false)
+            playlistHandler.loadPlaylist(view, false, true)
 
             registerForContextMenu(playlistView as ListView)
         }

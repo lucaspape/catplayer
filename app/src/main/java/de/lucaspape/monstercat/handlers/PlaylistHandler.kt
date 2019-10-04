@@ -53,7 +53,7 @@ class PlaylistHandler {
         val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
         swipeRefreshLayout.setOnRefreshListener {
             if (listViewDataIsPlaylistView) {
-                loadPlaylist(view, true)
+                loadPlaylist(view, true, true)
             } else {
                 loadPlaylistTracks(view, true, currentPlaylistId!!, currentPlaylistTrackCount!!)
             }
@@ -103,7 +103,7 @@ class PlaylistHandler {
         playlistList.refreshDrawableState()
     }
 
-    fun loadPlaylist(view: View, forceReload: Boolean) {
+    fun loadPlaylist(view: View, forceReload: Boolean, showAfter:Boolean) {
         val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
         swipeRefreshLayout.isRefreshing = true
 
@@ -119,11 +119,14 @@ class PlaylistHandler {
                 playlistHashMaps.add(jsonParser.parsePlaylistToHashMap(playlist))
             }
 
-            currentListViewData = playlistHashMaps
-            updateListView(view)
-            redrawListView(view)
+            if(showAfter){
+                currentListViewData = playlistHashMaps
+                updateListView(view)
+                redrawListView(view)
 
-            swipeRefreshLayout.isRefreshing = false
+                swipeRefreshLayout.isRefreshing = false
+            }
+
         } else {
             val playlistRequestQueue = Volley.newRequestQueue(view.context)
 
@@ -155,9 +158,12 @@ class PlaylistHandler {
                         playlistHashMaps.add(jsonParser.parsePlaylistToHashMap(playlist))
                     }
 
-                    currentListViewData = playlistHashMaps
-                    updateListView(view)
-                    redrawListView(view)
+                    if(showAfter){
+                        currentListViewData = playlistHashMaps
+                        updateListView(view)
+                        redrawListView(view)
+                    }
+
                 },
                 Response.ErrorListener { }) {
                 @Throws(AuthFailureError::class)
@@ -172,8 +178,10 @@ class PlaylistHandler {
             }
 
             playlistRequestQueue.addRequestFinishedListener<Any> {
-                swipeRefreshLayout.isRefreshing = false
-                listViewDataIsPlaylistView = true
+                if(showAfter){
+                    swipeRefreshLayout.isRefreshing = false
+                    listViewDataIsPlaylistView = true
+                }
             }
 
             playlistRequestQueue.add(playlistRequest)
@@ -215,6 +223,9 @@ class PlaylistHandler {
             //download cover art
             MainActivity.downloadHandler!!.addCoverArray(currentListViewData)
         } else {
+            //load playlists again, trackcount could have changed
+            loadPlaylist(view, true, false)
+
             var finishedRequests = 0
             var totalRequestsCount = 0
 
