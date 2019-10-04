@@ -1,5 +1,7 @@
 package de.lucaspape.monstercat.handlers
 
+import android.content.Context
+import android.os.AsyncTask
 import android.os.Handler
 import android.os.Looper
 import android.view.View
@@ -21,15 +23,48 @@ import de.lucaspape.monstercat.database.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadCoverArray
 import de.lucaspape.monstercat.json.JSONParser
 import org.json.JSONObject
+import java.lang.ref.WeakReference
 
 class PlaylistHandler {
-    var currentListViewData = ArrayList<HashMap<String, Any?>>()
-    var listViewDataIsPlaylistView = true
+    companion object{
+        @JvmStatic var currentListViewData = ArrayList<HashMap<String, Any?>>()
+        @JvmStatic var listViewDataIsPlaylistView = true
 
-    private var simpleAdapter: SimpleAdapter? = null
+        @JvmStatic private var simpleAdapter: SimpleAdapter? = null
 
-    private var currentPlaylistId: String? = null
-    private var currentPlaylistTrackCount: Int? = null
+        private var currentPlaylistId: String? = null
+        private var currentPlaylistTrackCount: Int? = null
+
+        @JvmStatic fun updateListView(view: View) {
+            val playlistList = view.findViewById<ListView>(R.id.playlistView)
+
+            var from = arrayOf("shownTitle", "secondaryImage")
+            var to = arrayOf(R.id.title, R.id.cover)
+
+            if (listViewDataIsPlaylistView) {
+                from = arrayOf("playlistName", "coverUrl")
+                to = arrayOf(R.id.title, R.id.cover)
+            }
+
+            simpleAdapter = SimpleAdapter(
+                view.context,
+                currentListViewData,
+                R.layout.list_single,
+                from,
+                to.toIntArray()
+            )
+
+            playlistList.adapter = simpleAdapter
+
+        }
+
+        @JvmStatic fun redrawListView(view: View) {
+            val playlistList = view.findViewById<ListView>(R.id.playlistView)
+            simpleAdapter!!.notifyDataSetChanged()
+            playlistList.invalidateViews()
+            playlistList.refreshDrawableState()
+        }
+    }
 
     fun setupListView(view: View) {
         updateListView(view)
@@ -73,244 +108,15 @@ class PlaylistHandler {
         }
     }
 
-    fun updateListView(view: View) {
-        val playlistList = view.findViewById<ListView>(R.id.playlistView)
-
-        var from = arrayOf("shownTitle", "secondaryImage")
-        var to = arrayOf(R.id.title, R.id.cover)
-
-        if (listViewDataIsPlaylistView) {
-            from = arrayOf("playlistName", "coverUrl")
-            to = arrayOf(R.id.title, R.id.cover)
-        }
-
-        simpleAdapter = SimpleAdapter(
-            view.context,
-            currentListViewData,
-            R.layout.list_single,
-            from,
-            to.toIntArray()
-        )
-
-        playlistList.adapter = simpleAdapter
-
-    }
-
-    private fun redrawListView(view: View) {
-        val playlistList = view.findViewById<ListView>(R.id.playlistView)
-        simpleAdapter!!.notifyDataSetChanged()
-        playlistList.invalidateViews()
-        playlistList.refreshDrawableState()
-    }
-
     fun loadPlaylist(view: View, forceReload: Boolean, showAfter:Boolean) {
-        val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
-        swipeRefreshLayout.isRefreshing = true
-
-        val playlistDatabaseHelper = PlaylistDatabaseHelper(view.context)
-        var playlists = playlistDatabaseHelper.getAllPlaylists()
-
-        if (!forceReload && playlists.isNotEmpty()) {
-            val jsonParser = JSONParser()
-
-            val playlistHashMaps = ArrayList<HashMap<String, Any?>>()
-
-            for (playlist in playlists) {
-                playlistHashMaps.add(jsonParser.parsePlaylistToHashMap(playlist))
-            }
-
-            if(showAfter){
-                currentListViewData = playlistHashMaps
-                updateListView(view)
-                redrawListView(view)
-
-                swipeRefreshLayout.isRefreshing = false
-            }
-
-        } else {
-            val playlistRequestQueue = Volley.newRequestQueue(view.context)
-
-            val playlistUrl = view.context.getString(R.string.playlistsUrl)
-
-            val playlistRequest = object : StringRequest(Method.GET, playlistUrl,
-                Response.Listener { response ->
-                    val jsonObject = JSONObject(response)
-                    val jsonArray = jsonObject.getJSONArray("results")
-
-                    val list = ArrayList<Long>()
-
-                    val jsonParser = JSONParser()
-
-                    for (i in (0 until jsonArray.length())) {
-                        list.add(
-                            jsonParser.parsePlaylistToDB(
-                                view.context,
-                                jsonArray.getJSONObject(i)
-                            )
-                        )
-                    }
-
-                    playlists = playlistDatabaseHelper.getAllPlaylists()
-
-                    val playlistHashMaps = ArrayList<HashMap<String, Any?>>()
-
-                    for (playlist in playlists) {
-                        playlistHashMaps.add(jsonParser.parsePlaylistToHashMap(playlist))
-                    }
-
-                    if(showAfter){
-                        currentListViewData = playlistHashMaps
-                        updateListView(view)
-                        redrawListView(view)
-                    }
-
-                },
-                Response.ErrorListener { }) {
-                @Throws(AuthFailureError::class)
-                override fun getHeaders(): Map<String, String> {
-                    val params = HashMap<String, String>()
-                    if (loggedIn) {
-                        params["Cookie"] = "connect.sid=$sid"
-                    }
-
-                    return params
-                }
-            }
-
-            playlistRequestQueue.addRequestFinishedListener<Any> {
-                if(showAfter){
-                    swipeRefreshLayout.isRefreshing = false
-                    listViewDataIsPlaylistView = true
-                }
-            }
-
-            playlistRequestQueue.add(playlistRequest)
-        }
+        val contextReference = WeakReference<Context>(view.context)
+        val viewReference = WeakReference<View>(view)
+        LoadPlaylistAsync(viewReference, contextReference, forceReload, showAfter).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 
     fun loadPlaylistTracks(view: View, forceReload: Boolean, playlistId: String, trackCount: Int) {
-        val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
-        swipeRefreshLayout.isRefreshing = true
-
-        val playlistDataDatabaseHelper = PlaylistDataDatabaseHelper(view.context, playlistId)
-        var playlistDatas = playlistDataDatabaseHelper.getAllData()
-
-        if (!forceReload && playlistDatas.isNotEmpty()) {
-            val sortedList = ArrayList<HashMap<String, Any?>>()
-
-            playlistDatas = playlistDataDatabaseHelper.getAllData()
-
-            val songDatabaseHelper = SongDatabaseHelper(view.context)
-
-            val jsonParser = JSONParser()
-
-            for (playlistData in playlistDatas) {
-                val song = songDatabaseHelper.getSong(playlistData.songId)
-
-                val hashMap = jsonParser.parseSongToHashMap(view.context, song)
-                sortedList.add(hashMap)
-
-            }
-
-            //display list
-            currentListViewData = sortedList
-            listViewDataIsPlaylistView = false
-            updateListView(view)
-            redrawListView(view)
-
-            swipeRefreshLayout.isRefreshing = false
-
-            //download cover art
-            addDownloadCoverArray(currentListViewData)
-        } else {
-            //load playlists again, trackcount could have changed
-            loadPlaylist(view, true, false)
-
-            var finishedRequests = 0
-            var totalRequestsCount = 0
-
-            val requests = ArrayList<StringRequest>()
-
-            val playlistTrackRequestQueue = Volley.newRequestQueue(view.context)
-
-            val tempList = arrayOfNulls<Long>(trackCount)
-
-            playlistTrackRequestQueue.addRequestFinishedListener<Any> {
-                finishedRequests++
-
-                if (finishedRequests >= totalRequestsCount) {
-                    val sortedList = ArrayList<HashMap<String, Any?>>()
-
-                    playlistDatas = playlistDataDatabaseHelper.getAllData()
-
-                    val songDatabaseHelper = SongDatabaseHelper(view.context)
-
-                    val jsonParser = JSONParser()
-
-                    for (playlistData in playlistDatas) {
-                        val song = songDatabaseHelper.getSong(playlistData.songId)
-
-                        val hashMap = jsonParser.parseSongToHashMap(view.context, song)
-                        sortedList.add(hashMap)
-                    }
-
-                    //display list
-                    currentListViewData = sortedList
-                    listViewDataIsPlaylistView = false
-                    updateListView(view)
-                    redrawListView(view)
-
-                    swipeRefreshLayout.isRefreshing = false
-
-                    //download cover art
-                    addDownloadCoverArray(currentListViewData)
-                } else {
-                    playlistTrackRequestQueue.add(requests[finishedRequests])
-                }
-            }
-
-            for (i in (0..(trackCount as Int / 50))) {
-                val playlistTrackUrl =
-                    view.context.getString(R.string.loadSongsUrl) + "?playlistId=" + playlistId + "&skip=" + (i * 50).toString() + "&limit=50"
-
-                val playlistTrackRequest = object : StringRequest(Method.GET, playlistTrackUrl,
-                    Response.Listener { response ->
-                        val jsonObject = JSONObject(response)
-                        val jsonArray = jsonObject.getJSONArray("results")
-
-                        for (k in (0 until jsonArray.length())) {
-                            val playlistObject = jsonArray.getJSONObject(k)
-
-                            val jsonParser = JSONParser()
-
-                            //  val trackHashMap = jsonParser.parsePlaylistTracksToHashMap(playlistObject, view.context)
-
-                            val id = jsonParser.parsePlaylistTrackToDB(
-                                playlistId,
-                                playlistObject,
-                                view.context
-                            )
-                            if (id != null) {
-                                tempList[i * 50 + k] = id
-                            }
-                        }
-                    },
-                    Response.ErrorListener { }) {
-                    @Throws(AuthFailureError::class)
-                    override fun getHeaders(): Map<String, String> {
-                        val params = HashMap<String, String>()
-                        if (loggedIn) {
-                            params["Cookie"] = "connect.sid=$sid"
-                        }
-
-                        return params
-                    }
-                }
-
-                totalRequestsCount++
-                requests.add(playlistTrackRequest)
-            }
-            playlistTrackRequestQueue.add(requests[finishedRequests])
-        }
+        val contextReference = WeakReference<Context>(view.context)
+        val viewReference = WeakReference<View>(view)
+        LoadPlaylistTracksAsync(viewReference, contextReference, forceReload, playlistId, trackCount).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 }

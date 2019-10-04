@@ -14,6 +14,7 @@ import de.lucaspape.monstercat.auth.sid
 import de.lucaspape.monstercat.auth.loggedIn
 import java.io.*
 import java.lang.IndexOutOfBoundsException
+import java.lang.RuntimeException
 import java.lang.ref.WeakReference
 import java.net.HttpURLConnection
 import java.net.SocketTimeoutException
@@ -170,28 +171,32 @@ class DownloadTask(private val weakReference: WeakReference<Context>) : AsyncTas
 
             try {
                 try{
-                    val downloadFile = Glide.with(context)
-                        .load(glideUrl)
-                        .downloadOnly(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
-                        .get()
+                    try{
+                        val downloadFile = Glide.with(context)
+                            .load(glideUrl)
+                            .downloadOnly(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                            .get()
 
-                    val destFile = File(location)
+                        val destFile = File(location)
 
-                    val bufferedInputStream = BufferedInputStream(FileInputStream(downloadFile))
-                    val bufferedOutputStream = BufferedOutputStream(FileOutputStream(destFile))
+                        val bufferedInputStream = BufferedInputStream(FileInputStream(downloadFile))
+                        val bufferedOutputStream = BufferedOutputStream(FileOutputStream(destFile))
 
-                    val buffer = ByteArray(1024)
+                        val buffer = ByteArray(1024)
 
-                    var len: Int
-                    len = bufferedInputStream.read(buffer)
-                    while (len > 0) {
-                        bufferedOutputStream.write(buffer, 0, len)
+                        var len: Int
                         len = bufferedInputStream.read(buffer)
-                    }
-                    bufferedOutputStream.flush()
-                    bufferedOutputStream.close()
+                        while (len > 0) {
+                            bufferedOutputStream.write(buffer, 0, len)
+                            len = bufferedInputStream.read(buffer)
+                        }
+                        bufferedOutputStream.flush()
+                        bufferedOutputStream.close()
 
-                    return true
+                        return true
+                    }catch (e: RuntimeException){
+                        return false
+                    }
                 }catch (e: SocketTimeoutException){
                     return false
                 }
