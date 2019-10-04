@@ -1,6 +1,7 @@
 package de.lucaspape.monstercat.music
 
 import android.animation.ValueAnimator
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -21,6 +22,9 @@ import android.media.session.PlaybackState
 import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Handler
+import android.support.v4.media.MediaMetadataCompat
+import android.support.v4.media.session.MediaSessionCompat
+import android.support.v4.media.session.PlaybackStateCompat
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
@@ -63,7 +67,7 @@ const val NOTIFICATION_PAUSE = "de.lucaspape.monstercat.pause"
 const val NOTIFICATION_PLAY = "de.lucaspape.monstercat.play"
 const val NOTIFICATION_NEXT = "de.lucaspape.monstercat.next"
 
-private var mediaSession: MediaSession? = null
+private var mediaSession: MediaSessionCompat? = null
 
 class NoisyReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
@@ -74,9 +78,12 @@ class NoisyReceiver : BroadcastReceiver() {
 }
 
 fun createMediaSession(context: WeakReference<Context>) {
-    mediaSession = MediaSession(context.get()!!, "de.lucaspape.monstercat.music")
+    mediaSession = MediaSessionCompat.fromMediaSession(
+        context.get()!!,
+        MediaSession(context.get()!!, "de.lucaspape.monstercat.music")
+    )
 
-    mediaSession!!.setCallback(object : MediaSession.Callback() {
+    mediaSession!!.setCallback(object : MediaSessionCompat.Callback() {
 
         override fun onPause() {
             pause()
@@ -304,7 +311,7 @@ private fun play() {
 }
 
 private fun setPlayerState(progress: Long) {
-    val stateBuilder = PlaybackState.Builder()
+    val stateBuilder = PlaybackStateCompat.Builder()
 
     val state: Int = if (playing) {
         PlaybackState.STATE_PLAYING
@@ -314,21 +321,21 @@ private fun setPlayerState(progress: Long) {
 
     stateBuilder.setState(state, progress, 1.0f)
     stateBuilder.setActions(
-        PlaybackState.ACTION_PLAY +
-                PlaybackState.ACTION_PAUSE +
-                PlaybackState.ACTION_SKIP_TO_NEXT +
-                PlaybackState.ACTION_SKIP_TO_PREVIOUS +
-                PlaybackState.ACTION_STOP +
-                PlaybackState.ACTION_PLAY_PAUSE +
-                PlaybackState.ACTION_SEEK_TO +
-                PlaybackState.ACTION_FAST_FORWARD +
-                PlaybackState.ACTION_REWIND
+        PlaybackStateCompat.ACTION_PLAY +
+                PlaybackStateCompat.ACTION_PAUSE +
+                PlaybackStateCompat.ACTION_SKIP_TO_NEXT +
+                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS +
+                PlaybackStateCompat.ACTION_STOP +
+                PlaybackStateCompat.ACTION_PLAY_PAUSE +
+                PlaybackStateCompat.ACTION_SEEK_TO +
+                PlaybackStateCompat.ACTION_FAST_FORWARD +
+                PlaybackStateCompat.ACTION_REWIND
     )
     mediaSession!!.setPlaybackState(stateBuilder.build())
 }
 
 private fun setSongMetadata(artist: String, title: String, coverImage: Bitmap?, duration: Long) {
-    val mediaMetadata = MediaMetadata.Builder()
+    val mediaMetadata = MediaMetadataCompat.Builder()
     mediaMetadata.putString(MediaMetadata.METADATA_KEY_ARTIST, artist)
     mediaMetadata.putString(MediaMetadata.METADATA_KEY_TITLE, title)
     mediaMetadata.putLong(MediaMetadata.METADATA_KEY_DURATION, duration)
@@ -455,176 +462,88 @@ fun toggleMusic() {
     }
 }
 
-/**
- * Notification
- */
-private fun showNotificationAndroidO(
-    titleName: String,
-    artistName: String,
-    coverUrl: String,
-    playing: Boolean
-) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        val context = contextReference!!.get()!!
 
-        createNotificationChannel()
-
-        val backgroundColor: Int
-        val expandedRemoteViews: RemoteViews
-
-        val coverFile = File(coverUrl)
-        if (coverFile.exists()) {
-            val bitmap = BitmapFactory.decodeFile(coverFile.absolutePath)
-            backgroundColor = getDominantColor(bitmap)
-
-            if (getTextColor(backgroundColor) == Color.WHITE) {
-                expandedRemoteViews = RemoteViews(
-                    context.packageName,
-                    R.layout.notification_expanded_white
-                )
-                expandedRemoteViews.setTextColor(R.id.songname, Color.WHITE)
-                expandedRemoteViews.setTextColor(R.id.artistname, Color.WHITE)
-            } else {
-                expandedRemoteViews = RemoteViews(
-                    context.packageName,
-                    R.layout.notification_expanded
-                )
-                expandedRemoteViews.setTextColor(R.id.songname, Color.BLACK)
-                expandedRemoteViews.setTextColor(R.id.artistname, Color.BLACK)
-            }
-
-            expandedRemoteViews.setImageViewBitmap(R.id.coverimageview, bitmap)
-
-            expandedRemoteViews.setInt(
-                R.id.notificationlayout,
-                "setBackgroundColor",
-                backgroundColor
-            )
-        } else {
-            expandedRemoteViews = RemoteViews(
-                context.packageName,
-                R.layout.notification_expanded
-            )
-        }
-
-        expandedRemoteViews.setTextViewText(R.id.artistname, artistName)
-        expandedRemoteViews.setTextViewText(R.id.songname, titleName)
-
-        if (playing) {
-            expandedRemoteViews.setViewVisibility(R.id.playButton, View.GONE)
-            expandedRemoteViews.setViewVisibility(R.id.pauseButton, View.VISIBLE)
-        } else {
-            expandedRemoteViews.setViewVisibility(R.id.playButton, View.VISIBLE)
-            expandedRemoteViews.setViewVisibility(R.id.pauseButton, View.GONE)
-        }
-
-        val notificationBuilder = NotificationCompat.Builder(context, channelID)
-        notificationBuilder.setSmallIcon(R.drawable.ic_play_circle_filled_black_24dp)
-        notificationBuilder.priority = NotificationCompat.PRIORITY_LOW
-        notificationBuilder.setOngoing(true)
-
-        notificationBuilder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
-        notificationBuilder.setCustomBigContentView(expandedRemoteViews)
-
-        setListeners(expandedRemoteViews, context)
-
-        val notificationManagerCompat = NotificationManagerCompat.from(context)
-        notificationManagerCompat.notify(notificationID, notificationBuilder.build())
-
-        context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_PREVIOUS))
-        context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_DELETE))
-        context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_PAUSE))
-        context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_PLAY))
-        context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_NEXT))
-    }
-}
-
-//android < sdk 26
 private fun showSongNotification(
     titleName: String,
     artistName: String,
     coverUrl: String,
     playing: Boolean
 ) {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-        val context = contextReference!!.get()!!
+    val context = contextReference!!.get()!!
 
-        createNotificationChannel()
+    createNotificationChannel()
 
-        val backgroundColor: Int
+    val backgroundColor: Int
+    val expandedRemoteViews: RemoteViews
 
-        val expandedRemoteViews: RemoteViews
+    val coverFile = File(coverUrl)
+    if (coverFile.exists()) {
+        val bitmap = BitmapFactory.decodeFile(coverFile.absolutePath)
+        backgroundColor = getDominantColor(bitmap)
 
-        val coverFile = File(coverUrl)
-        if (coverFile.exists()) {
-            val bitmap = BitmapFactory.decodeFile(coverFile.absolutePath)
-            backgroundColor = getDominantColor(bitmap)
-
-            if (getTextColor(backgroundColor) == Color.WHITE) {
-                expandedRemoteViews = RemoteViews(
-                    context.packageName,
-                    R.layout.notification_expanded_white
-                )
-                expandedRemoteViews.setTextColor(R.id.songname, Color.WHITE)
-                expandedRemoteViews.setTextColor(R.id.artistname, Color.WHITE)
-            } else {
-                expandedRemoteViews = RemoteViews(
-                    context.packageName,
-                    R.layout.notification_expanded
-                )
-                expandedRemoteViews.setTextColor(R.id.songname, Color.BLACK)
-                expandedRemoteViews.setTextColor(R.id.artistname, Color.BLACK)
-            }
-
-            expandedRemoteViews.setImageViewBitmap(R.id.coverimageview, bitmap)
-
-            expandedRemoteViews.setInt(
-                R.id.notificationlayout,
-                "setBackgroundColor",
-                backgroundColor
+        if (getTextColor(backgroundColor) == Color.WHITE) {
+            expandedRemoteViews = RemoteViews(
+                context.packageName,
+                R.layout.notification_expanded_white
             )
+            expandedRemoteViews.setTextColor(R.id.songname, Color.WHITE)
+            expandedRemoteViews.setTextColor(R.id.artistname, Color.WHITE)
         } else {
             expandedRemoteViews = RemoteViews(
                 context.packageName,
                 R.layout.notification_expanded
             )
+            expandedRemoteViews.setTextColor(R.id.songname, Color.BLACK)
+            expandedRemoteViews.setTextColor(R.id.artistname, Color.BLACK)
         }
 
-        expandedRemoteViews.setTextViewText(R.id.songname, titleName)
-        expandedRemoteViews.setTextViewText(R.id.songname, titleName)
+        expandedRemoteViews.setImageViewBitmap(R.id.coverimageview, bitmap)
 
-        if (playing) {
-            expandedRemoteViews.setViewVisibility(R.id.playButton, View.GONE)
-            expandedRemoteViews.setViewVisibility(R.id.pauseButton, View.VISIBLE)
-        } else {
-            expandedRemoteViews.setViewVisibility(R.id.playButton, View.VISIBLE)
-            expandedRemoteViews.setViewVisibility(R.id.pauseButton, View.GONE)
-        }
-
-        val notificationBuilder = NotificationCompat.Builder(context, channelID)
-        notificationBuilder.setSmallIcon(R.drawable.ic_play_circle_filled_black_24dp)
-        notificationBuilder.priority = NotificationCompat.PRIORITY_LOW
-        notificationBuilder.setOngoing(true)
-
-        //notificationBuilder.setColorized(true)
-        //notificationBuilder.color = backgroundColor
-
-        notificationBuilder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
-        notificationBuilder.setCustomBigContentView(expandedRemoteViews)
-
-        setListeners(expandedRemoteViews, context)
-
-        val notificationManagerCompat = NotificationManagerCompat.from(context)
-        notificationManagerCompat.notify(notificationID, notificationBuilder.build())
-
-        context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_PREVIOUS))
-        context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_DELETE))
-        context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_PAUSE))
-        context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_PLAY))
-        context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_NEXT))
+        expandedRemoteViews.setInt(
+            R.id.notificationlayout,
+            "setBackgroundColor",
+            backgroundColor
+        )
     } else {
-        showNotificationAndroidO(titleName, artistName, coverUrl, playing)
+        expandedRemoteViews = RemoteViews(
+            context.packageName,
+            R.layout.notification_expanded
+        )
     }
+
+    expandedRemoteViews.setTextViewText(R.id.artistname, artistName)
+    expandedRemoteViews.setTextViewText(R.id.songname, titleName)
+
+    if (playing) {
+        expandedRemoteViews.setViewVisibility(R.id.playButton, View.GONE)
+        expandedRemoteViews.setViewVisibility(R.id.pauseButton, View.VISIBLE)
+    } else {
+        expandedRemoteViews.setViewVisibility(R.id.playButton, View.VISIBLE)
+        expandedRemoteViews.setViewVisibility(R.id.pauseButton, View.GONE)
+    }
+
+    val notificationBuilder = NotificationCompat.Builder(context, channelID)
+    notificationBuilder.setSmallIcon(R.drawable.ic_play_circle_filled_black_24dp)
+    notificationBuilder.priority = NotificationCompat.PRIORITY_LOW
+    notificationBuilder.setOngoing(true)
+
+    notificationBuilder.setStyle(
+        androidx.media.app.NotificationCompat.MediaStyle().setMediaSession(
+            mediaSession!!.sessionToken
+        )
+    )
+    notificationBuilder.setCustomBigContentView(expandedRemoteViews)
+
+    setListeners(expandedRemoteViews, context)
+
+    val notificationManagerCompat = NotificationManagerCompat.from(context)
+    notificationManagerCompat.notify(notificationID, notificationBuilder.build())
+
+    context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_PREVIOUS))
+    context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_DELETE))
+    context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_PAUSE))
+    context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_PLAY))
+    context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_NEXT))
 }
 
 private fun createNotificationChannel() {
