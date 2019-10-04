@@ -13,8 +13,8 @@ import de.lucaspape.monstercat.R
 private const val channelID = "Download Notification"
 private const val notificationID = 2
 
-val downloadList = ArrayList<HashMap<String, Any?>>()
-val downloadCoverArrayListList = ArrayList<ArrayList<HashMap<String, Any?>>>()
+val downloadList = ArrayList<HashMap<String, Any?>?>()
+val downloadCoverArrayListList = ArrayList<ArrayList<HashMap<String, Any?>>?>()
 
 fun addDownloadSong(url: String, location: String, shownTitle: String) {
     val downloadTrack = HashMap<String, Any?>()

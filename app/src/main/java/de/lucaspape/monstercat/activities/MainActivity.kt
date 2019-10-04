@@ -105,10 +105,7 @@ class MainActivity : AppCompatActivity() {
             alertDialogBuilder.setPositiveButton(getString(R.string.ok), null)
             alertDialogBuilder.setView(textView)
             alertDialogBuilder.show()
-
-            alertDialogBuilder.setOnDismissListener {
-                settings.saveSetting("privacypolicy", "1.0")
-            }
+            settings.saveSetting("privacypolicy", "1.0")
 
         }
     }

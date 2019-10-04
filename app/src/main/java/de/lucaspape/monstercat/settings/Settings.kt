@@ -11,53 +11,15 @@ class Settings(private val context: Context) {
     }
 
     fun getSetting(key: String): String? {
-        try {
-            return try {
-                val settingsFile = File(context.getString(R.string.settingsFile, context.filesDir.toString()))
-                if (settingsFile.exists()) {
-                    val ois = ObjectInputStream(FileInputStream(settingsFile))
-                    val settingsMap = ois.readObject() as HashMap<String, String>
-                    ois.close()
-
-                    settingsMap[key]
-                } else {
-                    null
-                }
-            } catch (e: EOFException) {
-                //ah shit, here we go again
-                getSetting(key)
-            }
-        } catch (e: StreamCorruptedException) {
-            return getSetting(key)
-        }
-
+        val sharedPreferences = context.getSharedPreferences("settings", 0)
+        return sharedPreferences.getString(key, null)
     }
 
     fun saveSetting(key: String, setting: String) {
-        try {
-            try {
-                val settingsFile = File(context.getString(R.string.settingsFile, context.filesDir.toString()))
-                var settingsMap = HashMap<String, String>()
-
-                if (settingsFile.exists()) {
-                    val ois = ObjectInputStream(FileInputStream(settingsFile))
-                    settingsMap = ois.readObject() as HashMap<String, String>
-                    ois.close()
-                }
-
-                settingsMap[key] = setting
-
-                val oos = ObjectOutputStream(FileOutputStream(settingsFile))
-                oos.writeObject(settingsMap)
-                oos.flush()
-                oos.close()
-            } catch (e: EOFException) {
-                //ah shit, here we go again
-                saveSetting(key, setting)
-            }
-        } catch (e: StreamCorruptedException) {
-            saveSetting(key, setting)
-        }
+        val sharedPreferences = context.getSharedPreferences("settings", 0)
+        val editor = sharedPreferences.edit()
+        editor.putString(key, setting)
+        editor.apply()
     }
 
     private fun setDefaultSettings(overwrite: Boolean) {

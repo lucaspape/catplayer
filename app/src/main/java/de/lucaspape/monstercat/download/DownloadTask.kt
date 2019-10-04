@@ -4,9 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.ConnectivityManager
-import android.net.NetworkInfo
 import android.os.AsyncTask
-import android.os.Build
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.model.GlideUrl
@@ -47,9 +45,9 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                 if (wifi != null && !wifi.isConnected && settings.getSetting("downloadOverMobile") != "true") {
                     println("forbidden by user")
                 }else{
-                    if (downloadList[downloadedSongs].isNotEmpty()) {
+                    if (downloadList[downloadedSongs]!!.isNotEmpty()) {
                         val song = downloadList[downloadedSongs]
-                        val url = song["url"] as String
+                        val url = song!!["url"] as String
                         val location = song["location"] as String
                         val shownTitle = song["shownTitle"] as String
 
@@ -61,6 +59,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                                 downloaded = downloadSong(url, location, sid, context)
                             }
 
+                            downloadList[downloadedSongs] = null
                             hideDownloadNotification(context)
                         }
 
@@ -75,10 +74,10 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                 if (wifi != null && !wifi.isConnected && settings.getSetting("downloadCoversOverMobile") != "true") {
                     println("forbidden by user")
                 }else{
-                    if (downloadCoverArrayListList[downloadedCoverArrays].isNotEmpty()) {
+                    if (downloadCoverArrayListList[downloadedCoverArrays]!!.isNotEmpty()) {
                         val coverArray = downloadCoverArrayListList[downloadedCoverArrays]
 
-                        for (i in coverArray.indices) {
+                        for (i in coverArray!!.indices) {
                             showDownloadNotification(
                                 context.getString(R.string.downloadingCoversMsg),
                                 i,
@@ -101,8 +100,10 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
 
                             }
 
-                            hideDownloadNotification(context)
+                            downloadCoverArrayListList[downloadedCoverArrays] = null
                         }
+
+                        hideDownloadNotification(context)
                     }
                 }
 
@@ -181,8 +182,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
     ): Boolean {
         try {
             if (!File(location + primaryRes).exists() || !File(location + secondaryRes).exists()) {
-                val url = URL("$downloadUrl?image_width=$primaryRes")
-                val connection = url.openConnection() as HttpURLConnection
+                val connection = URL("$downloadUrl?image_width=$primaryRes").openConnection() as HttpURLConnection
                 connection.doInput = true
                 connection.connect()
                 val input = connection.inputStream
@@ -203,6 +203,8 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                 FileOutputStream(location + secondaryRes).use { out ->
                     secondaryBitmap!!.compress(Bitmap.CompressFormat.PNG, 100, out)
                 }
+
+                connection.disconnect()
             }
 
             return true
