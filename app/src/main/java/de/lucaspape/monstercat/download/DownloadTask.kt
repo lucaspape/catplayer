@@ -9,7 +9,7 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.model.LazyHeaders
 import com.bumptech.glide.request.target.Target
-import de.lucaspape.monstercat.MainActivity
+import de.lucaspape.monstercat.activities.MainActivity
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.sid
 import de.lucaspape.monstercat.auth.loggedIn

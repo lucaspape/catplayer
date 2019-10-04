@@ -1,6 +1,5 @@
 package de.lucaspape.monstercat.handlers
 
-import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.view.View
@@ -12,7 +11,7 @@ import com.android.volley.AuthFailureError
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import de.lucaspape.monstercat.MainActivity
+import de.lucaspape.monstercat.activities.MainActivity
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.loggedIn
 import de.lucaspape.monstercat.auth.sid

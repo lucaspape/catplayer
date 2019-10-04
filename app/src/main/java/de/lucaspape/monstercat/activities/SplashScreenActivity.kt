@@ -1,8 +1,9 @@
-package de.lucaspape.monstercat
+package de.lucaspape.monstercat.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.content.Intent
 import android.os.Bundle
+import de.lucaspape.monstercat.R
 
 class SplashScreenActivity : AppCompatActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {

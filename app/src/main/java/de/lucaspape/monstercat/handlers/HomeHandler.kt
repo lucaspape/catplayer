@@ -1,17 +1,14 @@
 package de.lucaspape.monstercat.handlers
 
-import android.app.AlertDialog
-import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.view.View
 import android.widget.*
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.android.volley.*
-import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import de.lucaspape.monstercat.MainActivity
+import de.lucaspape.monstercat.activities.MainActivity
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.sid
 import de.lucaspape.monstercat.auth.loggedIn
@@ -19,9 +16,7 @@ import de.lucaspape.monstercat.database.*
 import de.lucaspape.monstercat.json.JSONParser
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.settings.Settings
-import org.json.JSONArray
 import org.json.JSONObject
-import java.io.*
 import java.lang.ref.WeakReference
 
 /**

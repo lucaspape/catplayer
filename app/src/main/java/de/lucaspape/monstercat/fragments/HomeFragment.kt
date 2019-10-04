@@ -1,12 +1,15 @@
 package de.lucaspape.monstercat.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import android.widget.AdapterView
+import android.widget.ImageButton
 import android.widget.ListView
 import androidx.fragment.app.Fragment
 import de.lucaspape.monstercat.handlers.HomeHandler
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.activities.SettingsActivity
 import de.lucaspape.monstercat.database.SongDatabaseHelper
 import de.lucaspape.monstercat.handlers.addSongToPlaylist
 import de.lucaspape.monstercat.handlers.downloadSong
@@ -41,6 +44,13 @@ class HomeFragment : Fragment() {
             listView = view.findViewById(R.id.musiclistview)
             registerForContextMenu(listView as ListView)
         }
+
+        val settingButton = view.findViewById<ImageButton>(R.id.settingsButton)
+        settingButton.setOnClickListener {
+            val settingsIntent = Intent(view.context, SettingsActivity::class.java)
+            view.context.startActivity(settingsIntent)
+        }
+
     }
 
     override fun onCreateContextMenu(

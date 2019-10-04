@@ -8,8 +8,7 @@ import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import com.google.gson.JsonArray
-import de.lucaspape.monstercat.MainActivity
+import de.lucaspape.monstercat.activities.MainActivity
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.loggedIn
 import de.lucaspape.monstercat.auth.sid
