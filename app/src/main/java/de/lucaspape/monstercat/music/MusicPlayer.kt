@@ -62,9 +62,9 @@ const val NOTIFICATION_PAUSE = "de.lucaspape.monstercat.pause"
 const val NOTIFICATION_PLAY = "de.lucaspape.monstercat.play"
 const val NOTIFICATION_NEXT = "de.lucaspape.monstercat.next"
 
-private var mediaSession:MediaSession? = null
+private var mediaSession: MediaSession? = null
 
-class NoisyReceiver:BroadcastReceiver(){
+class NoisyReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         if (intent!!.action == AudioManager.ACTION_AUDIO_BECOMING_NOISY) {
             pause()
@@ -72,19 +72,19 @@ class NoisyReceiver:BroadcastReceiver(){
     }
 }
 
-fun createMediaSession(context:WeakReference<Context>){
+fun createMediaSession(context: WeakReference<Context>) {
     mediaSession = MediaSession(context.get()!!, "de.lucaspape.monstercat.music")
 
-    mediaSession!!.setCallback(object: MediaSession.Callback(){
+    mediaSession!!.setCallback(object : MediaSession.Callback() {
 
         override fun onPause() {
             pause()
         }
 
         override fun onPlay() {
-            if(paused){
+            if (paused) {
                 resume()
-            }else{
+            } else {
                 play()
             }
         }
@@ -195,92 +195,99 @@ fun setPlayButton(newPlayButton: ImageButton) {
  */
 
 private fun play() {
-    val settings = Settings(contextReference!!.get()!!)
-    val primaryResolution = settings.getSetting("primaryCoverResolution")
-
-    try {
+    try{
         val song = playList[currentSong]
 
         val url = song.getUrl()
-        val title = song.title
-        val artist = song.artist
-        val coverUrl = contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
 
         mediaPlayer.stop()
         mediaPlayer = MediaPlayer()
 
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC)
         mediaPlayer.setDataSource(url)
-        mediaPlayer.prepare()
-        mediaPlayer.start()
 
-        playing = true
+        mediaPlayer.prepareAsync()
 
-        textView1Reference!!.get()!!.text = title
-        textView2Reference!!.get()!!.text = title
-        textView2Reference!!.get()!!.text = title
+        mediaPlayer.setOnPreparedListener {
+            val settings = Settings(contextReference!!.get()!!)
+            val primaryResolution = settings.getSetting("primaryCoverResolution")
 
-        val valueAnimator = ValueAnimator.ofFloat(0.0f, 1.0f)
-        valueAnimator.repeatCount = Animation.INFINITE
-        valueAnimator.interpolator = LinearInterpolator()
-        valueAnimator.duration = 9000L
-        valueAnimator.addUpdateListener { animation ->
-            val progress = animation.animatedValue as Float
-            val width = textView1Reference!!.get()!!.width
-            val translationX = width * progress
-            textView1Reference!!.get()!!.translationX = translationX
-            textView2Reference!!.get()!!.translationX = translationX - width
-        }
+            mediaPlayer.start()
 
-        valueAnimator.start()
+            playing = true
 
-        mediaPlayer.setOnCompletionListener {
-            next()
-        }
+            val title = song.title
+            val artist = song.artist
+            val coverUrl =
+                contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
 
-        val seekbarUpdateHandler = Handler()
+            textView1Reference!!.get()!!.text = title
+            textView2Reference!!.get()!!.text = title
+            textView2Reference!!.get()!!.text = title
 
-        val updateSeekBar = object : Runnable {
-            override fun run() {
-                seekBarReference!!.get()!!.max = mediaPlayer.duration
-                seekBarReference!!.get()!!.progress = mediaPlayer.currentPosition
-                setPlayerState(mediaPlayer.currentPosition.toLong())
-
-                seekbarUpdateHandler.postDelayed(this, 50)
+            val valueAnimator = ValueAnimator.ofFloat(0.0f, 1.0f)
+            valueAnimator.repeatCount = Animation.INFINITE
+            valueAnimator.interpolator = LinearInterpolator()
+            valueAnimator.duration = 9000L
+            valueAnimator.addUpdateListener { animation ->
+                val progress = animation.animatedValue as Float
+                val width = textView1Reference!!.get()!!.width
+                val translationX = width * progress
+                textView1Reference!!.get()!!.translationX = translationX
+                textView2Reference!!.get()!!.translationX = translationX - width
             }
-        }
 
-        seekbarUpdateHandler.postDelayed(updateSeekBar, 0)
+            valueAnimator.start()
 
-        seekBarReference!!.get()!!.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                if (fromUser)
-                    mediaPlayer.seekTo(progress)
+            mediaPlayer.setOnCompletionListener {
+                next()
+            }
+
+            val seekbarUpdateHandler = Handler()
+
+            val updateSeekBar = object : Runnable {
+                override fun run() {
+                    seekBarReference!!.get()!!.max = mediaPlayer.duration
+                    seekBarReference!!.get()!!.progress = mediaPlayer.currentPosition
+                    setPlayerState(mediaPlayer.currentPosition.toLong())
+
+                    seekbarUpdateHandler.postDelayed(this, 50)
+                }
+            }
+
+            seekbarUpdateHandler.postDelayed(updateSeekBar, 0)
+
+            seekBarReference!!.get()!!.setOnSeekBarChangeListener(object :
+                SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                    if (fromUser)
+                        mediaPlayer.seekTo(progress)
                     setPlayerState(progress.toLong())
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar) {
+                }
+
+                override fun onStopTrackingTouch(seekBar: SeekBar) {
+                }
+            })
+
+            val coverFile = File(coverUrl)
+            if (coverFile.exists()) {
+                val bitmap = BitmapFactory.decodeFile(coverFile.absolutePath)
+                barCoverImageReference!!.get()!!.setImageBitmap(bitmap)
+                setSongMetadata(artist, title, bitmap, mediaPlayer.duration.toLong())
+            } else {
+                setSongMetadata(artist, title, null, mediaPlayer.duration.toLong())
             }
 
-            override fun onStartTrackingTouch(seekBar: SeekBar) {
-            }
-
-            override fun onStopTrackingTouch(seekBar: SeekBar) {
-            }
-        })
-
-        val coverFile = File(coverUrl)
-        if (coverFile.exists()) {
-            val bitmap = BitmapFactory.decodeFile(coverFile.absolutePath)
-            barCoverImageReference!!.get()!!.setImageBitmap(bitmap)
-            setSongMetadata(artist, title, bitmap, mediaPlayer.duration.toLong())
-        }else{
-            setSongMetadata(artist, title, null, mediaPlayer.duration.toLong())
-        }
-
-        showNotification(title, artist, coverUrl, true)
-        playButtonReference!!.get()!!.setImageDrawable(
-            contextReference!!.get()!!.resources.getDrawable(
-                R.drawable.ic_pause_white_24dp
+            showSongNotification(title, artist, coverUrl, true)
+            playButtonReference!!.get()!!.setImageDrawable(
+                contextReference!!.get()!!.resources.getDrawable(
+                    R.drawable.ic_pause_white_24dp
+                )
             )
-        )
+        }
 
 
     }catch (e: IndexOutOfBoundsException){
@@ -288,29 +295,31 @@ private fun play() {
     }
 }
 
-private fun setPlayerState(progress:Long){
+private fun setPlayerState(progress: Long) {
     val stateBuilder = PlaybackState.Builder()
 
-    val state:Int = if(playing){
+    val state: Int = if (playing) {
         PlaybackState.STATE_PLAYING
-    }else{
+    } else {
         PlaybackState.STATE_PAUSED
     }
 
     stateBuilder.setState(state, progress, 1.0f)
-    stateBuilder.setActions(PlaybackState.ACTION_PLAY +
-            PlaybackState.ACTION_PAUSE +
-            PlaybackState.ACTION_SKIP_TO_NEXT +
-            PlaybackState.ACTION_SKIP_TO_PREVIOUS +
-            PlaybackState.ACTION_STOP +
-            PlaybackState.ACTION_PLAY_PAUSE +
-            PlaybackState.ACTION_SEEK_TO +
-            PlaybackState.ACTION_FAST_FORWARD +
-            PlaybackState.ACTION_REWIND)
+    stateBuilder.setActions(
+        PlaybackState.ACTION_PLAY +
+                PlaybackState.ACTION_PAUSE +
+                PlaybackState.ACTION_SKIP_TO_NEXT +
+                PlaybackState.ACTION_SKIP_TO_PREVIOUS +
+                PlaybackState.ACTION_STOP +
+                PlaybackState.ACTION_PLAY_PAUSE +
+                PlaybackState.ACTION_SEEK_TO +
+                PlaybackState.ACTION_FAST_FORWARD +
+                PlaybackState.ACTION_REWIND
+    )
     mediaSession!!.setPlaybackState(stateBuilder.build())
 }
 
-private fun setSongMetadata(artist:String, title:String, coverImage:Bitmap?, duration:Long){
+private fun setSongMetadata(artist: String, title: String, coverImage: Bitmap?, duration: Long) {
     val mediaMetadata = MediaMetadata.Builder()
     mediaMetadata.putString(MediaMetadata.METADATA_KEY_ARTIST, artist)
     mediaMetadata.putString(MediaMetadata.METADATA_KEY_TITLE, title)
@@ -342,7 +351,7 @@ fun pause() {
         val coverUrl = context.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
 
         mediaPlayer.pause()
-        showNotification(title, artist, coverUrl, false)
+        showSongNotification(title, artist, coverUrl, false)
         playButtonReference!!.get()!!.setImageDrawable(context.resources.getDrawable(R.drawable.ic_play_arrow_white_24dp))
         playing = false
         paused = true
@@ -377,7 +386,7 @@ fun resume() {
             play()
         }
 
-        showNotification(title, artist, coverUrl, true)
+        showSongNotification(title, artist, coverUrl, true)
         playButtonReference!!.get()!!.setImageDrawable(context.resources.getDrawable(R.drawable.ic_pause_white_24dp))
         playing = true
     } catch (e: IndexOutOfBoundsException) {
@@ -399,7 +408,7 @@ fun previous() {
     }
 }
 
-fun playNow(song:Song) {
+fun playNow(song: Song) {
     try {
         playList.add(currentSong + 1, song)
         currentSong++
@@ -411,7 +420,7 @@ fun playNow(song:Song) {
     play()
 }
 
-fun addSong(song:Song) {
+fun addSong(song: Song) {
     playList.add(song)
 }
 
@@ -514,7 +523,7 @@ private fun showNotificationAndroidO(
 }
 
 //android < sdk 26
-private fun showNotification(
+private fun showSongNotification(
     titleName: String,
     artistName: String,
     coverUrl: String,
