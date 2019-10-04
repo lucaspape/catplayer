@@ -8,13 +8,12 @@ import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.google.gson.JsonArray
 import de.lucaspape.monstercat.MainActivity
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.loggedIn
 import de.lucaspape.monstercat.auth.sid
-import de.lucaspape.monstercat.database.PlaylistDataDatabaseHelper
-import de.lucaspape.monstercat.database.Song
-import de.lucaspape.monstercat.database.SongDatabaseHelper
+import de.lucaspape.monstercat.database.*
 import de.lucaspape.monstercat.json.JSONParser
 import de.lucaspape.monstercat.music.addSong
 import de.lucaspape.monstercat.settings.Settings
@@ -128,64 +127,33 @@ fun downloadSong(context: Context, song:Song) {
 
 }
 
-@Deprecated("currently not working")
-fun addSongToPlaylist(song: HashMap<String, Any?>, context: Context) {
-    var playlistNames = arrayOfNulls<String>(0)
-    var playlistIds = arrayOfNulls<String>(0)
-    var tracksArrays = arrayOfNulls<JSONArray>(0)
+fun addSongToPlaylist(context: Context, song:Song) {
+    val playlistDatabaseHelper = PlaylistDatabaseHelper(context)
+    val playlistList = playlistDatabaseHelper.getAllPlaylists()
 
-    val queue = Volley.newRequestQueue(context)
+    val playlistNames = arrayOfNulls<String>(playlistList.size)
+    val playlistIds = arrayOfNulls<String>(playlistList.size)
+    val trackList = arrayOfNulls<List<PlaylistData>>(playlistList.size)
 
-    //get all playlists
-    val playlistUrl = context.getString(R.string.playlistsUrl)
+    for(i in playlistList.indices){
+        val playlistDataDatabaseHelper = PlaylistDataDatabaseHelper(context, playlistList[i].playlistId)
 
-    val playlistRequest = object : StringRequest(playlistUrl,
-        Response.Listener { response ->
-            val jsonObject = JSONObject(response)
-            val jsonArray = jsonObject.getJSONArray("results")
-
-            playlistNames = arrayOfNulls(jsonArray.length())
-            playlistIds = arrayOfNulls(jsonArray.length())
-            tracksArrays = arrayOfNulls(jsonArray.length())
-
-            for (i in (0 until jsonArray.length())) {
-                val playlistObject = jsonArray.getJSONObject(i)
-
-                val playlistName = playlistObject.getString("name")
-                val playlistId = playlistObject.getString("_id")
-                val trackArray = playlistObject.getJSONArray("tracks")
-
-                playlistNames[i] = playlistName
-                playlistIds[i] = playlistId
-                tracksArrays[i] = trackArray
-            }
-        },
-
-        Response.ErrorListener { _ ->
-
-        }) {
-        @Throws(AuthFailureError::class)
-        override fun getHeaders(): Map<String, String> {
-            val params = HashMap<String, String>()
-            if (loggedIn) {
-                params["Cookie"] = "connect.sid=$sid"
-            }
-            return params
-        }
+        playlistNames[i] = playlistList[i].playlistName
+        playlistIds[i] = playlistList[i].playlistId
+        trackList[i] = playlistDataDatabaseHelper.getAllData()
     }
 
-    queue.addRequestFinishedListener<Any> {
-        val alertDialogBuilder = AlertDialog.Builder(context)
-        alertDialogBuilder.setTitle(context.getString(R.string.pickPlaylistMsg))
-        alertDialogBuilder.setItems(playlistNames) { _, i ->
-            val playlistPatchUrl = context.getString(R.string.playlistUrl) + playlistIds[i]
+    val alertDialogBuilder = AlertDialog.Builder(context)
+    alertDialogBuilder.setTitle(context.getString(R.string.pickPlaylistMsg))
+    alertDialogBuilder.setItems(playlistNames) { _, i ->
+        val playlistPatchUrl = context.getString(R.string.playlistUrl) + playlistIds[i]
+        val jsonParser = JSONParser()
+
+        if(trackList[i] != null){
+            val trackArray = jsonParser.parsePlaylistDataToJSONArray(context, trackList[i]!!)
             val patchParams = JSONObject()
 
-            val trackArray = tracksArrays[i]
-
-            val jsonParser = JSONParser()
-            val patchedArray = jsonParser.parsePatchedPlaylist(trackArray!!, song)
-
+            val patchedArray = jsonParser.parsePatchedPlaylist(JSONArray(trackArray), song)
             patchParams.put("tracks", JSONArray(patchedArray))
 
             val patchRequest =
@@ -195,9 +163,10 @@ fun addSongToPlaylist(song: HashMap<String, Any?>, context: Context) {
                     patchParams,
                     Response.Listener {
                         //TODO reload playlist
+                        println("ok")
                     },
                     Response.ErrorListener {
-
+                        println("error")
                     }) {
                     @Throws(AuthFailureError::class)
                     override fun getHeaders(): Map<String, String> {
@@ -212,12 +181,12 @@ fun addSongToPlaylist(song: HashMap<String, Any?>, context: Context) {
             val addToPlaylistQueue = Volley.newRequestQueue(context)
             addToPlaylistQueue.addRequestFinishedListener<Any> {
                 //TODO add msg
+                println("done")
             }
 
             addToPlaylistQueue.add(patchRequest)
-        }
-        alertDialogBuilder.show()
-    }
 
-    queue.add(playlistRequest)
+        }
+    }
+    alertDialogBuilder.show()
 }

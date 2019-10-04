@@ -67,7 +67,7 @@ class HomeFragment : Fragment() {
             when {
                 item.title == getString(R.string.download) -> downloadSong(context!!, song)
                 item.title == getString(R.string.playNext) -> playSongFromId(context!!, listItem["id"].toString(), false)
-                item.title == getString(R.string.addToPlaylist) -> addSongToPlaylist(listItem, context!!)
+                item.title == getString(R.string.addToPlaylist) -> addSongToPlaylist(context!!, song)
             }
         }
 

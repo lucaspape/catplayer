@@ -1,6 +1,7 @@
 package de.lucaspape.monstercat.json
 
 import android.content.Context
+import com.google.gson.JsonObject
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.*
 import de.lucaspape.monstercat.settings.Settings
@@ -120,7 +121,7 @@ class JSONParser {
         }
     }
 
-    fun parsePatchedPlaylist(trackArray: JSONArray, songItem: HashMap<String, Any?>): Array<JSONObject?> {
+    fun parsePatchedPlaylist(trackArray: JSONArray, song: Song): Array<JSONObject?> {
         val patchedArray = arrayOfNulls<JSONObject>(trackArray.length() + 1)
 
         for (k in (0 until trackArray.length())) {
@@ -128,12 +129,31 @@ class JSONParser {
         }
 
         val songJsonObject = JSONObject()
-        songJsonObject.put("releaseId", songItem["albumId"])
-        songJsonObject.put("trackId", songItem["id"])
+        songJsonObject.put("releaseId", song.albumId)
+        songJsonObject.put("trackId", song.songId)
 
         patchedArray[trackArray.length()] = songJsonObject
 
         return patchedArray
+    }
+
+    fun parsePlaylistDataToJSONArray(context: Context, playlistDataList:List<PlaylistData>):Array<JSONObject?>{
+        val jsonArray = arrayOfNulls<JSONObject>(playlistDataList.size)
+
+        val songDatabaseHelper = SongDatabaseHelper(context)
+
+        for(i in playlistDataList.indices){
+            val playlistData = playlistDataList[i]
+            val song = songDatabaseHelper.getSong(playlistData.songId)
+
+            val songJsonObject = JSONObject()
+            songJsonObject.put("releaseId", song.albumId)
+            songJsonObject.put("trackId", song.songId)
+
+            jsonArray[i] = songJsonObject
+        }
+
+        return jsonArray
     }
 
     fun parsePlaylistToHashMap(playlist: Playlist): HashMap<String, Any?> {
