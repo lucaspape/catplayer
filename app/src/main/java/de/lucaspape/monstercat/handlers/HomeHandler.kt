@@ -1,5 +1,7 @@
 package de.lucaspape.monstercat.handlers
 
+import android.content.Context
+import android.os.AsyncTask
 import android.os.Handler
 import android.os.Looper
 import android.view.View
@@ -25,15 +27,51 @@ import java.lang.ref.WeakReference
  */
 class HomeHandler {
 
-    var currentListViewData = ArrayList<HashMap<String, Any?>>()
-
-    //maximum songs loaded
-    private val loadMax = 200
-    private var simpleAdapter: SimpleAdapter? = null
-
     companion object{
         @JvmStatic var albumViewSelected = false
         @JvmStatic var albumView = false
+        @JvmStatic var currentListViewData = ArrayList<HashMap<String, Any?>>()
+        @JvmStatic val loadMax = 200
+        @JvmStatic private var simpleAdapter: SimpleAdapter? = null
+
+        @JvmStatic fun redrawListView(view: View) {
+            val musicList = view.findViewById<ListView>(R.id.musiclistview)
+            simpleAdapter!!.notifyDataSetChanged()
+            musicList.invalidateViews()
+            musicList.refreshDrawableState()
+        }
+
+        /**
+         * Updates content
+         */
+        @JvmStatic fun updateListView(view: View) {
+            val musicList = view.findViewById<ListView>(R.id.musiclistview)
+
+            if (albumView) {
+                val from = arrayOf("title", "primaryImage")
+                val to = arrayOf(R.id.description, R.id.cover)
+                simpleAdapter = SimpleAdapter(
+                    view.context,
+                    currentListViewData,
+                    R.layout.list_album_view,
+                    from,
+                    to.toIntArray()
+                )
+                musicList.adapter = simpleAdapter
+            } else {
+                val from = arrayOf("shownTitle", "secondaryImage")
+                val to = arrayOf(R.id.title, R.id.cover)
+                simpleAdapter = SimpleAdapter(
+                    view.context,
+                    currentListViewData,
+                    R.layout.list_single,
+                    from,
+                    to.toIntArray()
+                )
+                musicList.adapter = simpleAdapter
+            }
+
+        }
     }
 
     fun setupListView(view: View) {
@@ -177,374 +215,24 @@ class HomeHandler {
         }
     }
 
-    private fun redrawListView(view: View) {
-        val musicList = view.findViewById<ListView>(R.id.musiclistview)
-        simpleAdapter!!.notifyDataSetChanged()
-        musicList.invalidateViews()
-        musicList.refreshDrawableState()
-    }
-
-    /**
-     * Updates content
-     */
-    private fun updateListView(view: View) {
-        val musicList = view.findViewById<ListView>(R.id.musiclistview)
-
-        if (albumView) {
-            val from = arrayOf("title", "primaryImage")
-            val to = arrayOf(R.id.description, R.id.cover)
-            simpleAdapter = SimpleAdapter(
-                view.context,
-                currentListViewData,
-                R.layout.list_album_view,
-                from,
-                to.toIntArray()
-            )
-            musicList.adapter = simpleAdapter
-        } else {
-            val from = arrayOf("shownTitle", "secondaryImage")
-            val to = arrayOf(R.id.title, R.id.cover)
-            simpleAdapter = SimpleAdapter(
-                view.context,
-                currentListViewData,
-                R.layout.list_single,
-                from,
-                to.toIntArray()
-            )
-            musicList.adapter = simpleAdapter
-        }
-
-    }
-
     fun loadSongList(view: View, forceReload: Boolean) {
-        val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
-        swipeRefreshLayout.isRefreshing = true
-
-        val catalogSongsDatabaseHelper = CatalogSongsDatabaseHelper(view.context)
-        var songIdList = catalogSongsDatabaseHelper.getAllSongs()
-
-        if (!forceReload && songIdList.isNotEmpty()) {
-            val dbSongs = ArrayList<HashMap<String, Any?>>()
-
-            val songDatabaseHelper = SongDatabaseHelper(view.context)
-            val songList = ArrayList<Song>()
-
-            for(song in songIdList){
-                songList.add(songDatabaseHelper.getSong(song.songId))
-            }
-
-            for(song in songList){
-                val jsonParser = JSONParser()
-                dbSongs.add(jsonParser.parseSongToHashMap(view.context, song))
-            }
-
-            //display list
-            currentListViewData = dbSongs
-
-            updateListView(view)
-            redrawListView(view)
-
-            swipeRefreshLayout.isRefreshing = false
-
-            //download cover art
-            addDownloadCoverArray(currentListViewData)
-        } else {
-            val requestQueue = Volley.newRequestQueue(view.context)
-
-            val dbIds = ArrayList<Long>()
-
-            //if all finished continue
-            var finishedRequests = 0
-            var totalRequestsCount = 0
-
-            val sortedList = arrayOfNulls<Long>(loadMax)
-
-            val requests = ArrayList<StringRequest>()
-
-            requestQueue.addRequestFinishedListener<Any> {
-                finishedRequests++
-
-                //check if all done
-                if (finishedRequests >= totalRequestsCount) {
-                    val dbSongs = ArrayList<HashMap<String, Any?>>()
-
-                    for(i in sortedList){
-                        if(i != null){
-                            if(catalogSongsDatabaseHelper.getCatalogSong(i) == null){
-                                catalogSongsDatabaseHelper.insertSong(i)
-                            }
-                        }
-                    }
-
-                    songIdList = catalogSongsDatabaseHelper.getAllSongs()
-                    val songDatabaseHelper = SongDatabaseHelper(view.context)
-                    val songList = ArrayList<Song>()
-
-                    for(song in songIdList){
-                        songList.add(songDatabaseHelper.getSong(song.songId))
-                    }
-
-                    for(song in songList){
-                        val jsonParser = JSONParser()
-                        dbSongs.add(jsonParser.parseSongToHashMap(view.context, song))
-                    }
-
-                    //display list
-                    currentListViewData = dbSongs
-                    updateListView(view)
-                    redrawListView(view)
-
-                    swipeRefreshLayout.isRefreshing = false
-
-                    //download cover art
-                    addDownloadCoverArray(currentListViewData)
-                }else{
-                    requestQueue.add(requests[finishedRequests])
-                }
-            }
-
-            for (i in (0 until loadMax / 50)) {
-                val requestUrl =
-                    view.context.getString(R.string.loadSongsUrl) + "?limit=50&skip=" + i * 50
-
-                val listRequest = object : StringRequest(
-                    Method.GET, requestUrl, Response.Listener { response ->
-                        val json = JSONObject(response)
-                        val jsonArray = json.getJSONArray("results")
-
-                        //parse every single song into list
-                        for (k in (0 until jsonArray.length())) {
-                            val jsonParser = JSONParser()
-
-                            val dbId = jsonParser.parseCatalogSongToDB(jsonArray.getJSONObject(k), view.context)
-                            dbIds.add(dbId)
-
-                            sortedList[i * 50 + k] = dbId
-                        }
-
-                    }, Response.ErrorListener { }
-                ) {
-                    //add authentication
-                    @Throws(AuthFailureError::class)
-                    override fun getHeaders(): Map<String, String> {
-                        val params = HashMap<String, String>()
-                        if (loggedIn) {
-                            params["Cookie"] = "connect.sid=$sid"
-                        }
-                        return params
-                    }
-                }
-
-                totalRequestsCount++
-                requests.add(listRequest)
-            }
-
-            requestQueue.add(requests[finishedRequests])
-        }
-
+        val contextReference = WeakReference<Context>(view.context)
+        val viewReference = WeakReference<View>(view)
+        LoadSongListAsync(viewReference, contextReference, forceReload).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 
     fun loadAlbumList(view: View, forceReload: Boolean) {
-        val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
-        swipeRefreshLayout.isRefreshing = true
-
-        val requestQueue = Volley.newRequestQueue(view.context)
-
-        val tempList = arrayOfNulls<Long>(loadMax)
-
-        val albumDatabaseHelper = AlbumDatabaseHelper(view.context)
-        var albumList = albumDatabaseHelper.getAllAlbums()
-
-        if(!forceReload && albumList.isNotEmpty()){
-            val sortedList = ArrayList<HashMap<String, Any?>>()
-
-            for(album in albumList){
-                val jsonParser = JSONParser()
-                sortedList.add(jsonParser.parseAlbumToHashMap(view.context, album))
-            }
-
-            currentListViewData = sortedList
-
-            updateListView(view)
-            redrawListView(view)
-
-            swipeRefreshLayout.isRefreshing = false
-
-            //download cover art
-            addDownloadCoverArray(currentListViewData)
-        }else{
-            //if all finished continue
-            var finishedRequests = 0
-            var totalRequestsCount = 0
-
-            val requests = ArrayList<StringRequest>()
-
-            requestQueue.addRequestFinishedListener<Any?> {
-                finishedRequests++
-
-                //check if all done
-                if (finishedRequests >= totalRequestsCount) {
-                    val albums = ArrayList<Album>()
-
-                    for(i in tempList){
-                        if(i != null){
-                            albums.add(albumDatabaseHelper.getAlbum(i))
-                        }
-                    }
-
-                    val sortedList = ArrayList<HashMap<String, Any?>>()
-
-                    for(album in albums){
-                        val jsonParser = JSONParser()
-                        sortedList.add(jsonParser.parseAlbumToHashMap(view.context, album))
-                    }
-
-                    currentListViewData = sortedList
-                    updateListView(view)
-                    redrawListView(view)
-
-                    swipeRefreshLayout.isRefreshing = false
-
-                    //download cover art
-                    addDownloadCoverArray(currentListViewData)
-
-                }else{
-                    requestQueue.add(requests[finishedRequests])
-                }
-
-            }
-
-            for (i in (0 until loadMax / 50)) {
-                val requestUrl = view.context.getString(R.string.loadAlbumsUrl) + "?limit=50&skip=" + i * 50
-                val albumsRequest = object: StringRequest(
-                    Request.Method.GET, requestUrl,
-                    Response.Listener { response ->
-                        val json = JSONObject(response)
-                        val jsonArray = json.getJSONArray("results")
-
-                        for (k in (0 until jsonArray.length())) {
-                            val jsonObject = jsonArray.getJSONObject(k)
-
-                            val jsonParser = JSONParser()
-                            tempList[i * 50 + k] = jsonParser.parseAlbumToDB(jsonObject, view.context)
-                        }
-                    },
-                    Response.ErrorListener { }
-                ){
-                    //add authentication
-                    @Throws(AuthFailureError::class)
-                    override fun getHeaders(): Map<String, String> {
-                        val params = HashMap<String, String>()
-                        if (loggedIn) {
-                            params["Cookie"] = "connect.sid=$sid"
-                        }
-                        return params
-                    }
-                }
-
-                totalRequestsCount++
-
-                requests.add(albumsRequest)
-            }
-
-            requestQueue.add(requests[finishedRequests])
-        }
+        val contextReference = WeakReference<Context>(view.context)
+        val viewReference = WeakReference<View>(view)
+        LoadAlbumListAsync(viewReference, contextReference, forceReload).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 
     /**
      * Load single album
      */
     private fun loadAlbum(view: View, itemValue: HashMap<String, Any?>, forceReload: Boolean) {
-        val albumId = itemValue["id"] as String
-
-        val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
-        swipeRefreshLayout.isRefreshing = true
-
-        val requestQueue = Volley.newRequestQueue(view.context)
-
-        //used to sort list
-        val tempList = ArrayList<Long>()
-
-        val songDatabaseHelper = SongDatabaseHelper(view.context)
-        var songList = songDatabaseHelper.getAlbumSongs(albumId)
-
-        if(!forceReload && songList.isNotEmpty()){
-            // currentListViewData = albumCache as ArrayList<HashMap<String, Any?>>
-            val dbSongs = ArrayList<HashMap<String, Any?>>()
-
-            for(song in songList){
-                val jsonParser = JSONParser()
-                dbSongs.add(jsonParser.parseSongToHashMap(view.context, song))
-            }
-
-            currentListViewData = dbSongs
-
-            albumView = false
-
-            updateListView(view)
-            redrawListView(view)
-
-            swipeRefreshLayout.isRefreshing = false
-
-            //download cover art
-            addDownloadCoverArray(currentListViewData)
-        }else{
-            requestQueue.addRequestFinishedListener<Any> {
-                val dbSongs = ArrayList<HashMap<String, Any?>>()
-                songList = songDatabaseHelper.getAlbumSongs(albumId)
-
-                for(song in songList){
-                    val jsonParser = JSONParser()
-                    dbSongs.add(jsonParser.parseSongToHashMap(view.context, song))
-                }
-
-                //display list
-                currentListViewData = dbSongs
-                albumView = false
-
-                updateListView(view)
-                redrawListView(view)
-
-                swipeRefreshLayout.isRefreshing = false
-
-                //download cover art
-                addDownloadCoverArray(currentListViewData)
-            }
-
-            val requestUrl =
-                view.context.getString(R.string.loadSongsUrl) + "?albumId=" + albumId
-
-            val listRequest = object : StringRequest(
-                Method.GET, requestUrl, Response.Listener { response ->
-                    val json = JSONObject(response)
-                    val jsonArray = json.getJSONArray("results")
-
-                    //parse every single song into list
-                    for (k in (0 until jsonArray.length())) {
-                        val jsonParser = JSONParser()
-                        val songId =
-                            jsonParser.parseCatalogSongToDB(
-                                jsonArray.getJSONObject(k),
-                                view.context
-                            )
-
-                        tempList.add(songId)
-                    }
-
-                }, Response.ErrorListener { }
-            ) {
-                //add authentication
-                @Throws(AuthFailureError::class)
-                override fun getHeaders(): Map<String, String> {
-                    val params = HashMap<String, String>()
-                    if (loggedIn) {
-                        params["Cookie"] = "connect.sid=$sid"
-                    }
-                    return params
-                }
-            }
-
-            requestQueue.add(listRequest)
-        }
+        val contextReference = WeakReference<Context>(view.context)
+        val viewReference = WeakReference<View>(view)
+        LoadAlbumAsync(viewReference, contextReference, forceReload, itemValue).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 }

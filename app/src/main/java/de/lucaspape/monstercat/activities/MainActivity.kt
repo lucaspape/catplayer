@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.media.AudioManager
+import android.os.AsyncTask
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.method.LinkMovementMethod
@@ -84,7 +85,7 @@ class MainActivity : AppCompatActivity() {
         openFragment(homeFragment)
 
         val weakReference = WeakReference(applicationContext)
-        DownloadTask(weakReference).execute()
+        DownloadTask(weakReference).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 
         //for new privacy policy change version number
         if(settings.getSetting("privacypolicy") != "1.0"){
