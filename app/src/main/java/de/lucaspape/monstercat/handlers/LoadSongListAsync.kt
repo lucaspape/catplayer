@@ -19,9 +19,14 @@ import de.lucaspape.monstercat.json.JSONParser
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
-class LoadSongListAsync(private val viewReference: WeakReference<View>, private val contextReference: WeakReference<Context>, private val forceReload: Boolean) : AsyncTask<Void, Void, String>(){
+class LoadSongListAsync(
+    private val viewReference: WeakReference<View>,
+    private val contextReference: WeakReference<Context>,
+    private val forceReload: Boolean
+) : AsyncTask<Void, Void, String>() {
     override fun onPreExecute() {
-        val swipeRefreshLayout = viewReference.get()!!.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
+        val swipeRefreshLayout =
+            viewReference.get()!!.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
         swipeRefreshLayout.isRefreshing = true
     }
 
@@ -32,11 +37,12 @@ class LoadSongListAsync(private val viewReference: WeakReference<View>, private 
         //download cover art
         addDownloadCoverArray(HomeHandler.currentListViewData)
 
-        val swipeRefreshLayout = viewReference.get()!!.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
+        val swipeRefreshLayout =
+            viewReference.get()!!.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
         swipeRefreshLayout.isRefreshing = false
     }
 
-    override fun doInBackground(vararg params: Void?):String?{
+    override fun doInBackground(vararg param: Void?): String? {
 
         val catalogSongsDatabaseHelper = CatalogSongsDatabaseHelper(contextReference.get()!!)
         var songIdList = catalogSongsDatabaseHelper.getAllSongs()
@@ -47,11 +53,11 @@ class LoadSongListAsync(private val viewReference: WeakReference<View>, private 
             val songDatabaseHelper = SongDatabaseHelper(contextReference.get()!!)
             val songList = ArrayList<Song>()
 
-            for(song in songIdList){
+            for (song in songIdList) {
                 songList.add(songDatabaseHelper.getSong(song.songId))
             }
 
-            for(song in songList){
+            for (song in songList) {
                 val jsonParser = JSONParser()
                 dbSongs.add(jsonParser.parseSongToHashMap(contextReference.get()!!, song))
             }
@@ -79,9 +85,9 @@ class LoadSongListAsync(private val viewReference: WeakReference<View>, private 
                 if (finishedRequests >= totalRequestsCount) {
                     val dbSongs = ArrayList<HashMap<String, Any?>>()
 
-                    for(i in sortedList){
-                        if(i != null){
-                            if(catalogSongsDatabaseHelper.getCatalogSong(i) == null){
+                    for (i in sortedList) {
+                        if (i != null) {
+                            if (catalogSongsDatabaseHelper.getCatalogSong(i) == null) {
                                 catalogSongsDatabaseHelper.insertSong(i)
                             }
                         }
@@ -91,18 +97,18 @@ class LoadSongListAsync(private val viewReference: WeakReference<View>, private 
                     val songDatabaseHelper = SongDatabaseHelper(contextReference.get()!!)
                     val songList = ArrayList<Song>()
 
-                    for(song in songIdList){
+                    for (song in songIdList) {
                         songList.add(songDatabaseHelper.getSong(song.songId))
                     }
 
-                    for(song in songList){
+                    for (song in songList) {
                         val jsonParser = JSONParser()
                         dbSongs.add(jsonParser.parseSongToHashMap(contextReference.get()!!, song))
                     }
 
                     //display list
                     HomeHandler.currentListViewData = dbSongs
-                }else{
+                } else {
                     requestQueue.add(requests[finishedRequests])
                 }
             }
@@ -120,7 +126,10 @@ class LoadSongListAsync(private val viewReference: WeakReference<View>, private 
                         for (k in (0 until jsonArray.length())) {
                             val jsonParser = JSONParser()
 
-                            val dbId = jsonParser.parseCatalogSongToDB(jsonArray.getJSONObject(k), contextReference.get()!!)
+                            val dbId = jsonParser.parseCatalogSongToDB(
+                                jsonArray.getJSONObject(k),
+                                contextReference.get()!!
+                            )
                             dbIds.add(dbId)
 
                             sortedList[i * 50 + k] = dbId

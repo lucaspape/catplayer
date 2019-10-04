@@ -9,33 +9,24 @@ import android.widget.AdapterView
 import android.widget.ListView
 import android.widget.SimpleAdapter
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.android.volley.AuthFailureError
-import com.android.volley.Response
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
-import de.lucaspape.monstercat.activities.MainActivity
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.auth.loggedIn
-import de.lucaspape.monstercat.auth.sid
-import de.lucaspape.monstercat.database.PlaylistDataDatabaseHelper
-import de.lucaspape.monstercat.database.PlaylistDatabaseHelper
-import de.lucaspape.monstercat.database.SongDatabaseHelper
-import de.lucaspape.monstercat.download.addDownloadCoverArray
-import de.lucaspape.monstercat.json.JSONParser
-import org.json.JSONObject
 import java.lang.ref.WeakReference
 
 class PlaylistHandler {
-    companion object{
-        @JvmStatic var currentListViewData = ArrayList<HashMap<String, Any?>>()
-        @JvmStatic var listViewDataIsPlaylistView = true
+    companion object {
+        @JvmStatic
+        var currentListViewData = ArrayList<HashMap<String, Any?>>()
+        @JvmStatic
+        var listViewDataIsPlaylistView = true
 
-        @JvmStatic private var simpleAdapter: SimpleAdapter? = null
+        @JvmStatic
+        private var simpleAdapter: SimpleAdapter? = null
 
         private var currentPlaylistId: String? = null
         private var currentPlaylistTrackCount: Int? = null
 
-        @JvmStatic fun updateListView(view: View) {
+        @JvmStatic
+        fun updateListView(view: View) {
             val playlistList = view.findViewById<ListView>(R.id.playlistView)
 
             var from = arrayOf("shownTitle", "secondaryImage")
@@ -58,7 +49,8 @@ class PlaylistHandler {
 
         }
 
-        @JvmStatic fun redrawListView(view: View) {
+        @JvmStatic
+        fun redrawListView(view: View) {
             val playlistList = view.findViewById<ListView>(R.id.playlistView)
             simpleAdapter!!.notifyDataSetChanged()
             playlistList.invalidateViews()
@@ -108,15 +100,31 @@ class PlaylistHandler {
         }
     }
 
-    fun loadPlaylist(view: View, forceReload: Boolean, showAfter:Boolean) {
+    fun loadPlaylist(view: View, forceReload: Boolean, showAfter: Boolean) {
         val contextReference = WeakReference<Context>(view.context)
         val viewReference = WeakReference<View>(view)
-        LoadPlaylistAsync(viewReference, contextReference, forceReload, showAfter).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        LoadPlaylistAsync(
+            viewReference,
+            contextReference,
+            forceReload,
+            showAfter
+        ).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 
-    fun loadPlaylistTracks(view: View, forceReload: Boolean, playlistId: String, trackCount: Int) {
+    private fun loadPlaylistTracks(
+        view: View,
+        forceReload: Boolean,
+        playlistId: String,
+        trackCount: Int
+    ) {
         val contextReference = WeakReference<Context>(view.context)
         val viewReference = WeakReference<View>(view)
-        LoadPlaylistTracksAsync(viewReference, contextReference, forceReload, playlistId, trackCount).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        LoadPlaylistTracksAsync(
+            viewReference,
+            contextReference,
+            forceReload,
+            playlistId,
+            trackCount
+        ).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 }

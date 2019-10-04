@@ -22,7 +22,7 @@ class Playlist(){
     var playlistName:String = ""
     var trackCount:Int = 0
 
-    constructor(id:Int, playlistId:String, playlistName:String, trackCount:Int): this(){
+    constructor(id:Int, playlistId:String, playlistName:String, trackCount:Int) : this() {
         this.id = id
         this.playlistId = playlistId
         this.playlistName = playlistName

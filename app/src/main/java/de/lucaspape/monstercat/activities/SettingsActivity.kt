@@ -8,17 +8,13 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.Auth
 import de.lucaspape.monstercat.settings.Settings
 
-class SettingsActivity : AppCompatActivity(){
+class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_settings)
 
-
-        println("crated!")
-        val button = findViewById<Button>(R.id.add_account)
-
-        button.setOnClickListener {
+        findViewById<Button>(R.id.add_account).setOnClickListener {
             val usernameInput = findViewById<EditText>(R.id.usernameInput)
             val passwordInput = findViewById<EditText>(R.id.passwordInput)
 
@@ -29,8 +25,7 @@ class SettingsActivity : AppCompatActivity(){
             settings.saveSetting("email", username)
             settings.saveSetting("password", password)
 
-            val auth = Auth()
-            auth.login(this)
+            Auth().login(this)
         }
     }
 }

@@ -8,11 +8,14 @@ import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
 import java.lang.IndexOutOfBoundsException
 
-class CatalogSongsDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION){
+class CatalogSongsDatabaseHelper(context: Context) :
+    SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
-    companion object{
-        @JvmStatic private val DATABASE_VERSION = 1
-        @JvmStatic private val DATABASE_NAME = "catalog_songs_db"
+    companion object {
+        @JvmStatic
+        private val DATABASE_VERSION = 1
+        @JvmStatic
+        private val DATABASE_NAME = "catalog_songs_db"
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
@@ -24,7 +27,7 @@ class CatalogSongsDatabaseHelper(context: Context) : SQLiteOpenHelper(context, D
         db!!.execSQL(CatalogSongs.CREATE_TABLE)
     }
 
-    fun insertSong(songId:Long):Long{
+    fun insertSong(songId: Long): Long {
         val db = writableDatabase
 
         val values = ContentValues()
@@ -36,37 +39,42 @@ class CatalogSongsDatabaseHelper(context: Context) : SQLiteOpenHelper(context, D
         return id
     }
 
-    fun getCatalogSong(id:Long):CatalogSongs?{
+    fun getCatalogSong(id: Long): CatalogSongs? {
 
         val db = readableDatabase
         val cursor: Cursor
 
         try {
-            cursor = db.query(Song.TABLE_NAME, arrayOf(
-                CatalogSongs.COLUMN_ID),
+            cursor = db.query(
+                Song.TABLE_NAME, arrayOf(
+                    CatalogSongs.COLUMN_ID
+                ),
                 CatalogSongs.COLUMN_ID + "=?",
-                arrayOf(id.toString()), null, null, null, null)
+                arrayOf(id.toString()), null, null, null, null
+            )
 
             cursor.moveToFirst()
 
-            try{
-                val catalogSongs = CatalogSongs(cursor.getInt(cursor.getColumnIndex(CatalogSongs.COLUMN_ID)),
-                    cursor.getLong(cursor.getColumnIndex(CatalogSongs.COLUMN_SONG_ID)))
+            try {
+                val catalogSongs = CatalogSongs(
+                    cursor.getInt(cursor.getColumnIndex(CatalogSongs.COLUMN_ID)),
+                    cursor.getLong(cursor.getColumnIndex(CatalogSongs.COLUMN_SONG_ID))
+                )
 
                 cursor.close()
 
                 return catalogSongs
-            }catch (e:IndexOutOfBoundsException){
+            } catch (e: IndexOutOfBoundsException) {
                 cursor.close()
                 return null
             }
-        }catch(e: SQLiteException){
+        } catch (e: SQLiteException) {
             return null
         }
     }
 
-    fun getAllSongs():List<CatalogSongs>{
-        val catalogSongs:ArrayList<CatalogSongs> = ArrayList()
+    fun getAllSongs(): List<CatalogSongs> {
+        val catalogSongs: ArrayList<CatalogSongs> = ArrayList()
 
         val selectQuery = "SELECT * FROM " + CatalogSongs.TABLE_NAME + " ORDER BY " +
                 CatalogSongs.COLUMN_ID + " ASC"
@@ -74,11 +82,12 @@ class CatalogSongsDatabaseHelper(context: Context) : SQLiteOpenHelper(context, D
         val db = writableDatabase
         val cursor = db.rawQuery(selectQuery, null)
 
-        if(cursor.moveToFirst()){
-            do{
+        if (cursor.moveToFirst()) {
+            do {
                 val catalogSong = CatalogSongs()
                 catalogSong.id = cursor.getInt(cursor.getColumnIndex(CatalogSongs.COLUMN_ID))
-                catalogSong.songId = cursor.getLong(cursor.getColumnIndex(CatalogSongs.COLUMN_SONG_ID))
+                catalogSong.songId =
+                    cursor.getLong(cursor.getColumnIndex(CatalogSongs.COLUMN_SONG_ID))
 
                 catalogSongs.add(catalogSong)
             } while (cursor.moveToNext())
@@ -90,7 +99,8 @@ class CatalogSongsDatabaseHelper(context: Context) : SQLiteOpenHelper(context, D
         return catalogSongs
     }
 
-    fun getSongsCount():Int{
+    @Suppress("unused")
+    fun getSongsCount(): Int {
         val countQuery = "SELECT * FROM " + CatalogSongs.TABLE_NAME
         val db = readableDatabase
         val cursor = db.rawQuery(countQuery, null)
@@ -101,10 +111,14 @@ class CatalogSongsDatabaseHelper(context: Context) : SQLiteOpenHelper(context, D
         return count
     }
 
-
-    fun deleteSong(catalogSongs: CatalogSongs){
+    @Suppress("unused")
+    fun deleteSong(catalogSongs: CatalogSongs) {
         val db = writableDatabase
-        db.delete(CatalogSongs.TABLE_NAME, CatalogSongs.COLUMN_ID + " = ?", arrayOf(catalogSongs.id.toString()))
+        db.delete(
+            CatalogSongs.TABLE_NAME,
+            CatalogSongs.COLUMN_ID + " = ?",
+            arrayOf(catalogSongs.id.toString())
+        )
         db.close()
     }
 

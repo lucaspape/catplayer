@@ -8,10 +8,13 @@ import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
 import java.lang.IndexOutOfBoundsException
 
-class AlbumDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION){
-    companion object{
-        @JvmStatic private val DATABASE_VERSION = 1
-        @JvmStatic private val DATABASE_NAME = "albums_db"
+class AlbumDatabaseHelper(context: Context) :
+    SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
+    companion object {
+        @JvmStatic
+        private val DATABASE_VERSION = 1
+        @JvmStatic
+        private val DATABASE_NAME = "albums_db"
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
@@ -23,7 +26,7 @@ class AlbumDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
         db!!.execSQL(Album.CREATE_TABLE)
     }
 
-    fun insertAlbum(albumId:String, title: String, artist: String, coverUrl:String):Long{
+    fun insertAlbum(albumId: String, title: String, artist: String, coverUrl: String): Long {
         val db = writableDatabase
 
         val values = ContentValues()
@@ -38,70 +41,80 @@ class AlbumDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
         return id
     }
 
-    fun getAlbum(id:Long):Album{
+    fun getAlbum(id: Long): Album {
         val db = readableDatabase
 
-        val cursor = db.query(Album.TABLE_NAME, arrayOf(
-            Album.COLUMN_ID,
-            Album.COLUMN_ALBUM_ID,
-            Album.COLUMN_TITLE,
-            Album.COLUMN_ARTIST,
-            Album.COLUMN_COVER_URL),
+        val cursor = db.query(
+            Album.TABLE_NAME, arrayOf(
+                Album.COLUMN_ID,
+                Album.COLUMN_ALBUM_ID,
+                Album.COLUMN_TITLE,
+                Album.COLUMN_ARTIST,
+                Album.COLUMN_COVER_URL
+            ),
             Song.COLUMN_ID + "=?",
-            arrayOf(id.toString()), null, null, null, null)
+            arrayOf(id.toString()), null, null, null, null
+        )
 
         cursor?.moveToFirst()
 
-        val album = Album(cursor.getInt(cursor.getColumnIndex(Album.COLUMN_ID)),
+        val album = Album(
+            cursor.getInt(cursor.getColumnIndex(Album.COLUMN_ID)),
             cursor.getString(cursor.getColumnIndex(Album.COLUMN_ALBUM_ID)),
             cursor.getString(cursor.getColumnIndex(Album.COLUMN_TITLE)),
             cursor.getString(cursor.getColumnIndex(Album.COLUMN_ARTIST)),
-            cursor.getString(cursor.getColumnIndex(Album.COLUMN_COVER_URL)))
+            cursor.getString(cursor.getColumnIndex(Album.COLUMN_COVER_URL))
+        )
 
         cursor.close()
 
         return album
     }
 
-    fun getAlbum(albumId: String):Album?{
+    fun getAlbum(albumId: String): Album? {
         val db = readableDatabase
         val cursor: Cursor
 
-        try{
-            cursor = db.query(Album.TABLE_NAME, arrayOf(
-                Album.COLUMN_ID,
-                Album.COLUMN_ALBUM_ID,
-                Album.COLUMN_TITLE,
-                Album.COLUMN_ARTIST,
-                Album.COLUMN_COVER_URL),
+        try {
+            cursor = db.query(
+                Album.TABLE_NAME, arrayOf(
+                    Album.COLUMN_ID,
+                    Album.COLUMN_ALBUM_ID,
+                    Album.COLUMN_TITLE,
+                    Album.COLUMN_ARTIST,
+                    Album.COLUMN_COVER_URL
+                ),
                 Album.COLUMN_ALBUM_ID + "=?",
-                arrayOf(albumId), null, null, null, null)
+                arrayOf(albumId), null, null, null, null
+            )
 
             cursor?.moveToFirst()
 
             try {
-                val album = Album(cursor.getInt(cursor.getColumnIndex(Album.COLUMN_ID)),
+                val album = Album(
+                    cursor.getInt(cursor.getColumnIndex(Album.COLUMN_ID)),
                     cursor.getString(cursor.getColumnIndex(Album.COLUMN_ALBUM_ID)),
                     cursor.getString(cursor.getColumnIndex(Album.COLUMN_TITLE)),
                     cursor.getString(cursor.getColumnIndex(Album.COLUMN_ARTIST)),
-                    cursor.getString(cursor.getColumnIndex(Album.COLUMN_COVER_URL)))
+                    cursor.getString(cursor.getColumnIndex(Album.COLUMN_COVER_URL))
+                )
 
                 cursor.close()
 
                 return album
-            }catch (e: IndexOutOfBoundsException){
+            } catch (e: IndexOutOfBoundsException) {
                 cursor.close()
                 db.close()
                 return null
             }
 
-        }catch (e: SQLiteException){
+        } catch (e: SQLiteException) {
             return null
         }
     }
 
-    fun getAllAlbums():List<Album>{
-        val albums:ArrayList<Album> = ArrayList()
+    fun getAllAlbums(): List<Album> {
+        val albums: ArrayList<Album> = ArrayList()
 
         val selectQuery = "SELECT * FROM " + Album.TABLE_NAME + " ORDER BY " +
                 Album.COLUMN_ID + " ASC"
@@ -109,8 +122,8 @@ class AlbumDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
         val db = writableDatabase
         val cursor = db.rawQuery(selectQuery, null)
 
-        if(cursor.moveToFirst()){
-            do{
+        if (cursor.moveToFirst()) {
+            do {
                 val album = Album()
                 album.id = cursor.getInt(cursor.getColumnIndex(Album.COLUMN_ID))
                 album.albumId = cursor.getString(cursor.getColumnIndex(Album.COLUMN_ALBUM_ID))
@@ -128,7 +141,8 @@ class AlbumDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
         return albums
     }
 
-    fun getAlbumsCount():Int{
+    @Suppress("unused")
+    fun getAlbumsCount(): Int {
         val countQuery = "SELECT * FROM " + Album.TABLE_NAME
         val db = readableDatabase
         val cursor = db.rawQuery(countQuery, null)
@@ -139,8 +153,8 @@ class AlbumDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
         return count
     }
 
-
-    fun deleteAlbum(album: Album){
+    @Suppress("unused")
+    fun deleteAlbum(album: Album) {
         val db = writableDatabase
         db.delete(Album.TABLE_NAME, Album.COLUMN_ID + " = ?", arrayOf(album.id.toString()))
         db.close()

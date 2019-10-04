@@ -27,14 +27,20 @@ import java.lang.ref.WeakReference
  */
 class HomeHandler {
 
-    companion object{
-        @JvmStatic var albumViewSelected = false
-        @JvmStatic var albumView = false
-        @JvmStatic var currentListViewData = ArrayList<HashMap<String, Any?>>()
-        @JvmStatic val loadMax = 200
-        @JvmStatic private var simpleAdapter: SimpleAdapter? = null
+    companion object {
+        @JvmStatic
+        var albumViewSelected = false
+        @JvmStatic
+        var albumView = false
+        @JvmStatic
+        var currentListViewData = ArrayList<HashMap<String, Any?>>()
+        @JvmStatic
+        val loadMax = 200
+        @JvmStatic
+        private var simpleAdapter: SimpleAdapter? = null
 
-        @JvmStatic fun redrawListView(view: View) {
+        @JvmStatic
+        fun redrawListView(view: View) {
             val musicList = view.findViewById<ListView>(R.id.musiclistview)
             simpleAdapter!!.notifyDataSetChanged()
             musicList.invalidateViews()
@@ -44,7 +50,8 @@ class HomeHandler {
         /**
          * Updates content
          */
-        @JvmStatic fun updateListView(view: View) {
+        @JvmStatic
+        fun updateListView(view: View) {
             val musicList = view.findViewById<ListView>(R.id.musiclistview)
 
             if (albumView) {
@@ -128,9 +135,9 @@ class HomeHandler {
         //refresh
         val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
         swipeRefreshLayout.setOnRefreshListener {
-            if(albumView) {
+            if (albumView) {
                 loadAlbumList(view, true)
-            }else{
+            } else {
                 loadSongList(view, true)
             }
         }
@@ -166,9 +173,9 @@ class HomeHandler {
 
         val viewSelector = view.findViewById<Spinner>(R.id.viewSelector)
 
-        if(albumViewSelected){
+        if (albumViewSelected) {
             viewSelector.setSelection(1)
-        }else{
+        } else {
             viewSelector.setSelection(0)
         }
 
@@ -178,9 +185,9 @@ class HomeHandler {
         viewSelector.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) {
 
-                if(albumViewSelected){
+                if (albumViewSelected) {
                     viewSelector.setSelection(1)
-                }else{
+                } else {
                     viewSelector.setSelection(0)
                 }
 
@@ -196,12 +203,12 @@ class HomeHandler {
                 when {
                     viewSelector.getItemAtPosition(position) == "Catalog View" -> {
                         albumView = false
-                        albumViewSelected  = false
+                        albumViewSelected = false
                         settings.saveSetting("albumViewSelected", albumViewSelected.toString())
                     }
                     viewSelector.getItemAtPosition(position) == "Album View" -> {
                         albumView = true
-                        albumViewSelected  = true
+                        albumViewSelected = true
                         settings.saveSetting("albumViewSelected", albumViewSelected.toString())
                     }
                 }
@@ -218,13 +225,21 @@ class HomeHandler {
     fun loadSongList(view: View, forceReload: Boolean) {
         val contextReference = WeakReference<Context>(view.context)
         val viewReference = WeakReference<View>(view)
-        LoadSongListAsync(viewReference, contextReference, forceReload).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        LoadSongListAsync(
+            viewReference,
+            contextReference,
+            forceReload
+        ).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 
     fun loadAlbumList(view: View, forceReload: Boolean) {
         val contextReference = WeakReference<Context>(view.context)
         val viewReference = WeakReference<View>(view)
-        LoadAlbumListAsync(viewReference, contextReference, forceReload).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        LoadAlbumListAsync(
+            viewReference,
+            contextReference,
+            forceReload
+        ).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 
     /**
@@ -233,6 +248,8 @@ class HomeHandler {
     private fun loadAlbum(view: View, itemValue: HashMap<String, Any?>, forceReload: Boolean) {
         val contextReference = WeakReference<Context>(view.context)
         val viewReference = WeakReference<View>(view)
-        LoadAlbumAsync(viewReference, contextReference, forceReload, itemValue).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        LoadAlbumAsync(viewReference, contextReference, forceReload, itemValue).executeOnExecutor(
+            AsyncTask.THREAD_POOL_EXECUTOR
+        )
     }
 }

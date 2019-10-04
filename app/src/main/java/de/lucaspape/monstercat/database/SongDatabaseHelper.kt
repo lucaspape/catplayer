@@ -9,11 +9,14 @@ import android.database.sqlite.SQLiteOpenHelper
 import java.lang.IndexOutOfBoundsException
 
 
-class SongDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
+class SongDatabaseHelper(context: Context) :
+    SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
-    companion object{
-        @JvmStatic private val DATABASE_VERSION = 1
-        @JvmStatic private val DATABASE_NAME = "songs_db"
+    companion object {
+        @JvmStatic
+        private val DATABASE_VERSION = 1
+        @JvmStatic
+        private val DATABASE_NAME = "songs_db"
     }
 
 
@@ -26,7 +29,14 @@ class SongDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         db!!.execSQL(Song.CREATE_TABLE)
     }
 
-    fun insertSong(songId:String, title: String, version:String, albumId:String, artist: String, coverUrl:String):Long{
+    fun insertSong(
+        songId: String,
+        title: String,
+        version: String,
+        albumId: String,
+        artist: String,
+        coverUrl: String
+    ): Long {
         val db = writableDatabase
 
         val values = ContentValues()
@@ -43,78 +53,89 @@ class SongDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         return id
     }
 
-    fun getSong(id:Long):Song{
+    fun getSong(id: Long): Song {
         val db = readableDatabase
 
-        val cursor = db.query(Song.TABLE_NAME, arrayOf(
-            Song.COLUMN_ID,
-            Song.COLUMN_SONG_ID,
-            Song.COLUMN_TITLE,
-            Song.COLUMN_VERSION,
-            Song.COLUMN_ALBUM_ID,
-            Song.COLUMN_ARTIST,
-            Song.COLUMN_COVER_URL),
-            Song.COLUMN_ID + "=?",
-            arrayOf(id.toString()), null, null, null, null)
-
-        cursor?.moveToFirst()
-
-        val song = Song(cursor.getInt(cursor.getColumnIndex(Song.COLUMN_ID)),
-            cursor.getString(cursor.getColumnIndex(Song.COLUMN_SONG_ID)),
-            cursor.getString(cursor.getColumnIndex(Song.COLUMN_TITLE)),
-            cursor.getString(cursor.getColumnIndex(Song.COLUMN_VERSION)),
-            cursor.getString(cursor.getColumnIndex(Song.COLUMN_ALBUM_ID)),
-            cursor.getString(cursor.getColumnIndex(Song.COLUMN_ARTIST)),
-            cursor.getString(cursor.getColumnIndex(Song.COLUMN_COVER_URL)))
-
-        cursor.close()
-
-        return song
-    }
-
-    fun getSong(songId: String):Song?{
-        val db = readableDatabase
-        val cursor:Cursor
-
-        try{
-            cursor = db.query(Song.TABLE_NAME, arrayOf(
+        val cursor = db.query(
+            Song.TABLE_NAME, arrayOf(
                 Song.COLUMN_ID,
                 Song.COLUMN_SONG_ID,
                 Song.COLUMN_TITLE,
                 Song.COLUMN_VERSION,
                 Song.COLUMN_ALBUM_ID,
                 Song.COLUMN_ARTIST,
-                Song.COLUMN_COVER_URL),
+                Song.COLUMN_COVER_URL
+            ),
+            Song.COLUMN_ID + "=?",
+            arrayOf(id.toString()), null, null, null, null
+        )
+
+        cursor?.moveToFirst()
+
+        val song = Song(
+            cursor.getInt(cursor.getColumnIndex(Song.COLUMN_ID)),
+            cursor.getString(cursor.getColumnIndex(Song.COLUMN_SONG_ID)),
+            cursor.getString(cursor.getColumnIndex(Song.COLUMN_TITLE)),
+            cursor.getString(cursor.getColumnIndex(Song.COLUMN_VERSION)),
+            cursor.getString(cursor.getColumnIndex(Song.COLUMN_ALBUM_ID)),
+            cursor.getString(cursor.getColumnIndex(Song.COLUMN_ARTIST)),
+            cursor.getString(cursor.getColumnIndex(Song.COLUMN_COVER_URL))
+        )
+
+        cursor.close()
+
+        return song
+    }
+
+    fun getSong(songId: String): Song? {
+        val db = readableDatabase
+        val cursor: Cursor
+
+        try {
+            cursor = db.query(
+                Song.TABLE_NAME, arrayOf(
+                    Song.COLUMN_ID,
+                    Song.COLUMN_SONG_ID,
+                    Song.COLUMN_TITLE,
+                    Song.COLUMN_VERSION,
+                    Song.COLUMN_ALBUM_ID,
+                    Song.COLUMN_ARTIST,
+                    Song.COLUMN_COVER_URL
+                ),
                 Song.COLUMN_SONG_ID + "=?",
-                arrayOf(songId), null, null, null, null)
+                arrayOf(songId), null, null, null, null
+            )
 
             cursor?.moveToFirst()
 
             try {
-                val song = Song(cursor.getInt(cursor.getColumnIndex(Song.COLUMN_ID)),
+                val song = Song(
+                    cursor.getInt(cursor.getColumnIndex(Song.COLUMN_ID)),
                     cursor.getString(cursor.getColumnIndex(Song.COLUMN_SONG_ID)),
                     cursor.getString(cursor.getColumnIndex(Song.COLUMN_TITLE)),
                     cursor.getString(cursor.getColumnIndex(Song.COLUMN_VERSION)),
                     cursor.getString(cursor.getColumnIndex(Song.COLUMN_ALBUM_ID)),
                     cursor.getString(cursor.getColumnIndex(Song.COLUMN_ARTIST)),
-                    cursor.getString(cursor.getColumnIndex(Song.COLUMN_COVER_URL)))
+                    cursor.getString(cursor.getColumnIndex(Song.COLUMN_COVER_URL))
+                )
 
                 cursor.close()
 
                 return song
-            }catch (e: IndexOutOfBoundsException){
+            } catch (e: IndexOutOfBoundsException) {
                 cursor.close()
                 db.close()
                 return null
             }
 
-        }catch (e:SQLiteException){
+        } catch (e: SQLiteException) {
             return null
         }
     }
 
-    fun getAllSongs():List<Song>{
-        val songs:ArrayList<Song> = ArrayList()
+    @Suppress("unused")
+    fun getAllSongs(): List<Song> {
+        val songs: ArrayList<Song> = ArrayList()
 
         val selectQuery = "SELECT * FROM " + Song.TABLE_NAME + " ORDER BY " +
                 Song.COLUMN_ID + " DESC"
@@ -122,8 +143,8 @@ class SongDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         val db = writableDatabase
         val cursor = db.rawQuery(selectQuery, null)
 
-        if(cursor.moveToFirst()){
-            do{
+        if (cursor.moveToFirst()) {
+            do {
                 val song = Song()
                 song.id = cursor.getInt(cursor.getColumnIndex(Song.COLUMN_ID))
                 song.songId = cursor.getString(cursor.getColumnIndex(Song.COLUMN_SONG_ID))
@@ -143,16 +164,17 @@ class SongDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         return songs
     }
 
-    fun getAlbumSongs(albumId: String):List<Song>{
-        val songs:ArrayList<Song> = ArrayList()
+    fun getAlbumSongs(albumId: String): List<Song> {
+        val songs: ArrayList<Song> = ArrayList()
 
-        val selectQuery = "SELECT * FROM " + Song.TABLE_NAME + " WHERE " + Song.COLUMN_ALBUM_ID + " = \"" + albumId + "\""
+        val selectQuery =
+            "SELECT * FROM " + Song.TABLE_NAME + " WHERE " + Song.COLUMN_ALBUM_ID + " = \"" + albumId + "\""
 
         val db = writableDatabase
         val cursor = db.rawQuery(selectQuery, null)
 
-        if(cursor.moveToFirst()){
-            do{
+        if (cursor.moveToFirst()) {
+            do {
                 val song = Song()
                 song.id = cursor.getInt(cursor.getColumnIndex(Song.COLUMN_ID))
                 song.songId = cursor.getString(cursor.getColumnIndex(Song.COLUMN_SONG_ID))
@@ -172,7 +194,8 @@ class SongDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         return songs
     }
 
-    fun getSongsCount():Int{
+    @Suppress("unused")
+    fun getSongsCount(): Int {
         val countQuery = "SELECT * FROM " + Song.TABLE_NAME
         val db = readableDatabase
         val cursor = db.rawQuery(countQuery, null)
@@ -183,8 +206,8 @@ class SongDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         return count
     }
 
-
-    fun deleteSong(song: Song){
+    @Suppress("unused")
+    fun deleteSong(song: Song) {
         val db = writableDatabase
         db.delete(Song.TABLE_NAME, Song.COLUMN_ID + " = ?", arrayOf(song.id.toString()))
         db.close()

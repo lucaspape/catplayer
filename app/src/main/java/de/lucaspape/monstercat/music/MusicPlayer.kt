@@ -1,7 +1,6 @@
 package de.lucaspape.monstercat.music
 
 import android.animation.ValueAnimator
-import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -27,6 +26,7 @@ import android.view.animation.LinearInterpolator
 import android.widget.*
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import androidx.palette.graphics.Palette
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.Song
@@ -116,9 +116,6 @@ fun createMediaSession(context: WeakReference<Context>) {
 
     })
 
-
-    mediaSession!!.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS)
-    mediaSession!!.setFlags(MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS)
     mediaSession!!.isActive = true
 }
 
@@ -195,7 +192,7 @@ fun setPlayButton(newPlayButton: ImageButton) {
  */
 
 private fun play() {
-    try{
+    try {
         val song = playList[currentSong]
 
         val url = song.getUrl()
@@ -203,7 +200,6 @@ private fun play() {
         mediaPlayer.stop()
         mediaPlayer = MediaPlayer()
 
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC)
         mediaPlayer.setDataSource(url)
 
         mediaPlayer.prepareAsync()
@@ -283,14 +279,15 @@ private fun play() {
 
             showSongNotification(title, artist, coverUrl, true)
             playButtonReference!!.get()!!.setImageDrawable(
-                contextReference!!.get()!!.resources.getDrawable(
+                ContextCompat.getDrawable(
+                    contextReference!!.get()!!,
                     R.drawable.ic_pause_white_24dp
                 )
             )
         }
 
 
-    }catch (e: IndexOutOfBoundsException){
+    } catch (e: IndexOutOfBoundsException) {
 
     }
 }
@@ -334,7 +331,12 @@ private fun stop() {
     playing = false
     textView1Reference!!.get()!!.text = ""
     textView2Reference!!.get()!!.text = ""
-    playButtonReference!!.get()!!.setImageDrawable(context.resources.getDrawable(R.drawable.ic_play_arrow_white_24dp))
+    playButtonReference!!.get()!!.setImageDrawable(
+        ContextCompat.getDrawable(
+            context,
+            R.drawable.ic_play_arrow_white_24dp
+        )
+    )
     mediaPlayer.stop()
 }
 
@@ -352,7 +354,12 @@ fun pause() {
 
         mediaPlayer.pause()
         showSongNotification(title, artist, coverUrl, false)
-        playButtonReference!!.get()!!.setImageDrawable(context.resources.getDrawable(R.drawable.ic_play_arrow_white_24dp))
+        playButtonReference!!.get()!!.setImageDrawable(
+            ContextCompat.getDrawable(
+                context,
+                R.drawable.ic_play_arrow_white_24dp
+            )
+        )
         playing = false
         paused = true
     } catch (e: IndexOutOfBoundsException) {
@@ -387,7 +394,12 @@ fun resume() {
         }
 
         showSongNotification(title, artist, coverUrl, true)
-        playButtonReference!!.get()!!.setImageDrawable(context.resources.getDrawable(R.drawable.ic_pause_white_24dp))
+        playButtonReference!!.get()!!.setImageDrawable(
+            ContextCompat.getDrawable(
+                context,
+                R.drawable.ic_pause_white_24dp
+            )
+        )
         playing = true
     } catch (e: IndexOutOfBoundsException) {
 
@@ -495,19 +507,13 @@ private fun showNotificationAndroidO(
             expandedRemoteViews.setViewVisibility(R.id.pauseButton, View.GONE)
         }
 
-        val notificationBuilder = Notification.Builder(context, channelID)
+        val notificationBuilder = NotificationCompat.Builder(context, channelID)
         notificationBuilder.setSmallIcon(R.drawable.ic_play_circle_filled_black_24dp)
-        notificationBuilder.setPriority(Notification.PRIORITY_LOW)
+        notificationBuilder.priority = NotificationCompat.PRIORITY_LOW
         notificationBuilder.setOngoing(true)
 
-        //notificationBuilder.setColorized(true)
-        //notificationBuilder.color = backgroundColor
-
-        notificationBuilder.style = Notification.DecoratedCustomViewStyle()
+        notificationBuilder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
         notificationBuilder.setCustomBigContentView(expandedRemoteViews)
-
-        notificationBuilder.style = Notification.MediaStyle()
-            .setMediaSession(mediaSession!!.sessionToken)
 
         setListeners(expandedRemoteViews, context)
 

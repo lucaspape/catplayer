@@ -29,7 +29,7 @@ class PlaylistFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        playlistView = view.findViewById<ListView>(R.id.playlistView)
+        playlistView = view.findViewById(R.id.playlistView)
 
         val settings = Settings(view.context)
 

@@ -19,7 +19,11 @@ class HomeFragment : Fragment() {
     private var listView: ListView? = null
     private val homeHandler = HomeHandler()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_home, container, false)
     }
 
@@ -36,21 +40,15 @@ class HomeFragment : Fragment() {
         homeHandler.registerListeners(view)
         homeHandler.setupMusicPlayer(view)
 
-        if(HomeHandler.albumViewSelected){
-           // homeHandler.loadAlbumList(view, false)
-        }else{
-           // homeHandler.loadSongList(view, false)
-
+        if (!HomeHandler.albumViewSelected) {
             listView = view.findViewById(R.id.musiclistview)
             registerForContextMenu(listView as ListView)
         }
 
         val settingButton = view.findViewById<ImageButton>(R.id.settingsButton)
         settingButton.setOnClickListener {
-            val settingsIntent = Intent(view.context, SettingsActivity::class.java)
-            view.context.startActivity(settingsIntent)
+            view.context.startActivity(Intent(view.context, SettingsActivity::class.java))
         }
-
     }
 
     override fun onCreateContextMenu(
@@ -73,11 +71,18 @@ class HomeFragment : Fragment() {
         val songDatabaseHelper = SongDatabaseHelper(view!!.context)
         val song = songDatabaseHelper.getSong(listItem["id"] as String)
 
-        if(song != null){
+        if (song != null) {
             when {
                 item.title == getString(R.string.download) -> downloadSong(context!!, song)
-                item.title == getString(R.string.playNext) -> playSongFromId(context!!, listItem["id"].toString(), false)
-                item.title == getString(R.string.addToPlaylist) -> addSongToPlaylist(context!!, song)
+                item.title == getString(R.string.playNext) -> playSongFromId(
+                    context!!,
+                    listItem["id"].toString(),
+                    false
+                )
+                item.title == getString(R.string.addToPlaylist) -> addSongToPlaylist(
+                    context!!,
+                    song
+                )
             }
         }
 

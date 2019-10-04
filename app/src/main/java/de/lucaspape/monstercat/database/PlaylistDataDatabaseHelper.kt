@@ -8,10 +8,12 @@ import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
 import java.lang.IndexOutOfBoundsException
 
-class PlaylistDataDatabaseHelper (context:Context, var playlistId:String) : SQLiteOpenHelper(context, "playlists_data_db_" + playlistId, null, DATABASE_VERSION){
+class PlaylistDataDatabaseHelper(context: Context, var playlistId: String) :
+    SQLiteOpenHelper(context, "playlists_data_db_" + playlistId, null, DATABASE_VERSION) {
 
-    companion object{
-        @JvmStatic private val DATABASE_VERSION = 1
+    companion object {
+        @JvmStatic
+        private val DATABASE_VERSION = 1
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
@@ -23,7 +25,7 @@ class PlaylistDataDatabaseHelper (context:Context, var playlistId:String) : SQLi
         db!!.execSQL(PlaylistData.CREATE_TABLE)
     }
 
-    fun insertSongId(songId:Long):Long{
+    fun insertSongId(songId: Long): Long {
         val db = writableDatabase
 
         val values = ContentValues()
@@ -35,58 +37,69 @@ class PlaylistDataDatabaseHelper (context:Context, var playlistId:String) : SQLi
         return id
     }
 
-    fun getPlaylistData(id:Long):PlaylistData{
+    fun getPlaylistData(id: Long): PlaylistData {
         val db = readableDatabase
 
-        val cursor = db.query(PlaylistData.TABLE_NAME, arrayOf(
-            PlaylistData.COLUMN_ID,
-            PlaylistData.COLUMN_SONG_ID),
+        val cursor = db.query(
+            PlaylistData.TABLE_NAME, arrayOf(
+                PlaylistData.COLUMN_ID,
+                PlaylistData.COLUMN_SONG_ID
+            ),
             Playlist.COLUMN_ID + "=?",
-            arrayOf(id.toString()), null, null, null, null)
+            arrayOf(id.toString()), null, null, null, null
+        )
 
         cursor?.moveToFirst()
 
-        val newPlaylistData = PlaylistData(cursor.getInt(cursor.getColumnIndex(PlaylistData.COLUMN_ID)),
-            cursor.getLong(cursor.getColumnIndex(PlaylistData.COLUMN_SONG_ID)))
+        val newPlaylistData = PlaylistData(
+            cursor.getInt(cursor.getColumnIndex(PlaylistData.COLUMN_ID)),
+            cursor.getLong(cursor.getColumnIndex(PlaylistData.COLUMN_SONG_ID))
+        )
 
         cursor.close()
 
         return newPlaylistData
     }
 
-    fun getPlaylistData(songId: String):PlaylistData?{
+    @Suppress("unused")
+    fun getPlaylistData(songId: String): PlaylistData? {
         val db = readableDatabase
         val cursor: Cursor
 
-        try{
-            cursor = db.query(PlaylistData.TABLE_NAME, arrayOf(
-                PlaylistData.COLUMN_ID,
-                PlaylistData.COLUMN_SONG_ID),
+        try {
+            cursor = db.query(
+                PlaylistData.TABLE_NAME, arrayOf(
+                    PlaylistData.COLUMN_ID,
+                    PlaylistData.COLUMN_SONG_ID
+                ),
                 Song.COLUMN_SONG_ID + "=?",
-                arrayOf(playlistId), null, null, null, null)
+                arrayOf(playlistId), null, null, null, null
+            )
 
             cursor?.moveToFirst()
 
             try {
-                val newPlaylistData = PlaylistData(cursor.getInt(cursor.getColumnIndex(Playlist.COLUMN_ID)),
-                    cursor.getLong(cursor.getColumnIndex(PlaylistData.COLUMN_SONG_ID)))
+                val newPlaylistData = PlaylistData(
+                    cursor.getInt(cursor.getColumnIndex(Playlist.COLUMN_ID)),
+                    cursor.getLong(cursor.getColumnIndex(PlaylistData.COLUMN_SONG_ID))
+                )
 
                 cursor.close()
 
                 return newPlaylistData
-            }catch (e: IndexOutOfBoundsException){
+            } catch (e: IndexOutOfBoundsException) {
                 cursor.close()
                 db.close()
                 return null
             }
 
-        }catch (e: SQLiteException){
+        } catch (e: SQLiteException) {
             return null
         }
     }
 
-    fun getAllData():List<PlaylistData>{
-        val playlistDatas:ArrayList<PlaylistData> = ArrayList()
+    fun getAllData(): List<PlaylistData> {
+        val playlistDatas: ArrayList<PlaylistData> = ArrayList()
 
         val selectQuery = "SELECT * FROM " + PlaylistData.TABLE_NAME + " ORDER BY " +
                 PlaylistData.COLUMN_ID + " DESC"
@@ -94,11 +107,12 @@ class PlaylistDataDatabaseHelper (context:Context, var playlistId:String) : SQLi
         val db = writableDatabase
         val cursor = db.rawQuery(selectQuery, null)
 
-        if(cursor.moveToFirst()){
-            do{
+        if (cursor.moveToFirst()) {
+            do {
                 val newPlaylistData = PlaylistData()
                 newPlaylistData.id = cursor.getInt(cursor.getColumnIndex(PlaylistData.COLUMN_ID))
-                newPlaylistData.songId = cursor.getLong(cursor.getColumnIndex(PlaylistData.COLUMN_SONG_ID))
+                newPlaylistData.songId =
+                    cursor.getLong(cursor.getColumnIndex(PlaylistData.COLUMN_SONG_ID))
 
                 playlistDatas.add(newPlaylistData)
             } while (cursor.moveToNext())
@@ -110,7 +124,8 @@ class PlaylistDataDatabaseHelper (context:Context, var playlistId:String) : SQLi
         return playlistDatas
     }
 
-    fun getPlaylistDataCount():Int{
+    @Suppress("unused")
+    fun getPlaylistDataCount(): Int {
         val countQuery = "SELECT * FROM " + PlaylistData.TABLE_NAME
         val db = readableDatabase
         val cursor = db.rawQuery(countQuery, null)
@@ -121,10 +136,14 @@ class PlaylistDataDatabaseHelper (context:Context, var playlistId:String) : SQLi
         return count
     }
 
-
-    fun deletePlaylistData(dPlaylistData: PlaylistData){
+    @Suppress("unused")
+    fun deletePlaylistData(dPlaylistData: PlaylistData) {
         val db = writableDatabase
-        db.delete(PlaylistData.TABLE_NAME, PlaylistData.COLUMN_ID + " = ?", arrayOf(dPlaylistData.id.toString()))
+        db.delete(
+            PlaylistData.TABLE_NAME,
+            PlaylistData.COLUMN_ID + " = ?",
+            arrayOf(dPlaylistData.id.toString())
+        )
         db.close()
     }
 

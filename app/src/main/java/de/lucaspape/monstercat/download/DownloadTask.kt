@@ -21,16 +21,14 @@ import java.net.SocketTimeoutException
 import java.net.URISyntaxException
 import java.net.URL
 
-class DownloadTask(private val weakReference: WeakReference<Context>) : AsyncTask<Void, Void, String>() {
+class DownloadTask(private val weakReference: WeakReference<Context>) :
+    AsyncTask<Void, Void, String>() {
 
     override fun doInBackground(vararg p0: Void?): String? {
 
         val context = weakReference.get()!!
 
         var downloadedSongs = 0
-        var downloadedSongArrays = 0
-
-        var downloadedCovers = 0
         var downloadedCoverArrays = 0
 
         while (true) {
@@ -58,70 +56,6 @@ class DownloadTask(private val weakReference: WeakReference<Context>) : AsyncTas
             }
 
             try {
-                if (downloadArrayListList[downloadedSongArrays].isNotEmpty()) {
-                    val songArrayList = downloadArrayListList[downloadedSongArrays]
-
-                    if (loggedIn) {
-                        showDownloadNotification("", 0, songArrayList.size, false, context)
-
-                        for (i in songArrayList.indices) {
-                            val song = songArrayList[i]
-                            val url = song["downloadUrl"] as String
-                            val location = song["downloadLocation"] as String
-                            val shownTitle = song["shownTitle"] as String
-
-                            showDownloadNotification(
-                                shownTitle,
-                                i,
-                                songArrayList.size,
-                                false,
-                                context
-                            )
-
-                            var downloaded = false
-
-                            while (!downloaded) {
-                                downloaded = downloadSong(url, location, sid, context)
-                            }
-                        }
-
-                        hideDownloadNotification(context)
-
-                    }
-
-                }
-                downloadedSongArrays++
-
-            } catch (e: IndexOutOfBoundsException) {
-            }
-
-            try {
-                if (downloadCoverList[downloadedCovers].isNotEmpty()) {
-                    val cover = downloadCoverList[downloadedCovers]
-
-                    showDownloadNotification(
-                        context.getString(R.string.downloadingCoversMsg),
-                        0,
-                        0,
-                        true,
-                        context
-                    )
-
-                    val url = cover["coverUrl"] as String
-                    val location = cover["coverLocation"] as String
-
-                    val primaryRes = cover["primaryRes"] as String
-                    val secondaryRes = cover["secondaryRes"] as String
-
-                    downloadCover(url, location, primaryRes, secondaryRes)
-                    hideDownloadNotification(context)
-                }
-
-                downloadedCovers++
-            } catch (e: IndexOutOfBoundsException) {
-            }
-
-            try {
                 if (downloadCoverArrayListList[downloadedCoverArrays].isNotEmpty()) {
                     val coverArray = downloadCoverArrayListList[downloadedCoverArrays]
 
@@ -136,13 +70,18 @@ class DownloadTask(private val weakReference: WeakReference<Context>) : AsyncTas
 
                         val cover = coverArray[i]
 
-                        val url = cover["coverUrl"] as String
-                        val location = cover["coverLocation"] as String
+                        try {
+                            val url = cover["coverUrl"] as String
+                            val location = cover["coverLocation"] as String
 
-                        val primaryRes = cover["primaryRes"] as String
-                        val secondaryRes = cover["secondaryRes"] as String
+                            val primaryRes = cover["primaryRes"] as String
+                            val secondaryRes = cover["secondaryRes"] as String
 
-                        downloadCover(url, location, primaryRes, secondaryRes)
+                            downloadCover(url, location, primaryRes, secondaryRes)
+                        } catch (e: TypeCastException) {
+
+                        }
+
                     }
 
                     hideDownloadNotification(context)
@@ -156,22 +95,27 @@ class DownloadTask(private val weakReference: WeakReference<Context>) : AsyncTas
         }
     }
 
-    private fun downloadSong(url: String, location: String, sid: String, context: Context): Boolean {
+    private fun downloadSong(
+        url: String,
+        location: String,
+        sid: String,
+        context: Context
+    ): Boolean {
         try {
-            val glideUrl:GlideUrl
+            val glideUrl: GlideUrl
 
-            try{
+            try {
                 glideUrl = GlideUrl(
                     url, LazyHeaders.Builder()
                         .addHeader("Cookie", "connect.sid=$sid").build()
                 )
-            }catch(e:URISyntaxException){
+            } catch (e: URISyntaxException) {
                 return false
             }
 
             try {
-                try{
-                    try{
+                try {
+                    try {
                         val downloadFile = Glide.with(context)
                             .load(glideUrl)
                             .downloadOnly(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
@@ -194,10 +138,10 @@ class DownloadTask(private val weakReference: WeakReference<Context>) : AsyncTas
                         bufferedOutputStream.close()
 
                         return true
-                    }catch (e: RuntimeException){
+                    } catch (e: RuntimeException) {
                         return false
                     }
-                }catch (e: SocketTimeoutException){
+                } catch (e: SocketTimeoutException) {
                     return false
                 }
 
@@ -230,7 +174,12 @@ class DownloadTask(private val weakReference: WeakReference<Context>) : AsyncTas
                 }
 
                 val secondaryBitmap =
-                    Bitmap.createScaledBitmap(primaryBitmap, secondaryRes.toInt(), secondaryRes.toInt(), false)
+                    Bitmap.createScaledBitmap(
+                        primaryBitmap,
+                        secondaryRes.toInt(),
+                        secondaryRes.toInt(),
+                        false
+                    )
 
                 FileOutputStream(location + secondaryRes).use { out ->
                     secondaryBitmap!!.compress(Bitmap.CompressFormat.PNG, 100, out)

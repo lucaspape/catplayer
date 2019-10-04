@@ -38,7 +38,8 @@ class Auth {
 
                     try {
                         //get SID
-                        sid = headers.getString("Set-Cookie").substringBefore(';').replace("connect.sid=", "")
+                        sid = headers.getString("Set-Cookie").substringBefore(';')
+                            .replace("connect.sid=", "")
 
                         Toast.makeText(
                             context,

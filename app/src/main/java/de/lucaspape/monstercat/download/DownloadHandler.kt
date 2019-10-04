@@ -9,12 +9,11 @@ import androidx.core.app.NotificationManagerCompat
 import de.lucaspape.monstercat.R
 
 //notification var
-private val channelID = "Download Notification"
-private val notificationID = 2
+
+private const val channelID = "Download Notification"
+private const val notificationID = 2
 
 val downloadList = ArrayList<HashMap<String, Any?>>()
-val downloadArrayListList = ArrayList<ArrayList<HashMap<String, Any?>>>()
-val downloadCoverList = ArrayList<HashMap<String, Any?>>()
 val downloadCoverArrayListList = ArrayList<ArrayList<HashMap<String, Any?>>>()
 
 fun addDownloadSong(url: String, location: String, shownTitle: String) {
@@ -24,20 +23,6 @@ fun addDownloadSong(url: String, location: String, shownTitle: String) {
     downloadTrack["shownTitle"] = shownTitle
 
     downloadList.add(downloadTrack)
-}
-
-fun addDownloadSongArray(array: ArrayList<HashMap<String, Any?>>) {
-    downloadArrayListList.add(array)
-}
-
-fun addDownloadCover(url: String, location: String, primaryRes: String, secondaryRes: String) {
-    val cover = HashMap<String, Any?>()
-    cover["coverUrl"] = url
-    cover["location"] = location
-    cover["primaryRes"] = primaryRes
-    cover["secondaryRes"] = secondaryRes
-
-    downloadCoverList.add(cover)
 }
 
 fun addDownloadCoverArray(covers: ArrayList<HashMap<String, Any?>>) {

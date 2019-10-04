@@ -18,9 +18,16 @@ import de.lucaspape.monstercat.json.JSONParser
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
-class LoadPlaylistTracksAsync(private val viewReference: WeakReference<View>, private val contextReference: WeakReference<Context>, private val forceReload: Boolean, private val playlistId: String, private val trackCount: Int) : AsyncTask<Void, Void, String>(){
+class LoadPlaylistTracksAsync(
+    private val viewReference: WeakReference<View>,
+    private val contextReference: WeakReference<Context>,
+    private val forceReload: Boolean,
+    private val playlistId: String,
+    private val trackCount: Int
+) : AsyncTask<Void, Void, String>() {
     override fun onPreExecute() {
-        val swipeRefreshLayout = viewReference.get()!!.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
+        val swipeRefreshLayout =
+            viewReference.get()!!.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
         swipeRefreshLayout.isRefreshing = true
     }
 
@@ -31,12 +38,14 @@ class LoadPlaylistTracksAsync(private val viewReference: WeakReference<View>, pr
         //download cover art
         addDownloadCoverArray(PlaylistHandler.currentListViewData)
 
-        val swipeRefreshLayout = viewReference.get()!!.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
+        val swipeRefreshLayout =
+            viewReference.get()!!.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
         swipeRefreshLayout.isRefreshing = false
     }
 
-    override fun doInBackground(vararg params: Void?): String? {
-        val playlistDataDatabaseHelper = PlaylistDataDatabaseHelper(contextReference.get()!!, playlistId)
+    override fun doInBackground(vararg param: Void?): String? {
+        val playlistDataDatabaseHelper =
+            PlaylistDataDatabaseHelper(contextReference.get()!!, playlistId)
         var playlistDatas = playlistDataDatabaseHelper.getAllData()
 
         if (!forceReload && playlistDatas.isNotEmpty()) {
@@ -95,7 +104,7 @@ class LoadPlaylistTracksAsync(private val viewReference: WeakReference<View>, pr
                 }
             }
 
-            for (i in (0..(trackCount as Int / 50))) {
+            for (i in (0..(trackCount / 50))) {
                 val playlistTrackUrl =
                     contextReference.get()!!.getString(R.string.loadSongsUrl) + "?playlistId=" + playlistId + "&skip=" + (i * 50).toString() + "&limit=50"
 
@@ -109,9 +118,6 @@ class LoadPlaylistTracksAsync(private val viewReference: WeakReference<View>, pr
                             val playlistObject = jsonArray.getJSONObject(k)
 
                             val jsonParser = JSONParser()
-
-                            //  val trackHashMap = jsonParser.parsePlaylistTracksToHashMap(playlistObject, view.context)
-
                             val id = jsonParser.parsePlaylistTrackToDB(
                                 playlistId,
                                 playlistObject,

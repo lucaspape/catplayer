@@ -16,25 +16,32 @@ import de.lucaspape.monstercat.json.JSONParser
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
-class LoadPlaylistAsync(private val viewReference: WeakReference<View>, private val contextReference: WeakReference<Context>, private val forceReload: Boolean, private val showAfter:Boolean) : AsyncTask<Void, Void, String>(){
+class LoadPlaylistAsync(
+    private val viewReference: WeakReference<View>,
+    private val contextReference: WeakReference<Context>,
+    private val forceReload: Boolean,
+    private val showAfter: Boolean
+) : AsyncTask<Void, Void, String>() {
     override fun onPreExecute() {
-        if(showAfter){
-            val swipeRefreshLayout = viewReference.get()!!.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
+        if (showAfter) {
+            val swipeRefreshLayout =
+                viewReference.get()!!.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
             swipeRefreshLayout.isRefreshing = true
         }
     }
 
     override fun onPostExecute(result: String?) {
-        if(showAfter){
+        if (showAfter) {
             PlaylistHandler.updateListView(viewReference.get()!!)
             PlaylistHandler.redrawListView(viewReference.get()!!)
 
-            val swipeRefreshLayout = viewReference.get()!!.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
+            val swipeRefreshLayout =
+                viewReference.get()!!.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
             swipeRefreshLayout.isRefreshing = false
         }
     }
 
-    override fun doInBackground(vararg params: Void?): String? {
+    override fun doInBackground(vararg param: Void?): String? {
         val playlistDatabaseHelper = PlaylistDatabaseHelper(contextReference.get()!!)
         var playlists = playlistDatabaseHelper.getAllPlaylists()
 
@@ -47,7 +54,7 @@ class LoadPlaylistAsync(private val viewReference: WeakReference<View>, private 
                 playlistHashMaps.add(jsonParser.parsePlaylistToHashMap(playlist))
             }
 
-            if(showAfter) {
+            if (showAfter) {
                 PlaylistHandler.currentListViewData = playlistHashMaps
             }
 
@@ -84,7 +91,7 @@ class LoadPlaylistAsync(private val viewReference: WeakReference<View>, private 
                         playlistHashMaps.add(jsonParser.parsePlaylistToHashMap(playlist))
                     }
 
-                    if(showAfter){
+                    if (showAfter) {
                         PlaylistHandler.currentListViewData = playlistHashMaps
                     }
 

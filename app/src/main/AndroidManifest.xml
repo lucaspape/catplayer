@@ -20,8 +20,8 @@
         </receiver>
 
         <activity
-                android:name=".activities.SplashScreenActivity"
-                android:theme="@style/SplashScreenTheme"
+                android:name=".activities.MainActivity"
+                android:theme="@style/AppTheme"
                 android:label="@string/app_name"
                 android:screenOrientation="portrait">
 
@@ -30,11 +30,8 @@
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-
-
         </activity>
 
-        <activity android:name=".activities.MainActivity"/>
         <activity android:name=".activities.SettingsActivity"/>
 
         <!-- Set custom default icon. This is used when no icon is set for incoming notification messages.

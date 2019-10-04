@@ -28,23 +28,22 @@ import java.lang.ref.WeakReference
 
 class MainActivity : AppCompatActivity() {
 
-    private val onNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
-        when (item.itemId) {
-            R.id.navigation_home -> {
-                val homeFragment = HomeFragment.newInstance()
-                openFragment(homeFragment)
+    private val onNavigationItemSelectedListener =
+        BottomNavigationView.OnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.navigation_home -> {
+                    openFragment(HomeFragment.newInstance())
 
-                return@OnNavigationItemSelectedListener true
-            }
-            R.id.navigation_dashboard -> {
-                val playlistFragment = PlaylistFragment.newInstance()
-                openFragment(playlistFragment)
+                    return@OnNavigationItemSelectedListener true
+                }
+                R.id.navigation_dashboard -> {
+                    openFragment(PlaylistFragment.newInstance())
 
-                return@OnNavigationItemSelectedListener true
+                    return@OnNavigationItemSelectedListener true
+                }
             }
+            false
         }
-        false
-    }
 
     private fun openFragment(fragment: Fragment) {
         val transaction = supportFragmentManager.beginTransaction()
@@ -58,42 +57,42 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val navView: BottomNavigationView = findViewById(R.id.nav_view)
-
-        navView.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
+        findViewById<BottomNavigationView>(R.id.nav_view).setOnNavigationItemSelectedListener(
+            onNavigationItemSelectedListener
+        )
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET)
-            != PackageManager.PERMISSION_GRANTED) {
+            != PackageManager.PERMISSION_GRANTED
+        ) {
             println("Internet permission not granted!")
         }
 
         createMediaSession(WeakReference(this))
 
-        val intentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
-        registerReceiver(NoisyReceiver(), intentFilter)
+        registerReceiver(NoisyReceiver(), IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY))
 
         val settings = Settings(this)
 
-        val auth = Auth()
-        auth.login(this)
+        Auth().login(this)
 
-        if(settings.getSetting("albumViewSelected") != null){
+        if (settings.getSetting("albumViewSelected") != null) {
             HomeHandler.albumViewSelected = settings.getSetting("albumView") == true.toString()
         }
 
-        val homeFragment = HomeFragment.newInstance()
-        openFragment(homeFragment)
+        openFragment(HomeFragment.newInstance())
 
-        val weakReference = WeakReference(applicationContext)
-        DownloadTask(weakReference).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        DownloadTask(WeakReference(applicationContext)).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 
         //for new privacy policy change version number
-        if(settings.getSetting("privacypolicy") != "1.0"){
+        if (settings.getSetting("privacypolicy") != "1.0") {
             val textView = TextView(this)
-            val spannableString = SpannableString(getString(
-                R.string.reviewPrivacyPolicyMsg, getString(
-                    R.string.privacypolicyUrl
-                )))
+            val spannableString = SpannableString(
+                getString(
+                    R.string.reviewPrivacyPolicyMsg, getString(
+                        R.string.privacypolicyUrl
+                    )
+                )
+            )
 
             Linkify.addLinks(spannableString, Linkify.WEB_URLS)
             textView.text = spannableString

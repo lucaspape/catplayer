@@ -17,9 +17,15 @@ import de.lucaspape.monstercat.json.JSONParser
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
-class LoadAlbumAsync(private val viewReference: WeakReference<View>, private val contextReference: WeakReference<Context>, private val forceReload: Boolean, private val itemValue: HashMap<String, Any?>) : AsyncTask<Void, Void, String>(){
+class LoadAlbumAsync(
+    private val viewReference: WeakReference<View>,
+    private val contextReference: WeakReference<Context>,
+    private val forceReload: Boolean,
+    private val itemValue: HashMap<String, Any?>
+) : AsyncTask<Void, Void, String>() {
     override fun onPreExecute() {
-        val swipeRefreshLayout = viewReference.get()!!.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
+        val swipeRefreshLayout =
+            viewReference.get()!!.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
         swipeRefreshLayout.isRefreshing = true
     }
 
@@ -30,11 +36,12 @@ class LoadAlbumAsync(private val viewReference: WeakReference<View>, private val
         //download cover art
         addDownloadCoverArray(HomeHandler.currentListViewData)
 
-        val swipeRefreshLayout = viewReference.get()!!.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
+        val swipeRefreshLayout =
+            viewReference.get()!!.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
         swipeRefreshLayout.isRefreshing = false
     }
 
-    override fun doInBackground(vararg params: Void?): String? {
+    override fun doInBackground(vararg param: Void?): String? {
         val albumId = itemValue["id"] as String
 
         val requestQueue = Volley.newRequestQueue(contextReference.get()!!)
@@ -45,11 +52,11 @@ class LoadAlbumAsync(private val viewReference: WeakReference<View>, private val
         val songDatabaseHelper = SongDatabaseHelper(contextReference.get()!!)
         var songList = songDatabaseHelper.getAlbumSongs(albumId)
 
-        if(!forceReload && songList.isNotEmpty()){
+        if (!forceReload && songList.isNotEmpty()) {
             // currentListViewData = albumCache as ArrayList<HashMap<String, Any?>>
             val dbSongs = ArrayList<HashMap<String, Any?>>()
 
-            for(song in songList){
+            for (song in songList) {
                 val jsonParser = JSONParser()
                 dbSongs.add(jsonParser.parseSongToHashMap(contextReference.get()!!, song))
             }
@@ -59,12 +66,12 @@ class LoadAlbumAsync(private val viewReference: WeakReference<View>, private val
             HomeHandler.albumView = false
 
             return null
-        }else{
+        } else {
             requestQueue.addRequestFinishedListener<Any> {
                 val dbSongs = ArrayList<HashMap<String, Any?>>()
                 songList = songDatabaseHelper.getAlbumSongs(albumId)
 
-                for(song in songList){
+                for (song in songList) {
                     val jsonParser = JSONParser()
                     dbSongs.add(jsonParser.parseSongToHashMap(contextReference.get()!!, song))
                 }
