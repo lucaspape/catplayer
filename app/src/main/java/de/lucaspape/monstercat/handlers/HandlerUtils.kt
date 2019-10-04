@@ -12,6 +12,7 @@ import de.lucaspape.monstercat.MainActivity
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.loggedIn
 import de.lucaspape.monstercat.auth.sid
+import de.lucaspape.monstercat.database.PlaylistDataDatabaseHelper
 import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.database.SongDatabaseHelper
 import de.lucaspape.monstercat.json.JSONParser
@@ -86,8 +87,16 @@ fun playSongFromId(context: Context, songId:String, playNow: Boolean) {
     }
 }
 
-//TODO implement
 fun downloadPlaylist(context: Context, playlistId: String) {
+    val playlistDataDatabaseHelper = PlaylistDataDatabaseHelper(context, playlistId)
+    val playlistDataList = playlistDataDatabaseHelper.getAllData()
+
+    for(playlistData in playlistDataList){
+        val songDatabaseHelper = SongDatabaseHelper(context)
+        val song = songDatabaseHelper.getSong(playlistData.songId)
+
+        downloadSong(context, song)
+    }
 }
 
 fun downloadSong(context: Context, song:Song) {
