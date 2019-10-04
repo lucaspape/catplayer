@@ -3,7 +3,10 @@ package de.lucaspape.monstercat.download
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.os.AsyncTask
+import android.os.Build
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.model.GlideUrl
@@ -32,63 +35,73 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
         var downloadedCoverArrays = 0
 
         while (true) {
-            try {
-                if (downloadList[downloadedSongs].isNotEmpty()) {
-                    val song = downloadList[downloadedSongs]
-                    val url = song["url"] as String
-                    val location = song["location"] as String
-                    val shownTitle = song["shownTitle"] as String
+            val connectivityManager = weakReference.get()!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
 
-                    if (loggedIn) {
-                        showDownloadNotification(shownTitle, 0, 0, true, context)
-                        var downloaded = false
+            if(wifi != null){
+                if(wifi.isConnected){
+                    try {
 
-                        while (!downloaded) {
-                            downloaded = downloadSong(url, location, sid, context)
-                        }
 
-                        hideDownloadNotification(context)
-                    }
+                        if (downloadList[downloadedSongs].isNotEmpty()) {
+                            val song = downloadList[downloadedSongs]
+                            val url = song["url"] as String
+                            val location = song["location"] as String
+                            val shownTitle = song["shownTitle"] as String
 
-                }
-                downloadedSongs++
-            } catch (e: IndexOutOfBoundsException) {
-            }
+                            if (loggedIn) {
+                                showDownloadNotification(shownTitle, 0, 0, true, context)
+                                var downloaded = false
 
-            try {
-                if (downloadCoverArrayListList[downloadedCoverArrays].isNotEmpty()) {
-                    val coverArray = downloadCoverArrayListList[downloadedCoverArrays]
+                                while (!downloaded) {
+                                    downloaded = downloadSong(url, location, sid, context)
+                                }
 
-                    for (i in coverArray.indices) {
-                        showDownloadNotification(
-                            context.getString(R.string.downloadingCoversMsg),
-                            i,
-                            coverArray.size,
-                            false,
-                            context
-                        )
-
-                        val cover = coverArray[i]
-
-                        try {
-                            val url = cover["coverUrl"] as String
-                            val location = cover["coverLocation"] as String
-
-                            val primaryRes = cover["primaryRes"] as String
-                            val secondaryRes = cover["secondaryRes"] as String
-
-                            downloadCover(url, location, primaryRes, secondaryRes)
-                        } catch (e: TypeCastException) {
+                                hideDownloadNotification(context)
+                            }
 
                         }
-
+                        downloadedSongs++
+                    } catch (e: IndexOutOfBoundsException) {
                     }
 
-                    hideDownloadNotification(context)
+                    try {
+                        if (downloadCoverArrayListList[downloadedCoverArrays].isNotEmpty()) {
+                            val coverArray = downloadCoverArrayListList[downloadedCoverArrays]
+
+                            for (i in coverArray.indices) {
+                                showDownloadNotification(
+                                    context.getString(R.string.downloadingCoversMsg),
+                                    i,
+                                    coverArray.size,
+                                    false,
+                                    context
+                                )
+
+                                val cover = coverArray[i]
+
+                                try {
+                                    val url = cover["coverUrl"] as String
+                                    val location = cover["coverLocation"] as String
+
+                                    val primaryRes = cover["primaryRes"] as String
+                                    val secondaryRes = cover["secondaryRes"] as String
+
+                                    downloadCover(url, location, primaryRes, secondaryRes)
+                                } catch (e: TypeCastException) {
+
+                                }
+
+                            }
+
+                            hideDownloadNotification(context)
+                        }
+
+                        downloadedCoverArrays++
+                    } catch (e: IndexOutOfBoundsException) {
+                    }
                 }
 
-                downloadedCoverArrays++
-            } catch (e: IndexOutOfBoundsException) {
             }
 
             Thread.sleep(100)
