@@ -5,22 +5,16 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.ConnectivityManager
 import android.os.AsyncTask
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.load.model.GlideUrl
-import com.bumptech.glide.load.model.LazyHeaders
-import com.bumptech.glide.request.target.Target
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.sid
 import de.lucaspape.monstercat.auth.loggedIn
 import de.lucaspape.monstercat.settings.Settings
 import java.io.*
-import java.lang.IndexOutOfBoundsException
-import java.lang.RuntimeException
 import java.lang.ref.WeakReference
 import java.net.HttpURLConnection
-import java.net.SocketTimeoutException
-import java.net.URISyntaxException
 import java.net.URL
 
 class DownloadTask(private val weakReference: WeakReference<Context>) :
@@ -44,7 +38,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
             try {
                 if (wifi != null && !wifi.isConnected && settings.getSetting("downloadOverMobile") != "true") {
                     println("forbidden by user")
-                }else{
+                } else {
                     if (downloadList[downloadedSongs]!!.isNotEmpty()) {
                         val song = downloadList[downloadedSongs]
                         val url = song!!["url"] as String
@@ -73,7 +67,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
             try {
                 if (wifi != null && !wifi.isConnected && settings.getSetting("downloadCoversOverMobile") != "true") {
                     println("forbidden by user")
-                }else{
+                } else {
                     if (downloadCoverArrayListList[downloadedCoverArrays]!!.isNotEmpty()) {
                         val coverArray = downloadCoverArrayListList[downloadedCoverArrays]
 
@@ -122,51 +116,42 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
         context: Context
     ): Boolean {
         try {
-            val glideUrl: GlideUrl
+            val requestQueue = Volley.newRequestQueue(context)
 
-            try {
-                glideUrl = GlideUrl(
-                    url, LazyHeaders.Builder()
-                        .addHeader("Cookie", "connect.sid=$sid").build()
-                )
-            } catch (e: URISyntaxException) {
-                return false
+            val params = HashMap<String, String>()
+            if (loggedIn) {
+                params["Cookie"] = "connect.sid=$sid"
             }
 
-            try {
-                try {
-                    try {
-                        val downloadFile = Glide.with(context)
-                            .load(glideUrl)
-                            .downloadOnly(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
-                            .get()
+            var noError: Boolean = true
+            val syncObject = Object()
 
-                        val destFile = File(location)
+            val downloadRequest = DownloadRequest(Request.Method.GET, url,
+                Response.Listener { response ->
+                    val outputFile = File(location)
+                    outputFile.writeBytes(response)
 
-                        val bufferedInputStream = BufferedInputStream(FileInputStream(downloadFile))
-                        val bufferedOutputStream = BufferedOutputStream(FileOutputStream(destFile))
+                    noError = true
 
-                        val buffer = ByteArray(1024)
-
-                        var len: Int
-                        len = bufferedInputStream.read(buffer)
-                        while (len > 0) {
-                            bufferedOutputStream.write(buffer, 0, len)
-                            len = bufferedInputStream.read(buffer)
-                        }
-                        bufferedOutputStream.flush()
-                        bufferedOutputStream.close()
-
-                        return true
-                    } catch (e: RuntimeException) {
-                        return false
+                    synchronized(syncObject) {
+                        syncObject.notify()
                     }
-                } catch (e: SocketTimeoutException) {
-                    return false
-                }
+                },
+                Response.ErrorListener {
+                    noError = false
 
-            } catch (e: GlideException) {
-                return false
+                    synchronized(syncObject) {
+                        syncObject.notify()
+                    }
+                }, params
+            )
+
+            requestQueue.add(downloadRequest)
+
+            synchronized(syncObject) {
+                syncObject.wait()
+
+                return noError
             }
 
         } catch (e: IOException) {
@@ -182,7 +167,8 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
     ): Boolean {
         try {
             if (!File(location + primaryRes).exists() || !File(location + secondaryRes).exists()) {
-                val connection = URL("$downloadUrl?image_width=$primaryRes").openConnection() as HttpURLConnection
+                val connection =
+                    URL("$downloadUrl?image_width=$primaryRes").openConnection() as HttpURLConnection
                 connection.doInput = true
                 connection.connect()
                 val input = connection.inputStream
