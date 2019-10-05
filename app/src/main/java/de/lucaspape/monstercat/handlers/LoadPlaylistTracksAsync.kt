@@ -67,6 +67,8 @@ class LoadPlaylistTracksAsync(
             //display list
             PlaylistHandler.currentListViewData = sortedList
             PlaylistHandler.listViewDataIsPlaylistView = false
+
+            return null
         } else {
             var finishedRequests = 0
             var totalRequestsCount = 0
@@ -76,6 +78,8 @@ class LoadPlaylistTracksAsync(
             val playlistTrackRequestQueue = Volley.newRequestQueue(contextReference.get()!!)
 
             val tempList = arrayOfNulls<Long>(trackCount)
+
+            val syncObject = Object()
 
             playlistTrackRequestQueue.addRequestFinishedListener<Any> {
                 finishedRequests++
@@ -99,6 +103,10 @@ class LoadPlaylistTracksAsync(
                     //display list
                     PlaylistHandler.currentListViewData = sortedList
                     PlaylistHandler.listViewDataIsPlaylistView = false
+
+                    synchronized(syncObject){
+                        syncObject.notify()
+                    }
                 } else {
                     playlistTrackRequestQueue.add(requests[finishedRequests])
                 }
@@ -144,9 +152,12 @@ class LoadPlaylistTracksAsync(
                 requests.add(playlistTrackRequest)
             }
             playlistTrackRequestQueue.add(requests[finishedRequests])
-        }
 
-        return null
+            synchronized(syncObject){
+                syncObject.wait()
+                return null
+            }
+        }
     }
 
 }

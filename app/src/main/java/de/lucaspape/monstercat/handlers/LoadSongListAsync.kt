@@ -78,6 +78,8 @@ class LoadSongListAsync(
 
             val requests = ArrayList<StringRequest>()
 
+            val syncObject = Object()
+
             requestQueue.addRequestFinishedListener<Any> {
                 finishedRequests++
 
@@ -108,6 +110,10 @@ class LoadSongListAsync(
 
                     //display list
                     HomeHandler.currentListViewData = dbSongs
+
+                    synchronized(syncObject){
+                        syncObject.notify()
+                    }
                 } else {
                     requestQueue.add(requests[finishedRequests])
                 }
@@ -153,8 +159,11 @@ class LoadSongListAsync(
             }
 
             requestQueue.add(requests[finishedRequests])
-        }
 
-        return null
+            synchronized(syncObject){
+                syncObject.wait()
+                return null
+            }
+        }
     }
 }

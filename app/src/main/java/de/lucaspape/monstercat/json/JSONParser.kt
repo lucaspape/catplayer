@@ -181,7 +181,6 @@ class JSONParser {
 
         val databaseHelper = PlaylistDatabaseHelper(context)
         return if (databaseHelper.getPlaylist(playlistId) == null) {
-            println("Playlist does not exist!")
             databaseHelper.insertPlaylist(playlistId, playlistName, playlistTrackCount)
         } else {
             databaseHelper.getPlaylist(playlistId)!!.id.toLong()
