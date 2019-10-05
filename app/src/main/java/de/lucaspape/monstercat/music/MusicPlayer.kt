@@ -37,6 +37,7 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.settings.Settings
 import java.io.File
+import java.io.FileInputStream
 import java.lang.IndexOutOfBoundsException
 import java.lang.NullPointerException
 import java.lang.ref.WeakReference
@@ -205,6 +206,9 @@ private fun play() {
         val settings = Settings(contextReference!!.get()!!)
         val url = song.getUrl()
 
+        mediaPlayer.stop()
+        mediaPlayer = MediaPlayer()
+
         val connectivityManager =
             contextReference!!.get()!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
@@ -213,13 +217,17 @@ private fun play() {
             if (wifi != null && !wifi.isConnected && settings.getSetting("streamOverMobile") != "true") {
                 println("DONT STREAM")
                 return
+            }else{
+                mediaPlayer.setDataSource(url)
             }
+        }else{
+            println("FILE EXISTS")
+
+            val fis = FileInputStream(File(url))
+            mediaPlayer.setDataSource(fis.fd)
         }
 
-        mediaPlayer.stop()
-        mediaPlayer = MediaPlayer()
 
-        mediaPlayer.setDataSource(url)
 
         mediaPlayer.prepareAsync()
 
