@@ -5,9 +5,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.ConnectivityManager
 import android.os.AsyncTask
-import com.android.volley.Request
-import com.android.volley.Response
-import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.sid
 import de.lucaspape.monstercat.auth.loggedIn
@@ -116,45 +113,29 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
         context: Context
     ): Boolean {
         try {
-            val requestQueue = Volley.newRequestQueue(context)
+            val urlConnection = URL(url).openConnection() as HttpURLConnection
+            urlConnection.setRequestProperty("Cookie", "connect.sid=$sid")
 
-            val params = HashMap<String, String>()
-            if (loggedIn) {
-                params["Cookie"] = "connect.sid=$sid"
+            urlConnection.doInput = true
+            urlConnection.connect()
+
+            val bis = BufferedInputStream(urlConnection.inputStream)
+            val fos = FileOutputStream(File(location))
+
+            val dataBuffer = ByteArray(1024)
+            var bytesRead:Int
+
+            bytesRead = bis.read(dataBuffer, 0, 1024)
+
+            while (bytesRead != -1) {
+                fos.write(dataBuffer, 0, bytesRead)
+                bytesRead = bis.read(dataBuffer, 0, 1024)
             }
 
-            var noError: Boolean = true
-            val syncObject = Object()
-
-            val downloadRequest = DownloadRequest(Request.Method.GET, url,
-                Response.Listener { response ->
-                    val outputFile = File(location)
-                    outputFile.writeBytes(response)
-
-                    noError = true
-
-                    synchronized(syncObject) {
-                        syncObject.notify()
-                    }
-                },
-                Response.ErrorListener {
-                    noError = false
-
-                    synchronized(syncObject) {
-                        syncObject.notify()
-                    }
-                }, params
-            )
-
-            requestQueue.add(downloadRequest)
-
-            synchronized(syncObject) {
-                syncObject.wait()
-
-                return noError
-            }
+            return true
 
         } catch (e: IOException) {
+            println(e)
             return false
         }
     }
