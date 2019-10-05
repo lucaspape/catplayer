@@ -12,7 +12,7 @@ class PlaylistData() {
         var CREATE_TABLE =
             "CREATE TABLE " + TABLE_NAME + " (" +
                     COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    COLUMN_SONG_ID + " TEXT" +
+                    COLUMN_SONG_ID + " INTEGER" +
                     ")"
     }
 

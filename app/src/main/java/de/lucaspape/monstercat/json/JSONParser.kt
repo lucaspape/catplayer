@@ -219,17 +219,18 @@ class JSONParser {
 
             val songid: Long
 
-            songid = if (songDatabaseHelper.getSong(id) == null) {
-                songDatabaseHelper.insertSong(id, title, version, albumId, artist, coverUrl)
+             if (songDatabaseHelper.getSong(id) == null) {
+                 songid = songDatabaseHelper.insertSong(id, title, version, albumId, artist, coverUrl)
             } else {
-                songDatabaseHelper.getSong(id)!!.id.toLong()
+                 songid = songDatabaseHelper.getSong(id)!!.id.toLong()
             }
 
             val databaseHelper = PlaylistDataDatabaseHelper(context, playlistId)
-            return if (databaseHelper.getPlaylistData(songid.toString()) == null) {
-                databaseHelper.insertSongId(songid)
-            } else {
-                databaseHelper.getPlaylistData(songid).id.toLong()
+
+            if(databaseHelper.getPlaylistData(songid) == null){
+                return databaseHelper.insertSongId(songid)
+            }else{
+                return databaseHelper.getPlaylistData(songid)!!.id.toLong()
             }
         } else {
             return null

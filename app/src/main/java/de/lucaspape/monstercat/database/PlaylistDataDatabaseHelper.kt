@@ -35,34 +35,43 @@ class PlaylistDataDatabaseHelper(context: Context, var playlistId: String) :
         val id = db.insert(PlaylistData.TABLE_NAME, null, values)
         db.close()
         return id
+
     }
 
-    fun getPlaylistData(id: Long): PlaylistData {
+    fun getPlaylistData(id: Int): PlaylistData? {
         val db = readableDatabase
 
-        val cursor = db.query(
-            PlaylistData.TABLE_NAME, arrayOf(
-                PlaylistData.COLUMN_ID,
-                PlaylistData.COLUMN_SONG_ID
-            ),
-            Playlist.COLUMN_ID + "=?",
-            arrayOf(id.toString()), null, null, null, null
-        )
+        try {
+            try {
+                val cursor = db.query(
+                    PlaylistData.TABLE_NAME, arrayOf(
+                        PlaylistData.COLUMN_ID,
+                        PlaylistData.COLUMN_SONG_ID
+                    ),
+                    PlaylistData.COLUMN_ID + "=?",
+                    arrayOf(id.toString()), null, null, null, null
+                )
 
-        cursor?.moveToFirst()
+                cursor?.moveToFirst()
 
-        val newPlaylistData = PlaylistData(
-            cursor.getInt(cursor.getColumnIndex(PlaylistData.COLUMN_ID)),
-            cursor.getLong(cursor.getColumnIndex(PlaylistData.COLUMN_SONG_ID))
-        )
+                val newPlaylistData = PlaylistData(
+                    cursor.getInt(cursor.getColumnIndex(PlaylistData.COLUMN_ID)),
+                    cursor.getLong(cursor.getColumnIndex(PlaylistData.COLUMN_SONG_ID))
+                )
 
-        cursor.close()
+                cursor.close()
 
-        return newPlaylistData
+                return newPlaylistData
+            } catch (e: IndexOutOfBoundsException) {
+                return null
+            }
+        } catch (e: SQLiteException) {
+            return null
+        }
     }
 
-    @Suppress("unused")
-    fun getPlaylistData(songId: String): PlaylistData? {
+   // @Suppress("unused")
+    fun getPlaylistData(songId: Long): PlaylistData? {
         val db = readableDatabase
         val cursor: Cursor
 
@@ -73,7 +82,7 @@ class PlaylistDataDatabaseHelper(context: Context, var playlistId: String) :
                     PlaylistData.COLUMN_SONG_ID
                 ),
                 Song.COLUMN_SONG_ID + "=?",
-                arrayOf(playlistId), null, null, null, null
+                arrayOf(songId.toString()), null, null, null, null
             )
 
             cursor?.moveToFirst()
