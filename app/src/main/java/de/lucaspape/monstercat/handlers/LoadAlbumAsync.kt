@@ -67,6 +67,8 @@ class LoadAlbumAsync(
 
             return null
         } else {
+            val syncObject = Object()
+
             requestQueue.addRequestFinishedListener<Any> {
                 val dbSongs = ArrayList<HashMap<String, Any?>>()
                 songList = songDatabaseHelper.getAlbumSongs(albumId)
@@ -79,6 +81,10 @@ class LoadAlbumAsync(
                 //display list
                 HomeHandler.currentListViewData = dbSongs
                 HomeHandler.albumView = false
+
+                synchronized(syncObject){
+                    syncObject.notify()
+                }
             }
 
             val requestUrl =
@@ -115,9 +121,12 @@ class LoadAlbumAsync(
             }
 
             requestQueue.add(listRequest)
-        }
 
-        return null
+            synchronized(syncObject){
+                syncObject.wait()
+                return null
+            }
+        }
     }
 
 }

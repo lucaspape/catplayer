@@ -56,6 +56,7 @@ class LoadPlaylistAsync(
 
             if (showAfter) {
                 PlaylistHandler.currentListViewData = playlistHashMaps
+                PlaylistHandler.listViewDataIsPlaylistView = true
             }
 
             return null
@@ -63,6 +64,8 @@ class LoadPlaylistAsync(
             val playlistRequestQueue = Volley.newRequestQueue(contextReference.get()!!)
 
             val playlistUrl = contextReference.get()!!.getString(R.string.playlistsUrl)
+
+            val syncObject = Object()
 
             val playlistRequest = object : StringRequest(
                 Method.GET, playlistUrl,
@@ -93,6 +96,11 @@ class LoadPlaylistAsync(
 
                     if (showAfter) {
                         PlaylistHandler.currentListViewData = playlistHashMaps
+                        PlaylistHandler.listViewDataIsPlaylistView = true
+                    }
+
+                    synchronized(syncObject){
+                        syncObject.notify()
                     }
 
                 },
@@ -109,9 +117,12 @@ class LoadPlaylistAsync(
             }
 
             playlistRequestQueue.add(playlistRequest)
-        }
 
-        return null
+            synchronized(syncObject){
+                syncObject.wait()
+                return null
+            }
+        }
     }
 
 }
