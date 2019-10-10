@@ -117,7 +117,7 @@ class AlbumDatabaseHelper(context: Context) :
         val albums: ArrayList<Album> = ArrayList()
 
         val selectQuery = "SELECT * FROM " + Album.TABLE_NAME + " ORDER BY " +
-                Album.COLUMN_ID + " ASC"
+                Album.COLUMN_ID + " DESC"
 
         val db = writableDatabase
         val cursor = db.rawQuery(selectQuery, null)

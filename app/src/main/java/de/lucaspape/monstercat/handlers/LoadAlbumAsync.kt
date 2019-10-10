@@ -46,9 +46,6 @@ class LoadAlbumAsync(
 
         val requestQueue = Volley.newRequestQueue(contextReference.get()!!)
 
-        //used to sort list
-        val tempList = ArrayList<Long>()
-
         val songDatabaseHelper = SongDatabaseHelper(contextReference.get()!!)
         var songList = songDatabaseHelper.getAlbumSongs(albumId)
 
@@ -103,8 +100,6 @@ class LoadAlbumAsync(
                                 jsonArray.getJSONObject(k),
                                 contextReference.get()!!
                             )
-
-                        tempList.add(songId)
                     }
 
                 }, Response.ErrorListener { }

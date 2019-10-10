@@ -87,6 +87,7 @@ class LoadSongListAsync(
                 if (finishedRequests >= totalRequestsCount) {
                     val dbSongs = ArrayList<HashMap<String, Any?>>()
 
+                    sortedList.reverse()
                     for (i in sortedList) {
                         if (i != null) {
                             if (catalogSongsDatabaseHelper.getCatalogSong(i) == null) {

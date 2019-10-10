@@ -1,7 +1,6 @@
 package de.lucaspape.monstercat.music
 
 import android.animation.ValueAnimator
-import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -59,8 +58,8 @@ private var playing = false
 private var paused = false
 
 //notification var
-private const val channelID = "Music Notification"
-private const val notificationID = 1
+const val channelID = "Music Notification"
+const val notificationID = 1
 
 const val NOTIFICATION_PREVIOUS = "de.lucaspape.monstercat.previous"
 const val NOTIFICATION_DELETE = "de.lucaspape.monstercat.delete"

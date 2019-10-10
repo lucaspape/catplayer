@@ -77,7 +77,7 @@ class CatalogSongsDatabaseHelper(context: Context) :
         val catalogSongs: ArrayList<CatalogSongs> = ArrayList()
 
         val selectQuery = "SELECT * FROM " + CatalogSongs.TABLE_NAME + " ORDER BY " +
-                CatalogSongs.COLUMN_ID + " ASC"
+                CatalogSongs.COLUMN_ID + " DESC"
 
         val db = writableDatabase
         val cursor = db.rawQuery(selectQuery, null)
