@@ -43,6 +43,8 @@ import java.lang.ref.WeakReference
 import kotlin.Comparator
 import kotlin.collections.ArrayList
 
+//TODO move notification stuff to different file
+
 var contextReference: WeakReference<Context>? = null
 private var textView1Reference: WeakReference<TextView>? = null
 private var textView2Reference: WeakReference<TextView>? = null
@@ -69,6 +71,10 @@ const val NOTIFICATION_NEXT = "de.lucaspape.monstercat.next"
 
 private var mediaSession: MediaSessionCompat? = null
 
+/**
+ * Checks if headphones unplugged
+ * TODO unRegisterReceiver
+ */
 class NoisyReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         if (intent!!.action == AudioManager.ACTION_AUDIO_BECOMING_NOISY) {
@@ -77,6 +83,9 @@ class NoisyReceiver : BroadcastReceiver() {
     }
 }
 
+/**
+ * Create mediaSession and listen for callbacks (pause, play buttons on headphones etc.)
+ */
 fun createMediaSession(context: WeakReference<Context>) {
     mediaSession = MediaSessionCompat.fromMediaSession(
         context.get()!!,
@@ -198,7 +207,6 @@ fun setPlayButton(newPlayButton: ImageButton) {
 /**
  * Music control methods
  */
-
 private fun play() {
     try {
         val song = playList[currentSong]
@@ -214,22 +222,21 @@ private fun play() {
 
         if (!File(url).exists()) {
             if (wifi != null && !wifi.isConnected && settings.getSetting("streamOverMobile") != "true") {
+                //TODO msg
                 println("DONT STREAM")
                 return
             }else{
                 mediaPlayer.setDataSource(url)
             }
         }else{
-            println("FILE EXISTS")
-
             val fis = FileInputStream(File(url))
             mediaPlayer.setDataSource(fis.fd)
         }
 
-
-
+        //Prepare the player
         mediaPlayer.prepareAsync()
 
+        //if mediaPlayer is finished preparing
         mediaPlayer.setOnPreparedListener {
             val primaryResolution = settings.getSetting("primaryCoverResolution")
 
@@ -313,10 +320,13 @@ private fun play() {
 
 
     } catch (e: IndexOutOfBoundsException) {
-
+        //TODO do something idk
     }
 }
 
+/**
+ * SetPlayerState
+ */
 private fun setPlayerState(progress: Long) {
     val stateBuilder = PlaybackStateCompat.Builder()
 
@@ -341,6 +351,9 @@ private fun setPlayerState(progress: Long) {
     mediaSession!!.setPlaybackState(stateBuilder.build())
 }
 
+/**
+ * Set song metadata
+ */
 private fun setSongMetadata(artist: String, title: String, coverImage: Bitmap?, duration: Long) {
     val mediaMetadata = MediaMetadataCompat.Builder()
     mediaMetadata.putString(MediaMetadata.METADATA_KEY_ARTIST, artist)
@@ -351,6 +364,9 @@ private fun setSongMetadata(artist: String, title: String, coverImage: Bitmap?, 
     mediaSession!!.setMetadata(mediaMetadata.build())
 }
 
+/**
+ * Stop playback
+ */
 private fun stop() {
     val context = contextReference!!.get()!!
     playing = false
@@ -365,6 +381,9 @@ private fun stop() {
     mediaPlayer.stop()
 }
 
+/**
+ * Pause playback
+ */
 fun pause() {
     val context = contextReference!!.get()!!
     val settings = Settings(context)
@@ -392,6 +411,9 @@ fun pause() {
     }
 }
 
+/**
+ * Resume playback
+ */
 fun resume() {
     val context = contextReference!!.get()!!
     val settings = Settings(context)
@@ -431,12 +453,18 @@ fun resume() {
     }
 }
 
+/**
+ * Next song
+ */
 fun next() {
     currentSong++
     play()
 
 }
 
+/**
+ * Previous song
+ */
 fun previous() {
     if (currentSong != 0) {
         currentSong--
@@ -445,6 +473,9 @@ fun previous() {
     }
 }
 
+/**
+ * Play song now
+ */
 fun playNow(song: Song) {
     try {
         playList.add(currentSong + 1, song)
@@ -457,10 +488,16 @@ fun playNow(song: Song) {
     play()
 }
 
+/**
+ * Play song after
+ */
 fun addSong(song: Song) {
     playList.add(song)
 }
 
+/**
+ * Toggle pause/play
+ */
 fun toggleMusic() {
     if (playing) {
         pause()
@@ -469,7 +506,9 @@ fun toggleMusic() {
     }
 }
 
-
+/**
+ * Show notification
+ */
 private fun showSongNotification(
     titleName: String,
     artistName: String,
@@ -572,6 +611,9 @@ private fun createNotificationChannel() {
     }
 }
 
+/**
+ * Notification button listeners
+ */
 private fun setListeners(view: RemoteViews, context: Context) {
     val previous = Intent(NOTIFICATION_PREVIOUS)
     val delete = Intent(NOTIFICATION_DELETE)
@@ -617,6 +659,9 @@ class IntentReceiver : BroadcastReceiver() {
     }
 }
 
+/**
+ * Get the dominant color of a bitmap image (use for notification background color)
+ */
 private fun getDominantColor(bitmap: Bitmap): Int {
     val swatchesTemp = Palette.from(bitmap).generate().swatches
     val swatches = ArrayList<Palette.Swatch>(swatchesTemp)
@@ -626,6 +671,9 @@ private fun getDominantColor(bitmap: Bitmap): Int {
     return if (swatches.size > 0) swatches[0].rgb else Color.WHITE
 }
 
+/**
+ * Get either BLACK or WHITE, depending on the background color for best readability
+ */
 private fun getTextColor(background: Int): Int {
     val backgroundRed = Color.red(background)
     val backgroundGreen = Color.green(background)

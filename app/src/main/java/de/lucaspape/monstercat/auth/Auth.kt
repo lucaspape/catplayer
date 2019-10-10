@@ -14,9 +14,13 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
 
+//static vars
 var sid = ""
 var loggedIn = false
 
+/**
+ * Auth - Login to monstercat
+ */
 class Auth {
     fun login(context: Context) {
         val settings = Settings(context)
@@ -31,6 +35,7 @@ class Auth {
 
             val loginUrl = context.getString(R.string.loginUrl)
 
+            //login post request
             val loginPostRequest = object : JsonObjectRequest(
                 Method.POST,
                 loginUrl, loginPostParams, Response.Listener { response ->
@@ -48,17 +53,17 @@ class Auth {
                         ).show()
 
                     } catch (e: JSONException) {
+                        //TODO add exception
                     }
 
                 }, Response.ErrorListener { error ->
-                    println(error)
-
                     Toast.makeText(
                         context,
                         context.getString(R.string.loginFailedMsg),
                         Toast.LENGTH_SHORT
                     ).show()
                 }) {
+                //put the login data
                 override fun parseNetworkResponse(response: NetworkResponse?): Response<JSONObject> {
                     return try {
                         val jsonResponse = JSONObject()
@@ -69,7 +74,6 @@ class Auth {
                             HttpHeaderParser.parseCacheHeaders(response)
                         )
                     } catch (e: UnsupportedEncodingException) {
-
                         Response.error(ParseError(e))
                     }
                 }

@@ -41,7 +41,6 @@ fun playSongFromId(context: Context, songId: String, playNow: Boolean) {
             }
 
         } else {
-
             val streamHashQueue = Volley.newRequestQueue(context)
 
             //get stream hash
@@ -66,6 +65,7 @@ fun playSongFromId(context: Context, songId: String, playNow: Boolean) {
                         }
                     } else {
                         //could not find song
+                        //TODO msg
                     }
                 },
                 Response.ErrorListener { }) {

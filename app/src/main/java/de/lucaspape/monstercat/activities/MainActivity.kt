@@ -26,6 +26,9 @@ import de.lucaspape.monstercat.music.createMediaSession
 import de.lucaspape.monstercat.settings.Settings
 import java.lang.ref.WeakReference
 
+/**
+ * Main activity
+ */
 class MainActivity : AppCompatActivity() {
 
     private val onNavigationItemSelectedListener =
@@ -61,27 +64,40 @@ class MainActivity : AppCompatActivity() {
             onNavigationItemSelectedListener
         )
 
+        //check for internet
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET)
             != PackageManager.PERMISSION_GRANTED
         ) {
             println("Internet permission not granted!")
         }
 
+        //create the MusicPlayer.kt mediasession
         createMediaSession(WeakReference(this))
 
+        //register receiver which checks if headphones unplugged
         registerReceiver(NoisyReceiver(), IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY))
 
-        val settings = Settings(this)
-
+        //login to monstercat
         Auth().login(this)
 
+        //set the correct view
+        val settings = Settings(this)
         if (settings.getSetting("albumViewSelected") != null) {
             HomeHandler.albumViewSelected = settings.getSetting("albumView") == true.toString()
         }
 
+        //open the home fragment
         openFragment(HomeFragment.newInstance())
 
+        //start download background task
         DownloadTask(WeakReference(applicationContext)).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+
+        //show privacy policy
+        showPrivacyPolicy()
+    }
+
+    private fun showPrivacyPolicy() {
+        val settings = Settings(this)
 
         //for new privacy policy change version number
         if (settings.getSetting("privacypolicy") != "1.0") {

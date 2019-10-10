@@ -9,10 +9,10 @@ import androidx.core.app.NotificationManagerCompat
 import de.lucaspape.monstercat.R
 
 //notification var
-
 private const val channelID = "Download Notification"
 private const val notificationID = 2
 
+//this lists contain the urls that should be downloaded
 val downloadList = ArrayList<HashMap<String, Any?>?>()
 val downloadCoverArrayListList = ArrayList<ArrayList<HashMap<String, Any?>>?>()
 

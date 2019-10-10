@@ -9,6 +9,9 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.Auth
 import de.lucaspape.monstercat.settings.Settings
 
+/**
+ * SettingsActivity
+ */
 class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -17,6 +20,7 @@ class SettingsActivity : AppCompatActivity() {
 
         val settings = Settings(this)
 
+        //login button listener
         findViewById<Button>(R.id.add_account).setOnClickListener {
             val usernameInput = findViewById<EditText>(R.id.usernameInput)
             val passwordInput = findViewById<EditText>(R.id.passwordInput)
@@ -29,6 +33,7 @@ class SettingsActivity : AppCompatActivity() {
             Auth().login(this)
         }
 
+        //set the switches to the saved value
         val streamMobileSwitch = findViewById<Switch>(R.id.streamMobileSwitch)
         val downloadMobileSwitch = findViewById<Switch>(R.id.downloadMobileSwitch)
         val downloadCoversMobileSwitch = findViewById<Switch>(R.id.downloadCoversMobileSwitch)
@@ -46,15 +51,16 @@ class SettingsActivity : AppCompatActivity() {
         }
 
 
-        streamMobileSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+        //set switch listeners
+        streamMobileSwitch.setOnCheckedChangeListener { _, isChecked ->
             settings.saveSetting("streamOverMobile", isChecked.toString())
         }
 
-        downloadMobileSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+        downloadMobileSwitch.setOnCheckedChangeListener { _, isChecked ->
             settings.saveSetting("downloadOverMobile", isChecked.toString())
         }
 
-        downloadCoversMobileSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+        downloadCoversMobileSwitch.setOnCheckedChangeListener { _, isChecked ->
             settings.saveSetting("downloadCoversOverMobile", isChecked.toString())
         }
 

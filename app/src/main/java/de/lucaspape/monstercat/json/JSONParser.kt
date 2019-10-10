@@ -8,6 +8,9 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.lang.reflect.InvocationTargetException
 
+/**
+ * Parses Stuff, yes this class is not great
+ */
 class JSONParser {
 
     fun parseSongToHashMap(context: Context, song: Song): HashMap<String, Any?> {

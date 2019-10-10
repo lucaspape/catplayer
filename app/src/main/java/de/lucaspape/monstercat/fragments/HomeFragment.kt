@@ -42,6 +42,8 @@ class HomeFragment : Fragment() {
 
         if (!HomeHandler.albumViewSelected) {
             listView = view.findViewById(R.id.musiclistview)
+
+            //TODO context menu for album view
             registerForContextMenu(listView as ListView)
         }
 

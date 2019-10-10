@@ -25,6 +25,9 @@ class PlaylistHandler {
         private var currentPlaylistId: String? = null
         private var currentPlaylistTrackCount: Int? = null
 
+        /**
+         * Updates listView content
+         */
         @JvmStatic
         fun updateListView(view: View) {
             val playlistList = view.findViewById<ListView>(R.id.playlistView)
@@ -58,6 +61,9 @@ class PlaylistHandler {
         }
     }
 
+    /**
+     * Update listView every second (for album covers)
+     */
     fun setupListView(view: View) {
         updateListView(view)
         redrawListView(view)
@@ -72,6 +78,9 @@ class PlaylistHandler {
         }).start()
     }
 
+    /**
+     * Register listeners (buttons etc)
+     */
     fun registerListeners(view: View) {
         //click on list
         val playlistList = view.findViewById<ListView>(R.id.playlistView)
@@ -100,6 +109,9 @@ class PlaylistHandler {
         }
     }
 
+    /**
+     * Load playlists
+     */
     fun loadPlaylist(view: View, forceReload: Boolean, showAfter: Boolean) {
         val contextReference = WeakReference<Context>(view.context)
         val viewReference = WeakReference<View>(view)
@@ -111,6 +123,9 @@ class PlaylistHandler {
         ).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 
+    /**
+     * Load the tracks from a playlist
+     */
     private fun loadPlaylistTracks(
         view: View,
         forceReload: Boolean,

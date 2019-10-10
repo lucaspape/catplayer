@@ -1,8 +1,6 @@
 package de.lucaspape.monstercat.settings
 
 import android.content.Context
-import de.lucaspape.monstercat.R
-import java.io.*
 
 class Settings(private val context: Context) {
 
@@ -10,11 +8,17 @@ class Settings(private val context: Context) {
         setDefaultSettings(false)
     }
 
+    /**
+     * Get a setting
+     */
     fun getSetting(key: String): String? {
         val sharedPreferences = context.getSharedPreferences("settings", 0)
         return sharedPreferences.getString(key, null)
     }
 
+    /**
+     * Save a setting
+     */
     fun saveSetting(key: String, setting: String) {
         val sharedPreferences = context.getSharedPreferences("settings", 0)
         val editor = sharedPreferences.edit()
@@ -22,6 +26,9 @@ class Settings(private val context: Context) {
         editor.apply()
     }
 
+    /**
+     * Set default
+     */
     private fun setDefaultSettings(overwrite: Boolean) {
         if (getSetting("audioQuality") == null) {
             saveSetting("downloadType", "mp3")

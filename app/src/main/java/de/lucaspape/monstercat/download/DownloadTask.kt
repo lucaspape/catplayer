@@ -30,6 +30,8 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
         val settings = Settings(weakReference.get()!!)
 
         while (true) {
+            //TODO dont use depraced stuff
+
             val wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
 
             try {
@@ -47,7 +49,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                             var downloaded = false
 
                             while (!downloaded) {
-                                downloaded = downloadSong(url, location, sid, context)
+                                downloaded = downloadSong(url, location, sid)
                             }
 
                             downloadList[downloadedSongs] = null
@@ -109,8 +111,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
     private fun downloadSong(
         url: String,
         location: String,
-        sid: String,
-        context: Context
+        sid: String
     ): Boolean {
         try {
             val urlConnection = URL(url).openConnection() as HttpURLConnection

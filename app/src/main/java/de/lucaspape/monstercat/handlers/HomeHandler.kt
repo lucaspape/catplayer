@@ -7,19 +7,9 @@ import android.os.Looper
 import android.view.View
 import android.widget.*
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.android.volley.*
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
-import de.lucaspape.monstercat.activities.MainActivity
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.auth.sid
-import de.lucaspape.monstercat.auth.loggedIn
-import de.lucaspape.monstercat.database.*
-import de.lucaspape.monstercat.download.addDownloadCoverArray
-import de.lucaspape.monstercat.json.JSONParser
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.settings.Settings
-import org.json.JSONObject
 import java.lang.ref.WeakReference
 
 /**
@@ -48,7 +38,7 @@ class HomeHandler {
         }
 
         /**
-         * Updates content
+         * Updates content of listView
          */
         @JvmStatic
         fun updateListView(view: View) {
@@ -81,6 +71,9 @@ class HomeHandler {
         }
     }
 
+    /**
+     * Update listview every second (for album covers)
+     */
     fun setupListView(view: View) {
         updateListView(view)
         redrawListView(view)
@@ -111,6 +104,9 @@ class HomeHandler {
         viewSelector.adapter = arrayAdapter
     }
 
+    /**
+     * Set the correct views for the MusicPlayer.kt
+     */
     fun setupMusicPlayer(view: View) {
         val textview1 = view.findViewById<TextView>(R.id.songCurrent1)
         val textview2 = view.findViewById<TextView>(R.id.songCurrent2)
@@ -131,6 +127,9 @@ class HomeHandler {
         setPlayButton(playButton)
     }
 
+    /**
+     * Listeners (buttons, refresh etc)
+     */
     fun registerListeners(view: View) {
         //refresh
         val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
@@ -222,6 +221,9 @@ class HomeHandler {
         }
     }
 
+    /**
+     * Load song list ("catalog view")
+     */
     fun loadSongList(view: View, forceReload: Boolean) {
         val contextReference = WeakReference<Context>(view.context)
         val viewReference = WeakReference<View>(view)
@@ -232,6 +234,9 @@ class HomeHandler {
         ).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 
+    /**
+     * Load album list ("album view")
+     */
     fun loadAlbumList(view: View, forceReload: Boolean) {
         val contextReference = WeakReference<Context>(view.context)
         val viewReference = WeakReference<View>(view)
