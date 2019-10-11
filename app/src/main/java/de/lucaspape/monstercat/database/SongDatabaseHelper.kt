@@ -133,37 +133,6 @@ class SongDatabaseHelper(context: Context) :
         }
     }
 
-    @Suppress("unused")
-    fun getAllSongs(): List<Song> {
-        val songs: ArrayList<Song> = ArrayList()
-
-        val selectQuery = "SELECT * FROM " + Song.TABLE_NAME + " ORDER BY " +
-                Song.COLUMN_ID + " DESC"
-
-        val db = writableDatabase
-        val cursor = db.rawQuery(selectQuery, null)
-
-        if (cursor.moveToFirst()) {
-            do {
-                val song = Song()
-                song.id = cursor.getInt(cursor.getColumnIndex(Song.COLUMN_ID))
-                song.songId = cursor.getString(cursor.getColumnIndex(Song.COLUMN_SONG_ID))
-                song.title = cursor.getString(cursor.getColumnIndex(Song.COLUMN_TITLE))
-                song.version = cursor.getString(cursor.getColumnIndex(Song.COLUMN_VERSION))
-                song.albumId = cursor.getString(cursor.getColumnIndex(Song.COLUMN_ALBUM_ID))
-                song.artist = cursor.getString(cursor.getColumnIndex(Song.COLUMN_ARTIST))
-                song.coverUrl = cursor.getString(cursor.getColumnIndex(Song.COLUMN_COVER_URL))
-
-                songs.add(song)
-            } while (cursor.moveToNext())
-        }
-
-        cursor.close()
-        db.close()
-
-        return songs
-    }
-
     fun getAlbumSongs(albumId: String): List<Song> {
         val songs: ArrayList<Song> = ArrayList()
 
@@ -193,24 +162,4 @@ class SongDatabaseHelper(context: Context) :
 
         return songs
     }
-
-    @Suppress("unused")
-    fun getSongsCount(): Int {
-        val countQuery = "SELECT * FROM " + Song.TABLE_NAME
-        val db = readableDatabase
-        val cursor = db.rawQuery(countQuery, null)
-
-        val count = cursor.count
-        cursor.close()
-
-        return count
-    }
-
-    @Suppress("unused")
-    fun deleteSong(song: Song) {
-        val db = writableDatabase
-        db.delete(Song.TABLE_NAME, Song.COLUMN_ID + " = ?", arrayOf(song.id.toString()))
-        db.close()
-    }
-
 }

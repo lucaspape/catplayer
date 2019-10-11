@@ -92,6 +92,9 @@ class HomeHandler {
         }).start()
     }
 
+    /**
+     * Album/Catalog view selector
+     */
     fun setupSpinner(view: View) {
         val viewSelector = view.findViewById<Spinner>(R.id.viewSelector)
 

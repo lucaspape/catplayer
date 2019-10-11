@@ -40,35 +40,6 @@ class PlaylistDatabaseHelper(context: Context) :
         return id
     }
 
-    @Suppress("unused")
-    fun getPlaylist(id: Long): Playlist {
-        val db = readableDatabase
-
-        val cursor = db.query(
-            Playlist.TABLE_NAME, arrayOf(
-                Playlist.COLUMN_ID,
-                Playlist.COLUMN_PLAYLIST_ID,
-                Playlist.COLUMN_NAME,
-                Playlist.COLUMN_TRACK_COUNT
-            ),
-            Playlist.COLUMN_ID + "=?",
-            arrayOf(id.toString()), null, null, null, null
-        )
-
-        cursor?.moveToFirst()
-
-        val playlist = Playlist(
-            cursor.getInt(cursor.getColumnIndex(Playlist.COLUMN_ID)),
-            cursor.getString(cursor.getColumnIndex(Playlist.COLUMN_PLAYLIST_ID)),
-            cursor.getString(cursor.getColumnIndex(Playlist.COLUMN_NAME)),
-            cursor.getInt(cursor.getColumnIndex(Playlist.COLUMN_TRACK_COUNT))
-        )
-
-        cursor.close()
-
-        return playlist
-    }
-
     fun getPlaylist(playlistId: String): Playlist? {
         val db = readableDatabase
         val cursor: Cursor
@@ -138,24 +109,5 @@ class PlaylistDatabaseHelper(context: Context) :
         db.close()
 
         return playlists
-    }
-
-    @Suppress("unused")
-    fun getPlaylistsCount(): Int {
-        val countQuery = "SELECT * FROM " + Playlist.TABLE_NAME
-        val db = readableDatabase
-        val cursor = db.rawQuery(countQuery, null)
-
-        val count = cursor.count
-        cursor.close()
-
-        return count
-    }
-
-    @Suppress("unused")
-    fun deletePlaylist(playlist: Playlist) {
-        val db = writableDatabase
-        db.delete(Playlist.TABLE_NAME, Playlist.COLUMN_ID + " = ?", arrayOf(playlist.id.toString()))
-        db.close()
     }
 }

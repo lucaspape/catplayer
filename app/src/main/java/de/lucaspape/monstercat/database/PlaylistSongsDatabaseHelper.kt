@@ -37,39 +37,7 @@ class PlaylistSongsDatabaseHelper(context: Context, var playlistId: String) :
         return id
     }
 
-    fun getPlaylistData(id: Int): PlaylistSongs? {
-        val db = readableDatabase
-
-        try {
-            try {
-                val cursor = db.query(
-                    PlaylistSongs.TABLE_NAME, arrayOf(
-                        PlaylistSongs.COLUMN_ID,
-                        PlaylistSongs.COLUMN_SONG_ID
-                    ),
-                    PlaylistSongs.COLUMN_ID + "=?",
-                    arrayOf(id.toString()), null, null, null, null
-                )
-
-                cursor?.moveToFirst()
-
-                val newPlaylistData = PlaylistSongs(
-                    cursor.getInt(cursor.getColumnIndex(PlaylistSongs.COLUMN_ID)),
-                    cursor.getLong(cursor.getColumnIndex(PlaylistSongs.COLUMN_SONG_ID))
-                )
-
-                cursor.close()
-
-                return newPlaylistData
-            } catch (e: IndexOutOfBoundsException) {
-                return null
-            }
-        } catch (e: SQLiteException) {
-            return null
-        }
-    }
-
-    fun getPlaylistData(songId: Long): PlaylistSongs? {
+    fun getPlaylistSong(songId: Long): PlaylistSongs? {
         val db = readableDatabase
         val cursor: Cursor
 
@@ -129,29 +97,6 @@ class PlaylistSongsDatabaseHelper(context: Context, var playlistId: String) :
         db.close()
 
         return playlistDatas
-    }
-
-    @Suppress("unused")
-    fun getPlaylistDataCount(): Int {
-        val countQuery = "SELECT * FROM " + PlaylistSongs.TABLE_NAME
-        val db = readableDatabase
-        val cursor = db.rawQuery(countQuery, null)
-
-        val count = cursor.count
-        cursor.close()
-
-        return count
-    }
-
-    @Suppress("unused")
-    fun deletePlaylistData(dPlaylistData: PlaylistSongs) {
-        val db = writableDatabase
-        db.delete(
-            PlaylistSongs.TABLE_NAME,
-            PlaylistSongs.COLUMN_ID + " = ?",
-            arrayOf(dPlaylistData.id.toString())
-        )
-        db.close()
     }
 
 }

@@ -93,10 +93,10 @@ class JSONParser {
 
         val catalogSongsDatabaseHelper = CatalogSongsDatabaseHelper(context)
 
-        return if(catalogSongsDatabaseHelper.getCatalogSongFromSongID(songId) == null){
+        return if(catalogSongsDatabaseHelper.getCatalogSong(songId) == null){
             catalogSongsDatabaseHelper.insertSong(songId)
         }else{
-            catalogSongsDatabaseHelper.getCatalogSongFromSongID(songId)!!.id.toLong()
+            catalogSongsDatabaseHelper.getCatalogSong(songId)!!.id.toLong()
         }
     }
 
@@ -232,18 +232,18 @@ class JSONParser {
 
             val songid: Long
 
-             if (songDatabaseHelper.getSong(id) == null) {
-                 songid = songDatabaseHelper.insertSong(id, title, version, albumId, artist, coverUrl)
+            songid = if (songDatabaseHelper.getSong(id) == null) {
+                songDatabaseHelper.insertSong(id, title, version, albumId, artist, coverUrl)
             } else {
-                 songid = songDatabaseHelper.getSong(id)!!.id.toLong()
+                songDatabaseHelper.getSong(id)!!.id.toLong()
             }
 
             val databaseHelper = PlaylistSongsDatabaseHelper(context, playlistId)
 
-            if(databaseHelper.getPlaylistData(songid) == null){
-                return databaseHelper.insertSongId(songid)
+            return if(databaseHelper.getPlaylistSong(songid) == null){
+                databaseHelper.insertSongId(songid)
             }else{
-                return databaseHelper.getPlaylistData(songid)!!.id.toLong()
+                databaseHelper.getPlaylistSong(songid)!!.id.toLong()
             }
         } else {
             return null

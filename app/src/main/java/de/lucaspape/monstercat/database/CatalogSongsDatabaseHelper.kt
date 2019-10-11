@@ -39,7 +39,7 @@ class CatalogSongsDatabaseHelper(context: Context) :
         return id
     }
 
-    fun getCatalogSongFromSongID(songId: Long): CatalogSongs? {
+    fun getCatalogSong(songId: Long): CatalogSongs? {
 
         val db = readableDatabase
         val cursor: Cursor
@@ -52,40 +52,6 @@ class CatalogSongsDatabaseHelper(context: Context) :
                 ),
                 CatalogSongs.COLUMN_SONG_ID + "=?",
                 arrayOf(songId.toString()), null, null, null, null
-            )
-
-            cursor.moveToFirst()
-
-            return try {
-                val catalogSongs = CatalogSongs(
-                    cursor.getInt(cursor.getColumnIndex(CatalogSongs.COLUMN_ID)),
-                    cursor.getLong(cursor.getColumnIndex(CatalogSongs.COLUMN_SONG_ID))
-                )
-
-                cursor.close()
-
-                catalogSongs
-            } catch (e: IndexOutOfBoundsException) {
-                cursor.close()
-                null
-            }
-        } catch (e: SQLiteException) {
-            return null
-        }
-    }
-
-    fun getCatalogSong(id: Long): CatalogSongs? {
-
-        val db = readableDatabase
-        val cursor: Cursor
-
-        try {
-            cursor = db.query(
-                CatalogSongs.TABLE_NAME, arrayOf(
-                    CatalogSongs.COLUMN_ID
-                ),
-                CatalogSongs.COLUMN_ID + "=?",
-                arrayOf(id.toString()), null, null, null, null
             )
 
             cursor.moveToFirst()
@@ -133,30 +99,5 @@ class CatalogSongsDatabaseHelper(context: Context) :
 
         return catalogSongs
     }
-
-    @Suppress("unused")
-    fun getSongsCount(): Int {
-        val countQuery = "SELECT * FROM " + CatalogSongs.TABLE_NAME
-        val db = readableDatabase
-        val cursor = db.rawQuery(countQuery, null)
-
-        val count = cursor.count
-        cursor.close()
-
-        return count
-    }
-
-    @Suppress("unused")
-    fun deleteSong(catalogSongs: CatalogSongs) {
-        val db = writableDatabase
-        db.delete(
-            CatalogSongs.TABLE_NAME,
-            CatalogSongs.COLUMN_ID + " = ?",
-            arrayOf(catalogSongs.id.toString())
-        )
-        db.close()
-    }
-
-
 }
 

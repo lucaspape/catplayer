@@ -41,36 +41,6 @@ class AlbumDatabaseHelper(context: Context) :
         return id
     }
 
-    fun getAlbum(id: Long): Album {
-        val db = readableDatabase
-
-        val cursor = db.query(
-            Album.TABLE_NAME, arrayOf(
-                Album.COLUMN_ID,
-                Album.COLUMN_ALBUM_ID,
-                Album.COLUMN_TITLE,
-                Album.COLUMN_ARTIST,
-                Album.COLUMN_COVER_URL
-            ),
-            Song.COLUMN_ID + "=?",
-            arrayOf(id.toString()), null, null, null, null
-        )
-
-        cursor?.moveToFirst()
-
-        val album = Album(
-            cursor.getInt(cursor.getColumnIndex(Album.COLUMN_ID)),
-            cursor.getString(cursor.getColumnIndex(Album.COLUMN_ALBUM_ID)),
-            cursor.getString(cursor.getColumnIndex(Album.COLUMN_TITLE)),
-            cursor.getString(cursor.getColumnIndex(Album.COLUMN_ARTIST)),
-            cursor.getString(cursor.getColumnIndex(Album.COLUMN_COVER_URL))
-        )
-
-        cursor.close()
-
-        return album
-    }
-
     fun getAlbum(albumId: String): Album? {
         val db = readableDatabase
         val cursor: Cursor
@@ -139,24 +109,5 @@ class AlbumDatabaseHelper(context: Context) :
         db.close()
 
         return albums
-    }
-
-    @Suppress("unused")
-    fun getAlbumsCount(): Int {
-        val countQuery = "SELECT * FROM " + Album.TABLE_NAME
-        val db = readableDatabase
-        val cursor = db.rawQuery(countQuery, null)
-
-        val count = cursor.count
-        cursor.close()
-
-        return count
-    }
-
-    @Suppress("unused")
-    fun deleteAlbum(album: Album) {
-        val db = writableDatabase
-        db.delete(Album.TABLE_NAME, Album.COLUMN_ID + " = ?", arrayOf(album.id.toString()))
-        db.close()
     }
 }
