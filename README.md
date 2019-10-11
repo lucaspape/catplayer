@@ -13,3 +13,7 @@ This android app aims to implement the Monstercat API.
  - Full screen player
  - Continuous playback
 
+
+Disclamer: this is not an official app from monstercat.com!
+I am not responsible in any way for the content displayed in this app!
+Monstercat is a trademark from Monstercat inc.
