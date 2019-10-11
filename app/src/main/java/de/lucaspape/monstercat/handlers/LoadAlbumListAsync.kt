@@ -30,6 +30,18 @@ class LoadAlbumListAsync(
     }
 
     override fun onPostExecute(result: String?) {
+        val albumDatabaseHelper = AlbumDatabaseHelper(contextReference.get()!!)
+        val albumList = albumDatabaseHelper.getAllAlbums()
+
+        val sortedList = ArrayList<HashMap<String, Any?>>()
+
+        for (album in albumList) {
+            val jsonParser = JSONParser()
+            sortedList.add(jsonParser.parseAlbumToHashMap(contextReference.get()!!, album))
+        }
+
+        HomeHandler.currentListViewData = sortedList
+
         HomeHandler.updateListView(viewReference.get()!!)
         HomeHandler.redrawListView(viewReference.get()!!)
 
@@ -49,18 +61,9 @@ class LoadAlbumListAsync(
         val tempList = arrayOfNulls<JSONObject>(HomeHandler.loadMax)
 
         val albumDatabaseHelper = AlbumDatabaseHelper(contextReference.get()!!)
-        var albumList = albumDatabaseHelper.getAllAlbums()
+        val albumList = albumDatabaseHelper.getAllAlbums()
 
         if (!forceReload && albumList.isNotEmpty()) {
-            val sortedList = ArrayList<HashMap<String, Any?>>()
-
-            for (album in albumList) {
-                val jsonParser = JSONParser()
-                sortedList.add(jsonParser.parseAlbumToHashMap(contextReference.get()!!, album))
-            }
-
-            HomeHandler.currentListViewData = sortedList
-
             return null
         } else {
             //if all finished continue
@@ -77,40 +80,14 @@ class LoadAlbumListAsync(
                 //check if all done
                 if (finishedRequests >= totalRequestsCount) {
 
-                    val albums = ArrayList<Album>()
-
                     tempList.reverse()
 
                     val jsonParser = JSONParser()
                     for (jsonObject in tempList) {
-                        if(jsonObject != null){
-                            val id = jsonParser.parseAlbumToDB(jsonObject, contextReference.get()!!)
-
-                            albums.add(albumDatabaseHelper.getAlbum(id))
+                        if (jsonObject != null) {
+                            jsonParser.parseAlbumToDB(jsonObject, contextReference.get()!!)
                         }
                     }
-
-                    for (album in albums) {
-                        jsonParser.parseAlbumToHashMap(
-                            contextReference.get()!!,
-                            album
-                        )
-                    }
-
-                    albumList = albumDatabaseHelper.getAllAlbums()
-
-                    val sortedList = ArrayList<HashMap<String, Any?>>()
-
-                    for (album in albumList) {
-                        sortedList.add(
-                            jsonParser.parseAlbumToHashMap(
-                                contextReference.get()!!,
-                                album
-                            )
-                        )
-                    }
-
-                    HomeHandler.currentListViewData = sortedList
 
                     synchronized(syncObject) {
                         syncObject.notify()
@@ -135,7 +112,7 @@ class LoadAlbumListAsync(
                             val jsonObject = jsonArray.getJSONObject(k)
 
                             tempList[i * 50 + k] = jsonObject
-                                //jsonParser.parseAlbumToDB(jsonObject, contextReference.get()!!)
+                            //jsonParser.parseAlbumToDB(jsonObject, contextReference.get()!!)
                         }
                     },
                     Response.ErrorListener { }

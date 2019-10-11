@@ -32,6 +32,29 @@ class LoadPlaylistTracksAsync(
     }
 
     override fun onPostExecute(result: String?) {
+        val playlistDataDatabaseHelper =
+            PlaylistDataDatabaseHelper(contextReference.get()!!, playlistId)
+        var playlistDatas = playlistDataDatabaseHelper.getAllData()
+
+        val sortedList = ArrayList<HashMap<String, Any?>>()
+
+        playlistDatas = playlistDataDatabaseHelper.getAllData()
+
+        val songDatabaseHelper = SongDatabaseHelper(contextReference.get()!!)
+
+        val jsonParser = JSONParser()
+
+        for (playlistData in playlistDatas) {
+            val song = songDatabaseHelper.getSong(playlistData.songId)
+
+            val hashMap = jsonParser.parseSongToHashMap(contextReference.get()!!, song)
+            sortedList.add(hashMap)
+        }
+
+        //display list
+        PlaylistHandler.currentListViewData = sortedList
+        PlaylistHandler.listViewDataIsPlaylistView = false
+
         PlaylistHandler.updateListView(viewReference.get()!!)
         PlaylistHandler.redrawListView(viewReference.get()!!)
 
@@ -49,25 +72,6 @@ class LoadPlaylistTracksAsync(
         var playlistDatas = playlistDataDatabaseHelper.getAllData()
 
         if (!forceReload && playlistDatas.isNotEmpty()) {
-            val sortedList = ArrayList<HashMap<String, Any?>>()
-
-            playlistDatas = playlistDataDatabaseHelper.getAllData()
-
-            val songDatabaseHelper = SongDatabaseHelper(contextReference.get()!!)
-
-            val jsonParser = JSONParser()
-
-            for (playlistData in playlistDatas) {
-                val song = songDatabaseHelper.getSong(playlistData.songId)
-
-                val hashMap = jsonParser.parseSongToHashMap(contextReference.get()!!, song)
-                sortedList.add(hashMap)
-            }
-
-            //display list
-            PlaylistHandler.currentListViewData = sortedList
-            PlaylistHandler.listViewDataIsPlaylistView = false
-
             return null
         } else {
             var finishedRequests = 0
@@ -85,25 +89,6 @@ class LoadPlaylistTracksAsync(
                 finishedRequests++
 
                 if (finishedRequests >= totalRequestsCount) {
-                    val sortedList = ArrayList<HashMap<String, Any?>>()
-
-                    playlistDatas = playlistDataDatabaseHelper.getAllData()
-
-                    val songDatabaseHelper = SongDatabaseHelper(contextReference.get()!!)
-
-                    val jsonParser = JSONParser()
-
-                    for (playlistData in playlistDatas) {
-                        val song = songDatabaseHelper.getSong(playlistData.songId)
-
-                        val hashMap = jsonParser.parseSongToHashMap(contextReference.get()!!, song)
-                        sortedList.add(hashMap)
-                    }
-
-                    //display list
-                    PlaylistHandler.currentListViewData = sortedList
-                    PlaylistHandler.listViewDataIsPlaylistView = false
-
                     synchronized(syncObject){
                         syncObject.notify()
                     }

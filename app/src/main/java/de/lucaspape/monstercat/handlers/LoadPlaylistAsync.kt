@@ -31,7 +31,21 @@ class LoadPlaylistAsync(
     }
 
     override fun onPostExecute(result: String?) {
+        val playlistDatabaseHelper = PlaylistDatabaseHelper(contextReference.get()!!)
+        val playlists = playlistDatabaseHelper.getAllPlaylists()
+
+        val jsonParser = JSONParser()
+
+        val playlistHashMaps = ArrayList<HashMap<String, Any?>>()
+
+        for (playlist in playlists) {
+            playlistHashMaps.add(jsonParser.parsePlaylistToHashMap(playlist))
+        }
+
         if (showAfter) {
+            PlaylistHandler.currentListViewData = playlistHashMaps
+            PlaylistHandler.listViewDataIsPlaylistView = true
+
             PlaylistHandler.updateListView(viewReference.get()!!)
             PlaylistHandler.redrawListView(viewReference.get()!!)
 
@@ -43,22 +57,9 @@ class LoadPlaylistAsync(
 
     override fun doInBackground(vararg param: Void?): String? {
         val playlistDatabaseHelper = PlaylistDatabaseHelper(contextReference.get()!!)
-        var playlists = playlistDatabaseHelper.getAllPlaylists()
+        val playlists = playlistDatabaseHelper.getAllPlaylists()
 
         if (!forceReload && playlists.isNotEmpty()) {
-            val jsonParser = JSONParser()
-
-            val playlistHashMaps = ArrayList<HashMap<String, Any?>>()
-
-            for (playlist in playlists) {
-                playlistHashMaps.add(jsonParser.parsePlaylistToHashMap(playlist))
-            }
-
-            if (showAfter) {
-                PlaylistHandler.currentListViewData = playlistHashMaps
-                PlaylistHandler.listViewDataIsPlaylistView = true
-            }
-
             return null
         } else {
             val playlistRequestQueue = Volley.newRequestQueue(contextReference.get()!!)
@@ -73,33 +74,16 @@ class LoadPlaylistAsync(
                     val jsonObject = JSONObject(response)
                     val jsonArray = jsonObject.getJSONArray("results")
 
-                    val list = ArrayList<Long>()
-
                     val jsonParser = JSONParser()
 
                     for (i in (0 until jsonArray.length())) {
-                        list.add(
-                            jsonParser.parsePlaylistToDB(
-                                contextReference.get()!!,
-                                jsonArray.getJSONObject(i)
-                            )
+                        jsonParser.parsePlaylistToDB(
+                            contextReference.get()!!,
+                            jsonArray.getJSONObject(i)
                         )
                     }
 
-                    playlists = playlistDatabaseHelper.getAllPlaylists()
-
-                    val playlistHashMaps = ArrayList<HashMap<String, Any?>>()
-
-                    for (playlist in playlists) {
-                        playlistHashMaps.add(jsonParser.parsePlaylistToHashMap(playlist))
-                    }
-
-                    if (showAfter) {
-                        PlaylistHandler.currentListViewData = playlistHashMaps
-                        PlaylistHandler.listViewDataIsPlaylistView = true
-                    }
-
-                    synchronized(syncObject){
+                    synchronized(syncObject) {
                         syncObject.notify()
                     }
 
@@ -118,7 +102,7 @@ class LoadPlaylistAsync(
 
             playlistRequestQueue.add(playlistRequest)
 
-            synchronized(syncObject){
+            synchronized(syncObject) {
                 syncObject.wait()
                 return null
             }

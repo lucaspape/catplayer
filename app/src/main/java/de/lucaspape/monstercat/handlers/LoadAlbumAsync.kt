@@ -30,6 +30,22 @@ class LoadAlbumAsync(
     }
 
     override fun onPostExecute(result: String?) {
+        val albumId = itemValue["id"] as String
+
+        val songDatabaseHelper = SongDatabaseHelper(contextReference.get()!!)
+        val songList = songDatabaseHelper.getAlbumSongs(albumId)
+
+        val dbSongs = ArrayList<HashMap<String, Any?>>()
+
+        for (song in songList) {
+            val jsonParser = JSONParser()
+            dbSongs.add(jsonParser.parseSongToHashMap(contextReference.get()!!, song))
+        }
+
+        HomeHandler.currentListViewData = dbSongs
+
+        HomeHandler.albumView = false
+
         HomeHandler.updateListView(viewReference.get()!!)
         HomeHandler.redrawListView(viewReference.get()!!)
 
@@ -50,18 +66,6 @@ class LoadAlbumAsync(
         var songList = songDatabaseHelper.getAlbumSongs(albumId)
 
         if (!forceReload && songList.isNotEmpty()) {
-            // currentListViewData = albumCache as ArrayList<HashMap<String, Any?>>
-            val dbSongs = ArrayList<HashMap<String, Any?>>()
-
-            for (song in songList) {
-                val jsonParser = JSONParser()
-                dbSongs.add(jsonParser.parseSongToHashMap(contextReference.get()!!, song))
-            }
-
-            HomeHandler.currentListViewData = dbSongs
-
-            HomeHandler.albumView = false
-
             return null
         } else {
             val syncObject = Object()
@@ -75,11 +79,7 @@ class LoadAlbumAsync(
                     dbSongs.add(jsonParser.parseSongToHashMap(contextReference.get()!!, song))
                 }
 
-                //display list
-                HomeHandler.currentListViewData = dbSongs
-                HomeHandler.albumView = false
-
-                synchronized(syncObject){
+                synchronized(syncObject) {
                     syncObject.notify()
                 }
             }
@@ -117,7 +117,7 @@ class LoadAlbumAsync(
 
             requestQueue.add(listRequest)
 
-            synchronized(syncObject){
+            synchronized(syncObject) {
                 syncObject.wait()
                 return null
             }

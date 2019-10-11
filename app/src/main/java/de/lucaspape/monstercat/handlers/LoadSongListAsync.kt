@@ -31,6 +31,26 @@ class LoadSongListAsync(
     }
 
     override fun onPostExecute(result: String?) {
+        val catalogSongsDatabaseHelper = CatalogSongsDatabaseHelper(contextReference.get()!!)
+        val songIdList = catalogSongsDatabaseHelper.getAllSongs()
+
+        val dbSongs = ArrayList<HashMap<String, Any?>>()
+
+        val songDatabaseHelper = SongDatabaseHelper(contextReference.get()!!)
+        val songList = ArrayList<Song>()
+
+        for (song in songIdList) {
+            songList.add(songDatabaseHelper.getSong(song.songId))
+        }
+
+        for (song in songList) {
+            val jsonParser = JSONParser()
+            dbSongs.add(jsonParser.parseSongToHashMap(contextReference.get()!!, song))
+        }
+
+        //display list
+        HomeHandler.currentListViewData = dbSongs
+
         HomeHandler.updateListView(viewReference.get()!!)
         HomeHandler.redrawListView(viewReference.get()!!)
 
@@ -48,22 +68,6 @@ class LoadSongListAsync(
         var songIdList = catalogSongsDatabaseHelper.getAllSongs()
 
         if (!forceReload && songIdList.isNotEmpty()) {
-            val dbSongs = ArrayList<HashMap<String, Any?>>()
-
-            val songDatabaseHelper = SongDatabaseHelper(contextReference.get()!!)
-            val songList = ArrayList<Song>()
-
-            for (song in songIdList) {
-                songList.add(songDatabaseHelper.getSong(song.songId))
-            }
-
-            for (song in songList) {
-                val jsonParser = JSONParser()
-                dbSongs.add(jsonParser.parseSongToHashMap(contextReference.get()!!, song))
-            }
-
-            //display list
-            HomeHandler.currentListViewData = dbSongs
             return null
         } else {
             val requestQueue = Volley.newRequestQueue(contextReference.get()!!)
@@ -85,8 +89,6 @@ class LoadSongListAsync(
 
                 //check if all done
                 if (finishedRequests >= totalRequestsCount) {
-                    val dbSongs = ArrayList<HashMap<String, Any?>>()
-
                     sortedList.reverse()
                     for (i in sortedList) {
                         if (i != null) {
@@ -96,23 +98,7 @@ class LoadSongListAsync(
                         }
                     }
 
-                    songIdList = catalogSongsDatabaseHelper.getAllSongs()
-                    val songDatabaseHelper = SongDatabaseHelper(contextReference.get()!!)
-                    val songList = ArrayList<Song>()
-
-                    for (song in songIdList) {
-                        songList.add(songDatabaseHelper.getSong(song.songId))
-                    }
-
-                    for (song in songList) {
-                        val jsonParser = JSONParser()
-                        dbSongs.add(jsonParser.parseSongToHashMap(contextReference.get()!!, song))
-                    }
-
-                    //display list
-                    HomeHandler.currentListViewData = dbSongs
-
-                    synchronized(syncObject){
+                    synchronized(syncObject) {
                         syncObject.notify()
                     }
                 } else {
@@ -161,7 +147,7 @@ class LoadSongListAsync(
 
             requestQueue.add(requests[finishedRequests])
 
-            synchronized(syncObject){
+            synchronized(syncObject) {
                 syncObject.wait()
                 return null
             }
