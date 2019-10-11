@@ -7,17 +7,17 @@ class Song() {
         @JvmStatic
         val COLUMN_ID = "id"
         @JvmStatic
-        val COLUMN_SONG_ID = "songid"
+        val COLUMN_SONG_ID = "songId"
         @JvmStatic
         val COLUMN_TITLE = "title"
         @JvmStatic
         val COLUMN_VERSION = "version"
         @JvmStatic
-        val COLUMN_ALBUM_ID = "albumid"
+        val COLUMN_ALBUM_ID = "albumId"
         @JvmStatic
         val COLUMN_ARTIST = "artist"
         @JvmStatic
-        val COLUMN_COVER_URL = "coverurl"
+        val COLUMN_COVER_URL = "coverUrl"
 
         @JvmStatic
         val CREATE_TABLE =

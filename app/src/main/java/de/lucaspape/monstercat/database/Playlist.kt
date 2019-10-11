@@ -4,9 +4,9 @@ class Playlist(){
     companion object{
         @JvmStatic val TABLE_NAME = "Playlist"
         @JvmStatic val COLUMN_ID = "id"
-        @JvmStatic val COLUMN_PLAYLIST_ID = "playlistid"
+        @JvmStatic val COLUMN_PLAYLIST_ID = "playlistId"
         @JvmStatic val COLUMN_NAME = "name"
-        @JvmStatic val COLUMN_TRACK_COUNT = "trackcount"
+        @JvmStatic val COLUMN_TRACK_COUNT = "trackCount"
 
         @JvmStatic val CREATE_TABLE =
             "CREATE TABLE " + TABLE_NAME + " (" +

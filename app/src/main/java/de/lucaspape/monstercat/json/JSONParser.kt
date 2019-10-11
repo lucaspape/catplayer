@@ -145,7 +145,7 @@ class JSONParser {
 
     fun parsePlaylistDataToJSONArray(
         context: Context,
-        playlistDataList: List<PlaylistData>
+        playlistDataList: List<PlaylistSongs>
     ): Array<JSONObject?> {
         val jsonArray = arrayOfNulls<JSONObject>(playlistDataList.size)
 
@@ -228,7 +228,7 @@ class JSONParser {
                  songid = songDatabaseHelper.getSong(id)!!.id.toLong()
             }
 
-            val databaseHelper = PlaylistDataDatabaseHelper(context, playlistId)
+            val databaseHelper = PlaylistSongsDatabaseHelper(context, playlistId)
 
             if(databaseHelper.getPlaylistData(songid) == null){
                 return databaseHelper.insertSongId(songid)

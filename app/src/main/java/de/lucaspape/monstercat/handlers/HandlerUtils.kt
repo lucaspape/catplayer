@@ -86,12 +86,12 @@ fun playSongFromId(context: Context, songId: String, playNow: Boolean) {
 }
 
 fun downloadPlaylist(context: Context, playlistId: String) {
-    val playlistDataDatabaseHelper = PlaylistDataDatabaseHelper(context, playlistId)
-    val playlistDataList = playlistDataDatabaseHelper.getAllData()
+    val playlistSongsDatabaseHelper = PlaylistSongsDatabaseHelper(context, playlistId)
+    val playlistSongsList = playlistSongsDatabaseHelper.getAllData()
 
-    for (playlistData in playlistDataList) {
+    for (playlistSong in playlistSongsList) {
         val songDatabaseHelper = SongDatabaseHelper(context)
-        val song = songDatabaseHelper.getSong(playlistData.songId)
+        val song = songDatabaseHelper.getSong(playlistSong.songId)
 
         downloadSong(context, song)
     }
@@ -137,15 +137,15 @@ fun addSongToPlaylist(context: Context, song: Song) {
 
     val playlistNames = arrayOfNulls<String>(playlistList.size)
     val playlistIds = arrayOfNulls<String>(playlistList.size)
-    val trackList = arrayOfNulls<List<PlaylistData>>(playlistList.size)
+    val trackList = arrayOfNulls<List<PlaylistSongs>>(playlistList.size)
 
     for (i in playlistList.indices) {
-        val playlistDataDatabaseHelper =
-            PlaylistDataDatabaseHelper(context, playlistList[i].playlistId)
+        val playlistSongsDatabaseHelper =
+            PlaylistSongsDatabaseHelper(context, playlistList[i].playlistId)
 
         playlistNames[i] = playlistList[i].playlistName
         playlistIds[i] = playlistList[i].playlistId
-        trackList[i] = playlistDataDatabaseHelper.getAllData()
+        trackList[i] = playlistSongsDatabaseHelper.getAllData()
     }
 
     val alertDialogBuilder = AlertDialog.Builder(context)

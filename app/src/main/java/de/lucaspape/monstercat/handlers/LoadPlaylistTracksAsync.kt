@@ -11,7 +11,7 @@ import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.loggedIn
 import de.lucaspape.monstercat.auth.sid
-import de.lucaspape.monstercat.database.PlaylistDataDatabaseHelper
+import de.lucaspape.monstercat.database.PlaylistSongsDatabaseHelper
 import de.lucaspape.monstercat.database.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadCoverArray
 import de.lucaspape.monstercat.json.JSONParser
@@ -32,20 +32,19 @@ class LoadPlaylistTracksAsync(
     }
 
     override fun onPostExecute(result: String?) {
-        val playlistDataDatabaseHelper =
-            PlaylistDataDatabaseHelper(contextReference.get()!!, playlistId)
-        var playlistDatas = playlistDataDatabaseHelper.getAllData()
+        val playlistSongsDatabaseHelper =
+            PlaylistSongsDatabaseHelper(contextReference.get()!!, playlistId)
 
         val sortedList = ArrayList<HashMap<String, Any?>>()
 
-        playlistDatas = playlistDataDatabaseHelper.getAllData()
+        val playlistSongs = playlistSongsDatabaseHelper.getAllData()
 
         val songDatabaseHelper = SongDatabaseHelper(contextReference.get()!!)
 
         val jsonParser = JSONParser()
 
-        for (playlistData in playlistDatas) {
-            val song = songDatabaseHelper.getSong(playlistData.songId)
+        for (playlistSong in playlistSongs) {
+            val song = songDatabaseHelper.getSong(playlistSong.songId)
 
             val hashMap = jsonParser.parseSongToHashMap(contextReference.get()!!, song)
             sortedList.add(hashMap)
@@ -67,11 +66,11 @@ class LoadPlaylistTracksAsync(
     }
 
     override fun doInBackground(vararg param: Void?): String? {
-        val playlistDataDatabaseHelper =
-            PlaylistDataDatabaseHelper(contextReference.get()!!, playlistId)
-        var playlistDatas = playlistDataDatabaseHelper.getAllData()
+        val playlistSongsDatabaseHelper =
+            PlaylistSongsDatabaseHelper(contextReference.get()!!, playlistId)
+        val playlistSongs = playlistSongsDatabaseHelper.getAllData()
 
-        if (!forceReload && playlistDatas.isNotEmpty()) {
+        if (!forceReload && playlistSongs.isNotEmpty()) {
             return null
         } else {
             var finishedRequests = 0

@@ -1,13 +1,13 @@
 package de.lucaspape.monstercat.database
 
-class PlaylistData() {
+class PlaylistSongs() {
     companion object {
         @JvmStatic
         val COLUMN_ID = "id"
         @JvmStatic
-        val COLUMN_SONG_ID = "songid"
+        val COLUMN_SONG_ID = "songId"
         @JvmStatic
-        var TABLE_NAME = "Playlistdata"
+        var TABLE_NAME = "PlaylistSongs"
         @JvmStatic
         var CREATE_TABLE =
             "CREATE TABLE " + TABLE_NAME + " (" +

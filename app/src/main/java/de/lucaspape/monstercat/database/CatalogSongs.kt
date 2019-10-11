@@ -7,7 +7,7 @@ class CatalogSongs() {
         @JvmStatic
         val COLUMN_ID = "id"
         @JvmStatic
-        val COLUMN_SONG_ID = "songid"
+        val COLUMN_SONG_ID = "songId"
 
         @JvmStatic
         val CREATE_TABLE =
