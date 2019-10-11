@@ -1,4 +1,4 @@
-package de.lucaspape.monstercat.handlers
+package de.lucaspape.monstercat.handlers.util
 
 import android.content.Context
 import android.os.AsyncTask
@@ -13,6 +13,7 @@ import de.lucaspape.monstercat.auth.loggedIn
 import de.lucaspape.monstercat.auth.sid
 import de.lucaspape.monstercat.database.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadCoverArray
+import de.lucaspape.monstercat.handlers.HomeHandler
 import de.lucaspape.monstercat.json.JSONParser
 import org.json.JSONObject
 import java.lang.ref.WeakReference

@@ -11,9 +11,9 @@ import de.lucaspape.monstercat.handlers.HomeHandler
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.activities.SettingsActivity
 import de.lucaspape.monstercat.database.SongDatabaseHelper
-import de.lucaspape.monstercat.handlers.addSongToPlaylist
-import de.lucaspape.monstercat.handlers.downloadSong
-import de.lucaspape.monstercat.handlers.playSongFromId
+import de.lucaspape.monstercat.handlers.util.addSongToPlaylist
+import de.lucaspape.monstercat.handlers.util.downloadSong
+import de.lucaspape.monstercat.handlers.util.playSongFromId
 import de.lucaspape.monstercat.settings.Settings
 
 class HomeFragment : Fragment() {
@@ -81,7 +81,10 @@ class HomeFragment : Fragment() {
 
         if (song != null) {
             when {
-                item.title == getString(R.string.download) -> downloadSong(context!!, song)
+                item.title == getString(R.string.download) -> downloadSong(
+                    context!!,
+                    song
+                )
                 item.title == getString(R.string.playNext) -> playSongFromId(
                     context!!,
                     listItem["id"].toString(),

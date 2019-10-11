@@ -9,9 +9,9 @@ import androidx.fragment.app.Fragment
 import de.lucaspape.monstercat.handlers.PlaylistHandler
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.SongDatabaseHelper
-import de.lucaspape.monstercat.handlers.downloadPlaylist
-import de.lucaspape.monstercat.handlers.downloadSong
-import de.lucaspape.monstercat.handlers.playSongFromId
+import de.lucaspape.monstercat.handlers.util.downloadPlaylist
+import de.lucaspape.monstercat.handlers.util.downloadSong
+import de.lucaspape.monstercat.handlers.util.playSongFromId
 import de.lucaspape.monstercat.settings.Settings
 
 class PlaylistFragment : Fragment() {
@@ -73,7 +73,10 @@ class PlaylistFragment : Fragment() {
 
         if (item.title == getString(R.string.download)) {
             if (listItem["type"] == "playlist") {
-                downloadPlaylist(context!!, listItem["playlistId"] as String)
+                downloadPlaylist(
+                    context!!,
+                    listItem["playlistId"] as String
+                )
             } else {
                 val songDatabaseHelper = SongDatabaseHelper(view!!.context)
                 val song = songDatabaseHelper.getSong(listItem["id"] as String)
@@ -84,7 +87,11 @@ class PlaylistFragment : Fragment() {
             }
 
         } else if (item.title == getString(R.string.playNext)) {
-            playSongFromId(context!!, listItem["id"] as String, false)
+            playSongFromId(
+                context!!,
+                listItem["id"] as String,
+                false
+            )
         }
 
         return super.onContextItemSelected(item)

@@ -1,4 +1,4 @@
-package de.lucaspape.monstercat.handlers
+package de.lucaspape.monstercat.handlers.util
 
 import android.app.AlertDialog
 import android.content.Context

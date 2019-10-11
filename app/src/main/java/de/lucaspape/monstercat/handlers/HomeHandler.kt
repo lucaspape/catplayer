@@ -1,7 +1,6 @@
 package de.lucaspape.monstercat.handlers
 
 import android.content.Context
-import android.content.Intent
 import android.os.AsyncTask
 import android.os.Handler
 import android.os.Looper
@@ -9,7 +8,10 @@ import android.view.View
 import android.widget.*
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.activities.SettingsActivity
+import de.lucaspape.monstercat.handlers.util.LoadAlbumAsync
+import de.lucaspape.monstercat.handlers.util.LoadAlbumListAsync
+import de.lucaspape.monstercat.handlers.util.LoadSongListAsync
+import de.lucaspape.monstercat.handlers.util.playSongFromId
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.settings.Settings
 import java.lang.ref.WeakReference
@@ -168,7 +170,11 @@ class HomeHandler {
                 loadAlbum(view, itemValue, false)
             } else {
                 val itemValue = musicList.getItemAtPosition(position) as HashMap<String, Any?>
-                playSongFromId(view.context, itemValue["id"] as String, true)
+                playSongFromId(
+                    view.context,
+                    itemValue["id"] as String,
+                    true
+                )
             }
         }
 
@@ -261,7 +267,12 @@ class HomeHandler {
 
         val contextReference = WeakReference<Context>(view.context)
         val viewReference = WeakReference<View>(view)
-        LoadAlbumAsync(viewReference, contextReference, forceReload, itemValue).executeOnExecutor(
+        LoadAlbumAsync(
+            viewReference,
+            contextReference,
+            forceReload,
+            itemValue
+        ).executeOnExecutor(
             AsyncTask.THREAD_POOL_EXECUTOR
         )
     }

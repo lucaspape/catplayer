@@ -1,4 +1,4 @@
-package de.lucaspape.monstercat.handlers
+package de.lucaspape.monstercat.handlers.util
 
 import android.content.Context
 import android.os.AsyncTask
@@ -12,16 +12,15 @@ import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.loggedIn
 import de.lucaspape.monstercat.auth.sid
-import de.lucaspape.monstercat.database.CatalogSongsDatabaseHelper
-import de.lucaspape.monstercat.database.Song
-import de.lucaspape.monstercat.database.SongDatabaseHelper
+import de.lucaspape.monstercat.database.AlbumDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadCoverArray
+import de.lucaspape.monstercat.handlers.HomeHandler
 import de.lucaspape.monstercat.json.JSONParser
 import de.lucaspape.monstercat.settings.Settings
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
-class LoadSongListAsync(
+class LoadAlbumListAsync(
     private val viewReference: WeakReference<View>,
     private val contextReference: WeakReference<Context>,
     private val forceReload: Boolean
@@ -33,25 +32,17 @@ class LoadSongListAsync(
     }
 
     override fun onPostExecute(result: String?) {
-        val catalogSongsDatabaseHelper = CatalogSongsDatabaseHelper(contextReference.get()!!)
-        val songIdList = catalogSongsDatabaseHelper.getAllSongs()
+        val albumDatabaseHelper = AlbumDatabaseHelper(contextReference.get()!!)
+        val albumList = albumDatabaseHelper.getAllAlbums()
 
-        val dbSongs = ArrayList<HashMap<String, Any?>>()
+        val sortedList = ArrayList<HashMap<String, Any?>>()
 
-        val songDatabaseHelper = SongDatabaseHelper(contextReference.get()!!)
-        val songList = ArrayList<Song>()
-
-        for (song in songIdList) {
-            songList.add(songDatabaseHelper.getSong(song.songId))
-        }
-
-        for (song in songList) {
+        for (album in albumList) {
             val jsonParser = JSONParser()
-            dbSongs.add(jsonParser.parseSongToHashMap(contextReference.get()!!, song))
+            sortedList.add(jsonParser.parseAlbumToHashMap(contextReference.get()!!, album))
         }
 
-        //display list
-        HomeHandler.currentListViewData = dbSongs
+        HomeHandler.currentListViewData = sortedList
 
         HomeHandler.updateListView(viewReference.get()!!)
         HomeHandler.redrawListView(viewReference.get()!!)
@@ -59,75 +50,86 @@ class LoadSongListAsync(
         //download cover art
         addDownloadCoverArray(HomeHandler.currentListViewData)
 
+        val listView = viewReference.get()!!.findViewById<ListView>(R.id.musiclistview)
+        val settings = Settings(viewReference.get()!!.context)
+        val lastScroll = settings.getSetting("currentListAlbumViewLastScrollIndex")
+        val top = settings.getSetting("currentListAlbumViewTop")
+
+        if(top != null && lastScroll != null){
+            listView.setSelectionFromTop(lastScroll.toInt(), top.toInt())
+        }
+
+        settings.saveSetting("currentListAlbumViewLastScrollIndex", 0.toString())
+        settings.saveSetting("currentListAlbumViewTop", 0.toString())
+
         val swipeRefreshLayout =
             viewReference.get()!!.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
         swipeRefreshLayout.isRefreshing = false
     }
 
     override fun doInBackground(vararg param: Void?): String? {
+        //TODO download correct album list
 
-        val catalogSongsDatabaseHelper = CatalogSongsDatabaseHelper(contextReference.get()!!)
-        val songIdList = catalogSongsDatabaseHelper.getAllSongs()
+        val requestQueue = Volley.newRequestQueue(contextReference.get()!!)
 
-        if (!forceReload && songIdList.isNotEmpty()) {
+        val tempList = arrayOfNulls<JSONObject>(HomeHandler.loadMax)
+
+        val albumDatabaseHelper = AlbumDatabaseHelper(contextReference.get()!!)
+        val albumList = albumDatabaseHelper.getAllAlbums()
+
+        if (!forceReload && albumList.isNotEmpty()) {
             return null
         } else {
-            val requestQueue = Volley.newRequestQueue(contextReference.get()!!)
-
-            val dbIds = ArrayList<Long>()
-
             //if all finished continue
             var finishedRequests = 0
             var totalRequestsCount = 0
-
-            val sortedList = arrayOfNulls<JSONObject>(HomeHandler.loadMax)
 
             val requests = ArrayList<StringRequest>()
 
             val syncObject = Object()
 
-            requestQueue.addRequestFinishedListener<Any> {
+            requestQueue.addRequestFinishedListener<Any?> {
                 finishedRequests++
 
                 //check if all done
                 if (finishedRequests >= totalRequestsCount) {
-                    sortedList.reverse()
+
+                    tempList.reverse()
 
                     val jsonParser = JSONParser()
-
-                    for (jsonObject in sortedList) {
+                    for (jsonObject in tempList) {
                         if (jsonObject != null) {
-
-                            jsonParser.parseCatalogSongToDB(
-                                jsonObject,
-                                contextReference.get()!!
-                            )
+                            jsonParser.parseAlbumToDB(jsonObject, contextReference.get()!!)
                         }
                     }
 
                     synchronized(syncObject) {
                         syncObject.notify()
                     }
+
                 } else {
                     requestQueue.add(requests[finishedRequests])
                 }
+
             }
 
             for (i in (0 until HomeHandler.loadMax / 50)) {
                 val requestUrl =
-                    contextReference.get()!!.getString(R.string.loadSongsUrl) + "?limit=50&skip=" + i * 50
-
-                val listRequest = object : StringRequest(
-                    Method.GET, requestUrl, Response.Listener { response ->
+                    contextReference.get()!!.getString(R.string.loadAlbumsUrl) + "?limit=50&skip=" + i * 50
+                val albumsRequest = object : StringRequest(
+                    Method.GET, requestUrl,
+                    Response.Listener { response ->
                         val json = JSONObject(response)
                         val jsonArray = json.getJSONArray("results")
 
-                        //parse every single song into list
                         for (k in (0 until jsonArray.length())) {
-                            sortedList[i * 50 + k] = jsonArray.getJSONObject(k)
-                        }
+                            val jsonObject = jsonArray.getJSONObject(k)
 
-                    }, Response.ErrorListener { }
+                            tempList[i * 50 + k] = jsonObject
+                            //jsonParser.parseAlbumToDB(jsonObject, contextReference.get()!!)
+                        }
+                    },
+                    Response.ErrorListener { }
                 ) {
                     //add authentication
                     @Throws(AuthFailureError::class)
@@ -141,7 +143,8 @@ class LoadSongListAsync(
                 }
 
                 totalRequestsCount++
-                requests.add(listRequest)
+
+                requests.add(albumsRequest)
             }
 
             requestQueue.add(requests[finishedRequests])
@@ -151,5 +154,8 @@ class LoadSongListAsync(
                 return null
             }
         }
+
+
     }
+
 }
