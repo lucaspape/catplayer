@@ -1,6 +1,7 @@
 package de.lucaspape.monstercat.handlers
 
 import android.content.Context
+import android.content.Intent
 import android.os.AsyncTask
 import android.os.Handler
 import android.os.Looper
@@ -8,6 +9,7 @@ import android.view.View
 import android.widget.*
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.activities.SettingsActivity
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.settings.Settings
 import java.lang.ref.WeakReference
@@ -251,6 +253,12 @@ class HomeHandler {
      * Load single album
      */
     private fun loadAlbum(view: View, itemValue: HashMap<String, Any?>, forceReload: Boolean) {
+        val listView = view.findViewById<ListView>(R.id.musiclistview)
+
+        val settings = Settings(view.context)
+        settings.saveSetting("currentListAlbumViewLastScrollIndex", listView.firstVisiblePosition.toString())
+        settings.saveSetting("currentListAlbumViewTop", (listView.getChildAt(0).top - listView.paddingTop).toString())
+
         val contextReference = WeakReference<Context>(view.context)
         val viewReference = WeakReference<View>(view)
         LoadAlbumAsync(viewReference, contextReference, forceReload, itemValue).executeOnExecutor(

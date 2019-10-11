@@ -1,8 +1,10 @@
 package de.lucaspape.monstercat.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.Switch
 import androidx.appcompat.app.AppCompatActivity
 import de.lucaspape.monstercat.R
@@ -38,16 +40,17 @@ class SettingsActivity : AppCompatActivity() {
         val downloadMobileSwitch = findViewById<Switch>(R.id.downloadMobileSwitch)
         val downloadCoversMobileSwitch = findViewById<Switch>(R.id.downloadCoversMobileSwitch)
 
-        if(settings.getSetting("streamOverMobile") != null){
+        if (settings.getSetting("streamOverMobile") != null) {
             streamMobileSwitch.isChecked = settings.getSetting("streamOverMobile")!!.toBoolean()
         }
 
-        if(settings.getSetting("downloadOverMobile") != null){
+        if (settings.getSetting("downloadOverMobile") != null) {
             downloadMobileSwitch.isChecked = settings.getSetting("downloadOverMobile")!!.toBoolean()
         }
 
-        if(settings.getSetting("downloadCoversOverMobile") != null){
-            downloadCoversMobileSwitch.isChecked = settings.getSetting("downloadCoversOverMobile")!!.toBoolean()
+        if (settings.getSetting("downloadCoversOverMobile") != null) {
+            downloadCoversMobileSwitch.isChecked =
+                settings.getSetting("downloadCoversOverMobile")!!.toBoolean()
         }
 
 
@@ -63,8 +66,5 @@ class SettingsActivity : AppCompatActivity() {
         downloadCoversMobileSwitch.setOnCheckedChangeListener { _, isChecked ->
             settings.saveSetting("downloadCoversOverMobile", isChecked.toString())
         }
-
-
-
     }
 }

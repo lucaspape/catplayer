@@ -112,7 +112,7 @@ class MainActivity : AppCompatActivity() {
 
             Linkify.addLinks(spannableString, Linkify.WEB_URLS)
             textView.text = spannableString
-            textView.setTextSize(18f)
+            textView.textSize = 18f
             textView.movementMethod = LinkMovementMethod.getInstance()
 
             val alertDialogBuilder = AlertDialog.Builder(this)
@@ -124,5 +124,10 @@ class MainActivity : AppCompatActivity() {
             settings.saveSetting("privacypolicy", "1.0")
 
         }
+    }
+
+    override fun onBackPressed() {
+        //open the home fragment
+        openFragment(HomeFragment.newInstance())
     }
 }

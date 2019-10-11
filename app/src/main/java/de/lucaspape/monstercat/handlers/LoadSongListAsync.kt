@@ -3,6 +3,7 @@ package de.lucaspape.monstercat.handlers
 import android.content.Context
 import android.os.AsyncTask
 import android.view.View
+import android.widget.ListView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.android.volley.AuthFailureError
 import com.android.volley.Response
@@ -16,6 +17,7 @@ import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.database.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadCoverArray
 import de.lucaspape.monstercat.json.JSONParser
+import de.lucaspape.monstercat.settings.Settings
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
@@ -65,7 +67,7 @@ class LoadSongListAsync(
     override fun doInBackground(vararg param: Void?): String? {
 
         val catalogSongsDatabaseHelper = CatalogSongsDatabaseHelper(contextReference.get()!!)
-        var songIdList = catalogSongsDatabaseHelper.getAllSongs()
+        val songIdList = catalogSongsDatabaseHelper.getAllSongs()
 
         if (!forceReload && songIdList.isNotEmpty()) {
             return null

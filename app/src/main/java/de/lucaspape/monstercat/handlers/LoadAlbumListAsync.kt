@@ -3,6 +3,7 @@ package de.lucaspape.monstercat.handlers
 import android.content.Context
 import android.os.AsyncTask
 import android.view.View
+import android.widget.ListView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.android.volley.AuthFailureError
 import com.android.volley.Response
@@ -11,10 +12,10 @@ import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.loggedIn
 import de.lucaspape.monstercat.auth.sid
-import de.lucaspape.monstercat.database.Album
 import de.lucaspape.monstercat.database.AlbumDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadCoverArray
 import de.lucaspape.monstercat.json.JSONParser
+import de.lucaspape.monstercat.settings.Settings
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
@@ -47,6 +48,18 @@ class LoadAlbumListAsync(
 
         //download cover art
         addDownloadCoverArray(HomeHandler.currentListViewData)
+
+        val listView = viewReference.get()!!.findViewById<ListView>(R.id.musiclistview)
+        val settings = Settings(viewReference.get()!!.context)
+        val lastScroll = settings.getSetting("currentListAlbumViewLastScrollIndex")
+        val top = settings.getSetting("currentListAlbumViewTop")
+
+        if(top != null && lastScroll != null){
+            listView.setSelectionFromTop(lastScroll.toInt(), top.toInt())
+        }
+
+        settings.saveSetting("currentListAlbumViewLastScrollIndex", 0.toString())
+        settings.saveSetting("currentListAlbumViewTop", 0.toString())
 
         val swipeRefreshLayout =
             viewReference.get()!!.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)

@@ -90,6 +90,4 @@ class HomeFragment : Fragment() {
 
         return super.onContextItemSelected(item)
     }
-
-
 }
