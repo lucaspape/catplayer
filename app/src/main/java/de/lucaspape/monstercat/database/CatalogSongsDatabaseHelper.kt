@@ -39,6 +39,41 @@ class CatalogSongsDatabaseHelper(context: Context) :
         return id
     }
 
+    fun getCatalogSongFromSongID(songId: Long): CatalogSongs? {
+
+        val db = readableDatabase
+        val cursor: Cursor
+
+        try {
+            cursor = db.query(
+                CatalogSongs.TABLE_NAME, arrayOf(
+                    CatalogSongs.COLUMN_ID,
+                    CatalogSongs.COLUMN_SONG_ID
+                ),
+                CatalogSongs.COLUMN_SONG_ID + "=?",
+                arrayOf(songId.toString()), null, null, null, null
+            )
+
+            cursor.moveToFirst()
+
+            return try {
+                val catalogSongs = CatalogSongs(
+                    cursor.getInt(cursor.getColumnIndex(CatalogSongs.COLUMN_ID)),
+                    cursor.getLong(cursor.getColumnIndex(CatalogSongs.COLUMN_SONG_ID))
+                )
+
+                cursor.close()
+
+                catalogSongs
+            } catch (e: IndexOutOfBoundsException) {
+                cursor.close()
+                null
+            }
+        } catch (e: SQLiteException) {
+            return null
+        }
+    }
+
     fun getCatalogSong(id: Long): CatalogSongs? {
 
         val db = readableDatabase
@@ -46,7 +81,7 @@ class CatalogSongsDatabaseHelper(context: Context) :
 
         try {
             cursor = db.query(
-                Song.TABLE_NAME, arrayOf(
+                CatalogSongs.TABLE_NAME, arrayOf(
                     CatalogSongs.COLUMN_ID
                 ),
                 CatalogSongs.COLUMN_ID + "=?",
@@ -55,7 +90,7 @@ class CatalogSongsDatabaseHelper(context: Context) :
 
             cursor.moveToFirst()
 
-            try {
+            return try {
                 val catalogSongs = CatalogSongs(
                     cursor.getInt(cursor.getColumnIndex(CatalogSongs.COLUMN_ID)),
                     cursor.getLong(cursor.getColumnIndex(CatalogSongs.COLUMN_SONG_ID))
@@ -63,10 +98,10 @@ class CatalogSongsDatabaseHelper(context: Context) :
 
                 cursor.close()
 
-                return catalogSongs
+                catalogSongs
             } catch (e: IndexOutOfBoundsException) {
                 cursor.close()
-                return null
+                null
             }
         } catch (e: SQLiteException) {
             return null

@@ -80,7 +80,7 @@ class LoadSongListAsync(
             var finishedRequests = 0
             var totalRequestsCount = 0
 
-            val sortedList = arrayOfNulls<Long>(HomeHandler.loadMax)
+            val sortedList = arrayOfNulls<JSONObject>(HomeHandler.loadMax)
 
             val requests = ArrayList<StringRequest>()
 
@@ -92,11 +92,16 @@ class LoadSongListAsync(
                 //check if all done
                 if (finishedRequests >= totalRequestsCount) {
                     sortedList.reverse()
-                    for (i in sortedList) {
-                        if (i != null) {
-                            if (catalogSongsDatabaseHelper.getCatalogSong(i) == null) {
-                                catalogSongsDatabaseHelper.insertSong(i)
-                            }
+
+                    val jsonParser = JSONParser()
+
+                    for (jsonObject in sortedList) {
+                        if (jsonObject != null) {
+
+                            jsonParser.parseCatalogSongToDB(
+                                jsonObject,
+                                contextReference.get()!!
+                            )
                         }
                     }
 
@@ -119,15 +124,7 @@ class LoadSongListAsync(
 
                         //parse every single song into list
                         for (k in (0 until jsonArray.length())) {
-                            val jsonParser = JSONParser()
-
-                            val dbId = jsonParser.parseCatalogSongToDB(
-                                jsonArray.getJSONObject(k),
-                                contextReference.get()!!
-                            )
-                            dbIds.add(dbId)
-
-                            sortedList[i * 50 + k] = dbId
+                            sortedList[i * 50 + k] = jsonArray.getJSONObject(k)
                         }
 
                     }, Response.ErrorListener { }

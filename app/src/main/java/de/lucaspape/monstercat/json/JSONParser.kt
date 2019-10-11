@@ -82,11 +82,21 @@ class JSONParser {
             version = ""
         }
 
+        val songId:Long
+
         val databaseHelper = SongDatabaseHelper(context)
-        return if (databaseHelper.getSong(id) == null) {
+        songId = if (databaseHelper.getSong(id) == null) {
             databaseHelper.insertSong(id, title, version, albumId, artist, coverUrl)
         } else {
             databaseHelper.getSong(id)!!.id.toLong()
+        }
+
+        val catalogSongsDatabaseHelper = CatalogSongsDatabaseHelper(context)
+
+        return if(catalogSongsDatabaseHelper.getCatalogSongFromSongID(songId) == null){
+            catalogSongsDatabaseHelper.insertSong(songId)
+        }else{
+            catalogSongsDatabaseHelper.getCatalogSongFromSongID(songId)!!.id.toLong()
         }
     }
 

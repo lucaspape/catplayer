@@ -35,7 +35,6 @@ class PlaylistSongsDatabaseHelper(context: Context, var playlistId: String) :
         val id = db.insert(PlaylistSongs.TABLE_NAME, null, values)
         db.close()
         return id
-
     }
 
     fun getPlaylistData(id: Int): PlaylistSongs? {
@@ -70,7 +69,6 @@ class PlaylistSongsDatabaseHelper(context: Context, var playlistId: String) :
         }
     }
 
-    // @Suppress("unused")
     fun getPlaylistData(songId: Long): PlaylistSongs? {
         val db = readableDatabase
         val cursor: Cursor
@@ -81,7 +79,7 @@ class PlaylistSongsDatabaseHelper(context: Context, var playlistId: String) :
                     PlaylistSongs.COLUMN_ID,
                     PlaylistSongs.COLUMN_SONG_ID
                 ),
-                Song.COLUMN_SONG_ID + "=?",
+                PlaylistSongs.COLUMN_SONG_ID + "=?",
                 arrayOf(songId.toString()), null, null, null, null
             )
 
