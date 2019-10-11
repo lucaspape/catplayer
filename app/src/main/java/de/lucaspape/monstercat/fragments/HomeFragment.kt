@@ -40,7 +40,7 @@ class HomeFragment : Fragment() {
         if(settings.getSetting("albumViewSelected") != null){
             HomeHandler.albumViewSelected = settings.getSetting("albumViewSelected")!!.toBoolean()
         }
-        
+
         homeHandler.setupListView(view)
         homeHandler.setupSpinner(view)
         homeHandler.registerListeners(view)
@@ -62,9 +62,12 @@ class HomeFragment : Fragment() {
         menuInfo: ContextMenu.ContextMenuInfo?
     ) {
         super.onCreateContextMenu(menu, v, menuInfo)
-        menu.add(0, v.id, 0, getString(R.string.download))
-        menu.add(0, v.id, 0, getString(R.string.playNext))
-        menu.add(0, v.id, 0, getString(R.string.addToPlaylist))
+
+        if(!HomeHandler.albumView){
+            menu.add(0, v.id, 0, getString(R.string.download))
+            menu.add(0, v.id, 0, getString(R.string.playNext))
+            menu.add(0, v.id, 0, getString(R.string.addToPlaylist))
+        }
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
