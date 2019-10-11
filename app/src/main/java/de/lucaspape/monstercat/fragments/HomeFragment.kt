@@ -14,6 +14,7 @@ import de.lucaspape.monstercat.database.SongDatabaseHelper
 import de.lucaspape.monstercat.handlers.addSongToPlaylist
 import de.lucaspape.monstercat.handlers.downloadSong
 import de.lucaspape.monstercat.handlers.playSongFromId
+import de.lucaspape.monstercat.settings.Settings
 
 class HomeFragment : Fragment() {
     private var listView: ListView? = null
@@ -35,17 +36,19 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val settings = Settings(view.context)
+        if(settings.getSetting("albumViewSelected") != null){
+            HomeHandler.albumViewSelected = settings.getSetting("albumViewSelected")!!.toBoolean()
+        }
+        
         homeHandler.setupListView(view)
         homeHandler.setupSpinner(view)
         homeHandler.registerListeners(view)
         homeHandler.setupMusicPlayer(view)
 
-        if (!HomeHandler.albumViewSelected) {
-            listView = view.findViewById(R.id.musiclistview)
-
-            //TODO context menu for album view
-            registerForContextMenu(listView as ListView)
-        }
+        //TODO context menu for album view
+        listView = view.findViewById(R.id.musiclistview)
+        registerForContextMenu(listView as ListView)
 
         val settingButton = view.findViewById<ImageButton>(R.id.settingsButton)
         settingButton.setOnClickListener {
