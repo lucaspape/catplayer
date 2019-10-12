@@ -4,12 +4,10 @@ import android.content.Context
 import android.os.AsyncTask
 import android.view.View
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.android.volley.AuthFailureError
 import com.android.volley.Response
 import com.android.volley.Request
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.auth.loggedIn
 import de.lucaspape.monstercat.auth.sid
 import de.lucaspape.monstercat.database.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.handlers.PlaylistHandler

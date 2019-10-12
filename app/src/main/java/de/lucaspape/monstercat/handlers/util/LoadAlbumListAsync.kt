@@ -10,7 +10,6 @@ import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.auth.loggedIn
 import de.lucaspape.monstercat.auth.sid
 import de.lucaspape.monstercat.database.AlbumDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadCoverArray

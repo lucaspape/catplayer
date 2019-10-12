@@ -4,12 +4,10 @@ import android.content.Context
 import android.os.AsyncTask
 import android.view.View
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.android.volley.AuthFailureError
 import com.android.volley.Response
 import com.android.volley.Request
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.auth.loggedIn
 import de.lucaspape.monstercat.auth.sid
 import de.lucaspape.monstercat.database.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadCoverArray
@@ -89,19 +87,19 @@ class LoadAlbumAsync(
             val requestUrl =
                 contextReference.get()!!.getString(R.string.loadSongsUrl) + "?albumId=" + albumId
 
-            val listRequest =  MonstercatRequest(
+            val listRequest = MonstercatRequest(
                 Request.Method.GET, requestUrl, sid, Response.Listener { response ->
                     val json = JSONObject(response)
                     val jsonArray = json.getJSONArray("results")
 
+                    val jsonParser = JSONParser()
+
                     //parse every single song into list
                     for (k in (0 until jsonArray.length())) {
-                        val jsonParser = JSONParser()
-                        val songId =
-                            jsonParser.parseCatalogSongToDB(
-                                jsonArray.getJSONObject(k),
-                                contextReference.get()!!
-                            )
+                        jsonParser.parseCatalogSongToDB(
+                            jsonArray.getJSONObject(k),
+                            contextReference.get()!!
+                        )
                     }
 
                 }, Response.ErrorListener { }

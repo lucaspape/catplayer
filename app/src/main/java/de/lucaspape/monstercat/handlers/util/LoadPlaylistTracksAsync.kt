@@ -4,12 +4,10 @@ import android.content.Context
 import android.os.AsyncTask
 import android.view.View
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.android.volley.AuthFailureError
 import com.android.volley.Response
 import com.android.volley.Request
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.auth.loggedIn
 import de.lucaspape.monstercat.auth.sid
 import de.lucaspape.monstercat.database.PlaylistSongsDatabaseHelper
 import de.lucaspape.monstercat.database.SongDatabaseHelper
@@ -81,13 +79,15 @@ class LoadPlaylistTracksAsync(
 
             var trackCount = 0
 
-            val trackCountRequest = MonstercatRequest(Request.Method.GET, contextReference.get()!!.getString(R.string.playlistsUrl), sid,
+            val trackCountRequest = MonstercatRequest(Request.Method.GET,
+                contextReference.get()!!.getString(R.string.playlistsUrl),
+                sid,
                 Response.Listener { response ->
                     val jsonObject = JSONObject(response)
                     val jsonArray = jsonObject.getJSONArray("results")
 
-                    for(i in (0 until jsonArray.length())){
-                        if(jsonArray.getJSONObject(i).getString("_id") == playlistId){
+                    for (i in (0 until jsonArray.length())) {
+                        if (jsonArray.getJSONObject(i).getString("_id") == playlistId) {
                             println(jsonArray.getJSONObject(i).getJSONArray("tracks"))
                             val tracks = jsonArray.getJSONObject(i).getJSONArray("tracks")
                             trackCount = tracks.length()
@@ -95,7 +95,7 @@ class LoadPlaylistTracksAsync(
                         }
                     }
                 },
-                Response.ErrorListener {  })
+                Response.ErrorListener { })
 
 
             trackCountRequestQueue.addRequestFinishedListener<Any> {
@@ -112,7 +112,7 @@ class LoadPlaylistTracksAsync(
                     finishedRequests++
 
                     if (finishedRequests >= totalRequestsCount) {
-                        synchronized(syncObject){
+                        synchronized(syncObject) {
                             syncObject.notify()
                         }
                     } else {
@@ -130,10 +130,11 @@ class LoadPlaylistTracksAsync(
                             val jsonObject = JSONObject(response)
                             val jsonArray = jsonObject.getJSONArray("results")
 
+                            val jsonParser = JSONParser()
+
                             for (k in (0 until jsonArray.length())) {
                                 val playlistObject = jsonArray.getJSONObject(k)
 
-                                val jsonParser = JSONParser()
                                 val id = jsonParser.parsePlaylistTrackToDB(
                                     playlistId,
                                     playlistObject,
@@ -157,7 +158,7 @@ class LoadPlaylistTracksAsync(
             trackCountRequestQueue.add(trackCountRequest)
 
 
-            synchronized(syncObject){
+            synchronized(syncObject) {
                 syncObject.wait()
                 return null
             }
