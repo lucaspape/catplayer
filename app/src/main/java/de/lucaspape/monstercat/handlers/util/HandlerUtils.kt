@@ -6,7 +6,7 @@ import android.widget.Toast
 import com.android.volley.AuthFailureError
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
-import com.android.volley.toolbox.StringRequest
+import com.android.volley.Request
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.loggedIn
@@ -15,6 +15,7 @@ import de.lucaspape.monstercat.database.*
 import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.json.JSONParser
 import de.lucaspape.monstercat.music.addSong
+import de.lucaspape.monstercat.request.MonstercatRequest
 import de.lucaspape.monstercat.settings.Settings
 import org.json.JSONArray
 import org.json.JSONObject
@@ -47,8 +48,8 @@ fun playSongFromId(context: Context, songId: String, playNow: Boolean) {
             val streamHashUrl =
                 context.getString(R.string.loadSongsUrl) + "?albumId=" + song.albumId
 
-            val hashRequest = object : StringRequest(
-                Method.GET, streamHashUrl,
+            val hashRequest = MonstercatRequest(
+                Request.Method.GET, streamHashUrl, sid,
                 Response.Listener { response ->
                     val jsonObject = JSONObject(response)
 
@@ -68,17 +69,7 @@ fun playSongFromId(context: Context, songId: String, playNow: Boolean) {
                         //TODO msg
                     }
                 },
-                Response.ErrorListener { }) {
-                //add authentication
-                @Throws(AuthFailureError::class)
-                override fun getHeaders(): Map<String, String> {
-                    val params = HashMap<String, String>()
-                    if (loggedIn) {
-                        params["Cookie"] = "connect.sid=$sid"
-                    }
-                    return params
-                }
-            }
+                Response.ErrorListener { })
 
             streamHashQueue.add(hashRequest)
         }

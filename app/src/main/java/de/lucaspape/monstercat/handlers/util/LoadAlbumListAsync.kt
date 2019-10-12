@@ -5,7 +5,7 @@ import android.os.AsyncTask
 import android.view.View
 import android.widget.ListView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.android.volley.AuthFailureError
+import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
@@ -16,6 +16,7 @@ import de.lucaspape.monstercat.database.AlbumDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadCoverArray
 import de.lucaspape.monstercat.handlers.HomeHandler
 import de.lucaspape.monstercat.json.JSONParser
+import de.lucaspape.monstercat.request.MonstercatRequest
 import de.lucaspape.monstercat.settings.Settings
 import org.json.JSONObject
 import java.lang.ref.WeakReference
@@ -116,8 +117,8 @@ class LoadAlbumListAsync(
             for (i in (0 until HomeHandler.loadMax / 50)) {
                 val requestUrl =
                     contextReference.get()!!.getString(R.string.loadAlbumsUrl) + "?limit=50&skip=" + i * 50
-                val albumsRequest = object : StringRequest(
-                    Method.GET, requestUrl,
+                val albumsRequest = MonstercatRequest(
+                    Request.Method.GET, requestUrl, sid,
                     Response.Listener { response ->
                         val json = JSONObject(response)
                         val jsonArray = json.getJSONArray("results")
@@ -126,21 +127,10 @@ class LoadAlbumListAsync(
                             val jsonObject = jsonArray.getJSONObject(k)
 
                             tempList[i * 50 + k] = jsonObject
-                            //jsonParser.parseAlbumToDB(jsonObject, contextReference.get()!!)
                         }
                     },
                     Response.ErrorListener { }
-                ) {
-                    //add authentication
-                    @Throws(AuthFailureError::class)
-                    override fun getHeaders(): Map<String, String> {
-                        val params = HashMap<String, String>()
-                        if (loggedIn) {
-                            params["Cookie"] = "connect.sid=$sid"
-                        }
-                        return params
-                    }
-                }
+                )
 
                 totalRequestsCount++
 

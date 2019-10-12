@@ -6,7 +6,7 @@ import android.view.View
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.android.volley.AuthFailureError
 import com.android.volley.Response
-import com.android.volley.toolbox.StringRequest
+import com.android.volley.Request
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.loggedIn
@@ -17,6 +17,7 @@ import de.lucaspape.monstercat.database.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadCoverArray
 import de.lucaspape.monstercat.handlers.HomeHandler
 import de.lucaspape.monstercat.json.JSONParser
+import de.lucaspape.monstercat.request.MonstercatRequest
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
@@ -73,15 +74,13 @@ class LoadSongListAsync(
         } else {
             val requestQueue = Volley.newRequestQueue(contextReference.get()!!)
 
-            val dbIds = ArrayList<Long>()
-
             //if all finished continue
             var finishedRequests = 0
             var totalRequestsCount = 0
 
             val sortedList = arrayOfNulls<JSONObject>(HomeHandler.loadMax)
 
-            val requests = ArrayList<StringRequest>()
+            val requests = ArrayList<MonstercatRequest>()
 
             val syncObject = Object()
 
@@ -116,8 +115,9 @@ class LoadSongListAsync(
                 val requestUrl =
                     contextReference.get()!!.getString(R.string.loadSongsUrl) + "?limit=50&skip=" + i * 50
 
-                val listRequest = object : StringRequest(
-                    Method.GET, requestUrl, Response.Listener { response ->
+                val listRequest = MonstercatRequest(
+                    Request.Method.GET, requestUrl, sid,
+                    Response.Listener { response ->
                         val json = JSONObject(response)
                         val jsonArray = json.getJSONArray("results")
 
@@ -127,17 +127,7 @@ class LoadSongListAsync(
                         }
 
                     }, Response.ErrorListener { }
-                ) {
-                    //add authentication
-                    @Throws(AuthFailureError::class)
-                    override fun getHeaders(): Map<String, String> {
-                        val params = HashMap<String, String>()
-                        if (loggedIn) {
-                            params["Cookie"] = "connect.sid=$sid"
-                        }
-                        return params
-                    }
-                }
+                )
 
                 totalRequestsCount++
                 requests.add(listRequest)

@@ -6,7 +6,7 @@ import android.view.View
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.android.volley.AuthFailureError
 import com.android.volley.Response
-import com.android.volley.toolbox.StringRequest
+import com.android.volley.Request
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.loggedIn
@@ -14,6 +14,7 @@ import de.lucaspape.monstercat.auth.sid
 import de.lucaspape.monstercat.database.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.handlers.PlaylistHandler
 import de.lucaspape.monstercat.json.JSONParser
+import de.lucaspape.monstercat.request.MonstercatRequest
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
@@ -69,8 +70,8 @@ class LoadPlaylistAsync(
 
             val syncObject = Object()
 
-            val playlistRequest = object : StringRequest(
-                Method.GET, playlistUrl,
+            val playlistRequest =  MonstercatRequest(
+                Request.Method.GET, playlistUrl, sid,
                 Response.Listener { response ->
                     val jsonObject = JSONObject(response)
                     val jsonArray = jsonObject.getJSONArray("results")
@@ -89,18 +90,7 @@ class LoadPlaylistAsync(
                     }
 
                 },
-                Response.ErrorListener { }) {
-                @Throws(AuthFailureError::class)
-                override fun getHeaders(): Map<String, String> {
-                    val params = HashMap<String, String>()
-                    if (loggedIn) {
-                        params["Cookie"] = "connect.sid=$sid"
-                    }
-
-                    return params
-                }
-            }
-
+                Response.ErrorListener { })
             playlistRequestQueue.add(playlistRequest)
 
             synchronized(syncObject) {

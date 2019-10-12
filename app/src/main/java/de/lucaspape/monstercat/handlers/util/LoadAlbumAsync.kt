@@ -6,7 +6,7 @@ import android.view.View
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.android.volley.AuthFailureError
 import com.android.volley.Response
-import com.android.volley.toolbox.StringRequest
+import com.android.volley.Request
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.loggedIn
@@ -15,6 +15,7 @@ import de.lucaspape.monstercat.database.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadCoverArray
 import de.lucaspape.monstercat.handlers.HomeHandler
 import de.lucaspape.monstercat.json.JSONParser
+import de.lucaspape.monstercat.request.MonstercatRequest
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
@@ -88,8 +89,8 @@ class LoadAlbumAsync(
             val requestUrl =
                 contextReference.get()!!.getString(R.string.loadSongsUrl) + "?albumId=" + albumId
 
-            val listRequest = object : StringRequest(
-                Method.GET, requestUrl, Response.Listener { response ->
+            val listRequest =  MonstercatRequest(
+                Request.Method.GET, requestUrl, sid, Response.Listener { response ->
                     val json = JSONObject(response)
                     val jsonArray = json.getJSONArray("results")
 
@@ -104,17 +105,7 @@ class LoadAlbumAsync(
                     }
 
                 }, Response.ErrorListener { }
-            ) {
-                //add authentication
-                @Throws(AuthFailureError::class)
-                override fun getHeaders(): Map<String, String> {
-                    val params = HashMap<String, String>()
-                    if (loggedIn) {
-                        params["Cookie"] = "connect.sid=$sid"
-                    }
-                    return params
-                }
-            }
+            )
 
             requestQueue.add(listRequest)
 

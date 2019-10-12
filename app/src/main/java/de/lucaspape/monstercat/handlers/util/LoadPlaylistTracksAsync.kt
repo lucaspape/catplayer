@@ -6,7 +6,7 @@ import android.view.View
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.android.volley.AuthFailureError
 import com.android.volley.Response
-import com.android.volley.toolbox.StringRequest
+import com.android.volley.Request
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.loggedIn
@@ -16,6 +16,7 @@ import de.lucaspape.monstercat.database.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadCoverArray
 import de.lucaspape.monstercat.handlers.PlaylistHandler
 import de.lucaspape.monstercat.json.JSONParser
+import de.lucaspape.monstercat.request.MonstercatRequest
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
@@ -80,7 +81,7 @@ class LoadPlaylistTracksAsync(
 
             var trackCount = 0
 
-            val trackCountRequest = object:StringRequest(Method.GET, contextReference.get()!!.getString(R.string.playlistsUrl),
+            val trackCountRequest = MonstercatRequest(Request.Method.GET, contextReference.get()!!.getString(R.string.playlistsUrl), sid,
                 Response.Listener { response ->
                     val jsonObject = JSONObject(response)
                     val jsonArray = jsonObject.getJSONArray("results")
@@ -95,24 +96,13 @@ class LoadPlaylistTracksAsync(
                     }
                 },
                 Response.ErrorListener {  })
-            {
-                @Throws(AuthFailureError::class)
-                override fun getHeaders(): Map<String, String> {
-                    val params = HashMap<String, String>()
-                    if (loggedIn) {
-                        params["Cookie"] = "connect.sid=$sid"
-                    }
-
-                    return params
-                }
-            }
 
 
             trackCountRequestQueue.addRequestFinishedListener<Any> {
                 var finishedRequests = 0
                 var totalRequestsCount = 0
 
-                val requests = ArrayList<StringRequest>()
+                val requests = ArrayList<MonstercatRequest>()
 
                 val playlistTrackRequestQueue = Volley.newRequestQueue(contextReference.get()!!)
 
@@ -134,8 +124,8 @@ class LoadPlaylistTracksAsync(
                     val playlistTrackUrl =
                         contextReference.get()!!.getString(R.string.loadSongsUrl) + "?playlistId=" + playlistId + "&skip=" + (i * 50).toString() + "&limit=50"
 
-                    val playlistTrackRequest = object : StringRequest(
-                        Method.GET, playlistTrackUrl,
+                    val playlistTrackRequest = MonstercatRequest(
+                        Request.Method.GET, playlistTrackUrl, sid,
                         Response.Listener { response ->
                             val jsonObject = JSONObject(response)
                             val jsonArray = jsonObject.getJSONArray("results")
@@ -154,17 +144,7 @@ class LoadPlaylistTracksAsync(
                                 }
                             }
                         },
-                        Response.ErrorListener { }) {
-                        @Throws(AuthFailureError::class)
-                        override fun getHeaders(): Map<String, String> {
-                            val params = HashMap<String, String>()
-                            if (loggedIn) {
-                                params["Cookie"] = "connect.sid=$sid"
-                            }
-
-                            return params
-                        }
-                    }
+                        Response.ErrorListener { })
 
                     totalRequestsCount++
                     requests.add(playlistTrackRequest)
