@@ -26,7 +26,6 @@ class PlaylistHandler {
         private var simpleAdapter: SimpleAdapter? = null
 
         private var currentPlaylistId: String? = null
-        private var currentPlaylistTrackCount: Int? = null
 
         /**
          * Updates listView content
@@ -94,7 +93,7 @@ class PlaylistHandler {
             if (listViewDataIsPlaylistView) {
                 loadPlaylist(view, true, true)
             } else {
-                loadPlaylistTracks(view, true, currentPlaylistId!!, currentPlaylistTrackCount!!)
+                loadPlaylistTracks(view, true, currentPlaylistId!!)
             }
         }
 
@@ -103,8 +102,7 @@ class PlaylistHandler {
 
             if (listViewDataIsPlaylistView) {
                 currentPlaylistId = itemValue["playlistId"] as String
-                currentPlaylistTrackCount = itemValue["trackCount"] as Int
-                loadPlaylistTracks(view, false, currentPlaylistId!!, currentPlaylistTrackCount!!)
+                loadPlaylistTracks(view, false, currentPlaylistId!!)
             } else {
                 val songId = itemValue["id"] as String
                 playSongFromId(view.context, songId, true)
@@ -132,8 +130,7 @@ class PlaylistHandler {
     private fun loadPlaylistTracks(
         view: View,
         forceReload: Boolean,
-        playlistId: String,
-        trackCount: Int
+        playlistId: String
     ) {
         val contextReference = WeakReference<Context>(view.context)
         val viewReference = WeakReference<View>(view)
@@ -141,8 +138,7 @@ class PlaylistHandler {
             viewReference,
             contextReference,
             forceReload,
-            playlistId,
-            trackCount
+            playlistId
         ).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 }

@@ -23,8 +23,7 @@ class LoadPlaylistTracksAsync(
     private val viewReference: WeakReference<View>,
     private val contextReference: WeakReference<Context>,
     private val forceReload: Boolean,
-    private val playlistId: String,
-    private val trackCount: Int
+    private val playlistId: String
 ) : AsyncTask<Void, Void, String>() {
     override fun onPreExecute() {
         val swipeRefreshLayout =
@@ -74,74 +73,116 @@ class LoadPlaylistTracksAsync(
         if (!forceReload && playlistSongs.isNotEmpty()) {
             return null
         } else {
-            var finishedRequests = 0
-            var totalRequestsCount = 0
-
-            val requests = ArrayList<StringRequest>()
-
-            val playlistTrackRequestQueue = Volley.newRequestQueue(contextReference.get()!!)
-
-            val tempList = arrayOfNulls<Long>(trackCount)
 
             val syncObject = Object()
 
-            playlistTrackRequestQueue.addRequestFinishedListener<Any> {
-                finishedRequests++
+            val trackCountRequestQueue = Volley.newRequestQueue(contextReference.get()!!)
 
-                if (finishedRequests >= totalRequestsCount) {
-                    synchronized(syncObject){
-                        syncObject.notify()
+            var trackCount = 0
+
+            val trackCountRequest = object:StringRequest(Method.GET, contextReference.get()!!.getString(R.string.playlistsUrl),
+                Response.Listener { response ->
+                    val jsonObject = JSONObject(response)
+                    val jsonArray = jsonObject.getJSONArray("results")
+
+                    for(i in (0 until jsonArray.length())){
+                        if(jsonArray.getJSONObject(i).getString("_id") == playlistId){
+                            println(jsonArray.getJSONObject(i).getJSONArray("tracks"))
+                            val tracks = jsonArray.getJSONObject(i).getJSONArray("tracks")
+                            trackCount = tracks.length()
+                            break
+                        }
                     }
-                } else {
-                    playlistTrackRequestQueue.add(requests[finishedRequests])
+                },
+                Response.ErrorListener {  })
+            {
+                @Throws(AuthFailureError::class)
+                override fun getHeaders(): Map<String, String> {
+                    val params = HashMap<String, String>()
+                    if (loggedIn) {
+                        params["Cookie"] = "connect.sid=$sid"
+                    }
+
+                    return params
                 }
             }
 
-            for (i in (0..(trackCount / 50))) {
-                val playlistTrackUrl =
-                    contextReference.get()!!.getString(R.string.loadSongsUrl) + "?playlistId=" + playlistId + "&skip=" + (i * 50).toString() + "&limit=50"
 
-                val playlistTrackRequest = object : StringRequest(
-                    Method.GET, playlistTrackUrl,
-                    Response.Listener { response ->
-                        val jsonObject = JSONObject(response)
-                        val jsonArray = jsonObject.getJSONArray("results")
+            trackCountRequestQueue.addRequestFinishedListener<Any> {
+                var finishedRequests = 0
+                var totalRequestsCount = 0
 
-                        for (k in (0 until jsonArray.length())) {
-                            val playlistObject = jsonArray.getJSONObject(k)
+                val requests = ArrayList<StringRequest>()
 
-                            val jsonParser = JSONParser()
-                            val id = jsonParser.parsePlaylistTrackToDB(
-                                playlistId,
-                                playlistObject,
-                                contextReference.get()!!
-                            )
-                            if (id != null) {
-                                tempList[i * 50 + k] = id
+                val playlistTrackRequestQueue = Volley.newRequestQueue(contextReference.get()!!)
+
+                val tempList = arrayOfNulls<Long>(trackCount)
+
+                playlistTrackRequestQueue.addRequestFinishedListener<Any> {
+                    finishedRequests++
+
+                    if (finishedRequests >= totalRequestsCount) {
+                        synchronized(syncObject){
+                            syncObject.notify()
+                        }
+                    } else {
+                        playlistTrackRequestQueue.add(requests[finishedRequests])
+                    }
+                }
+
+                for (i in (0..(trackCount / 50))) {
+                    val playlistTrackUrl =
+                        contextReference.get()!!.getString(R.string.loadSongsUrl) + "?playlistId=" + playlistId + "&skip=" + (i * 50).toString() + "&limit=50"
+
+                    val playlistTrackRequest = object : StringRequest(
+                        Method.GET, playlistTrackUrl,
+                        Response.Listener { response ->
+                            val jsonObject = JSONObject(response)
+                            val jsonArray = jsonObject.getJSONArray("results")
+
+                            for (k in (0 until jsonArray.length())) {
+                                val playlistObject = jsonArray.getJSONObject(k)
+
+                                val jsonParser = JSONParser()
+                                val id = jsonParser.parsePlaylistTrackToDB(
+                                    playlistId,
+                                    playlistObject,
+                                    contextReference.get()!!
+                                )
+                                if (id != null) {
+                                    tempList[i * 50 + k] = id
+                                }
                             }
-                        }
-                    },
-                    Response.ErrorListener { }) {
-                    @Throws(AuthFailureError::class)
-                    override fun getHeaders(): Map<String, String> {
-                        val params = HashMap<String, String>()
-                        if (loggedIn) {
-                            params["Cookie"] = "connect.sid=$sid"
-                        }
+                        },
+                        Response.ErrorListener { }) {
+                        @Throws(AuthFailureError::class)
+                        override fun getHeaders(): Map<String, String> {
+                            val params = HashMap<String, String>()
+                            if (loggedIn) {
+                                params["Cookie"] = "connect.sid=$sid"
+                            }
 
-                        return params
+                            return params
+                        }
                     }
-                }
 
-                totalRequestsCount++
-                requests.add(playlistTrackRequest)
+                    totalRequestsCount++
+                    requests.add(playlistTrackRequest)
+                }
+                playlistTrackRequestQueue.add(requests[finishedRequests])
+
+
             }
-            playlistTrackRequestQueue.add(requests[finishedRequests])
+
+            trackCountRequestQueue.add(trackCountRequest)
+
 
             synchronized(syncObject){
                 syncObject.wait()
                 return null
             }
+
+
         }
     }
 
