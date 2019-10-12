@@ -12,7 +12,9 @@ This android app aims to implement the Monstercat API.
 
  - Full screen player
  - Continuous playback
-
+ - Delete songs in playlists
+ - Search
+ - Audio focus
 
 Disclamer: this is not an official app from monstercat.com!
 I am not responsible in any way for the content displayed in this app!
