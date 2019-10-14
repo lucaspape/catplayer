@@ -8,9 +8,9 @@ import androidx.fragment.app.Fragment
 import de.lucaspape.monstercat.handlers.HomeHandler
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.SongDatabaseHelper
-import de.lucaspape.monstercat.handlers.util.addSongToPlaylist
-import de.lucaspape.monstercat.handlers.util.downloadSong
-import de.lucaspape.monstercat.handlers.util.playSongFromId
+import de.lucaspape.monstercat.handlers.addSongToPlaylist
+import de.lucaspape.monstercat.handlers.downloadSong
+import de.lucaspape.monstercat.handlers.playSongFromId
 import de.lucaspape.monstercat.settings.Settings
 
 class HomeFragment : Fragment() {

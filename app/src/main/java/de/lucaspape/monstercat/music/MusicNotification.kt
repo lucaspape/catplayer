@@ -20,19 +20,19 @@ import de.lucaspape.monstercat.R
 import java.io.File
 
 //notification var
-const val channelID = "Music Notification"
-const val notificationID = 1
+internal const val channelID = "Music Notification"
+internal const val notificationID = 1
 
-const val NOTIFICATION_PREVIOUS = "de.lucaspape.monstercat.previous"
-const val NOTIFICATION_DELETE = "de.lucaspape.monstercat.delete"
-const val NOTIFICATION_PAUSE = "de.lucaspape.monstercat.pause"
-const val NOTIFICATION_PLAY = "de.lucaspape.monstercat.play"
-const val NOTIFICATION_NEXT = "de.lucaspape.monstercat.next"
+private const val NOTIFICATION_PREVIOUS = "de.lucaspape.monstercat.previous"
+private const val NOTIFICATION_DELETE = "de.lucaspape.monstercat.delete"
+private const val NOTIFICATION_PAUSE = "de.lucaspape.monstercat.pause"
+private const val NOTIFICATION_PLAY = "de.lucaspape.monstercat.play"
+private const val NOTIFICATION_NEXT = "de.lucaspape.monstercat.next"
 
 /**
  * Show notification
  */
-fun showSongNotification(
+internal fun showSongNotification(
     titleName: String,
     artistName: String,
     coverUrl: String,

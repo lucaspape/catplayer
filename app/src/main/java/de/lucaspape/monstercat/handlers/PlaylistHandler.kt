@@ -11,10 +11,9 @@ import android.widget.SimpleAdapter
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.activities.loadContinuousSongListAsyncTask
-import de.lucaspape.monstercat.handlers.util.LoadContinuousSongListAsync
-import de.lucaspape.monstercat.handlers.util.LoadPlaylistAsync
-import de.lucaspape.monstercat.handlers.util.LoadPlaylistTracksAsync
-import de.lucaspape.monstercat.handlers.util.playSongFromId
+import de.lucaspape.monstercat.handlers.async.LoadContinuousSongListAsync
+import de.lucaspape.monstercat.handlers.async.LoadPlaylistAsync
+import de.lucaspape.monstercat.handlers.async.LoadPlaylistTracksAsync
 import de.lucaspape.monstercat.music.clearContinuous
 import java.lang.ref.WeakReference
 
@@ -120,7 +119,10 @@ class PlaylistHandler {
                 }
 
                 loadContinuousSongListAsyncTask =
-                    LoadContinuousSongListAsync(continuousList, WeakReference(view.context))
+                    LoadContinuousSongListAsync(
+                        continuousList,
+                        WeakReference(view.context)
+                    )
                 loadContinuousSongListAsyncTask!!.executeOnExecutor(
                     AsyncTask.THREAD_POOL_EXECUTOR
                 )

@@ -9,9 +9,9 @@ import androidx.fragment.app.Fragment
 import de.lucaspape.monstercat.handlers.PlaylistHandler
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.SongDatabaseHelper
-import de.lucaspape.monstercat.handlers.util.downloadPlaylist
-import de.lucaspape.monstercat.handlers.util.downloadSong
-import de.lucaspape.monstercat.handlers.util.playSongFromId
+import de.lucaspape.monstercat.handlers.downloadPlaylist
+import de.lucaspape.monstercat.handlers.downloadSong
+import de.lucaspape.monstercat.handlers.playSongFromId
 import de.lucaspape.monstercat.settings.Settings
 
 class PlaylistFragment : Fragment() {

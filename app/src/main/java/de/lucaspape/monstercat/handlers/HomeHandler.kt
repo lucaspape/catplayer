@@ -12,7 +12,10 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.activities.PlayerFullscreenActivity
 import de.lucaspape.monstercat.activities.SettingsActivity
 import de.lucaspape.monstercat.activities.loadContinuousSongListAsyncTask
-import de.lucaspape.monstercat.handlers.util.*
+import de.lucaspape.monstercat.handlers.async.LoadAlbumAsync
+import de.lucaspape.monstercat.handlers.async.LoadAlbumListAsync
+import de.lucaspape.monstercat.handlers.async.LoadContinuousSongListAsync
+import de.lucaspape.monstercat.handlers.async.LoadSongListAsync
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.settings.Settings
 import java.lang.ref.WeakReference
@@ -190,7 +193,10 @@ class HomeHandler {
                 }
 
                 loadContinuousSongListAsyncTask =
-                    LoadContinuousSongListAsync(continuousList, WeakReference(view.context))
+                    LoadContinuousSongListAsync(
+                        continuousList,
+                        WeakReference(view.context)
+                    )
                 loadContinuousSongListAsyncTask!!.executeOnExecutor(
                     AsyncTask.THREAD_POOL_EXECUTOR
                 )

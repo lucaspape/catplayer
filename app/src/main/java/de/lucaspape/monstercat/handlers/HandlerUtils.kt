@@ -1,4 +1,4 @@
-package de.lucaspape.monstercat.handlers.util
+package de.lucaspape.monstercat.handlers
 
 import android.app.AlertDialog
 import android.content.Context
@@ -21,7 +21,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 
-fun playSongFromId(context: Context, songId: String, playNow: Boolean) {
+internal fun playSongFromId(context: Context, songId: String, playNow: Boolean) {
     val settings = Settings(context)
     val downloadType = settings.getSetting("downloadType")
 
@@ -80,7 +80,7 @@ fun playSongFromId(context: Context, songId: String, playNow: Boolean) {
     }
 }
 
-fun downloadPlaylist(context: Context, playlistId: String) {
+internal fun downloadPlaylist(context: Context, playlistId: String) {
     val playlistSongsDatabaseHelper = PlaylistSongsDatabaseHelper(context, playlistId)
     val playlistSongsList = playlistSongsDatabaseHelper.getAllData()
 
@@ -92,7 +92,7 @@ fun downloadPlaylist(context: Context, playlistId: String) {
     }
 }
 
-fun downloadSong(context: Context, song: Song) {
+internal fun downloadSong(context: Context, song: Song) {
     val settings = Settings(context)
 
     val downloadType = settings.getSetting("downloadType")
@@ -126,7 +126,7 @@ fun downloadSong(context: Context, song: Song) {
 
 }
 
-fun addSongToPlaylist(context: Context, song: Song) {
+internal fun addSongToPlaylist(context: Context, song: Song) {
     val playlistDatabaseHelper = PlaylistDatabaseHelper(context)
     val playlistList = playlistDatabaseHelper.getAllPlaylists()
 
