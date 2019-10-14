@@ -106,10 +106,10 @@ fun pause() {
         mediaPlayer.pause()
         showSongNotification(title, artist, coverUrl, false)
 
-        setPlayButtonImage()
-
         playing = false
         paused = true
+
+        setPlayButtonImage()
     } catch (e: IndexOutOfBoundsException) {
 
     }
@@ -146,9 +146,9 @@ fun resume() {
 
         showSongNotification(title, artist, coverUrl, true)
 
-        setPlayButtonImage()
-
         playing = true
+
+        setPlayButtonImage()
     } catch (e: IndexOutOfBoundsException) {
 
     }

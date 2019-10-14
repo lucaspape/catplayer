@@ -182,7 +182,7 @@ fun setFullscreenPlayButton(newPlayButton: ImageButton) {
     fullscreenPlayButtonReference = WeakReference(newPlayButton)
 }
 
-internal fun setTitle(title:String){
+internal fun setTitle(title: String) {
     try {
         textView1Reference!!.get()!!.text = title
     } catch (e: NullPointerException) {
@@ -207,7 +207,7 @@ internal fun setTitle(title:String){
     }
 }
 
-internal fun startTextAnimation(){
+internal fun startTextAnimation() {
     val valueAnimator = ValueAnimator.ofFloat(0.0f, 1.0f)
     valueAnimator.repeatCount = Animation.INFINITE
     valueAnimator.interpolator = LinearInterpolator()
@@ -261,7 +261,7 @@ internal fun startTextAnimation(){
     valueAnimator.start()
 }
 
-internal fun startSeekBarUpdate(){
+internal fun startSeekBarUpdate() {
     val seekBarUpdateHandler = Handler()
 
     val updateSeekBar = object : Runnable {
@@ -334,11 +334,12 @@ internal fun startSeekBarUpdate(){
     }
 }
 
-internal fun setCover(song: Song){
+internal fun setCover(song: Song) {
     val settings = Settings(contextReference!!.get()!!)
     val primaryResolution = settings.getSetting("primaryCoverResolution")
 
-    val coverFile = File(contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution)
+    val coverFile =
+        File(contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution)
 
     if (coverFile.exists()) {
         val bitmap = BitmapFactory.decodeFile(coverFile.absolutePath)
@@ -361,8 +362,8 @@ internal fun setCover(song: Song){
     }
 }
 
-internal fun setPlayButtonImage(){
-    if(playing){
+internal fun setPlayButtonImage() {
+    if (playing) {
         try {
             playButtonReference!!.get()!!.setImageDrawable(
                 ContextCompat.getDrawable(
@@ -386,7 +387,7 @@ internal fun setPlayButtonImage(){
         } catch (e: NullPointerException) {
 
         }
-    }else{
+    } else {
         try {
             playButtonReference!!.get()!!.setImageDrawable(
                 ContextCompat.getDrawable(
