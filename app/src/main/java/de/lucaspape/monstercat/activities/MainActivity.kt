@@ -27,7 +27,7 @@ import de.lucaspape.monstercat.music.createMediaSession
 import de.lucaspape.monstercat.settings.Settings
 import java.lang.ref.WeakReference
 
-var loadContinuousSongListAsyncTask:LoadContinuousSongListAsync? = null
+var loadContinuousSongListAsyncTask: LoadContinuousSongListAsync? = null
 
 /**
  * Main activity

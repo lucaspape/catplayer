@@ -6,9 +6,9 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.music.*
 import java.lang.ref.WeakReference
 
-class FullscreenPlayerHandler{
+class FullscreenPlayerHandler {
 
-    fun setupMusicPlayer(view:View) {
+    fun setupMusicPlayer(view: View) {
         val textview1 = view.findViewById<TextView>(R.id.fullscreenSongCurrent1)
         val textview2 = view.findViewById<TextView>(R.id.fullscreenSongCurrent2)
         val coverBarImageView = view.findViewById<ImageView>(R.id.fullscreenAlbumImage)
@@ -27,7 +27,7 @@ class FullscreenPlayerHandler{
 
     }
 
-    fun registerListeners(view:View){
+    fun registerListeners(view: View) {
         //music control buttons
         val playButton = view.findViewById<ImageButton>(R.id.fullScreenPlay)
         val backButton = view.findViewById<ImageButton>(R.id.fullscreenPrev)

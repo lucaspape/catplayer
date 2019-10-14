@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.AsyncTask
 import com.android.volley.Request
 import com.android.volley.Response
-import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.sid
@@ -17,7 +16,10 @@ import org.json.JSONObject
 import java.io.File
 import java.lang.ref.WeakReference
 
-class LoadContinuousSongListAsync (private val songIdList:ArrayList<String>, private val contextReference: WeakReference<Context>) : AsyncTask<Void, Void, String>(){
+class LoadContinuousSongListAsync(
+    private val songIdList: ArrayList<String>,
+    private val contextReference: WeakReference<Context>
+) : AsyncTask<Void, Void, String>() {
     override fun doInBackground(vararg params: Void?): String? {
         val context = contextReference.get()!!
 
@@ -31,14 +33,14 @@ class LoadContinuousSongListAsync (private val songIdList:ArrayList<String>, pri
         val syncObject = Object()
 
         streamHashQueue.addRequestFinishedListener<Any> {
-            synchronized(syncObject){
+            synchronized(syncObject) {
                 syncObject.notify()
             }
         }
 
-        for(songId in songIdList){
+        for (songId in songIdList) {
             val song = songDatabaseHelper.getSong(songId)
-            if(song != null){
+            if (song != null) {
                 //check if song is already downloaded
                 val songDownloadLocation =
                     context.filesDir.toString() + "/" + song.artist + song.title + song.version + "." + downloadType
@@ -64,7 +66,7 @@ class LoadContinuousSongListAsync (private val songIdList:ArrayList<String>, pri
                             if (streamHash != null) {
                                 song.streamLocation =
                                     context.getString(R.string.songStreamUrl) + streamHash
-                                    addContinuous(song)
+                                addContinuous(song)
                             } else {
                                 //could not find song
                                 //TODO msg
@@ -74,7 +76,7 @@ class LoadContinuousSongListAsync (private val songIdList:ArrayList<String>, pri
 
                     streamHashQueue.add(hashRequest)
 
-                    synchronized(syncObject){
+                    synchronized(syncObject) {
                         syncObject.wait()
                     }
                 }

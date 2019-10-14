@@ -18,7 +18,11 @@ class PlaylistFragment : Fragment() {
     private val playlistHandler = PlaylistHandler()
     private var playlistView: ListView? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? =
         inflater.inflate(R.layout.fragment_playlist, container, false)
 
     companion object {
@@ -81,7 +85,7 @@ class PlaylistFragment : Fragment() {
                 val songDatabaseHelper = SongDatabaseHelper(view!!.context)
                 val song = songDatabaseHelper.getSong(listItem["id"] as String)
 
-                if(song != null){
+                if (song != null) {
                     downloadSong(context!!, song)
                 }
             }

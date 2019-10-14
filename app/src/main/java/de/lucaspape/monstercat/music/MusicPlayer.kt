@@ -530,49 +530,49 @@ private fun stop() {
     val context = contextReference!!.get()!!
     playing = false
 
-    try{
+    try {
         textView1Reference!!.get()!!.text = ""
-    }catch (e: NullPointerException){
+    } catch (e: NullPointerException) {
 
     }
 
-    try{
+    try {
         textView2Reference!!.get()!!.text = ""
-    }catch (e: NullPointerException){
+    } catch (e: NullPointerException) {
 
     }
 
-    try{
+    try {
         fullscreenTextView1Reference!!.get()!!.text = ""
-    }catch (e: NullPointerException){
+    } catch (e: NullPointerException) {
 
     }
 
-    try{
+    try {
         fullscreenTextView2Reference!!.get()!!.text = ""
-    }catch (e: NullPointerException){
+    } catch (e: NullPointerException) {
 
     }
 
-    try{
+    try {
         playButtonReference!!.get()!!.setImageDrawable(
             ContextCompat.getDrawable(
                 context,
                 R.drawable.ic_play_arrow_black_24dp
             )
         )
-    }catch (e: NullPointerException){
+    } catch (e: NullPointerException) {
 
     }
 
-    try{
+    try {
         fullscreenPlayButtonReference!!.get()!!.setImageDrawable(
             ContextCompat.getDrawable(
                 context,
                 R.drawable.ic_play_arrow_black_24dp
             )
         )
-    }catch (e: NullPointerException){
+    } catch (e: NullPointerException) {
 
     }
 
@@ -598,25 +598,25 @@ fun pause() {
         showSongNotification(title, artist, coverUrl, false)
 
 
-        try{
+        try {
             playButtonReference!!.get()!!.setImageDrawable(
                 ContextCompat.getDrawable(
                     context,
                     R.drawable.ic_play_arrow_white_24dp
                 )
             )
-        }catch (e: NullPointerException){
+        } catch (e: NullPointerException) {
 
         }
 
-        try{
+        try {
             fullscreenPlayButtonReference!!.get()!!.setImageDrawable(
                 ContextCompat.getDrawable(
                     context,
                     R.drawable.ic_play_arrow_black_24dp
                 )
             )
-        }catch (e: NullPointerException){
+        } catch (e: NullPointerException) {
 
         }
 
@@ -659,25 +659,25 @@ fun resume() {
 
         showSongNotification(title, artist, coverUrl, true)
 
-        try{
+        try {
             playButtonReference!!.get()!!.setImageDrawable(
                 ContextCompat.getDrawable(
                     context,
                     R.drawable.ic_pause_white_24dp
                 )
             )
-        }catch (e: NullPointerException){
+        } catch (e: NullPointerException) {
 
         }
 
-        try{
+        try {
             fullscreenPlayButtonReference!!.get()!!.setImageDrawable(
                 ContextCompat.getDrawable(
                     context,
                     R.drawable.ic_pause_black_24dp
                 )
             )
-        }catch (e: NullPointerException){
+        } catch (e: NullPointerException) {
 
         }
 
@@ -731,9 +731,9 @@ fun addSong(song: Song) {
 }
 
 fun clearContinuous() {
-    try{
+    try {
         loadContinuousSongListAsyncTask!!.cancel(true)
-    }catch (e: NullPointerException){
+    } catch (e: NullPointerException) {
 
     }
 

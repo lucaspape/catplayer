@@ -184,12 +184,13 @@ class HomeHandler {
 
                 val continuousList = ArrayList<String>()
 
-                for(i in (position + 1 until musicList.adapter.count)){
+                for (i in (position + 1 until musicList.adapter.count)) {
                     val nextItemValue = musicList.getItemAtPosition(i) as HashMap<String, Any?>
                     continuousList.add(nextItemValue["id"] as String)
                 }
 
-                loadContinuousSongListAsyncTask =  LoadContinuousSongListAsync(continuousList, WeakReference(view.context))
+                loadContinuousSongListAsyncTask =
+                    LoadContinuousSongListAsync(continuousList, WeakReference(view.context))
                 loadContinuousSongListAsyncTask!!.executeOnExecutor(
                     AsyncTask.THREAD_POOL_EXECUTOR
                 )
@@ -288,8 +289,14 @@ class HomeHandler {
         val listView = view.findViewById<ListView>(R.id.musiclistview)
 
         val settings = Settings(view.context)
-        settings.saveSetting("currentListAlbumViewLastScrollIndex", listView.firstVisiblePosition.toString())
-        settings.saveSetting("currentListAlbumViewTop", (listView.getChildAt(0).top - listView.paddingTop).toString())
+        settings.saveSetting(
+            "currentListAlbumViewLastScrollIndex",
+            listView.firstVisiblePosition.toString()
+        )
+        settings.saveSetting(
+            "currentListAlbumViewTop",
+            (listView.getChildAt(0).top - listView.paddingTop).toString()
+        )
 
         val contextReference = WeakReference<Context>(view.context)
         val viewReference = WeakReference<View>(view)

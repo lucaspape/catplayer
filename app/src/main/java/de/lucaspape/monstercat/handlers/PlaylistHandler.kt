@@ -114,12 +114,13 @@ class PlaylistHandler {
 
                 val continuousList = ArrayList<String>()
 
-                for(i in (position + 1 until playlistList.adapter.count)){
+                for (i in (position + 1 until playlistList.adapter.count)) {
                     val nextItemValue = playlistList.getItemAtPosition(i) as HashMap<String, Any?>
                     continuousList.add(nextItemValue["id"] as String)
                 }
 
-                loadContinuousSongListAsyncTask =  LoadContinuousSongListAsync(continuousList, WeakReference(view.context))
+                loadContinuousSongListAsyncTask =
+                    LoadContinuousSongListAsync(continuousList, WeakReference(view.context))
                 loadContinuousSongListAsyncTask!!.executeOnExecutor(
                     AsyncTask.THREAD_POOL_EXECUTOR
                 )

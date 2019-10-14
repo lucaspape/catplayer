@@ -16,9 +16,4 @@ class PlayerFullscreenActivity : AppCompatActivity() {
         fullscreenPlayerHandler.setupMusicPlayer(window.decorView.rootView)
         fullscreenPlayerHandler.registerListeners(window.decorView.rootView)
     }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-    }
-
 }

@@ -1,15 +1,12 @@
 package de.lucaspape.monstercat.fragments
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import android.widget.AdapterView
-import android.widget.ImageButton
 import android.widget.ListView
 import androidx.fragment.app.Fragment
 import de.lucaspape.monstercat.handlers.HomeHandler
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.activities.SettingsActivity
 import de.lucaspape.monstercat.database.SongDatabaseHelper
 import de.lucaspape.monstercat.handlers.util.addSongToPlaylist
 import de.lucaspape.monstercat.handlers.util.downloadSong
@@ -37,7 +34,7 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val settings = Settings(view.context)
-        if(settings.getSetting("albumViewSelected") != null){
+        if (settings.getSetting("albumViewSelected") != null) {
             HomeHandler.albumViewSelected = settings.getSetting("albumViewSelected")!!.toBoolean()
         }
 
@@ -58,7 +55,7 @@ class HomeFragment : Fragment() {
     ) {
         super.onCreateContextMenu(menu, v, menuInfo)
 
-        if(!HomeHandler.albumView){
+        if (!HomeHandler.albumView) {
             menu.add(0, v.id, 0, getString(R.string.download))
             menu.add(0, v.id, 0, getString(R.string.playNext))
             menu.add(0, v.id, 0, getString(R.string.addToPlaylist))
