@@ -574,6 +574,7 @@ fun addSong(song: Song) {
 
 fun clearContinuous() {
     playList = ArrayList(playList.subList(0, currentContinuousPoint))
+    currentSong -= currentContinuousPoint
     currentContinuousPoint = 0
 }
 

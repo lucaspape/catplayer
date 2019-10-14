@@ -22,7 +22,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 
-fun playSongFromId(context: Context, songId: String, playNow: Boolean, continuous:Boolean) {
+fun playSongFromId(context: Context, songId: String, playNow: Boolean) {
     val settings = Settings(context)
     val downloadType = settings.getSetting("downloadType")
 
@@ -36,15 +36,13 @@ fun playSongFromId(context: Context, songId: String, playNow: Boolean, continuou
 
         if (File(songDownloadLocation).exists()) {
             song.downloadLocation = songDownloadLocation
-            if(!continuous){
-                if (playNow) {
-                    de.lucaspape.monstercat.music.playNow(song)
-                } else {
-                    addSong(song)
-                }
-            }else{
-                addContinuous(song)
+
+            if (playNow) {
+                de.lucaspape.monstercat.music.playNow(song)
+            } else {
+                addSong(song)
             }
+
 
         } else {
             val streamHashQueue = Volley.newRequestQueue(context)
@@ -64,15 +62,13 @@ fun playSongFromId(context: Context, songId: String, playNow: Boolean, continuou
                     if (streamHash != null) {
                         song.streamLocation =
                             context.getString(R.string.songStreamUrl) + streamHash
-                        if(!continuous){
-                            if (playNow) {
-                                de.lucaspape.monstercat.music.playNow(song)
-                            } else {
-                                addSong(song)
-                            }
-                        }else{
-                            addContinuous(song)
+
+                        if (playNow) {
+                            de.lucaspape.monstercat.music.playNow(song)
+                        } else {
+                            addSong(song)
                         }
+
                     } else {
                         //could not find song
                         //TODO msg

@@ -108,7 +108,7 @@ class PlaylistHandler {
                 clearContinuous()
 
                 val songId = itemValue["id"] as String
-                playSongFromId(view.context, songId, true, continuous = false)
+                playSongFromId(view.context, songId, true)
             }
         }
     }

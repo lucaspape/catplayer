@@ -90,7 +90,7 @@ class PlaylistFragment : Fragment() {
             playSongFromId(
                 context!!,
                 listItem["id"] as String,
-                false, continuous = false
+                false
             )
         }
 

@@ -83,7 +83,7 @@ class HomeFragment : Fragment() {
                 item.title == getString(R.string.playNext) -> playSongFromId(
                     context!!,
                     listItem["id"].toString(),
-                    false, continuous = false
+                    false
                 )
                 item.title == getString(R.string.addToPlaylist) -> addSongToPlaylist(
                     context!!,

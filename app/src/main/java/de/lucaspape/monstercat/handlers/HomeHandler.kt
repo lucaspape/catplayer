@@ -11,10 +11,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.activities.PlayerFullscreenActivity
 import de.lucaspape.monstercat.activities.SettingsActivity
-import de.lucaspape.monstercat.handlers.util.LoadAlbumAsync
-import de.lucaspape.monstercat.handlers.util.LoadAlbumListAsync
-import de.lucaspape.monstercat.handlers.util.LoadSongListAsync
-import de.lucaspape.monstercat.handlers.util.playSongFromId
+import de.lucaspape.monstercat.handlers.util.*
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.settings.Settings
 import java.lang.ref.WeakReference
@@ -181,17 +178,19 @@ class HomeHandler {
                 playSongFromId(
                     view.context,
                     itemValue["id"] as String,
-                    true, continuous = false
+                    true
                 )
+
+                val continuousList = ArrayList<String>()
 
                 for(i in (position + 1 until musicList.adapter.count)){
                     val nextItemValue = musicList.getItemAtPosition(i) as HashMap<String, Any?>
-                    playSongFromId(
-                        view.context,
-                        nextItemValue["id"] as String,
-                        true, continuous = true
-                    )
+                    continuousList.add(nextItemValue["id"] as String)
                 }
+
+                LoadContinuousSongListAsync(continuousList, WeakReference(view.context)).executeOnExecutor(
+                    AsyncTask.THREAD_POOL_EXECUTOR
+                )
             }
         }
 
