@@ -14,6 +14,7 @@ import de.lucaspape.monstercat.auth.sid
 import de.lucaspape.monstercat.database.*
 import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.json.JSONParser
+import de.lucaspape.monstercat.music.addContinuous
 import de.lucaspape.monstercat.music.addSong
 import de.lucaspape.monstercat.request.MonstercatRequest
 import de.lucaspape.monstercat.settings.Settings
@@ -21,7 +22,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 
-fun playSongFromId(context: Context, songId: String, playNow: Boolean) {
+fun playSongFromId(context: Context, songId: String, playNow: Boolean, continuous:Boolean) {
     val settings = Settings(context)
     val downloadType = settings.getSetting("downloadType")
 
@@ -35,10 +36,14 @@ fun playSongFromId(context: Context, songId: String, playNow: Boolean) {
 
         if (File(songDownloadLocation).exists()) {
             song.downloadLocation = songDownloadLocation
-            if (playNow) {
-                de.lucaspape.monstercat.music.playNow(song)
-            } else {
-                addSong(song)
+            if(!continuous){
+                if (playNow) {
+                    de.lucaspape.monstercat.music.playNow(song)
+                } else {
+                    addSong(song)
+                }
+            }else{
+                addContinuous(song)
             }
 
         } else {
@@ -59,10 +64,14 @@ fun playSongFromId(context: Context, songId: String, playNow: Boolean) {
                     if (streamHash != null) {
                         song.streamLocation =
                             context.getString(R.string.songStreamUrl) + streamHash
-                        if (playNow) {
-                            de.lucaspape.monstercat.music.playNow(song)
-                        } else {
-                            addSong(song)
+                        if(!continuous){
+                            if (playNow) {
+                                de.lucaspape.monstercat.music.playNow(song)
+                            } else {
+                                addSong(song)
+                            }
+                        }else{
+                            addContinuous(song)
                         }
                     } else {
                         //could not find song

@@ -33,7 +33,6 @@ import java.lang.ref.WeakReference
 import kotlin.collections.ArrayList
 
 var contextReference: WeakReference<Context>? = null
-var blackbuttons = false
 
 var textView1Reference: WeakReference<TextView>? = null
 var textView2Reference: WeakReference<TextView>? = null
@@ -42,8 +41,15 @@ var barCoverImageReference: WeakReference<ImageView>? = null
 var musicBarReference: WeakReference<androidx.appcompat.widget.Toolbar>? = null
 var playButtonReference: WeakReference<ImageButton>? = null
 
+var fullscreenTextView1Reference: WeakReference<TextView>? = null
+var fullscreenTextView2Reference: WeakReference<TextView>? = null
+var fullscreenSeekBarReference: WeakReference<SeekBar>? = null
+var fullscreenCoverReference: WeakReference<ImageView>? = null
+var fullscreenPlayButtonReference: WeakReference<ImageButton>? = null
+
 private var mediaPlayer = MediaPlayer()
 private var currentSong = 0
+private var currentContinuousPoint = 0
 private var playList = ArrayList<Song>(1)
 private var playing = false
 private var paused = false
@@ -131,6 +137,18 @@ fun setTextView(newTextView1: TextView, newTextView2: TextView) {
     textView2Reference = WeakReference(newTextView2)
 }
 
+fun setFullscreenTextView(newTextView1: TextView, newTextView2: TextView) {
+    try {
+        newTextView1.text = textView1Reference!!.get()!!.text
+        newTextView2.text = textView2Reference!!.get()!!.text
+    } catch (e: NullPointerException) {
+
+    }
+
+    fullscreenTextView1Reference = WeakReference(newTextView1)
+    fullscreenTextView2Reference = WeakReference(newTextView2)
+}
+
 fun setSeekBar(newSeekBar: SeekBar) {
     try {
         newSeekBar.progress = seekBarReference!!.get()!!.progress
@@ -154,6 +172,29 @@ fun setSeekBar(newSeekBar: SeekBar) {
     seekBarReference = WeakReference(newSeekBar)
 }
 
+fun setFullscreenSeekBar(newSeekBar: SeekBar) {
+    try {
+        newSeekBar.progress = seekBarReference!!.get()!!.progress
+    } catch (e: NullPointerException) {
+
+    }
+
+    newSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+            if (fromUser)
+                mediaPlayer.seekTo(progress)
+        }
+
+        override fun onStartTrackingTouch(seekBar: SeekBar) {
+        }
+
+        override fun onStopTrackingTouch(seekBar: SeekBar) {
+        }
+    })
+
+    fullscreenSeekBarReference = WeakReference(newSeekBar)
+}
+
 fun setBarCoverImageView(newImageView: ImageView) {
     try {
         newImageView.setImageDrawable(barCoverImageReference!!.get()!!.drawable)
@@ -162,6 +203,16 @@ fun setBarCoverImageView(newImageView: ImageView) {
     }
 
     barCoverImageReference = WeakReference(newImageView)
+}
+
+fun setFullscreenCoverImageView(newImageView: ImageView) {
+    try {
+        newImageView.setImageDrawable(barCoverImageReference!!.get()!!.drawable)
+    } catch (e: NullPointerException) {
+
+    }
+
+    fullscreenCoverReference = WeakReference(newImageView)
 }
 
 fun setMusicBar(newToolbar: androidx.appcompat.widget.Toolbar) {
@@ -174,42 +225,47 @@ fun setMusicBar(newToolbar: androidx.appcompat.widget.Toolbar) {
 }
 
 fun setPlayButton(newPlayButton: ImageButton) {
-    println("SETTTTITNGA")
-    if(playing){
-        if(blackbuttons){
-            newPlayButton.setImageDrawable(
-                ContextCompat.getDrawable(
-                    contextReference!!.get()!!,
-                    R.drawable.ic_pause_black_24dp
-                )
+    if (playing) {
+        newPlayButton.setImageDrawable(
+            ContextCompat.getDrawable(
+                contextReference!!.get()!!,
+                R.drawable.ic_pause_white_24dp
             )
-        }else{
-            newPlayButton.setImageDrawable(
-                ContextCompat.getDrawable(
-                    contextReference!!.get()!!,
-                    R.drawable.ic_pause_white_24dp
-                )
+        )
+
+    } else {
+        newPlayButton.setImageDrawable(
+            ContextCompat.getDrawable(
+                contextReference!!.get()!!,
+                R.drawable.ic_play_arrow_white_24dp
             )
-        }
-    }else{
-        if(blackbuttons){
-            newPlayButton.setImageDrawable(
-                ContextCompat.getDrawable(
-                    contextReference!!.get()!!,
-                    R.drawable.ic_play_arrow_black_24dp
-                )
-            )
-        }else{
-            newPlayButton.setImageDrawable(
-                ContextCompat.getDrawable(
-                    contextReference!!.get()!!,
-                    R.drawable.ic_play_arrow_white_24dp
-                )
-            )
-        }
+        )
+
     }
 
     playButtonReference = WeakReference(newPlayButton)
+}
+
+fun setFullscreenPlayButton(newPlayButton: ImageButton) {
+    if (playing) {
+        newPlayButton.setImageDrawable(
+            ContextCompat.getDrawable(
+                contextReference!!.get()!!,
+                R.drawable.ic_pause_black_24dp
+            )
+        )
+
+    } else {
+        newPlayButton.setImageDrawable(
+            ContextCompat.getDrawable(
+                contextReference!!.get()!!,
+                R.drawable.ic_play_arrow_black_24dp
+            )
+        )
+
+    }
+
+    fullscreenPlayButtonReference = WeakReference(newPlayButton)
 }
 
 /**
@@ -218,6 +274,7 @@ fun setPlayButton(newPlayButton: ImageButton) {
 private fun play() {
     try {
         val song = playList[currentSong]
+
         val settings = Settings(contextReference!!.get()!!)
         val url = song.getUrl()
 
@@ -233,10 +290,10 @@ private fun play() {
                 //TODO msg
                 println("DONT STREAM")
                 return
-            }else{
+            } else {
                 mediaPlayer.setDataSource(url)
             }
-        }else{
+        } else {
             val fis = FileInputStream(File(url))
             mediaPlayer.setDataSource(fis.fd)
         }
@@ -318,14 +375,8 @@ private fun play() {
             }
 
             showSongNotification(title, artist, coverUrl, true)
-            if(blackbuttons){
-                playButtonReference!!.get()!!.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        contextReference!!.get()!!,
-                        R.drawable.ic_pause_black_24dp
-                    )
-                )
-            }else{
+
+            if (playButtonReference != null && playButtonReference!!.get() != null) {
                 playButtonReference!!.get()!!.setImageDrawable(
                     ContextCompat.getDrawable(
                         contextReference!!.get()!!,
@@ -334,52 +385,18 @@ private fun play() {
                 )
             }
 
+            if (fullscreenPlayButtonReference != null && fullscreenPlayButtonReference!!.get() != null) {
+                fullscreenPlayButtonReference!!.get()!!.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        contextReference!!.get()!!,
+                        R.drawable.ic_pause_black_24dp
+                    )
+                )
+            }
         }
-
-
     } catch (e: IndexOutOfBoundsException) {
-        //TODO do something idk
+
     }
-}
-
-/**
- * SetPlayerState
- */
-private fun setPlayerState(progress: Long) {
-    val stateBuilder = PlaybackStateCompat.Builder()
-
-    val state: Int = if (playing) {
-        PlaybackState.STATE_PLAYING
-    } else {
-        PlaybackState.STATE_PAUSED
-    }
-
-    stateBuilder.setState(state, progress, 1.0f)
-    stateBuilder.setActions(
-        PlaybackStateCompat.ACTION_PLAY +
-                PlaybackStateCompat.ACTION_PAUSE +
-                PlaybackStateCompat.ACTION_SKIP_TO_NEXT +
-                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS +
-                PlaybackStateCompat.ACTION_STOP +
-                PlaybackStateCompat.ACTION_PLAY_PAUSE +
-                PlaybackStateCompat.ACTION_SEEK_TO +
-                PlaybackStateCompat.ACTION_FAST_FORWARD +
-                PlaybackStateCompat.ACTION_REWIND
-    )
-    mediaSession!!.setPlaybackState(stateBuilder.build())
-}
-
-/**
- * Set song metadata
- */
-private fun setSongMetadata(artist: String, title: String, coverImage: Bitmap?, duration: Long) {
-    val mediaMetadata = MediaMetadataCompat.Builder()
-    mediaMetadata.putString(MediaMetadata.METADATA_KEY_ARTIST, artist)
-    mediaMetadata.putString(MediaMetadata.METADATA_KEY_TITLE, title)
-    mediaMetadata.putLong(MediaMetadata.METADATA_KEY_DURATION, duration)
-    mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, coverImage)
-    mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ART, coverImage)
-    mediaSession!!.setMetadata(mediaMetadata.build())
 }
 
 /**
@@ -391,18 +408,20 @@ private fun stop() {
     textView1Reference!!.get()!!.text = ""
     textView2Reference!!.get()!!.text = ""
 
-    if(blackbuttons){
+    if (playButtonReference != null && playButtonReference!!.get() != null) {
         playButtonReference!!.get()!!.setImageDrawable(
             ContextCompat.getDrawable(
                 context,
                 R.drawable.ic_play_arrow_black_24dp
             )
         )
-    }else{
-        playButtonReference!!.get()!!.setImageDrawable(
+    }
+
+    if (fullscreenPlayButtonReference != null && fullscreenPlayButtonReference!!.get() != null) {
+        fullscreenPlayButtonReference!!.get()!!.setImageDrawable(
             ContextCompat.getDrawable(
                 context,
-                R.drawable.ic_play_arrow_white_24dp
+                R.drawable.ic_play_arrow_black_24dp
             )
         )
     }
@@ -428,14 +447,8 @@ fun pause() {
         mediaPlayer.pause()
         showSongNotification(title, artist, coverUrl, false)
 
-        if (blackbuttons){
-            playButtonReference!!.get()!!.setImageDrawable(
-                ContextCompat.getDrawable(
-                    context,
-                    R.drawable.ic_play_arrow_black_24dp
-                )
-            )
-        }else{
+
+        if(playButtonReference != null && playButtonReference!!.get() != null){
             playButtonReference!!.get()!!.setImageDrawable(
                 ContextCompat.getDrawable(
                     context,
@@ -443,6 +456,16 @@ fun pause() {
                 )
             )
         }
+
+        if(fullscreenPlayButtonReference != null && fullscreenPlayButtonReference!!.get() != null){
+            fullscreenPlayButtonReference!!.get()!!.setImageDrawable(
+                ContextCompat.getDrawable(
+                    context,
+                    R.drawable.ic_play_arrow_black_24dp
+                )
+            )
+        }
+
 
         playing = false
         paused = true
@@ -482,18 +505,20 @@ fun resume() {
 
         showSongNotification(title, artist, coverUrl, true)
 
-        if(blackbuttons){
-            playButtonReference!!.get()!!.setImageDrawable(
-                ContextCompat.getDrawable(
-                    context,
-                    R.drawable.ic_pause_black_24dp
-                )
-            )
-        }else{
+        if(playButtonReference != null && playButtonReference!!.get() != null){
             playButtonReference!!.get()!!.setImageDrawable(
                 ContextCompat.getDrawable(
                     context,
                     R.drawable.ic_pause_white_24dp
+                )
+            )
+        }
+
+        if(fullscreenPlayButtonReference != null && fullscreenPlayButtonReference!!.get() != null){
+            fullscreenPlayButtonReference!!.get()!!.setImageDrawable(
+                ContextCompat.getDrawable(
+                    context,
+                    R.drawable.ic_pause_black_24dp
                 )
             )
         }
@@ -543,6 +568,16 @@ fun playNow(song: Song) {
  * Play song after
  */
 fun addSong(song: Song) {
+    playList.add(currentContinuousPoint, song)
+    currentContinuousPoint++
+}
+
+fun clearContinuous() {
+    playList = ArrayList(playList.subList(0, currentContinuousPoint))
+    currentContinuousPoint = 0
+}
+
+fun addContinuous(song: Song) {
     playList.add(song)
 }
 
@@ -557,3 +592,42 @@ fun toggleMusic() {
     }
 }
 
+/**
+ * SetPlayerState
+ */
+private fun setPlayerState(progress: Long) {
+    val stateBuilder = PlaybackStateCompat.Builder()
+
+    val state: Int = if (playing) {
+        PlaybackState.STATE_PLAYING
+    } else {
+        PlaybackState.STATE_PAUSED
+    }
+
+    stateBuilder.setState(state, progress, 1.0f)
+    stateBuilder.setActions(
+        PlaybackStateCompat.ACTION_PLAY +
+                PlaybackStateCompat.ACTION_PAUSE +
+                PlaybackStateCompat.ACTION_SKIP_TO_NEXT +
+                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS +
+                PlaybackStateCompat.ACTION_STOP +
+                PlaybackStateCompat.ACTION_PLAY_PAUSE +
+                PlaybackStateCompat.ACTION_SEEK_TO +
+                PlaybackStateCompat.ACTION_FAST_FORWARD +
+                PlaybackStateCompat.ACTION_REWIND
+    )
+    mediaSession!!.setPlaybackState(stateBuilder.build())
+}
+
+/**
+ * Set song metadata
+ */
+private fun setSongMetadata(artist: String, title: String, coverImage: Bitmap?, duration: Long) {
+    val mediaMetadata = MediaMetadataCompat.Builder()
+    mediaMetadata.putString(MediaMetadata.METADATA_KEY_ARTIST, artist)
+    mediaMetadata.putString(MediaMetadata.METADATA_KEY_TITLE, title)
+    mediaMetadata.putLong(MediaMetadata.METADATA_KEY_DURATION, duration)
+    mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, coverImage)
+    mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ART, coverImage)
+    mediaSession!!.setMetadata(mediaMetadata.build())
+}

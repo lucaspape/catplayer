@@ -13,6 +13,7 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.handlers.util.LoadPlaylistAsync
 import de.lucaspape.monstercat.handlers.util.LoadPlaylistTracksAsync
 import de.lucaspape.monstercat.handlers.util.playSongFromId
+import de.lucaspape.monstercat.music.clearContinuous
 import java.lang.ref.WeakReference
 
 class PlaylistHandler {
@@ -104,8 +105,10 @@ class PlaylistHandler {
                 currentPlaylistId = itemValue["playlistId"] as String
                 loadPlaylistTracks(view, false, currentPlaylistId!!)
             } else {
+                clearContinuous()
+
                 val songId = itemValue["id"] as String
-                playSongFromId(view.context, songId, true)
+                playSongFromId(view.context, songId, true, continuous = false)
             }
         }
     }

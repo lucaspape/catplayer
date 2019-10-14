@@ -129,8 +129,6 @@ class HomeHandler {
 
         //setup musicPlayer
 
-        blackbuttons = false
-
         contextReference = (weakReference)
         setTextView(textview1, textview2)
         setSeekBar(seekBar)
@@ -177,12 +175,23 @@ class HomeHandler {
                 val itemValue = musicList.getItemAtPosition(position) as HashMap<String, Any?>
                 loadAlbum(view, itemValue, false)
             } else {
+                clearContinuous()
+
                 val itemValue = musicList.getItemAtPosition(position) as HashMap<String, Any?>
                 playSongFromId(
                     view.context,
                     itemValue["id"] as String,
-                    true
+                    true, continuous = false
                 )
+
+                for(i in (position + 1 until musicList.adapter.count)){
+                    val nextItemValue = musicList.getItemAtPosition(i) as HashMap<String, Any?>
+                    playSongFromId(
+                        view.context,
+                        nextItemValue["id"] as String,
+                        true, continuous = true
+                    )
+                }
             }
         }
 

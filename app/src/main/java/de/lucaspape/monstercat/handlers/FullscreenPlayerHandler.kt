@@ -19,13 +19,11 @@ class FullscreenPlayerHandler{
 
         //setup musicPlayer
 
-        blackbuttons = true
-
         contextReference = (weakReference)
-        setTextView(textview1, textview2)
-        setSeekBar(seekBar)
-        setBarCoverImageView(coverBarImageView)
-        setPlayButton(playButton)
+        setFullscreenTextView(textview1, textview2)
+        setFullscreenSeekBar(seekBar)
+        setFullscreenCoverImageView(coverBarImageView)
+        setFullscreenPlayButton(playButton)
 
     }
 
