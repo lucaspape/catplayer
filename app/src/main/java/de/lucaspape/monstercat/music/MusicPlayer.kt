@@ -33,12 +33,14 @@ import java.lang.ref.WeakReference
 import kotlin.collections.ArrayList
 
 var contextReference: WeakReference<Context>? = null
-private var textView1Reference: WeakReference<TextView>? = null
-private var textView2Reference: WeakReference<TextView>? = null
-private var seekBarReference: WeakReference<SeekBar>? = null
-private var barCoverImageReference: WeakReference<ImageView>? = null
-private var musicBarReference: WeakReference<androidx.appcompat.widget.Toolbar>? = null
-private var playButtonReference: WeakReference<ImageButton>? = null
+var blackbuttons = false
+
+var textView1Reference: WeakReference<TextView>? = null
+var textView2Reference: WeakReference<TextView>? = null
+var seekBarReference: WeakReference<SeekBar>? = null
+var barCoverImageReference: WeakReference<ImageView>? = null
+var musicBarReference: WeakReference<androidx.appcompat.widget.Toolbar>? = null
+var playButtonReference: WeakReference<ImageButton>? = null
 
 private var mediaPlayer = MediaPlayer()
 private var currentSong = 0
@@ -172,10 +174,39 @@ fun setMusicBar(newToolbar: androidx.appcompat.widget.Toolbar) {
 }
 
 fun setPlayButton(newPlayButton: ImageButton) {
-    try {
-        newPlayButton.setImageDrawable(playButtonReference!!.get()!!.drawable)
-    } catch (e: NullPointerException) {
-
+    println("SETTTTITNGA")
+    if(playing){
+        if(blackbuttons){
+            newPlayButton.setImageDrawable(
+                ContextCompat.getDrawable(
+                    contextReference!!.get()!!,
+                    R.drawable.ic_pause_black_24dp
+                )
+            )
+        }else{
+            newPlayButton.setImageDrawable(
+                ContextCompat.getDrawable(
+                    contextReference!!.get()!!,
+                    R.drawable.ic_pause_white_24dp
+                )
+            )
+        }
+    }else{
+        if(blackbuttons){
+            newPlayButton.setImageDrawable(
+                ContextCompat.getDrawable(
+                    contextReference!!.get()!!,
+                    R.drawable.ic_play_arrow_black_24dp
+                )
+            )
+        }else{
+            newPlayButton.setImageDrawable(
+                ContextCompat.getDrawable(
+                    contextReference!!.get()!!,
+                    R.drawable.ic_play_arrow_white_24dp
+                )
+            )
+        }
     }
 
     playButtonReference = WeakReference(newPlayButton)
@@ -287,12 +318,22 @@ private fun play() {
             }
 
             showSongNotification(title, artist, coverUrl, true)
-            playButtonReference!!.get()!!.setImageDrawable(
-                ContextCompat.getDrawable(
-                    contextReference!!.get()!!,
-                    R.drawable.ic_pause_white_24dp
+            if(blackbuttons){
+                playButtonReference!!.get()!!.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        contextReference!!.get()!!,
+                        R.drawable.ic_pause_black_24dp
+                    )
                 )
-            )
+            }else{
+                playButtonReference!!.get()!!.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        contextReference!!.get()!!,
+                        R.drawable.ic_pause_white_24dp
+                    )
+                )
+            }
+
         }
 
 
@@ -349,12 +390,23 @@ private fun stop() {
     playing = false
     textView1Reference!!.get()!!.text = ""
     textView2Reference!!.get()!!.text = ""
-    playButtonReference!!.get()!!.setImageDrawable(
-        ContextCompat.getDrawable(
-            context,
-            R.drawable.ic_play_arrow_white_24dp
+
+    if(blackbuttons){
+        playButtonReference!!.get()!!.setImageDrawable(
+            ContextCompat.getDrawable(
+                context,
+                R.drawable.ic_play_arrow_black_24dp
+            )
         )
-    )
+    }else{
+        playButtonReference!!.get()!!.setImageDrawable(
+            ContextCompat.getDrawable(
+                context,
+                R.drawable.ic_play_arrow_white_24dp
+            )
+        )
+    }
+
     mediaPlayer.stop()
 }
 
@@ -375,12 +427,23 @@ fun pause() {
 
         mediaPlayer.pause()
         showSongNotification(title, artist, coverUrl, false)
-        playButtonReference!!.get()!!.setImageDrawable(
-            ContextCompat.getDrawable(
-                context,
-                R.drawable.ic_play_arrow_white_24dp
+
+        if (blackbuttons){
+            playButtonReference!!.get()!!.setImageDrawable(
+                ContextCompat.getDrawable(
+                    context,
+                    R.drawable.ic_play_arrow_black_24dp
+                )
             )
-        )
+        }else{
+            playButtonReference!!.get()!!.setImageDrawable(
+                ContextCompat.getDrawable(
+                    context,
+                    R.drawable.ic_play_arrow_white_24dp
+                )
+            )
+        }
+
         playing = false
         paused = true
     } catch (e: IndexOutOfBoundsException) {
@@ -418,12 +481,23 @@ fun resume() {
         }
 
         showSongNotification(title, artist, coverUrl, true)
-        playButtonReference!!.get()!!.setImageDrawable(
-            ContextCompat.getDrawable(
-                context,
-                R.drawable.ic_pause_white_24dp
+
+        if(blackbuttons){
+            playButtonReference!!.get()!!.setImageDrawable(
+                ContextCompat.getDrawable(
+                    context,
+                    R.drawable.ic_pause_black_24dp
+                )
             )
-        )
+        }else{
+            playButtonReference!!.get()!!.setImageDrawable(
+                ContextCompat.getDrawable(
+                    context,
+                    R.drawable.ic_pause_white_24dp
+                )
+            )
+        }
+
         playing = true
     } catch (e: IndexOutOfBoundsException) {
 

@@ -49,11 +49,6 @@ class HomeFragment : Fragment() {
         //TODO context menu for album view
         listView = view.findViewById(R.id.musiclistview)
         registerForContextMenu(listView as ListView)
-
-        val settingButton = view.findViewById<ImageButton>(R.id.settingsButton)
-        settingButton.setOnClickListener {
-            view.context.startActivity(Intent(view.context, SettingsActivity::class.java))
-        }
     }
 
     override fun onCreateContextMenu(

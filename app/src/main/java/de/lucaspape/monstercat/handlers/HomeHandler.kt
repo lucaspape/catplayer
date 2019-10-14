@@ -1,6 +1,7 @@
 package de.lucaspape.monstercat.handlers
 
 import android.content.Context
+import android.content.Intent
 import android.os.AsyncTask
 import android.os.Handler
 import android.os.Looper
@@ -8,6 +9,8 @@ import android.view.View
 import android.widget.*
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.activities.PlayerFullscreenActivity
+import de.lucaspape.monstercat.activities.SettingsActivity
 import de.lucaspape.monstercat.handlers.util.LoadAlbumAsync
 import de.lucaspape.monstercat.handlers.util.LoadAlbumListAsync
 import de.lucaspape.monstercat.handlers.util.LoadSongListAsync
@@ -118,13 +121,15 @@ class HomeHandler {
         val textview1 = view.findViewById<TextView>(R.id.songCurrent1)
         val textview2 = view.findViewById<TextView>(R.id.songCurrent2)
         val coverBarImageView = view.findViewById<ImageView>(R.id.barCoverImage)
-        val musicToolBar = view.findViewById<androidx.appcompat.widget.Toolbar>(R.id.muscicbar)
+        val musicToolBar = view.findViewById<androidx.appcompat.widget.Toolbar>(R.id.musicBar)
         val playButton = view.findViewById<ImageButton>(R.id.playButton)
         val seekBar = view.findViewById<SeekBar>(R.id.seekBar)
 
         val weakReference = WeakReference(view.context)
 
         //setup musicPlayer
+
+        blackbuttons = false
 
         contextReference = (weakReference)
         setTextView(textview1, textview2)
@@ -229,6 +234,14 @@ class HomeHandler {
                     loadSongList(view, false)
                 }
             }
+        }
+
+        view.findViewById<ImageButton>(R.id.settingsButton).setOnClickListener {
+            view.context.startActivity(Intent(view.context, SettingsActivity::class.java))
+        }
+
+        view.findViewById<androidx.appcompat.widget.Toolbar>(R.id.musicBar).setOnClickListener {
+            view.context.startActivity(Intent(view.context, PlayerFullscreenActivity::class.java))
         }
     }
 
