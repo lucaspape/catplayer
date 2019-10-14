@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.AsyncTask
 import com.android.volley.Request
 import com.android.volley.Response
+import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.sid
@@ -18,29 +19,39 @@ import java.lang.ref.WeakReference
 
 class LoadContinuousSongListAsync (private val songIdList:ArrayList<String>, private val contextReference: WeakReference<Context>) : AsyncTask<Void, Void, String>(){
     override fun doInBackground(vararg params: Void?): String? {
-        val settings = Settings(contextReference.get()!!)
+        val context = contextReference.get()!!
+
+        val settings = Settings(context)
         val downloadType = settings.getSetting("downloadType")
 
-        val songDatabaseHelper = SongDatabaseHelper(contextReference.get()!!)
+        val songDatabaseHelper = SongDatabaseHelper(context)
+
+        val streamHashQueue = Volley.newRequestQueue(context)
+
+        val syncObject = Object()
+
+        streamHashQueue.addRequestFinishedListener<Any> {
+            synchronized(syncObject){
+                syncObject.notify()
+            }
+        }
 
         for(songId in songIdList){
             val song = songDatabaseHelper.getSong(songId)
-            val syncObject = Object()
-
             if(song != null){
                 //check if song is already downloaded
                 val songDownloadLocation =
-                    contextReference.get()!!.filesDir.toString() + "/" + song.artist + song.title + song.version + "." + downloadType
+                    context.filesDir.toString() + "/" + song.artist + song.title + song.version + "." + downloadType
 
                 if (File(songDownloadLocation).exists()) {
                     song.downloadLocation = songDownloadLocation
                     addContinuous(song)
                 } else {
-                    val streamHashQueue = Volley.newRequestQueue(contextReference.get()!!)
+
 
                     //get stream hash
                     val streamHashUrl =
-                        contextReference.get()!!.getString(R.string.loadSongsUrl) + "?albumId=" + song.albumId
+                        context.getString(R.string.loadSongsUrl) + "?albumId=" + song.albumId
 
                     val hashRequest = MonstercatRequest(
                         Request.Method.GET, streamHashUrl, sid,
@@ -52,7 +63,7 @@ class LoadContinuousSongListAsync (private val songIdList:ArrayList<String>, pri
 
                             if (streamHash != null) {
                                 song.streamLocation =
-                                    contextReference.get()!!.getString(R.string.songStreamUrl) + streamHash
+                                    context.getString(R.string.songStreamUrl) + streamHash
                                     addContinuous(song)
                             } else {
                                 //could not find song
@@ -61,18 +72,11 @@ class LoadContinuousSongListAsync (private val songIdList:ArrayList<String>, pri
                         },
                         Response.ErrorListener { })
 
-                    streamHashQueue.addRequestFinishedListener<Any> {
-                        synchronized(syncObject){
-                            syncObject.notify()
-                        }
-                    }
-
                     streamHashQueue.add(hashRequest)
 
                     synchronized(syncObject){
                         syncObject.wait()
                     }
-
                 }
             }
 
