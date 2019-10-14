@@ -315,9 +315,21 @@ private fun play() {
             val coverUrl =
                 contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
 
-            textView1Reference!!.get()!!.text = title
-            textView2Reference!!.get()!!.text = title
-            textView2Reference!!.get()!!.text = title
+            if(textView1Reference != null){
+                textView1Reference!!.get()!!.text = title
+            }
+
+            if(textView2Reference != null){
+                textView2Reference!!.get()!!.text = title
+            }
+
+            if(fullscreenTextView1Reference != null){
+                fullscreenTextView1Reference!!.get()!!.text = title
+            }
+
+            if(fullscreenTextView2Reference != null){
+                fullscreenTextView2Reference!!.get()!!.text = title
+            }
 
             val valueAnimator = ValueAnimator.ofFloat(0.0f, 1.0f)
             valueAnimator.repeatCount = Animation.INFINITE
@@ -325,10 +337,35 @@ private fun play() {
             valueAnimator.duration = 9000L
             valueAnimator.addUpdateListener { animation ->
                 val progress = animation.animatedValue as Float
-                val width = textView1Reference!!.get()!!.width
+
+                var width = 0
+
+                if(textView1Reference != null) {
+                    width = textView1Reference!!.get()!!.width
+                }
+
+                if(fullscreenTextView1Reference != null){
+                    width = fullscreenTextView1Reference!!.get()!!.width
+                }
+
+
                 val translationX = width * progress
-                textView1Reference!!.get()!!.translationX = translationX
-                textView2Reference!!.get()!!.translationX = translationX - width
+
+                if(textView1Reference != null){
+                    textView1Reference!!.get()!!.translationX = translationX
+                }
+
+                if(textView2Reference != null){
+                    textView2Reference!!.get()!!.translationX = translationX - width
+                }
+
+                if(fullscreenTextView1Reference != null){
+                    fullscreenTextView1Reference!!.get()!!.translationX = translationX
+                }
+
+                if(fullscreenTextView2Reference != null){
+                    fullscreenTextView2Reference!!.get()!!.translationX = translationX - width
+                }
             }
 
             valueAnimator.start()
@@ -341,8 +378,15 @@ private fun play() {
 
             val updateSeekBar = object : Runnable {
                 override fun run() {
-                    seekBarReference!!.get()!!.max = mediaPlayer.duration
-                    seekBarReference!!.get()!!.progress = mediaPlayer.currentPosition
+                    if(seekBarReference != null){
+                        seekBarReference!!.get()!!.max = mediaPlayer.duration
+                        seekBarReference!!.get()!!.progress = mediaPlayer.currentPosition
+                    }
+
+                    if(fullscreenSeekBarReference != null){
+                        fullscreenSeekBarReference!!.get()!!.max = mediaPlayer.duration
+                        fullscreenSeekBarReference!!.get()!!.progress = mediaPlayer.currentPosition
+                    }
                     setPlayerState(mediaPlayer.currentPosition.toLong())
 
                     seekbarUpdateHandler.postDelayed(this, 50)
@@ -351,25 +395,53 @@ private fun play() {
 
             seekbarUpdateHandler.postDelayed(updateSeekBar, 0)
 
-            seekBarReference!!.get()!!.setOnSeekBarChangeListener(object :
-                SeekBar.OnSeekBarChangeListener {
-                override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                    if (fromUser)
-                        mediaPlayer.seekTo(progress)
-                    setPlayerState(progress.toLong())
-                }
+            if(seekBarReference != null){
+                seekBarReference!!.get()!!.setOnSeekBarChangeListener(object :
+                    SeekBar.OnSeekBarChangeListener {
+                    override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                        if (fromUser)
+                            mediaPlayer.seekTo(progress)
+                        setPlayerState(progress.toLong())
+                    }
 
-                override fun onStartTrackingTouch(seekBar: SeekBar) {
-                }
+                    override fun onStartTrackingTouch(seekBar: SeekBar) {
+                    }
 
-                override fun onStopTrackingTouch(seekBar: SeekBar) {
-                }
-            })
+                    override fun onStopTrackingTouch(seekBar: SeekBar) {
+                    }
+                })
+            }
+
+            if(fullscreenSeekBarReference != null){
+                fullscreenSeekBarReference!!.get()!!.setOnSeekBarChangeListener(object :
+                    SeekBar.OnSeekBarChangeListener {
+                    override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                        if (fromUser)
+                            mediaPlayer.seekTo(progress)
+                        setPlayerState(progress.toLong())
+                    }
+
+                    override fun onStartTrackingTouch(seekBar: SeekBar) {
+                    }
+
+                    override fun onStopTrackingTouch(seekBar: SeekBar) {
+                    }
+                })
+            }
+
 
             val coverFile = File(coverUrl)
             if (coverFile.exists()) {
                 val bitmap = BitmapFactory.decodeFile(coverFile.absolutePath)
-                barCoverImageReference!!.get()!!.setImageBitmap(bitmap)
+
+                if(barCoverImageReference != null){
+                    barCoverImageReference!!.get()!!.setImageBitmap(bitmap)
+                }
+
+                if(fullscreenCoverReference != null){
+                    fullscreenCoverReference!!.get()!!.setImageBitmap(bitmap)
+                }
+
                 setSongMetadata(artist, title, bitmap, mediaPlayer.duration.toLong())
             } else {
                 setSongMetadata(artist, title, null, mediaPlayer.duration.toLong())
@@ -406,8 +478,22 @@ private fun play() {
 private fun stop() {
     val context = contextReference!!.get()!!
     playing = false
-    textView1Reference!!.get()!!.text = ""
-    textView2Reference!!.get()!!.text = ""
+
+    if(textView1Reference != null){
+        textView1Reference!!.get()!!.text = ""
+    }
+
+    if(textView2Reference != null){
+        textView2Reference!!.get()!!.text = ""
+    }
+
+    if(fullscreenTextView1Reference != null){
+        fullscreenTextView1Reference!!.get()!!.text = ""
+    }
+
+    if(fullscreenTextView2Reference != null){
+        fullscreenTextView2Reference!!.get()!!.text = ""
+    }
 
     if (playButtonReference != null && playButtonReference!!.get() != null) {
         playButtonReference!!.get()!!.setImageDrawable(
