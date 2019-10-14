@@ -21,10 +21,13 @@ import de.lucaspape.monstercat.download.DownloadTask
 import de.lucaspape.monstercat.fragments.HomeFragment
 import de.lucaspape.monstercat.fragments.PlaylistFragment
 import de.lucaspape.monstercat.handlers.HomeHandler
+import de.lucaspape.monstercat.handlers.util.LoadContinuousSongListAsync
 import de.lucaspape.monstercat.music.NoisyReceiver
 import de.lucaspape.monstercat.music.createMediaSession
 import de.lucaspape.monstercat.settings.Settings
 import java.lang.ref.WeakReference
+
+var loadContinuousSongListAsyncTask:LoadContinuousSongListAsync? = null
 
 /**
  * Main activity

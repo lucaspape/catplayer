@@ -23,6 +23,7 @@ import android.view.animation.LinearInterpolator
 import android.widget.*
 import androidx.core.content.ContextCompat
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.activities.loadContinuousSongListAsyncTask
 import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.settings.Settings
 import java.io.File
@@ -573,8 +574,12 @@ fun addSong(song: Song) {
 }
 
 fun clearContinuous() {
+    if(loadContinuousSongListAsyncTask != null){
+        loadContinuousSongListAsyncTask!!.cancel(true)
+    }
+
     playList = ArrayList(playList.subList(0, currentContinuousPoint))
-    currentSong -= currentContinuousPoint
+    currentSong = playList.size
     currentContinuousPoint = 0
 }
 

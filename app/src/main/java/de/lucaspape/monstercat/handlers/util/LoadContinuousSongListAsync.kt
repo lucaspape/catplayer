@@ -10,8 +10,6 @@ import de.lucaspape.monstercat.auth.sid
 import de.lucaspape.monstercat.database.SongDatabaseHelper
 import de.lucaspape.monstercat.json.JSONParser
 import de.lucaspape.monstercat.music.addContinuous
-import de.lucaspape.monstercat.music.addSong
-import de.lucaspape.monstercat.music.playNow
 import de.lucaspape.monstercat.request.MonstercatRequest
 import de.lucaspape.monstercat.settings.Settings
 import org.json.JSONObject
@@ -74,6 +72,7 @@ class LoadContinuousSongListAsync (private val songIdList:ArrayList<String>, pri
                     synchronized(syncObject){
                         syncObject.wait()
                     }
+
                 }
             }
 

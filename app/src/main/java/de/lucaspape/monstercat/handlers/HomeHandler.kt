@@ -11,6 +11,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.activities.PlayerFullscreenActivity
 import de.lucaspape.monstercat.activities.SettingsActivity
+import de.lucaspape.monstercat.activities.loadContinuousSongListAsyncTask
 import de.lucaspape.monstercat.handlers.util.*
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.settings.Settings
@@ -188,7 +189,8 @@ class HomeHandler {
                     continuousList.add(nextItemValue["id"] as String)
                 }
 
-                LoadContinuousSongListAsync(continuousList, WeakReference(view.context)).executeOnExecutor(
+                loadContinuousSongListAsyncTask =  LoadContinuousSongListAsync(continuousList, WeakReference(view.context))
+                loadContinuousSongListAsyncTask!!.executeOnExecutor(
                     AsyncTask.THREAD_POOL_EXECUTOR
                 )
             }
