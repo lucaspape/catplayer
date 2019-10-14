@@ -10,8 +10,6 @@ This android app aims to implement the Monstercat API.
 
 ## Todo
 
- - Full screen player
- - Continuous playback
  - Delete songs in playlists
  - Search
  - Audio focus
