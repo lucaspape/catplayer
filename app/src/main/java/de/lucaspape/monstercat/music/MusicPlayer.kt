@@ -315,20 +315,27 @@ private fun play() {
             val coverUrl =
                 contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
 
-            if(textView1Reference != null){
+            try {
                 textView1Reference!!.get()!!.text = title
-            }
+            } catch (e: NullPointerException) {
 
-            if(textView2Reference != null){
+            }
+            try {
                 textView2Reference!!.get()!!.text = title
+            } catch (e: NullPointerException) {
+
             }
 
-            if(fullscreenTextView1Reference != null){
+            try {
                 fullscreenTextView1Reference!!.get()!!.text = title
+            } catch (e: NullPointerException) {
+
             }
 
-            if(fullscreenTextView2Reference != null){
+            try {
                 fullscreenTextView2Reference!!.get()!!.text = title
+            } catch (e: NullPointerException) {
+
             }
 
             val valueAnimator = ValueAnimator.ofFloat(0.0f, 1.0f)
@@ -340,31 +347,44 @@ private fun play() {
 
                 var width = 0
 
-                if(textView1Reference != null) {
+
+                try {
                     width = textView1Reference!!.get()!!.width
+                } catch (e: NullPointerException) {
+
                 }
 
-                if(fullscreenTextView1Reference != null){
+
+                try {
                     width = fullscreenTextView1Reference!!.get()!!.width
+                } catch (e: NullPointerException) {
+
                 }
 
 
                 val translationX = width * progress
 
-                if(textView1Reference != null){
+                try {
                     textView1Reference!!.get()!!.translationX = translationX
+                } catch (e: NullPointerException) {
+
                 }
 
-                if(textView2Reference != null){
+                try {
                     textView2Reference!!.get()!!.translationX = translationX - width
+                } catch (e: NullPointerException) {
                 }
 
-                if(fullscreenTextView1Reference != null){
+                try {
                     fullscreenTextView1Reference!!.get()!!.translationX = translationX
+                } catch (e: NullPointerException) {
+
                 }
 
-                if(fullscreenTextView2Reference != null){
+                try {
                     fullscreenTextView2Reference!!.get()!!.translationX = translationX - width
+                } catch (e: NullPointerException) {
+
                 }
             }
 
@@ -378,14 +398,18 @@ private fun play() {
 
             val updateSeekBar = object : Runnable {
                 override fun run() {
-                    if(seekBarReference != null){
+                    try {
                         seekBarReference!!.get()!!.max = mediaPlayer.duration
                         seekBarReference!!.get()!!.progress = mediaPlayer.currentPosition
+                    } catch (e: NullPointerException) {
+
                     }
 
-                    if(fullscreenSeekBarReference != null){
+                    try {
                         fullscreenSeekBarReference!!.get()!!.max = mediaPlayer.duration
                         fullscreenSeekBarReference!!.get()!!.progress = mediaPlayer.currentPosition
+                    } catch (e: NullPointerException) {
+
                     }
                     setPlayerState(mediaPlayer.currentPosition.toLong())
 
@@ -395,10 +419,14 @@ private fun play() {
 
             seekbarUpdateHandler.postDelayed(updateSeekBar, 0)
 
-            if(seekBarReference != null){
+            try {
                 seekBarReference!!.get()!!.setOnSeekBarChangeListener(object :
                     SeekBar.OnSeekBarChangeListener {
-                    override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                    override fun onProgressChanged(
+                        seekBar: SeekBar,
+                        progress: Int,
+                        fromUser: Boolean
+                    ) {
                         if (fromUser)
                             mediaPlayer.seekTo(progress)
                         setPlayerState(progress.toLong())
@@ -410,12 +438,18 @@ private fun play() {
                     override fun onStopTrackingTouch(seekBar: SeekBar) {
                     }
                 })
+            } catch (e: NullPointerException) {
+
             }
 
-            if(fullscreenSeekBarReference != null){
+            try {
                 fullscreenSeekBarReference!!.get()!!.setOnSeekBarChangeListener(object :
                     SeekBar.OnSeekBarChangeListener {
-                    override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                    override fun onProgressChanged(
+                        seekBar: SeekBar,
+                        progress: Int,
+                        fromUser: Boolean
+                    ) {
                         if (fromUser)
                             mediaPlayer.seekTo(progress)
                         setPlayerState(progress.toLong())
@@ -427,6 +461,8 @@ private fun play() {
                     override fun onStopTrackingTouch(seekBar: SeekBar) {
                     }
                 })
+            } catch (e: NullPointerException) {
+
             }
 
 
@@ -434,12 +470,16 @@ private fun play() {
             if (coverFile.exists()) {
                 val bitmap = BitmapFactory.decodeFile(coverFile.absolutePath)
 
-                if(barCoverImageReference != null){
+                try {
                     barCoverImageReference!!.get()!!.setImageBitmap(bitmap)
+                } catch (e: NullPointerException) {
+
                 }
 
-                if(fullscreenCoverReference != null){
+                try {
                     fullscreenCoverReference!!.get()!!.setImageBitmap(bitmap)
+                } catch (e: NullPointerException) {
+
                 }
 
                 setSongMetadata(artist, title, bitmap, mediaPlayer.duration.toLong())
@@ -449,23 +489,34 @@ private fun play() {
 
             showSongNotification(title, artist, coverUrl, true)
 
-            if (playButtonReference != null && playButtonReference!!.get() != null) {
+            try {
+
                 playButtonReference!!.get()!!.setImageDrawable(
                     ContextCompat.getDrawable(
                         contextReference!!.get()!!,
                         R.drawable.ic_pause_white_24dp
                     )
                 )
+
+            } catch (e: NullPointerException) {
+
             }
 
-            if (fullscreenPlayButtonReference != null && fullscreenPlayButtonReference!!.get() != null) {
+
+            try {
+
                 fullscreenPlayButtonReference!!.get()!!.setImageDrawable(
                     ContextCompat.getDrawable(
                         contextReference!!.get()!!,
                         R.drawable.ic_pause_black_24dp
                     )
                 )
+
+            } catch (e: NullPointerException) {
+
             }
+
+
         }
     } catch (e: IndexOutOfBoundsException) {
 
@@ -479,38 +530,50 @@ private fun stop() {
     val context = contextReference!!.get()!!
     playing = false
 
-    if(textView1Reference != null){
+    try{
         textView1Reference!!.get()!!.text = ""
+    }catch (e: NullPointerException){
+
     }
 
-    if(textView2Reference != null){
+    try{
         textView2Reference!!.get()!!.text = ""
+    }catch (e: NullPointerException){
+
     }
 
-    if(fullscreenTextView1Reference != null){
+    try{
         fullscreenTextView1Reference!!.get()!!.text = ""
+    }catch (e: NullPointerException){
+
     }
 
-    if(fullscreenTextView2Reference != null){
+    try{
         fullscreenTextView2Reference!!.get()!!.text = ""
+    }catch (e: NullPointerException){
+
     }
 
-    if (playButtonReference != null && playButtonReference!!.get() != null) {
+    try{
         playButtonReference!!.get()!!.setImageDrawable(
             ContextCompat.getDrawable(
                 context,
                 R.drawable.ic_play_arrow_black_24dp
             )
         )
+    }catch (e: NullPointerException){
+
     }
 
-    if (fullscreenPlayButtonReference != null && fullscreenPlayButtonReference!!.get() != null) {
+    try{
         fullscreenPlayButtonReference!!.get()!!.setImageDrawable(
             ContextCompat.getDrawable(
                 context,
                 R.drawable.ic_play_arrow_black_24dp
             )
         )
+    }catch (e: NullPointerException){
+
     }
 
     mediaPlayer.stop()
@@ -535,22 +598,26 @@ fun pause() {
         showSongNotification(title, artist, coverUrl, false)
 
 
-        if(playButtonReference != null && playButtonReference!!.get() != null){
+        try{
             playButtonReference!!.get()!!.setImageDrawable(
                 ContextCompat.getDrawable(
                     context,
                     R.drawable.ic_play_arrow_white_24dp
                 )
             )
+        }catch (e: NullPointerException){
+
         }
 
-        if(fullscreenPlayButtonReference != null && fullscreenPlayButtonReference!!.get() != null){
+        try{
             fullscreenPlayButtonReference!!.get()!!.setImageDrawable(
                 ContextCompat.getDrawable(
                     context,
                     R.drawable.ic_play_arrow_black_24dp
                 )
             )
+        }catch (e: NullPointerException){
+
         }
 
 
@@ -592,22 +659,26 @@ fun resume() {
 
         showSongNotification(title, artist, coverUrl, true)
 
-        if(playButtonReference != null && playButtonReference!!.get() != null){
+        try{
             playButtonReference!!.get()!!.setImageDrawable(
                 ContextCompat.getDrawable(
                     context,
                     R.drawable.ic_pause_white_24dp
                 )
             )
+        }catch (e: NullPointerException){
+
         }
 
-        if(fullscreenPlayButtonReference != null && fullscreenPlayButtonReference!!.get() != null){
+        try{
             fullscreenPlayButtonReference!!.get()!!.setImageDrawable(
                 ContextCompat.getDrawable(
                     context,
                     R.drawable.ic_pause_black_24dp
                 )
             )
+        }catch (e: NullPointerException){
+
         }
 
         playing = true
@@ -660,8 +731,10 @@ fun addSong(song: Song) {
 }
 
 fun clearContinuous() {
-    if(loadContinuousSongListAsyncTask != null){
+    try{
         loadContinuousSongListAsyncTask!!.cancel(true)
+    }catch (e: NullPointerException){
+
     }
 
     playList = ArrayList(playList.subList(0, currentContinuousPoint))
