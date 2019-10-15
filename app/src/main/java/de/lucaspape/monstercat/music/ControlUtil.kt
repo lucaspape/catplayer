@@ -19,6 +19,8 @@ internal fun play() {
         val song = playList[currentSong]
 
         val settings = Settings(contextReference!!.get()!!)
+        val primaryResolution = settings.getSetting("primaryCoverResolution")
+        
         val url = song.getUrl()
 
         mediaPlayer.stop()
@@ -67,7 +69,7 @@ internal fun play() {
 
             setPlayButtonImage()
 
-            showSongNotification(song.title, song.artist, song.coverUrl, true)
+            showSongNotification(song.title, song.artist, context.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution, true)
 
         }
     } catch (e: IndexOutOfBoundsException) {
