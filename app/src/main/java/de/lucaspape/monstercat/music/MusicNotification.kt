@@ -175,6 +175,7 @@ class IntentReceiver : BroadcastReceiver() {
                 pause()
                 notificationManager.cancel(notificationID)
             }
+
             intent.action.equals(NOTIFICATION_PAUSE) -> pause()
             intent.action.equals(NOTIFICATION_PLAY) -> resume()
             intent.action.equals(NOTIFICATION_NEXT) -> next()

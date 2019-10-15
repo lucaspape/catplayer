@@ -20,6 +20,7 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.settings.Settings
 import java.io.File
+import java.lang.IllegalStateException
 import java.lang.NullPointerException
 import java.lang.ref.WeakReference
 
@@ -266,6 +267,7 @@ internal fun startSeekBarUpdate() {
 
     val updateSeekBar = object : Runnable {
         override fun run() {
+
             try {
                 seekBarReference!!.get()!!.max = mediaPlayer.duration
                 seekBarReference!!.get()!!.progress = mediaPlayer.currentPosition
@@ -285,9 +287,9 @@ internal fun startSeekBarUpdate() {
         }
     }
 
-    seekBarUpdateHandler.postDelayed(updateSeekBar, 0)
-
     try {
+        seekBarUpdateHandler.postDelayed(updateSeekBar, 0)
+
         seekBarReference!!.get()!!.setOnSeekBarChangeListener(object :
             SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(

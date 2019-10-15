@@ -11,6 +11,8 @@ import java.io.File
 import java.io.FileInputStream
 import java.lang.IndexOutOfBoundsException
 
+private var preparing = false
+
 /**
  * Music control methods
  */
@@ -20,7 +22,7 @@ internal fun play() {
 
         val settings = Settings(contextReference!!.get()!!)
         val primaryResolution = settings.getSetting("primaryCoverResolution")
-        
+
         val url = song.getUrl()
 
         mediaPlayer.stop()
@@ -49,11 +51,9 @@ internal fun play() {
         //if mediaPlayer is finished preparing
         mediaPlayer.setOnPreparedListener {
 
-
             mediaPlayer.start()
 
             playing = true
-
 
             setTitle(song.title)
 
@@ -69,9 +69,16 @@ internal fun play() {
 
             setPlayButtonImage()
 
-            showSongNotification(song.title, song.artist, context.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution, true)
+            showSongNotification(
+                song.title,
+                song.artist,
+                contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution,
+                true
+            )
 
+            preparing = false
         }
+
     } catch (e: IndexOutOfBoundsException) {
 
     }
@@ -81,13 +88,19 @@ internal fun play() {
  * Stop playback
  */
 internal fun stop() {
-    playing = false
+    if (mediaPlayer.isPlaying) {
+        mediaPlayer.setOnCompletionListener {
 
-    setTitle("")
+        }
 
-    setPlayButtonImage()
+        playing = false
 
-    mediaPlayer.stop()
+        setTitle("")
+
+        setPlayButtonImage()
+
+        mediaPlayer.stop()
+    }
 }
 
 /**
@@ -121,38 +134,43 @@ fun pause() {
  * Resume playback
  */
 fun resume() {
-    val context = contextReference!!.get()!!
-    val settings = Settings(context)
-    val primaryResolution = settings.getSetting("primaryCoverResolution")
+    if(!preparing){
+        preparing = true
 
-    try {
-        val song = playList[currentSong]
+        val context = contextReference!!.get()!!
+        val settings = Settings(context)
+        val primaryResolution = settings.getSetting("primaryCoverResolution")
 
-        val title = song.title
-        val artist = song.artist
-        val coverUrl = context.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
+        try {
+            val song = playList[currentSong]
 
-        val length = mediaPlayer.currentPosition
+            val title = song.title
+            val artist = song.artist
+            val coverUrl = context.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
 
-        if (paused) {
-            mediaPlayer.seekTo(length)
-            mediaPlayer.start()
+            val length = mediaPlayer.currentPosition
 
-            paused = false
+            if (paused) {
+                mediaPlayer.seekTo(length)
+                mediaPlayer.start()
 
-            val intentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
-            context.registerReceiver(NoisyReceiver(), intentFilter)
-        } else {
-            play()
+                paused = false
+                preparing = false
+
+                val intentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
+                context.registerReceiver(NoisyReceiver(), intentFilter)
+            } else {
+                play()
+            }
+
+            showSongNotification(title, artist, coverUrl, true)
+
+            playing = true
+
+            setPlayButtonImage()
+        } catch (e: IndexOutOfBoundsException) {
+
         }
-
-        showSongNotification(title, artist, coverUrl, true)
-
-        playing = true
-
-        setPlayButtonImage()
-    } catch (e: IndexOutOfBoundsException) {
-
     }
 }
 
@@ -160,19 +178,24 @@ fun resume() {
  * Next song
  */
 fun next() {
-    currentSong++
-    play()
-
+    if(!preparing){
+        preparing = true
+        currentSong++
+        play()
+    }
 }
 
 /**
  * Previous song
  */
 fun previous() {
-    if (currentSong != 0) {
-        currentSong--
+    if(!preparing){
+        preparing = true
+        if (currentSong != 0) {
+            currentSong--
 
-        play()
+            play()
+        }
     }
 }
 
@@ -180,15 +203,18 @@ fun previous() {
  * Play song now
  */
 fun playNow(song: Song) {
-    try {
-        playList.add(currentSong + 1, song)
-        currentSong++
-    } catch (e: IndexOutOfBoundsException) {
-        playList.add(song)
+    if(!preparing){
+        preparing = true
+
+        try {
+            playList.add(currentSong + 1, song)
+            currentSong++
+        } catch (e: IndexOutOfBoundsException) {
+            playList.add(song)
+        }
+
+        play()
     }
-
-
-    play()
 }
 
 /**
