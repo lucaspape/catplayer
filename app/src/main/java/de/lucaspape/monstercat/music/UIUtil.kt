@@ -20,22 +20,21 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.settings.Settings
 import java.io.File
-import java.lang.IllegalStateException
 import java.lang.NullPointerException
 import java.lang.ref.WeakReference
 
-var textView1Reference: WeakReference<TextView>? = null
-var textView2Reference: WeakReference<TextView>? = null
-var seekBarReference: WeakReference<SeekBar>? = null
-var barCoverImageReference: WeakReference<ImageView>? = null
-var musicBarReference: WeakReference<androidx.appcompat.widget.Toolbar>? = null
-var playButtonReference: WeakReference<ImageButton>? = null
+private var textView1Reference: WeakReference<TextView>? = null
+private var textView2Reference: WeakReference<TextView>? = null
+private var seekBarReference: WeakReference<SeekBar>? = null
+private var barCoverImageReference: WeakReference<ImageView>? = null
+private var musicBarReference: WeakReference<androidx.appcompat.widget.Toolbar>? = null
+private var playButtonReference: WeakReference<ImageButton>? = null
 
-var fullscreenTextView1Reference: WeakReference<TextView>? = null
-var fullscreenTextView2Reference: WeakReference<TextView>? = null
-var fullscreenSeekBarReference: WeakReference<SeekBar>? = null
-var fullscreenCoverReference: WeakReference<ImageView>? = null
-var fullscreenPlayButtonReference: WeakReference<ImageButton>? = null
+private var fullscreenTextView1Reference: WeakReference<TextView>? = null
+private var fullscreenTextView2Reference: WeakReference<TextView>? = null
+private var fullscreenSeekBarReference: WeakReference<SeekBar>? = null
+private var fullscreenCoverReference: WeakReference<ImageView>? = null
+private var fullscreenPlayButtonReference: WeakReference<ImageButton>? = null
 
 /**
  * UI update methods

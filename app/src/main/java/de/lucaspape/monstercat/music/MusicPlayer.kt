@@ -15,12 +15,15 @@ import kotlin.collections.ArrayList
 
 var contextReference: WeakReference<Context>? = null
 
-var mediaPlayer = MediaPlayer()
-var currentSong = 0
-var currentContinuousPoint = 0
-var playList = ArrayList<Song>(1)
-var playing = false
-var paused = false
+internal var mediaPlayer = MediaPlayer()
+
+internal var currentSong = 0
+internal var currentContinuousPoint = 0
+internal var playList = ArrayList<Song>(1)
+
+internal var playing = false
+internal var paused = false
+internal var preparing = false
 
 var mediaSession: MediaSessionCompat? = null
 

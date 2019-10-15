@@ -11,8 +11,6 @@ import java.io.File
 import java.io.FileInputStream
 import java.lang.IndexOutOfBoundsException
 
-private var preparing = false
-
 /**
  * Music control methods
  */
