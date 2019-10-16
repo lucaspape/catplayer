@@ -25,14 +25,14 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
         val settings = Settings(weakReference.get()!!)
 
         while (true) {
-            val sSid = getSid()
+            //TODO dont use depraced stuff
 
-            if (sSid != null) {
-                //TODO dont use depraced stuff
+            val wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
 
-                val wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
+            try {
+                val sSid = getSid()
 
-                try {
+                if(sSid != null){
                     if (wifi != null && !wifi.isConnected && settings.getSetting("downloadOverMobile") != "true") {
                         println("forbidden by user")
                     } else {
@@ -42,66 +42,66 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                             val location = song["location"] as String
                             val shownTitle = song["shownTitle"] as String
 
-                            if (loggedIn) {
-                                showDownloadNotification(shownTitle, 0, 0, true, context)
-                                var downloaded = false
+                            showDownloadNotification(shownTitle, 0, 0, true, context)
+                            var downloaded = false
 
-                                while (!downloaded) {
-                                    downloaded = downloadSong(url, location, sSid)
-                                }
-
-                                downloadList[downloadedSongs] = null
-                                hideDownloadNotification(context)
+                            while (!downloaded) {
+                                downloaded = downloadSong(url, location, sSid)
                             }
+
+                            downloadList[downloadedSongs] = null
+                            hideDownloadNotification(context)
+
 
                         }
                         downloadedSongs++
                     }
-
-                } catch (e: IndexOutOfBoundsException) {
                 }
 
-                try {
-                    if (wifi != null && !wifi.isConnected && settings.getSetting("downloadCoversOverMobile") != "true") {
-                        println("forbidden by user")
-                    } else {
-                        if (downloadCoverArrayListList[downloadedCoverArrays]!!.isNotEmpty()) {
-                            val coverArray = downloadCoverArrayListList[downloadedCoverArrays]
+            } catch (e: IndexOutOfBoundsException) {
+            }
 
-                            for (i in coverArray!!.indices) {
-                                showDownloadNotification(
-                                    context.getString(R.string.downloadingCoversMsg),
-                                    i,
-                                    coverArray.size,
-                                    false,
-                                    context
-                                )
+            try {
+                if (wifi != null && !wifi.isConnected && settings.getSetting("downloadCoversOverMobile") != "true") {
+                    println("forbidden by user")
+                } else {
+                    if (downloadCoverArrayListList[downloadedCoverArrays]!!.isNotEmpty()) {
+                        val coverArray = downloadCoverArrayListList[downloadedCoverArrays]
 
-                                val cover = coverArray[i]
+                        for (i in coverArray!!.indices) {
+                            showDownloadNotification(
+                                context.getString(R.string.downloadingCoversMsg),
+                                i,
+                                coverArray.size,
+                                false,
+                                context
+                            )
 
-                                try {
-                                    val url = cover["coverUrl"] as String
-                                    val location = cover["coverLocation"] as String
+                            val cover = coverArray[i]
 
-                                    val primaryRes = cover["primaryRes"] as String
-                                    val secondaryRes = cover["secondaryRes"] as String
+                            try {
+                                val url = cover["coverUrl"] as String
+                                val location = cover["coverLocation"] as String
 
-                                    downloadCover(url, location, primaryRes, secondaryRes)
-                                } catch (e: TypeCastException) {
+                                val primaryRes = cover["primaryRes"] as String
+                                val secondaryRes = cover["secondaryRes"] as String
 
-                                }
+                                downloadCover(url, location, primaryRes, secondaryRes)
+                            } catch (e: TypeCastException) {
 
-                                downloadCoverArrayListList[downloadedCoverArrays] = null
                             }
 
-                            hideDownloadNotification(context)
+                            downloadCoverArrayListList[downloadedCoverArrays] = null
                         }
-                    }
 
-                    downloadedCoverArrays++
-                } catch (e: IndexOutOfBoundsException) {
+                        hideDownloadNotification(context)
+                    }
                 }
+
+                downloadedCoverArrays++
+            } catch (e: IndexOutOfBoundsException) {
             }
+
 
             Thread.sleep(100)
         }
