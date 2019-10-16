@@ -48,13 +48,9 @@ internal fun playSongFromId(context: Context, songId: String, playNow: Boolean) 
         } else {
             val streamHashQueue = Volley.newRequestQueue(context)
 
-            println("ALBUM" + song.albumId)
-            println("ID" + getSid())
             //get stream hash
             val streamHashUrl =
                 context.getString(R.string.loadSongsUrl) + "?albumId=" + song.albumId
-
-            println(streamHashUrl)
 
             val hashRequest = MonstercatRequest(
                 Request.Method.GET, streamHashUrl, getSid(),
@@ -168,10 +164,8 @@ internal fun addSongToPlaylist(context: Context, song: Song) {
                         patchParams,
                         Response.Listener {
                             //TODO reload playlist
-                            println("ok")
                         },
                         Response.ErrorListener {
-                            println("error")
                         }) {
                         @Throws(AuthFailureError::class)
                         override fun getHeaders(): Map<String, String> {
@@ -186,7 +180,6 @@ internal fun addSongToPlaylist(context: Context, song: Song) {
                 val addToPlaylistQueue = Volley.newRequestQueue(context)
                 addToPlaylistQueue.addRequestFinishedListener<Any> {
                     //TODO add msg
-                    println("done")
                 }
 
                 addToPlaylistQueue.add(patchRequest)

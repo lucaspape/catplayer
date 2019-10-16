@@ -88,7 +88,6 @@ class LoadPlaylistTracksAsync(
 
                     for (i in (0 until jsonArray.length())) {
                         if (jsonArray.getJSONObject(i).getString("_id") == playlistId) {
-                            println(jsonArray.getJSONObject(i).getJSONArray("tracks"))
                             val tracks = jsonArray.getJSONObject(i).getJSONArray("tracks")
                             trackCount = tracks.length()
                             break
