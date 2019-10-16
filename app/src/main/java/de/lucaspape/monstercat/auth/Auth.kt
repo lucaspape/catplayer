@@ -11,97 +11,100 @@ import com.android.volley.Response
 import com.android.volley.toolbox.HttpHeaderParser
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
+import com.android.volley.Request
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.request.MonstercatRequest
 import de.lucaspape.monstercat.settings.Settings
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
 
 //static vars
-var sid = ""
+private var sid = ""
 var loggedIn = false
+
+fun getSid():String?{
+    if(loggedIn && sid != ""){
+        return sid
+    }else{
+        return null
+    }
+}
 
 /**
  * Auth - Login to monstercat
  */
 class Auth {
     fun login(context: Context) {
-        val settings = Settings(context)
+        loadLogin(context)
 
-        val username = settings.getSetting("email")
-        val password = settings.getSetting("password")
+        if(sid == ""){
+            val settings = Settings(context)
 
-        if (username != null && password != null) {
-            val loginPostParams = JSONObject()
-            loginPostParams.put("email", username)
-            loginPostParams.put("password", password)
+            val username = settings.getSetting("email")
+            val password = settings.getSetting("password")
 
-            val loginUrl = context.getString(R.string.loginUrl)
+            if (username != null && password != null) {
+                val loginPostParams = JSONObject()
+                loginPostParams.put("email", username)
+                loginPostParams.put("password", password)
 
-            //login post request
-            val loginPostRequest = object : JsonObjectRequest(
-                Method.POST,
-                loginUrl, loginPostParams, Response.Listener { response ->
-                    try {
-                        println(response)
+                val loginUrl = context.getString(R.string.loginUrl)
 
-                        val headers = response.getJSONObject("headers")
-                        sid = headers.getString("Set-Cookie").substringBefore(';')
-                            .replace("connect.sid=", "")
+                //login post request
+                val loginPostRequest = object : JsonObjectRequest(
+                    Method.POST,
+                    loginUrl, loginPostParams, Response.Listener { response ->
+                        try {
+                            println(response)
 
-                        if (response.getJSONObject("response").getString("message") == "Enter the code sent to your device") {
-                            showTwoFAInput(context)
-                        } else {
-                            Toast.makeText(
-                                context,
-                                context.getString(R.string.loginSuccessfulMsg),
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            val headers = response.getJSONObject("headers")
+                            sid = headers.getString("Set-Cookie").substringBefore(';')
+                                .replace("connect.sid=", "")
+
+                            if (response.getJSONObject("response").getString("message") == "Enter the code sent to your device") {
+                                showTwoFAInput(context)
+                            } else {
+                                checkLogin(context)
+                            }
+
+
+                        } catch (e: JSONException) {
+                            checkLogin(context)
                         }
 
+                    }, Response.ErrorListener { _ ->
+                        checkLogin(context)
+                    }) {
+                    //put the login data
+                    override fun parseNetworkResponse(response: NetworkResponse?): Response<JSONObject> {
+                        return try {
+                            println(response)
 
-                    } catch (e: JSONException) {
-                        println("f")
-                    }
+                            val jsonResponse = JSONObject()
+                            jsonResponse.put("headers", JSONObject(response!!.headers as Map<*, *>))
+                            jsonResponse.put("response", response)
 
-                }, Response.ErrorListener { error ->
-                    Toast.makeText(
-                        context,
-                        context.getString(R.string.loginFailedMsg),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }) {
-                //put the login data
-                override fun parseNetworkResponse(response: NetworkResponse?): Response<JSONObject> {
-                    return try {
-                        println(response)
-
-                        val jsonResponse = JSONObject()
-                        jsonResponse.put("headers", JSONObject(response!!.headers as Map<*, *>))
-                        jsonResponse.put("response", response)
-
-                        Response.success(
-                            jsonResponse,
-                            HttpHeaderParser.parseCacheHeaders(response)
-                        )
-                    } catch (e: UnsupportedEncodingException) {
-                        Response.error(ParseError(e))
+                            Response.success(
+                                jsonResponse,
+                                HttpHeaderParser.parseCacheHeaders(response)
+                            )
+                        } catch (e: UnsupportedEncodingException) {
+                            Response.error(ParseError(e))
+                        }
                     }
                 }
-            }
 
-            val loginQueue = Volley.newRequestQueue(context)
+                val loginQueue = Volley.newRequestQueue(context)
 
-            loginQueue.addRequestFinishedListener<Any> {
-                if (sid != "") {
-                    loggedIn = true
+                loginQueue.addRequestFinishedListener<Any> {
+                    checkLogin(context)
                 }
-            }
 
-            //add to queue
-            loginQueue.add(loginPostRequest)
+                //add to queue
+                loginQueue.add(loginPostRequest)
+            }
         }
-
     }
 
     private fun showTwoFAInput(context: Context) {
@@ -114,7 +117,7 @@ class Auth {
         alertDialogBuilder.setView(twoFAInputView)
         alertDialogBuilder.setCancelable(false)
 
-        alertDialogBuilder.setPositiveButton("OK"){ dialog, which ->
+        alertDialogBuilder.setPositiveButton("OK"){ _, _ ->
             val twoFAEditText = twoFAInputView.findViewById<EditText>(R.id.twoFAInput)
             val twoFACode = twoFAEditText.text.toString()
 
@@ -157,13 +160,56 @@ class Auth {
             val twoFAQueue = Volley.newRequestQueue(context)
 
             twoFAQueue.addRequestFinishedListener<Any> {
-                if (sid != "") {
-                    loggedIn = true
-                }
+                checkLogin(context)
             }
 
             twoFAQueue.add(twoFAPostRequest)
 
         }
+
+        alertDialogBuilder.show()
+    }
+
+    private fun saveLogin(context: Context){
+        val settings = Settings(context)
+        settings.saveSetting("sid", sid)
+    }
+
+    private fun loadLogin(context: Context){
+        val settings = Settings(context)
+
+        val sSid = settings.getSetting("sid")
+
+        if(sSid != null){
+            sid = sSid
+
+            checkLogin(context)
+        }
+    }
+
+    private fun checkLogin(context: Context){
+        val checkLoginRequest = MonstercatRequest(Request.Method.GET, context.getString(R.string.playlistsUrl) , sid,
+            Response.Listener{
+                loggedIn = true
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.loginSuccessfulMsg),
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                saveLogin(context)
+            },
+            Response.ErrorListener {
+                loggedIn = false
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.loginFailedMsg),
+                    Toast.LENGTH_SHORT
+                ).show()
+            })
+
+        val checkLoginQueue = Volley.newRequestQueue(context)
+        checkLoginQueue.add(checkLoginRequest)
+
     }
 }

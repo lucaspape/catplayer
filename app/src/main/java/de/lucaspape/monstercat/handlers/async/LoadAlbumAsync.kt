@@ -8,7 +8,7 @@ import com.android.volley.Response
 import com.android.volley.Request
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.auth.sid
+import de.lucaspape.monstercat.auth.getSid
 import de.lucaspape.monstercat.database.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadCoverArray
 import de.lucaspape.monstercat.handlers.HomeHandler
@@ -88,7 +88,7 @@ class LoadAlbumAsync(
                 contextReference.get()!!.getString(R.string.loadSongsUrl) + "?albumId=" + albumId
 
             val listRequest = MonstercatRequest(
-                Request.Method.GET, requestUrl, sid, Response.Listener { response ->
+                Request.Method.GET, requestUrl, getSid(), Response.Listener { response ->
                     val json = JSONObject(response)
                     val jsonArray = json.getJSONArray("results")
 
