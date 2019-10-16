@@ -23,11 +23,11 @@ import java.io.UnsupportedEncodingException
 private var sid = ""
 var loggedIn = false
 
-fun getSid():String?{
-    if(loggedIn && sid != ""){
-        return sid
-    }else{
-        return null
+fun getSid(): String? {
+    return if (loggedIn && sid != "") {
+        sid
+    } else {
+        null
     }
 }
 
@@ -38,7 +38,7 @@ class Auth {
     fun login(context: Context) {
         loadLogin(context)
 
-        if(sid == ""){
+        if (sid == "") {
             val settings = Settings(context)
 
             val username = settings.getSetting("email")
@@ -66,12 +66,11 @@ class Auth {
                                 checkLogin(context)
                             }
 
-
                         } catch (e: JSONException) {
                             checkLogin(context)
                         }
 
-                    }, Response.ErrorListener { _ ->
+                    }, Response.ErrorListener {
                         checkLogin(context)
                     }) {
                     //put the login data
@@ -108,13 +107,14 @@ class Auth {
         val alertDialogBuilder = AlertDialog.Builder(context)
         alertDialogBuilder.setTitle("2FA Code")
 
-        val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val layoutInflater =
+            context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val twoFAInputView = layoutInflater.inflate(R.layout.two_fa_input_layout, null)
 
         alertDialogBuilder.setView(twoFAInputView)
         alertDialogBuilder.setCancelable(false)
 
-        alertDialogBuilder.setPositiveButton("OK"){ _, _ ->
+        alertDialogBuilder.setPositiveButton("OK") { _, _ ->
             val twoFAEditText = twoFAInputView.findViewById<EditText>(R.id.twoFAInput)
             val twoFACode = twoFAEditText.text.toString()
 
@@ -122,7 +122,9 @@ class Auth {
             twoFaTokenParams.put("token", twoFACode)
 
             val twoFAPostRequest = object :
-                JsonObjectRequest(Method.POST, context.getString(R.string.tokenUrl), twoFaTokenParams,
+                JsonObjectRequest(Method.POST,
+                    context.getString(R.string.tokenUrl),
+                    twoFaTokenParams,
                     Response.Listener { response ->
                         val headers = response.getJSONObject("headers")
                         sid = headers.getString("Set-Cookie").substringBefore(';')
@@ -166,43 +168,45 @@ class Auth {
         alertDialogBuilder.show()
     }
 
-    private fun saveLogin(context: Context){
+    private fun saveLogin(context: Context) {
         val settings = Settings(context)
         settings.saveSetting("sid", sid)
     }
 
-    private fun loadLogin(context: Context){
+    private fun loadLogin(context: Context) {
         val settings = Settings(context)
 
         val sSid = settings.getSetting("sid")
 
-        if(sSid != null){
+        if (sSid != null) {
             sid = sSid
 
             checkLogin(context)
         }
     }
 
-    private fun checkLogin(context: Context){
-        val checkLoginRequest = MonstercatRequest(Request.Method.GET, context.getString(R.string.playlistsUrl) , sid,
-            Response.Listener{
-                loggedIn = true
-                Toast.makeText(
-                    context,
-                    context.getString(R.string.loginSuccessfulMsg),
-                    Toast.LENGTH_SHORT
-                ).show()
+    private fun checkLogin(context: Context) {
+        val checkLoginRequest =
+            MonstercatRequest(Request.Method.GET, context.getString(R.string.playlistsUrl), sid,
+                Response.Listener {
+                    loggedIn = true
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.loginSuccessfulMsg),
+                        Toast.LENGTH_SHORT
+                    ).show()
 
-                saveLogin(context)
-            },
-            Response.ErrorListener {
-                loggedIn = false
-                Toast.makeText(
-                    context,
-                    context.getString(R.string.loginFailedMsg),
-                    Toast.LENGTH_SHORT
-                ).show()
-            })
+                    saveLogin(context)
+                },
+                Response.ErrorListener {
+                    loggedIn = false
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.loginFailedMsg),
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                })
 
         val checkLoginQueue = Volley.newRequestQueue(context)
         checkLoginQueue.add(checkLoginRequest)
