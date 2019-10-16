@@ -183,26 +183,56 @@ fun setFullscreenPlayButton(newPlayButton: ImageButton) {
     fullscreenPlayButtonReference = WeakReference(newPlayButton)
 }
 
-internal fun setTitle(title: String) {
+internal fun setTitle(title: String, version:String, artist: String) {
+
+    val text = "$title $version - $artist"
+
     try {
-        textView1Reference!!.get()!!.text = title
+        textView1Reference!!.get()!!.text = text
     } catch (e: NullPointerException) {
 
     }
     try {
-        textView2Reference!!.get()!!.text = title
+        textView2Reference!!.get()!!.text = text
     } catch (e: NullPointerException) {
 
     }
 
     try {
-        fullscreenTextView1Reference!!.get()!!.text = title
+        fullscreenTextView1Reference!!.get()!!.text = text
     } catch (e: NullPointerException) {
 
     }
 
     try {
-        fullscreenTextView2Reference!!.get()!!.text = title
+        fullscreenTextView2Reference!!.get()!!.text = text
+    } catch (e: NullPointerException) {
+
+    }
+}
+
+internal fun hideTitle(){
+    val text = ""
+
+    try {
+        textView1Reference!!.get()!!.text = text
+    } catch (e: NullPointerException) {
+
+    }
+    try {
+        textView2Reference!!.get()!!.text = text
+    } catch (e: NullPointerException) {
+
+    }
+
+    try {
+        fullscreenTextView1Reference!!.get()!!.text = text
+    } catch (e: NullPointerException) {
+
+    }
+
+    try {
+        fullscreenTextView2Reference!!.get()!!.text = text
     } catch (e: NullPointerException) {
 
     }

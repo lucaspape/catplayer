@@ -53,7 +53,7 @@ internal fun play() {
 
             playing = true
 
-            setTitle(song.title)
+            setTitle(song.title, song.version, song.artist)
 
             startTextAnimation()
 
@@ -69,6 +69,7 @@ internal fun play() {
 
             showSongNotification(
                 song.title,
+                song.version,
                 song.artist,
                 contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution,
                 true
@@ -93,7 +94,7 @@ internal fun stop() {
 
         playing = false
 
-        setTitle("")
+        hideTitle()
 
         setPlayButtonImage()
 
@@ -112,12 +113,10 @@ fun pause() {
     try {
         val song = playList[currentSong]
 
-        val title = song.title
-        val artist = song.artist
         val coverUrl = context.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
 
         mediaPlayer.pause()
-        showSongNotification(title, artist, coverUrl, false)
+        showSongNotification(song.title, song.artist, song.version, coverUrl, false)
 
         playing = false
         paused = true
@@ -142,8 +141,6 @@ fun resume() {
         try {
             val song = playList[currentSong]
 
-            val title = song.title
-            val artist = song.artist
             val coverUrl = context.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
 
             val length = mediaPlayer.currentPosition
@@ -161,7 +158,7 @@ fun resume() {
                 play()
             }
 
-            showSongNotification(title, artist, coverUrl, true)
+            showSongNotification(song.title, song.version, song.artist, coverUrl, true)
 
             playing = true
 

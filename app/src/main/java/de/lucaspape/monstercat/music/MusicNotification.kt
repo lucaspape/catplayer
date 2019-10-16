@@ -33,9 +33,10 @@ private const val NOTIFICATION_NEXT = "de.lucaspape.monstercat.next"
  * Show notification
  */
 internal fun showSongNotification(
-    titleName: String,
-    artistName: String,
-    coverUrl: String,
+    title: String,
+    version: String,
+    artist: String,
+    coverLocation: String,
     playing: Boolean
 ) {
     val context = contextReference!!.get()!!
@@ -45,7 +46,7 @@ internal fun showSongNotification(
     val backgroundColor: Int
     val expandedRemoteViews: RemoteViews
 
-    val coverFile = File(coverUrl)
+    val coverFile = File(coverLocation)
     if (coverFile.exists()) {
         val bitmap = BitmapFactory.decodeFile(coverFile.absolutePath)
         backgroundColor = getDominantColor(bitmap)
@@ -80,8 +81,8 @@ internal fun showSongNotification(
         )
     }
 
-    expandedRemoteViews.setTextViewText(R.id.artistname, artistName)
-    expandedRemoteViews.setTextViewText(R.id.songname, titleName)
+    expandedRemoteViews.setTextViewText(R.id.artistname, artist)
+    expandedRemoteViews.setTextViewText(R.id.songname, "$title $version")
 
     if (playing) {
         expandedRemoteViews.setViewVisibility(R.id.playButton, View.GONE)
