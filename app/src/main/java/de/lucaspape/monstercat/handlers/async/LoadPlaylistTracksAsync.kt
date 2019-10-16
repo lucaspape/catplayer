@@ -98,13 +98,24 @@ class LoadPlaylistTracksAsync(
 
 
             trackCountRequestQueue.addRequestFinishedListener<Any> {
+                var finishedRequests = 0
+                var totalRequestsCount = 0
+
+                val requests = ArrayList<MonstercatRequest>()
+
                 val playlistTrackRequestQueue = Volley.newRequestQueue(contextReference.get()!!)
 
                 val tempList = arrayOfNulls<Long>(trackCount)
 
                 playlistTrackRequestQueue.addRequestFinishedListener<Any> {
-                    synchronized(syncObject) {
-                        syncObject.notify()
+                    finishedRequests++
+
+                    if (finishedRequests >= totalRequestsCount) {
+                        synchronized(syncObject) {
+                            syncObject.notify()
+                        }
+                    } else {
+                        playlistTrackRequestQueue.add(requests[finishedRequests])
                     }
                 }
 
@@ -135,17 +146,18 @@ class LoadPlaylistTracksAsync(
                         },
                         Response.ErrorListener { })
 
-                    playlistTrackRequestQueue.add(playlistTrackRequest)
-
-                    synchronized(syncObject){
-                        syncObject.wait()
-                    }
+                    totalRequestsCount++
+                    requests.add(playlistTrackRequest)
                 }
+                playlistTrackRequestQueue.add(requests[finishedRequests])
             }
 
             trackCountRequestQueue.add(trackCountRequest)
 
-            return null
+            synchronized(syncObject) {
+                syncObject.wait()
+                return null
+            }
         }
     }
 
