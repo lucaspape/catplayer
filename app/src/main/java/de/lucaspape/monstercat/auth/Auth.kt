@@ -56,8 +56,6 @@ class Auth {
                     Method.POST,
                     loginUrl, loginPostParams, Response.Listener { response ->
                         try {
-                            println(response)
-
                             val headers = response.getJSONObject("headers")
                             sid = headers.getString("Set-Cookie").substringBefore(';')
                                 .replace("connect.sid=", "")
@@ -79,7 +77,6 @@ class Auth {
                     //put the login data
                     override fun parseNetworkResponse(response: NetworkResponse?): Response<JSONObject> {
                         return try {
-                            println(response)
 
                             val jsonResponse = JSONObject()
                             jsonResponse.put("headers", JSONObject(response!!.headers as Map<*, *>))
@@ -132,7 +129,6 @@ class Auth {
                             .replace("connect.sid=", "")
                     },
                     Response.ErrorListener {
-                        println("Well fuck.")
                     }) {
                 //put the login data
                 override fun parseNetworkResponse(response: NetworkResponse?): Response<JSONObject> {
