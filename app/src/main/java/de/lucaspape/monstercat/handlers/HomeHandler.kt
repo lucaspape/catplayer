@@ -53,8 +53,8 @@ class HomeHandler {
             val musicList = view.findViewById<ListView>(R.id.musiclistview)
 
             if (albumView) {
-                val from = arrayOf("title", "primaryImage")
-                val to = arrayOf(R.id.description, R.id.cover)
+                val from = arrayOf("title", "artist", "primaryImage")
+                val to = arrayOf(R.id.albumTitle,R.id.albumArtist, R.id.cover)
                 simpleAdapter = SimpleAdapter(
                     view.context,
                     currentListViewData,
