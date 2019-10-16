@@ -1,6 +1,7 @@
 package de.lucaspape.monstercat.music
 
 import android.animation.ValueAnimator
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.ColorDrawable
@@ -9,8 +10,6 @@ import android.media.session.PlaybackState
 import android.os.Handler
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import android.view.MotionEvent
-import android.view.View
 import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
 import android.widget.ImageButton
@@ -263,6 +262,7 @@ internal fun startTextAnimation() {
     valueAnimator.start()
 }
 
+@SuppressLint("ClickableViewAccessibility")
 internal fun startSeekBarUpdate() {
     val seekBarUpdateHandler = Handler()
 
@@ -291,7 +291,7 @@ internal fun startSeekBarUpdate() {
     try {
         seekBarUpdateHandler.postDelayed(updateSeekBar, 0)
 
-        seekBarReference!!.get()!!.setOnTouchListener { v, event -> true }
+        seekBarReference!!.get()!!.setOnTouchListener { _, _ -> true }
 
 
     } catch (e: NullPointerException) {

@@ -41,7 +41,6 @@ class HomeFragment : Fragment() {
         homeHandler.setupListView(view)
         homeHandler.setupSpinner(view)
         homeHandler.registerListeners(view)
-        homeHandler.setupMusicPlayer(view)
 
         //TODO context menu for album view
         listView = view.findViewById(R.id.musiclistview)

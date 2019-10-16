@@ -116,29 +116,6 @@ class HomeHandler {
     }
 
     /**
-     * Set the correct views for the MusicPlayer.kt
-     */
-    fun setupMusicPlayer(view: View) {
-        val textview1 = view.findViewById<TextView>(R.id.songCurrent1)
-        val textview2 = view.findViewById<TextView>(R.id.songCurrent2)
-        val coverBarImageView = view.findViewById<ImageView>(R.id.barCoverImage)
-        val musicToolBar = view.findViewById<androidx.appcompat.widget.Toolbar>(R.id.musicBar)
-        val playButton = view.findViewById<ImageButton>(R.id.playButton)
-        val seekBar = view.findViewById<SeekBar>(R.id.seekBar)
-
-        val weakReference = WeakReference(view.context)
-
-        //setup musicPlayer
-
-        contextReference = (weakReference)
-        setTextView(textview1, textview2)
-        setSeekBar(seekBar)
-        setBarCoverImageView(coverBarImageView)
-        setMusicBar(musicToolBar)
-        setPlayButton(playButton)
-    }
-
-    /**
      * Listeners (buttons, refresh etc)
      */
     fun registerListeners(view: View) {
@@ -150,23 +127,6 @@ class HomeHandler {
             } else {
                 loadSongList(view, true)
             }
-        }
-
-        //music control buttons
-        val playButton = view.findViewById<ImageButton>(R.id.playButton)
-        val backButton = view.findViewById<ImageButton>(R.id.backbutton)
-        val nextButton = view.findViewById<ImageButton>(R.id.nextbutton)
-
-        playButton.setOnClickListener {
-            toggleMusic()
-        }
-
-        nextButton.setOnClickListener {
-            next()
-        }
-
-        backButton.setOnClickListener {
-            previous()
         }
 
         //click on list
@@ -255,10 +215,6 @@ class HomeHandler {
 
         view.findViewById<ImageButton>(R.id.settingsButton).setOnClickListener {
             view.context.startActivity(Intent(view.context, SettingsActivity::class.java))
-        }
-
-        view.findViewById<androidx.appcompat.widget.Toolbar>(R.id.musicBar).setOnClickListener {
-            view.context.startActivity(Intent(view.context, PlayerFullscreenActivity::class.java))
         }
     }
 

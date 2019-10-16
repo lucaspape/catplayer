@@ -2,6 +2,7 @@ package de.lucaspape.monstercat.activities
 
 import android.Manifest
 import android.app.AlertDialog
+import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.media.AudioManager
@@ -10,6 +11,10 @@ import android.os.Bundle
 import android.text.SpannableString
 import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
+import android.view.View
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.SeekBar
 import android.widget.TextView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
@@ -22,8 +27,7 @@ import de.lucaspape.monstercat.fragments.HomeFragment
 import de.lucaspape.monstercat.fragments.PlaylistFragment
 import de.lucaspape.monstercat.handlers.HomeHandler
 import de.lucaspape.monstercat.handlers.async.LoadContinuousSongListAsync
-import de.lucaspape.monstercat.music.NoisyReceiver
-import de.lucaspape.monstercat.music.createMediaSession
+import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.settings.Settings
 import java.lang.ref.WeakReference
 
@@ -97,6 +101,9 @@ class MainActivity : AppCompatActivity() {
 
         //show privacy policy
         showPrivacyPolicy()
+
+        setupMusicPlayer()
+        registerButtonListeners()
     }
 
     private fun showPrivacyPolicy() {
@@ -132,5 +139,51 @@ class MainActivity : AppCompatActivity() {
     override fun onBackPressed() {
         //open the home fragment
         openFragment(HomeFragment.newInstance())
+    }
+
+    /**
+     * Set the correct views for the MusicPlayer.kt
+     */
+    fun setupMusicPlayer() {
+        val textview1 = findViewById<TextView>(R.id.songCurrent1)
+        val textview2 = findViewById<TextView>(R.id.songCurrent2)
+        val coverBarImageView = findViewById<ImageView>(R.id.barCoverImage)
+        val musicToolBar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.musicBar)
+        val playButton = findViewById<ImageButton>(R.id.playButton)
+        val seekBar = findViewById<SeekBar>(R.id.seekBar)
+
+        val weakReference = WeakReference(applicationContext)
+
+        //setup musicPlayer
+
+        contextReference = (weakReference)
+        setTextView(textview1, textview2)
+        setSeekBar(seekBar)
+        setBarCoverImageView(coverBarImageView)
+        setMusicBar(musicToolBar)
+        setPlayButton(playButton)
+    }
+
+    fun registerButtonListeners(){
+        //music control buttons
+        val playButton = findViewById<ImageButton>(R.id.playButton)
+        val backButton = findViewById<ImageButton>(R.id.backbutton)
+        val nextButton = findViewById<ImageButton>(R.id.nextbutton)
+
+        playButton.setOnClickListener {
+            toggleMusic()
+        }
+
+        nextButton.setOnClickListener {
+            next()
+        }
+
+        backButton.setOnClickListener {
+            previous()
+        }
+
+        findViewById<androidx.appcompat.widget.Toolbar>(R.id.musicBar).setOnClickListener {
+            startActivity(Intent(applicationContext, PlayerFullscreenActivity::class.java))
+        }
     }
 }
