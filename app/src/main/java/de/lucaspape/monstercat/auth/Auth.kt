@@ -1,6 +1,9 @@
 package de.lucaspape.monstercat.auth
 
+import android.app.AlertDialog
 import android.content.Context
+import android.view.LayoutInflater
+import android.widget.EditText
 import android.widget.Toast
 import com.android.volley.NetworkResponse
 import com.android.volley.ParseError
@@ -39,21 +42,26 @@ class Auth {
             val loginPostRequest = object : JsonObjectRequest(
                 Method.POST,
                 loginUrl, loginPostParams, Response.Listener { response ->
-                    val headers = response.getJSONObject("headers")
-
                     try {
-                        //get SID
+                        println(response)
+
+                        val headers = response.getJSONObject("headers")
                         sid = headers.getString("Set-Cookie").substringBefore(';')
                             .replace("connect.sid=", "")
 
-                        Toast.makeText(
-                            context,
-                            context.getString(R.string.loginSuccessfulMsg),
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        if (response.getJSONObject("response").getString("message") == "Enter the code sent to your device") {
+                            showTwoFAInput(context)
+                        } else {
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.loginSuccessfulMsg),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
 
                     } catch (e: JSONException) {
-                        //TODO add exception
+                        println("f")
                     }
 
                 }, Response.ErrorListener { error ->
@@ -63,6 +71,66 @@ class Auth {
                         Toast.LENGTH_SHORT
                     ).show()
                 }) {
+                //put the login data
+                override fun parseNetworkResponse(response: NetworkResponse?): Response<JSONObject> {
+                    return try {
+                        println(response)
+
+                        val jsonResponse = JSONObject()
+                        jsonResponse.put("headers", JSONObject(response!!.headers as Map<*, *>))
+                        jsonResponse.put("response", response)
+
+                        Response.success(
+                            jsonResponse,
+                            HttpHeaderParser.parseCacheHeaders(response)
+                        )
+                    } catch (e: UnsupportedEncodingException) {
+                        Response.error(ParseError(e))
+                    }
+                }
+            }
+
+            val loginQueue = Volley.newRequestQueue(context)
+
+            loginQueue.addRequestFinishedListener<Any> {
+                if (sid != "") {
+                    loggedIn = true
+                }
+            }
+
+            //add to queue
+            loginQueue.add(loginPostRequest)
+        }
+
+    }
+
+    private fun showTwoFAInput(context: Context) {
+        val alertDialogBuilder = AlertDialog.Builder(context)
+        alertDialogBuilder.setTitle("2FA Code")
+
+        val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val twoFAInputView = layoutInflater.inflate(R.layout.two_fa_input_layout, null)
+
+        alertDialogBuilder.setView(twoFAInputView)
+        alertDialogBuilder.setCancelable(false)
+
+        alertDialogBuilder.setPositiveButton("OK"){ dialog, which ->
+            val twoFAEditText = twoFAInputView.findViewById<EditText>(R.id.twoFAInput)
+            val twoFACode = twoFAEditText.text.toString()
+
+            val twoFaTokenParams = JSONObject()
+            twoFaTokenParams.put("token", twoFACode)
+
+            val twoFAPostRequest = object :
+                JsonObjectRequest(Method.POST, context.getString(R.string.tokenUrl), twoFaTokenParams,
+                    Response.Listener { response ->
+                        val headers = response.getJSONObject("headers")
+                        sid = headers.getString("Set-Cookie").substringBefore(';')
+                            .replace("connect.sid=", "")
+                    },
+                    Response.ErrorListener {
+                        println("Well fuck.")
+                    }) {
                 //put the login data
                 override fun parseNetworkResponse(response: NetworkResponse?): Response<JSONObject> {
                     return try {
@@ -77,20 +145,25 @@ class Auth {
                         Response.error(ParseError(e))
                     }
                 }
+
+                override fun getHeaders(): Map<String, String> {
+                    val params = HashMap<String, String>()
+                    params["Cookie"] = "connect.sid=$sid"
+
+                    return params
+                }
             }
 
+            val twoFAQueue = Volley.newRequestQueue(context)
 
-            val loginQueue = Volley.newRequestQueue(context)
-
-            loginQueue.addRequestFinishedListener<Any> {
+            twoFAQueue.addRequestFinishedListener<Any> {
                 if (sid != "") {
                     loggedIn = true
                 }
             }
 
-            //add to queue
-            loginQueue.add(loginPostRequest)
-        }
+            twoFAQueue.add(twoFAPostRequest)
 
+        }
     }
 }
