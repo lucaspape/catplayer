@@ -6,8 +6,7 @@
     android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_marginTop="2dp"
-        android:layout_marginBottom="2dp">
+        android:background="@drawable/listview_shape">
 
         <ImageView
             android:id="@+id/cover"
