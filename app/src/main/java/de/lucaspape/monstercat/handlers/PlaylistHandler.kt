@@ -36,8 +36,8 @@ class PlaylistHandler {
         fun updateListView(view: View) {
             val playlistList = view.findViewById<ListView>(R.id.playlistView)
 
-            var from = arrayOf("shownTitle", "secondaryImage")
-            var to = arrayOf(R.id.title, R.id.cover)
+            var from = arrayOf("shownTitle", "artist" , "secondaryImage")
+            var to = arrayOf(R.id.title, R.id.artist, R.id.cover)
 
             if (listViewDataIsPlaylistView) {
                 from = arrayOf("playlistName", "coverUrl")

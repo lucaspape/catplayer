@@ -25,7 +25,7 @@ class JSONParser {
         hashMap["id"] = song.songId
         hashMap["albumId"] = song.albumId
         hashMap["artist"] = song.artist
-        hashMap["shownTitle"] = song.title + song.version
+        hashMap["shownTitle"] = song.title + " " + song.version
         hashMap["coverUrl"] = song.coverUrl
         hashMap["coverLocation"] = context.filesDir.toString() + "/" + song.albumId + ".png"
         hashMap["primaryRes"] = primaryResolution
