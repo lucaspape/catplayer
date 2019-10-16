@@ -9,6 +9,8 @@ import android.media.session.PlaybackState
 import android.os.Handler
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import android.view.MotionEvent
+import android.view.View
 import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
 import android.widget.ImageButton
@@ -289,24 +291,9 @@ internal fun startSeekBarUpdate() {
     try {
         seekBarUpdateHandler.postDelayed(updateSeekBar, 0)
 
-        seekBarReference!!.get()!!.setOnSeekBarChangeListener(object :
-            SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(
-                seekBar: SeekBar,
-                progress: Int,
-                fromUser: Boolean
-            ) {
-                if (fromUser)
-                    mediaPlayer.seekTo(progress)
-                setPlayerState(progress.toLong())
-            }
+        seekBarReference!!.get()!!.setOnTouchListener { v, event -> true }
 
-            override fun onStartTrackingTouch(seekBar: SeekBar) {
-            }
 
-            override fun onStopTrackingTouch(seekBar: SeekBar) {
-            }
-        })
     } catch (e: NullPointerException) {
 
     }
