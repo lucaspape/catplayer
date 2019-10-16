@@ -71,14 +71,6 @@ class LoadAlbumAsync(
             val syncObject = Object()
 
             requestQueue.addRequestFinishedListener<Any> {
-                val dbSongs = ArrayList<HashMap<String, Any?>>()
-                songList = songDatabaseHelper.getAlbumSongs(albumId)
-
-                for (song in songList) {
-                    val jsonParser = JSONParser()
-                    dbSongs.add(jsonParser.parseSongToHashMap(contextReference.get()!!, song))
-                }
-
                 synchronized(syncObject) {
                     syncObject.notify()
                 }
@@ -106,11 +98,19 @@ class LoadAlbumAsync(
             )
 
             requestQueue.add(listRequest)
-
             synchronized(syncObject) {
                 syncObject.wait()
-                return null
             }
+
+            val dbSongs = ArrayList<HashMap<String, Any?>>()
+            songList = songDatabaseHelper.getAlbumSongs(albumId)
+
+            for (song in songList) {
+                val jsonParser = JSONParser()
+                dbSongs.add(jsonParser.parseSongToHashMap(contextReference.get()!!, song))
+            }
+
+            return null
         }
     }
 

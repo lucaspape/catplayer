@@ -12,6 +12,7 @@ import de.lucaspape.monstercat.auth.getSid
 import de.lucaspape.monstercat.database.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.handlers.PlaylistHandler
 import de.lucaspape.monstercat.json.JSONParser
+import de.lucaspape.monstercat.music.play
 import de.lucaspape.monstercat.request.MonstercatRequest
 import org.json.JSONObject
 import java.lang.ref.WeakReference
@@ -68,6 +69,12 @@ class LoadPlaylistAsync(
 
             val syncObject = Object()
 
+            playlistRequestQueue.addRequestFinishedListener<Any> {
+                synchronized(syncObject) {
+                    syncObject.notify()
+                }
+            }
+
             val playlistRequest =  MonstercatRequest(
                 Request.Method.GET, playlistUrl, getSid(),
                 Response.Listener { response ->
@@ -83,18 +90,16 @@ class LoadPlaylistAsync(
                         )
                     }
 
-                    synchronized(syncObject) {
-                        syncObject.notify()
-                    }
-
                 },
                 Response.ErrorListener { })
+
             playlistRequestQueue.add(playlistRequest)
 
             synchronized(syncObject) {
                 syncObject.wait()
-                return null
             }
+
+            return null
         }
     }
 

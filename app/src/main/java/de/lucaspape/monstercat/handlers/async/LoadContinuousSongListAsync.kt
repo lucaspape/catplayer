@@ -50,8 +50,6 @@ class LoadContinuousSongListAsync(
                     song.downloadLocation = songDownloadLocation
                     addContinuous(song)
                 } else {
-
-
                     //get stream hash
                     val streamHashUrl =
                         context.getString(R.string.loadSongsUrl) + "?albumId=" + song.albumId

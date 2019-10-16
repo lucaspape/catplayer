@@ -55,7 +55,7 @@ class LoadAlbumListAsync(
         val lastScroll = settings.getSetting("currentListAlbumViewLastScrollIndex")
         val top = settings.getSetting("currentListAlbumViewTop")
 
-        if(top != null && lastScroll != null){
+        if (top != null && lastScroll != null) {
             listView.setSelectionFromTop(lastScroll.toInt(), top.toInt())
         }
 
@@ -80,37 +80,13 @@ class LoadAlbumListAsync(
         if (!forceReload && albumList.isNotEmpty()) {
             return null
         } else {
-            //if all finished continue
-            var finishedRequests = 0
-            var totalRequestsCount = 0
-
-            val requests = ArrayList<StringRequest>()
-
             val syncObject = Object()
 
-            requestQueue.addRequestFinishedListener<Any?> {
-                finishedRequests++
+            requestQueue.addRequestFinishedListener<Any> {
 
-                //check if all done
-                if (finishedRequests >= totalRequestsCount) {
-
-                    tempList.reverse()
-
-                    val jsonParser = JSONParser()
-                    for (jsonObject in tempList) {
-                        if (jsonObject != null) {
-                            jsonParser.parseAlbumToDB(jsonObject, contextReference.get()!!)
-                        }
-                    }
-
-                    synchronized(syncObject) {
-                        syncObject.notify()
-                    }
-
-                } else {
-                    requestQueue.add(requests[finishedRequests])
+                synchronized(syncObject) {
+                    syncObject.notify()
                 }
-
             }
 
             for (i in (0 until HomeHandler.loadMax / 50)) {
@@ -131,17 +107,22 @@ class LoadAlbumListAsync(
                     Response.ErrorListener { }
                 )
 
-                totalRequestsCount++
+                requestQueue.add(albumsRequest)
 
-                requests.add(albumsRequest)
+                synchronized(syncObject) {
+                    syncObject.wait()
+                }
             }
 
-            requestQueue.add(requests[finishedRequests])
-
-            synchronized(syncObject) {
-                syncObject.wait()
-                return null
+            tempList.reverse()
+            val jsonParser = JSONParser()
+            for (jsonObject in tempList) {
+                if (jsonObject != null) {
+                    jsonParser.parseAlbumToDB(jsonObject, contextReference.get()!!)
+                }
             }
+
+            return null
         }
 
 

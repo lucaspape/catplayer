@@ -72,40 +72,13 @@ class LoadSongListAsync(
         } else {
             val requestQueue = Volley.newRequestQueue(contextReference.get()!!)
 
-            //if all finished continue
-            var finishedRequests = 0
-            var totalRequestsCount = 0
-
             val sortedList = arrayOfNulls<JSONObject>(HomeHandler.loadMax)
-
-            val requests = ArrayList<MonstercatRequest>()
 
             val syncObject = Object()
 
             requestQueue.addRequestFinishedListener<Any> {
-                finishedRequests++
-
-                //check if all done
-                if (finishedRequests >= totalRequestsCount) {
-                    sortedList.reverse()
-
-                    val jsonParser = JSONParser()
-
-                    for (jsonObject in sortedList) {
-                        if (jsonObject != null) {
-
-                            jsonParser.parseCatalogSongToDB(
-                                jsonObject,
-                                contextReference.get()!!
-                            )
-                        }
-                    }
-
-                    synchronized(syncObject) {
-                        syncObject.notify()
-                    }
-                } else {
-                    requestQueue.add(requests[finishedRequests])
+                synchronized(syncObject) {
+                    syncObject.notify()
                 }
             }
 
@@ -127,16 +100,28 @@ class LoadSongListAsync(
                     }, Response.ErrorListener { }
                 )
 
-                totalRequestsCount++
-                requests.add(listRequest)
+                requestQueue.add(listRequest)
+
+                synchronized(syncObject) {
+                    syncObject.wait()
+                }
             }
 
-            requestQueue.add(requests[finishedRequests])
+            sortedList.reverse()
 
-            synchronized(syncObject) {
-                syncObject.wait()
-                return null
+            val jsonParser = JSONParser()
+
+            for (jsonObject in sortedList) {
+                if (jsonObject != null) {
+
+                    jsonParser.parseCatalogSongToDB(
+                        jsonObject,
+                        contextReference.get()!!
+                    )
+                }
             }
+
+            return null
         }
     }
 }
