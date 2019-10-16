@@ -13,6 +13,7 @@ This android app aims to implement the Monstercat API.
  - Delete songs in playlists
  - Search
  - Audio focus
+ - More playlist features (delete tracks, add public playlists etc.)
 
 ## Alpha
 
