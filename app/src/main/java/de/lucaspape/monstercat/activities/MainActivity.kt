@@ -1,6 +1,7 @@
 package de.lucaspape.monstercat.activities
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.IntentFilter
@@ -144,6 +145,7 @@ class MainActivity : AppCompatActivity() {
     /**
      * Set the correct views for the MusicPlayer.kt
      */
+    @SuppressLint("ClickableViewAccessibility")
     fun setupMusicPlayer() {
         val textview1 = findViewById<TextView>(R.id.songCurrent1)
         val textview2 = findViewById<TextView>(R.id.songCurrent2)
@@ -162,6 +164,8 @@ class MainActivity : AppCompatActivity() {
         setBarCoverImageView(coverBarImageView)
         setMusicBar(musicToolBar)
         setPlayButton(playButton)
+
+        seekBar.setOnTouchListener { _, _ -> true }
     }
 
     fun registerButtonListeners(){
