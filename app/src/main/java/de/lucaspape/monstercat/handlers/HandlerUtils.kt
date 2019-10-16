@@ -9,7 +9,6 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.Request
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.auth.Auth
 import de.lucaspape.monstercat.auth.getSid
 import de.lucaspape.monstercat.auth.loggedIn
 import de.lucaspape.monstercat.database.*
@@ -19,7 +18,6 @@ import de.lucaspape.monstercat.music.addSong
 import de.lucaspape.monstercat.request.MonstercatRequest
 import de.lucaspape.monstercat.settings.Settings
 import org.json.JSONArray
-import org.json.JSONException
 import org.json.JSONObject
 import java.io.File
 
@@ -69,10 +67,6 @@ internal fun playSongFromId(context: Context, songId: String, playNow: Boolean) 
                         } else {
                             addSong(song)
                         }
-
-                    } else {
-                        //could not find song
-                        //TODO msg
                     }
 
                 },
@@ -141,15 +135,16 @@ internal fun addSongToPlaylist(context: Context, song: Song) {
         trackList[i] = playlistSongsDatabaseHelper.getAllData()
     }
 
-    val alertDialogBuilder = AlertDialog.Builder(context)
-    alertDialogBuilder.setTitle(context.getString(R.string.pickPlaylistMsg))
-    alertDialogBuilder.setItems(playlistNames) { _, i ->
-        val playlistPatchUrl = context.getString(R.string.playlistUrl) + playlistIds[i]
-        val jsonParser = JSONParser()
+    val sSid = getSid()
 
-        val sSid = getSid()
+    if (sSid != null) {
+        val alertDialogBuilder = AlertDialog.Builder(context)
+        alertDialogBuilder.setTitle(context.getString(R.string.pickPlaylistMsg))
+        alertDialogBuilder.setItems(playlistNames) { _, i ->
+            val playlistPatchUrl = context.getString(R.string.playlistUrl) + playlistIds[i]
+            val jsonParser = JSONParser()
 
-        if (sSid != null) {
+
             if (trackList[i] != null) {
                 val trackArray = jsonParser.parsePlaylistDataToJSONArray(context, trackList[i]!!)
                 val patchParams = JSONObject()
@@ -179,14 +174,23 @@ internal fun addSongToPlaylist(context: Context, song: Song) {
 
                 val addToPlaylistQueue = Volley.newRequestQueue(context)
                 addToPlaylistQueue.addRequestFinishedListener<Any> {
-                    //TODO add msg
+                    Toast.makeText(
+                        context,
+                        context.getString(
+                            R.string.songAddedToPlaylistMsg,
+                            song.title + " " + song.version
+                        ),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
 
                 addToPlaylistQueue.add(patchRequest)
 
             }
 
-            alertDialogBuilder.show()
+
         }
+        alertDialogBuilder.show()
+    
     }
 }
