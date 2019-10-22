@@ -4,6 +4,7 @@ import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.media.MediaMetadata
 import android.media.session.PlaybackState
@@ -24,8 +25,7 @@ import java.io.File
 import java.lang.NullPointerException
 import java.lang.ref.WeakReference
 
-private var textView1Reference: WeakReference<TextView>? = null
-private var textView2Reference: WeakReference<TextView>? = null
+private var textViewReference: WeakReference<TextView>? = null
 private var seekBarReference: WeakReference<SeekBar>? = null
 private var barCoverImageReference: WeakReference<ImageView>? = null
 private var musicBarReference: WeakReference<androidx.appcompat.widget.Toolbar>? = null
@@ -40,22 +40,20 @@ private var fullscreenPlayButtonReference: WeakReference<ImageButton>? = null
 /**
  * UI update methods
  */
-fun setTextView(newTextView1: TextView, newTextView2: TextView) {
+fun setTextView(newTextView: TextView) {
     try {
-        newTextView1.text = textView1Reference!!.get()!!.text
-        newTextView2.text = textView2Reference!!.get()!!.text
+        newTextView.text = textViewReference!!.get()!!.text
     } catch (e: NullPointerException) {
 
     }
 
-    textView1Reference = WeakReference(newTextView1)
-    textView2Reference = WeakReference(newTextView2)
+    textViewReference = WeakReference(newTextView)
 }
 
 fun setFullscreenTextView(newTextView1: TextView, newTextView2: TextView) {
     try {
-        newTextView1.text = textView1Reference!!.get()!!.text
-        newTextView2.text = textView2Reference!!.get()!!.text
+        newTextView1.text = textViewReference!!.get()!!.text
+        newTextView2.text = textViewReference!!.get()!!.text
     } catch (e: NullPointerException) {
 
     }
@@ -188,12 +186,7 @@ internal fun setTitle(title: String, version:String, artist: String) {
     val text = "$title $version - $artist"
 
     try {
-        textView1Reference!!.get()!!.text = text
-    } catch (e: NullPointerException) {
-
-    }
-    try {
-        textView2Reference!!.get()!!.text = text
+        textViewReference!!.get()!!.text = text
     } catch (e: NullPointerException) {
 
     }
@@ -215,12 +208,7 @@ internal fun hideTitle(){
     val text = ""
 
     try {
-        textView1Reference!!.get()!!.text = text
-    } catch (e: NullPointerException) {
-
-    }
-    try {
-        textView2Reference!!.get()!!.text = text
+        textViewReference!!.get()!!.text = text
     } catch (e: NullPointerException) {
 
     }
@@ -248,14 +236,6 @@ internal fun startTextAnimation() {
 
         var width = 0
 
-
-        try {
-            width = textView1Reference!!.get()!!.width
-        } catch (e: NullPointerException) {
-
-        }
-
-
         try {
             width = fullscreenTextView1Reference!!.get()!!.width
         } catch (e: NullPointerException) {
@@ -264,17 +244,6 @@ internal fun startTextAnimation() {
 
 
         val translationX = width * progress
-
-        try {
-            textView1Reference!!.get()!!.translationX = translationX
-        } catch (e: NullPointerException) {
-
-        }
-
-        try {
-            textView2Reference!!.get()!!.translationX = translationX - width
-        } catch (e: NullPointerException) {
-        }
 
         try {
             fullscreenTextView1Reference!!.get()!!.translationX = translationX

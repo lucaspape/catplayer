@@ -147,8 +147,7 @@ class MainActivity : AppCompatActivity() {
      */
     @SuppressLint("ClickableViewAccessibility")
     fun setupMusicPlayer() {
-        val textview1 = findViewById<TextView>(R.id.songCurrent1)
-        val textview2 = findViewById<TextView>(R.id.songCurrent2)
+        val textView = findViewById<TextView>(R.id.songCurrentText)
         val coverBarImageView = findViewById<ImageView>(R.id.barCoverImage)
         val musicToolBar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.musicBar)
         val playButton = findViewById<ImageButton>(R.id.playButton)
@@ -159,7 +158,7 @@ class MainActivity : AppCompatActivity() {
         //setup musicPlayer
 
         contextReference = (weakReference)
-        setTextView(textview1, textview2)
+        setTextView(textView)
         setSeekBar(seekBar)
         setBarCoverImageView(coverBarImageView)
         setMusicBar(musicToolBar)
@@ -171,19 +170,9 @@ class MainActivity : AppCompatActivity() {
     fun registerButtonListeners(){
         //music control buttons
         val playButton = findViewById<ImageButton>(R.id.playButton)
-        val backButton = findViewById<ImageButton>(R.id.backbutton)
-        val nextButton = findViewById<ImageButton>(R.id.nextbutton)
 
         playButton.setOnClickListener {
             toggleMusic()
-        }
-
-        nextButton.setOnClickListener {
-            next()
-        }
-
-        backButton.setOnClickListener {
-            previous()
         }
 
         findViewById<androidx.appcompat.widget.Toolbar>(R.id.musicBar).setOnClickListener {

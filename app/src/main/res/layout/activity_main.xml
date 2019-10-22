@@ -18,117 +18,66 @@
         app:layout_constraintRight_toRightOf="parent"
         app:menu="@menu/bottom_nav_menu" />
 
-    <androidx.appcompat.widget.Toolbar
-
+    <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/musicBar"
         android:layout_width="fill_parent"
-        android:layout_height="90dp"
+        android:layout_height="50dp"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="78dp"
-        android:background="@color/colorPlayerBackground"
         android:gravity="bottom"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme"
+        android:background="@drawable/toolbar_style"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent" />
 
+
     <TextView
-        android:id="@+id/songCurrent1"
-        android:layout_width="match_parent"
+        android:id="@+id/songCurrentText"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:maxLines="1"
         android:text=""
-        android:textColor="#FFFFFF"
-        app:layout_constraintBottom_toTopOf="@+id/playButton"
-        app:layout_constraintEnd_toEndOf="@+id/musicBar"
-        app:layout_constraintStart_toStartOf="@+id/musicBar"
-        app:layout_constraintTop_toTopOf="@+id/musicBar" />
-
-    <TextView
-        android:id="@+id/songCurrent2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:maxLines="1"
-        android:text=""
-        android:textColor="#FFFFFF"
-        app:layout_constraintBottom_toTopOf="@+id/playButton"
-        app:layout_constraintEnd_toEndOf="@+id/musicBar"
-        app:layout_constraintStart_toStartOf="@+id/musicBar"
-        app:layout_constraintTop_toTopOf="@+id/musicBar" />
-
+        android:textColor="?android:attr/textColorPrimary"
+        app:layout_constraintBottom_toBottomOf="@+id/musicBar"
+        app:layout_constraintEnd_toStartOf="@+id/playButton"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/barCoverImage"
+        app:layout_constraintTop_toBottomOf="@+id/seekBar"
+        android:layout_marginStart="10dp"
+        app:layout_constraintVertical_bias="0.527" />
 
     <ImageButton
         android:id="@+id/playButton"
         android:layout_width="50dp"
         android:layout_height="50dp"
+        android:layout_marginEnd="8dp"
         android:background="@null"
         android:contentDescription="@string/playButton"
         android:src="@drawable/ic_play_arrow_white_24dp"
-        app:layout_constraintBottom_toTopOf="@+id/seekBar"
-        app:layout_constraintEnd_toEndOf="@+id/musicBar"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="@+id/musicBar"
-        app:layout_constraintTop_toTopOf="@+id/musicBar"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintBottom_toTopOf="@+id/nav_view"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <ImageView
         android:id="@+id/barCoverImage"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
         android:contentDescription="@string/coverImage"
-        app:layout_constraintBottom_toBottomOf="@+id/playButton"
-        app:layout_constraintEnd_toStartOf="@+id/backbutton"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintBottom_toBottomOf="@+id/musicBar"
         app:layout_constraintStart_toStartOf="@+id/musicBar"
-        app:layout_constraintTop_toTopOf="@+id/playButton"
-        app:layout_constraintVertical_bias="0.8"
+        app:layout_constraintTop_toTopOf="@+id/musicBar"
+        android:layout_marginTop="10dp"
         app:srcCompat="@drawable/ic_music_video_black_24dp" />
-
-    <ImageButton
-        android:id="@+id/backbutton"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:background="@null"
-        android:contentDescription="@string/prevButton"
-        android:src="@drawable/ic_skip_previous_white_24dp"
-        app:layout_constraintBottom_toBottomOf="@+id/playButton"
-        app:layout_constraintEnd_toStartOf="@+id/playButton"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="@+id/musicBar"
-        app:layout_constraintTop_toTopOf="@+id/playButton"
-        app:layout_constraintVertical_bias="0.0" />
-
-    <ImageButton
-        android:id="@+id/nextbutton"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:background="@null"
-        android:contentDescription="@string/nextButton"
-        android:src="@drawable/ic_skip_next_white_24dp"
-        app:layout_constraintBottom_toBottomOf="@+id/playButton"
-        app:layout_constraintEnd_toEndOf="@+id/musicBar"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/playButton"
-        app:layout_constraintTop_toTopOf="@+id/playButton"
-        app:layout_constraintVertical_bias="0.0" />
 
     <SeekBar
         android:id="@+id/seekBar"
         android:layout_width="0dp"
         android:layout_height="16dp"
-        android:thumb="@null"
         android:clickable="false"
-        app:layout_constraintBottom_toBottomOf="@+id/musicBar"
+        android:thumb="@null"
         app:layout_constraintEnd_toEndOf="@+id/musicBar"
-        app:layout_constraintStart_toStartOf="@+id/musicBar" />
+        app:layout_constraintStart_toStartOf="@+id/musicBar"
+        app:layout_constraintTop_toTopOf="@+id/musicBar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

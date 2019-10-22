@@ -187,7 +187,7 @@ class IntentReceiver : BroadcastReceiver() {
 /**
  * Get the dominant color of a bitmap image (use for notification background color)
  */
-private fun getDominantColor(bitmap: Bitmap): Int {
+fun getDominantColor(bitmap: Bitmap): Int {
     val swatchesTemp = Palette.from(bitmap).generate().swatches
     val swatches = ArrayList<Palette.Swatch>(swatchesTemp)
 
@@ -199,7 +199,7 @@ private fun getDominantColor(bitmap: Bitmap): Int {
 /**
  * Get either BLACK or WHITE, depending on the background color for best readability
  */
-private fun getTextColor(background: Int): Int {
+fun getTextColor(background: Int): Int {
     val backgroundRed = Color.red(background)
     val backgroundGreen = Color.green(background)
     val backgroundBlue = Color.blue(background)

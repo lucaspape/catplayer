@@ -9,7 +9,6 @@ import android.view.View
 import android.widget.*
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.activities.PlayerFullscreenActivity
 import de.lucaspape.monstercat.activities.SettingsActivity
 import de.lucaspape.monstercat.activities.loadContinuousSongListAsyncTask
 import de.lucaspape.monstercat.handlers.async.LoadAlbumAsync
