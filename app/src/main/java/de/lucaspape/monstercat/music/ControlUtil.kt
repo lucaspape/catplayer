@@ -128,8 +128,6 @@ fun resume() {
 
             val coverUrl = context.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
 
-            val length = mediaPlayer!!.currentPosition
-
             if (paused) {
                // mediaPlayer!!.seekTo(length)
                 mediaPlayer!!.playWhenReady = true

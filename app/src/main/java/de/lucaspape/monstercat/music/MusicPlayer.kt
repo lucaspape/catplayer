@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
-import android.media.MediaPlayer
 import android.media.session.MediaSession
 import android.support.v4.media.session.MediaSessionCompat
 import com.google.android.exoplayer2.ExoPlayer

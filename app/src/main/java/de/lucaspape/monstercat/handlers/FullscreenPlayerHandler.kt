@@ -2,15 +2,14 @@ package de.lucaspape.monstercat.handlers
 
 import android.view.View
 import android.widget.*
-import androidx.core.graphics.drawable.toBitmap
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.music.*
 import java.lang.ref.WeakReference
 
 class FullscreenPlayerHandler {
     fun setupMusicPlayer(view: View) {
-        val textview1 = view.findViewById<TextView>(R.id.fullscreenSongCurrent1)
-        val textview2 = view.findViewById<TextView>(R.id.fullscreenSongCurrent2)
+        val textView1 = view.findViewById<TextView>(R.id.fullscreenSongCurrent1)
+        val textView2 = view.findViewById<TextView>(R.id.fullscreenSongCurrent2)
         val coverBarImageView = view.findViewById<ImageView>(R.id.fullscreenAlbumImage)
         val playButton = view.findViewById<ImageButton>(R.id.fullScreenPlay)
         val seekBar = view.findViewById<SeekBar>(R.id.fullscreenSeekBar)
@@ -20,7 +19,7 @@ class FullscreenPlayerHandler {
         //setup musicPlayer
 
         contextReference = (weakReference)
-        setFullscreenTextView(textview1, textview2)
+        setFullscreenTextView(textView1, textView2)
         setFullscreenSeekBar(seekBar)
         setFullscreenCoverImageView(coverBarImageView)
         setFullscreenPlayButton(playButton)

@@ -36,7 +36,7 @@ class PlaylistHandler {
         fun updateListView(view: View) {
             val playlistList = view.findViewById<ListView>(R.id.playlistView)
 
-            var from = arrayOf("shownTitle", "artist" , "secondaryImage")
+            var from = arrayOf("shownTitle", "artist", "secondaryImage")
             var to = arrayOf(R.id.title, R.id.artist, R.id.cover)
 
             if (listViewDataIsPlaylistView) {
@@ -93,7 +93,7 @@ class PlaylistHandler {
         val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
         swipeRefreshLayout.setOnRefreshListener {
             if (listViewDataIsPlaylistView) {
-                loadPlaylist(view, true, true)
+                loadPlaylist(view, forceReload = true, showAfter = true)
             } else {
                 loadPlaylistTracks(view, true, currentPlaylistId!!)
             }

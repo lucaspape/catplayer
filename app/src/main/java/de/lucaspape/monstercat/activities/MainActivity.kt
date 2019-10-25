@@ -12,7 +12,6 @@ import android.os.Bundle
 import android.text.SpannableString
 import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
-import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.SeekBar
@@ -167,7 +166,7 @@ class MainActivity : AppCompatActivity() {
         seekBar.setOnTouchListener { _, _ -> true }
     }
 
-    fun registerButtonListeners(){
+    fun registerButtonListeners() {
         //music control buttons
         val playButton = findViewById<ImageButton>(R.id.playButton)
 

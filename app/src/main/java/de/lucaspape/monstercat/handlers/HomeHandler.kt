@@ -53,7 +53,7 @@ class HomeHandler {
 
             if (albumView) {
                 val from = arrayOf("title", "artist", "primaryImage")
-                val to = arrayOf(R.id.albumTitle,R.id.albumArtist, R.id.cover)
+                val to = arrayOf(R.id.albumTitle, R.id.albumArtist, R.id.cover)
                 simpleAdapter = SimpleAdapter(
                     view.context,
                     currentListViewData,
@@ -63,7 +63,7 @@ class HomeHandler {
                 )
                 musicList.adapter = simpleAdapter
             } else {
-                val from = arrayOf("shownTitle", "artist" ,"secondaryImage")
+                val from = arrayOf("shownTitle", "artist", "secondaryImage")
                 val to = arrayOf(R.id.title, R.id.artist, R.id.cover)
                 simpleAdapter = SimpleAdapter(
                     view.context,
