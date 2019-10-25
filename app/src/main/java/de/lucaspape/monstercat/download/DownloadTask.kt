@@ -42,7 +42,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                             val location = song["location"] as String
                             val shownTitle = song["shownTitle"] as String
 
-                            downloadSong(url, location, shownTitle, sSid, context)
+                            downloadSong(url, location, sSid, context)
 
                             downloadList[downloadedSongs] = null
 
