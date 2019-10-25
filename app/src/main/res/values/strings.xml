@@ -37,4 +37,5 @@
     <string name="allowDownloadMobile">Allow downloading over mobile data</string>
     <string name="allowCoverDownloadMobile">Allow cover downloads over mobile data</string>
     <string name="settingsDescription">Settings</string>
+    <string name="darkThemeSwitch">Enable dark theme</string>
 </resources>

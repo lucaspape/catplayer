@@ -18,6 +18,7 @@ import android.widget.SeekBar
 import android.widget.TextView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import de.lucaspape.monstercat.R
@@ -29,6 +30,7 @@ import de.lucaspape.monstercat.handlers.HomeHandler
 import de.lucaspape.monstercat.handlers.async.LoadContinuousSongListAsync
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.settings.Settings
+import java.lang.IllegalArgumentException
 import java.lang.ref.WeakReference
 
 var loadContinuousSongListAsyncTask: LoadContinuousSongListAsync? = null
@@ -65,6 +67,17 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val settings = Settings(this)
+
+        if(settings.getSetting("darkTheme") != null){
+            if(settings.getSetting("darkTheme")!!.toBoolean()){
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            }else{
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            }
+        }
+
         setContentView(R.layout.activity_main)
 
         findViewById<BottomNavigationView>(R.id.nav_view).setOnNavigationItemSelectedListener(
@@ -88,7 +101,6 @@ class MainActivity : AppCompatActivity() {
         Auth().login(this)
 
         //set the correct view
-        val settings = Settings(this)
         if (settings.getSetting("albumViewSelected") != null) {
             HomeHandler.albumViewSelected = settings.getSetting("albumView") == true.toString()
         }
@@ -104,6 +116,17 @@ class MainActivity : AppCompatActivity() {
 
         setupMusicPlayer()
         registerButtonListeners()
+    }
+
+    override fun onDestroy() {
+        try{
+            unregisterReceiver(NoisyReceiver())
+        }catch (e: IllegalArgumentException){
+
+        }
+
+
+        super.onDestroy()
     }
 
     private fun showPrivacyPolicy() {

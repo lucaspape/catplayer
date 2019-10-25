@@ -7,6 +7,7 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.getSid
 import de.lucaspape.monstercat.auth.loggedIn
 import de.lucaspape.monstercat.settings.Settings
+import java.lang.NullPointerException
 import java.lang.ref.WeakReference
 
 class DownloadTask(private val weakReference: WeakReference<Context>) :
@@ -59,37 +60,42 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                 if (wifi != null && !wifi.isConnected && settings.getSetting("downloadCoversOverMobile") != "true") {
                     println("forbidden by user")
                 } else {
-                    if (downloadCoverArrayListList[downloadedCoverArrays]!!.isNotEmpty()) {
-                        val coverArray = downloadCoverArrayListList[downloadedCoverArrays]
+                    try{
+                        if (downloadCoverArrayListList[downloadedCoverArrays]!!.isNotEmpty()) {
+                            val coverArray = downloadCoverArrayListList[downloadedCoverArrays]
 
-                        for (i in coverArray!!.indices) {
-                            showDownloadNotification(
-                                context.getString(R.string.downloadingCoversMsg),
-                                i,
-                                coverArray.size,
-                                false,
-                                context
-                            )
+                            for (i in coverArray!!.indices) {
+                                showDownloadNotification(
+                                    context.getString(R.string.downloadingCoversMsg),
+                                    i,
+                                    coverArray.size,
+                                    false,
+                                    context
+                                )
 
-                            val cover = coverArray[i]
+                                val cover = coverArray[i]
 
-                            try {
-                                val url = cover["coverUrl"] as String
-                                val location = cover["coverLocation"] as String
+                                try {
+                                    val url = cover["coverUrl"] as String
+                                    val location = cover["coverLocation"] as String
 
-                                val primaryRes = cover["primaryRes"] as String
-                                val secondaryRes = cover["secondaryRes"] as String
+                                    val primaryRes = cover["primaryRes"] as String
+                                    val secondaryRes = cover["secondaryRes"] as String
 
-                                downloadCover(url, location, primaryRes, secondaryRes)
-                            } catch (e: TypeCastException) {
+                                    downloadCover(url, location, primaryRes, secondaryRes)
+                                } catch (e: TypeCastException) {
 
+                                }
+
+                                downloadCoverArrayListList[downloadedCoverArrays] = null
                             }
 
-                            downloadCoverArrayListList[downloadedCoverArrays] = null
+                            hideDownloadNotification(context)
                         }
+                    }catch (e: NullPointerException){
 
-                        hideDownloadNotification(context)
                     }
+
                 }
 
                 downloadedCoverArrays++

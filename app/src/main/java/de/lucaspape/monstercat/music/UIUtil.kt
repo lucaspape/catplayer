@@ -21,6 +21,7 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.settings.Settings
 import java.io.File
+import java.lang.ClassCastException
 import java.lang.NullPointerException
 import java.lang.ref.WeakReference
 
@@ -128,11 +129,6 @@ fun setFullscreenCoverImageView(newImageView: ImageView) {
 }
 
 fun setMusicBar(newToolbar: androidx.appcompat.widget.Toolbar) {
-    try {
-        newToolbar.setBackgroundColor((musicBarReference!!.get()!!.background as ColorDrawable).color)
-    } catch (e: NullPointerException) {
-
-    }
     musicBarReference = WeakReference(newToolbar)
 }
 

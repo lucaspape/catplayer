@@ -1,10 +1,13 @@
 package de.lucaspape.monstercat.activities
 
+import android.os.Build
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Switch
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.Auth
 import de.lucaspape.monstercat.settings.Settings
@@ -37,6 +40,7 @@ class SettingsActivity : AppCompatActivity() {
         val streamMobileSwitch = findViewById<Switch>(R.id.streamMobileSwitch)
         val downloadMobileSwitch = findViewById<Switch>(R.id.downloadMobileSwitch)
         val downloadCoversMobileSwitch = findViewById<Switch>(R.id.downloadCoversMobileSwitch)
+        val darkThemeSwitch = findViewById<Switch>(R.id.darkThemeSwitch)
 
         if (settings.getSetting("streamOverMobile") != null) {
             streamMobileSwitch.isChecked = settings.getSetting("streamOverMobile")!!.toBoolean()
@@ -51,6 +55,16 @@ class SettingsActivity : AppCompatActivity() {
                 settings.getSetting("downloadCoversOverMobile")!!.toBoolean()
         }
 
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P){
+            darkThemeSwitch.visibility = View.VISIBLE
+        }else{
+            darkThemeSwitch.visibility = View.GONE
+        }
+
+        if(settings.getSetting("darkTheme") != null){
+            darkThemeSwitch.isChecked = settings.getSetting("darkTheme")!!.toBoolean()
+        }
+
 
         //set switch listeners
         streamMobileSwitch.setOnCheckedChangeListener { _, isChecked ->
@@ -63,6 +77,17 @@ class SettingsActivity : AppCompatActivity() {
 
         downloadCoversMobileSwitch.setOnCheckedChangeListener { _, isChecked ->
             settings.saveSetting("downloadCoversOverMobile", isChecked.toString())
+        }
+
+        darkThemeSwitch.setOnCheckedChangeListener { _, isChecked ->
+            settings.saveSetting("darkTheme", isChecked.toString())
+
+            if(isChecked){
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            }else{
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            }
+
         }
     }
 }
