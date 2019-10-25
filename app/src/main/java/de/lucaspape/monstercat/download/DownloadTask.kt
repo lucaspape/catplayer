@@ -32,7 +32,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
             try {
                 val sSid = getSid()
 
-                if(sSid != null){
+                if (sSid != null) {
                     if (wifi != null && !wifi.isConnected && settings.getSetting("downloadOverMobile") != "true") {
                         println("forbidden by user")
                     } else {
@@ -42,15 +42,9 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                             val location = song["location"] as String
                             val shownTitle = song["shownTitle"] as String
 
-                            showDownloadNotification(shownTitle, 0, 0, true, context)
-                            var downloaded = false
-
-                            while (!downloaded) {
-                                downloaded = downloadSong(url, location, shownTitle, sSid, context)
-                            }
+                            downloadSong(url, location, shownTitle, sSid, context)
 
                             downloadList[downloadedSongs] = null
-                            hideDownloadNotification(context)
 
 
                         }

@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.IntentFilter
 import android.media.AudioManager
 import android.net.ConnectivityManager
+import android.net.Uri
 import androidx.core.net.toUri
 import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
@@ -31,15 +32,19 @@ internal fun play() {
 
         mediaPlayer = ExoPlayerFactory.newSimpleInstance(contextReference!!.get()!!)
 
-        println(song.getUrl())
-
         val connectivityManager =
             contextReference!!.get()!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
 
         if((wifi != null && wifi.isConnected) || settings.getSetting("streamOverMobile") == "true" || File(song.getUrl()).exists()){
-            mediaPlayer!!.prepare(ProgressiveMediaSource.Factory(DefaultDataSourceFactory(contextReference!!.get()!!, Util.getUserAgent(
-                contextReference!!.get()!!, "MonstercatPlayer"))).createMediaSource(song.getUrl().toUri()))
+
+            if(File(song.getUrl()).exists()){
+                mediaPlayer!!.prepare(ProgressiveMediaSource.Factory(DefaultDataSourceFactory(contextReference!!.get()!!, Util.getUserAgent(
+                    contextReference!!.get()!!, "MonstercatPlayer"))).createMediaSource(song.getUrl().toUri()))
+            }else{
+                mediaPlayer!!.prepare(ProgressiveMediaSource.Factory(DefaultDataSourceFactory(contextReference!!.get()!!, Util.getUserAgent(
+                    contextReference!!.get()!!, "MonstercatPlayer"))).createMediaSource(Uri.parse("file://" + song.getUrl())))
+            }
 
             mediaPlayer!!.playWhenReady = true
 

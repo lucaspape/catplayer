@@ -1,8 +1,10 @@
 package de.lucaspape.monstercat.download
 
+import android.app.DownloadManager
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -13,46 +15,20 @@ import java.net.URL
 internal fun downloadSong(
     url: String,
     location: String,
-    shownTitle: String,
     sid: String,
-    context:Context
-): Boolean {
-    try {
-        val urlConnection = URL(url).openConnection() as HttpURLConnection
-        urlConnection.setRequestProperty("Cookie", "connect.sid=$sid")
+    context: Context
+) {
+    val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
 
-        urlConnection.doInput = true
-        urlConnection.connect()
+    val downloadUri = Uri.parse(url)
 
-        val bis = BufferedInputStream(urlConnection.inputStream)
-        val fos = FileOutputStream(File(location))
+    val downloadRequest = DownloadManager.Request(downloadUri)
 
-        val dataBuffer = ByteArray(1024)
-        var bytesRead:Int
+    downloadRequest.addRequestHeader("Cookie", "connect.sid=$sid")
+        .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+        .setDestinationUri(Uri.parse("file://$location"))
 
-        bytesRead = bis.read(dataBuffer)
-
-        var total:Long = 0
-
-        while (bytesRead != -1) {
-            fos.write(dataBuffer, 0, bytesRead)
-            fos.flush()
-
-            total += bytesRead
-
-            showDownloadNotification(shownTitle, (total).toInt(), urlConnection.contentLength, false, context)
-
-            bytesRead = bis.read(dataBuffer)
-        }
-
-        fos.close()
-
-        return true
-
-    } catch (e: IOException) {
-        println(e)
-        return false
-    }
+    downloadManager.enqueue(downloadRequest)
 }
 
 internal fun downloadCover(

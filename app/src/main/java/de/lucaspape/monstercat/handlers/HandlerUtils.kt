@@ -31,7 +31,7 @@ internal fun playSongFromId(context: Context, songId: String, playNow: Boolean) 
     if (song != null) {
         //check if song is already downloaded
         val songDownloadLocation =
-            context.filesDir.toString() + "/" + song.artist + song.title + song.version + "." + downloadType
+            context.getExternalFilesDir(null).toString() + "/" + song.artist + song.title + song.version + "." + downloadType
 
         if (File(songDownloadLocation).exists()) {
             song.downloadLocation = songDownloadLocation
@@ -99,7 +99,7 @@ internal fun downloadSong(context: Context, song: Song) {
         context.getString(R.string.songDownloadUrl) + song.albumId + "/download?method=download&type=" + downloadType + "_" + downloadQuality + "&track=" + song.songId
 
     val downloadLocation =
-        context.filesDir.toString() + "/" + song.artist + song.title + song.version + "." + downloadType
+        context.getExternalFilesDir(null).toString() + "/" + song.artist + song.title + song.version + "." + downloadType
 
     if (!File(downloadLocation).exists()) {
         val sSid = getSid()

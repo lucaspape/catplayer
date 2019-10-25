@@ -44,7 +44,7 @@ class LoadContinuousSongListAsync(
             if (song != null) {
                 //check if song is already downloaded
                 val songDownloadLocation =
-                    context.filesDir.toString() + "/" + song.artist + song.title + song.version + "." + downloadType
+                    context.getExternalFilesDir(null).toString() + "/" + song.artist + song.title + song.version + "." + downloadType
 
                 if (File(songDownloadLocation).exists()) {
                     song.downloadLocation = songDownloadLocation
