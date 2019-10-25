@@ -3,10 +3,8 @@ package de.lucaspape.monstercat.music
 import android.content.Context
 import android.content.IntentFilter
 import android.media.AudioManager
-import android.media.MediaPlayer
 import android.net.ConnectivityManager
 import androidx.core.net.toUri
-import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
@@ -14,7 +12,6 @@ import com.google.android.exoplayer2.util.Util
 import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.settings.Settings
 import java.io.File
-import java.io.FileInputStream
 import java.lang.IndexOutOfBoundsException
 
 /**
@@ -40,32 +37,34 @@ internal fun play() {
             contextReference!!.get()!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
 
-        mediaPlayer!!.prepare(ProgressiveMediaSource.Factory(DefaultDataSourceFactory(contextReference!!.get()!!, Util.getUserAgent(
-            contextReference!!.get()!!, "MonstercatPlayer"))).createMediaSource(song.getUrl().toUri()))
+        if((wifi != null && wifi.isConnected) || settings.getSetting("streamOverMobile") == "true" || File(song.getUrl()).exists()){
+            mediaPlayer!!.prepare(ProgressiveMediaSource.Factory(DefaultDataSourceFactory(contextReference!!.get()!!, Util.getUserAgent(
+                contextReference!!.get()!!, "MonstercatPlayer"))).createMediaSource(song.getUrl().toUri()))
 
-        mediaPlayer!!.playWhenReady = true
+            mediaPlayer!!.playWhenReady = true
 
-        setTitle(song.title, song.version, song.artist)
+            setTitle(song.title, song.version, song.artist)
 
-        startTextAnimation()
+            startTextAnimation()
 
-        setCover(song)
+            setCover(song)
 
-        setPlayButtonImage()
+            setPlayButtonImage()
 
-        showSongNotification(
-            song.title,
-            song.version,
-            song.artist,
-            contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution,
-            true
-        )
+            showSongNotification(
+                song.title,
+                song.version,
+                song.artist,
+                contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution,
+                true
+            )
 
-        playing = true
+            playing = true
 
-        startSeekBarUpdate()
+            startSeekBarUpdate()
 
-        preparing = false
+            preparing = false
+        }
 
     } catch (e: IndexOutOfBoundsException) {
 
