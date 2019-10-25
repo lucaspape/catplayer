@@ -46,7 +46,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                             var downloaded = false
 
                             while (!downloaded) {
-                                downloaded = downloadSong(url, location, sSid)
+                                downloaded = downloadSong(url, location, shownTitle, sSid, context)
                             }
 
                             downloadList[downloadedSongs] = null

@@ -1,5 +1,6 @@
 package de.lucaspape.monstercat.download
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import java.io.BufferedInputStream
@@ -12,7 +13,9 @@ import java.net.URL
 internal fun downloadSong(
     url: String,
     location: String,
-    sid: String
+    shownTitle: String,
+    sid: String,
+    context:Context
 ): Boolean {
     try {
         val urlConnection = URL(url).openConnection() as HttpURLConnection
@@ -27,12 +30,22 @@ internal fun downloadSong(
         val dataBuffer = ByteArray(1024)
         var bytesRead:Int
 
-        bytesRead = bis.read(dataBuffer, 0, 1024)
+        bytesRead = bis.read(dataBuffer)
+
+        var total:Long = 0
 
         while (bytesRead != -1) {
             fos.write(dataBuffer, 0, bytesRead)
-            bytesRead = bis.read(dataBuffer, 0, 1024)
+            fos.flush()
+
+            total += bytesRead
+
+            showDownloadNotification(shownTitle, (total).toInt(), urlConnection.contentLength, false, context)
+
+            bytesRead = bis.read(dataBuffer)
         }
+
+        fos.close()
 
         return true
 
