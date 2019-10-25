@@ -72,7 +72,7 @@ fun setSeekBar(newSeekBar: SeekBar) {
     newSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
         override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
             if (fromUser)
-                mediaPlayer.seekTo(progress)
+                mediaPlayer!!.seekTo(progress.toLong())
         }
 
         override fun onStartTrackingTouch(seekBar: SeekBar) {
@@ -95,7 +95,7 @@ fun setFullscreenSeekBar(newSeekBar: SeekBar) {
     newSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
         override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
             if (fromUser)
-                mediaPlayer.seekTo(progress)
+                mediaPlayer!!.seekTo(progress.toLong())
         }
 
         override fun onStartTrackingTouch(seekBar: SeekBar) {
@@ -269,19 +269,19 @@ internal fun startSeekBarUpdate() {
         override fun run() {
 
             try {
-                seekBarReference!!.get()!!.max = mediaPlayer.duration
-                seekBarReference!!.get()!!.progress = mediaPlayer.currentPosition
+                seekBarReference!!.get()!!.max = mediaPlayer!!.duration.toInt()
+                seekBarReference!!.get()!!.progress = mediaPlayer!!.currentPosition.toInt()
             } catch (e: NullPointerException) {
 
             }
 
             try {
-                fullscreenSeekBarReference!!.get()!!.max = mediaPlayer.duration
-                fullscreenSeekBarReference!!.get()!!.progress = mediaPlayer.currentPosition
+                fullscreenSeekBarReference!!.get()!!.max = mediaPlayer!!.duration.toInt()
+                fullscreenSeekBarReference!!.get()!!.progress = mediaPlayer!!.currentPosition.toInt()
             } catch (e: NullPointerException) {
 
             }
-            setPlayerState(mediaPlayer.currentPosition.toLong())
+            setPlayerState(mediaPlayer!!.currentPosition)
 
             seekBarUpdateHandler.postDelayed(this, 50)
         }
@@ -306,7 +306,7 @@ internal fun startSeekBarUpdate() {
                 fromUser: Boolean
             ) {
                 if (fromUser)
-                    mediaPlayer.seekTo(progress)
+                    mediaPlayer!!.seekTo(progress.toLong())
                 setPlayerState(progress.toLong())
             }
 
@@ -343,9 +343,9 @@ internal fun setCover(song: Song) {
 
         }
 
-        setSongMetadata(song.artist, song.title, bitmap, mediaPlayer.duration.toLong())
+        setSongMetadata(song.artist, song.title, bitmap, mediaPlayer!!.duration)
     } else {
-        setSongMetadata(song.artist, song.title, null, mediaPlayer.duration.toLong())
+        setSongMetadata(song.artist, song.title, null, mediaPlayer!!.duration)
     }
 }
 

@@ -7,6 +7,7 @@ import android.media.AudioManager
 import android.media.MediaPlayer
 import android.media.session.MediaSession
 import android.support.v4.media.session.MediaSessionCompat
+import com.google.android.exoplayer2.ExoPlayer
 import de.lucaspape.monstercat.activities.loadContinuousSongListAsyncTask
 import de.lucaspape.monstercat.database.Song
 import java.lang.NullPointerException
@@ -15,7 +16,7 @@ import kotlin.collections.ArrayList
 
 var contextReference: WeakReference<Context>? = null
 
-internal var mediaPlayer = MediaPlayer()
+internal var mediaPlayer:ExoPlayer? = null
 
 internal var currentSong = 0
 internal var currentContinuousPoint = 0
@@ -75,16 +76,16 @@ fun createMediaSession(context: WeakReference<Context>) {
         }
 
         override fun onSeekTo(pos: Long) {
-            mediaPlayer.seekTo(pos.toInt())
+            mediaPlayer!!.seekTo(pos)
         }
 
         override fun onFastForward() {
-            mediaPlayer.seekTo(mediaPlayer.duration)
+            mediaPlayer!!.seekTo(mediaPlayer!!.duration)
         }
 
         override fun onRewind() {
             super.onRewind()
-            mediaPlayer.seekTo(0)
+            mediaPlayer!!.seekTo(0)
         }
 
     })

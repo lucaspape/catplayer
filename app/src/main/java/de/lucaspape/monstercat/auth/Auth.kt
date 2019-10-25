@@ -36,7 +36,7 @@ fun getSid(): String? {
  */
 class Auth {
     fun login(context: Context) {
-        loadLogin(context)
+        //loadLogin(context)
 
         if (sid == "") {
             val settings = Settings(context)
@@ -55,10 +55,12 @@ class Auth {
                 val loginPostRequest = object : JsonObjectRequest(
                     Method.POST,
                     loginUrl, loginPostParams, Response.Listener { response ->
+
                         try {
                             val headers = response.getJSONObject("headers")
                             sid = headers.getString("Set-Cookie").substringBefore(';')
                                 .replace("connect.sid=", "")
+
 
                             if (response.getJSONObject("response").getString("message") == "Enter the code sent to your device") {
                                 showTwoFAInput(context)
@@ -187,7 +189,8 @@ class Auth {
 
     private fun checkLogin(context: Context) {
         val checkLoginRequest =
-            MonstercatRequest(Request.Method.GET, context.getString(R.string.playlistsUrl), sid,
+            MonstercatRequest(Request.Method.GET, context.getString
+                (R.string.playlistsUrl), sid,
                 Response.Listener {
                     loggedIn = true
                     Toast.makeText(

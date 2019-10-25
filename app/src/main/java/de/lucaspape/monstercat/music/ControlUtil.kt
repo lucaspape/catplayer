@@ -5,6 +5,12 @@ import android.content.IntentFilter
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.ConnectivityManager
+import androidx.core.net.toUri
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.ExoPlayerFactory
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.android.exoplayer2.util.Util
 import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.settings.Settings
 import java.io.File
@@ -21,62 +27,45 @@ internal fun play() {
         val settings = Settings(contextReference!!.get()!!)
         val primaryResolution = settings.getSetting("primaryCoverResolution")
 
-        val url = song.getUrl()
+        if(mediaPlayer != null){
+            mediaPlayer!!.release()
+            mediaPlayer!!.stop()
+        }
 
-        mediaPlayer.stop()
-        mediaPlayer = MediaPlayer()
+        mediaPlayer = ExoPlayerFactory.newSimpleInstance(contextReference!!.get()!!)
+
+        println(song.getUrl())
 
         val connectivityManager =
             contextReference!!.get()!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
 
-        if (!File(url).exists()) {
-            if (wifi != null && !wifi.isConnected && settings.getSetting("streamOverMobile") != "true") {
-                //TODO msg
-                println("DONT STREAM")
-                return
-            } else {
-                mediaPlayer.setDataSource(url)
-            }
-        } else {
-            val fis = FileInputStream(File(url))
-            mediaPlayer.setDataSource(fis.fd)
-        }
+        mediaPlayer!!.prepare(ProgressiveMediaSource.Factory(DefaultDataSourceFactory(contextReference!!.get()!!, Util.getUserAgent(
+            contextReference!!.get()!!, "MonstercatPlayer"))).createMediaSource(song.getUrl().toUri()))
 
-        //Prepare the player
-        mediaPlayer.prepareAsync()
+        mediaPlayer!!.playWhenReady = true
 
-        //if mediaPlayer is finished preparing
-        mediaPlayer.setOnPreparedListener {
+        setTitle(song.title, song.version, song.artist)
 
-            mediaPlayer.start()
+        startTextAnimation()
 
-            playing = true
+        setCover(song)
 
-            setTitle(song.title, song.version, song.artist)
+        setPlayButtonImage()
 
-            startTextAnimation()
+        showSongNotification(
+            song.title,
+            song.version,
+            song.artist,
+            contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution,
+            true
+        )
 
-            mediaPlayer.setOnCompletionListener {
-                next()
-            }
+        playing = true
 
-            startSeekBarUpdate()
+        startSeekBarUpdate()
 
-            setCover(song)
-
-            setPlayButtonImage()
-
-            showSongNotification(
-                song.title,
-                song.version,
-                song.artist,
-                contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution,
-                true
-            )
-
-            preparing = false
-        }
+        preparing = false
 
     } catch (e: IndexOutOfBoundsException) {
 
@@ -87,10 +76,7 @@ internal fun play() {
  * Stop playback
  */
 internal fun stop() {
-    if (mediaPlayer.isPlaying) {
-        mediaPlayer.setOnCompletionListener {
-
-        }
+    if (mediaPlayer!!.isPlaying) {
 
         playing = false
 
@@ -98,7 +84,7 @@ internal fun stop() {
 
         setPlayButtonImage()
 
-        mediaPlayer.stop()
+        mediaPlayer!!.stop()
     }
 }
 
@@ -115,7 +101,7 @@ fun pause() {
 
         val coverUrl = context.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
 
-        mediaPlayer.pause()
+        mediaPlayer!!.playWhenReady = false
         showSongNotification(song.title, song.artist, song.version, coverUrl, false)
 
         playing = false
@@ -143,11 +129,11 @@ fun resume() {
 
             val coverUrl = context.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
 
-            val length = mediaPlayer.currentPosition
+            val length = mediaPlayer!!.currentPosition
 
             if (paused) {
-                mediaPlayer.seekTo(length)
-                mediaPlayer.start()
+               // mediaPlayer!!.seekTo(length)
+                mediaPlayer!!.playWhenReady = true
 
                 paused = false
                 preparing = false

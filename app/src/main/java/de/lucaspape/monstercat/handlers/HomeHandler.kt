@@ -156,6 +156,7 @@ class HomeHandler {
                         continuousList,
                         WeakReference(view.context)
                     )
+
                 loadContinuousSongListAsyncTask!!.executeOnExecutor(
                     AsyncTask.THREAD_POOL_EXECUTOR
                 )
