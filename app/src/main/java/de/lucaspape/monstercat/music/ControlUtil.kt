@@ -38,7 +38,7 @@ internal fun play() {
 
         if((wifi != null && wifi.isConnected) || settings.getSetting("streamOverMobile") == "true" || File(song.getUrl()).exists()){
 
-            if(File(song.getUrl()).exists()){
+            if(!File(song.getUrl()).exists()){
                 mediaPlayer!!.prepare(ProgressiveMediaSource.Factory(DefaultDataSourceFactory(contextReference!!.get()!!, Util.getUserAgent(
                     contextReference!!.get()!!, "MonstercatPlayer"))).createMediaSource(song.getUrl().toUri()))
             }else{
