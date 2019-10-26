@@ -29,6 +29,10 @@ class PlaylistItemDatabaseHelper(context: Context, var playlistId: String) :
         onCreate(db)
     }
 
+    override fun onOpen(db: SQLiteDatabase?) {
+        db!!.execSQL(PlaylistItem(playlistId, 0, 0).CREATE_TABLE)
+    }
+
     override fun onCreate(db: SQLiteDatabase?) {
         db!!.execSQL(PlaylistItem(playlistId, 0, 0).CREATE_TABLE)
     }
