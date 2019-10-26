@@ -12,6 +12,9 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.getSid
 import de.lucaspape.monstercat.auth.loggedIn
 import de.lucaspape.monstercat.database.*
+import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
+import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
+import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.json.JSONParser
 import de.lucaspape.monstercat.music.addSong
@@ -78,12 +81,13 @@ internal fun playSongFromId(context: Context, songId: String, playNow: Boolean) 
 }
 
 internal fun downloadPlaylist(context: Context, playlistId: String) {
-    val playlistSongsDatabaseHelper = PlaylistSongsDatabaseHelper(context, playlistId)
-    val playlistSongsList = playlistSongsDatabaseHelper.getAllData()
+    val playlistItemDatabaseHelper =
+        PlaylistItemDatabaseHelper(context, playlistId)
+    val playlistItemList = playlistItemDatabaseHelper.getAllData()
 
-    for (playlistSong in playlistSongsList) {
+    for (playlistItem in playlistItemList) {
         val songDatabaseHelper = SongDatabaseHelper(context)
-        val song = songDatabaseHelper.getSong(playlistSong.songId)
+        val song = songDatabaseHelper.getSong(playlistItem.songId)
 
         downloadSong(context, song)
     }
@@ -119,20 +123,24 @@ internal fun downloadSong(context: Context, song: Song) {
 }
 
 internal fun addSongToPlaylist(context: Context, song: Song) {
-    val playlistDatabaseHelper = PlaylistDatabaseHelper(context)
+    val playlistDatabaseHelper =
+        PlaylistDatabaseHelper(context)
     val playlistList = playlistDatabaseHelper.getAllPlaylists()
 
     val playlistNames = arrayOfNulls<String>(playlistList.size)
     val playlistIds = arrayOfNulls<String>(playlistList.size)
-    val trackList = arrayOfNulls<List<PlaylistSongs>>(playlistList.size)
+    val trackList = arrayOfNulls<List<PlaylistItem>>(playlistList.size)
 
     for (i in playlistList.indices) {
-        val playlistSongsDatabaseHelper =
-            PlaylistSongsDatabaseHelper(context, playlistList[i].playlistId)
+        val playlistItemDatabaseHelper =
+            PlaylistItemDatabaseHelper(
+                context,
+                playlistList[i].playlistId
+            )
 
         playlistNames[i] = playlistList[i].playlistName
         playlistIds[i] = playlistList[i].playlistId
-        trackList[i] = playlistSongsDatabaseHelper.getAllData()
+        trackList[i] = playlistItemDatabaseHelper.getAllData()
     }
 
     val sSid = getSid()

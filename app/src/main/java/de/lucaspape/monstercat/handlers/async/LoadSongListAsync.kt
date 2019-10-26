@@ -9,9 +9,9 @@ import com.android.volley.Request
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.getSid
-import de.lucaspape.monstercat.database.CatalogSongsDatabaseHelper
+import de.lucaspape.monstercat.database.helper.CatalogSongDatabaseHelper
 import de.lucaspape.monstercat.database.Song
-import de.lucaspape.monstercat.database.SongDatabaseHelper
+import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadCoverArray
 import de.lucaspape.monstercat.handlers.HomeHandler
 import de.lucaspape.monstercat.json.JSONParser
@@ -31,12 +31,14 @@ class LoadSongListAsync(
     }
 
     override fun onPostExecute(result: String?) {
-        val catalogSongsDatabaseHelper = CatalogSongsDatabaseHelper(contextReference.get()!!)
-        val songIdList = catalogSongsDatabaseHelper.getAllSongs()
+        val catalogSongDatabaseHelper =
+            CatalogSongDatabaseHelper(contextReference.get()!!)
+        val songIdList = catalogSongDatabaseHelper.getAllSongs()
 
         val dbSongs = ArrayList<HashMap<String, Any?>>()
 
-        val songDatabaseHelper = SongDatabaseHelper(contextReference.get()!!)
+        val songDatabaseHelper =
+            SongDatabaseHelper(contextReference.get()!!)
         val songList = ArrayList<Song>()
 
         for (song in songIdList) {
@@ -64,8 +66,9 @@ class LoadSongListAsync(
 
     override fun doInBackground(vararg param: Void?): String? {
 
-        val catalogSongsDatabaseHelper = CatalogSongsDatabaseHelper(contextReference.get()!!)
-        val songIdList = catalogSongsDatabaseHelper.getAllSongs()
+        val catalogSongDatabaseHelper =
+            CatalogSongDatabaseHelper(contextReference.get()!!)
+        val songIdList = catalogSongDatabaseHelper.getAllSongs()
 
         if (!forceReload && songIdList.isNotEmpty()) {
             return null

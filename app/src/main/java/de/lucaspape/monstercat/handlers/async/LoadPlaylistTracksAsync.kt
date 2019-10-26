@@ -9,8 +9,8 @@ import com.android.volley.Request
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.getSid
-import de.lucaspape.monstercat.database.PlaylistSongsDatabaseHelper
-import de.lucaspape.monstercat.database.SongDatabaseHelper
+import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
+import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadCoverArray
 import de.lucaspape.monstercat.handlers.PlaylistHandler
 import de.lucaspape.monstercat.json.JSONParser
@@ -31,19 +31,23 @@ class LoadPlaylistTracksAsync(
     }
 
     override fun onPostExecute(result: String?) {
-        val playlistSongsDatabaseHelper =
-            PlaylistSongsDatabaseHelper(contextReference.get()!!, playlistId)
+        val playlistItemDatabaseHelper =
+            PlaylistItemDatabaseHelper(
+                contextReference.get()!!,
+                playlistId
+            )
 
         val sortedList = ArrayList<HashMap<String, Any?>>()
 
-        val playlistSongs = playlistSongsDatabaseHelper.getAllData()
+        val playlistItems = playlistItemDatabaseHelper.getAllData()
 
-        val songDatabaseHelper = SongDatabaseHelper(contextReference.get()!!)
+        val songDatabaseHelper =
+            SongDatabaseHelper(contextReference.get()!!)
 
         val jsonParser = JSONParser()
 
-        for (playlistSong in playlistSongs) {
-            val song = songDatabaseHelper.getSong(playlistSong.songId)
+        for (playlistItem in playlistItems) {
+            val song = songDatabaseHelper.getSong(playlistItem.songId)
 
             val hashMap = jsonParser.parseSongToHashMap(contextReference.get()!!, song)
             sortedList.add(hashMap)
@@ -65,11 +69,14 @@ class LoadPlaylistTracksAsync(
     }
 
     override fun doInBackground(vararg param: Void?): String? {
-        val playlistSongsDatabaseHelper =
-            PlaylistSongsDatabaseHelper(contextReference.get()!!, playlistId)
-        val playlistSongs = playlistSongsDatabaseHelper.getAllData()
+        val playlistItemDatabaseHelper =
+            PlaylistItemDatabaseHelper(
+                contextReference.get()!!,
+                playlistId
+            )
+        val playlistItems = playlistItemDatabaseHelper.getAllData()
 
-        if (!forceReload && playlistSongs.isNotEmpty()) {
+        if (!forceReload && playlistItems.isNotEmpty()) {
             return null
         } else {
 

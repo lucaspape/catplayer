@@ -9,7 +9,7 @@ import com.android.volley.Request
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.getSid
-import de.lucaspape.monstercat.database.SongDatabaseHelper
+import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadCoverArray
 import de.lucaspape.monstercat.handlers.HomeHandler
 import de.lucaspape.monstercat.json.JSONParser
@@ -32,7 +32,8 @@ class LoadAlbumAsync(
     override fun onPostExecute(result: String?) {
         val albumId = itemValue["id"] as String
 
-        val songDatabaseHelper = SongDatabaseHelper(contextReference.get()!!)
+        val songDatabaseHelper =
+            SongDatabaseHelper(contextReference.get()!!)
         val songList = songDatabaseHelper.getAlbumSongs(albumId)
 
         val dbSongs = ArrayList<HashMap<String, Any?>>()
@@ -62,7 +63,8 @@ class LoadAlbumAsync(
 
         val requestQueue = Volley.newRequestQueue(contextReference.get()!!)
 
-        val songDatabaseHelper = SongDatabaseHelper(contextReference.get()!!)
+        val songDatabaseHelper =
+            SongDatabaseHelper(contextReference.get()!!)
         var songList = songDatabaseHelper.getAlbumSongs(albumId)
 
         if (!forceReload && songList.isNotEmpty()) {

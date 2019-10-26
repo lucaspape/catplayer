@@ -1,9 +1,9 @@
 package de.lucaspape.monstercat.database
 
-class CatalogSongs() {
+data class CatalogSong(val id: Int, val songId: Long) {
     companion object {
         @JvmStatic
-        val TABLE_NAME = "CatalogSongs"
+        val TABLE_NAME = "catalog_song"
         @JvmStatic
         val COLUMN_ID = "id"
         @JvmStatic
@@ -17,11 +17,4 @@ class CatalogSongs() {
                     ")"
     }
 
-    var id: Int = 0
-    var songId: Long = 0
-
-    constructor(id: Int, songId: Long) : this() {
-        this.id = id
-        this.songId = songId
-    }
 }

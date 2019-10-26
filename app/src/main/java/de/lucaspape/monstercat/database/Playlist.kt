@@ -1,8 +1,8 @@
 package de.lucaspape.monstercat.database
 
-class Playlist(){
+data class Playlist(val id:Int, val playlistId:String, val playlistName:String, val trackCount:Int){
     companion object{
-        @JvmStatic val TABLE_NAME = "Playlist"
+        @JvmStatic val TABLE_NAME = "playlist"
         @JvmStatic val COLUMN_ID = "id"
         @JvmStatic val COLUMN_PLAYLIST_ID = "playlistId"
         @JvmStatic val COLUMN_NAME = "name"
@@ -17,15 +17,4 @@ class Playlist(){
                     ")"
     }
 
-    var id:Int = 0
-    var playlistId:String = ""
-    var playlistName:String = ""
-    var trackCount:Int = 0
-
-    constructor(id:Int, playlistId:String, playlistName:String, trackCount:Int) : this() {
-        this.id = id
-        this.playlistId = playlistId
-        this.playlistName = playlistName
-        this.trackCount = trackCount
-    }
 }

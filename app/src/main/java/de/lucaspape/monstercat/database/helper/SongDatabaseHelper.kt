@@ -1,4 +1,4 @@
-package de.lucaspape.monstercat.database
+package de.lucaspape.monstercat.database.helper
 
 import android.content.ContentValues
 import android.content.Context
@@ -6,11 +6,15 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
+import de.lucaspape.monstercat.database.Song
 import java.lang.IndexOutOfBoundsException
 
 
 class SongDatabaseHelper(context: Context) :
-    SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
+    SQLiteOpenHelper(context,
+        DATABASE_NAME, null,
+        DATABASE_VERSION
+    ) {
 
     companion object {
         @JvmStatic
@@ -144,14 +148,15 @@ class SongDatabaseHelper(context: Context) :
 
         if (cursor.moveToFirst()) {
             do {
-                val song = Song()
-                song.id = cursor.getInt(cursor.getColumnIndex(Song.COLUMN_ID))
-                song.songId = cursor.getString(cursor.getColumnIndex(Song.COLUMN_SONG_ID))
-                song.title = cursor.getString(cursor.getColumnIndex(Song.COLUMN_TITLE))
-                song.version = cursor.getString(cursor.getColumnIndex(Song.COLUMN_VERSION))
-                song.albumId = cursor.getString(cursor.getColumnIndex(Song.COLUMN_ALBUM_ID))
-                song.artist = cursor.getString(cursor.getColumnIndex(Song.COLUMN_ARTIST))
-                song.coverUrl = cursor.getString(cursor.getColumnIndex(Song.COLUMN_COVER_URL))
+                val song = Song(
+                    cursor.getInt(cursor.getColumnIndex(Song.COLUMN_ID)),
+                    cursor.getString(cursor.getColumnIndex(Song.COLUMN_SONG_ID)),
+                    cursor.getString(cursor.getColumnIndex(Song.COLUMN_TITLE)),
+                    cursor.getString(cursor.getColumnIndex(Song.COLUMN_VERSION)),
+                    cursor.getString(cursor.getColumnIndex(Song.COLUMN_ALBUM_ID)),
+                    cursor.getString(cursor.getColumnIndex(Song.COLUMN_ARTIST)),
+                    cursor.getString(cursor.getColumnIndex(Song.COLUMN_COVER_URL))
+                )
 
                 songs.add(song)
             } while (cursor.moveToNext())

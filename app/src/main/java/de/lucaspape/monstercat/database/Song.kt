@@ -1,9 +1,16 @@
 package de.lucaspape.monstercat.database
 
-class Song() {
+data class Song(val id: Int,
+                val songId: String,
+                val title: String,
+                val version: String,
+                val albumId: String,
+                val artist: String,
+                val coverUrl: String){
+
     companion object {
         @JvmStatic
-        val TABLE_NAME = "Song"
+        val TABLE_NAME = "song"
         @JvmStatic
         val COLUMN_ID = "id"
         @JvmStatic
@@ -32,35 +39,8 @@ class Song() {
                     ")"
     }
 
-    //stored in SQL
-    var id: Int = 0
-    var songId: String = ""
-    var title: String = ""
-    var version: String = ""
-    var albumId = ""
-    var artist: String = ""
-    var coverUrl: String = ""
-
     var downloadLocation: String = ""
     var streamLocation: String = ""
-
-    constructor(
-        id: Int,
-        songId: String,
-        title: String,
-        version: String,
-        albumId: String,
-        artist: String,
-        coverUrl: String
-    ) : this() {
-        this.id = id
-        this.songId = songId
-        this.title = title
-        this.version = version
-        this.albumId = albumId
-        this.artist = artist
-        this.coverUrl = coverUrl
-    }
 
     fun getUrl(): String {
         return if (downloadLocation != "") {
@@ -69,4 +49,5 @@ class Song() {
             streamLocation
         }
     }
+
 }

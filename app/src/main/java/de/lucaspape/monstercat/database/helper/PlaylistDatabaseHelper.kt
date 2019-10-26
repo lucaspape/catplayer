@@ -1,4 +1,4 @@
-package de.lucaspape.monstercat.database
+package de.lucaspape.monstercat.database.helper
 
 import android.content.ContentValues
 import android.content.Context
@@ -6,10 +6,14 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
+import de.lucaspape.monstercat.database.Playlist
 import java.lang.IndexOutOfBoundsException
 
 class PlaylistDatabaseHelper(context: Context) :
-    SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
+    SQLiteOpenHelper(context,
+        DATABASE_NAME, null,
+        DATABASE_VERSION
+    ) {
     companion object {
         @JvmStatic
         private val DATABASE_VERSION = 1
@@ -92,14 +96,12 @@ class PlaylistDatabaseHelper(context: Context) :
 
         if (cursor.moveToFirst()) {
             do {
-                val playlist = Playlist()
-                playlist.id = cursor.getInt(cursor.getColumnIndex(Playlist.COLUMN_ID))
-                playlist.playlistId =
-                    cursor.getString(cursor.getColumnIndex(Playlist.COLUMN_PLAYLIST_ID))
-                playlist.playlistName =
-                    cursor.getString(cursor.getColumnIndex(Playlist.COLUMN_NAME))
-                playlist.trackCount =
+                val playlist = Playlist(
+                    cursor.getInt(cursor.getColumnIndex(Playlist.COLUMN_ID)),
+                    cursor.getString(cursor.getColumnIndex(Playlist.COLUMN_PLAYLIST_ID)),
+                    cursor.getString(cursor.getColumnIndex(Playlist.COLUMN_NAME)),
                     cursor.getInt(cursor.getColumnIndex(Playlist.COLUMN_TRACK_COUNT))
+                )
 
                 playlists.add(playlist)
             } while (cursor.moveToNext())

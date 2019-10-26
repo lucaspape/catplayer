@@ -9,10 +9,9 @@ import com.android.volley.Request
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.getSid
-import de.lucaspape.monstercat.database.PlaylistDatabaseHelper
+import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.handlers.PlaylistHandler
 import de.lucaspape.monstercat.json.JSONParser
-import de.lucaspape.monstercat.music.play
 import de.lucaspape.monstercat.request.MonstercatRequest
 import org.json.JSONObject
 import java.lang.ref.WeakReference
@@ -32,7 +31,8 @@ class LoadPlaylistAsync(
     }
 
     override fun onPostExecute(result: String?) {
-        val playlistDatabaseHelper = PlaylistDatabaseHelper(contextReference.get()!!)
+        val playlistDatabaseHelper =
+            PlaylistDatabaseHelper(contextReference.get()!!)
         val playlists = playlistDatabaseHelper.getAllPlaylists()
 
         val jsonParser = JSONParser()
@@ -57,7 +57,8 @@ class LoadPlaylistAsync(
     }
 
     override fun doInBackground(vararg param: Void?): String? {
-        val playlistDatabaseHelper = PlaylistDatabaseHelper(contextReference.get()!!)
+        val playlistDatabaseHelper =
+            PlaylistDatabaseHelper(contextReference.get()!!)
         val playlists = playlistDatabaseHelper.getAllPlaylists()
 
         if (!forceReload && playlists.isNotEmpty()) {

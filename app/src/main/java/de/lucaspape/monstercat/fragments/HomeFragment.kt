@@ -7,7 +7,7 @@ import android.widget.ListView
 import androidx.fragment.app.Fragment
 import de.lucaspape.monstercat.handlers.HomeHandler
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.database.SongDatabaseHelper
+import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.handlers.addSongToPlaylist
 import de.lucaspape.monstercat.handlers.downloadSong
 import de.lucaspape.monstercat.handlers.playSongFromId
@@ -67,7 +67,8 @@ class HomeFragment : Fragment() {
 
         val listItem = listView!!.getItemAtPosition(position) as HashMap<String, Any?>
 
-        val songDatabaseHelper = SongDatabaseHelper(view!!.context)
+        val songDatabaseHelper =
+            SongDatabaseHelper(view!!.context)
         val song = songDatabaseHelper.getSong(listItem["id"] as String)
 
         if (song != null) {

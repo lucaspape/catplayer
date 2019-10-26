@@ -1,9 +1,13 @@
 package de.lucaspape.monstercat.database
 
-class Album() {
+data class Album(val id: Int,
+                 val albumId: String,
+                 val title: String,
+                 val artist: String,
+                 val coverUrl: String) {
     companion object {
         @JvmStatic
-        val TABLE_NAME = "Album"
+        val TABLE_NAME = "album"
         @JvmStatic
         val COLUMN_ID = "id"
         @JvmStatic
@@ -24,25 +28,5 @@ class Album() {
                     COLUMN_ARTIST + " TEXT," +
                     COLUMN_COVER_URL + " TEXT" +
                     ")"
-    }
-
-    var id: Int = 0
-    var title: String = ""
-    var albumId = ""
-    var artist: String = ""
-    var coverUrl: String = ""
-
-    constructor(
-        id: Int,
-        albumId: String,
-        title: String,
-        artist: String,
-        coverUrl: String
-    ) : this() {
-        this.id = id
-        this.title = title
-        this.albumId = albumId
-        this.artist = artist
-        this.coverUrl = coverUrl
     }
 }

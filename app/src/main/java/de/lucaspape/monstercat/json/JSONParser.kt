@@ -1,8 +1,8 @@
 package de.lucaspape.monstercat.json
 
 import android.content.Context
-import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.*
+import de.lucaspape.monstercat.database.helper.*
 import de.lucaspape.monstercat.settings.Settings
 import org.json.JSONArray
 import org.json.JSONObject
@@ -91,12 +91,12 @@ class JSONParser {
             databaseHelper.getSong(id)!!.id.toLong()
         }
 
-        val catalogSongsDatabaseHelper = CatalogSongsDatabaseHelper(context)
+        val catalogSongDatabaseHelper = CatalogSongDatabaseHelper(context)
 
-        return if(catalogSongsDatabaseHelper.getCatalogSong(songId) == null){
-            catalogSongsDatabaseHelper.insertSong(songId)
+        return if(catalogSongDatabaseHelper.getCatalogSong(songId) == null){
+            catalogSongDatabaseHelper.insertSong(songId)
         }else{
-            catalogSongsDatabaseHelper.getCatalogSong(songId)!!.id.toLong()
+            catalogSongDatabaseHelper.getCatalogSong(songId)!!.id.toLong()
         }
     }
 
@@ -155,15 +155,14 @@ class JSONParser {
 
     fun parsePlaylistDataToJSONArray(
         context: Context,
-        playlistDataList: List<PlaylistSongs>
+        playlistItemList: List<PlaylistItem>
     ): Array<JSONObject?> {
-        val jsonArray = arrayOfNulls<JSONObject>(playlistDataList.size)
+        val jsonArray = arrayOfNulls<JSONObject>(playlistItemList.size)
 
         val songDatabaseHelper = SongDatabaseHelper(context)
 
-        for (i in playlistDataList.indices) {
-            val playlistData = playlistDataList[i]
-            val song = songDatabaseHelper.getSong(playlistData.songId)
+        for (i in playlistItemList.indices) {
+            val song = songDatabaseHelper.getSong(playlistItemList[i].songId)
 
             val songJsonObject = JSONObject()
             songJsonObject.put("releaseId", song.albumId)
@@ -213,22 +212,13 @@ class JSONParser {
             val coverUrl = jsonObject.getJSONObject("release").getString("coverUrl")
             val id = jsonObject.getString("_id")
             val albumId = jsonObject.getJSONObject("albums").getString("albumId")
-            val streamHash = jsonObject.getJSONObject("albums").getString("streamHash")
 
             if (version == "null") {
                 version = ""
             }
 
-            val song = Song()
-            song.title = title
-            song.artist = artist
-            song.coverUrl = coverUrl
-            song.version = version
-            song.albumId = albumId
-            song.songId = id
-            song.streamLocation = context.getString(R.string.songStreamUrl) + streamHash
-
-            val songDatabaseHelper = SongDatabaseHelper(context)
+            val songDatabaseHelper =
+                SongDatabaseHelper(context)
 
             val songId: Long
 
@@ -238,12 +228,15 @@ class JSONParser {
                 songDatabaseHelper.getSong(id)!!.id.toLong()
             }
 
-            val databaseHelper = PlaylistSongsDatabaseHelper(context, playlistId)
+            val databaseHelper = PlaylistItemDatabaseHelper(
+                context,
+                playlistId
+            )
 
-            return if(databaseHelper.getPlaylistSong(songId) == null){
+            return if(databaseHelper.getItemFromSongId(songId) == null){
                 databaseHelper.insertSongId(songId)
             }else{
-                databaseHelper.getPlaylistSong(songId)!!.id.toLong()
+                databaseHelper.getItemFromSongId(songId)!!.songId
             }
         } else {
             return null

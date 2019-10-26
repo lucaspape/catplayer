@@ -7,12 +7,11 @@ import com.android.volley.Response
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.getSid
-import de.lucaspape.monstercat.database.SongDatabaseHelper
+import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.json.JSONParser
 import de.lucaspape.monstercat.music.addContinuous
 import de.lucaspape.monstercat.request.MonstercatRequest
 import de.lucaspape.monstercat.settings.Settings
-import org.json.JSONException
 import org.json.JSONObject
 import java.io.File
 import java.lang.ref.WeakReference

@@ -1,4 +1,4 @@
-package de.lucaspape.monstercat.database
+package de.lucaspape.monstercat.database.helper
 
 import android.content.ContentValues
 import android.content.Context
@@ -6,10 +6,14 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
+import de.lucaspape.monstercat.database.Album
 import java.lang.IndexOutOfBoundsException
 
 class AlbumDatabaseHelper(context: Context) :
-    SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
+    SQLiteOpenHelper(context,
+        DATABASE_NAME, null,
+        DATABASE_VERSION
+    ) {
     companion object {
         @JvmStatic
         private val DATABASE_VERSION = 1
@@ -94,13 +98,13 @@ class AlbumDatabaseHelper(context: Context) :
 
         if (cursor.moveToFirst()) {
             do {
-                val album = Album()
-                album.id = cursor.getInt(cursor.getColumnIndex(Album.COLUMN_ID))
-                album.albumId = cursor.getString(cursor.getColumnIndex(Album.COLUMN_ALBUM_ID))
-                album.title = cursor.getString(cursor.getColumnIndex(Album.COLUMN_TITLE))
-                album.artist = cursor.getString(cursor.getColumnIndex(Album.COLUMN_ARTIST))
-                album.coverUrl = cursor.getString(cursor.getColumnIndex(Album.COLUMN_COVER_URL))
-
+                val album = Album(
+                    cursor.getInt(cursor.getColumnIndex(Album.COLUMN_ID)),
+                    cursor.getString(cursor.getColumnIndex(Album.COLUMN_ALBUM_ID)),
+                    cursor.getString(cursor.getColumnIndex(Album.COLUMN_TITLE)),
+                    cursor.getString(cursor.getColumnIndex(Album.COLUMN_ARTIST)),
+                    cursor.getString(cursor.getColumnIndex(Album.COLUMN_COVER_URL))
+                )
                 albums.add(album)
             } while (cursor.moveToNext())
         }

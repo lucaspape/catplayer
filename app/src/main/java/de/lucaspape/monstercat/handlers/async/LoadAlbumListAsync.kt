@@ -7,11 +7,10 @@ import android.widget.ListView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.android.volley.Request
 import com.android.volley.Response
-import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.getSid
-import de.lucaspape.monstercat.database.AlbumDatabaseHelper
+import de.lucaspape.monstercat.database.helper.AlbumDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadCoverArray
 import de.lucaspape.monstercat.handlers.HomeHandler
 import de.lucaspape.monstercat.json.JSONParser
@@ -32,7 +31,8 @@ class LoadAlbumListAsync(
     }
 
     override fun onPostExecute(result: String?) {
-        val albumDatabaseHelper = AlbumDatabaseHelper(contextReference.get()!!)
+        val albumDatabaseHelper =
+            AlbumDatabaseHelper(contextReference.get()!!)
         val albumList = albumDatabaseHelper.getAllAlbums()
 
         val sortedList = ArrayList<HashMap<String, Any?>>()
@@ -74,7 +74,8 @@ class LoadAlbumListAsync(
 
         val tempList = arrayOfNulls<JSONObject>(HomeHandler.loadMax)
 
-        val albumDatabaseHelper = AlbumDatabaseHelper(contextReference.get()!!)
+        val albumDatabaseHelper =
+            AlbumDatabaseHelper(contextReference.get()!!)
         val albumList = albumDatabaseHelper.getAllAlbums()
 
         if (!forceReload && albumList.isNotEmpty()) {
