@@ -47,9 +47,7 @@ class LoadPlaylistTracksAsync(
         val jsonParser = JSONParser()
 
         for (playlistItem in playlistItems) {
-            val song = songDatabaseHelper.getSong(playlistItem.songId)
-
-            val hashMap = jsonParser.parseSongToHashMap(contextReference.get()!!, song)
+            val hashMap = jsonParser.parseSongToHashMap(contextReference.get()!!, songDatabaseHelper.getSong(playlistItem.songId))
             sortedList.add(hashMap)
         }
 

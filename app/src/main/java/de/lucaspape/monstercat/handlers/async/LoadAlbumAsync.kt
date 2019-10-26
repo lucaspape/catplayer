@@ -9,6 +9,7 @@ import com.android.volley.Request
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.getSid
+import de.lucaspape.monstercat.database.helper.AlbumItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadCoverArray
 import de.lucaspape.monstercat.handlers.HomeHandler
@@ -32,15 +33,17 @@ class LoadAlbumAsync(
     override fun onPostExecute(result: String?) {
         val albumId = itemValue["id"] as String
 
-        val songDatabaseHelper =
-            SongDatabaseHelper(contextReference.get()!!)
-        val songList = songDatabaseHelper.getAlbumSongs(albumId)
+        val albumItemDatabaseHelper =
+            AlbumItemDatabaseHelper(contextReference.get()!!, albumId)
+        val albumItemList = albumItemDatabaseHelper.getAllData()
 
         val dbSongs = ArrayList<HashMap<String, Any?>>()
 
-        for (song in songList) {
+        val songDatabaseHelper = SongDatabaseHelper(contextReference.get()!!)
+
+        for (albumItem in albumItemList) {
             val jsonParser = JSONParser()
-            dbSongs.add(jsonParser.parseSongToHashMap(contextReference.get()!!, song))
+            dbSongs.add(jsonParser.parseSongToHashMap(contextReference.get()!!, songDatabaseHelper.getSong(albumItem.songId)))
         }
 
         HomeHandler.currentListViewData = dbSongs
@@ -63,11 +66,11 @@ class LoadAlbumAsync(
 
         val requestQueue = Volley.newRequestQueue(contextReference.get()!!)
 
-        val songDatabaseHelper =
-            SongDatabaseHelper(contextReference.get()!!)
-        var songList = songDatabaseHelper.getAlbumSongs(albumId)
+        val albumItemDatabaseHelper =
+            AlbumItemDatabaseHelper(contextReference.get()!!, albumId)
+        val albumItems = albumItemDatabaseHelper.getAllData()
 
-        if (!forceReload && songList.isNotEmpty()) {
+        if (!forceReload && albumItems.isNotEmpty()) {
             return null
         } else {
             val syncObject = Object()
@@ -90,8 +93,9 @@ class LoadAlbumAsync(
 
                     //parse every single song into list
                     for (k in (0 until jsonArray.length())) {
-                        jsonParser.parseCatalogSongToDB(
+                        jsonParser.parsAlbumSongToDB(
                             jsonArray.getJSONObject(k),
+                            albumId,
                             contextReference.get()!!
                         )
                     }
@@ -102,14 +106,6 @@ class LoadAlbumAsync(
             requestQueue.add(listRequest)
             synchronized(syncObject) {
                 syncObject.wait()
-            }
-
-            val dbSongs = ArrayList<HashMap<String, Any?>>()
-            songList = songDatabaseHelper.getAlbumSongs(albumId)
-
-            for (song in songList) {
-                val jsonParser = JSONParser()
-                dbSongs.add(jsonParser.parseSongToHashMap(contextReference.get()!!, song))
             }
 
             return null
