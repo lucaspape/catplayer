@@ -17,7 +17,7 @@ class PlaylistItemDatabaseHelper(context: Context, var playlistId: String) :
         @JvmStatic
         private val DATABASE_VERSION = 1
         @JvmStatic
-        private val DATABASE_NAME = "playlists_items_db"
+        private val DATABASE_NAME = "playlist_items_db"
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
