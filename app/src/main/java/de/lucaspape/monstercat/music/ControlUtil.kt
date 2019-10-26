@@ -7,6 +7,7 @@ import android.net.ConnectivityManager
 import android.net.Uri
 import androidx.core.net.toUri
 import com.google.android.exoplayer2.ExoPlayerFactory
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
@@ -31,6 +32,14 @@ internal fun play() {
         }
 
         mediaPlayer = ExoPlayerFactory.newSimpleInstance(contextReference!!.get()!!)
+
+        mediaPlayer!!.addListener(object: Player.EventListener{
+            override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
+                when (playbackState){
+                    Player.STATE_ENDED -> next()
+                }
+            }
+        })
 
         val connectivityManager =
             contextReference!!.get()!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
