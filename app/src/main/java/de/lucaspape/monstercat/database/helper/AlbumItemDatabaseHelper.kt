@@ -117,7 +117,7 @@ class AlbumItemDatabaseHelper(context: Context, var albumId: String) :
             0,
             0
         ).TABLE_NAME + " ORDER BY " +
-                AlbumItem.COLUMN_ID + " DESC"
+                AlbumItem.COLUMN_ID + " ASC "
 
         val db = writableDatabase
         val cursor = db.rawQuery(selectQuery, null)
