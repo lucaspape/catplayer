@@ -32,8 +32,6 @@ class HomeHandler {
         @JvmStatic
         var currentListViewData = ArrayList<HashMap<String, Any?>>()
         @JvmStatic
-        val loadMax = 200
-        @JvmStatic
         private var simpleAdapter: SimpleAdapter? = null
 
         @JvmStatic
@@ -222,12 +220,14 @@ class HomeHandler {
      * Load song list ("catalog view")
      */
     fun loadSongList(view: View, forceReload: Boolean) {
+        val loadMax = Integer.parseInt(Settings(view.context).getSetting("maximumLoad")!!)
         val contextReference = WeakReference<Context>(view.context)
         val viewReference = WeakReference<View>(view)
         LoadSongListAsync(
             viewReference,
             contextReference,
-            forceReload
+            forceReload,
+            loadMax
         ).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 
@@ -235,12 +235,14 @@ class HomeHandler {
      * Load album list ("album view")
      */
     fun loadAlbumList(view: View, forceReload: Boolean) {
+        val loadMax = Integer.parseInt(Settings(view.context).getSetting("maximumLoad")!!)
         val contextReference = WeakReference<Context>(view.context)
         val viewReference = WeakReference<View>(view)
         LoadAlbumListAsync(
             viewReference,
             contextReference,
-            forceReload
+            forceReload,
+            loadMax
         ).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 

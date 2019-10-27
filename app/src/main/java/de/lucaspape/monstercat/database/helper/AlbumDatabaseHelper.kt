@@ -16,7 +16,7 @@ class AlbumDatabaseHelper(context: Context) :
     ) {
     companion object {
         @JvmStatic
-        private val DATABASE_VERSION = 1
+        private val DATABASE_VERSION = 2
         @JvmStatic
         private val DATABASE_NAME = "albums_db"
     }
@@ -28,6 +28,13 @@ class AlbumDatabaseHelper(context: Context) :
 
     override fun onCreate(db: SQLiteDatabase?) {
         db!!.execSQL(Album.CREATE_TABLE)
+    }
+
+    fun reCreateTable(){
+        val db = writableDatabase
+
+        db!!.execSQL("DROP TABLE IF EXISTS " + Album.TABLE_NAME)
+        onCreate(db)
     }
 
     fun insertAlbum(albumId: String, title: String, artist: String, coverUrl: String): Long {

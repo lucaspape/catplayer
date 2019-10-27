@@ -52,6 +52,10 @@ class Settings(private val context: Context) {
             saveSetting("downloadCoversOverMobile", "false")
         }
 
+        if(getSetting("maximumLoad") == null){
+            saveSetting("maximumLoad", 50.toString())
+        }
+
         if (overwrite) {
             saveSetting("downloadType", "mp3")
             saveSetting("downloadQuality", "320")
@@ -62,6 +66,7 @@ class Settings(private val context: Context) {
             saveSetting("streamOverMobile", "false")
             saveSetting("downloadOverMobile", "false")
             saveSetting("downloadCoversOverMobile", "false")
+            saveSetting("maximumLoad", 50.toString())
         }
 
     }

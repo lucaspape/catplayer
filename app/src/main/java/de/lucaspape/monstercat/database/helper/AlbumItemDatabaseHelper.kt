@@ -15,7 +15,7 @@ class AlbumItemDatabaseHelper(context: Context, var albumId: String) :
 
     companion object {
         @JvmStatic
-        private val DATABASE_VERSION = 1
+        private val DATABASE_VERSION = 2
         @JvmStatic
         private val DATABASE_NAME = "album_items_db"
     }
@@ -35,6 +35,17 @@ class AlbumItemDatabaseHelper(context: Context, var albumId: String) :
 
     override fun onCreate(db: SQLiteDatabase?) {
         db!!.execSQL(AlbumItem(albumId, 0, 0).CREATE_TABLE)
+    }
+
+    fun reCreateTable(){
+        val db = writableDatabase
+
+        db!!.execSQL("DROP TABLE IF EXISTS " + AlbumItem(
+            albumId,
+            0,
+            0
+        ).TABLE_NAME)
+        onCreate(db)
     }
 
     fun insertSongId(songId: Long): Long {

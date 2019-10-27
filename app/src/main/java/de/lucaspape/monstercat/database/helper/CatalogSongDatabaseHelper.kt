@@ -17,7 +17,7 @@ class CatalogSongDatabaseHelper(context: Context) :
 
     companion object {
         @JvmStatic
-        private val DATABASE_VERSION = 1
+        private val DATABASE_VERSION = 2
         @JvmStatic
         private val DATABASE_NAME = "catalog_songs_db"
     }
@@ -29,6 +29,13 @@ class CatalogSongDatabaseHelper(context: Context) :
 
     override fun onCreate(db: SQLiteDatabase?) {
         db!!.execSQL(CatalogSong.CREATE_TABLE)
+    }
+
+    fun reCreateTable(){
+        val db = writableDatabase
+
+        db!!.execSQL("DROP TABLE IF EXISTS " + CatalogSong.TABLE_NAME)
+        onCreate(db)
     }
 
     fun insertSong(songId: Long): Long {

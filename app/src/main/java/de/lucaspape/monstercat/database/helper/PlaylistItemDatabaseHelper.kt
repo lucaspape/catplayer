@@ -15,7 +15,7 @@ class PlaylistItemDatabaseHelper(context: Context, var playlistId: String) :
 
     companion object {
         @JvmStatic
-        private val DATABASE_VERSION = 1
+        private val DATABASE_VERSION = 2
         @JvmStatic
         private val DATABASE_NAME = "playlist_items_db"
     }
@@ -35,6 +35,17 @@ class PlaylistItemDatabaseHelper(context: Context, var playlistId: String) :
 
     override fun onCreate(db: SQLiteDatabase?) {
         db!!.execSQL(PlaylistItem(playlistId, 0, 0).CREATE_TABLE)
+    }
+
+    fun reCreateTable(){
+        val db = writableDatabase
+
+        db!!.execSQL("DROP TABLE IF EXISTS " + PlaylistItem(
+            playlistId,
+            0,
+            0
+        ).TABLE_NAME)
+        onCreate(db)
     }
 
     fun insertSongId(songId: Long): Long {

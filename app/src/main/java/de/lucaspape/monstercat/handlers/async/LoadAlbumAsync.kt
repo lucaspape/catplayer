@@ -89,6 +89,8 @@ class LoadAlbumAsync(
                     val json = JSONObject(response)
                     val jsonArray = json.getJSONArray("results")
 
+                    albumItemDatabaseHelper.reCreateTable()
+
                     val jsonParser = JSONParser()
 
                     //parse every single song into list

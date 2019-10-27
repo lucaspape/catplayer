@@ -97,4 +97,34 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/downloadCoversMobileSwitch" />
+
+    <TextView
+        android:id="@+id/maximumLoadText"
+        android:layout_width="0dp"
+        android:layout_height="20dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/maximumSongsSeekBarLabel"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/darkThemeSwitch" />
+
+    <TextView
+        android:id="@+id/shownMaxValue"
+        android:layout_width="30dp"
+        android:layout_height="50dp"
+        android:layout_margin="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/maximumLoadText" />
+
+    <SeekBar
+        android:id="@+id/maximumLoadSeekBar"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginStart="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/shownMaxValue"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/maximumLoadText" />
 </androidx.constraintlayout.widget.ConstraintLayout>

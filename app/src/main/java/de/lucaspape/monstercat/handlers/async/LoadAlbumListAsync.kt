@@ -22,7 +22,8 @@ import java.lang.ref.WeakReference
 class LoadAlbumListAsync(
     private val viewReference: WeakReference<View>,
     private val contextReference: WeakReference<Context>,
-    private val forceReload: Boolean
+    private val forceReload: Boolean,
+    private val loadMax:Int
 ) : AsyncTask<Void, Void, String>() {
     override fun onPreExecute() {
         val swipeRefreshLayout =
@@ -72,7 +73,7 @@ class LoadAlbumListAsync(
 
         val requestQueue = Volley.newRequestQueue(contextReference.get()!!)
 
-        val tempList = arrayOfNulls<JSONObject>(HomeHandler.loadMax)
+        val tempList = arrayOfNulls<JSONObject>(loadMax)
 
         val albumDatabaseHelper =
             AlbumDatabaseHelper(contextReference.get()!!)
@@ -90,7 +91,7 @@ class LoadAlbumListAsync(
                 }
             }
 
-            for (i in (0 until HomeHandler.loadMax / 50)) {
+            for (i in (0 until loadMax / 50)) {
                 val requestUrl =
                     contextReference.get()!!.getString(R.string.loadAlbumsUrl) + "?limit=50&skip=" + i * 50
                 val albumsRequest = MonstercatRequest(
@@ -116,6 +117,9 @@ class LoadAlbumListAsync(
             }
 
             tempList.reverse()
+
+            albumDatabaseHelper.reCreateTable()
+
             val jsonParser = JSONParser()
             for (jsonObject in tempList) {
                 if (jsonObject != null) {

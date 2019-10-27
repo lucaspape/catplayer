@@ -47,7 +47,10 @@ class LoadPlaylistTracksAsync(
         val jsonParser = JSONParser()
 
         for (playlistItem in playlistItems) {
-            val hashMap = jsonParser.parseSongToHashMap(contextReference.get()!!, songDatabaseHelper.getSong(playlistItem.songId))
+            val hashMap = jsonParser.parseSongToHashMap(
+                contextReference.get()!!,
+                songDatabaseHelper.getSong(playlistItem.songId)
+            )
             sortedList.add(hashMap)
         }
 
@@ -103,6 +106,8 @@ class LoadPlaylistTracksAsync(
 
 
             trackCountRequestQueue.addRequestFinishedListener<Any> {
+                val tempList = arrayOfNulls<JSONObject>(trackCount)
+
                 var finishedRequests = 0
                 var totalRequestsCount = 0
 
@@ -110,12 +115,26 @@ class LoadPlaylistTracksAsync(
 
                 val playlistTrackRequestQueue = Volley.newRequestQueue(contextReference.get()!!)
 
-                val tempList = arrayOfNulls<Long>(trackCount)
-
                 playlistTrackRequestQueue.addRequestFinishedListener<Any> {
                     finishedRequests++
 
                     if (finishedRequests >= totalRequestsCount) {
+
+                        playlistItemDatabaseHelper.reCreateTable()
+
+                        val jsonParser = JSONParser()
+
+                        for (playlistObject in tempList) {
+                            if (playlistObject != null) {
+                                jsonParser.parsePlaylistTrackToDB(
+                                    playlistId,
+                                    playlistObject,
+                                    contextReference.get()!!
+                                )
+                            }
+
+                        }
+
                         synchronized(syncObject) {
                             syncObject.notify()
                         }
@@ -134,19 +153,8 @@ class LoadPlaylistTracksAsync(
                             val jsonObject = JSONObject(response)
                             val jsonArray = jsonObject.getJSONArray("results")
 
-                            val jsonParser = JSONParser()
-
                             for (k in (0 until jsonArray.length())) {
-                                val playlistObject = jsonArray.getJSONObject(k)
-
-                                val id = jsonParser.parsePlaylistTrackToDB(
-                                    playlistId,
-                                    playlistObject,
-                                    contextReference.get()!!
-                                )
-                                if (id != null) {
-                                    tempList[i * 50 + k] = id
-                                }
+                                tempList[i * 50 + k] = jsonArray.getJSONObject(k)
                             }
                         },
                         Response.ErrorListener { })
@@ -154,6 +162,7 @@ class LoadPlaylistTracksAsync(
                     totalRequestsCount++
                     requests.add(playlistTrackRequest)
                 }
+
                 playlistTrackRequestQueue.add(requests[finishedRequests])
             }
 
@@ -161,8 +170,9 @@ class LoadPlaylistTracksAsync(
 
             synchronized(syncObject) {
                 syncObject.wait()
-                return null
             }
+
+            return null
         }
     }
 

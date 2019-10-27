@@ -3,14 +3,13 @@ package de.lucaspape.monstercat.activities
 import android.os.Build
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Switch
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.Auth
 import de.lucaspape.monstercat.settings.Settings
+import kotlinx.android.synthetic.main.activity_settings.*
 
 /**
  * SettingsActivity
@@ -41,6 +40,10 @@ class SettingsActivity : AppCompatActivity() {
         val downloadMobileSwitch = findViewById<Switch>(R.id.downloadMobileSwitch)
         val downloadCoversMobileSwitch = findViewById<Switch>(R.id.downloadCoversMobileSwitch)
         val darkThemeSwitch = findViewById<Switch>(R.id.darkThemeSwitch)
+        val maxLoadSeekBar = findViewById<SeekBar>(R.id.maximumLoadSeekBar)
+        val shownMaxValue = findViewById<TextView>(R.id.shownMaxValue)
+
+        maxLoadSeekBar.max = 200 / 50
 
         if (settings.getSetting("streamOverMobile") != null) {
             streamMobileSwitch.isChecked = settings.getSetting("streamOverMobile")!!.toBoolean()
@@ -53,6 +56,11 @@ class SettingsActivity : AppCompatActivity() {
         if (settings.getSetting("downloadCoversOverMobile") != null) {
             downloadCoversMobileSwitch.isChecked =
                 settings.getSetting("downloadCoversOverMobile")!!.toBoolean()
+        }
+
+        if(settings.getSetting("maximumLoad") != null){
+            maxLoadSeekBar.progress = Integer.parseInt(settings.getSetting("maximumLoad")!!) / 50
+            shownMaxValue.text = settings.getSetting("maximumLoad")!!
         }
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P){
@@ -89,5 +97,25 @@ class SettingsActivity : AppCompatActivity() {
             }
 
         }
+
+        maximumLoadSeekBar.setOnSeekBarChangeListener (object :
+            SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(
+                seekBar: SeekBar,
+                progress: Int,
+                fromUser: Boolean
+            ) {
+                if (fromUser){
+                    settings.saveSetting("maximumLoad", (progress*50).toString())
+                    shownMaxValue.text = settings.getSetting("maximumLoad")!!
+                }
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
+            }
+        })
     }
 }
