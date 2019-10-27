@@ -35,13 +35,7 @@ internal fun play() {
 
         mediaPlayer = ExoPlayerFactory.newSimpleInstance(contextReference!!.get()!!)
 
-        mediaPlayer!!.addListener(object : Player.EventListener {
-            override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-                when (playbackState) {
-                    Player.STATE_ENDED -> next()
-                }
-            }
-        })
+        registerNextListener()
 
         val connectivityManager =
             contextReference!!.get()!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -117,6 +111,8 @@ internal fun stop() {
         setPlayButtonImage()
 
         mediaPlayer!!.stop()
+
+        registerNextListener()
     }
 }
 
@@ -142,6 +138,8 @@ fun pause() {
         paused = true
 
         setPlayButtonImage()
+
+        registerNextListener()
     } catch (e: IndexOutOfBoundsException) {
 
     }
@@ -177,6 +175,8 @@ fun resume() {
         playing = true
 
         setPlayButtonImage()
+
+        registerNextListener()
     } catch (e: IndexOutOfBoundsException) {
 
     }
@@ -234,6 +234,18 @@ private fun clearListener(){
     if(mediaPlayer != null){
         mediaPlayer!!.addListener(object : Player.EventListener {
             override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
+            }
+        })
+    }
+}
+
+private fun registerNextListener(){
+    if(mediaPlayer != null){
+        mediaPlayer!!.addListener(object : Player.EventListener {
+            override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
+                when (playbackState) {
+                    Player.STATE_ENDED -> next()
+                }
             }
         })
     }
