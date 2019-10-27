@@ -20,8 +20,8 @@ import de.lucaspape.monstercat.R
 import java.io.File
 
 //notification var
-internal const val channelID = "Music Notification"
-internal const val notificationID = 1
+const val musicChannelID = "Music Notification"
+const val musicNotificationID = 1
 
 private const val NOTIFICATION_PREVIOUS = "de.lucaspape.monstercat.previous"
 private const val NOTIFICATION_DELETE = "de.lucaspape.monstercat.delete"
@@ -130,7 +130,7 @@ internal fun showSongNotification(
         normalRemoteViews.setViewVisibility(R.id.pauseButton, View.GONE)
     }
 
-    val notificationBuilder = NotificationCompat.Builder(context, channelID)
+    val notificationBuilder = NotificationCompat.Builder(context, musicChannelID)
     notificationBuilder.setSmallIcon(R.drawable.ic_play_circle_filled_black_24dp)
     notificationBuilder.priority = NotificationCompat.PRIORITY_LOW
     notificationBuilder.setOngoing(true)
@@ -148,7 +148,7 @@ internal fun showSongNotification(
     setListeners(normalRemoteViews, expandedRemoteViews, context)
 
     val notificationManagerCompat = NotificationManagerCompat.from(context)
-    notificationManagerCompat.notify(notificationID, notificationBuilder.build())
+    notificationManagerCompat.notify(musicNotificationID, notificationBuilder.build())
 
     context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_PREVIOUS))
     context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_DELETE))
@@ -165,7 +165,7 @@ private fun createNotificationChannel() {
         val channelDescription = "Handy dandy description"
         val importance = NotificationManager.IMPORTANCE_LOW
 
-        val notificationChannel = NotificationChannel(channelID, channelName, importance)
+        val notificationChannel = NotificationChannel(musicChannelID, channelName, importance)
 
         notificationChannel.description = channelDescription
 
@@ -223,7 +223,7 @@ class IntentReceiver : BroadcastReceiver() {
                     val notificationManager =
                         context!!.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                     pause()
-                    notificationManager.cancel(notificationID)
+                    notificationManager.cancel(musicNotificationID)
                 }
 
                 intent.action.equals(NOTIFICATION_PAUSE) -> pause()

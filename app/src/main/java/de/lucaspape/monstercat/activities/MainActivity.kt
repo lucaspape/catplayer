@@ -3,6 +3,8 @@ package de.lucaspape.monstercat.activities
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
@@ -125,6 +127,10 @@ class MainActivity : AppCompatActivity() {
         }catch (e: IllegalArgumentException){
 
         }
+
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancel(musicNotificationID)
 
         super.onDestroy()
     }

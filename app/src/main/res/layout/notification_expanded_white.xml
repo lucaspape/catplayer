@@ -69,7 +69,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:divider="@drawable/divider"
+            android:divider="@drawable/divider_white"
             android:dividerPadding="12dp"
             android:gravity="top|center"
             android:orientation="horizontal"

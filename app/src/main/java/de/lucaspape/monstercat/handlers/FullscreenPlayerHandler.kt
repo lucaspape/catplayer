@@ -4,7 +4,6 @@ import android.view.View
 import android.widget.*
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.music.*
-import java.lang.ref.WeakReference
 
 class FullscreenPlayerHandler {
     fun setupMusicPlayer(view: View) {
