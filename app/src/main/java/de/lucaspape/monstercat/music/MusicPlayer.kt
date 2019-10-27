@@ -23,7 +23,6 @@ internal var playList = ArrayList<Song>(1)
 
 internal var playing = false
 internal var paused = false
-internal var preparing = false
 
 var mediaSession: MediaSessionCompat? = null
 

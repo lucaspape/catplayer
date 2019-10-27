@@ -20,22 +20,24 @@ import java.lang.IndexOutOfBoundsException
  * Music control methods
  */
 internal fun play() {
+    clearListener()
+
     try {
         val song = playList[currentSong]
 
         val settings = Settings(contextReference!!.get()!!)
         val primaryResolution = settings.getSetting("primaryCoverResolution")
 
-        if(mediaPlayer != null){
+        if (mediaPlayer != null) {
             mediaPlayer!!.release()
             mediaPlayer!!.stop()
         }
 
         mediaPlayer = ExoPlayerFactory.newSimpleInstance(contextReference!!.get()!!)
 
-        mediaPlayer!!.addListener(object: Player.EventListener{
+        mediaPlayer!!.addListener(object : Player.EventListener {
             override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-                when (playbackState){
+                when (playbackState) {
                     Player.STATE_ENDED -> next()
                 }
             }
@@ -45,14 +47,31 @@ internal fun play() {
             contextReference!!.get()!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
 
-        if((wifi != null && wifi.isConnected) || settings.getSetting("streamOverMobile") == "true" || File(song.getUrl()).exists()){
+        if ((wifi != null && wifi.isConnected) || settings.getSetting("streamOverMobile") == "true" || File(
+                song.getUrl()
+            ).exists()
+        ) {
 
-            if(!File(song.getUrl()).exists()){
-                mediaPlayer!!.prepare(ProgressiveMediaSource.Factory(DefaultDataSourceFactory(contextReference!!.get()!!, Util.getUserAgent(
-                    contextReference!!.get()!!, "MonstercatPlayer"))).createMediaSource(song.getUrl().toUri()))
-            }else{
-                mediaPlayer!!.prepare(ProgressiveMediaSource.Factory(DefaultDataSourceFactory(contextReference!!.get()!!, Util.getUserAgent(
-                    contextReference!!.get()!!, "MonstercatPlayer"))).createMediaSource(Uri.parse("file://" + song.getUrl())))
+            if (!File(song.getUrl()).exists()) {
+                mediaPlayer!!.prepare(
+                    ProgressiveMediaSource.Factory(
+                        DefaultDataSourceFactory(
+                            contextReference!!.get()!!, Util.getUserAgent(
+                                contextReference!!.get()!!, "MonstercatPlayer"
+                            )
+                        )
+                    ).createMediaSource(song.getUrl().toUri())
+                )
+            } else {
+                mediaPlayer!!.prepare(
+                    ProgressiveMediaSource.Factory(
+                        DefaultDataSourceFactory(
+                            contextReference!!.get()!!, Util.getUserAgent(
+                                contextReference!!.get()!!, "MonstercatPlayer"
+                            )
+                        )
+                    ).createMediaSource(Uri.parse("file://" + song.getUrl()))
+                )
             }
 
             mediaPlayer!!.playWhenReady = true
@@ -76,8 +95,6 @@ internal fun play() {
             playing = true
 
             startSeekBarUpdate()
-
-            preparing = false
         }
 
     } catch (e: IndexOutOfBoundsException) {
@@ -90,6 +107,8 @@ internal fun play() {
  */
 internal fun stop() {
     if (mediaPlayer!!.isPlaying) {
+
+        clearListener()
 
         playing = false
 
@@ -105,6 +124,8 @@ internal fun stop() {
  * Pause playback
  */
 fun pause() {
+    clearListener()
+
     val context = contextReference!!.get()!!
     val settings = Settings(context)
     val primaryResolution = settings.getSetting("primaryCoverResolution")
@@ -115,7 +136,7 @@ fun pause() {
         val coverUrl = context.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
 
         mediaPlayer!!.playWhenReady = false
-        showSongNotification(song.title, song.artist, song.version, coverUrl, false)
+        showSongNotification(song.title, song.version, song.artist, coverUrl, false)
 
         playing = false
         paused = true
@@ -130,39 +151,34 @@ fun pause() {
  * Resume playback
  */
 fun resume() {
-    if(!preparing){
-        preparing = true
+    clearListener()
 
-        val context = contextReference!!.get()!!
-        val settings = Settings(context)
-        val primaryResolution = settings.getSetting("primaryCoverResolution")
+    val context = contextReference!!.get()!!
+    val settings = Settings(context)
+    val primaryResolution = settings.getSetting("primaryCoverResolution")
 
-        try {
-            val song = playList[currentSong]
+    try {
+        val song = playList[currentSong]
 
-            val coverUrl = context.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
+        val coverUrl = context.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
 
-            if (paused) {
-               // mediaPlayer!!.seekTo(length)
-                mediaPlayer!!.playWhenReady = true
+        if (paused) {
+            // mediaPlayer!!.seekTo(length)
+            mediaPlayer!!.playWhenReady = true
 
-                paused = false
-                preparing = false
+            paused = false
 
-                val intentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
-                context.registerReceiver(NoisyReceiver(), intentFilter)
-            } else {
-                play()
-            }
-
-            showSongNotification(song.title, song.version, song.artist, coverUrl, true)
-
-            playing = true
-
-            setPlayButtonImage()
-        } catch (e: IndexOutOfBoundsException) {
-
+            val intentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
+            context.registerReceiver(NoisyReceiver(), intentFilter)
         }
+
+        showSongNotification(song.title, song.version, song.artist, coverUrl, true)
+
+        playing = true
+
+        setPlayButtonImage()
+    } catch (e: IndexOutOfBoundsException) {
+
     }
 }
 
@@ -170,24 +186,22 @@ fun resume() {
  * Next song
  */
 fun next() {
-    if(!preparing){
-        preparing = true
-        currentSong++
-        play()
-    }
+    clearListener()
+
+    currentSong++
+    play()
 }
 
 /**
  * Previous song
  */
 fun previous() {
-    if(!preparing){
-        preparing = true
-        if (currentSong != 0) {
-            currentSong--
+    if (currentSong != 0) {
+        clearListener()
 
-            play()
-        }
+        currentSong--
+
+        play()
     }
 }
 
@@ -195,18 +209,14 @@ fun previous() {
  * Play song now
  */
 fun playNow(song: Song) {
-    if(!preparing){
-        preparing = true
-
-        try {
-            playList.add(currentSong + 1, song)
-            currentSong++
-        } catch (e: IndexOutOfBoundsException) {
-            playList.add(song)
-        }
-
-        play()
+    try {
+        playList.add(currentSong + 1, song)
+        currentSong++
+    } catch (e: IndexOutOfBoundsException) {
+        playList.add(song)
     }
+
+    play()
 }
 
 /**
@@ -217,5 +227,14 @@ fun toggleMusic() {
         pause()
     } else {
         resume()
+    }
+}
+
+private fun clearListener(){
+    if(mediaPlayer != null){
+        mediaPlayer!!.addListener(object : Player.EventListener {
+            override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
+            }
+        })
     }
 }

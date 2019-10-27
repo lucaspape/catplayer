@@ -29,6 +29,8 @@ private const val NOTIFICATION_PAUSE = "de.lucaspape.monstercat.pause"
 private const val NOTIFICATION_PLAY = "de.lucaspape.monstercat.play"
 private const val NOTIFICATION_NEXT = "de.lucaspape.monstercat.next"
 
+private var lastButtonPress:Long = 0
+
 /**
  * Show notification
  */
@@ -212,19 +214,25 @@ private fun setListeners(normalView: RemoteViews, bigView:RemoteViews, context: 
 
 class IntentReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
-        when {
-            intent!!.action.equals(NOTIFICATION_PREVIOUS) -> previous()
-            intent.action.equals(NOTIFICATION_DELETE) -> {
-                val notificationManager =
-                    context!!.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                pause()
-                notificationManager.cancel(notificationID)
-            }
+        if((System.currentTimeMillis() - lastButtonPress) > 200){
+            lastButtonPress = System.currentTimeMillis()
 
-            intent.action.equals(NOTIFICATION_PAUSE) -> pause()
-            intent.action.equals(NOTIFICATION_PLAY) -> resume()
-            intent.action.equals(NOTIFICATION_NEXT) -> next()
+            when {
+                intent!!.action.equals(NOTIFICATION_PREVIOUS) -> previous()
+                intent.action.equals(NOTIFICATION_DELETE) -> {
+                    val notificationManager =
+                        context!!.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                    pause()
+                    notificationManager.cancel(notificationID)
+                }
+
+                intent.action.equals(NOTIFICATION_PAUSE) -> pause()
+                intent.action.equals(NOTIFICATION_PLAY) -> resume()
+                intent.action.equals(NOTIFICATION_NEXT) -> next()
+            }
         }
+
+
     }
 }
 
