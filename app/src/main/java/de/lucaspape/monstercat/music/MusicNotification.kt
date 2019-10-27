@@ -45,6 +45,7 @@ internal fun showSongNotification(
 
     val backgroundColor: Int
     val expandedRemoteViews: RemoteViews
+    val normalRemoteViews: RemoteViews
 
     val coverFile = File(coverLocation)
     if (coverFile.exists()) {
@@ -58,6 +59,13 @@ internal fun showSongNotification(
             )
             expandedRemoteViews.setTextColor(R.id.songname, Color.WHITE)
             expandedRemoteViews.setTextColor(R.id.artistname, Color.WHITE)
+
+            normalRemoteViews = RemoteViews(
+                context.packageName,
+                R.layout.notification_normal_white
+            )
+
+            normalRemoteViews.setTextColor(R.id.title, Color.WHITE)
         } else {
             expandedRemoteViews = RemoteViews(
                 context.packageName,
@@ -65,6 +73,13 @@ internal fun showSongNotification(
             )
             expandedRemoteViews.setTextColor(R.id.songname, Color.BLACK)
             expandedRemoteViews.setTextColor(R.id.artistname, Color.BLACK)
+
+            normalRemoteViews = RemoteViews(
+                context.packageName,
+                R.layout.notification_normal
+            )
+
+            normalRemoteViews.setTextColor(R.id.title, Color.BLACK)
         }
 
         expandedRemoteViews.setImageViewBitmap(R.id.coverimageview, bitmap)
@@ -74,22 +89,43 @@ internal fun showSongNotification(
             "setBackgroundColor",
             backgroundColor
         )
+
+        normalRemoteViews.setImageViewBitmap(R.id.coverimageview, bitmap)
+
+        normalRemoteViews.setInt(
+            R.id.notificationlayout,
+            "setBackgroundColor",
+            backgroundColor
+        )
     } else {
         expandedRemoteViews = RemoteViews(
             context.packageName,
             R.layout.notification_expanded
+        )
+
+        normalRemoteViews = RemoteViews(
+            context.packageName,
+            R.layout.notification_normal
         )
     }
 
     expandedRemoteViews.setTextViewText(R.id.artistname, artist)
     expandedRemoteViews.setTextViewText(R.id.songname, "$title $version")
 
+    normalRemoteViews.setTextViewText(R.id.title, "$title $version")
+
     if (playing) {
         expandedRemoteViews.setViewVisibility(R.id.playButton, View.GONE)
         expandedRemoteViews.setViewVisibility(R.id.pauseButton, View.VISIBLE)
+
+        normalRemoteViews.setViewVisibility(R.id.playButton, View.GONE)
+        normalRemoteViews.setViewVisibility(R.id.pauseButton, View.VISIBLE)
     } else {
         expandedRemoteViews.setViewVisibility(R.id.playButton, View.VISIBLE)
         expandedRemoteViews.setViewVisibility(R.id.pauseButton, View.GONE)
+
+        normalRemoteViews.setViewVisibility(R.id.playButton, View.VISIBLE)
+        normalRemoteViews.setViewVisibility(R.id.pauseButton, View.GONE)
     }
 
     val notificationBuilder = NotificationCompat.Builder(context, channelID)
@@ -102,9 +138,12 @@ internal fun showSongNotification(
             mediaSession!!.sessionToken
         )
     )
-    notificationBuilder.setCustomBigContentView(expandedRemoteViews)
 
-    setListeners(expandedRemoteViews, context)
+    notificationBuilder.setCustomBigContentView(expandedRemoteViews)
+    notificationBuilder.setCustomContentView(normalRemoteViews)
+    notificationBuilder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+
+    setListeners(normalRemoteViews, expandedRemoteViews, context)
 
     val notificationManagerCompat = NotificationManagerCompat.from(context)
     notificationManagerCompat.notify(notificationID, notificationBuilder.build())
@@ -138,7 +177,7 @@ private fun createNotificationChannel() {
 /**
  * Notification button listeners
  */
-private fun setListeners(view: RemoteViews, context: Context) {
+private fun setListeners(normalView: RemoteViews, bigView:RemoteViews, context: Context) {
     val previous = Intent(NOTIFICATION_PREVIOUS)
     val delete = Intent(NOTIFICATION_DELETE)
     val pause = Intent(NOTIFICATION_PAUSE)
@@ -147,23 +186,28 @@ private fun setListeners(view: RemoteViews, context: Context) {
 
     val pendingPrevious =
         PendingIntent.getBroadcast(context, 0, previous, PendingIntent.FLAG_CANCEL_CURRENT)
-    view.setOnClickPendingIntent(R.id.prevButton, pendingPrevious)
+    normalView.setOnClickPendingIntent(R.id.prevButton, pendingPrevious)
+    bigView.setOnClickPendingIntent(R.id.prevButton, pendingPrevious)
 
     val pendingDelete =
         PendingIntent.getBroadcast(context, 0, delete, PendingIntent.FLAG_CANCEL_CURRENT)
-    view.setOnClickPendingIntent(R.id.closeButton, pendingDelete)
+    normalView.setOnClickPendingIntent(R.id.closeButton, pendingDelete)
+    bigView.setOnClickPendingIntent(R.id.closeButton, pendingDelete)
 
     val pendingPause =
         PendingIntent.getBroadcast(context, 0, pause, PendingIntent.FLAG_CANCEL_CURRENT)
-    view.setOnClickPendingIntent(R.id.pauseButton, pendingPause)
+    normalView.setOnClickPendingIntent(R.id.pauseButton, pendingPause)
+    bigView.setOnClickPendingIntent(R.id.pauseButton, pendingPause)
 
     val pendingPlay =
         PendingIntent.getBroadcast(context, 0, play, PendingIntent.FLAG_CANCEL_CURRENT)
-    view.setOnClickPendingIntent(R.id.playButton, pendingPlay)
+    normalView.setOnClickPendingIntent(R.id.playButton, pendingPlay)
+    bigView.setOnClickPendingIntent(R.id.playButton, pendingPlay)
 
     val pendingNext =
         PendingIntent.getBroadcast(context, 0, next, PendingIntent.FLAG_CANCEL_CURRENT)
-    view.setOnClickPendingIntent(R.id.nextButton, pendingNext)
+    normalView.setOnClickPendingIntent(R.id.nextButton, pendingNext)
+    bigView.setOnClickPendingIntent(R.id.nextButton, pendingNext)
 }
 
 class IntentReceiver : BroadcastReceiver() {
