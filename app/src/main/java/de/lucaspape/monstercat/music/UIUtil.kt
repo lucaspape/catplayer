@@ -137,7 +137,7 @@ fun setPlayButton(newPlayButton: ImageButton) {
         newPlayButton.setImageDrawable(
             ContextCompat.getDrawable(
                 contextReference!!.get()!!,
-                R.drawable.ic_pause_white_24dp
+                R.drawable.ic_pause_24dp
             )
         )
 
@@ -145,7 +145,7 @@ fun setPlayButton(newPlayButton: ImageButton) {
         newPlayButton.setImageDrawable(
             ContextCompat.getDrawable(
                 contextReference!!.get()!!,
-                R.drawable.ic_play_arrow_white_24dp
+                R.drawable.ic_play_arrow_24dp
             )
         )
 
@@ -159,7 +159,7 @@ fun setFullscreenPlayButton(newPlayButton: ImageButton) {
         newPlayButton.setImageDrawable(
             ContextCompat.getDrawable(
                 contextReference!!.get()!!,
-                R.drawable.ic_pause_black_24dp
+                R.drawable.ic_pause_24dp
             )
         )
 
@@ -167,7 +167,7 @@ fun setFullscreenPlayButton(newPlayButton: ImageButton) {
         newPlayButton.setImageDrawable(
             ContextCompat.getDrawable(
                 contextReference!!.get()!!,
-                R.drawable.ic_play_arrow_black_24dp
+                R.drawable.ic_play_arrow_24dp
             )
         )
 

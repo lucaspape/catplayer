@@ -29,7 +29,7 @@
             android:layout_gravity="end"
             android:background="@null"
             android:contentDescription="@string/settingsDescription"
-            android:src="@drawable/ic_settings_black_24dp"
+            android:src="@drawable/ic_settings_24dp"
             tools:layout_editor_absoluteX="316dp" />
 
     </androidx.appcompat.widget.Toolbar>
