@@ -2,6 +2,7 @@ package de.lucaspape.monstercat.music
 
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.ColorDrawable
@@ -132,11 +133,11 @@ fun setMusicBar(newToolbar: androidx.appcompat.widget.Toolbar) {
     musicBarReference = WeakReference(newToolbar)
 }
 
-fun setPlayButton(newPlayButton: ImageButton) {
+fun setPlayButton(newPlayButton: ImageButton, context: Context) {
     if (playing) {
         newPlayButton.setImageDrawable(
             ContextCompat.getDrawable(
-                contextReference!!.get()!!,
+                context,
                 R.drawable.ic_pause_24dp
             )
         )
@@ -144,7 +145,7 @@ fun setPlayButton(newPlayButton: ImageButton) {
     } else {
         newPlayButton.setImageDrawable(
             ContextCompat.getDrawable(
-                contextReference!!.get()!!,
+                context,
                 R.drawable.ic_play_arrow_24dp
             )
         )
@@ -154,11 +155,11 @@ fun setPlayButton(newPlayButton: ImageButton) {
     playButtonReference = WeakReference(newPlayButton)
 }
 
-fun setFullscreenPlayButton(newPlayButton: ImageButton) {
+fun setFullscreenPlayButton(newPlayButton: ImageButton, context: Context) {
     if (playing) {
         newPlayButton.setImageDrawable(
             ContextCompat.getDrawable(
-                contextReference!!.get()!!,
+                context,
                 R.drawable.ic_pause_24dp
             )
         )
@@ -166,7 +167,7 @@ fun setFullscreenPlayButton(newPlayButton: ImageButton) {
     } else {
         newPlayButton.setImageDrawable(
             ContextCompat.getDrawable(
-                contextReference!!.get()!!,
+                context,
                 R.drawable.ic_play_arrow_24dp
             )
         )
@@ -316,12 +317,12 @@ internal fun startSeekBarUpdate() {
     }
 }
 
-internal fun setCover(song: Song) {
-    val settings = Settings(contextReference!!.get()!!)
+internal fun setCover(song: Song, context: Context) {
+    val settings = Settings(context)
     val primaryResolution = settings.getSetting("primaryCoverResolution")
 
     val coverFile =
-        File(contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution)
+        File(context.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution)
 
     if (coverFile.exists()) {
         val bitmap = BitmapFactory.decodeFile(coverFile.absolutePath)
@@ -344,13 +345,13 @@ internal fun setCover(song: Song) {
     }
 }
 
-internal fun setPlayButtonImage() {
+internal fun setPlayButtonImage(context:Context) {
     if (playing) {
         try {
             playButtonReference!!.get()!!.setImageDrawable(
                 ContextCompat.getDrawable(
-                    contextReference!!.get()!!,
-                    R.drawable.ic_pause_white_24dp
+                    context,
+                    R.drawable.ic_pause_24dp
                 )
             )
 
@@ -361,8 +362,8 @@ internal fun setPlayButtonImage() {
         try {
             fullscreenPlayButtonReference!!.get()!!.setImageDrawable(
                 ContextCompat.getDrawable(
-                    contextReference!!.get()!!,
-                    R.drawable.ic_pause_black_24dp
+                    context,
+                    R.drawable.ic_pause_24dp
                 )
             )
 
@@ -373,8 +374,8 @@ internal fun setPlayButtonImage() {
         try {
             playButtonReference!!.get()!!.setImageDrawable(
                 ContextCompat.getDrawable(
-                    contextReference!!.get()!!,
-                    R.drawable.ic_play_arrow_white_24dp
+                    context,
+                    R.drawable.ic_play_arrow_24dp
                 )
             )
 
@@ -385,8 +386,8 @@ internal fun setPlayButtonImage() {
         try {
             fullscreenPlayButtonReference!!.get()!!.setImageDrawable(
                 ContextCompat.getDrawable(
-                    contextReference!!.get()!!,
-                    R.drawable.ic_play_arrow_black_24dp
+                    context,
+                    R.drawable.ic_play_arrow_24dp
                 )
             )
 

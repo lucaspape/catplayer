@@ -9,7 +9,6 @@ import android.content.pm.PackageManager
 import android.media.AudioManager
 import android.os.AsyncTask
 import android.os.Bundle
-import android.os.strictmode.IntentReceiverLeakedViolation
 import android.text.SpannableString
 import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
@@ -79,12 +78,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        setContentView(R.layout.activity_main)
-
-        findViewById<BottomNavigationView>(R.id.nav_view).setOnNavigationItemSelectedListener(
-            onNavigationItemSelectedListener
-        )
-
         //check for internet
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET)
             != PackageManager.PERMISSION_GRANTED
@@ -106,16 +99,23 @@ class MainActivity : AppCompatActivity() {
             HomeHandler.albumViewSelected = settings.getSetting("albumView") == true.toString()
         }
 
-        //open the home fragment
-        openFragment(HomeFragment.newInstance())
-
         //start download background task
         DownloadTask(WeakReference(applicationContext)).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 
         //show privacy policy
         showPrivacyPolicy()
 
+        //open the home fragment
+        openFragment(HomeFragment.newInstance())
+
+        setContentView(R.layout.activity_main)
+
+        findViewById<BottomNavigationView>(R.id.nav_view).setOnNavigationItemSelectedListener(
+            onNavigationItemSelectedListener
+        )
+
         setupMusicPlayer()
+
         registerButtonListeners()
     }
 
@@ -125,7 +125,6 @@ class MainActivity : AppCompatActivity() {
         }catch (e: IllegalArgumentException){
 
         }
-
 
         super.onDestroy()
     }
@@ -169,28 +168,24 @@ class MainActivity : AppCompatActivity() {
      * Set the correct views for the MusicPlayer.kt
      */
     @SuppressLint("ClickableViewAccessibility")
-    fun setupMusicPlayer() {
+    private fun setupMusicPlayer() {
         val textView = findViewById<TextView>(R.id.songCurrentText)
         val coverBarImageView = findViewById<ImageView>(R.id.barCoverImage)
         val musicToolBar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.musicBar)
         val playButton = findViewById<ImageButton>(R.id.playButton)
         val seekBar = findViewById<SeekBar>(R.id.seekBar)
 
-        val weakReference = WeakReference(applicationContext)
-
         //setup musicPlayer
-
-        contextReference = (weakReference)
         setTextView(textView)
         setSeekBar(seekBar)
         setBarCoverImageView(coverBarImageView)
         setMusicBar(musicToolBar)
-        setPlayButton(playButton)
+        setPlayButton(playButton, this)
 
         seekBar.setOnTouchListener { _, _ -> true }
     }
 
-    fun registerButtonListeners() {
+    private fun registerButtonListeners() {
         //music control buttons
         val playButton = findViewById<ImageButton>(R.id.playButton)
 

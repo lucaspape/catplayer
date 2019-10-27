@@ -14,15 +14,11 @@ class FullscreenPlayerHandler {
         val playButton = view.findViewById<ImageButton>(R.id.fullScreenPlay)
         val seekBar = view.findViewById<SeekBar>(R.id.fullscreenSeekBar)
 
-        val weakReference = WeakReference(view.context)
-
         //setup musicPlayer
-
-        contextReference = (weakReference)
         setFullscreenTextView(textView1, textView2)
         setFullscreenSeekBar(seekBar)
         setFullscreenCoverImageView(coverBarImageView)
-        setFullscreenPlayButton(playButton)
+        setFullscreenPlayButton(playButton, view.context)
     }
 
     fun registerListeners(view: View) {

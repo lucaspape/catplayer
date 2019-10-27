@@ -74,9 +74,9 @@ internal fun play() {
 
             startTextAnimation()
 
-            setCover(song)
+            setCover(song, contextReference!!.get()!!)
 
-            setPlayButtonImage()
+            setPlayButtonImage(contextReference!!.get()!!)
 
             showSongNotification(
                 song.title,
@@ -108,7 +108,7 @@ internal fun stop() {
 
         hideTitle()
 
-        setPlayButtonImage()
+        setPlayButtonImage(contextReference!!.get()!!)
 
         mediaPlayer!!.stop()
 
@@ -137,7 +137,7 @@ fun pause() {
         playing = false
         paused = true
 
-        setPlayButtonImage()
+        setPlayButtonImage(context)
 
         registerNextListener()
     } catch (e: IndexOutOfBoundsException) {
@@ -174,7 +174,7 @@ fun resume() {
 
         playing = true
 
-        setPlayButtonImage()
+        setPlayButtonImage(context)
 
         registerNextListener()
     } catch (e: IndexOutOfBoundsException) {

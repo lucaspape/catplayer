@@ -13,7 +13,7 @@ import java.lang.NullPointerException
 import java.lang.ref.WeakReference
 import kotlin.collections.ArrayList
 
-var contextReference: WeakReference<Context>? = null
+internal var contextReference: WeakReference<Context>? = null
 
 internal var mediaPlayer:ExoPlayer? = null
 
@@ -89,6 +89,7 @@ fun createMediaSession(context: WeakReference<Context>) {
     })
 
     mediaSession!!.isActive = true
+    contextReference = context
 }
 
 /**
