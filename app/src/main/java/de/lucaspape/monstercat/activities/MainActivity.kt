@@ -9,6 +9,7 @@ import android.content.pm.PackageManager
 import android.media.AudioManager
 import android.os.AsyncTask
 import android.os.Bundle
+import android.os.strictmode.IntentReceiverLeakedViolation
 import android.text.SpannableString
 import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
