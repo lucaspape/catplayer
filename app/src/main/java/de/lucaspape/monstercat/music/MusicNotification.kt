@@ -33,7 +33,7 @@ private var lastButtonPress:Long = 0
 /**
  * Show notification
  */
-internal fun showSongNotification(
+private fun showSongNotification(
     title: String,
     version: String,
     artist: String,
@@ -160,6 +160,11 @@ internal fun showSongNotification(
     return notification
 }
 
+private fun hideMusicNotification(){
+    val notificationManagerCompat = NotificationManagerCompat.from(contextReference!!.get()!!)
+    notificationManagerCompat.cancel(musicNotificationID)
+}
+
 private fun createNotificationChannel() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         val context = contextReference!!.get()!!
@@ -223,10 +228,8 @@ class IntentReceiver : BroadcastReceiver() {
             when {
                 intent!!.action.equals(NOTIFICATION_PREVIOUS) -> previous()
                 intent.action.equals(NOTIFICATION_DELETE) -> {
-                    val notificationManager =
-                        context!!.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                     pause()
-                    notificationManager.cancel(musicNotificationID)
+                    hideMusicNotification()
                 }
 
                 intent.action.equals(NOTIFICATION_PAUSE) -> pause()
@@ -279,6 +282,11 @@ class MusicNotificationService: Service() {
 
         startForeground(1, showSongNotification(title, version, artist, coverLocation, playing))
         return START_NOT_STICKY
+    }
+
+    override fun onDestroy() {
+        hideMusicNotification()
+        super.onDestroy()
     }
 
 }

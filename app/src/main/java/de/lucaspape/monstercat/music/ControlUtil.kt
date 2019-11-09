@@ -136,10 +136,20 @@ fun pause() {
     try {
         val song = playList[currentSong]
 
-        val coverUrl = context.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
-
         mediaPlayer!!.playWhenReady = false
-        showSongNotification(song.title, song.version, song.artist, coverUrl, false)
+
+        val notificationServiceIntent = Intent(contextReference!!.get()!!, MusicNotificationService::class.java)
+        notificationServiceIntent.putExtra("title", song.title)
+        notificationServiceIntent.putExtra("version", song.version)
+        notificationServiceIntent.putExtra("artist", song.artist)
+        notificationServiceIntent.putExtra("coverLocation", contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution)
+        notificationServiceIntent.putExtra("playing", false.toString())
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            contextReference!!.get()!!.startForegroundService(notificationServiceIntent)
+        }else{
+            contextReference!!.get()!!.startService(notificationServiceIntent)
+        }
 
         playing = false
         paused = true
@@ -165,8 +175,6 @@ fun resume() {
     try {
         val song = playList[currentSong]
 
-        val coverUrl = context.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
-
         if (paused) {
             // mediaPlayer!!.seekTo(length)
             mediaPlayer!!.playWhenReady = true
@@ -177,7 +185,18 @@ fun resume() {
             context.registerReceiver(NoisyReceiver(), intentFilter)
         }
 
-        showSongNotification(song.title, song.version, song.artist, coverUrl, true)
+        val notificationServiceIntent = Intent(contextReference!!.get()!!, MusicNotificationService::class.java)
+        notificationServiceIntent.putExtra("title", song.title)
+        notificationServiceIntent.putExtra("version", song.version)
+        notificationServiceIntent.putExtra("artist", song.artist)
+        notificationServiceIntent.putExtra("coverLocation", contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution)
+        notificationServiceIntent.putExtra("playing", true.toString())
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            contextReference!!.get()!!.startForegroundService(notificationServiceIntent)
+        }else{
+            contextReference!!.get()!!.startService(notificationServiceIntent)
+        }
 
         playing = true
 
