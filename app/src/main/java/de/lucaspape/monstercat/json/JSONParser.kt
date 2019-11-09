@@ -102,7 +102,7 @@ class JSONParser {
         return songList
     }
 
-    fun parseCatalogSongToDB(jsonObject: JSONObject, context: Context): Long {
+    fun parseSongToDB(jsonObject: JSONObject, context: Context):Long{
         var id = ""
         var albumId = ""
         var title = ""
@@ -124,14 +124,16 @@ class JSONParser {
             version = ""
         }
 
-        val songId: Long
-
         val databaseHelper = SongDatabaseHelper(context)
-        songId = if (databaseHelper.getSong(id) == null) {
+        return if (databaseHelper.getSong(id) == null) {
             databaseHelper.insertSong(id, title, version, albumId, artist, coverUrl)
         } else {
             databaseHelper.getSong(id)!!.id.toLong()
         }
+    }
+
+    fun parseCatalogSongToDB(jsonObject: JSONObject, context: Context): Long {
+        val songId = parseSongToDB(jsonObject, context)
 
         val catalogSongDatabaseHelper = CatalogSongDatabaseHelper(context)
 
@@ -178,7 +180,7 @@ class JSONParser {
         return if (albumItemDatabaseHelper.getItemFromSongId(songId) == null) {
             albumItemDatabaseHelper.insertSongId(songId)
         } else {
-            albumItemDatabaseHelper.getItemFromSongId(songId)!!.id.toLong()
+            albumItemDatabaseHelper.getItemFromSongId(songId)!!.id
         }
     }
 

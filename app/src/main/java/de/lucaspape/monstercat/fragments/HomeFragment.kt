@@ -5,10 +5,11 @@ import android.view.*
 import android.widget.AdapterView
 import android.widget.ListView
 import androidx.fragment.app.Fragment
-import de.lucaspape.monstercat.handlers.HomeHandler
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
+import de.lucaspape.monstercat.handlers.*
 import de.lucaspape.monstercat.handlers.addSongToPlaylist
+import de.lucaspape.monstercat.handlers.downloadAlbum
 import de.lucaspape.monstercat.handlers.downloadSong
 import de.lucaspape.monstercat.handlers.playSongFromId
 import de.lucaspape.monstercat.settings.Settings
@@ -58,6 +59,8 @@ class HomeFragment : Fragment() {
             menu.add(0, v.id, 0, getString(R.string.download))
             menu.add(0, v.id, 0, getString(R.string.playNext))
             menu.add(0, v.id, 0, getString(R.string.addToPlaylist))
+        }else{
+            menu.add(0, v.id, 0, getString(R.string.downloadAlbum))
         }
     }
 
@@ -85,6 +88,13 @@ class HomeFragment : Fragment() {
                 item.title == getString(R.string.addToPlaylist) -> addSongToPlaylist(
                     context!!,
                     song
+                )
+            }
+        }else{
+            when{
+                item.title == getString(R.string.downloadAlbum) -> downloadAlbum(
+                    context!!,
+                    listItem["id"].toString()
                 )
             }
         }

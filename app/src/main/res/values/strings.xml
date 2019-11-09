@@ -7,6 +7,7 @@
     <string name="password">Password</string>
     <string name="addaccount">Login</string>
     <string name="download">Download</string>
+    <string name="downloadAlbum">Download Album</string>
     <string name="alreadyDownloadedMsg">%1$s already downloaded!</string>
     <string name="downloadNotAvailableMsg">%1$s not available for download!</string>
     <string name="songAddedToPlaylistMsg">%1$s added to the playlist!</string>
