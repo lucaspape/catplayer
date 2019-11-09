@@ -234,7 +234,7 @@ class HomeHandler {
                 albumViewSelected = false
 
                 searchSong(view, query!!)
-                
+
                 return false
             }
 
