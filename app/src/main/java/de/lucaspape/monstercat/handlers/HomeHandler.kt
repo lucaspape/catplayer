@@ -11,10 +11,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.activities.SettingsActivity
 import de.lucaspape.monstercat.activities.loadContinuousSongListAsyncTask
-import de.lucaspape.monstercat.handlers.async.LoadAlbumAsync
-import de.lucaspape.monstercat.handlers.async.LoadAlbumListAsync
-import de.lucaspape.monstercat.handlers.async.LoadContinuousSongListAsync
-import de.lucaspape.monstercat.handlers.async.LoadSongListAsync
+import de.lucaspape.monstercat.handlers.async.*
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.settings.Settings
 import java.lang.ref.WeakReference
@@ -214,6 +211,30 @@ class HomeHandler {
         view.findViewById<ImageButton>(R.id.settingsButton).setOnClickListener {
             view.context.startActivity(Intent(view.context, SettingsActivity::class.java))
         }
+
+        val search = view.findViewById<SearchView>(R.id.homeSearch)
+
+        search.setOnCloseListener {
+            if (albumView) {
+                loadAlbumList(view, false)
+            } else {
+                loadSongList(view, false)
+            }
+
+            false
+        }
+
+        search.setOnQueryTextListener(object:SearchView.OnQueryTextListener{
+            override fun onQueryTextChange(newText: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                searchSong(view, query!!)
+                return false
+            }
+
+        })
     }
 
     /**
@@ -269,6 +290,18 @@ class HomeHandler {
             contextReference,
             forceReload,
             itemValue
+        ).executeOnExecutor(
+            AsyncTask.THREAD_POOL_EXECUTOR
+        )
+    }
+
+    fun searchSong(view: View, searchString: String){
+        val contextReference = WeakReference<Context>(view.context)
+        val viewReference = WeakReference<View>(view)
+        LoadTitleSearchAsync(
+            viewReference,
+            contextReference,
+            searchString
         ).executeOnExecutor(
             AsyncTask.THREAD_POOL_EXECUTOR
         )

@@ -60,6 +60,48 @@ class JSONParser {
         return hashMap
     }
 
+    fun parseSongSearchToSongList(context: Context, jsonArray: JSONArray):ArrayList<Song>{
+        val songList = ArrayList<Song>()
+
+        for(i in (0 until jsonArray.length())){
+            val jsonObject = jsonArray.getJSONObject(i)
+
+            var id = ""
+            var albumId = ""
+            var title = ""
+            var artist = ""
+            var coverUrl = ""
+            var version = ""
+
+            try {
+                albumId = jsonObject.getJSONObject("albums").getString("albumId")
+                title = jsonObject.getString("title")
+                artist = jsonObject.getString("artistsTitle")
+                coverUrl = jsonObject.getJSONObject("release").getString("coverUrl")
+                version = jsonObject.getString("version")
+                id = jsonObject.getString("_id")
+            } catch (e: InvocationTargetException) {
+            }
+
+            if (version == "null") {
+                version = ""
+            }
+
+            val songId:Long
+
+            val databaseHelper = SongDatabaseHelper(context)
+            songId = if (databaseHelper.getSong(id) == null) {
+                databaseHelper.insertSong(id, title, version, albumId, artist, coverUrl)
+            } else {
+                databaseHelper.getSong(id)!!.id.toLong()
+            }
+
+            songList.add(databaseHelper.getSong(songId))
+        }
+
+        return songList
+    }
+
     fun parseCatalogSongToDB(jsonObject: JSONObject, context: Context): Long {
         var id = ""
         var albumId = ""
