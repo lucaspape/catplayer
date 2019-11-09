@@ -36,6 +36,7 @@ import java.lang.IllegalArgumentException
 import java.lang.ref.WeakReference
 
 var loadContinuousSongListAsyncTask: LoadContinuousSongListAsync? = null
+var downloadTask:DownloadTask? = null
 
 /**
  * Main activity
@@ -102,7 +103,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         //start download background task
-        DownloadTask(WeakReference(applicationContext)).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+
+        if(downloadTask != null){
+            downloadTask!!.cancel(true)
+        }
+
+        downloadTask = DownloadTask(WeakReference(applicationContext))
+        downloadTask!!.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 
         //show privacy policy
         showPrivacyPolicy()

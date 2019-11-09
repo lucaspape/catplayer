@@ -59,7 +59,7 @@ class HomeFragment : Fragment() {
             menu.add(0, v.id, 0, getString(R.string.download))
             menu.add(0, v.id, 0, getString(R.string.playNext))
             menu.add(0, v.id, 0, getString(R.string.addToPlaylist))
-        }else{
+        } else {
             menu.add(0, v.id, 0, getString(R.string.downloadAlbum))
             menu.add(0, v.id, 0, getString(R.string.playAlbumNext))
         }
@@ -91,8 +91,8 @@ class HomeFragment : Fragment() {
                     song
                 )
             }
-        }else{
-            when{
+        } else {
+            when {
                 item.title == getString(R.string.downloadAlbum) -> downloadAlbum(
                     context!!,
                     listItem["id"].toString()

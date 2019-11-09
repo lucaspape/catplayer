@@ -16,7 +16,3 @@ fun addDownloadSong(url: String, location: String, shownTitle: String) {
 fun addDownloadCoverArray(covers: ArrayList<HashMap<String, Any?>>) {
     downloadCoverArrayListList.add(covers)
 }
-
-
-
-
