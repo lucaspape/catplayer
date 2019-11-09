@@ -61,6 +61,7 @@ class HomeFragment : Fragment() {
             menu.add(0, v.id, 0, getString(R.string.addToPlaylist))
         }else{
             menu.add(0, v.id, 0, getString(R.string.downloadAlbum))
+            menu.add(0, v.id, 0, getString(R.string.playAlbumNext))
         }
     }
 
@@ -93,6 +94,11 @@ class HomeFragment : Fragment() {
         }else{
             when{
                 item.title == getString(R.string.downloadAlbum) -> downloadAlbum(
+                    context!!,
+                    listItem["id"].toString()
+                )
+
+                item.title == getString(R.string.playAlbumNext) -> playAlbumNext(
                     context!!,
                     listItem["id"].toString()
                 )

@@ -79,6 +79,38 @@ internal fun playSongFromId(context: Context, songId: String, playNow: Boolean) 
     }
 }
 
+internal fun playAlbumNext(context: Context, albumId: String){
+    val requestUrl =
+        context.getString(R.string.loadSongsUrl) + "?albumId=" + albumId
+
+    val albumRequestQueue = Volley.newRequestQueue(context)
+
+    val albumRequest = MonstercatRequest(Request.Method.GET, requestUrl, getSid() ,
+        Response.Listener { response ->
+            val jsonObject = JSONObject(response)
+            val jsonArray = jsonObject.getJSONArray("results")
+
+            val idArray = ArrayList<Long>()
+            val jsonParser = JSONParser()
+
+            for(i in (0 until jsonArray.length())){
+                idArray.add(jsonParser.parseSongToDB(jsonArray.getJSONObject(i), context))
+            }
+
+            val databaseHelper = SongDatabaseHelper(context)
+
+            for(id in idArray){
+                val song = databaseHelper.getSong(id)
+                addSong(song)
+            }
+        },
+        Response.ErrorListener { error ->
+            println(error)
+        })
+
+    albumRequestQueue.add(albumRequest)
+}
+
 internal fun downloadPlaylist(context: Context, playlistId: String) {
     val playlistItemDatabaseHelper =
         PlaylistItemDatabaseHelper(context, playlistId)
@@ -143,10 +175,6 @@ internal fun downloadAlbum(context: Context, albumId:String){
 
             for(id in idArray){
                 val song = databaseHelper.getSong(id)
-
-                println(song.title)
-
-                println(id)
                 downloadSong(context, song)
             }
         },
