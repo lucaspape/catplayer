@@ -60,10 +60,10 @@ class JSONParser {
         return hashMap
     }
 
-    fun parseSongSearchToSongList(context: Context, jsonArray: JSONArray):ArrayList<Song>{
+    fun parseSongSearchToSongList(context: Context, jsonArray: JSONArray): ArrayList<Song> {
         val songList = ArrayList<Song>()
 
-        for(i in (0 until jsonArray.length())){
+        for (i in (0 until jsonArray.length())) {
             val jsonObject = jsonArray.getJSONObject(i)
 
             var id = ""
@@ -87,7 +87,7 @@ class JSONParser {
                 version = ""
             }
 
-            val songId:Long
+            val songId: Long
 
             val databaseHelper = SongDatabaseHelper(context)
             songId = if (databaseHelper.getSong(id) == null) {
@@ -124,7 +124,7 @@ class JSONParser {
             version = ""
         }
 
-        val songId:Long
+        val songId: Long
 
         val databaseHelper = SongDatabaseHelper(context)
         songId = if (databaseHelper.getSong(id) == null) {
@@ -135,14 +135,14 @@ class JSONParser {
 
         val catalogSongDatabaseHelper = CatalogSongDatabaseHelper(context)
 
-        return if(catalogSongDatabaseHelper.getCatalogSong(songId) == null){
+        return if (catalogSongDatabaseHelper.getCatalogSong(songId) == null) {
             catalogSongDatabaseHelper.insertSong(songId)
-        }else{
+        } else {
             catalogSongDatabaseHelper.getCatalogSong(songId)!!.id.toLong()
         }
     }
 
-    fun parsAlbumSongToDB(jsonObject: JSONObject, sAlbumId:String, context: Context): Long {
+    fun parsAlbumSongToDB(jsonObject: JSONObject, sAlbumId: String, context: Context): Long {
         var id = ""
         var albumId = ""
         var title = ""
@@ -164,7 +164,7 @@ class JSONParser {
             version = ""
         }
 
-        val songId:Long
+        val songId: Long
 
         val databaseHelper = SongDatabaseHelper(context)
         songId = if (databaseHelper.getSong(id) == null) {
@@ -175,9 +175,9 @@ class JSONParser {
 
         val albumItemDatabaseHelper = AlbumItemDatabaseHelper(context, sAlbumId)
 
-        return if(albumItemDatabaseHelper.getItemFromSongId(songId) == null){
+        return if (albumItemDatabaseHelper.getItemFromSongId(songId) == null) {
             albumItemDatabaseHelper.insertSongId(songId)
-        }else{
+        } else {
             albumItemDatabaseHelper.getItemFromSongId(songId)!!.id.toLong()
         }
     }
@@ -199,14 +199,25 @@ class JSONParser {
     fun parseObjectToStreamHash(jsonObject: JSONObject, song: Song): String? {
         val jsonArray = jsonObject.getJSONArray("results")
 
+        // println(jsonArray)
+
         var streamHash = ""
-        val searchSong = song.title + song.version
+        val searchSong = song.artist + song.title + song.version
 
         for (i in (0 until jsonArray.length())) {
-            if (jsonArray.getJSONObject(i).getString("title") + jsonArray.getJSONObject(i).getString(
-                    "version"
-                ) == searchSong
-            ) {
+            val sArtist = jsonArray.getJSONObject(i).getString("artistsTitle")
+            val sTitle = jsonArray.getJSONObject(i).getString("title")
+            var sVersion = jsonArray.getJSONObject(i).getString(
+                "version"
+            )
+
+            if(sVersion == "null"){
+               sVersion = ""
+            }
+
+            val sString = sArtist + sTitle + sVersion
+
+            if (sString == searchSong) {
                 streamHash =
                     jsonArray.getJSONObject(i).getJSONObject("albums").getString("streamHash")
             }
@@ -315,9 +326,9 @@ class JSONParser {
                 playlistId
             )
 
-            return if(databaseHelper.getItemFromSongId(songId) == null){
+            return if (databaseHelper.getItemFromSongId(songId) == null) {
                 databaseHelper.insertSongId(songId)
-            }else{
+            } else {
                 databaseHelper.getItemFromSongId(songId)!!.songId
             }
         } else {
