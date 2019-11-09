@@ -5,11 +5,11 @@ import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
 import android.media.session.MediaSession
-import android.os.Build
 import android.support.v4.media.session.MediaSessionCompat
 import com.google.android.exoplayer2.ExoPlayer
 import de.lucaspape.monstercat.activities.loadContinuousSongListAsyncTask
 import de.lucaspape.monstercat.database.Song
+import java.lang.IndexOutOfBoundsException
 import java.lang.NullPointerException
 import java.lang.ref.WeakReference
 import kotlin.collections.ArrayList
@@ -19,7 +19,6 @@ internal var contextReference: WeakReference<Context>? = null
 internal var mediaPlayer:ExoPlayer? = null
 
 internal var currentSong = 0
-internal var currentContinuousPoint = 0
 internal var playList = ArrayList<Song>(1)
 
 internal var playing = false
@@ -97,8 +96,15 @@ fun createMediaSession(context: WeakReference<Context>) {
  * Play song after
  */
 fun addSong(song: Song) {
-    playList.add(currentContinuousPoint, song)
-    currentContinuousPoint++
+    if(!playing && !paused){
+        playNow(song)
+    }else{
+        try {
+            playList.add(currentSong + 1, song)
+        }catch (e: IndexOutOfBoundsException){
+            playList.add(song)
+        }
+    }
 }
 
 fun clearContinuous() {
@@ -108,9 +114,8 @@ fun clearContinuous() {
 
     }
 
-    playList = ArrayList(playList.subList(0, currentContinuousPoint))
+    playList = ArrayList(playList.subList(0, currentSong))
     currentSong = playList.size
-    currentContinuousPoint = 0
 }
 
 fun addContinuous(song: Song) {

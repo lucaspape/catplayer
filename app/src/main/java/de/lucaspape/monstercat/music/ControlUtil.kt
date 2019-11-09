@@ -99,7 +99,6 @@ internal fun play() {
         }
 
     } catch (e: IndexOutOfBoundsException) {
-
     }
 }
 
@@ -238,6 +237,7 @@ fun playNow(song: Song) {
     try {
         playList.add(currentSong + 1, song)
         currentSong++
+
     } catch (e: IndexOutOfBoundsException) {
         playList.add(song)
     }

@@ -45,7 +45,6 @@ internal fun playSongFromId(context: Context, songId: String, playNow: Boolean) 
                 addSong(song)
             }
 
-
         } else {
             val streamHashQueue = Volley.newRequestQueue(context)
 
