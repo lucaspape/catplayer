@@ -1,8 +1,6 @@
 package de.lucaspape.monstercat.music
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
+import android.app.*
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -11,6 +9,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Build
+import android.os.IBinder
 import android.view.View
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
@@ -40,7 +39,7 @@ internal fun showSongNotification(
     artist: String,
     coverLocation: String,
     playing: Boolean
-) {
+):Notification {
     val context = contextReference!!.get()!!
 
     createNotificationChannel()
@@ -147,14 +146,18 @@ internal fun showSongNotification(
 
     setListeners(normalRemoteViews, expandedRemoteViews, context)
 
+    val notification = notificationBuilder.build()
+
     val notificationManagerCompat = NotificationManagerCompat.from(context)
-    notificationManagerCompat.notify(musicNotificationID, notificationBuilder.build())
+    notificationManagerCompat.notify(musicNotificationID, notification)
 
     context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_PREVIOUS))
     context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_DELETE))
     context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_PAUSE))
     context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_PLAY))
     context.registerReceiver(IntentReceiver(), IntentFilter(NOTIFICATION_NEXT))
+
+    return notification
 }
 
 private fun createNotificationChannel() {
@@ -262,4 +265,21 @@ fun getTextColor(background: Int): Int {
     return if (luma > 0.5) Color.BLACK else Color.WHITE
 }
 
+class MusicNotificationService: Service() {
+    override fun onBind(intent: Intent?): IBinder? {
+        return null
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        val title = intent!!.getStringExtra("title")!!
+        val version = intent.getStringExtra("version")!!
+        val artist = intent.getStringExtra("artist")!!
+        val coverLocation = intent.getStringExtra("coverLocation")!!
+        val playing = intent.getStringExtra("playing")!!.toBoolean()
+
+        startForeground(1, showSongNotification(title, version, artist, coverLocation, playing))
+        return START_NOT_STICKY
+    }
+
+}
 

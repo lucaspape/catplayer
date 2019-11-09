@@ -1,10 +1,12 @@
 package de.lucaspape.monstercat.music
 
 import android.content.Context
+import android.content.Intent
 import android.content.IntentFilter
 import android.media.AudioManager
 import android.net.ConnectivityManager
 import android.net.Uri
+import android.os.Build
 import androidx.core.net.toUri
 import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.Player
@@ -78,13 +80,18 @@ internal fun play() {
 
             setPlayButtonImage(contextReference!!.get()!!)
 
-            showSongNotification(
-                song.title,
-                song.version,
-                song.artist,
-                contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution,
-                true
-            )
+            val notificationServiceIntent = Intent(contextReference!!.get()!!, MusicNotificationService::class.java)
+            notificationServiceIntent.putExtra("title", song.title)
+            notificationServiceIntent.putExtra("version", song.version)
+            notificationServiceIntent.putExtra("artist", song.artist)
+            notificationServiceIntent.putExtra("coverLocation", contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution)
+            notificationServiceIntent.putExtra("playing", true.toString())
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                contextReference!!.get()!!.startForegroundService(notificationServiceIntent)
+            }else{
+                contextReference!!.get()!!.startService(notificationServiceIntent)
+            }
 
             playing = true
 
