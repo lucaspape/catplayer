@@ -230,7 +230,11 @@ class HomeHandler {
             }
 
             override fun onQueryTextSubmit(query: String?): Boolean {
+                albumView = false
+                albumViewSelected = false
+
                 searchSong(view, query!!)
+                
                 return false
             }
 
