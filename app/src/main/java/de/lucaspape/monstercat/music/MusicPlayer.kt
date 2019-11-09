@@ -26,6 +26,10 @@ internal var paused = false
 
 var mediaSession: MediaSessionCompat? = null
 
+val audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener{
+    pause()
+}
+
 /**
  * Checks if headphones unplugged
  * TODO unRegisterReceiver
