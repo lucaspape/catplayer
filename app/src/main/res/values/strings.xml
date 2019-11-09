@@ -39,4 +39,5 @@
     <string name="settingsDescription">Settings</string>
     <string name="darkThemeSwitch">Enable dark theme</string>
     <string name="maximumSongsSeekBarLabel">Maximum songs loaded</string>
+    <string name="disableAudioFocusSwitch">Enable playback over other media apps</string>
 </resources>

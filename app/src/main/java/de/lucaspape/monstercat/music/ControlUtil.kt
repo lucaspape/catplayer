@@ -11,7 +11,6 @@ import androidx.core.net.toUri
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
@@ -31,6 +30,13 @@ internal fun play() {
         val song = playList[currentSong]
 
         val settings = Settings(contextReference!!.get()!!)
+
+        val disableAudioFocus = if(settings.getSetting("disableAudioFocus") != null){
+            settings.getSetting("disableAudioFocus")!!.toBoolean()
+        }else{
+            false
+        }
+
         val primaryResolution = settings.getSetting("primaryCoverResolution")
 
         if (mediaPlayer != null) {
@@ -48,11 +54,15 @@ internal fun play() {
 
         mediaPlayer = exoPlayer
 
-        val audioManager = contextReference!!.get()!!.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        val requestResult = audioManager.requestAudioFocus(
-            audioFocusChangeListener,
-            AudioManager.STREAM_MUSIC,
-            AudioManager.AUDIOFOCUS_GAIN)
+        val requestResult = if(disableAudioFocus){
+            AudioManager.AUDIOFOCUS_REQUEST_GRANTED
+        }else{
+            val audioManager = contextReference!!.get()!!.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            audioManager.requestAudioFocus(
+                audioFocusChangeListener,
+                AudioManager.STREAM_MUSIC,
+                AudioManager.AUDIOFOCUS_GAIN)
+        }
 
         if(requestResult == AudioManager.AUDIOFOCUS_REQUEST_GRANTED){
             registerNextListener()
@@ -200,11 +210,21 @@ fun resume() {
         val song = playList[currentSong]
 
         if (paused) {
-            val audioManager = contextReference!!.get()!!.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-            val requestResult = audioManager.requestAudioFocus(
-                audioFocusChangeListener,
-                AudioManager.STREAM_MUSIC,
-                AudioManager.AUDIOFOCUS_GAIN)
+            val disableAudioFocus = if(settings.getSetting("disableAudioFocus") != null){
+                settings.getSetting("disableAudioFocus")!!.toBoolean()
+            }else{
+                false
+            }
+
+            val requestResult = if(disableAudioFocus){
+                AudioManager.AUDIOFOCUS_REQUEST_GRANTED
+            }else{
+                val audioManager = contextReference!!.get()!!.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                audioManager.requestAudioFocus(
+                    audioFocusChangeListener,
+                    AudioManager.STREAM_MUSIC,
+                    AudioManager.AUDIOFOCUS_GAIN)
+            }
 
             if(requestResult == AudioManager.AUDIOFOCUS_REQUEST_GRANTED){
                 // mediaPlayer!!.seekTo(length)

@@ -40,6 +40,7 @@ class SettingsActivity : AppCompatActivity() {
         val downloadMobileSwitch = findViewById<Switch>(R.id.downloadMobileSwitch)
         val downloadCoversMobileSwitch = findViewById<Switch>(R.id.downloadCoversMobileSwitch)
         val darkThemeSwitch = findViewById<Switch>(R.id.darkThemeSwitch)
+        val disableAudioFocusSwitch = findViewById<Switch>(R.id.audioFocusSwitch)
         val maxLoadSeekBar = findViewById<SeekBar>(R.id.maximumLoadSeekBar)
         val shownMaxValue = findViewById<TextView>(R.id.shownMaxValue)
 
@@ -56,6 +57,11 @@ class SettingsActivity : AppCompatActivity() {
         if (settings.getSetting("downloadCoversOverMobile") != null) {
             downloadCoversMobileSwitch.isChecked =
                 settings.getSetting("downloadCoversOverMobile")!!.toBoolean()
+        }
+
+        if (settings.getSetting("disableAudioFocus") != null) {
+            disableAudioFocusSwitch.isChecked =
+                settings.getSetting("disableAudioFocus")!!.toBoolean()
         }
 
         if(settings.getSetting("maximumLoad") != null){
@@ -85,6 +91,10 @@ class SettingsActivity : AppCompatActivity() {
 
         downloadCoversMobileSwitch.setOnCheckedChangeListener { _, isChecked ->
             settings.saveSetting("downloadCoversOverMobile", isChecked.toString())
+        }
+
+        disableAudioFocusSwitch.setOnCheckedChangeListener{_, isChecked ->
+            settings.saveSetting("disableAudioFocus", isChecked.toString())
         }
 
         darkThemeSwitch.setOnCheckedChangeListener { _, isChecked ->
