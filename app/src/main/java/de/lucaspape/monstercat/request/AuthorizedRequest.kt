@@ -6,7 +6,7 @@ import com.android.volley.toolbox.StringRequest
 /**
  * Modified stringRequest
  */
-class MonstercatRequest(
+class AuthorizedRequest(
     method:Int,
     url: String,
     private val sid:String?,

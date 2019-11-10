@@ -12,7 +12,7 @@ import de.lucaspape.monstercat.auth.getSid
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.handlers.PlaylistHandler
 import de.lucaspape.monstercat.json.JSONParser
-import de.lucaspape.monstercat.request.MonstercatRequest
+import de.lucaspape.monstercat.request.AuthorizedRequest
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
@@ -76,7 +76,7 @@ class LoadPlaylistAsync(
                 }
             }
 
-            val playlistRequest =  MonstercatRequest(
+            val playlistRequest =  AuthorizedRequest(
                 Request.Method.GET, playlistUrl, getSid(),
                 Response.Listener { response ->
                     val jsonObject = JSONObject(response)

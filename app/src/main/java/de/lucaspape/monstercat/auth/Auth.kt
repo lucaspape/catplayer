@@ -13,7 +13,7 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.android.volley.Request
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.request.MonstercatRequest
+import de.lucaspape.monstercat.request.AuthorizedRequest
 import de.lucaspape.monstercat.settings.Settings
 import org.json.JSONException
 import org.json.JSONObject
@@ -195,7 +195,7 @@ class Auth {
 
     private fun checkLogin(context: Context) {
         val checkLoginRequest =
-            MonstercatRequest(Request.Method.GET, context.getString
+            AuthorizedRequest(Request.Method.GET, context.getString
                 (R.string.playlistsUrl), sid,
                 Response.Listener {
                     loggedIn = true

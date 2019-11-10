@@ -21,8 +21,6 @@ internal fun downloadSong(
         urlConnection.setRequestProperty("Cookie", "connect.sid=$sid")
         urlConnection.connect()
 
-        println(location)
-
         val lengthOfFile = urlConnection.contentLength
 
         val bufferedInputStream = BufferedInputStream(urlConnection.getInputStream(), 8192)

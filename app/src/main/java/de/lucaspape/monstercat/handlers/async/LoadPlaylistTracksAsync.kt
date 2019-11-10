@@ -14,7 +14,7 @@ import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadCoverArray
 import de.lucaspape.monstercat.handlers.PlaylistHandler
 import de.lucaspape.monstercat.json.JSONParser
-import de.lucaspape.monstercat.request.MonstercatRequest
+import de.lucaspape.monstercat.request.AuthorizedRequest
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
@@ -87,7 +87,7 @@ class LoadPlaylistTracksAsync(
 
             var trackCount = 0
 
-            val trackCountRequest = MonstercatRequest(Request.Method.GET,
+            val trackCountRequest = AuthorizedRequest(Request.Method.GET,
                 contextReference.get()!!.getString(R.string.playlistsUrl),
                 getSid(),
                 Response.Listener { response ->
@@ -111,7 +111,7 @@ class LoadPlaylistTracksAsync(
                 var finishedRequests = 0
                 var totalRequestsCount = 0
 
-                val requests = ArrayList<MonstercatRequest>()
+                val requests = ArrayList<AuthorizedRequest>()
 
                 val playlistTrackRequestQueue = Volley.newRequestQueue(contextReference.get()!!)
 
@@ -147,7 +147,7 @@ class LoadPlaylistTracksAsync(
                     val playlistTrackUrl =
                         contextReference.get()!!.getString(R.string.loadSongsUrl) + "?playlistId=" + playlistId + "&skip=" + (i * 50).toString() + "&limit=50"
 
-                    val playlistTrackRequest = MonstercatRequest(
+                    val playlistTrackRequest = AuthorizedRequest(
                         Request.Method.GET, playlistTrackUrl, getSid(),
                         Response.Listener { response ->
                             val jsonObject = JSONObject(response)

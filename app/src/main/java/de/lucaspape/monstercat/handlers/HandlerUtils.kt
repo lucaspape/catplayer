@@ -18,7 +18,7 @@ import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.json.JSONParser
 import de.lucaspape.monstercat.music.addSong
-import de.lucaspape.monstercat.request.MonstercatRequest
+import de.lucaspape.monstercat.request.AuthorizedRequest
 import de.lucaspape.monstercat.settings.Settings
 import org.json.JSONArray
 import org.json.JSONObject
@@ -52,7 +52,7 @@ internal fun playSongFromId(context: Context, songId: String, playNow: Boolean) 
             val streamHashUrl =
                 context.getString(R.string.loadSongsUrl) + "?albumId=" + song.albumId
 
-            val hashRequest = MonstercatRequest(
+            val hashRequest = AuthorizedRequest(
                 Request.Method.GET, streamHashUrl, getSid(),
                 Response.Listener { response ->
                     val jsonObject = JSONObject(response)
@@ -85,7 +85,7 @@ internal fun playAlbumNext(context: Context, albumId: String){
 
     val albumRequestQueue = Volley.newRequestQueue(context)
 
-    val albumRequest = MonstercatRequest(Request.Method.GET, requestUrl, getSid() ,
+    val albumRequest = AuthorizedRequest(Request.Method.GET, requestUrl, getSid() ,
         Response.Listener { response ->
             val jsonObject = JSONObject(response)
             val jsonArray = jsonObject.getJSONArray("results")
@@ -159,7 +159,7 @@ internal fun downloadAlbum(context: Context, albumId:String){
 
     val albumRequestQueue = Volley.newRequestQueue(context)
 
-    val albumRequest = MonstercatRequest(Request.Method.GET, requestUrl, getSid() ,
+    val albumRequest = AuthorizedRequest(Request.Method.GET, requestUrl, getSid() ,
         Response.Listener { response ->
             val jsonObject = JSONObject(response)
             val jsonArray = jsonObject.getJSONArray("results")

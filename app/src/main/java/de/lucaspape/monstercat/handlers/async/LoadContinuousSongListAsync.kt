@@ -10,7 +10,7 @@ import de.lucaspape.monstercat.auth.getSid
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.json.JSONParser
 import de.lucaspape.monstercat.music.addContinuous
-import de.lucaspape.monstercat.request.MonstercatRequest
+import de.lucaspape.monstercat.request.AuthorizedRequest
 import de.lucaspape.monstercat.settings.Settings
 import org.json.JSONObject
 import java.io.File
@@ -53,7 +53,7 @@ class LoadContinuousSongListAsync(
                     val streamHashUrl =
                         context.getString(R.string.loadSongsUrl) + "?albumId=" + song.albumId
 
-                    val hashRequest = MonstercatRequest(
+                    val hashRequest = AuthorizedRequest(
                         Request.Method.GET, streamHashUrl, getSid(),
                         Response.Listener { response ->
                             val jsonObject = JSONObject(response)

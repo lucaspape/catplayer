@@ -14,7 +14,7 @@ import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadCoverArray
 import de.lucaspape.monstercat.handlers.HomeHandler
 import de.lucaspape.monstercat.json.JSONParser
-import de.lucaspape.monstercat.request.MonstercatRequest
+import de.lucaspape.monstercat.request.AuthorizedRequest
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
@@ -84,7 +84,7 @@ class LoadAlbumAsync(
             val requestUrl =
                 contextReference.get()!!.getString(R.string.loadSongsUrl) + "?albumId=" + albumId
 
-            val listRequest = MonstercatRequest(
+            val listRequest = AuthorizedRequest(
                 Request.Method.GET, requestUrl, getSid(), Response.Listener { response ->
                     val json = JSONObject(response)
                     val jsonArray = json.getJSONArray("results")
