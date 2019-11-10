@@ -14,7 +14,8 @@
             android:label="@string/app_name"
             android:supportsRtl="true"
             android:theme="@style/AppTheme" tools:ignore="GoogleAppIndexingWarning">
-        <receiver android:name=".music.IntentReceiver">
+        <receiver android:name=".music.IntentReceiver"
+            android:exported="false">
             <intent-filter>
                 <action android:name="de.lucaspape.monstercat.previous"/>
                 <action android:name="de.lucaspape.monstercat.delete"/>
@@ -26,7 +27,7 @@
 
         <service android:name=".music.MusicNotificationService"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="false" />
 
         <activity
                 android:name=".activities.MainActivity"
