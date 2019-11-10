@@ -21,6 +21,7 @@ All album images seen in these screenshots are Copyright Monstercat.
 ## Todo
 
  - More playlist features (delete tracks, add public playlists etc.)
+ - Live Radio from Twitch
  - 2FA (currently testing)
 
 ## Alpha
