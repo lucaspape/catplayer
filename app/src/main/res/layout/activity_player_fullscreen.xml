@@ -17,7 +17,8 @@
         app:layout_constraintHorizontal_bias="0.492"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_music_video_black_24dp" />
+        app:srcCompat="@drawable/ic_music_video_black_24dp"
+        android:contentDescription="@string/fullscreenAlbumImage" />
 
     <ImageButton
         android:id="@+id/fullScreenPlay"
@@ -28,7 +29,8 @@
         android:src="@drawable/ic_play_arrow_24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        android:contentDescription="@string/fullscreenPlayPause" />
 
     <ImageButton
         android:id="@+id/fullscreenNext"
@@ -39,7 +41,8 @@
         android:src="@drawable/ic_skip_next_24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/fullScreenPlay" />
+        app:layout_constraintStart_toEndOf="@+id/fullScreenPlay"
+        android:contentDescription="@string/fullscreenNext" />
 
     <ImageButton
         android:id="@+id/fullscreenPrev"
@@ -50,7 +53,8 @@
         android:src="@drawable/ic_skip_previous_24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/fullScreenPlay"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        android:contentDescription="@string/fullscreenPrevButton" />
 
     <TextView
         android:id="@+id/fullscreenSongCurrent1"

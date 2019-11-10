@@ -43,4 +43,8 @@
     <string name="disableAudioFocusSwitch">Enable playback over other media apps</string>
     <string name="downloadAlbum">Download Album</string>
     <string name="playAlbumNext">Play Album Next</string>
+    <string name="fullscreenAlbumImage">Album Image</string>
+    <string name="fullscreenPlayPause">Play Pause Button</string>
+    <string name="fullscreenNext">Next Button</string>
+    <string name="fullscreenPrevButton">Previous Button</string>
 </resources>
