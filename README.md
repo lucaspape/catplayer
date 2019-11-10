@@ -1,5 +1,7 @@
 ## Player for Monstercat
 
+![Icon](https://raw.githubusercontent.com/lucaspape/catplayer/master/playstore_res/icon-round-full.png)
+
 This android app aims to implement the Monstercat API.
 
 ## Features
