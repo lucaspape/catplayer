@@ -55,6 +55,9 @@ class Auth {
                 val loginPostRequest = object : JsonObjectRequest(
                     Method.POST,
                     loginUrl, loginPostParams, Response.Listener { response ->
+                        val networkResponse = response.get("response") as String
+
+                        val jsonObject = JSONObject(networkResponse)
 
                         try {
                             val headers = response.getJSONObject("headers")
@@ -62,7 +65,7 @@ class Auth {
                                 .replace("connect.sid=", "")
 
 
-                            if (response.getJSONObject("response").getString("message") == "Enter the code sent to your device") {
+                            if (jsonObject.getString("message") == "Enter the code sent to your device") {
                                 showTwoFAInput(context)
                             } else {
                                 checkLogin(context)
@@ -81,7 +84,7 @@ class Auth {
 
                             val jsonResponse = JSONObject()
                             jsonResponse.put("headers", JSONObject(response!!.headers as Map<*, *>))
-                            jsonResponse.put("response", response)
+                            jsonResponse.put("response", String(response.data))
 
                             Response.success(
                                 jsonResponse,
