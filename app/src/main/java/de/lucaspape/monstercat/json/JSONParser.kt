@@ -66,36 +66,9 @@ class JSONParser {
         for (i in (0 until jsonArray.length())) {
             val jsonObject = jsonArray.getJSONObject(i)
 
-            var id = ""
-            var albumId = ""
-            var title = ""
-            var artist = ""
-            var coverUrl = ""
-            var version = ""
-
-            try {
-                albumId = jsonObject.getJSONObject("albums").getString("albumId")
-                title = jsonObject.getString("title")
-                artist = jsonObject.getString("artistsTitle")
-                coverUrl = jsonObject.getJSONObject("release").getString("coverUrl")
-                version = jsonObject.getString("version")
-                id = jsonObject.getString("_id")
-            } catch (e: InvocationTargetException) {
-            }
-
-            if (version == "null") {
-                version = ""
-            }
-
-            val songId: Long
+            val songId = parseSongToDB(jsonObject, context)
 
             val databaseHelper = SongDatabaseHelper(context)
-            songId = if (databaseHelper.getSong(id) == null) {
-                databaseHelper.insertSong(id, title, version, albumId, artist, coverUrl)
-            } else {
-                databaseHelper.getSong(id)!!.id.toLong()
-            }
-
             songList.add(databaseHelper.getSong(songId))
         }
 
@@ -145,35 +118,7 @@ class JSONParser {
     }
 
     fun parsAlbumSongToDB(jsonObject: JSONObject, sAlbumId: String, context: Context): Long {
-        var id = ""
-        var albumId = ""
-        var title = ""
-        var artist = ""
-        var coverUrl = ""
-        var version = ""
-
-        try {
-            albumId = jsonObject.getJSONObject("albums").getString("albumId")
-            title = jsonObject.getString("title")
-            artist = jsonObject.getString("artistsTitle")
-            coverUrl = jsonObject.getJSONObject("release").getString("coverUrl")
-            version = jsonObject.getString("version")
-            id = jsonObject.getString("_id")
-        } catch (e: InvocationTargetException) {
-        }
-
-        if (version == "null") {
-            version = ""
-        }
-
-        val songId: Long
-
-        val databaseHelper = SongDatabaseHelper(context)
-        songId = if (databaseHelper.getSong(id) == null) {
-            databaseHelper.insertSong(id, title, version, albumId, artist, coverUrl)
-        } else {
-            databaseHelper.getSong(id)!!.id.toLong()
-        }
+        val songId = parseSongToDB(jsonObject, context)
 
         val albumItemDatabaseHelper = AlbumItemDatabaseHelper(context, sAlbumId)
 
@@ -200,8 +145,6 @@ class JSONParser {
 
     fun parseObjectToStreamHash(jsonObject: JSONObject, song: Song): String? {
         val jsonArray = jsonObject.getJSONArray("results")
-
-        // println(jsonArray)
 
         var streamHash = ""
         val searchSong = song.artist + song.title + song.version
@@ -302,26 +245,7 @@ class JSONParser {
         val title = jsonObject.getString("title")
 
         if (title != "null") {
-            var version = jsonObject.getString("version")
-            val artist = jsonObject.getString("artistsTitle")
-            val coverUrl = jsonObject.getJSONObject("release").getString("coverUrl")
-            val id = jsonObject.getString("_id")
-            val albumId = jsonObject.getJSONObject("albums").getString("albumId")
-
-            if (version == "null") {
-                version = ""
-            }
-
-            val songDatabaseHelper =
-                SongDatabaseHelper(context)
-
-            val songId: Long
-
-            songId = if (songDatabaseHelper.getSong(id) == null) {
-                songDatabaseHelper.insertSong(id, title, version, albumId, artist, coverUrl)
-            } else {
-                songDatabaseHelper.getSong(id)!!.id.toLong()
-            }
+            val songId = parseSongToDB(jsonObject, context)
 
             val databaseHelper = PlaylistItemDatabaseHelper(
                 context,
