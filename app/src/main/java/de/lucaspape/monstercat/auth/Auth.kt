@@ -55,15 +55,18 @@ class Auth {
                 val loginPostRequest = object : JsonObjectRequest(
                     Method.POST,
                     loginUrl, loginPostParams, Response.Listener { response ->
-                        val networkResponse = response.get("response") as String
 
-                        val jsonObject = JSONObject(networkResponse)
-
-                        try {
+                        try{
                             val headers = response.getJSONObject("headers")
                             sid = headers.getString("Set-Cookie").substringBefore(';')
                                 .replace("connect.sid=", "")
+                        }catch (e: JSONException){
+                            checkLogin(context)
+                        }
 
+                        try {
+                            val networkResponse = response.get("response") as String
+                            val jsonObject = JSONObject(networkResponse)
 
                             if (jsonObject.getString("message") == "Enter the code sent to your device") {
                                 showTwoFAInput(context)
