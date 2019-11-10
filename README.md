@@ -1,7 +1,8 @@
 ## Player for Monstercat
 
 ![Icon](https://raw.githubusercontent.com/lucaspape/catplayer/master/playstore_res/icon-round-full.png)
-Icon source: https://pixabay.com/illustrations/black-panther-figure-3704552/
+
+[Icon source] (https://pixabay.com/illustrations/black-panther-figure-3704552/)
 
 This android app aims to implement the Monstercat API.
 
