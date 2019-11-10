@@ -69,8 +69,6 @@ class LoadAlbumListAsync(
     }
 
     override fun doInBackground(vararg param: Void?): String? {
-        //TODO download correct album list
-
         val requestQueue = Volley.newRequestQueue(contextReference.get()!!)
 
         val tempList = arrayOfNulls<JSONObject>(loadMax)

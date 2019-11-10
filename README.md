@@ -10,7 +10,6 @@ This android app aims to implement the Monstercat API.
 
 ## Todo
 
- - Delete songs in playlists
  - More playlist features (delete tracks, add public playlists etc.)
  - 2FA (currently testing)
 

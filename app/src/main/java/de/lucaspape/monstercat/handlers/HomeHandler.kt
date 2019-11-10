@@ -127,12 +127,12 @@ class HomeHandler {
         val musicList = view.findViewById<ListView>(R.id.musiclistview)
         musicList.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
             if (albumView) {
-                val itemValue = musicList.getItemAtPosition(position) as HashMap<String, Any?>
+                val itemValue = musicList.getItemAtPosition(position) as HashMap<*, *>
                 loadAlbum(view, itemValue, false)
             } else {
                 clearContinuous()
 
-                val itemValue = musicList.getItemAtPosition(position) as HashMap<String, Any?>
+                val itemValue = musicList.getItemAtPosition(position) as HashMap<*, *>
                 playSongFromId(
                     view.context,
                     itemValue["id"] as String,
@@ -142,7 +142,7 @@ class HomeHandler {
                 val continuousList = ArrayList<String>()
 
                 for (i in (position + 1 until musicList.adapter.count)) {
-                    val nextItemValue = musicList.getItemAtPosition(i) as HashMap<String, Any?>
+                    val nextItemValue = musicList.getItemAtPosition(i) as HashMap<*, *>
                     continuousList.add(nextItemValue["id"] as String)
                 }
 
@@ -274,7 +274,7 @@ class HomeHandler {
     /**
      * Load single album
      */
-    private fun loadAlbum(view: View, itemValue: HashMap<String, Any?>, forceReload: Boolean) {
+    private fun loadAlbum(view: View, itemValue: HashMap<*, *>, forceReload: Boolean) {
         val listView = view.findViewById<ListView>(R.id.musiclistview)
 
         val settings = Settings(view.context)

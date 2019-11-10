@@ -43,7 +43,6 @@ class HomeFragment : Fragment() {
         homeHandler.setupSpinner(view)
         homeHandler.registerListeners(view)
 
-        //TODO context menu for album view
         listView = view.findViewById(R.id.musiclistview)
         registerForContextMenu(listView as ListView)
     }
@@ -69,7 +68,7 @@ class HomeFragment : Fragment() {
         val adapterContextInfo = item.menuInfo as AdapterView.AdapterContextMenuInfo
         val position = adapterContextInfo.position
 
-        val listItem = listView!!.getItemAtPosition(position) as HashMap<String, Any?>
+        val listItem = listView!!.getItemAtPosition(position) as HashMap<*, *>
 
         val songDatabaseHelper =
             SongDatabaseHelper(view!!.context)

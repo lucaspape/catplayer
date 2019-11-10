@@ -22,7 +22,7 @@ class LoadAlbumAsync(
     private val viewReference: WeakReference<View>,
     private val contextReference: WeakReference<Context>,
     private val forceReload: Boolean,
-    private val itemValue: HashMap<String, Any?>
+    private val itemValue: HashMap<*, *>
 ) : AsyncTask<Void, Void, String>() {
     override fun onPreExecute() {
         val swipeRefreshLayout =

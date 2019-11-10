@@ -73,7 +73,7 @@ class PlaylistFragment : Fragment() {
         val adapterContextInfo = item.menuInfo as AdapterView.AdapterContextMenuInfo
         val position = adapterContextInfo.position
 
-        val listItem = playlistView!!.getItemAtPosition(position) as HashMap<String, Any?>
+        val listItem = playlistView!!.getItemAtPosition(position) as HashMap<*, *>
 
         if (item.title == getString(R.string.download)) {
             if (listItem["type"] == "playlist") {

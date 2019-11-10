@@ -100,7 +100,7 @@ class PlaylistHandler {
         }
 
         playlistList.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
-            val itemValue = playlistList.getItemAtPosition(position) as HashMap<String, Any?>
+            val itemValue = playlistList.getItemAtPosition(position) as HashMap<*, *>
 
             if (listViewDataIsPlaylistView) {
                 currentPlaylistId = itemValue["playlistId"] as String
@@ -114,7 +114,7 @@ class PlaylistHandler {
                 val continuousList = ArrayList<String>()
 
                 for (i in (position + 1 until playlistList.adapter.count)) {
-                    val nextItemValue = playlistList.getItemAtPosition(i) as HashMap<String, Any?>
+                    val nextItemValue = playlistList.getItemAtPosition(i) as HashMap<*, *>
                     continuousList.add(nextItemValue["id"] as String)
                 }
 
