@@ -2,7 +2,7 @@
 
 ![Icon](https://raw.githubusercontent.com/lucaspape/catplayer/master/playstore_res/icon-round-full.png)
 
-[Icon source] (https://pixabay.com/illustrations/black-panther-figure-3704552/)
+https://pixabay.com/illustrations/black-panther-figure-3704552/ - icon source
 
 This android app aims to implement the Monstercat API.
 
