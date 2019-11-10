@@ -12,6 +12,7 @@ This android app aims to implement the Monstercat API.
  - Download songs (with Monstercat Gold)
  - Browse in catalog and in album view
  - Search songs
+ - Dark Mode (Android 9 or higher)
 
 <img src="https://raw.githubusercontent.com/lucaspape/catplayer/master/playstore_res/screenshots/Screenshot_20191110-152127_Player_for_Monstercat.png" width="40%">  <img src="https://raw.githubusercontent.com/lucaspape/catplayer/master/playstore_res/screenshots/Screenshot_20191110-152238_Player_for_Monstercat.png" width="40%">
 
