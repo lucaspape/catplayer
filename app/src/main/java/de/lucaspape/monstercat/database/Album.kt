@@ -1,10 +1,12 @@
 package de.lucaspape.monstercat.database
 
-data class Album(val id: Int,
-                 val albumId: String,
-                 val title: String,
-                 val artist: String,
-                 val coverUrl: String) {
+data class Album(
+    val id: Int,
+    val albumId: String,
+    val title: String,
+    val artist: String,
+    val coverUrl: String
+) {
     companion object {
         @JvmStatic
         val TABLE_NAME = "album"

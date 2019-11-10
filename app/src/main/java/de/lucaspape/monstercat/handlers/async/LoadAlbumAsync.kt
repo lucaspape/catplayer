@@ -43,7 +43,12 @@ class LoadAlbumAsync(
 
         for (albumItem in albumItemList) {
             val jsonParser = JSONParser()
-            dbSongs.add(jsonParser.parseSongToHashMap(contextReference.get()!!, songDatabaseHelper.getSong(albumItem.songId)))
+            dbSongs.add(
+                jsonParser.parseSongToHashMap(
+                    contextReference.get()!!,
+                    songDatabaseHelper.getSong(albumItem.songId)
+                )
+            )
         }
 
         HomeHandler.currentListViewData = dbSongs
@@ -59,6 +64,9 @@ class LoadAlbumAsync(
         val swipeRefreshLayout =
             viewReference.get()!!.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
         swipeRefreshLayout.isRefreshing = false
+
+        HomeHandler.albumContentsDisplayed = true
+        HomeHandler.currentAlbumId = itemValue["id"] as String
     }
 
     override fun doInBackground(vararg param: Void?): String? {

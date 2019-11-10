@@ -31,9 +31,9 @@ internal fun play() {
 
         val settings = Settings(contextReference!!.get()!!)
 
-        val disableAudioFocus = if(settings.getSetting("disableAudioFocus") != null){
+        val disableAudioFocus = if (settings.getSetting("disableAudioFocus") != null) {
             settings.getSetting("disableAudioFocus")!!.toBoolean()
-        }else{
+        } else {
             false
         }
 
@@ -54,17 +54,19 @@ internal fun play() {
 
         mediaPlayer = exoPlayer
 
-        val requestResult = if(disableAudioFocus){
+        val requestResult = if (disableAudioFocus) {
             AudioManager.AUDIOFOCUS_REQUEST_GRANTED
-        }else{
-            val audioManager = contextReference!!.get()!!.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        } else {
+            val audioManager =
+                contextReference!!.get()!!.getSystemService(Context.AUDIO_SERVICE) as AudioManager
             audioManager.requestAudioFocus(
                 audioFocusChangeListener,
                 AudioManager.STREAM_MUSIC,
-                AudioManager.AUDIOFOCUS_GAIN)
+                AudioManager.AUDIOFOCUS_GAIN
+            )
         }
 
-        if(requestResult == AudioManager.AUDIOFOCUS_REQUEST_GRANTED){
+        if (requestResult == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             registerNextListener()
 
             val connectivityManager =
@@ -108,16 +110,20 @@ internal fun play() {
 
                 setPlayButtonImage(contextReference!!.get()!!)
 
-                val notificationServiceIntent = Intent(contextReference!!.get()!!, MusicNotificationService::class.java)
+                val notificationServiceIntent =
+                    Intent(contextReference!!.get()!!, MusicNotificationService::class.java)
                 notificationServiceIntent.putExtra("title", song.title)
                 notificationServiceIntent.putExtra("version", song.version)
                 notificationServiceIntent.putExtra("artist", song.artist)
-                notificationServiceIntent.putExtra("coverLocation", contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution)
+                notificationServiceIntent.putExtra(
+                    "coverLocation",
+                    contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
+                )
                 notificationServiceIntent.putExtra("playing", true.toString())
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     contextReference!!.get()!!.startForegroundService(notificationServiceIntent)
-                }else{
+                } else {
                     contextReference!!.get()!!.startService(notificationServiceIntent)
                 }
 
@@ -149,7 +155,8 @@ internal fun stop() {
 
         registerNextListener()
 
-        val audioManager = contextReference!!.get()!!.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        val audioManager =
+            contextReference!!.get()!!.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         audioManager.abandonAudioFocus(audioFocusChangeListener)
     }
 }
@@ -169,16 +176,20 @@ fun pause() {
 
         mediaPlayer!!.playWhenReady = false
 
-        val notificationServiceIntent = Intent(contextReference!!.get()!!, MusicNotificationService::class.java)
+        val notificationServiceIntent =
+            Intent(contextReference!!.get()!!, MusicNotificationService::class.java)
         notificationServiceIntent.putExtra("title", song.title)
         notificationServiceIntent.putExtra("version", song.version)
         notificationServiceIntent.putExtra("artist", song.artist)
-        notificationServiceIntent.putExtra("coverLocation", contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution)
+        notificationServiceIntent.putExtra(
+            "coverLocation",
+            contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
+        )
         notificationServiceIntent.putExtra("playing", false.toString())
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             contextReference!!.get()!!.startForegroundService(notificationServiceIntent)
-        }else{
+        } else {
             contextReference!!.get()!!.startService(notificationServiceIntent)
         }
 
@@ -189,7 +200,8 @@ fun pause() {
 
         registerNextListener()
 
-        val audioManager = contextReference!!.get()!!.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        val audioManager =
+            contextReference!!.get()!!.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         audioManager.abandonAudioFocus(audioFocusChangeListener)
     } catch (e: IndexOutOfBoundsException) {
 
@@ -210,23 +222,25 @@ fun resume() {
         val song = playList[currentSong]
 
         if (paused) {
-            val disableAudioFocus = if(settings.getSetting("disableAudioFocus") != null){
+            val disableAudioFocus = if (settings.getSetting("disableAudioFocus") != null) {
                 settings.getSetting("disableAudioFocus")!!.toBoolean()
-            }else{
+            } else {
                 false
             }
 
-            val requestResult = if(disableAudioFocus){
+            val requestResult = if (disableAudioFocus) {
                 AudioManager.AUDIOFOCUS_REQUEST_GRANTED
-            }else{
-                val audioManager = contextReference!!.get()!!.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            } else {
+                val audioManager =
+                    contextReference!!.get()!!.getSystemService(Context.AUDIO_SERVICE) as AudioManager
                 audioManager.requestAudioFocus(
                     audioFocusChangeListener,
                     AudioManager.STREAM_MUSIC,
-                    AudioManager.AUDIOFOCUS_GAIN)
+                    AudioManager.AUDIOFOCUS_GAIN
+                )
             }
 
-            if(requestResult == AudioManager.AUDIOFOCUS_REQUEST_GRANTED){
+            if (requestResult == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                 // mediaPlayer!!.seekTo(length)
                 mediaPlayer!!.playWhenReady = true
 
@@ -236,16 +250,20 @@ fun resume() {
                 context.registerReceiver(NoisyReceiver(), intentFilter)
             }
 
-            val notificationServiceIntent = Intent(contextReference!!.get()!!, MusicNotificationService::class.java)
+            val notificationServiceIntent =
+                Intent(contextReference!!.get()!!, MusicNotificationService::class.java)
             notificationServiceIntent.putExtra("title", song.title)
             notificationServiceIntent.putExtra("version", song.version)
             notificationServiceIntent.putExtra("artist", song.artist)
-            notificationServiceIntent.putExtra("coverLocation", contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution)
+            notificationServiceIntent.putExtra(
+                "coverLocation",
+                contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
+            )
             notificationServiceIntent.putExtra("playing", true.toString())
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 contextReference!!.get()!!.startForegroundService(notificationServiceIntent)
-            }else{
+            } else {
                 contextReference!!.get()!!.startService(notificationServiceIntent)
             }
 
@@ -310,8 +328,8 @@ fun toggleMusic() {
     }
 }
 
-private fun clearListener(){
-    if(mediaPlayer != null){
+private fun clearListener() {
+    if (mediaPlayer != null) {
         mediaPlayer!!.addListener(object : Player.EventListener {
             override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
             }
@@ -319,8 +337,8 @@ private fun clearListener(){
     }
 }
 
-private fun registerNextListener(){
-    if(mediaPlayer != null){
+private fun registerNextListener() {
+    if (mediaPlayer != null) {
         mediaPlayer!!.addListener(object : Player.EventListener {
             override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
                 when (playbackState) {

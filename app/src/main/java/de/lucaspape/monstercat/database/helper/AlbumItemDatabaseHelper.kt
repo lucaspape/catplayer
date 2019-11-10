@@ -8,7 +8,8 @@ import android.database.sqlite.SQLiteOpenHelper
 import de.lucaspape.monstercat.database.AlbumItem
 
 class AlbumItemDatabaseHelper(context: Context, var albumId: String) :
-    SQLiteOpenHelper(context,
+    SQLiteOpenHelper(
+        context,
         DATABASE_NAME, null,
         DATABASE_VERSION
     ) {
@@ -21,11 +22,13 @@ class AlbumItemDatabaseHelper(context: Context, var albumId: String) :
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        db!!.execSQL("DROP TABLE IF EXISTS " + AlbumItem(
-            albumId,
-            0,
-            0
-        ).TABLE_NAME)
+        db!!.execSQL(
+            "DROP TABLE IF EXISTS " + AlbumItem(
+                albumId,
+                0,
+                0
+            ).TABLE_NAME
+        )
         onCreate(db)
     }
 
@@ -37,14 +40,16 @@ class AlbumItemDatabaseHelper(context: Context, var albumId: String) :
         db!!.execSQL(AlbumItem(albumId, 0, 0).CREATE_TABLE)
     }
 
-    fun reCreateTable(){
+    fun reCreateTable() {
         val db = writableDatabase
 
-        db!!.execSQL("DROP TABLE IF EXISTS " + AlbumItem(
-            albumId,
-            0,
-            0
-        ).TABLE_NAME)
+        db!!.execSQL(
+            "DROP TABLE IF EXISTS " + AlbumItem(
+                albumId,
+                0,
+                0
+            ).TABLE_NAME
+        )
         onCreate(db)
     }
 
@@ -60,35 +65,10 @@ class AlbumItemDatabaseHelper(context: Context, var albumId: String) :
         return id
     }
 
-    fun getItem(id: Long): AlbumItem {
-        val db = readableDatabase
-
-        val cursor = db.query(
-            AlbumItem(albumId, 0, 0).TABLE_NAME, arrayOf(
-                AlbumItem.COLUMN_ID,
-                AlbumItem.COLUMN_SONG_ID
-            ),
-            AlbumItem.COLUMN_ID + "=?",
-            arrayOf(id.toString()), null, null, null, null
-        )
-
-        cursor?.moveToFirst()
-
-        val albumItem = AlbumItem(
-            albumId,
-            cursor.getLong(cursor.getColumnIndex(AlbumItem.COLUMN_ID)),
-            cursor.getLong(cursor.getColumnIndex(AlbumItem.COLUMN_SONG_ID))
-        )
-
-        cursor.close()
-
-        return albumItem
-    }
-
     fun getItemFromSongId(songId: Long): AlbumItem? {
         val db = readableDatabase
 
-        try{
+        try {
             val cursor = db.query(
                 AlbumItem(albumId, 0, 0).TABLE_NAME, arrayOf(
                     AlbumItem.COLUMN_ID,
@@ -100,7 +80,7 @@ class AlbumItemDatabaseHelper(context: Context, var albumId: String) :
 
             cursor?.moveToFirst()
 
-            try {
+            return try {
                 val albumItem = AlbumItem(
                     albumId,
                     cursor.getLong(cursor.getColumnIndex(AlbumItem.COLUMN_ID)),
@@ -109,13 +89,13 @@ class AlbumItemDatabaseHelper(context: Context, var albumId: String) :
 
                 cursor.close()
 
-                return albumItem
-            }catch (e: IndexOutOfBoundsException){
+                albumItem
+            } catch (e: IndexOutOfBoundsException) {
                 cursor.close()
                 db.close()
-                return null
+                null
             }
-        }catch (e: SQLiteException){
+        } catch (e: SQLiteException) {
             return null
         }
     }

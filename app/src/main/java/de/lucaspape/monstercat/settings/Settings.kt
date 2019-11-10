@@ -40,19 +40,19 @@ class Settings(private val context: Context) {
             saveSetting("secondaryCoverResolution", "64")
         }
 
-        if(getSetting("streamOverMobile") == null){
+        if (getSetting("streamOverMobile") == null) {
             saveSetting("streamOverMobile", "false")
         }
 
-        if(getSetting("downloadOverMobile") == null){
+        if (getSetting("downloadOverMobile") == null) {
             saveSetting("downloadOverMobile", "false")
         }
 
-        if(getSetting("downloadCoversOverMobile") == null){
+        if (getSetting("downloadCoversOverMobile") == null) {
             saveSetting("downloadCoversOverMobile", "false")
         }
 
-        if(getSetting("maximumLoad") == null){
+        if (getSetting("maximumLoad") == null) {
             saveSetting("maximumLoad", 50.toString())
         }
 

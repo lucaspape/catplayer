@@ -30,6 +30,10 @@ class HomeHandler {
         var currentListViewData = ArrayList<HashMap<String, Any?>>()
         @JvmStatic
         private var simpleAdapter: SimpleAdapter? = null
+        @JvmStatic
+        var albumContentsDisplayed = false
+        @JvmStatic
+        var currentAlbumId = ""
 
         @JvmStatic
         fun redrawListView(view: View) {
@@ -116,8 +120,14 @@ class HomeHandler {
         //refresh
         val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
         swipeRefreshLayout.setOnRefreshListener {
-            if (albumView) {
-                loadAlbumList(view, true)
+            if (albumView || albumContentsDisplayed) {
+                if (albumContentsDisplayed) {
+                    val itemValue = HashMap<String, Any?>()
+                    itemValue["id"] = currentAlbumId
+                    loadAlbum(view, itemValue, true)
+                } else {
+                    loadAlbumList(view, true)
+                }
             } else {
                 loadSongList(view, true)
             }
@@ -224,7 +234,7 @@ class HomeHandler {
             false
         }
 
-        search.setOnQueryTextListener(object:SearchView.OnQueryTextListener{
+        search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextChange(newText: String?): Boolean {
                 return false
             }
@@ -299,7 +309,7 @@ class HomeHandler {
         )
     }
 
-    fun searchSong(view: View, searchString: String){
+    fun searchSong(view: View, searchString: String) {
         val contextReference = WeakReference<Context>(view.context)
         val viewReference = WeakReference<View>(view)
         LoadTitleSearchAsync(

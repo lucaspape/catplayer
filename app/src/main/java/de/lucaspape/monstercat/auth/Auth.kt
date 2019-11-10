@@ -56,11 +56,11 @@ class Auth {
                     Method.POST,
                     loginUrl, loginPostParams, Response.Listener { response ->
 
-                        try{
+                        try {
                             val headers = response.getJSONObject("headers")
                             sid = headers.getString("Set-Cookie").substringBefore(';')
                                 .replace("connect.sid=", "")
-                        }catch (e: JSONException){
+                        } catch (e: JSONException) {
                             checkLogin(context)
                         }
 

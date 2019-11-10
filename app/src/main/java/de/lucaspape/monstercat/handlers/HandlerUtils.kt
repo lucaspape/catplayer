@@ -79,13 +79,13 @@ internal fun playSongFromId(context: Context, songId: String, playNow: Boolean) 
     }
 }
 
-internal fun playAlbumNext(context: Context, albumId: String){
+internal fun playAlbumNext(context: Context, albumId: String) {
     val requestUrl =
         context.getString(R.string.loadSongsUrl) + "?albumId=" + albumId
 
     val albumRequestQueue = Volley.newRequestQueue(context)
 
-    val albumRequest = AuthorizedRequest(Request.Method.GET, requestUrl, getSid() ,
+    val albumRequest = AuthorizedRequest(Request.Method.GET, requestUrl, getSid(),
         Response.Listener { response ->
             val jsonObject = JSONObject(response)
             val jsonArray = jsonObject.getJSONArray("results")
@@ -93,13 +93,13 @@ internal fun playAlbumNext(context: Context, albumId: String){
             val idArray = ArrayList<Long>()
             val jsonParser = JSONParser()
 
-            for(i in (0 until jsonArray.length())){
+            for (i in (0 until jsonArray.length())) {
                 idArray.add(jsonParser.parseSongToDB(jsonArray.getJSONObject(i), context))
             }
 
             val databaseHelper = SongDatabaseHelper(context)
 
-            for(id in idArray){
+            for (id in idArray) {
                 val song = databaseHelper.getSong(id)
                 addSong(song)
             }
@@ -153,13 +153,13 @@ internal fun downloadSong(context: Context, song: Song) {
 
 }
 
-internal fun downloadAlbum(context: Context, albumId:String){
+internal fun downloadAlbum(context: Context, albumId: String) {
     val requestUrl =
         context.getString(R.string.loadSongsUrl) + "?albumId=" + albumId
 
     val albumRequestQueue = Volley.newRequestQueue(context)
 
-    val albumRequest = AuthorizedRequest(Request.Method.GET, requestUrl, getSid() ,
+    val albumRequest = AuthorizedRequest(Request.Method.GET, requestUrl, getSid(),
         Response.Listener { response ->
             val jsonObject = JSONObject(response)
             val jsonArray = jsonObject.getJSONArray("results")
@@ -167,13 +167,13 @@ internal fun downloadAlbum(context: Context, albumId:String){
             val idArray = ArrayList<Long>()
             val jsonParser = JSONParser()
 
-            for(i in (0 until jsonArray.length())){
+            for (i in (0 until jsonArray.length())) {
                 idArray.add(jsonParser.parseSongToDB(jsonArray.getJSONObject(i), context))
             }
 
             val databaseHelper = SongDatabaseHelper(context)
 
-            for(id in idArray){
+            for (id in idArray) {
                 val song = databaseHelper.getSong(id)
                 downloadSong(context, song)
             }

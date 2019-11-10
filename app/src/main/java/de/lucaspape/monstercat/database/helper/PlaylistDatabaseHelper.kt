@@ -10,7 +10,8 @@ import de.lucaspape.monstercat.database.Playlist
 import java.lang.IndexOutOfBoundsException
 
 class PlaylistDatabaseHelper(context: Context) :
-    SQLiteOpenHelper(context,
+    SQLiteOpenHelper(
+        context,
         DATABASE_NAME, null,
         DATABASE_VERSION
     ) {

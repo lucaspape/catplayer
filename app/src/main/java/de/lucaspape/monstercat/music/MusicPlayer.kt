@@ -16,7 +16,7 @@ import kotlin.collections.ArrayList
 
 internal var contextReference: WeakReference<Context>? = null
 
-internal var mediaPlayer:ExoPlayer? = null
+internal var mediaPlayer: ExoPlayer? = null
 
 internal var currentSong = 0
 internal var playList = ArrayList<Song>(1)
@@ -26,7 +26,7 @@ internal var paused = false
 
 var mediaSession: MediaSessionCompat? = null
 
-val audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener{
+val audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener {
     pause()
 }
 
@@ -100,12 +100,12 @@ fun createMediaSession(context: WeakReference<Context>) {
  * Play song after
  */
 fun addSong(song: Song) {
-    if(!playing && !paused){
+    if (!playing && !paused) {
         playNow(song)
-    }else{
+    } else {
         try {
             playList.add(currentSong + 1, song)
-        }catch (e: IndexOutOfBoundsException){
+        } catch (e: IndexOutOfBoundsException) {
             playList.add(song)
         }
     }

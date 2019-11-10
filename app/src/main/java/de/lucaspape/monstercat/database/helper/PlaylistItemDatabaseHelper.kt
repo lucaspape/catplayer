@@ -8,7 +8,8 @@ import android.database.sqlite.SQLiteOpenHelper
 import de.lucaspape.monstercat.database.PlaylistItem
 
 class PlaylistItemDatabaseHelper(context: Context, var playlistId: String) :
-    SQLiteOpenHelper(context,
+    SQLiteOpenHelper(
+        context,
         DATABASE_NAME, null,
         DATABASE_VERSION
     ) {
@@ -21,11 +22,13 @@ class PlaylistItemDatabaseHelper(context: Context, var playlistId: String) :
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        db!!.execSQL("DROP TABLE IF EXISTS " + PlaylistItem(
-            playlistId,
-            0,
-            0
-        ).TABLE_NAME)
+        db!!.execSQL(
+            "DROP TABLE IF EXISTS " + PlaylistItem(
+                playlistId,
+                0,
+                0
+            ).TABLE_NAME
+        )
         onCreate(db)
     }
 
@@ -37,14 +40,16 @@ class PlaylistItemDatabaseHelper(context: Context, var playlistId: String) :
         db!!.execSQL(PlaylistItem(playlistId, 0, 0).CREATE_TABLE)
     }
 
-    fun reCreateTable(){
+    fun reCreateTable() {
         val db = writableDatabase
 
-        db!!.execSQL("DROP TABLE IF EXISTS " + PlaylistItem(
-            playlistId,
-            0,
-            0
-        ).TABLE_NAME)
+        db!!.execSQL(
+            "DROP TABLE IF EXISTS " + PlaylistItem(
+                playlistId,
+                0,
+                0
+            ).TABLE_NAME
+        )
         onCreate(db)
     }
 
@@ -60,35 +65,10 @@ class PlaylistItemDatabaseHelper(context: Context, var playlistId: String) :
         return id
     }
 
-    fun getItem(id: Long): PlaylistItem {
-        val db = readableDatabase
-
-        val cursor = db.query(
-            PlaylistItem(playlistId, 0, 0).TABLE_NAME, arrayOf(
-                PlaylistItem.COLUMN_ID,
-                PlaylistItem.COLUMN_SONG_ID
-            ),
-            PlaylistItem.COLUMN_ID + "=?",
-            arrayOf(id.toString()), null, null, null, null
-        )
-
-        cursor?.moveToFirst()
-
-        val playlistItem = PlaylistItem(
-            playlistId,
-            cursor.getLong(cursor.getColumnIndex(PlaylistItem.COLUMN_ID)),
-            cursor.getLong(cursor.getColumnIndex(PlaylistItem.COLUMN_SONG_ID))
-        )
-
-        cursor.close()
-
-        return playlistItem
-    }
-
     fun getItemFromSongId(songId: Long): PlaylistItem? {
         val db = readableDatabase
 
-        try{
+        try {
             val cursor = db.query(
                 PlaylistItem(playlistId, 0, 0).TABLE_NAME, arrayOf(
                     PlaylistItem.COLUMN_ID,
@@ -100,7 +80,7 @@ class PlaylistItemDatabaseHelper(context: Context, var playlistId: String) :
 
             cursor?.moveToFirst()
 
-            try {
+            return try {
                 val playlistItem = PlaylistItem(
                     playlistId,
                     cursor.getLong(cursor.getColumnIndex(PlaylistItem.COLUMN_ID)),
@@ -109,13 +89,13 @@ class PlaylistItemDatabaseHelper(context: Context, var playlistId: String) :
 
                 cursor.close()
 
-                return playlistItem
-            }catch (e: IndexOutOfBoundsException){
+                playlistItem
+            } catch (e: IndexOutOfBoundsException) {
                 cursor.close()
                 db.close()
-                return null
+                null
             }
-        }catch (e: SQLiteException){
+        } catch (e: SQLiteException) {
             return null
         }
     }

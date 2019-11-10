@@ -75,7 +75,7 @@ class JSONParser {
         return songList
     }
 
-    fun parseSongToDB(jsonObject: JSONObject, context: Context):Long{
+    fun parseSongToDB(jsonObject: JSONObject, context: Context): Long {
         var id = ""
         var albumId = ""
         var title = ""
@@ -156,8 +156,8 @@ class JSONParser {
                 "version"
             )
 
-            if(sVersion == "null"){
-               sVersion = ""
+            if (sVersion == "null") {
+                sVersion = ""
             }
 
             val sString = sArtist + sTitle + sVersion

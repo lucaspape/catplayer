@@ -43,15 +43,25 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                                 val url = song!!["url"] as String
                                 val location = song["location"] as String
 
-                                downloadSong(url, location, sSid, song["shownTitle"] as String) { shownTitle, max, current ->
-                                    publishProgress(shownTitle, max.toString(), current.toString(), false.toString())
+                                downloadSong(
+                                    url,
+                                    location,
+                                    sSid,
+                                    song["shownTitle"] as String
+                                ) { shownTitle, max, current ->
+                                    publishProgress(
+                                        shownTitle,
+                                        max.toString(),
+                                        current.toString(),
+                                        false.toString()
+                                    )
                                 }
 
                                 downloadList[downloadedSongs] = null
                             }
 
                             downloadedSongs++
-                        }catch (e: NullPointerException){
+                        } catch (e: NullPointerException) {
 
                         }
                     }
@@ -64,12 +74,17 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                 if (wifi != null && !wifi.isConnected && settings.getSetting("downloadCoversOverMobile") != "true") {
                     println("forbidden by user")
                 } else {
-                    try{
+                    try {
                         if (downloadCoverArrayListList[downloadedCoverArrays]!!.isNotEmpty()) {
                             val coverArray = downloadCoverArrayListList[downloadedCoverArrays]
 
                             for (i in coverArray!!.indices) {
-                                publishProgress(context.getString(R.string.downloadingCoversMsg), coverArray.size.toString(), i.toString(), false.toString())
+                                publishProgress(
+                                    context.getString(R.string.downloadingCoversMsg),
+                                    coverArray.size.toString(),
+                                    i.toString(),
+                                    false.toString()
+                                )
 
                                 val cover = coverArray[i]
 
@@ -88,7 +103,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                                 downloadCoverArrayListList[downloadedCoverArrays] = null
                             }
                         }
-                    }catch (e: NullPointerException){
+                    } catch (e: NullPointerException) {
 
                     }
 

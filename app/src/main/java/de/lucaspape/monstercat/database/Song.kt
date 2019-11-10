@@ -1,12 +1,14 @@
 package de.lucaspape.monstercat.database
 
-data class Song(val id: Int,
-                val songId: String,
-                val title: String,
-                val version: String,
-                val albumId: String,
-                val artist: String,
-                val coverUrl: String){
+data class Song(
+    val id: Int,
+    val songId: String,
+    val title: String,
+    val version: String,
+    val albumId: String,
+    val artist: String,
+    val coverUrl: String
+) {
 
     companion object {
         @JvmStatic

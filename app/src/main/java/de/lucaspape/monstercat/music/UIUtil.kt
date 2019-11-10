@@ -177,7 +177,7 @@ fun setFullscreenPlayButton(newPlayButton: ImageButton, context: Context) {
     fullscreenPlayButtonReference = WeakReference(newPlayButton)
 }
 
-internal fun setTitle(title: String, version:String, artist: String) {
+internal fun setTitle(title: String, version: String, artist: String) {
 
     val text = "$title $version - $artist"
 
@@ -200,7 +200,7 @@ internal fun setTitle(title: String, version:String, artist: String) {
     }
 }
 
-internal fun hideTitle(){
+internal fun hideTitle() {
     val text = ""
 
     try {
@@ -273,7 +273,8 @@ internal fun startSeekBarUpdate() {
 
             try {
                 fullscreenSeekBarReference!!.get()!!.max = mediaPlayer!!.duration.toInt()
-                fullscreenSeekBarReference!!.get()!!.progress = mediaPlayer!!.currentPosition.toInt()
+                fullscreenSeekBarReference!!.get()!!.progress =
+                    mediaPlayer!!.currentPosition.toInt()
             } catch (e: NullPointerException) {
 
             }
@@ -345,7 +346,7 @@ internal fun setCover(song: Song, context: Context) {
     }
 }
 
-internal fun setPlayButtonImage(context:Context) {
+internal fun setPlayButtonImage(context: Context) {
     if (playing) {
         try {
             playButtonReference!!.get()!!.setImageDrawable(

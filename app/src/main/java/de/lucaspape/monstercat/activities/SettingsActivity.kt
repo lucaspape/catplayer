@@ -64,18 +64,18 @@ class SettingsActivity : AppCompatActivity() {
                 settings.getSetting("disableAudioFocus")!!.toBoolean()
         }
 
-        if(settings.getSetting("maximumLoad") != null){
+        if (settings.getSetting("maximumLoad") != null) {
             maxLoadSeekBar.progress = Integer.parseInt(settings.getSetting("maximumLoad")!!) / 50
             shownMaxValue.text = settings.getSetting("maximumLoad")!!
         }
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             darkThemeSwitch.visibility = View.VISIBLE
-        }else{
+        } else {
             darkThemeSwitch.visibility = View.GONE
         }
 
-        if(settings.getSetting("darkTheme") != null){
+        if (settings.getSetting("darkTheme") != null) {
             darkThemeSwitch.isChecked = settings.getSetting("darkTheme")!!.toBoolean()
         }
 
@@ -93,30 +93,30 @@ class SettingsActivity : AppCompatActivity() {
             settings.saveSetting("downloadCoversOverMobile", isChecked.toString())
         }
 
-        disableAudioFocusSwitch.setOnCheckedChangeListener{_, isChecked ->
+        disableAudioFocusSwitch.setOnCheckedChangeListener { _, isChecked ->
             settings.saveSetting("disableAudioFocus", isChecked.toString())
         }
 
         darkThemeSwitch.setOnCheckedChangeListener { _, isChecked ->
             settings.saveSetting("darkTheme", isChecked.toString())
 
-            if(isChecked){
+            if (isChecked) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            }else{
+            } else {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
             }
 
         }
 
-        maximumLoadSeekBar.setOnSeekBarChangeListener (object :
+        maximumLoadSeekBar.setOnSeekBarChangeListener(object :
             SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(
                 seekBar: SeekBar,
                 progress: Int,
                 fromUser: Boolean
             ) {
-                if (fromUser){
-                    settings.saveSetting("maximumLoad", (progress*50).toString())
+                if (fromUser) {
+                    settings.saveSetting("maximumLoad", (progress * 50).toString())
                     shownMaxValue.text = settings.getSetting("maximumLoad")!!
                 }
             }

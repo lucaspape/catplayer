@@ -10,7 +10,8 @@ import de.lucaspape.monstercat.database.Album
 import java.lang.IndexOutOfBoundsException
 
 class AlbumDatabaseHelper(context: Context) :
-    SQLiteOpenHelper(context,
+    SQLiteOpenHelper(
+        context,
         DATABASE_NAME, null,
         DATABASE_VERSION
     ) {
@@ -30,7 +31,7 @@ class AlbumDatabaseHelper(context: Context) :
         db!!.execSQL(Album.CREATE_TABLE)
     }
 
-    fun reCreateTable(){
+    fun reCreateTable() {
         val db = writableDatabase
 
         db!!.execSQL("DROP TABLE IF EXISTS " + Album.TABLE_NAME)

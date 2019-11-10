@@ -13,10 +13,10 @@ internal fun downloadSong(
     url: String,
     location: String,
     sid: String,
-    shownTitle:String,
-    downloadUpdate:(shownTitle:String, max:Int, current:Int) -> Unit
+    shownTitle: String,
+    downloadUpdate: (shownTitle: String, max: Int, current: Int) -> Unit
 ) {
-    if(!File(location).exists()){
+    if (!File(location).exists()) {
         val urlConnection = URL(url).openConnection()
         urlConnection.setRequestProperty("Cookie", "connect.sid=$sid")
         urlConnection.connect()
@@ -28,13 +28,13 @@ internal fun downloadSong(
         val fileOutputStream = FileOutputStream(File(location))
 
         val data = ByteArray(1024)
-        var total:Long = 0
+        var total: Long = 0
         var count: Int
 
         do {
             count = bufferedInputStream.read(data)
 
-            if(count == -1){
+            if (count == -1) {
                 break
             }
 
@@ -43,7 +43,7 @@ internal fun downloadSong(
             fileOutputStream.write(data, 0, count)
 
             downloadUpdate(shownTitle, lengthOfFile, total.toInt())
-        } while(true)
+        } while (true)
 
         fileOutputStream.flush()
         fileOutputStream.close()

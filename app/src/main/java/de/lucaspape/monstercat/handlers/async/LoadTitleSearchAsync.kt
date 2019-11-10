@@ -14,23 +14,27 @@ import de.lucaspape.monstercat.json.JSONParser
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
-class LoadTitleSearchAsync(private val viewReference: WeakReference<View>,
-                           private val contextReference: WeakReference<Context>,
-                           private val searchString: String) : AsyncTask<Void, Void, String>(){
+class LoadTitleSearchAsync(
+    private val viewReference: WeakReference<View>,
+    private val contextReference: WeakReference<Context>,
+    private val searchString: String
+) : AsyncTask<Void, Void, String>() {
 
     override fun doInBackground(vararg params: Void?): String? {
         val searchQueue = Volley.newRequestQueue(contextReference.get()!!)
 
-        val searchRequest = StringRequest(Request.Method.GET, contextReference.get()!!.getString(R.string.loadSongsUrl) + "?term=$searchString&limit=50&skip=0&fields=&search=$searchString",
+        val searchRequest = StringRequest(Request.Method.GET,
+            contextReference.get()!!.getString(R.string.loadSongsUrl) + "?term=$searchString&limit=50&skip=0&fields=&search=$searchString",
             Response.Listener { response ->
                 val jsonArray = JSONObject(response).getJSONArray("results")
 
                 val jsonParser = JSONParser()
-                val songList = jsonParser.parseSongSearchToSongList(contextReference.get()!!, jsonArray)
+                val songList =
+                    jsonParser.parseSongSearchToSongList(contextReference.get()!!, jsonArray)
 
                 val hashMapList = ArrayList<HashMap<String, Any?>>()
 
-                for(song in songList){
+                for (song in songList) {
                     hashMapList.add(jsonParser.parseSongToHashMap(contextReference.get()!!, song))
                 }
 
@@ -42,6 +46,8 @@ class LoadTitleSearchAsync(private val viewReference: WeakReference<View>,
 
                 //download cover art
                 addDownloadCoverArray(HomeHandler.currentListViewData)
+
+                HomeHandler.albumContentsDisplayed = false
             },
             Response.ErrorListener { error ->
                 println(error)

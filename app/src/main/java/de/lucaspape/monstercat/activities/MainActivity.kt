@@ -36,7 +36,7 @@ import java.lang.IllegalArgumentException
 import java.lang.ref.WeakReference
 
 var loadContinuousSongListAsyncTask: LoadContinuousSongListAsync? = null
-var downloadTask:DownloadTask? = null
+var downloadTask: DownloadTask? = null
 
 /**
  * Main activity
@@ -73,10 +73,10 @@ class MainActivity : AppCompatActivity() {
 
         val settings = Settings(this)
 
-        if(settings.getSetting("darkTheme") != null){
-            if(settings.getSetting("darkTheme")!!.toBoolean()){
+        if (settings.getSetting("darkTheme") != null) {
+            if (settings.getSetting("darkTheme")!!.toBoolean()) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            }else{
+            } else {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
             }
         }
@@ -104,7 +104,7 @@ class MainActivity : AppCompatActivity() {
 
         //start download background task
 
-        if(downloadTask != null){
+        if (downloadTask != null) {
             downloadTask!!.cancel(true)
         }
 
@@ -129,9 +129,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        try{
+        try {
             unregisterReceiver(NoisyReceiver())
-        }catch (e: IllegalArgumentException){
+        } catch (e: IllegalArgumentException) {
 
         }
 

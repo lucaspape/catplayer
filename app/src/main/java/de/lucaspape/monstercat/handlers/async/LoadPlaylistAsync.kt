@@ -76,7 +76,7 @@ class LoadPlaylistAsync(
                 }
             }
 
-            val playlistRequest =  AuthorizedRequest(
+            val playlistRequest = AuthorizedRequest(
                 Request.Method.GET, playlistUrl, getSid(),
                 Response.Listener { response ->
                     val jsonObject = JSONObject(response)

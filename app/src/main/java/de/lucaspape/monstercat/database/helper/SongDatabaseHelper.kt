@@ -9,9 +9,9 @@ import android.database.sqlite.SQLiteOpenHelper
 import de.lucaspape.monstercat.database.Song
 import java.lang.IndexOutOfBoundsException
 
-
 class SongDatabaseHelper(context: Context) :
-    SQLiteOpenHelper(context,
+    SQLiteOpenHelper(
+        context,
         DATABASE_NAME, null,
         DATABASE_VERSION
     ) {
@@ -135,36 +135,5 @@ class SongDatabaseHelper(context: Context) :
         } catch (e: SQLiteException) {
             return null
         }
-    }
-
-    fun getAlbumSongs(albumId: String): List<Song> {
-        val songs: ArrayList<Song> = ArrayList()
-
-        val selectQuery =
-            "SELECT * FROM " + Song.TABLE_NAME + " WHERE " + Song.COLUMN_ALBUM_ID + " = \"" + albumId + "\""
-
-        val db = writableDatabase
-        val cursor = db.rawQuery(selectQuery, null)
-
-        if (cursor.moveToFirst()) {
-            do {
-                val song = Song(
-                    cursor.getInt(cursor.getColumnIndex(Song.COLUMN_ID)),
-                    cursor.getString(cursor.getColumnIndex(Song.COLUMN_SONG_ID)),
-                    cursor.getString(cursor.getColumnIndex(Song.COLUMN_TITLE)),
-                    cursor.getString(cursor.getColumnIndex(Song.COLUMN_VERSION)),
-                    cursor.getString(cursor.getColumnIndex(Song.COLUMN_ALBUM_ID)),
-                    cursor.getString(cursor.getColumnIndex(Song.COLUMN_ARTIST)),
-                    cursor.getString(cursor.getColumnIndex(Song.COLUMN_COVER_URL))
-                )
-
-                songs.add(song)
-            } while (cursor.moveToNext())
-        }
-
-        cursor.close()
-        db.close()
-
-        return songs
     }
 }

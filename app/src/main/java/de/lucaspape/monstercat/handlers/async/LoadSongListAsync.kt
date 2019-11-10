@@ -23,7 +23,7 @@ class LoadSongListAsync(
     private val viewReference: WeakReference<View>,
     private val contextReference: WeakReference<Context>,
     private val forceReload: Boolean,
-    private val loadMax:Int
+    private val loadMax: Int
 ) : AsyncTask<Void, Void, String>() {
     override fun onPreExecute() {
         val swipeRefreshLayout =
@@ -63,6 +63,8 @@ class LoadSongListAsync(
         val swipeRefreshLayout =
             viewReference.get()!!.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
         swipeRefreshLayout.isRefreshing = false
+
+        HomeHandler.albumContentsDisplayed = false
     }
 
     override fun doInBackground(vararg param: Void?): String? {

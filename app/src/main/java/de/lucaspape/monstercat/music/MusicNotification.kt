@@ -227,7 +227,12 @@ class IntentReceiver : BroadcastReceiver() {
                 intent!!.action.equals(NOTIFICATION_PREVIOUS) -> previous()
                 intent.action.equals(NOTIFICATION_DELETE) -> {
                     pause()
-                    contextReference!!.get()!!.stopService(Intent(contextReference!!.get()!!, MusicNotificationService::class.java))
+                    contextReference!!.get()!!.stopService(
+                        Intent(
+                            contextReference!!.get()!!,
+                            MusicNotificationService::class.java
+                        )
+                    )
                 }
 
                 intent.action.equals(NOTIFICATION_PAUSE) -> pause()

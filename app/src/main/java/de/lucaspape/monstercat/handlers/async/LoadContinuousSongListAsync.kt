@@ -65,11 +65,7 @@ class LoadContinuousSongListAsync(
                                 song.streamLocation =
                                     context.getString(R.string.songStreamUrl) + streamHash
                                 addContinuous(song)
-                            } else {
-                                //could not find song
-                                //TODO msg
                             }
-
                         },
                         Response.ErrorListener { })
 
