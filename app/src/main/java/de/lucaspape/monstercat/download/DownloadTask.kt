@@ -5,13 +5,13 @@ import android.net.ConnectivityManager
 import android.os.AsyncTask
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.auth.getSid
-import de.lucaspape.monstercat.auth.loggedIn
+import de.lucaspape.monstercat.music.contextReference
 import de.lucaspape.monstercat.settings.Settings
 import java.lang.NullPointerException
 import java.lang.ref.WeakReference
 
 class DownloadTask(private val weakReference: WeakReference<Context>) :
-    AsyncTask<Void, Void, String>() {
+    AsyncTask<Void, String, String>() {
 
     override fun doInBackground(vararg p0: Void?): String? {
 
@@ -43,7 +43,9 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                                 val url = song!!["url"] as String
                                 val location = song["location"] as String
 
-                                downloadSong(url, location, sSid, context)
+                                downloadSong(url, location, sSid, song["shownTitle"] as String) { shownTitle, max, current ->
+                                    publishProgress(shownTitle, max.toString(), current.toString(), false.toString())
+                                }
 
                                 downloadList[downloadedSongs] = null
                             }
@@ -67,13 +69,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                             val coverArray = downloadCoverArrayListList[downloadedCoverArrays]
 
                             for (i in coverArray!!.indices) {
-                                showDownloadNotification(
-                                    context.getString(R.string.downloadingCoversMsg),
-                                    i,
-                                    coverArray.size,
-                                    false,
-                                    context
-                                )
+                                publishProgress(context.getString(R.string.downloadingCoversMsg), coverArray.size.toString(), i.toString(), false.toString())
 
                                 val cover = coverArray[i]
 
@@ -91,8 +87,6 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
 
                                 downloadCoverArrayListList[downloadedCoverArrays] = null
                             }
-
-                            hideDownloadNotification(context)
                         }
                     }catch (e: NullPointerException){
 
@@ -104,9 +98,19 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
             } catch (e: IndexOutOfBoundsException) {
             }
 
+            hideDownloadNotification(context)
 
             Thread.sleep(100)
         }
+    }
+
+    override fun onProgressUpdate(vararg values: String?) {
+        val title = values[0]!!
+        val max = values[1]!!.toInt()
+        val current = values[2]!!.toInt()
+        val int = values[3]!!.toBoolean()
+
+        showDownloadNotification(title, current, max, int, contextReference!!.get()!!)
     }
 
 

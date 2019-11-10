@@ -1,10 +1,8 @@
 package de.lucaspape.monstercat.download
 
-import android.app.DownloadManager
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.net.Uri
+import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -15,18 +13,43 @@ internal fun downloadSong(
     url: String,
     location: String,
     sid: String,
-    context: Context
+    shownTitle:String,
+    downloadUpdate:(shownTitle:String, max:Int, current:Int) -> Unit
 ) {
     if(!File(location).exists()){
-        val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        val urlConnection = URL(url).openConnection()
+        urlConnection.setRequestProperty("Cookie", "connect.sid=$sid")
+        urlConnection.connect()
 
-        val downloadRequest = DownloadManager.Request(Uri.parse(url))
+        println(location)
 
-        downloadRequest.addRequestHeader("Cookie", "connect.sid=$sid")
-            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-            .setDestinationUri(Uri.parse("file://$location"))
+        val lengthOfFile = urlConnection.contentLength
 
-        downloadManager.enqueue(downloadRequest)
+        val bufferedInputStream = BufferedInputStream(urlConnection.getInputStream(), 8192)
+
+        val fileOutputStream = FileOutputStream(File(location))
+
+        val data = ByteArray(1024)
+        var total:Long = 0
+        var count: Int
+
+        do {
+            count = bufferedInputStream.read(data)
+
+            if(count == -1){
+                break
+            }
+
+            total += count
+
+            fileOutputStream.write(data, 0, count)
+
+            downloadUpdate(shownTitle, lengthOfFile, total.toInt())
+        } while(true)
+
+        fileOutputStream.flush()
+        fileOutputStream.close()
+        bufferedInputStream.close()
     }
 }
 
