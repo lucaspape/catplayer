@@ -25,8 +25,8 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="78dp"
-        android:gravity="bottom"
         android:background="@drawable/toolbar_style"
+        android:gravity="bottom"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -37,6 +37,7 @@
         android:id="@+id/songCurrentText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
         android:maxLines="1"
         android:text=""
         android:textColor="?android:attr/textColorPrimary"
@@ -45,7 +46,6 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/barCoverImage"
         app:layout_constraintTop_toBottomOf="@+id/seekBar"
-        android:layout_marginStart="10dp"
         app:layout_constraintVertical_bias="0.527" />
 
     <ImageButton
@@ -63,11 +63,11 @@
         android:id="@+id/barCoverImage"
         android:layout_width="35dp"
         android:layout_height="35dp"
+        android:layout_marginTop="10dp"
         android:contentDescription="@string/coverImage"
         app:layout_constraintBottom_toBottomOf="@+id/musicBar"
         app:layout_constraintStart_toStartOf="@+id/musicBar"
         app:layout_constraintTop_toTopOf="@+id/musicBar"
-        android:layout_marginTop="10dp"
         app:srcCompat="@drawable/ic_music_video_black_24dp" />
 
     <SeekBar

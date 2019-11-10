@@ -20,7 +20,7 @@
         <Spinner
             android:id="@+id/viewSelector"
             android:layout_width="200dp"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
 
         <ImageButton
             android:id="@+id/settingsButton"
@@ -36,8 +36,8 @@
             android:id="@+id/homeSearch"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            app:layout_constraintStart_toEndOf="@+id/viewSelector"
             app:layout_constraintEnd_toEndOf="@+id/settingsButton"
+            app:layout_constraintStart_toEndOf="@+id/viewSelector"
             tools:layout_editor_absoluteY="14dp" />
 
     </androidx.appcompat.widget.Toolbar>
@@ -47,8 +47,8 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
         android:layout_marginTop="10dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="135dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -67,7 +67,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.033" />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -50,42 +50,42 @@
             android:showDividers="middle">
 
             <ImageButton
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
                 android:id="@+id/prevButton"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
                 android:background="@null"
                 android:contentDescription="@string/prevButton"
                 android:src="@drawable/ic_skip_previous_white_24dp" />
 
             <ImageButton
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
                 android:id="@+id/playButton"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
                 android:background="@null"
                 android:contentDescription="@string/playButton"
                 android:src="@drawable/ic_play_arrow_white_24dp" />
 
             <ImageButton
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
                 android:id="@+id/pauseButton"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
                 android:background="@null"
                 android:contentDescription="@string/pauseButton"
                 android:src="@drawable/ic_pause_white_24dp"
                 android:visibility="gone" />
 
             <ImageButton
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
                 android:id="@+id/nextButton"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
                 android:background="@null"
                 android:contentDescription="@string/nextButton"
                 android:src="@drawable/ic_skip_next_white_24dp" />
