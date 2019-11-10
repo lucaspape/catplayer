@@ -11,8 +11,8 @@ This android app aims to implement the Monstercat API.
  - Download songs (with Monstercat Gold)
  - Browse in catalog and in album view
 
-![Screenshot1](https://raw.githubusercontent.com/lucaspape/catplayer/master/playstore_res/screenshots/Screenshot_20191110-152238_Player_for_Monstercat.png =250x)
-![Screenshot2](https://raw.githubusercontent.com/lucaspape/catplayer/master/playstore_res/screenshots/Screenshot_20191110-152238_Player_for_Monstercat.png =250x)
+![Screenshot1](https://raw.githubusercontent.com/lucaspape/catplayer/master/playstore_res/screenshots/Screenshot_20191110-152238_Player_for_Monstercat.png | width=100)
+![Screenshot2](https://raw.githubusercontent.com/lucaspape/catplayer/master/playstore_res/screenshots/Screenshot_20191110-152238_Player_for_Monstercat.png | width=100)
 
 ## Todo
 
