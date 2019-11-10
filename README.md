@@ -2,7 +2,7 @@
 
 ![Icon](https://raw.githubusercontent.com/lucaspape/catplayer/master/playstore_res/icon-round-full.png)
 
-https://pixabay.com/illustrations/black-panther-figure-3704552/ - icon source
+https://pixabay.com/illustrations/black-panther-figure-3704552/ - Black Panther Figure by Victoria Borodinova
 
 This android app aims to implement the Monstercat API.
 
