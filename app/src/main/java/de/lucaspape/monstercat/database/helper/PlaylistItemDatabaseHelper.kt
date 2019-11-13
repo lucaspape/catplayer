@@ -108,7 +108,7 @@ class PlaylistItemDatabaseHelper(context: Context, var playlistId: String) :
             0,
             0
         ).TABLE_NAME + " ORDER BY " +
-                PlaylistItem.COLUMN_ID + " DESC"
+                PlaylistItem.COLUMN_ID + " ASC"
 
         val db = writableDatabase
         val cursor = db.rawQuery(selectQuery, null)

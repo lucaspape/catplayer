@@ -18,6 +18,9 @@ import de.lucaspape.monstercat.util.parsePlaylistTrackToDB
 import de.lucaspape.monstercat.util.parseSongToHashMap
 import org.json.JSONObject
 import java.lang.ref.WeakReference
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class LoadPlaylistTracksAsync(
     private val viewReference: WeakReference<View>,
@@ -54,7 +57,12 @@ class LoadPlaylistTracksAsync(
         }
 
         //display list
-        PlaylistHandler.currentListViewData = sortedList
+        PlaylistHandler.currentListViewData =  ArrayList()
+
+        for(i in (sortedList.size -1) downTo 0){
+            PlaylistHandler.currentListViewData.add(sortedList[i])
+        }
+
         PlaylistHandler.listViewDataIsPlaylistView = false
 
         PlaylistHandler.updateListView(viewReference.get()!!)
