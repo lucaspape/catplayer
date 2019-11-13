@@ -30,6 +30,7 @@ internal fun downloadSong(
         val data = ByteArray(1024)
         var total: Long = 0
         var count: Int
+        var updateCount = 0
 
         do {
             count = bufferedInputStream.read(data)
@@ -42,7 +43,12 @@ internal fun downloadSong(
 
             fileOutputStream.write(data, 0, count)
 
-            downloadUpdate(shownTitle, lengthOfFile, total.toInt())
+            updateCount++
+
+            if(updateCount > 100){
+                updateCount = 0
+                downloadUpdate(shownTitle, lengthOfFile, total.toInt())
+            }
         } while (true)
 
         fileOutputStream.flush()
