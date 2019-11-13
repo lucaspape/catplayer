@@ -76,7 +76,7 @@ class PlaylistHandler {
         Thread(Runnable {
             while (true) {
                 Handler(Looper.getMainLooper()).post { redrawListView(view) }
-                Thread.sleep(1000)
+                Thread.sleep(200)
             }
 
         }).start()
