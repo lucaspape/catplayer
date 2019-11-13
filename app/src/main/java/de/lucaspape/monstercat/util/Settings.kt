@@ -1,4 +1,4 @@
-package de.lucaspape.monstercat.settings
+package de.lucaspape.monstercat.util
 
 import android.content.Context
 

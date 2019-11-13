@@ -8,13 +8,14 @@ import com.android.volley.Response
 import com.android.volley.Request
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.auth.getSid
+import de.lucaspape.monstercat.util.getSid
 import de.lucaspape.monstercat.database.helper.AlbumItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadCoverArray
 import de.lucaspape.monstercat.handlers.HomeHandler
-import de.lucaspape.monstercat.json.JSONParser
 import de.lucaspape.monstercat.request.AuthorizedRequest
+import de.lucaspape.monstercat.util.parsAlbumSongToDB
+import de.lucaspape.monstercat.util.parseSongToHashMap
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
@@ -42,9 +43,8 @@ class LoadAlbumAsync(
         val songDatabaseHelper = SongDatabaseHelper(contextReference.get()!!)
 
         for (albumItem in albumItemList) {
-            val jsonParser = JSONParser()
             dbSongs.add(
-                jsonParser.parseSongToHashMap(
+                parseSongToHashMap(
                     contextReference.get()!!,
                     songDatabaseHelper.getSong(albumItem.songId)
                 )
@@ -93,17 +93,16 @@ class LoadAlbumAsync(
                 contextReference.get()!!.getString(R.string.loadSongsUrl) + "?albumId=" + albumId
 
             val listRequest = AuthorizedRequest(
-                Request.Method.GET, requestUrl, getSid(), Response.Listener { response ->
+                Request.Method.GET, requestUrl,
+                getSid(), Response.Listener { response ->
                     val json = JSONObject(response)
                     val jsonArray = json.getJSONArray("results")
 
                     albumItemDatabaseHelper.reCreateTable()
 
-                    val jsonParser = JSONParser()
-
                     //parse every single song into list
                     for (k in (0 until jsonArray.length())) {
-                        jsonParser.parsAlbumSongToDB(
+                        parsAlbumSongToDB(
                             jsonArray.getJSONObject(k),
                             albumId,
                             contextReference.get()!!

@@ -8,13 +8,14 @@ import com.android.volley.Response
 import com.android.volley.Request
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.auth.getSid
+import de.lucaspape.monstercat.util.getSid
 import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadCoverArray
 import de.lucaspape.monstercat.handlers.PlaylistHandler
-import de.lucaspape.monstercat.json.JSONParser
 import de.lucaspape.monstercat.request.AuthorizedRequest
+import de.lucaspape.monstercat.util.parsePlaylistTrackToDB
+import de.lucaspape.monstercat.util.parseSongToHashMap
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
@@ -44,10 +45,8 @@ class LoadPlaylistTracksAsync(
         val songDatabaseHelper =
             SongDatabaseHelper(contextReference.get()!!)
 
-        val jsonParser = JSONParser()
-
         for (playlistItem in playlistItems) {
-            val hashMap = jsonParser.parseSongToHashMap(
+            val hashMap = parseSongToHashMap(
                 contextReference.get()!!,
                 songDatabaseHelper.getSong(playlistItem.songId)
             )
@@ -122,11 +121,9 @@ class LoadPlaylistTracksAsync(
 
                         playlistItemDatabaseHelper.reCreateTable()
 
-                        val jsonParser = JSONParser()
-
                         for (playlistObject in tempList) {
                             if (playlistObject != null) {
-                                jsonParser.parsePlaylistTrackToDB(
+                                parsePlaylistTrackToDB(
                                     playlistId,
                                     playlistObject,
                                     contextReference.get()!!

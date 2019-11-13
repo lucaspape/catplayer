@@ -1,4 +1,4 @@
-package de.lucaspape.monstercat.auth
+package de.lucaspape.monstercat.util
 
 import android.app.AlertDialog
 import android.content.Context
@@ -14,7 +14,6 @@ import com.android.volley.toolbox.Volley
 import com.android.volley.Request
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.request.AuthorizedRequest
-import de.lucaspape.monstercat.settings.Settings
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException

@@ -7,8 +7,8 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.auth.Auth
-import de.lucaspape.monstercat.settings.Settings
+import de.lucaspape.monstercat.util.Auth
+import de.lucaspape.monstercat.util.Settings
 import kotlinx.android.synthetic.main.activity_settings.*
 
 /**

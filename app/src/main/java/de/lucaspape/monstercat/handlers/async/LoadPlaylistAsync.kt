@@ -8,11 +8,12 @@ import com.android.volley.Response
 import com.android.volley.Request
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.auth.getSid
+import de.lucaspape.monstercat.util.getSid
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.handlers.PlaylistHandler
-import de.lucaspape.monstercat.json.JSONParser
 import de.lucaspape.monstercat.request.AuthorizedRequest
+import de.lucaspape.monstercat.util.parsePlaylistToDB
+import de.lucaspape.monstercat.util.parsePlaylistToHashMap
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
@@ -35,12 +36,10 @@ class LoadPlaylistAsync(
             PlaylistDatabaseHelper(contextReference.get()!!)
         val playlists = playlistDatabaseHelper.getAllPlaylists()
 
-        val jsonParser = JSONParser()
-
         val playlistHashMaps = ArrayList<HashMap<String, Any?>>()
 
         for (playlist in playlists) {
-            playlistHashMaps.add(jsonParser.parsePlaylistToHashMap(playlist))
+            playlistHashMaps.add(parsePlaylistToHashMap(playlist))
         }
 
         if (showAfter) {
@@ -82,10 +81,8 @@ class LoadPlaylistAsync(
                     val jsonObject = JSONObject(response)
                     val jsonArray = jsonObject.getJSONArray("results")
 
-                    val jsonParser = JSONParser()
-
                     for (i in (0 until jsonArray.length())) {
-                        jsonParser.parsePlaylistToDB(
+                        parsePlaylistToDB(
                             contextReference.get()!!,
                             jsonArray.getJSONObject(i)
                         )

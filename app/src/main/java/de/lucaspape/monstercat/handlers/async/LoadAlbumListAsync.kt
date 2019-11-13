@@ -9,13 +9,14 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.auth.getSid
+import de.lucaspape.monstercat.util.getSid
 import de.lucaspape.monstercat.database.helper.AlbumDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadCoverArray
 import de.lucaspape.monstercat.handlers.HomeHandler
-import de.lucaspape.monstercat.json.JSONParser
 import de.lucaspape.monstercat.request.AuthorizedRequest
-import de.lucaspape.monstercat.settings.Settings
+import de.lucaspape.monstercat.util.Settings
+import de.lucaspape.monstercat.util.parseAlbumToDB
+import de.lucaspape.monstercat.util.parseAlbumToHashMap
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
@@ -39,8 +40,7 @@ class LoadAlbumListAsync(
         val sortedList = ArrayList<HashMap<String, Any?>>()
 
         for (album in albumList) {
-            val jsonParser = JSONParser()
-            sortedList.add(jsonParser.parseAlbumToHashMap(contextReference.get()!!, album))
+            sortedList.add(parseAlbumToHashMap(contextReference.get()!!, album))
         }
 
         HomeHandler.currentListViewData = sortedList
@@ -120,10 +120,9 @@ class LoadAlbumListAsync(
 
             albumDatabaseHelper.reCreateTable()
 
-            val jsonParser = JSONParser()
             for (jsonObject in tempList) {
                 if (jsonObject != null) {
-                    jsonParser.parseAlbumToDB(jsonObject, contextReference.get()!!)
+                    parseAlbumToDB(jsonObject, contextReference.get()!!)
                 }
             }
 

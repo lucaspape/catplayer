@@ -6,12 +6,12 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.auth.getSid
+import de.lucaspape.monstercat.util.getSid
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
-import de.lucaspape.monstercat.json.JSONParser
 import de.lucaspape.monstercat.music.addContinuous
 import de.lucaspape.monstercat.request.AuthorizedRequest
-import de.lucaspape.monstercat.settings.Settings
+import de.lucaspape.monstercat.util.Settings
+import de.lucaspape.monstercat.util.parseObjectToStreamHash
 import org.json.JSONObject
 import java.io.File
 import java.lang.ref.WeakReference
@@ -58,8 +58,7 @@ class LoadContinuousSongListAsync(
                         Response.Listener { response ->
                             val jsonObject = JSONObject(response)
 
-                            val jsonParser = JSONParser()
-                            val streamHash = jsonParser.parseObjectToStreamHash(jsonObject, song)
+                            val streamHash = parseObjectToStreamHash(jsonObject, song)
 
                             if (streamHash != null) {
                                 song.streamLocation =

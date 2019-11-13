@@ -16,7 +16,7 @@ import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import de.lucaspape.monstercat.database.Song
-import de.lucaspape.monstercat.settings.Settings
+import de.lucaspape.monstercat.util.Settings
 import java.io.File
 import java.lang.IndexOutOfBoundsException
 

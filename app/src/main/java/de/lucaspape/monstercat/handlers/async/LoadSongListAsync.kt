@@ -8,14 +8,15 @@ import com.android.volley.Response
 import com.android.volley.Request
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.auth.getSid
+import de.lucaspape.monstercat.util.getSid
 import de.lucaspape.monstercat.database.helper.CatalogSongDatabaseHelper
 import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadCoverArray
 import de.lucaspape.monstercat.handlers.HomeHandler
-import de.lucaspape.monstercat.json.JSONParser
 import de.lucaspape.monstercat.request.AuthorizedRequest
+import de.lucaspape.monstercat.util.parseCatalogSongToDB
+import de.lucaspape.monstercat.util.parseSongToHashMap
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
@@ -47,8 +48,7 @@ class LoadSongListAsync(
         }
 
         for (song in songList) {
-            val jsonParser = JSONParser()
-            dbSongs.add(jsonParser.parseSongToHashMap(contextReference.get()!!, song))
+            dbSongs.add(parseSongToHashMap(contextReference.get()!!, song))
         }
 
         //display list
@@ -117,12 +117,10 @@ class LoadSongListAsync(
 
             catalogSongDatabaseHelper.reCreateTable()
 
-            val jsonParser = JSONParser()
-
             for (jsonObject in sortedList) {
                 if (jsonObject != null) {
 
-                    jsonParser.parseCatalogSongToDB(
+                    parseCatalogSongToDB(
                         jsonObject,
                         contextReference.get()!!
                     )

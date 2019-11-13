@@ -10,7 +10,8 @@ import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.download.addDownloadCoverArray
 import de.lucaspape.monstercat.handlers.HomeHandler
-import de.lucaspape.monstercat.json.JSONParser
+import de.lucaspape.monstercat.util.parseSongSearchToSongList
+import de.lucaspape.monstercat.util.parseSongToHashMap
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
@@ -28,14 +29,13 @@ class LoadTitleSearchAsync(
             Response.Listener { response ->
                 val jsonArray = JSONObject(response).getJSONArray("results")
 
-                val jsonParser = JSONParser()
                 val songList =
-                    jsonParser.parseSongSearchToSongList(contextReference.get()!!, jsonArray)
+                    parseSongSearchToSongList(contextReference.get()!!, jsonArray)
 
                 val hashMapList = ArrayList<HashMap<String, Any?>>()
 
                 for (song in songList) {
-                    hashMapList.add(jsonParser.parseSongToHashMap(contextReference.get()!!, song))
+                    hashMapList.add(parseSongToHashMap(contextReference.get()!!, song))
                 }
 
                 //display list

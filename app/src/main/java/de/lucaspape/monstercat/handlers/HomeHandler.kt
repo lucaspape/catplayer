@@ -13,7 +13,7 @@ import de.lucaspape.monstercat.activities.SettingsActivity
 import de.lucaspape.monstercat.activities.loadContinuousSongListAsyncTask
 import de.lucaspape.monstercat.handlers.async.*
 import de.lucaspape.monstercat.music.*
-import de.lucaspape.monstercat.settings.Settings
+import de.lucaspape.monstercat.util.Settings
 import java.lang.ref.WeakReference
 
 /**

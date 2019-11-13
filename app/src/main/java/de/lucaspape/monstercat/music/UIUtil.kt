@@ -5,7 +5,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.drawable.ColorDrawable
 import android.media.MediaMetadata
 import android.media.session.PlaybackState
 import android.os.Handler
@@ -20,9 +19,8 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.Song
-import de.lucaspape.monstercat.settings.Settings
+import de.lucaspape.monstercat.util.Settings
 import java.io.File
-import java.lang.ClassCastException
 import java.lang.NullPointerException
 import java.lang.ref.WeakReference
 

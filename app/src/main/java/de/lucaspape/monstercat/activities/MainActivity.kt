@@ -24,14 +24,14 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.auth.Auth
+import de.lucaspape.monstercat.util.Auth
 import de.lucaspape.monstercat.download.DownloadTask
 import de.lucaspape.monstercat.fragments.HomeFragment
 import de.lucaspape.monstercat.fragments.PlaylistFragment
 import de.lucaspape.monstercat.handlers.HomeHandler
 import de.lucaspape.monstercat.handlers.async.LoadContinuousSongListAsync
 import de.lucaspape.monstercat.music.*
-import de.lucaspape.monstercat.settings.Settings
+import de.lucaspape.monstercat.util.Settings
 import java.lang.IllegalArgumentException
 import java.lang.ref.WeakReference
 

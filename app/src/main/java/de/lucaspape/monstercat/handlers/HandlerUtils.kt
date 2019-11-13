@@ -9,17 +9,14 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.Request
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.auth.getSid
-import de.lucaspape.monstercat.auth.loggedIn
 import de.lucaspape.monstercat.database.*
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadSong
-import de.lucaspape.monstercat.json.JSONParser
 import de.lucaspape.monstercat.music.addSong
 import de.lucaspape.monstercat.request.AuthorizedRequest
-import de.lucaspape.monstercat.settings.Settings
+import de.lucaspape.monstercat.util.*
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -57,8 +54,7 @@ internal fun playSongFromId(context: Context, songId: String, playNow: Boolean) 
                 Response.Listener { response ->
                     val jsonObject = JSONObject(response)
 
-                    val jsonParser = JSONParser()
-                    val streamHash = jsonParser.parseObjectToStreamHash(jsonObject, song)
+                    val streamHash = parseObjectToStreamHash(jsonObject, song)
 
                     if (streamHash != null) {
                         song.streamLocation =
@@ -85,16 +81,16 @@ internal fun playAlbumNext(context: Context, albumId: String) {
 
     val albumRequestQueue = Volley.newRequestQueue(context)
 
-    val albumRequest = AuthorizedRequest(Request.Method.GET, requestUrl, getSid(),
+    val albumRequest = AuthorizedRequest(Request.Method.GET, requestUrl,
+        getSid(),
         Response.Listener { response ->
             val jsonObject = JSONObject(response)
             val jsonArray = jsonObject.getJSONArray("results")
 
             val idArray = ArrayList<Long>()
-            val jsonParser = JSONParser()
 
             for (i in (0 until jsonArray.length())) {
-                idArray.add(jsonParser.parseSongToDB(jsonArray.getJSONObject(i), context))
+                idArray.add(parseSongToDB(jsonArray.getJSONObject(i), context))
             }
 
             val databaseHelper = SongDatabaseHelper(context)
@@ -139,7 +135,7 @@ internal fun downloadSong(context: Context, song: Song) {
     if (!File(downloadLocation).exists()) {
         val sSid = getSid()
         if (sSid != null) {
-            addDownloadSong(downloadUrl, downloadLocation, song.title + song.version)
+            addDownloadSong(downloadUrl, downloadLocation, song.title + " " + song.version)
         }
 
     } else {
@@ -159,16 +155,16 @@ internal fun downloadAlbum(context: Context, albumId: String) {
 
     val albumRequestQueue = Volley.newRequestQueue(context)
 
-    val albumRequest = AuthorizedRequest(Request.Method.GET, requestUrl, getSid(),
+    val albumRequest = AuthorizedRequest(Request.Method.GET, requestUrl,
+        getSid(),
         Response.Listener { response ->
             val jsonObject = JSONObject(response)
             val jsonArray = jsonObject.getJSONArray("results")
 
             val idArray = ArrayList<Long>()
-            val jsonParser = JSONParser()
 
             for (i in (0 until jsonArray.length())) {
-                idArray.add(jsonParser.parseSongToDB(jsonArray.getJSONObject(i), context))
+                idArray.add(parseSongToDB(jsonArray.getJSONObject(i), context))
             }
 
             val databaseHelper = SongDatabaseHelper(context)
@@ -213,14 +209,12 @@ internal fun addSongToPlaylist(context: Context, song: Song) {
         alertDialogBuilder.setTitle(context.getString(R.string.pickPlaylistMsg))
         alertDialogBuilder.setItems(playlistNames) { _, i ->
             val playlistPatchUrl = context.getString(R.string.playlistUrl) + playlistIds[i]
-            val jsonParser = JSONParser()
-
 
             if (trackList[i] != null) {
-                val trackArray = jsonParser.parsePlaylistDataToJSONArray(context, trackList[i]!!)
+                val trackArray = parsePlaylistItemToJSONArray(context, trackList[i]!!)
                 val patchParams = JSONObject()
 
-                val patchedArray = jsonParser.parsePatchedPlaylist(JSONArray(trackArray), song)
+                val patchedArray = parsePatchedPlaylist(JSONArray(trackArray), song)
                 patchParams.put("tracks", JSONArray(patchedArray))
 
                 val patchRequest =
@@ -258,7 +252,6 @@ internal fun addSongToPlaylist(context: Context, song: Song) {
                 addToPlaylistQueue.add(patchRequest)
 
             }
-
 
         }
         alertDialogBuilder.show()

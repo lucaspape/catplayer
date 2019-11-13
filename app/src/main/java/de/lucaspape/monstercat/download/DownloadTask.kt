@@ -4,9 +4,9 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.os.AsyncTask
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.auth.getSid
+import de.lucaspape.monstercat.util.getSid
 import de.lucaspape.monstercat.music.contextReference
-import de.lucaspape.monstercat.settings.Settings
+import de.lucaspape.monstercat.util.Settings
 import java.lang.NullPointerException
 import java.lang.ref.WeakReference
 

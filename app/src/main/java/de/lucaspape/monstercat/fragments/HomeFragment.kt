@@ -12,7 +12,7 @@ import de.lucaspape.monstercat.handlers.addSongToPlaylist
 import de.lucaspape.monstercat.handlers.downloadAlbum
 import de.lucaspape.monstercat.handlers.downloadSong
 import de.lucaspape.monstercat.handlers.playSongFromId
-import de.lucaspape.monstercat.settings.Settings
+import de.lucaspape.monstercat.util.Settings
 
 class HomeFragment : Fragment() {
     private var listView: ListView? = null
