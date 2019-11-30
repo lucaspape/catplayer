@@ -191,15 +191,8 @@ internal fun addSongToPlaylist(context: Context, song: Song) {
     val trackList = arrayOfNulls<List<PlaylistItem>>(playlistList.size)
 
     for (i in playlistList.indices) {
-        val playlistItemDatabaseHelper =
-            PlaylistItemDatabaseHelper(
-                context,
-                playlistList[i].playlistId
-            )
-
         playlistNames[i] = playlistList[i].playlistName
         playlistIds[i] = playlistList[i].playlistId
-       // trackList[i] = playlistItemDatabaseHelper.getAllData()
     }
 
     val sSid = getSid()
