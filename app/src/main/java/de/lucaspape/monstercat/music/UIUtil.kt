@@ -132,7 +132,7 @@ fun setMusicBar(newToolbar: androidx.appcompat.widget.Toolbar) {
 }
 
 fun setPlayButton(newPlayButton: ImageButton, context: Context) {
-    if (playing) {
+    if (mediaPlayer!!.isPlaying) {
         newPlayButton.setImageDrawable(
             ContextCompat.getDrawable(
                 context,
@@ -154,7 +154,7 @@ fun setPlayButton(newPlayButton: ImageButton, context: Context) {
 }
 
 fun setFullscreenPlayButton(newPlayButton: ImageButton, context: Context) {
-    if (playing) {
+    if (mediaPlayer!!.isPlaying) {
         newPlayButton.setImageDrawable(
             ContextCompat.getDrawable(
                 context,
@@ -345,7 +345,7 @@ internal fun setCover(song: Song, context: Context) {
 }
 
 internal fun setPlayButtonImage(context: Context) {
-    if (playing) {
+    if (mediaPlayer!!.isPlaying) {
         try {
             playButtonReference!!.get()!!.setImageDrawable(
                 ContextCompat.getDrawable(
@@ -402,7 +402,7 @@ internal fun setPlayButtonImage(context: Context) {
 internal fun setPlayerState(progress: Long) {
     val stateBuilder = PlaybackStateCompat.Builder()
 
-    val state: Int = if (playing) {
+    val state: Int = if (mediaPlayer!!.isPlaying) {
         PlaybackState.STATE_PLAYING
     } else {
         PlaybackState.STATE_PAUSED

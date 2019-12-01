@@ -7,6 +7,7 @@ import android.media.AudioManager
 import android.media.session.MediaSession
 import android.support.v4.media.session.MediaSessionCompat
 import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.ExoPlayerFactory
 import de.lucaspape.monstercat.activities.loadContinuousSongListAsyncTask
 import de.lucaspape.monstercat.database.Song
 import java.lang.IndexOutOfBoundsException
@@ -20,9 +21,6 @@ internal var mediaPlayer: ExoPlayer? = null
 
 internal var currentSong = 0
 internal var playList = ArrayList<Song>(1)
-
-internal var playing = false
-internal var paused = false
 
 var mediaSession: MediaSessionCompat? = null
 
@@ -46,6 +44,8 @@ class NoisyReceiver : BroadcastReceiver() {
  * Create mediaSession and listen for callbacks (pause, play buttons on headphones etc.)
  */
 fun createMediaSession(context: WeakReference<Context>) {
+    mediaPlayer = ExoPlayerFactory.newSimpleInstance(context.get()!!)
+
     mediaSession = MediaSessionCompat.fromMediaSession(
         context.get()!!,
         MediaSession(context.get()!!, "de.lucaspape.monstercat.music")
@@ -58,11 +58,7 @@ fun createMediaSession(context: WeakReference<Context>) {
         }
 
         override fun onPlay() {
-            if (paused) {
-                resume()
-            } else {
-                play()
-            }
+            mediaPlayer!!.playWhenReady = true
         }
 
         override fun onSkipToNext() {
@@ -100,7 +96,7 @@ fun createMediaSession(context: WeakReference<Context>) {
  * Play song after
  */
 fun addSong(song: Song) {
-    if (!playing && !paused) {
+    if (!mediaPlayer!!.isPlaying) {
         playNow(song)
     } else {
         try {

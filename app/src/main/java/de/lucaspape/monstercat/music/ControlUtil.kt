@@ -1,12 +1,10 @@
 package de.lucaspape.monstercat.music
 
 import android.content.Context
-import android.content.Intent
 import android.content.IntentFilter
 import android.media.AudioManager
 import android.net.ConnectivityManager
 import android.net.Uri
-import android.os.Build
 import androidx.core.net.toUri
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayerFactory
@@ -110,9 +108,7 @@ internal fun play() {
 
                 setPlayButtonImage(contextReference!!.get()!!)
 
-                createSongNotification(song.title, song.version, song.artist, contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution, true)
-
-                playing = true
+                createSongNotification(song.title, song.version, song.artist, contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution)
 
                 startSeekBarUpdate()
             }
@@ -129,8 +125,6 @@ internal fun stop() {
     if (mediaPlayer!!.isPlaying) {
 
         clearListener()
-
-        playing = false
 
         hideTitle()
 
@@ -160,10 +154,7 @@ fun pause() {
         val song = playList[currentSong]
 
         mediaPlayer!!.playWhenReady = false
-        createSongNotification(song.title, song.version, song.artist, contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution, false)
-
-        playing = false
-        paused = true
+        createSongNotification(song.title, song.version, song.artist, contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution)
 
         setPlayButtonImage(context)
 
@@ -190,7 +181,7 @@ fun resume() {
     try {
         val song = playList[currentSong]
 
-        if (paused) {
+        if (!mediaPlayer!!.isPlaying) {
             val disableAudioFocus = if (settings.getSetting("disableAudioFocus") != null) {
                 settings.getSetting("disableAudioFocus")!!.toBoolean()
             } else {
@@ -213,15 +204,12 @@ fun resume() {
                 // mediaPlayer!!.seekTo(length)
                 mediaPlayer!!.playWhenReady = true
 
-                paused = false
 
                 val intentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
                 context.registerReceiver(NoisyReceiver(), intentFilter)
             }
 
-            createSongNotification(song.title, song.version, song.artist, contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution, true)
-
-            playing = true
+            createSongNotification(song.title, song.version, song.artist, contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution)
 
             setPlayButtonImage(context)
 
@@ -275,7 +263,7 @@ fun playNow(song: Song) {
  * Toggle pause/play
  */
 fun toggleMusic() {
-    if (playing) {
+    if (mediaPlayer!!.isPlaying) {
         pause()
     } else {
         resume()

@@ -19,8 +19,7 @@ internal fun createSongNotification(
     title: String,
     version: String,
     artist: String,
-    coverLocation: String,
-    playing: Boolean
+    coverLocation: String
 ) {
     createNotificationChannel()
 
@@ -34,7 +33,7 @@ internal fun createSongNotification(
         }
 
         override fun getCurrentContentTitle(player: Player?): String {
-            return title
+            return "$title $version"
         }
 
         override fun getCurrentContentText(player: Player?): String? {
