@@ -110,22 +110,7 @@ internal fun play() {
 
                 setPlayButtonImage(contextReference!!.get()!!)
 
-                val notificationServiceIntent =
-                    Intent(contextReference!!.get()!!, MusicNotificationService::class.java)
-                notificationServiceIntent.putExtra("title", song.title)
-                notificationServiceIntent.putExtra("version", song.version)
-                notificationServiceIntent.putExtra("artist", song.artist)
-                notificationServiceIntent.putExtra(
-                    "coverLocation",
-                    contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
-                )
-                notificationServiceIntent.putExtra("playing", true.toString())
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    contextReference!!.get()!!.startForegroundService(notificationServiceIntent)
-                } else {
-                    contextReference!!.get()!!.startService(notificationServiceIntent)
-                }
+                createSongNotification(song.title, song.version, song.artist, contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution, true)
 
                 playing = true
 
@@ -175,23 +160,7 @@ fun pause() {
         val song = playList[currentSong]
 
         mediaPlayer!!.playWhenReady = false
-
-        val notificationServiceIntent =
-            Intent(contextReference!!.get()!!, MusicNotificationService::class.java)
-        notificationServiceIntent.putExtra("title", song.title)
-        notificationServiceIntent.putExtra("version", song.version)
-        notificationServiceIntent.putExtra("artist", song.artist)
-        notificationServiceIntent.putExtra(
-            "coverLocation",
-            contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
-        )
-        notificationServiceIntent.putExtra("playing", false.toString())
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            contextReference!!.get()!!.startForegroundService(notificationServiceIntent)
-        } else {
-            contextReference!!.get()!!.startService(notificationServiceIntent)
-        }
+        createSongNotification(song.title, song.version, song.artist, contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution, false)
 
         playing = false
         paused = true
@@ -250,22 +219,7 @@ fun resume() {
                 context.registerReceiver(NoisyReceiver(), intentFilter)
             }
 
-            val notificationServiceIntent =
-                Intent(contextReference!!.get()!!, MusicNotificationService::class.java)
-            notificationServiceIntent.putExtra("title", song.title)
-            notificationServiceIntent.putExtra("version", song.version)
-            notificationServiceIntent.putExtra("artist", song.artist)
-            notificationServiceIntent.putExtra(
-                "coverLocation",
-                contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
-            )
-            notificationServiceIntent.putExtra("playing", true.toString())
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                contextReference!!.get()!!.startForegroundService(notificationServiceIntent)
-            } else {
-                contextReference!!.get()!!.startService(notificationServiceIntent)
-            }
+            createSongNotification(song.title, song.version, song.artist, contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution, true)
 
             playing = true
 
