@@ -51,9 +51,9 @@ fun createMediaSession(context: WeakReference<Context>) {
         MediaSession(context.get()!!, "de.lucaspape.monstercat.music")
     )
 
-    mediaSession!!.setCallback(MediaSessionCallback())
+    mediaSession?.setCallback(MediaSessionCallback())
 
-    mediaSession!!.isActive = true
+    mediaSession?.isActive = true
     contextReference = context
 }
 
@@ -61,7 +61,7 @@ fun createMediaSession(context: WeakReference<Context>) {
  * Play song after
  */
 fun addSong(song: Song) {
-    if (!mediaPlayer!!.isPlaying) {
+    if (mediaPlayer?.isPlaying == false) {
         playNow(song)
     } else {
         try {
@@ -74,7 +74,7 @@ fun addSong(song: Song) {
 
 fun clearContinuous() {
     try {
-        loadContinuousSongListAsyncTask!!.cancel(true)
+        loadContinuousSongListAsyncTask?.cancel(true)
     } catch (e: NullPointerException) {
 
     }

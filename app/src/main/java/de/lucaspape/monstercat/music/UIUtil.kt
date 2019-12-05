@@ -41,7 +41,7 @@ private var fullscreenPlayButtonReference: WeakReference<ImageButton>? = null
  */
 fun setTextView(newTextView: TextView) {
     try {
-        newTextView.text = textViewReference!!.get()!!.text
+        newTextView.text = textViewReference?.get()?.text
     } catch (e: NullPointerException) {
 
     }
@@ -51,8 +51,8 @@ fun setTextView(newTextView: TextView) {
 
 fun setFullscreenTextView(newTextView1: TextView, newTextView2: TextView) {
     try {
-        newTextView1.text = textViewReference!!.get()!!.text
-        newTextView2.text = textViewReference!!.get()!!.text
+        newTextView1.text = textViewReference?.get()?.text
+        newTextView2.text = textViewReference?.get()?.text
     } catch (e: NullPointerException) {
 
     }
@@ -63,7 +63,7 @@ fun setFullscreenTextView(newTextView1: TextView, newTextView2: TextView) {
 
 fun setSeekBar(newSeekBar: SeekBar) {
     try {
-        newSeekBar.progress = seekBarReference!!.get()!!.progress
+        seekBarReference?.get()?.progress?.let { newSeekBar.progress = it }
     } catch (e: NullPointerException) {
 
     }
@@ -71,7 +71,7 @@ fun setSeekBar(newSeekBar: SeekBar) {
     newSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
         override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
             if (fromUser)
-                mediaPlayer!!.seekTo(progress.toLong())
+                mediaPlayer?.seekTo(progress.toLong())
         }
 
         override fun onStartTrackingTouch(seekBar: SeekBar) {
@@ -86,7 +86,7 @@ fun setSeekBar(newSeekBar: SeekBar) {
 
 fun setFullscreenSeekBar(newSeekBar: SeekBar) {
     try {
-        newSeekBar.progress = seekBarReference!!.get()!!.progress
+        seekBarReference?.get()?.progress?.let { newSeekBar.progress = it }
     } catch (e: NullPointerException) {
 
     }
@@ -94,7 +94,7 @@ fun setFullscreenSeekBar(newSeekBar: SeekBar) {
     newSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
         override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
             if (fromUser)
-                mediaPlayer!!.seekTo(progress.toLong())
+                mediaPlayer?.seekTo(progress.toLong())
         }
 
         override fun onStartTrackingTouch(seekBar: SeekBar) {
@@ -109,7 +109,7 @@ fun setFullscreenSeekBar(newSeekBar: SeekBar) {
 
 fun setBarCoverImageView(newImageView: ImageView) {
     try {
-        newImageView.setImageDrawable(barCoverImageReference!!.get()!!.drawable)
+        newImageView.setImageDrawable(barCoverImageReference?.get()?.drawable)
     } catch (e: NullPointerException) {
 
     }
@@ -119,7 +119,7 @@ fun setBarCoverImageView(newImageView: ImageView) {
 
 fun setFullscreenCoverImageView(newImageView: ImageView) {
     try {
-        newImageView.setImageDrawable(barCoverImageReference!!.get()!!.drawable)
+        newImageView.setImageDrawable(barCoverImageReference?.get()?.drawable)
     } catch (e: NullPointerException) {
 
     }
@@ -132,7 +132,7 @@ fun setMusicBar(newToolbar: androidx.appcompat.widget.Toolbar) {
 }
 
 fun setPlayButton(newPlayButton: ImageButton, context: Context) {
-    if (mediaPlayer!!.isPlaying) {
+    if (mediaPlayer?.isPlaying == true) {
         newPlayButton.setImageDrawable(
             ContextCompat.getDrawable(
                 context,
@@ -154,7 +154,7 @@ fun setPlayButton(newPlayButton: ImageButton, context: Context) {
 }
 
 fun setFullscreenPlayButton(newPlayButton: ImageButton, context: Context) {
-    if (mediaPlayer!!.isPlaying) {
+    if (mediaPlayer?.isPlaying == true) {
         newPlayButton.setImageDrawable(
             ContextCompat.getDrawable(
                 context,
@@ -180,19 +180,19 @@ internal fun setTitle(title: String, version: String, artist: String) {
     val text = "$title $version - $artist"
 
     try {
-        textViewReference!!.get()!!.text = text
+        textViewReference?.get()?.text = text
     } catch (e: NullPointerException) {
 
     }
 
     try {
-        fullscreenTextView1Reference!!.get()!!.text = text
+        fullscreenTextView1Reference?.get()?.text = text
     } catch (e: NullPointerException) {
 
     }
 
     try {
-        fullscreenTextView2Reference!!.get()!!.text = text
+        fullscreenTextView2Reference?.get()?.text = text
     } catch (e: NullPointerException) {
 
     }
@@ -202,19 +202,19 @@ internal fun hideTitle() {
     val text = ""
 
     try {
-        textViewReference!!.get()!!.text = text
+        textViewReference?.get()?.text = text
     } catch (e: NullPointerException) {
 
     }
 
     try {
-        fullscreenTextView1Reference!!.get()!!.text = text
+        fullscreenTextView1Reference?.get()?.text = text
     } catch (e: NullPointerException) {
 
     }
 
     try {
-        fullscreenTextView2Reference!!.get()!!.text = text
+        fullscreenTextView2Reference?.get()?.text = text
     } catch (e: NullPointerException) {
 
     }
@@ -231,7 +231,7 @@ internal fun startTextAnimation() {
         var width = 0
 
         try {
-            width = fullscreenTextView1Reference!!.get()!!.width
+            fullscreenTextView1Reference?.get()?.width?.let { width = it }
         } catch (e: NullPointerException) {
 
         }
@@ -240,13 +240,13 @@ internal fun startTextAnimation() {
         val translationX = width * progress
 
         try {
-            fullscreenTextView1Reference!!.get()!!.translationX = translationX
+            fullscreenTextView1Reference?.get()?.translationX = translationX
         } catch (e: NullPointerException) {
 
         }
 
         try {
-            fullscreenTextView2Reference!!.get()!!.translationX = translationX - width
+            fullscreenTextView2Reference?.get()?.translationX = translationX - width
         } catch (e: NullPointerException) {
 
         }
@@ -263,20 +263,22 @@ internal fun startSeekBarUpdate() {
         override fun run() {
 
             try {
-                seekBarReference!!.get()!!.max = mediaPlayer!!.duration.toInt()
-                seekBarReference!!.get()!!.progress = mediaPlayer!!.currentPosition.toInt()
+                mediaPlayer?.duration?.toInt()?.let { seekBarReference?.get()?.max = it }
+                mediaPlayer?.currentPosition?.toInt()?.let { seekBarReference?.get()?.progress = it }
+
             } catch (e: NullPointerException) {
 
             }
 
             try {
-                fullscreenSeekBarReference!!.get()!!.max = mediaPlayer!!.duration.toInt()
-                fullscreenSeekBarReference!!.get()!!.progress =
-                    mediaPlayer!!.currentPosition.toInt()
+                mediaPlayer?.duration?.toInt()?.let { fullscreenSeekBarReference?.get()?.max = it }
+                mediaPlayer?.currentPosition?.toInt()?.let { fullscreenSeekBarReference?.get()?.progress = it }
+
+
             } catch (e: NullPointerException) {
 
             }
-            setPlayerState(mediaPlayer!!.currentPosition)
+            mediaPlayer?.currentPosition?.let { setPlayerState(it) }
 
             seekBarUpdateHandler.postDelayed(this, 50)
         }
@@ -285,7 +287,7 @@ internal fun startSeekBarUpdate() {
     try {
         seekBarUpdateHandler.postDelayed(updateSeekBar, 0)
 
-        seekBarReference!!.get()!!.setOnTouchListener { _, _ -> true }
+        seekBarReference?.get()?.setOnTouchListener { _, _ -> true }
 
 
     } catch (e: NullPointerException) {
@@ -293,7 +295,7 @@ internal fun startSeekBarUpdate() {
     }
 
     try {
-        fullscreenSeekBarReference!!.get()!!.setOnSeekBarChangeListener(object :
+        fullscreenSeekBarReference?.get()?.setOnSeekBarChangeListener(object :
             SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(
                 seekBar: SeekBar,
@@ -301,7 +303,7 @@ internal fun startSeekBarUpdate() {
                 fromUser: Boolean
             ) {
                 if (fromUser)
-                    mediaPlayer!!.seekTo(progress.toLong())
+                    mediaPlayer?.seekTo(progress.toLong())
                 setPlayerState(progress.toLong())
             }
 
@@ -327,27 +329,28 @@ internal fun setCover(song: Song, context: Context) {
         val bitmap = BitmapFactory.decodeFile(coverFile.absolutePath)
 
         try {
-            barCoverImageReference!!.get()!!.setImageBitmap(bitmap)
+            barCoverImageReference?.get()?.setImageBitmap(bitmap)
         } catch (e: NullPointerException) {
 
         }
 
         try {
-            fullscreenCoverReference!!.get()!!.setImageBitmap(bitmap)
+            fullscreenCoverReference?.get()?.setImageBitmap(bitmap)
         } catch (e: NullPointerException) {
 
         }
 
-        setSongMetadata(song.artist, song.title, bitmap, mediaPlayer!!.duration)
+        mediaPlayer?.duration?.let { setSongMetadata(song.artist, song.title, bitmap, it) }
+
     } else {
-        setSongMetadata(song.artist, song.title, null, mediaPlayer!!.duration)
+        mediaPlayer?.duration?.let { setSongMetadata(song.artist, song.title, null, it) }
     }
 }
 
 internal fun setPlayButtonImage(context: Context) {
-    if (mediaPlayer!!.isPlaying) {
+    if (mediaPlayer?.isPlaying == true) {
         try {
-            playButtonReference!!.get()!!.setImageDrawable(
+            playButtonReference?.get()?.setImageDrawable(
                 ContextCompat.getDrawable(
                     context,
                     R.drawable.ic_pause_24dp
@@ -359,7 +362,7 @@ internal fun setPlayButtonImage(context: Context) {
         }
 
         try {
-            fullscreenPlayButtonReference!!.get()!!.setImageDrawable(
+            fullscreenPlayButtonReference?.get()?.setImageDrawable(
                 ContextCompat.getDrawable(
                     context,
                     R.drawable.ic_pause_24dp
@@ -371,7 +374,7 @@ internal fun setPlayButtonImage(context: Context) {
         }
     } else {
         try {
-            playButtonReference!!.get()!!.setImageDrawable(
+            playButtonReference?.get()?.setImageDrawable(
                 ContextCompat.getDrawable(
                     context,
                     R.drawable.ic_play_arrow_24dp
@@ -383,7 +386,7 @@ internal fun setPlayButtonImage(context: Context) {
         }
 
         try {
-            fullscreenPlayButtonReference!!.get()!!.setImageDrawable(
+            fullscreenPlayButtonReference?.get()?.setImageDrawable(
                 ContextCompat.getDrawable(
                     context,
                     R.drawable.ic_play_arrow_24dp
@@ -402,7 +405,7 @@ internal fun setPlayButtonImage(context: Context) {
 internal fun setPlayerState(progress: Long) {
     val stateBuilder = PlaybackStateCompat.Builder()
 
-    val state: Int = if (mediaPlayer!!.isPlaying) {
+    val state: Int = if (mediaPlayer?.isPlaying == true) {
         PlaybackState.STATE_PLAYING
     } else {
         PlaybackState.STATE_PAUSED
@@ -420,7 +423,7 @@ internal fun setPlayerState(progress: Long) {
                 PlaybackStateCompat.ACTION_FAST_FORWARD +
                 PlaybackStateCompat.ACTION_REWIND
     )
-    mediaSession!!.setPlaybackState(stateBuilder.build())
+    mediaSession?.setPlaybackState(stateBuilder.build())
 }
 
 /**
@@ -433,5 +436,5 @@ internal fun setSongMetadata(artist: String, title: String, coverImage: Bitmap?,
     mediaMetadata.putLong(MediaMetadata.METADATA_KEY_DURATION, duration)
     mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, coverImage)
     mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ART, coverImage)
-    mediaSession!!.setMetadata(mediaMetadata.build())
+    mediaSession?.setMetadata(mediaMetadata.build())
 }
