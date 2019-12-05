@@ -51,42 +51,7 @@ fun createMediaSession(context: WeakReference<Context>) {
         MediaSession(context.get()!!, "de.lucaspape.monstercat.music")
     )
 
-    mediaSession!!.setCallback(object : MediaSessionCompat.Callback() {
-
-        override fun onPause() {
-            pause()
-        }
-
-        override fun onPlay() {
-            mediaPlayer!!.playWhenReady = true
-        }
-
-        override fun onSkipToNext() {
-            next()
-        }
-
-        override fun onSkipToPrevious() {
-            previous()
-        }
-
-        override fun onStop() {
-            stop()
-        }
-
-        override fun onSeekTo(pos: Long) {
-            mediaPlayer!!.seekTo(pos)
-        }
-
-        override fun onFastForward() {
-            mediaPlayer!!.seekTo(mediaPlayer!!.duration)
-        }
-
-        override fun onRewind() {
-            super.onRewind()
-            mediaPlayer!!.seekTo(0)
-        }
-
-    })
+    mediaSession!!.setCallback(MediaSessionCallback())
 
     mediaSession!!.isActive = true
     contextReference = context

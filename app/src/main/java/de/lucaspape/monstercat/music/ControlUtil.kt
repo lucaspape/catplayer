@@ -50,6 +50,13 @@ internal fun play() {
         val exoPlayer = ExoPlayerFactory.newSimpleInstance(contextReference!!.get()!!)
         exoPlayer.audioAttributes = audioAttributes
 
+        exoPlayer.addListener(object:Player.EventListener{
+            @Override
+            override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
+                setPlayButtonImage(contextReference!!.get()!!)
+            }
+        })
+
         mediaPlayer = exoPlayer
 
         val requestResult = if (disableAudioFocus) {
