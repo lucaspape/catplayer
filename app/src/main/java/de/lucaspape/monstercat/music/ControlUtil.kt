@@ -27,7 +27,7 @@ internal fun play() {
     try {
         val song = playList[currentSong]
 
-        val settings = Settings(contextReference!!.get()!!)
+        val settings = Settings(contextReference?.get()!!)
 
         val disableAudioFocus = if (settings.getSetting("disableAudioFocus") != null) {
             settings.getSetting("disableAudioFocus")!!.toBoolean()
@@ -37,23 +37,21 @@ internal fun play() {
 
         val primaryResolution = settings.getSetting("primaryCoverResolution")
 
-        if (mediaPlayer != null) {
-            mediaPlayer!!.release()
-            mediaPlayer!!.stop()
-        }
+        mediaPlayer?.release()
+        mediaPlayer?.stop()
 
         val audioAttributes = AudioAttributes.Builder()
             .setUsage(C.USAGE_MEDIA)
             .setContentType(C.CONTENT_TYPE_MUSIC)
             .build()
 
-        val exoPlayer = ExoPlayerFactory.newSimpleInstance(contextReference!!.get()!!)
+        val exoPlayer = ExoPlayerFactory.newSimpleInstance(contextReference?.get()!!)
         exoPlayer.audioAttributes = audioAttributes
 
-        exoPlayer.addListener(object:Player.EventListener{
+        exoPlayer.addListener(object : Player.EventListener {
             @Override
             override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-                setPlayButtonImage(contextReference!!.get()!!)
+                setPlayButtonImage(contextReference?.get()!!)
             }
         })
 
@@ -63,7 +61,7 @@ internal fun play() {
             AudioManager.AUDIOFOCUS_REQUEST_GRANTED
         } else {
             val audioManager =
-                contextReference!!.get()!!.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                contextReference?.get()!!.getSystemService(Context.AUDIO_SERVICE) as AudioManager
             audioManager.requestAudioFocus(
                 audioFocusChangeListener,
                 AudioManager.STREAM_MUSIC,
@@ -75,7 +73,7 @@ internal fun play() {
             registerNextListener()
 
             val connectivityManager =
-                contextReference!!.get()!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                contextReference?.get()!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             val wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
 
             if ((wifi != null && wifi.isConnected) || settings.getSetting("streamOverMobile") == "true" || File(
@@ -87,8 +85,8 @@ internal fun play() {
                     mediaPlayer!!.prepare(
                         ProgressiveMediaSource.Factory(
                             DefaultDataSourceFactory(
-                                contextReference!!.get()!!, Util.getUserAgent(
-                                    contextReference!!.get()!!, "MonstercatPlayer"
+                                contextReference?.get()!!, Util.getUserAgent(
+                                    contextReference?.get()!!, "MonstercatPlayer"
                                 )
                             )
                         ).createMediaSource(song.getUrl().toUri())
@@ -97,25 +95,30 @@ internal fun play() {
                     mediaPlayer!!.prepare(
                         ProgressiveMediaSource.Factory(
                             DefaultDataSourceFactory(
-                                contextReference!!.get()!!, Util.getUserAgent(
-                                    contextReference!!.get()!!, "MonstercatPlayer"
+                                contextReference?.get()!!, Util.getUserAgent(
+                                    contextReference?.get()!!, "MonstercatPlayer"
                                 )
                             )
                         ).createMediaSource(Uri.parse("file://" + song.getUrl()))
                     )
                 }
 
-                mediaPlayer!!.playWhenReady = true
+                mediaPlayer?.playWhenReady = true
 
                 setTitle(song.title, song.version, song.artist)
 
                 startTextAnimation()
 
-                setCover(song, contextReference!!.get()!!)
+                setCover(song, contextReference?.get()!!)
 
-                setPlayButtonImage(contextReference!!.get()!!)
+                setPlayButtonImage(contextReference?.get()!!)
 
-                createSongNotification(song.title, song.version, song.artist, contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution)
+                createSongNotification(
+                    song.title,
+                    song.version,
+                    song.artist,
+                    contextReference?.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
+                )
 
                 startSeekBarUpdate()
             }
@@ -129,15 +132,15 @@ internal fun play() {
  * Stop playback
  */
 internal fun stop() {
-    if (mediaPlayer!!.isPlaying) {
+    if (mediaPlayer?.isPlaying == true) {
 
         clearListener()
 
         hideTitle()
 
-        setPlayButtonImage(contextReference!!.get()!!)
+        setPlayButtonImage(contextReference?.get()!!)
 
-        mediaPlayer!!.stop()
+        mediaPlayer?.stop()
 
         registerNextListener()
 
@@ -153,22 +156,27 @@ internal fun stop() {
 fun pause() {
     clearListener()
 
-    val context = contextReference!!.get()!!
+    val context = contextReference?.get()!!
     val settings = Settings(context)
     val primaryResolution = settings.getSetting("primaryCoverResolution")
 
     try {
         val song = playList[currentSong]
 
-        mediaPlayer!!.playWhenReady = false
-        createSongNotification(song.title, song.version, song.artist, contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution)
+        mediaPlayer?.playWhenReady = false
+        createSongNotification(
+            song.title,
+            song.version,
+            song.artist,
+            contextReference?.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
+        )
 
         setPlayButtonImage(context)
 
         registerNextListener()
 
         val audioManager =
-            contextReference!!.get()!!.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            contextReference?.get()!!.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         audioManager.abandonAudioFocus(audioFocusChangeListener)
     } catch (e: IndexOutOfBoundsException) {
 
@@ -181,14 +189,14 @@ fun pause() {
 fun resume() {
     clearListener()
 
-    val context = contextReference!!.get()!!
+    val context = contextReference?.get()!!
     val settings = Settings(context)
     val primaryResolution = settings.getSetting("primaryCoverResolution")
 
     try {
         val song = playList[currentSong]
 
-        if (!mediaPlayer!!.isPlaying) {
+        if (mediaPlayer?.isPlaying == false) {
             val disableAudioFocus = if (settings.getSetting("disableAudioFocus") != null) {
                 settings.getSetting("disableAudioFocus")!!.toBoolean()
             } else {
@@ -199,7 +207,7 @@ fun resume() {
                 AudioManager.AUDIOFOCUS_REQUEST_GRANTED
             } else {
                 val audioManager =
-                    contextReference!!.get()!!.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                    contextReference?.get()!!.getSystemService(Context.AUDIO_SERVICE) as AudioManager
                 audioManager.requestAudioFocus(
                     audioFocusChangeListener,
                     AudioManager.STREAM_MUSIC,
@@ -216,7 +224,12 @@ fun resume() {
                 context.registerReceiver(NoisyReceiver(), intentFilter)
             }
 
-            createSongNotification(song.title, song.version, song.artist, contextReference!!.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution)
+            createSongNotification(
+                song.title,
+                song.version,
+                song.artist,
+                contextReference?.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
+            )
 
             setPlayButtonImage(context)
 
@@ -270,7 +283,7 @@ fun playNow(song: Song) {
  * Toggle pause/play
  */
 fun toggleMusic() {
-    if (mediaPlayer!!.isPlaying) {
+    if (mediaPlayer?.isPlaying == true) {
         pause()
     } else {
         resume()
@@ -278,22 +291,18 @@ fun toggleMusic() {
 }
 
 private fun clearListener() {
-    if (mediaPlayer != null) {
-        mediaPlayer!!.addListener(object : Player.EventListener {
-            override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-            }
-        })
-    }
+    mediaPlayer?.addListener(object : Player.EventListener {
+        override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
+        }
+    })
 }
 
 private fun registerNextListener() {
-    if (mediaPlayer != null) {
-        mediaPlayer!!.addListener(object : Player.EventListener {
-            override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-                when (playbackState) {
-                    Player.STATE_ENDED -> next()
-                }
+    mediaPlayer?.addListener(object : Player.EventListener {
+        override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
+            when (playbackState) {
+                Player.STATE_ENDED -> next()
             }
-        })
-    }
+        }
+    })
 }
