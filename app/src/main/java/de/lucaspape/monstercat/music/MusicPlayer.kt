@@ -34,7 +34,7 @@ val audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener {
  */
 class NoisyReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
-        if (intent!!.action == AudioManager.ACTION_AUDIO_BECOMING_NOISY) {
+        if (intent?.action == AudioManager.ACTION_AUDIO_BECOMING_NOISY) {
             pause()
         }
     }
@@ -46,15 +46,17 @@ class NoisyReceiver : BroadcastReceiver() {
 fun createMediaSession(context: WeakReference<Context>) {
     mediaPlayer = ExoPlayerFactory.newSimpleInstance(context.get()!!)
 
-    mediaSession = MediaSessionCompat.fromMediaSession(
-        context.get()!!,
-        MediaSession(context.get()!!, "de.lucaspape.monstercat.music")
-    )
+    context.get()?.let {
+        mediaSession = MediaSessionCompat.fromMediaSession(
+            it,
+            MediaSession(it, "de.lucaspape.monstercat.music")
+        )
 
-    mediaSession?.setCallback(MediaSessionCallback())
+        mediaSession?.setCallback(MediaSessionCallback())
 
-    mediaSession?.isActive = true
-    contextReference = context
+        mediaSession?.isActive = true
+        contextReference = context
+    }
 }
 
 /**
@@ -73,11 +75,7 @@ fun addSong(song: Song) {
 }
 
 fun clearContinuous() {
-    try {
-        loadContinuousSongListAsyncTask?.cancel(true)
-    } catch (e: NullPointerException) {
-
-    }
+    loadContinuousSongListAsyncTask?.cancel(true)
 
     playList = ArrayList(playList.subList(0, currentSong))
     currentSong = playList.size

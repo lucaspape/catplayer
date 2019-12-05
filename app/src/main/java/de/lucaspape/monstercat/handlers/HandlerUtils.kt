@@ -90,7 +90,9 @@ internal fun playAlbumNext(context: Context, albumId: String) {
             val idArray = ArrayList<Long>()
 
             for (i in (0 until jsonArray.length())) {
-                idArray.add(parseSongToDB(jsonArray.getJSONObject(i), context))
+                parseSongToDB(jsonArray.getJSONObject(i), context)?.let { id ->
+                    idArray.add(id)
+                }
             }
 
             val databaseHelper = SongDatabaseHelper(context)
@@ -164,7 +166,9 @@ internal fun downloadAlbum(context: Context, albumId: String) {
             val idArray = ArrayList<Long>()
 
             for (i in (0 until jsonArray.length())) {
-                idArray.add(parseSongToDB(jsonArray.getJSONObject(i), context))
+                parseSongToDB(jsonArray.getJSONObject(i), context)?.let {id ->
+                    idArray.add(id)
+                }
             }
 
             val databaseHelper = SongDatabaseHelper(context)
@@ -203,139 +207,140 @@ internal fun addSongToPlaylist(context: Context, song: Song) {
         alertDialogBuilder.setItems(playlistNames) { _, i ->
             val playlistPatchUrl = context.getString(R.string.playlistUrl) + playlistIds[i]
 
-            //get playlist tracks
-            val playlistId = playlistIds[i]!!
+            playlistIds[i]?.let { playlistId ->
+                val trackCountRequestQueue = Volley.newRequestQueue(context)
 
-            val trackCountRequestQueue = Volley.newRequestQueue(context)
+                var trackCount = 0
 
-            var trackCount = 0
+                val trackCountRequest = AuthorizedRequest(Request.Method.GET,
+                    context.getString(R.string.playlistsUrl),
+                    getSid(),
+                    Response.Listener { response ->
+                        val jsonObject = JSONObject(response)
+                        val jsonArray = jsonObject.getJSONArray("results")
 
-            val trackCountRequest = AuthorizedRequest(Request.Method.GET,
-                context.getString(R.string.playlistsUrl),
-                getSid(),
-                Response.Listener { response ->
-                    val jsonObject = JSONObject(response)
-                    val jsonArray = jsonObject.getJSONArray("results")
-
-                    for (u in (0 until jsonArray.length())) {
-                        if (jsonArray.getJSONObject(u).getString("_id") == playlistId) {
-                            val tracks = jsonArray.getJSONObject(u).getJSONArray("tracks")
-                            trackCount = tracks.length()
-                            break
-                        }
-                    }
-                },
-                Response.ErrorListener { })
-
-
-            trackCountRequestQueue.addRequestFinishedListener<Any> {
-                val tempList = arrayOfNulls<JSONObject>(trackCount)
-
-                var finishedRequests = 0
-                var totalRequestsCount = 0
-
-                val requests = ArrayList<AuthorizedRequest>()
-
-                val playlistItemDatabaseHelper =
-                    PlaylistItemDatabaseHelper(
-                        context,
-                        playlistId
-                    )
-
-                val playlistTrackRequestQueue = Volley.newRequestQueue(context)
-
-                playlistTrackRequestQueue.addRequestFinishedListener<Any> {
-                    finishedRequests++
-
-                    if (finishedRequests >= totalRequestsCount) {
-
-                        playlistItemDatabaseHelper.reCreateTable()
-
-                        for (playlistObject in tempList) {
-                            if (playlistObject != null) {
-                                parsePlaylistTrackToDB(
-                                    playlistId,
-                                    playlistObject,
-                                    context
-                                )
+                        for (u in (0 until jsonArray.length())) {
+                            if (jsonArray.getJSONObject(u).getString("_id") == playlistId) {
+                                val tracks = jsonArray.getJSONObject(u).getJSONArray("tracks")
+                                trackCount = tracks.length()
+                                break
                             }
-
                         }
+                    },
+                    Response.ErrorListener { })
 
-                        //DONE
-                        trackList[i] = playlistItemDatabaseHelper.getAllData()
 
-                        if (trackList[i] != null) {
-                            val trackArray = parsePlaylistItemToJSONArray(context, trackList[i]!!)
-                            val patchParams = JSONObject()
+                trackCountRequestQueue.addRequestFinishedListener<Any> {
+                    val tempList = arrayOfNulls<JSONObject>(trackCount)
 
-                            val patchedArray = parsePatchedPlaylist(JSONArray(trackArray), song)
-                            patchParams.put("tracks", JSONArray(patchedArray))
+                    var finishedRequests = 0
+                    var totalRequestsCount = 0
 
-                            val patchRequest =
-                                object : JsonObjectRequest(
-                                    Method.PATCH,
-                                    playlistPatchUrl,
-                                    patchParams,
-                                    Response.Listener {
-                                        //TODO reload playlist
-                                    },
-                                    Response.ErrorListener {
-                                    }) {
-                                    @Throws(AuthFailureError::class)
-                                    override fun getHeaders(): Map<String, String> {
-                                        val params = HashMap<String, String>()
-                                        if (loggedIn) {
-                                            params["Cookie"] = "connect.sid=$sSid"
-                                        }
-                                        return params
-                                    }
+                    val requests = ArrayList<AuthorizedRequest>()
+
+                    val playlistItemDatabaseHelper =
+                        PlaylistItemDatabaseHelper(
+                            context,
+                            playlistId
+                        )
+
+                    val playlistTrackRequestQueue = Volley.newRequestQueue(context)
+
+                    playlistTrackRequestQueue.addRequestFinishedListener<Any> {
+                        finishedRequests++
+
+                        if (finishedRequests >= totalRequestsCount) {
+
+                            playlistItemDatabaseHelper.reCreateTable()
+
+                            for (playlistObject in tempList) {
+                                if (playlistObject != null) {
+                                    parsePlaylistTrackToDB(
+                                        playlistId,
+                                        playlistObject,
+                                        context
+                                    )
                                 }
 
-                            val addToPlaylistQueue = Volley.newRequestQueue(context)
-                            addToPlaylistQueue.addRequestFinishedListener<Any> {
-                                Toast.makeText(
-                                    context,
-                                    context.getString(
-                                        R.string.songAddedToPlaylistMsg,
-                                        song.title + " " + song.version
-                                    ),
-                                    Toast.LENGTH_SHORT
-                                ).show()
                             }
 
-                            addToPlaylistQueue.add(patchRequest)
+                            //DONE
+                            trackList[i] = playlistItemDatabaseHelper.getAllData()
 
+                            if (trackList[i] != null) {
+                                val trackArray =
+                                    parsePlaylistItemToJSONArray(context, trackList[i]!!)
+                                val patchParams = JSONObject()
+
+                                val patchedArray = parsePatchedPlaylist(JSONArray(trackArray), song)
+                                patchParams.put("tracks", JSONArray(patchedArray))
+
+                                val patchRequest =
+                                    object : JsonObjectRequest(
+                                        Method.PATCH,
+                                        playlistPatchUrl,
+                                        patchParams,
+                                        Response.Listener {
+                                            //TODO reload playlist
+                                        },
+                                        Response.ErrorListener {
+                                        }) {
+                                        @Throws(AuthFailureError::class)
+                                        override fun getHeaders(): Map<String, String> {
+                                            val params = HashMap<String, String>()
+                                            if (loggedIn) {
+                                                params["Cookie"] = "connect.sid=$sSid"
+                                            }
+                                            return params
+                                        }
+                                    }
+
+                                val addToPlaylistQueue = Volley.newRequestQueue(context)
+                                addToPlaylistQueue.addRequestFinishedListener<Any> {
+                                    Toast.makeText(
+                                        context,
+                                        context.getString(
+                                            R.string.songAddedToPlaylistMsg,
+                                            song.title + " " + song.version
+                                        ),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+
+                                addToPlaylistQueue.add(patchRequest)
+
+                            }
+                        } else {
+                            playlistTrackRequestQueue.add(requests[finishedRequests])
                         }
-                    } else {
-                        playlistTrackRequestQueue.add(requests[finishedRequests])
                     }
+
+                    for (u in (0..(trackCount / 50))) {
+                        val playlistTrackUrl =
+                            context.getString(R.string.loadSongsUrl) + "?playlistId=" + playlistId + "&skip=" + (u * 50).toString() + "&limit=50"
+
+                        val playlistTrackRequest = AuthorizedRequest(
+                            Request.Method.GET, playlistTrackUrl, getSid(),
+                            Response.Listener { response ->
+                                val jsonObject = JSONObject(response)
+                                val jsonArray = jsonObject.getJSONArray("results")
+
+                                for (k in (0 until jsonArray.length())) {
+                                    tempList[u * 50 + k] = jsonArray.getJSONObject(k)
+                                }
+                            },
+                            Response.ErrorListener { })
+
+                        totalRequestsCount++
+                        requests.add(playlistTrackRequest)
+                    }
+
+                    playlistTrackRequestQueue.add(requests[finishedRequests])
                 }
 
-                for (u in (0..(trackCount / 50))) {
-                    val playlistTrackUrl =
-                        context.getString(R.string.loadSongsUrl) + "?playlistId=" + playlistId + "&skip=" + (u * 50).toString() + "&limit=50"
-
-                    val playlistTrackRequest = AuthorizedRequest(
-                        Request.Method.GET, playlistTrackUrl, getSid(),
-                        Response.Listener { response ->
-                            val jsonObject = JSONObject(response)
-                            val jsonArray = jsonObject.getJSONArray("results")
-
-                            for (k in (0 until jsonArray.length())) {
-                                tempList[u * 50 + k] = jsonArray.getJSONObject(k)
-                            }
-                        },
-                        Response.ErrorListener { })
-
-                    totalRequestsCount++
-                    requests.add(playlistTrackRequest)
-                }
-
-                playlistTrackRequestQueue.add(requests[finishedRequests])
+                trackCountRequestQueue.add(trackCountRequest)
             }
 
-            trackCountRequestQueue.add(trackCountRequest)
         }
         alertDialogBuilder.show()
 

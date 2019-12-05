@@ -22,7 +22,7 @@ class PlaylistItemDatabaseHelper(context: Context, var playlistId: String) :
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        db!!.execSQL(
+        db?.execSQL(
             "DROP TABLE IF EXISTS " + PlaylistItem(
                 playlistId,
                 0,
@@ -33,17 +33,17 @@ class PlaylistItemDatabaseHelper(context: Context, var playlistId: String) :
     }
 
     override fun onOpen(db: SQLiteDatabase?) {
-        db!!.execSQL(PlaylistItem(playlistId, 0, 0).CREATE_TABLE)
+        db?.execSQL(PlaylistItem(playlistId, 0, 0).CREATE_TABLE)
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
-        db!!.execSQL(PlaylistItem(playlistId, 0, 0).CREATE_TABLE)
+        db?.execSQL(PlaylistItem(playlistId, 0, 0).CREATE_TABLE)
     }
 
     fun reCreateTable() {
         val db = writableDatabase
 
-        db!!.execSQL(
+        db?.execSQL(
             "DROP TABLE IF EXISTS " + PlaylistItem(
                 playlistId,
                 0,

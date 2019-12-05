@@ -27,107 +27,114 @@ class LoadSongListAsync(
     private val loadMax: Int
 ) : AsyncTask<Void, Void, String>() {
     override fun onPreExecute() {
-        val swipeRefreshLayout =
-            viewReference.get()!!.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
-        swipeRefreshLayout.isRefreshing = true
+        viewReference.get()?.let { view ->
+            val swipeRefreshLayout =
+                view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
+            swipeRefreshLayout.isRefreshing = true
+        }
     }
 
     override fun onPostExecute(result: String?) {
-        val catalogSongDatabaseHelper =
-            CatalogSongDatabaseHelper(contextReference.get()!!)
-        val songIdList = catalogSongDatabaseHelper.getAllSongs()
+        contextReference.get()?.let { context ->
+            val catalogSongDatabaseHelper =
+                CatalogSongDatabaseHelper(context)
+            val songIdList = catalogSongDatabaseHelper.getAllSongs()
 
-        val dbSongs = ArrayList<HashMap<String, Any?>>()
+            val dbSongs = ArrayList<HashMap<String, Any?>>()
 
-        val songDatabaseHelper =
-            SongDatabaseHelper(contextReference.get()!!)
-        val songList = ArrayList<Song>()
+            val songDatabaseHelper =
+                SongDatabaseHelper(context)
+            val songList = ArrayList<Song>()
 
-        for (song in songIdList) {
-            songList.add(songDatabaseHelper.getSong(song.songId))
+            for (song in songIdList) {
+                songList.add(songDatabaseHelper.getSong(song.songId))
+            }
+
+            for (song in songList) {
+                dbSongs.add(parseSongToHashMap(context, song))
+            }
+
+            //display list
+            HomeHandler.currentListViewData = dbSongs
+
+            viewReference.get()?.let { view ->
+                HomeHandler.updateListView(view)
+                HomeHandler.redrawListView(view)
+
+                //download cover art
+                addDownloadCoverArray(HomeHandler.currentListViewData)
+
+                val swipeRefreshLayout =
+                    view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
+                swipeRefreshLayout.isRefreshing = false
+
+                HomeHandler.albumContentsDisplayed = false
+            }
         }
-
-        for (song in songList) {
-            dbSongs.add(parseSongToHashMap(contextReference.get()!!, song))
-        }
-
-        //display list
-        HomeHandler.currentListViewData = dbSongs
-
-        HomeHandler.updateListView(viewReference.get()!!)
-        HomeHandler.redrawListView(viewReference.get()!!)
-
-        //download cover art
-        addDownloadCoverArray(HomeHandler.currentListViewData)
-
-        val swipeRefreshLayout =
-            viewReference.get()!!.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
-        swipeRefreshLayout.isRefreshing = false
-
-        HomeHandler.albumContentsDisplayed = false
     }
 
     override fun doInBackground(vararg param: Void?): String? {
+        contextReference.get()?.let { context ->
+            val catalogSongDatabaseHelper =
+                CatalogSongDatabaseHelper(context)
+            val songIdList = catalogSongDatabaseHelper.getAllSongs()
 
-        val catalogSongDatabaseHelper =
-            CatalogSongDatabaseHelper(contextReference.get()!!)
-        val songIdList = catalogSongDatabaseHelper.getAllSongs()
+            if (!forceReload && songIdList.isNotEmpty()) {
+                return null
+            } else {
+                val requestQueue = Volley.newRequestQueue(context)
 
-        if (!forceReload && songIdList.isNotEmpty()) {
-            return null
-        } else {
-            val requestQueue = Volley.newRequestQueue(contextReference.get()!!)
+                val sortedList = arrayOfNulls<JSONObject>(loadMax)
 
-            val sortedList = arrayOfNulls<JSONObject>(loadMax)
+                val syncObject = Object()
 
-            val syncObject = Object()
-
-            requestQueue.addRequestFinishedListener<Any> {
-                synchronized(syncObject) {
-                    syncObject.notify()
+                requestQueue.addRequestFinishedListener<Any> {
+                    synchronized(syncObject) {
+                        syncObject.notify()
+                    }
                 }
-            }
 
-            for (i in (0 until loadMax / 50)) {
-                val requestUrl =
-                    contextReference.get()!!.getString(R.string.loadSongsUrl) + "?limit=50&skip=" + i * 50
+                for (i in (0 until loadMax / 50)) {
+                    val requestUrl =
+                        context.getString(R.string.loadSongsUrl) + "?limit=50&skip=" + i * 50
 
-                val listRequest = AuthorizedRequest(
-                    Request.Method.GET, requestUrl, getSid(),
-                    Response.Listener { response ->
-                        val json = JSONObject(response)
-                        val jsonArray = json.getJSONArray("results")
+                    val listRequest = AuthorizedRequest(
+                        Request.Method.GET, requestUrl, getSid(),
+                        Response.Listener { response ->
+                            val json = JSONObject(response)
+                            val jsonArray = json.getJSONArray("results")
 
-                        //parse every single song into list
-                        for (k in (0 until jsonArray.length())) {
-                            sortedList[i * 50 + k] = jsonArray.getJSONObject(k)
-                        }
+                            //parse every single song into list
+                            for (k in (0 until jsonArray.length())) {
+                                sortedList[i * 50 + k] = jsonArray.getJSONObject(k)
+                            }
 
-                    }, Response.ErrorListener { }
-                )
-
-                requestQueue.add(listRequest)
-
-                synchronized(syncObject) {
-                    syncObject.wait()
-                }
-            }
-
-            sortedList.reverse()
-
-            catalogSongDatabaseHelper.reCreateTable()
-
-            for (jsonObject in sortedList) {
-                if (jsonObject != null) {
-
-                    parseCatalogSongToDB(
-                        jsonObject,
-                        contextReference.get()!!
+                        }, Response.ErrorListener { }
                     )
+
+                    requestQueue.add(listRequest)
+
+                    synchronized(syncObject) {
+                        syncObject.wait()
+                    }
+                }
+
+                sortedList.reverse()
+
+                catalogSongDatabaseHelper.reCreateTable()
+
+                for (jsonObject in sortedList) {
+                    if (jsonObject != null) {
+
+                        parseCatalogSongToDB(
+                            jsonObject,
+                            context
+                        )
+                    }
                 }
             }
-
-            return null
         }
+
+        return null
     }
 }

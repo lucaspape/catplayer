@@ -23,18 +23,18 @@ class CatalogSongDatabaseHelper(context: Context) :
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        db!!.execSQL("DROP TABLE IF EXISTS " + CatalogSong.TABLE_NAME)
+        db?.execSQL("DROP TABLE IF EXISTS " + CatalogSong.TABLE_NAME)
         onCreate(db)
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
-        db!!.execSQL(CatalogSong.CREATE_TABLE)
+        db?.execSQL(CatalogSong.CREATE_TABLE)
     }
 
     fun reCreateTable(){
         val db = writableDatabase
 
-        db!!.execSQL("DROP TABLE IF EXISTS " + CatalogSong.TABLE_NAME)
+        db?.execSQL("DROP TABLE IF EXISTS " + CatalogSong.TABLE_NAME)
         onCreate(db)
     }
 

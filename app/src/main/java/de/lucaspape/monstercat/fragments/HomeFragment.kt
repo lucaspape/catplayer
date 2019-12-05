@@ -68,39 +68,42 @@ class HomeFragment : Fragment() {
         val adapterContextInfo = item.menuInfo as AdapterView.AdapterContextMenuInfo
         val position = adapterContextInfo.position
 
-        val listItem = listView!!.getItemAtPosition(position) as HashMap<*, *>
+        val listItem = listView?.getItemAtPosition(position) as HashMap<*, *>
 
-        val songDatabaseHelper =
-            SongDatabaseHelper(view!!.context)
-        val song = songDatabaseHelper.getSong(listItem["id"] as String)
+        view?.let {view ->
+            val songDatabaseHelper =
+                SongDatabaseHelper(view.context)
+            val song = songDatabaseHelper.getSong(listItem["id"] as String)
 
-        if (song != null) {
-            when {
-                item.title == getString(R.string.download) -> downloadSong(
-                    context!!,
-                    song
-                )
-                item.title == getString(R.string.playNext) -> playSongFromId(
-                    context!!,
-                    listItem["id"].toString(),
-                    false
-                )
-                item.title == getString(R.string.addToPlaylist) -> addSongToPlaylist(
-                    context!!,
-                    song
-                )
-            }
-        } else {
-            when {
-                item.title == getString(R.string.downloadAlbum) -> downloadAlbum(
-                    context!!,
-                    listItem["id"].toString()
-                )
-
-                item.title == getString(R.string.playAlbumNext) -> playAlbumNext(
-                    context!!,
-                    listItem["id"].toString()
-                )
+            context?.let {
+                if (song != null) {
+                    when (item.title) {
+                        getString(R.string.download) -> downloadSong(
+                            it,
+                            song
+                        )
+                        getString(R.string.playNext) -> playSongFromId(
+                            it,
+                            listItem["id"].toString(),
+                            false
+                        )
+                        getString(R.string.addToPlaylist) -> addSongToPlaylist(
+                            it,
+                            song
+                        )
+                    }
+                } else {
+                    when (item.title) {
+                        getString(R.string.downloadAlbum) -> downloadAlbum(
+                            it,
+                            listItem["id"].toString()
+                        )
+                        getString(R.string.playAlbumNext) -> playAlbumNext(
+                            it,
+                            listItem["id"].toString()
+                        )
+                    }
+                }
             }
         }
 

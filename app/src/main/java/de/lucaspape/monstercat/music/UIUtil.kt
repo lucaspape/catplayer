@@ -40,33 +40,21 @@ private var fullscreenPlayButtonReference: WeakReference<ImageButton>? = null
  * UI update methods
  */
 fun setTextView(newTextView: TextView) {
-    try {
-        newTextView.text = textViewReference?.get()?.text
-    } catch (e: NullPointerException) {
-
-    }
+    newTextView.text = textViewReference?.get()?.text
 
     textViewReference = WeakReference(newTextView)
 }
 
 fun setFullscreenTextView(newTextView1: TextView, newTextView2: TextView) {
-    try {
-        newTextView1.text = textViewReference?.get()?.text
-        newTextView2.text = textViewReference?.get()?.text
-    } catch (e: NullPointerException) {
-
-    }
+    newTextView1.text = textViewReference?.get()?.text
+    newTextView2.text = textViewReference?.get()?.text
 
     fullscreenTextView1Reference = WeakReference(newTextView1)
     fullscreenTextView2Reference = WeakReference(newTextView2)
 }
 
 fun setSeekBar(newSeekBar: SeekBar) {
-    try {
-        seekBarReference?.get()?.progress?.let { newSeekBar.progress = it }
-    } catch (e: NullPointerException) {
-
-    }
+    seekBarReference?.get()?.progress?.let { newSeekBar.progress = it }
 
     newSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
         override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
@@ -85,11 +73,7 @@ fun setSeekBar(newSeekBar: SeekBar) {
 }
 
 fun setFullscreenSeekBar(newSeekBar: SeekBar) {
-    try {
-        seekBarReference?.get()?.progress?.let { newSeekBar.progress = it }
-    } catch (e: NullPointerException) {
-
-    }
+    seekBarReference?.get()?.progress?.let { newSeekBar.progress = it }
 
     newSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
         override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
@@ -108,21 +92,13 @@ fun setFullscreenSeekBar(newSeekBar: SeekBar) {
 }
 
 fun setBarCoverImageView(newImageView: ImageView) {
-    try {
-        newImageView.setImageDrawable(barCoverImageReference?.get()?.drawable)
-    } catch (e: NullPointerException) {
-
-    }
+    newImageView.setImageDrawable(barCoverImageReference?.get()?.drawable)
 
     barCoverImageReference = WeakReference(newImageView)
 }
 
 fun setFullscreenCoverImageView(newImageView: ImageView) {
-    try {
-        newImageView.setImageDrawable(barCoverImageReference?.get()?.drawable)
-    } catch (e: NullPointerException) {
-
-    }
+    newImageView.setImageDrawable(barCoverImageReference?.get()?.drawable)
 
     fullscreenCoverReference = WeakReference(newImageView)
 }
@@ -179,45 +155,21 @@ internal fun setTitle(title: String, version: String, artist: String) {
 
     val text = "$title $version - $artist"
 
-    try {
-        textViewReference?.get()?.text = text
-    } catch (e: NullPointerException) {
+    textViewReference?.get()?.text = text
 
-    }
+    fullscreenTextView1Reference?.get()?.text = text
 
-    try {
-        fullscreenTextView1Reference?.get()?.text = text
-    } catch (e: NullPointerException) {
-
-    }
-
-    try {
-        fullscreenTextView2Reference?.get()?.text = text
-    } catch (e: NullPointerException) {
-
-    }
+    fullscreenTextView2Reference?.get()?.text = text
 }
 
 internal fun hideTitle() {
     val text = ""
 
-    try {
-        textViewReference?.get()?.text = text
-    } catch (e: NullPointerException) {
+    textViewReference?.get()?.text = text
 
-    }
+    fullscreenTextView1Reference?.get()?.text = text
 
-    try {
-        fullscreenTextView1Reference?.get()?.text = text
-    } catch (e: NullPointerException) {
-
-    }
-
-    try {
-        fullscreenTextView2Reference?.get()?.text = text
-    } catch (e: NullPointerException) {
-
-    }
+    fullscreenTextView2Reference?.get()?.text = text
 }
 
 internal fun startTextAnimation() {
@@ -230,26 +182,13 @@ internal fun startTextAnimation() {
 
         var width = 0
 
-        try {
-            fullscreenTextView1Reference?.get()?.width?.let { width = it }
-        } catch (e: NullPointerException) {
-
-        }
-
+        fullscreenTextView1Reference?.get()?.width?.let { width = it }
 
         val translationX = width * progress
 
-        try {
-            fullscreenTextView1Reference?.get()?.translationX = translationX
-        } catch (e: NullPointerException) {
+        fullscreenTextView1Reference?.get()?.translationX = translationX
 
-        }
-
-        try {
-            fullscreenTextView2Reference?.get()?.translationX = translationX - width
-        } catch (e: NullPointerException) {
-
-        }
+        fullscreenTextView2Reference?.get()?.translationX = translationX - width
     }
 
     valueAnimator.start()
@@ -261,61 +200,44 @@ internal fun startSeekBarUpdate() {
 
     val updateSeekBar = object : Runnable {
         override fun run() {
-
-            try {
-                mediaPlayer?.duration?.toInt()?.let { seekBarReference?.get()?.max = it }
-                mediaPlayer?.currentPosition?.toInt()?.let { seekBarReference?.get()?.progress = it }
-
-            } catch (e: NullPointerException) {
-
-            }
-
-            try {
-                mediaPlayer?.duration?.toInt()?.let { fullscreenSeekBarReference?.get()?.max = it }
-                mediaPlayer?.currentPosition?.toInt()?.let { fullscreenSeekBarReference?.get()?.progress = it }
+            mediaPlayer?.duration?.toInt()?.let { seekBarReference?.get()?.max = it }
+            mediaPlayer?.currentPosition?.toInt()
+                ?.let { seekBarReference?.get()?.progress = it }
 
 
-            } catch (e: NullPointerException) {
+            mediaPlayer?.duration?.toInt()?.let { fullscreenSeekBarReference?.get()?.max = it }
+            mediaPlayer?.currentPosition?.toInt()
+                ?.let { fullscreenSeekBarReference?.get()?.progress = it }
 
-            }
+
             mediaPlayer?.currentPosition?.let { setPlayerState(it) }
 
             seekBarUpdateHandler.postDelayed(this, 50)
         }
     }
 
-    try {
-        seekBarUpdateHandler.postDelayed(updateSeekBar, 0)
+    seekBarUpdateHandler.postDelayed(updateSeekBar, 0)
 
-        seekBarReference?.get()?.setOnTouchListener { _, _ -> true }
+    seekBarReference?.get()?.setOnTouchListener { _, _ -> true }
 
+    fullscreenSeekBarReference?.get()?.setOnSeekBarChangeListener(object :
+        SeekBar.OnSeekBarChangeListener {
+        override fun onProgressChanged(
+            seekBar: SeekBar,
+            progress: Int,
+            fromUser: Boolean
+        ) {
+            if (fromUser)
+                mediaPlayer?.seekTo(progress.toLong())
+            setPlayerState(progress.toLong())
+        }
 
-    } catch (e: NullPointerException) {
+        override fun onStartTrackingTouch(seekBar: SeekBar) {
+        }
 
-    }
-
-    try {
-        fullscreenSeekBarReference?.get()?.setOnSeekBarChangeListener(object :
-            SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(
-                seekBar: SeekBar,
-                progress: Int,
-                fromUser: Boolean
-            ) {
-                if (fromUser)
-                    mediaPlayer?.seekTo(progress.toLong())
-                setPlayerState(progress.toLong())
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar) {
-            }
-
-            override fun onStopTrackingTouch(seekBar: SeekBar) {
-            }
-        })
-    } catch (e: NullPointerException) {
-
-    }
+        override fun onStopTrackingTouch(seekBar: SeekBar) {
+        }
+    })
 }
 
 internal fun setCover(song: Song, context: Context) {
@@ -328,17 +250,9 @@ internal fun setCover(song: Song, context: Context) {
     if (coverFile.exists()) {
         val bitmap = BitmapFactory.decodeFile(coverFile.absolutePath)
 
-        try {
-            barCoverImageReference?.get()?.setImageBitmap(bitmap)
-        } catch (e: NullPointerException) {
+        barCoverImageReference?.get()?.setImageBitmap(bitmap)
 
-        }
-
-        try {
-            fullscreenCoverReference?.get()?.setImageBitmap(bitmap)
-        } catch (e: NullPointerException) {
-
-        }
+        fullscreenCoverReference?.get()?.setImageBitmap(bitmap)
 
         mediaPlayer?.duration?.let { setSongMetadata(song.artist, song.title, bitmap, it) }
 
@@ -349,53 +263,33 @@ internal fun setCover(song: Song, context: Context) {
 
 internal fun setPlayButtonImage(context: Context) {
     if (mediaPlayer?.isPlaying == true) {
-        try {
-            playButtonReference?.get()?.setImageDrawable(
-                ContextCompat.getDrawable(
-                    context,
-                    R.drawable.ic_pause_24dp
-                )
+        playButtonReference?.get()?.setImageDrawable(
+            ContextCompat.getDrawable(
+                context,
+                R.drawable.ic_pause_24dp
             )
+        )
 
-        } catch (e: NullPointerException) {
-
-        }
-
-        try {
-            fullscreenPlayButtonReference?.get()?.setImageDrawable(
-                ContextCompat.getDrawable(
-                    context,
-                    R.drawable.ic_pause_24dp
-                )
+        fullscreenPlayButtonReference?.get()?.setImageDrawable(
+            ContextCompat.getDrawable(
+                context,
+                R.drawable.ic_pause_24dp
             )
+        )
 
-        } catch (e: NullPointerException) {
-
-        }
     } else {
-        try {
-            playButtonReference?.get()?.setImageDrawable(
-                ContextCompat.getDrawable(
-                    context,
-                    R.drawable.ic_play_arrow_24dp
-                )
+        playButtonReference?.get()?.setImageDrawable(
+            ContextCompat.getDrawable(
+                context,
+                R.drawable.ic_play_arrow_24dp
             )
-
-        } catch (e: NullPointerException) {
-
-        }
-
-        try {
-            fullscreenPlayButtonReference?.get()?.setImageDrawable(
-                ContextCompat.getDrawable(
-                    context,
-                    R.drawable.ic_play_arrow_24dp
-                )
+        )
+        fullscreenPlayButtonReference?.get()?.setImageDrawable(
+            ContextCompat.getDrawable(
+                context,
+                R.drawable.ic_play_arrow_24dp
             )
-
-        } catch (e: NullPointerException) {
-
-        }
+        )
     }
 }
 

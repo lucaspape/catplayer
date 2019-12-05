@@ -27,109 +27,115 @@ class LoadAlbumListAsync(
     private val loadMax: Int
 ) : AsyncTask<Void, Void, String>() {
     override fun onPreExecute() {
-        val swipeRefreshLayout =
-            viewReference.get()!!.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
-        swipeRefreshLayout.isRefreshing = true
+        viewReference.get()?.let {view ->
+            val swipeRefreshLayout =
+                view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
+            swipeRefreshLayout.isRefreshing = true
+        }
     }
 
     override fun onPostExecute(result: String?) {
-        val albumDatabaseHelper =
-            AlbumDatabaseHelper(contextReference.get()!!)
-        val albumList = albumDatabaseHelper.getAllAlbums()
+        contextReference.get()?.let { context ->
+            val albumDatabaseHelper =
+                AlbumDatabaseHelper(context)
+            val albumList = albumDatabaseHelper.getAllAlbums()
 
-        val sortedList = ArrayList<HashMap<String, Any?>>()
+            val sortedList = ArrayList<HashMap<String, Any?>>()
 
-        for (album in albumList) {
-            sortedList.add(parseAlbumToHashMap(contextReference.get()!!, album))
+            for (album in albumList) {
+                sortedList.add(parseAlbumToHashMap(context, album))
+            }
+
+            HomeHandler.currentListViewData = sortedList
+
+            viewReference.get()?.let {view ->
+                HomeHandler.updateListView(view)
+                HomeHandler.redrawListView(view)
+
+                //download cover art
+                addDownloadCoverArray(HomeHandler.currentListViewData)
+
+                val listView = view.findViewById<ListView>(R.id.musiclistview)
+                val settings = Settings(view.context)
+                val lastScroll = settings.getSetting("currentListAlbumViewLastScrollIndex")
+                val top = settings.getSetting("currentListAlbumViewTop")
+
+                if (top != null && lastScroll != null) {
+                    listView.setSelectionFromTop(lastScroll.toInt(), top.toInt())
+                }
+
+                settings.saveSetting("currentListAlbumViewLastScrollIndex", 0.toString())
+                settings.saveSetting("currentListAlbumViewTop", 0.toString())
+
+                val swipeRefreshLayout =
+                    view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
+                swipeRefreshLayout.isRefreshing = false
+
+                HomeHandler.albumContentsDisplayed = false
+            }
         }
-
-        HomeHandler.currentListViewData = sortedList
-
-        HomeHandler.updateListView(viewReference.get()!!)
-        HomeHandler.redrawListView(viewReference.get()!!)
-
-        //download cover art
-        addDownloadCoverArray(HomeHandler.currentListViewData)
-
-        val listView = viewReference.get()!!.findViewById<ListView>(R.id.musiclistview)
-        val settings = Settings(viewReference.get()!!.context)
-        val lastScroll = settings.getSetting("currentListAlbumViewLastScrollIndex")
-        val top = settings.getSetting("currentListAlbumViewTop")
-
-        if (top != null && lastScroll != null) {
-            listView.setSelectionFromTop(lastScroll.toInt(), top.toInt())
-        }
-
-        settings.saveSetting("currentListAlbumViewLastScrollIndex", 0.toString())
-        settings.saveSetting("currentListAlbumViewTop", 0.toString())
-
-        val swipeRefreshLayout =
-            viewReference.get()!!.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
-        swipeRefreshLayout.isRefreshing = false
-
-        HomeHandler.albumContentsDisplayed = false
     }
 
     override fun doInBackground(vararg param: Void?): String? {
-        val requestQueue = Volley.newRequestQueue(contextReference.get()!!)
+        contextReference.get()?.let { context ->
+            val requestQueue = Volley.newRequestQueue(context)
 
-        val tempList = arrayOfNulls<JSONObject>(loadMax)
+            val tempList = arrayOfNulls<JSONObject>(loadMax)
 
-        val albumDatabaseHelper =
-            AlbumDatabaseHelper(contextReference.get()!!)
-        val albumList = albumDatabaseHelper.getAllAlbums()
+            val albumDatabaseHelper =
+                AlbumDatabaseHelper(context)
+            val albumList = albumDatabaseHelper.getAllAlbums()
 
-        if (!forceReload && albumList.isNotEmpty()) {
-            return null
-        } else {
-            val syncObject = Object()
+            if (!forceReload && albumList.isNotEmpty()) {
+                return null
+            } else {
+                val syncObject = Object()
 
-            requestQueue.addRequestFinishedListener<Any> {
+                requestQueue.addRequestFinishedListener<Any> {
 
-                synchronized(syncObject) {
-                    syncObject.notify()
+                    synchronized(syncObject) {
+                        syncObject.notify()
+                    }
+                }
+
+                for (i in (0 until loadMax / 50)) {
+                    val requestUrl =
+                        context.getString(R.string.loadAlbumsUrl) + "?limit=50&skip=" + i * 50
+                    val albumsRequest = AuthorizedRequest(
+                        Request.Method.GET, requestUrl, getSid(),
+                        Response.Listener { response ->
+                            val json = JSONObject(response)
+                            val jsonArray = json.getJSONArray("results")
+
+                            for (k in (0 until jsonArray.length())) {
+                                val jsonObject = jsonArray.getJSONObject(k)
+
+                                tempList[i * 50 + k] = jsonObject
+                            }
+                        },
+                        Response.ErrorListener { }
+                    )
+
+                    requestQueue.add(albumsRequest)
+
+                    synchronized(syncObject) {
+                        syncObject.wait()
+                    }
+                }
+
+                tempList.reverse()
+
+                albumDatabaseHelper.reCreateTable()
+
+                for (jsonObject in tempList) {
+                    if (jsonObject != null) {
+                        parseAlbumToDB(jsonObject, context)
+                    }
                 }
             }
-
-            for (i in (0 until loadMax / 50)) {
-                val requestUrl =
-                    contextReference.get()!!.getString(R.string.loadAlbumsUrl) + "?limit=50&skip=" + i * 50
-                val albumsRequest = AuthorizedRequest(
-                    Request.Method.GET, requestUrl, getSid(),
-                    Response.Listener { response ->
-                        val json = JSONObject(response)
-                        val jsonArray = json.getJSONArray("results")
-
-                        for (k in (0 until jsonArray.length())) {
-                            val jsonObject = jsonArray.getJSONObject(k)
-
-                            tempList[i * 50 + k] = jsonObject
-                        }
-                    },
-                    Response.ErrorListener { }
-                )
-
-                requestQueue.add(albumsRequest)
-
-                synchronized(syncObject) {
-                    syncObject.wait()
-                }
-            }
-
-            tempList.reverse()
-
-            albumDatabaseHelper.reCreateTable()
-
-            for (jsonObject in tempList) {
-                if (jsonObject != null) {
-                    parseAlbumToDB(jsonObject, contextReference.get()!!)
-                }
-            }
-
-            return null
         }
 
-
+        return null
     }
 
 }

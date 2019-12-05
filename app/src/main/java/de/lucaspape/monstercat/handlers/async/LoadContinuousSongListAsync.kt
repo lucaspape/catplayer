@@ -21,60 +21,62 @@ class LoadContinuousSongListAsync(
     private val contextReference: WeakReference<Context>
 ) : AsyncTask<Void, Void, String>() {
     override fun doInBackground(vararg params: Void?): String? {
-        val context = contextReference.get()!!
+        contextReference.get()?.let { context ->
+            val settings = Settings(context)
+            val downloadType = settings.getSetting("downloadType")
 
-        val settings = Settings(context)
-        val downloadType = settings.getSetting("downloadType")
+            val songDatabaseHelper = SongDatabaseHelper(context)
 
-        val songDatabaseHelper = SongDatabaseHelper(context)
+            val streamHashQueue = Volley.newRequestQueue(context)
 
-        val streamHashQueue = Volley.newRequestQueue(context)
+            val syncObject = Object()
 
-        val syncObject = Object()
-
-        streamHashQueue.addRequestFinishedListener<Any> {
-            synchronized(syncObject) {
-                syncObject.notify()
-            }
-        }
-
-        for (songId in songIdList) {
-            val song = songDatabaseHelper.getSong(songId)
-            if (song != null) {
-                //check if song is already downloaded
-                val songDownloadLocation =
-                    context.getExternalFilesDir(null).toString() + "/" + song.artist + song.title + song.version + "." + downloadType
-
-                if (File(songDownloadLocation).exists()) {
-                    song.downloadLocation = songDownloadLocation
-                    addContinuous(song)
-                } else {
-                    //get stream hash
-                    val streamHashUrl =
-                        context.getString(R.string.loadSongsUrl) + "?albumId=" + song.albumId
-
-                    val hashRequest = AuthorizedRequest(
-                        Request.Method.GET, streamHashUrl, getSid(),
-                        Response.Listener { response ->
-                            val jsonObject = JSONObject(response)
-
-                            val streamHash = parseObjectToStreamHash(jsonObject, song)
-
-                            if (streamHash != null) {
-                                song.streamLocation =
-                                    context.getString(R.string.songStreamUrl) + streamHash
-                                addContinuous(song)
-                            }
-                        },
-                        Response.ErrorListener { })
-
-                    streamHashQueue.add(hashRequest)
-
-                    synchronized(syncObject) {
-                        syncObject.wait()
-                    }
+            streamHashQueue.addRequestFinishedListener<Any> {
+                synchronized(syncObject) {
+                    syncObject.notify()
                 }
             }
+
+            for (songId in songIdList) {
+                val song = songDatabaseHelper.getSong(songId)
+                if (song != null) {
+                    //check if song is already downloaded
+                    val songDownloadLocation =
+                        context.getExternalFilesDir(null).toString() + "/" + song.artist + song.title + song.version + "." + downloadType
+
+                    if (File(songDownloadLocation).exists()) {
+                        song.downloadLocation = songDownloadLocation
+                        addContinuous(song)
+                    } else {
+                        //get stream hash
+                        val streamHashUrl =
+                            context.getString(R.string.loadSongsUrl) + "?albumId=" + song.albumId
+
+                        val hashRequest = AuthorizedRequest(
+                            Request.Method.GET, streamHashUrl, getSid(),
+                            Response.Listener { response ->
+                                val jsonObject = JSONObject(response)
+
+                                val streamHash = parseObjectToStreamHash(jsonObject, song)
+
+                                if (streamHash != null) {
+                                    song.streamLocation =
+                                        context.getString(R.string.songStreamUrl) + streamHash
+                                    addContinuous(song)
+                                }
+                            },
+                            Response.ErrorListener { })
+
+                        streamHashQueue.add(hashRequest)
+
+                        synchronized(syncObject) {
+                            syncObject.wait()
+                        }
+                    }
+                }
+
+            }
+
 
         }
 

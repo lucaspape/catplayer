@@ -22,38 +22,43 @@ class LoadTitleSearchAsync(
 ) : AsyncTask<Void, Void, String>() {
 
     override fun doInBackground(vararg params: Void?): String? {
-        val searchQueue = Volley.newRequestQueue(contextReference.get()!!)
+        contextReference.get()?.let {context ->
+            val searchQueue = Volley.newRequestQueue(context)
 
-        val searchRequest = StringRequest(Request.Method.GET,
-            contextReference.get()!!.getString(R.string.loadSongsUrl) + "?term=$searchString&limit=50&skip=0&fields=&search=$searchString",
-            Response.Listener { response ->
-                val jsonArray = JSONObject(response).getJSONArray("results")
+            val searchRequest = StringRequest(Request.Method.GET,
+                context.getString(R.string.loadSongsUrl) + "?term=$searchString&limit=50&skip=0&fields=&search=$searchString",
+                Response.Listener { response ->
+                    val jsonArray = JSONObject(response).getJSONArray("results")
 
-                val songList =
-                    parseSongSearchToSongList(contextReference.get()!!, jsonArray)
+                    val songList =
+                        parseSongSearchToSongList(context, jsonArray)
 
-                val hashMapList = ArrayList<HashMap<String, Any?>>()
+                    val hashMapList = ArrayList<HashMap<String, Any?>>()
 
-                for (song in songList) {
-                    hashMapList.add(parseSongToHashMap(contextReference.get()!!, song))
-                }
+                    for (song in songList) {
+                        hashMapList.add(parseSongToHashMap(context, song))
+                    }
 
-                //display list
-                HomeHandler.currentListViewData = hashMapList
+                    //display list
+                    HomeHandler.currentListViewData = hashMapList
 
-                HomeHandler.updateListView(viewReference.get()!!)
-                HomeHandler.redrawListView(viewReference.get()!!)
+                    viewReference.get()?.let {view ->
+                        HomeHandler.updateListView(view)
+                        HomeHandler.redrawListView(view)
 
-                //download cover art
-                addDownloadCoverArray(HomeHandler.currentListViewData)
+                        //download cover art
+                        addDownloadCoverArray(HomeHandler.currentListViewData)
 
-                HomeHandler.albumContentsDisplayed = false
-            },
-            Response.ErrorListener { error ->
-                println(error)
-            })
+                        HomeHandler.albumContentsDisplayed = false
+                    }
 
-        searchQueue.add(searchRequest)
+                },
+                Response.ErrorListener { error ->
+                    println(error)
+                })
+
+            searchQueue.add(searchRequest)
+        }
 
         return null
     }

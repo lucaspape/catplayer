@@ -117,7 +117,7 @@ class SettingsActivity : AppCompatActivity() {
             ) {
                 if (fromUser) {
                     settings.saveSetting("maximumLoad", (progress * 50).toString())
-                    shownMaxValue.text = settings.getSetting("maximumLoad")!!
+                    settings.getSetting("maximumLoad")?.let { shownMaxValue.text = it }
                 }
             }
 

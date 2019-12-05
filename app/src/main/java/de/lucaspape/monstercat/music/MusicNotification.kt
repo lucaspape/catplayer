@@ -23,27 +23,31 @@ internal fun createSongNotification(
 ) {
     createNotificationChannel()
 
-    val playerNotificationManager = PlayerNotificationManager(contextReference!!.get()!!, musicChannelID, musicNotificationID, object:
-        PlayerNotificationManager.MediaDescriptionAdapter{
-        override fun getCurrentLargeIcon(
-            player: Player?,
-            callback: PlayerNotificationManager.BitmapCallback?
-        ): Bitmap? {
-            return BitmapFactory.decodeFile(coverLocation)
-        }
+    val playerNotificationManager = PlayerNotificationManager(
+        contextReference!!.get()!!,
+        musicChannelID,
+        musicNotificationID,
+        object :
+            PlayerNotificationManager.MediaDescriptionAdapter {
+            override fun getCurrentLargeIcon(
+                player: Player?,
+                callback: PlayerNotificationManager.BitmapCallback?
+            ): Bitmap? {
+                return BitmapFactory.decodeFile(coverLocation)
+            }
 
-        override fun getCurrentContentTitle(player: Player?): String {
-            return "$title $version"
-        }
+            override fun getCurrentContentTitle(player: Player?): String {
+                return "$title $version"
+            }
 
-        override fun getCurrentContentText(player: Player?): String? {
-            return artist
-        }
+            override fun getCurrentContentText(player: Player?): String? {
+                return artist
+            }
 
-        override fun createCurrentContentIntent(player: Player?): PendingIntent? {
-            return null
-        }
-    })
+            override fun createCurrentContentIntent(player: Player?): PendingIntent? {
+                return null
+            }
+        })
 
     playerNotificationManager.setPlayer(mediaPlayer)
 
@@ -55,19 +59,18 @@ internal fun createSongNotification(
 
 private fun createNotificationChannel() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        val context = contextReference!!.get()!!
+        contextReference!!.get()?.let { context ->
+            val channelName = "Music Notification"
+            val channelDescription = "Handy dandy description"
+            val importance = NotificationManager.IMPORTANCE_LOW
 
-        val channelName = "Music Notification"
-        val channelDescription = "Handy dandy description"
-        val importance = NotificationManager.IMPORTANCE_LOW
+            val notificationChannel = NotificationChannel(musicChannelID, channelName, importance)
 
-        val notificationChannel = NotificationChannel(musicChannelID, channelName, importance)
+            notificationChannel.description = channelDescription
 
-        notificationChannel.description = channelDescription
-
-        val notificationManager =
-            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.createNotificationChannel(notificationChannel)
-
+            val notificationManager =
+                context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(notificationChannel)
+        }
     }
 }

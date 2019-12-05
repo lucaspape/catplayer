@@ -38,7 +38,7 @@ class HomeHandler {
         @JvmStatic
         fun redrawListView(view: View) {
             val musicList = view.findViewById<ListView>(R.id.musiclistview)
-            simpleAdapter!!.notifyDataSetChanged()
+            simpleAdapter?.notifyDataSetChanged()
             musicList.invalidateViews()
             musicList.refreshDrawableState()
         }
@@ -243,7 +243,9 @@ class HomeHandler {
                 albumView = false
                 albumViewSelected = false
 
-                searchSong(view, query!!)
+                query?.let {
+                    searchSong(view, it)
+                }
 
                 return false
             }
@@ -255,30 +257,34 @@ class HomeHandler {
      * Load song list ("catalog view")
      */
     fun loadSongList(view: View, forceReload: Boolean) {
-        val loadMax = Integer.parseInt(Settings(view.context).getSetting("maximumLoad")!!)
-        val contextReference = WeakReference<Context>(view.context)
-        val viewReference = WeakReference<View>(view)
-        LoadSongListAsync(
-            viewReference,
-            contextReference,
-            forceReload,
-            loadMax
-        ).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        Settings(view.context).getSetting("maximumLoad")?.let {
+            val contextReference = WeakReference<Context>(view.context)
+            val viewReference = WeakReference<View>(view)
+
+            LoadSongListAsync(
+                viewReference,
+                contextReference,
+                forceReload,
+                Integer.parseInt(it)
+            ).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        }
+
     }
 
     /**
      * Load album list ("album view")
      */
     fun loadAlbumList(view: View, forceReload: Boolean) {
-        val loadMax = Integer.parseInt(Settings(view.context).getSetting("maximumLoad")!!)
-        val contextReference = WeakReference<Context>(view.context)
-        val viewReference = WeakReference<View>(view)
-        LoadAlbumListAsync(
-            viewReference,
-            contextReference,
-            forceReload,
-            loadMax
-        ).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        Settings(view.context).getSetting("maximumLoad")?.let {
+            val contextReference = WeakReference<Context>(view.context)
+            val viewReference = WeakReference<View>(view)
+            LoadAlbumListAsync(
+                viewReference,
+                contextReference,
+                forceReload,
+                Integer.parseInt(it)
+            ).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        }
     }
 
     /**

@@ -26,9 +26,11 @@ class LoadAlbumAsync(
     private val itemValue: HashMap<*, *>
 ) : AsyncTask<Void, Void, String>() {
     override fun onPreExecute() {
-        val swipeRefreshLayout =
-            viewReference.get()!!.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
-        swipeRefreshLayout.isRefreshing = true
+        viewReference.get()?.let {view ->
+            val swipeRefreshLayout =
+                view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
+            swipeRefreshLayout.isRefreshing = true
+        }
     }
 
     override fun onPostExecute(result: String?) {
@@ -43,20 +45,25 @@ class LoadAlbumAsync(
         val songDatabaseHelper = SongDatabaseHelper(contextReference.get()!!)
 
         for (albumItem in albumItemList) {
-            dbSongs.add(
-                parseSongToHashMap(
-                    contextReference.get()!!,
-                    songDatabaseHelper.getSong(albumItem.songId)
+            contextReference.get()?.let {context ->
+                dbSongs.add(
+                    parseSongToHashMap(
+                        context,
+                        songDatabaseHelper.getSong(albumItem.songId)
+                    )
                 )
-            )
+            }
+
         }
 
         HomeHandler.currentListViewData = dbSongs
 
         HomeHandler.albumView = false
 
-        HomeHandler.updateListView(viewReference.get()!!)
-        HomeHandler.redrawListView(viewReference.get()!!)
+        viewReference.get()?.let { view ->
+            HomeHandler.updateListView(view)
+            HomeHandler.redrawListView(view)
+        }
 
         //download cover art
         addDownloadCoverArray(HomeHandler.currentListViewData)
@@ -72,53 +79,57 @@ class LoadAlbumAsync(
     override fun doInBackground(vararg param: Void?): String? {
         val albumId = itemValue["id"] as String
 
-        val requestQueue = Volley.newRequestQueue(contextReference.get()!!)
+        contextReference.get()?.let {context ->
+            val requestQueue = Volley.newRequestQueue(context)
 
-        val albumItemDatabaseHelper =
-            AlbumItemDatabaseHelper(contextReference.get()!!, albumId)
-        val albumItems = albumItemDatabaseHelper.getAllData()
+            val albumItemDatabaseHelper =
+                AlbumItemDatabaseHelper(context, albumId)
+            val albumItems = albumItemDatabaseHelper.getAllData()
 
-        if (!forceReload && albumItems.isNotEmpty()) {
-            return null
-        } else {
-            val syncObject = Object()
+            if (!forceReload && albumItems.isNotEmpty()) {
+                return null
+            } else {
+                val syncObject = Object()
 
-            requestQueue.addRequestFinishedListener<Any> {
-                synchronized(syncObject) {
-                    syncObject.notify()
-                }
-            }
-
-            val requestUrl =
-                contextReference.get()!!.getString(R.string.loadSongsUrl) + "?albumId=" + albumId
-
-            val listRequest = AuthorizedRequest(
-                Request.Method.GET, requestUrl,
-                getSid(), Response.Listener { response ->
-                    val json = JSONObject(response)
-                    val jsonArray = json.getJSONArray("results")
-
-                    albumItemDatabaseHelper.reCreateTable()
-
-                    //parse every single song into list
-                    for (k in (0 until jsonArray.length())) {
-                        parsAlbumSongToDB(
-                            jsonArray.getJSONObject(k),
-                            albumId,
-                            contextReference.get()!!
-                        )
+                requestQueue.addRequestFinishedListener<Any> {
+                    synchronized(syncObject) {
+                        syncObject.notify()
                     }
+                }
 
-                }, Response.ErrorListener { }
-            )
+                val requestUrl =
+                    context.getString(R.string.loadSongsUrl) + "?albumId=" + albumId
 
-            requestQueue.add(listRequest)
-            synchronized(syncObject) {
-                syncObject.wait()
+                val listRequest = AuthorizedRequest(
+                    Request.Method.GET, requestUrl,
+                    getSid(), Response.Listener { response ->
+                        val json = JSONObject(response)
+                        val jsonArray = json.getJSONArray("results")
+
+                        albumItemDatabaseHelper.reCreateTable()
+
+                        //parse every single song into list
+                        for (k in (0 until jsonArray.length())) {
+                            parsAlbumSongToDB(
+                                jsonArray.getJSONObject(k),
+                                albumId,
+                                context
+                            )
+                        }
+
+                    }, Response.ErrorListener { }
+                )
+
+                requestQueue.add(listRequest)
+                synchronized(syncObject) {
+                    syncObject.wait()
+                }
+
+
             }
-
-            return null
         }
+
+        return null
     }
 
 }

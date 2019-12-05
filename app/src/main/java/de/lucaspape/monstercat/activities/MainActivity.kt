@@ -103,13 +103,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         //start download background task
-
-        if (downloadTask != null) {
-            downloadTask!!.cancel(true)
-        }
+        downloadTask?.cancel(true)
 
         downloadTask = DownloadTask(WeakReference(applicationContext))
-        downloadTask!!.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        downloadTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 
         //show privacy policy
         showPrivacyPolicy()
@@ -168,7 +165,6 @@ class MainActivity : AppCompatActivity() {
             alertDialogBuilder.setView(textView)
             alertDialogBuilder.show()
             settings.saveSetting("privacypolicy", "1.0")
-
         }
     }
 

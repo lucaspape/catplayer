@@ -62,14 +62,16 @@ fun parseSongSearchToSongList(context: Context, jsonArray: JSONArray): ArrayList
 
         val songId = parseSongToDB(jsonObject, context)
 
-        val databaseHelper = SongDatabaseHelper(context)
-        songList.add(databaseHelper.getSong(songId))
+        songId?.let {
+            val databaseHelper = SongDatabaseHelper(context)
+            songList.add(databaseHelper.getSong(it))
+        }
     }
 
     return songList
 }
 
-fun parseSongToDB(jsonObject: JSONObject, context: Context): Long {
+fun parseSongToDB(jsonObject: JSONObject, context: Context): Long? {
     var id = ""
     var albumId = ""
     var title = ""
@@ -95,35 +97,43 @@ fun parseSongToDB(jsonObject: JSONObject, context: Context): Long {
     return if (databaseHelper.getSong(id) == null) {
         databaseHelper.insertSong(id, title, version, albumId, artist, coverUrl)
     } else {
-        databaseHelper.getSong(id)!!.id.toLong()
+        databaseHelper.getSong(id)?.id?.toLong()
     }
 }
 
-fun parseCatalogSongToDB(jsonObject: JSONObject, context: Context): Long {
+fun parseCatalogSongToDB(jsonObject: JSONObject, context: Context): Long? {
     val songId = parseSongToDB(jsonObject, context)
 
     val catalogSongDatabaseHelper = CatalogSongDatabaseHelper(context)
 
-    return if (catalogSongDatabaseHelper.getCatalogSong(songId) == null) {
-        catalogSongDatabaseHelper.insertSong(songId)
-    } else {
-        catalogSongDatabaseHelper.getCatalogSong(songId)!!.id.toLong()
+    songId?.let {
+        return if (catalogSongDatabaseHelper.getCatalogSong(it) == null) {
+            catalogSongDatabaseHelper.insertSong(it)
+        } else {
+            catalogSongDatabaseHelper.getCatalogSong(it)?.id?.toLong()
+        }
     }
+
+    return null
 }
 
-fun parsAlbumSongToDB(jsonObject: JSONObject, sAlbumId: String, context: Context): Long {
+fun parsAlbumSongToDB(jsonObject: JSONObject, sAlbumId: String, context: Context): Long? {
     val songId = parseSongToDB(jsonObject, context)
 
     val albumItemDatabaseHelper = AlbumItemDatabaseHelper(context, sAlbumId)
 
-    return if (albumItemDatabaseHelper.getItemFromSongId(songId) == null) {
-        albumItemDatabaseHelper.insertSongId(songId)
-    } else {
-        albumItemDatabaseHelper.getItemFromSongId(songId)!!.id
+    songId?.let {
+        return if (albumItemDatabaseHelper.getItemFromSongId(it) == null) {
+            albumItemDatabaseHelper.insertSongId(it)
+        } else {
+            albumItemDatabaseHelper.getItemFromSongId(it)?.id
+        }
     }
+
+    return null
 }
 
-fun parseAlbumToDB(jsonObject: JSONObject, context: Context): Long {
+fun parseAlbumToDB(jsonObject: JSONObject, context: Context): Long? {
     val id = jsonObject.getString("_id")
     val title = jsonObject.getString("title")
     val artist = jsonObject.getString("renderedArtists")
@@ -133,7 +143,7 @@ fun parseAlbumToDB(jsonObject: JSONObject, context: Context): Long {
     return if (databaseHelper.getAlbum(id) == null) {
         databaseHelper.insertAlbum(id, title, artist, coverUrl)
     } else {
-        databaseHelper.getAlbum(id)!!.id.toLong()
+        databaseHelper.getAlbum(id)?.id?.toLong()
     }
 }
 
@@ -218,7 +228,7 @@ fun parsePlaylistToHashMap(playlist: Playlist): HashMap<String, Any?> {
     return playlistHashMap
 }
 
-fun parsePlaylistToDB(context: Context, jsonObject: JSONObject): Long {
+fun parsePlaylistToDB(context: Context, jsonObject: JSONObject): Long? {
     val playlistName = jsonObject.getString("name") as String
     val playlistId = jsonObject.getString("_id") as String
     val playlistTrackCount = jsonObject.getJSONArray("tracks").length()
@@ -227,7 +237,7 @@ fun parsePlaylistToDB(context: Context, jsonObject: JSONObject): Long {
     return if (databaseHelper.getPlaylist(playlistId) == null) {
         databaseHelper.insertPlaylist(playlistId, playlistName, playlistTrackCount)
     } else {
-        databaseHelper.getPlaylist(playlistId)!!.id.toLong()
+        databaseHelper.getPlaylist(playlistId)?.id?.toLong()
     }
 }
 
@@ -246,11 +256,15 @@ fun parsePlaylistTrackToDB(
             playlistId
         )
 
-        return if (databaseHelper.getItemFromSongId(songId) == null) {
-            databaseHelper.insertSongId(songId)
-        } else {
-            databaseHelper.getItemFromSongId(songId)!!.songId
+        songId?.let {
+            return if (databaseHelper.getItemFromSongId(it) == null) {
+                databaseHelper.insertSongId(it)
+            } else {
+                databaseHelper.getItemFromSongId(it)?.songId
+            }
         }
+
+        return null
     } else {
         return null
     }

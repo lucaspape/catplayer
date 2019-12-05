@@ -73,7 +73,7 @@ internal fun downloadCover(
             val primaryBitmap = BitmapFactory.decodeStream(input)
 
             FileOutputStream(location + primaryRes).use { out ->
-                primaryBitmap!!.compress(Bitmap.CompressFormat.PNG, 100, out)
+                primaryBitmap?.compress(Bitmap.CompressFormat.PNG, 100, out)
             }
 
             val secondaryBitmap =
@@ -85,7 +85,7 @@ internal fun downloadCover(
                 )
 
             FileOutputStream(location + secondaryRes).use { out ->
-                secondaryBitmap!!.compress(Bitmap.CompressFormat.PNG, 100, out)
+                secondaryBitmap?.compress(Bitmap.CompressFormat.PNG, 100, out)
             }
 
             connection.disconnect()

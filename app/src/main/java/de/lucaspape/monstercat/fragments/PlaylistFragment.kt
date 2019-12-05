@@ -73,34 +73,36 @@ class PlaylistFragment : Fragment() {
         val adapterContextInfo = item.menuInfo as AdapterView.AdapterContextMenuInfo
         val position = adapterContextInfo.position
 
-        val listItem = playlistView!!.getItemAtPosition(position) as HashMap<*, *>
+        val listItem = playlistView?.getItemAtPosition(position) as HashMap<*, *>
 
-        if (item.title == getString(R.string.download)) {
-            if (listItem["type"] == "playlist") {
-                downloadPlaylist(
-                    context!!,
-                    listItem["playlistId"] as String
-                )
-            } else {
-                val songDatabaseHelper =
-                    SongDatabaseHelper(view!!.context)
-                val song = songDatabaseHelper.getSong(listItem["id"] as String)
+        context?.let {
+            if (item.title == getString(R.string.download)) {
+                if (listItem["type"] == "playlist") {
+                    downloadPlaylist(
+                        it,
+                        listItem["playlistId"] as String
+                    )
+                } else {
+                    view?.let { view ->
+                        val songDatabaseHelper =
+                            SongDatabaseHelper(view.context)
+                        val song = songDatabaseHelper.getSong(listItem["id"] as String)
 
-                if (song != null) {
-                    downloadSong(context!!, song)
+                        if (song != null) {
+                            downloadSong(it, song)
+                        }
+                    }
                 }
-            }
 
-        } else if (item.title == getString(R.string.playNext)) {
-            playSongFromId(
-                context!!,
-                listItem["id"] as String,
-                false
-            )
+            } else if (item.title == getString(R.string.playNext)) {
+                playSongFromId(
+                    it,
+                    listItem["id"] as String,
+                    false
+                )
+            }else{}
         }
 
         return super.onContextItemSelected(item)
     }
-
-
 }

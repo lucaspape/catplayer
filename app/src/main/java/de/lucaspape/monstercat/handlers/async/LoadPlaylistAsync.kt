@@ -25,33 +25,39 @@ class LoadPlaylistAsync(
 ) : AsyncTask<Void, Void, String>() {
     override fun onPreExecute() {
         if (showAfter) {
-            val swipeRefreshLayout =
-                viewReference.get()!!.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
-            swipeRefreshLayout.isRefreshing = true
+            viewReference.get()?.let {
+                val swipeRefreshLayout =
+                    it.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
+                swipeRefreshLayout.isRefreshing = true
+            }
         }
     }
 
     override fun onPostExecute(result: String?) {
-        val playlistDatabaseHelper =
-            PlaylistDatabaseHelper(contextReference.get()!!)
-        val playlists = playlistDatabaseHelper.getAllPlaylists()
+        contextReference.get()?.let { context ->
+            val playlistDatabaseHelper =
+                PlaylistDatabaseHelper(context)
+            val playlists = playlistDatabaseHelper.getAllPlaylists()
 
-        val playlistHashMaps = ArrayList<HashMap<String, Any?>>()
+            val playlistHashMaps = ArrayList<HashMap<String, Any?>>()
 
-        for (playlist in playlists) {
-            playlistHashMaps.add(parsePlaylistToHashMap(playlist))
-        }
+            for (playlist in playlists) {
+                playlistHashMaps.add(parsePlaylistToHashMap(playlist))
+            }
 
-        if (showAfter) {
-            PlaylistHandler.currentListViewData = playlistHashMaps
-            PlaylistHandler.listViewDataIsPlaylistView = true
+            if (showAfter) {
+                viewReference.get()?.let { view ->
+                    PlaylistHandler.currentListViewData = playlistHashMaps
+                    PlaylistHandler.listViewDataIsPlaylistView = true
 
-            PlaylistHandler.updateListView(viewReference.get()!!)
-            PlaylistHandler.redrawListView(viewReference.get()!!)
+                    PlaylistHandler.updateListView(view)
+                    PlaylistHandler.redrawListView(view)
 
-            val swipeRefreshLayout =
-                viewReference.get()!!.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
-            swipeRefreshLayout.isRefreshing = false
+                    val swipeRefreshLayout =
+                        view.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
+                    swipeRefreshLayout.isRefreshing = false
+                }
+            }
         }
     }
 
@@ -63,38 +69,40 @@ class LoadPlaylistAsync(
         if (!forceReload && playlists.isNotEmpty()) {
             return null
         } else {
-            val playlistRequestQueue = Volley.newRequestQueue(contextReference.get()!!)
+            contextReference.get()?.let { context ->
+                val playlistRequestQueue = Volley.newRequestQueue(context)
 
-            val playlistUrl = contextReference.get()!!.getString(R.string.playlistsUrl)
+                val playlistUrl = context.getString(R.string.playlistsUrl)
 
-            val syncObject = Object()
+                val syncObject = Object()
 
-            playlistRequestQueue.addRequestFinishedListener<Any> {
-                synchronized(syncObject) {
-                    syncObject.notify()
-                }
-            }
-
-            val playlistRequest = AuthorizedRequest(
-                Request.Method.GET, playlistUrl, getSid(),
-                Response.Listener { response ->
-                    val jsonObject = JSONObject(response)
-                    val jsonArray = jsonObject.getJSONArray("results")
-
-                    for (i in (0 until jsonArray.length())) {
-                        parsePlaylistToDB(
-                            contextReference.get()!!,
-                            jsonArray.getJSONObject(i)
-                        )
+                playlistRequestQueue.addRequestFinishedListener<Any> {
+                    synchronized(syncObject) {
+                        syncObject.notify()
                     }
+                }
 
-                },
-                Response.ErrorListener { })
+                val playlistRequest = AuthorizedRequest(
+                    Request.Method.GET, playlistUrl, getSid(),
+                    Response.Listener { response ->
+                        val jsonObject = JSONObject(response)
+                        val jsonArray = jsonObject.getJSONArray("results")
 
-            playlistRequestQueue.add(playlistRequest)
+                        for (i in (0 until jsonArray.length())) {
+                            parsePlaylistToDB(
+                                context,
+                                jsonArray.getJSONObject(i)
+                            )
+                        }
 
-            synchronized(syncObject) {
-                syncObject.wait()
+                    },
+                    Response.ErrorListener { })
+
+                playlistRequestQueue.add(playlistRequest)
+
+                synchronized(syncObject) {
+                    syncObject.wait()
+                }
             }
 
             return null

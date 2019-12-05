@@ -21,7 +21,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
         var downloadedCoverArrays = 0
 
         val connectivityManager =
-            weakReference.get()!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            weakReference.get()?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
         val settings = Settings(weakReference.get()!!)
 
@@ -37,11 +37,12 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                     if (wifi != null && !wifi.isConnected && settings.getSetting("downloadOverMobile") != "true") {
                         println("forbidden by user")
                     } else {
-                        try {
-                            if (downloadList[downloadedSongs]!!.isNotEmpty()) {
-                                val song = downloadList[downloadedSongs]
-                                val url = song!!["url"] as String
-                                val location = song["location"] as String
+
+                        if (downloadList[downloadedSongs]?.isNotEmpty() == true) {
+                            val song = downloadList[downloadedSongs]
+                            song?.let {
+                                val url = it["url"] as String
+                                val location = it["location"] as String
 
                                 downloadSong(
                                     url,
@@ -60,10 +61,9 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                                 downloadList[downloadedSongs] = null
                             }
 
-                            downloadedSongs++
-                        } catch (e: NullPointerException) {
-
                         }
+
+                        downloadedSongs++
                     }
                 }
 
@@ -74,19 +74,19 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                 if (wifi != null && !wifi.isConnected && settings.getSetting("downloadCoversOverMobile") != "true") {
                     println("forbidden by user")
                 } else {
-                    try {
-                        if (downloadCoverArrayListList[downloadedCoverArrays]!!.isNotEmpty()) {
-                            val coverArray = downloadCoverArrayListList[downloadedCoverArrays]
+                    if (downloadCoverArrayListList[downloadedCoverArrays]?.isNotEmpty() == true) {
+                        val coverArray = downloadCoverArrayListList[downloadedCoverArrays]
 
-                            for (i in coverArray!!.indices) {
+                        coverArray?.let {
+                            for (i in it.indices) {
                                 publishProgress(
                                     context.getString(R.string.downloadingCoversMsg),
-                                    coverArray.size.toString(),
+                                    it.size.toString(),
                                     i.toString(),
                                     false.toString()
                                 )
 
-                                val cover = coverArray[i]
+                                val cover = it[i]
 
                                 try {
                                     val url = cover["coverUrl"] as String
@@ -103,8 +103,6 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                                 downloadCoverArrayListList[downloadedCoverArrays] = null
                             }
                         }
-                    } catch (e: NullPointerException) {
-
                     }
 
                 }
@@ -120,13 +118,25 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
     }
 
     override fun onProgressUpdate(vararg values: String?) {
-        val title = values[0]!!
-        val max = values[1]!!.toInt()
-        val current = values[2]!!.toInt()
-        val int = values[3]!!.toBoolean()
+        val title = values[0]
+        val max = values[1]?.toInt()
+        val current = values[2]?.toInt()
+        val int = values[3]?.toBoolean()
 
-        showDownloadNotification(title, current, max, int, contextReference!!.get()!!)
+        title?.let {
+            max?.let {
+                current?.let {
+                    int?.let {
+                        showDownloadNotification(
+                            title,
+                            current,
+                            max,
+                            int,
+                            contextReference!!.get()!!
+                        )
+                    }
+                }
+            }
+        }
     }
-
-
 }

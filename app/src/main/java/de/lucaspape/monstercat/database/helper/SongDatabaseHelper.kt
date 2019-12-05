@@ -25,12 +25,12 @@ class SongDatabaseHelper(context: Context) :
 
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        db!!.execSQL("DROP TABLE IF EXISTS " + Song.TABLE_NAME)
+        db?.execSQL("DROP TABLE IF EXISTS " + Song.TABLE_NAME)
         onCreate(db)
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
-        db!!.execSQL(Song.CREATE_TABLE)
+        db?.execSQL(Song.CREATE_TABLE)
     }
 
     fun insertSong(

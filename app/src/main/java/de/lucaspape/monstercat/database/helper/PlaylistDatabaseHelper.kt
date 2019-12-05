@@ -23,12 +23,12 @@ class PlaylistDatabaseHelper(context: Context) :
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        db!!.execSQL("DROP TABLE IF EXISTS " + Playlist.TABLE_NAME)
+        db?.execSQL("DROP TABLE IF EXISTS " + Playlist.TABLE_NAME)
         onCreate(db)
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
-        db!!.execSQL(Playlist.CREATE_TABLE)
+        db?.execSQL(Playlist.CREATE_TABLE)
     }
 
     fun insertPlaylist(playlistId: String, name: String, trackCount: Int): Long {
