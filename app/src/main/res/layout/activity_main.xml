@@ -13,6 +13,8 @@
         android:layout_width="0dp"
         android:layout_height="70dp"
         android:background="?android:attr/windowBackground"
+        app:itemIconTint="@drawable/navigation_menu_color"
+        app:itemTextColor="@drawable/navigation_menu_color"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -72,6 +74,8 @@
 
     <SeekBar
         android:id="@+id/seekBar"
+        android:paddingStart="0dp"
+        android:paddingEnd="0dp"
         android:layout_width="0dp"
         android:layout_height="16dp"
         android:clickable="false"
