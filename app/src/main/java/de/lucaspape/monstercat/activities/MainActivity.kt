@@ -195,10 +195,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun registerButtonListeners() {
-        //music control buttons
-        val playButton = findViewById<ImageButton>(R.id.playButton)
-
-        playButton.setOnClickListener {
+        findViewById<ImageButton>(R.id.playButton).setOnClickListener {
             toggleMusic()
         }
 

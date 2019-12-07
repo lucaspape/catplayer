@@ -47,4 +47,6 @@
     <string name="fullscreenPlayPause">Play Pause Button</string>
     <string name="fullscreenNext">Next Button</string>
     <string name="fullscreenPrevButton">Previous Button</string>
+    <string name="livestreamTitle">Monstercat Livestream</string>
+    <string name="livestreamArtist">Monstercat</string>
 </resources>

@@ -11,6 +11,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.activities.SettingsActivity
 import de.lucaspape.monstercat.activities.loadContinuousSongListAsyncTask
+import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.handlers.async.*
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.util.Settings
@@ -220,6 +221,12 @@ class HomeHandler {
 
         view.findViewById<ImageButton>(R.id.settingsButton).setOnClickListener {
             view.context.startActivity(Intent(view.context, SettingsActivity::class.java))
+        }
+
+        view.findViewById<ImageButton>(R.id.liveButton).setOnClickListener {
+            val liveSong = Song(0, "0", view.context.getString(R.string.livestreamTitle), "", "", view.context.getString(R.string.livestreamArtist), "")
+            liveSong.streamLocation = view.context.getString(R.string.streamUrl)
+            playNow(liveSong)
         }
 
         val search = view.findViewById<SearchView>(R.id.homeSearch)

@@ -19,7 +19,7 @@
 
         <Spinner
             android:id="@+id/viewSelector"
-            android:layout_width="200dp"
+            android:layout_width="150dp"
             android:layout_height="wrap_content" />
 
         <ImageButton
@@ -34,11 +34,21 @@
 
         <SearchView
             android:id="@+id/homeSearch"
-            android:layout_width="match_parent"
+            android:layout_width="130dp"
             android:layout_height="40dp"
-            app:layout_constraintEnd_toEndOf="@+id/settingsButton"
+            app:layout_constraintEnd_toEndOf="@+id/liveButton"
             app:layout_constraintStart_toEndOf="@+id/viewSelector"
             tools:layout_editor_absoluteY="14dp" />
+
+        <ImageButton
+            android:layout_marginStart="20dp"
+            android:id="@+id/liveButton"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@null"
+            android:src="@drawable/ic_live_tv_24dp"
+            app:layout_constraintEnd_toEndOf="@+id/settingsButton"
+            app:layout_constraintStart_toEndOf="@+id/homeSearch" />
 
     </androidx.appcompat.widget.Toolbar>
 
