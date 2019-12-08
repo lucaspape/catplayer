@@ -75,15 +75,15 @@ class Stream(private val clientId: String) {
 
     fun updateInfo(context: Context, volleyQueue: RequestQueue, finished: (stream: Stream) -> Unit) {
         val artistTitleRequest =
-            StringRequest(Request.Method.GET, context.getString(R.string.liveInfoUrl),
+            StringRequest(Request.Method.GET, context.getString(R.string.liveInfoUrl) + "?key=" + context.getString(R.string.lucaspapeApiKey),
                 Response.Listener { artistTitleResponse ->
                     val jsonObject = JSONObject(artistTitleResponse)
 
                     title = jsonObject.getString("title")
                     artist = jsonObject.getString("artist")
 
-                    titleArtistUpdateUrl = context.getString(R.string.liveInfoUrl)
-                    albumCoverUpdateUrl = context.getString(R.string.liveCoverUrl)
+                    titleArtistUpdateUrl = context.getString(R.string.liveInfoUrl) + "?key=" + context.getString(R.string.lucaspapeApiKey)
+                    albumCoverUpdateUrl = context.getString(R.string.liveCoverUrl) + "?key=" + context.getString(R.string.lucaspapeApiKey)
 
                 },
                 Response.ErrorListener { error ->
