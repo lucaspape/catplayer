@@ -49,5 +49,4 @@
     <string name="fullscreenPrevButton">Previous Button</string>
     <string name="livestreamTitle">Monstercat Livestream</string>
     <string name="livestreamArtist">Monstercat</string>
-    <string name="livestreamAudioQualitySwitch">Use low quality stream (120 instead of 320 kb/s)</string>
 </resources>

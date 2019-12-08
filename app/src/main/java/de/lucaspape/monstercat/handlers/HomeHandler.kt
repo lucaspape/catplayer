@@ -11,7 +11,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.activities.SettingsActivity
 import de.lucaspape.monstercat.activities.loadContinuousSongListAsyncTask
-import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.handlers.async.*
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.util.Settings
@@ -224,22 +223,8 @@ class HomeHandler {
         }
 
         view.findViewById<ImageButton>(R.id.liveButton).setOnClickListener {
-            var lowQuality = false
-
-            if (settings.getSetting("lowLiveStreamQuality") != null) {
-                lowQuality =
-                    settings.getSetting("lowLiveStreamQuality")!!.toBoolean()
-            }
-
-            val liveSong = Song(0, "0", view.context.getString(R.string.livestreamTitle), "", "", view.context.getString(R.string.livestreamArtist), "")
-
-            if(lowQuality){
-                liveSong.streamLocation = view.context.getString(R.string.streamUrlLow)
-            }else{
-                liveSong.streamLocation = view.context.getString(R.string.streamUrl)
-            }
-
-            playNow(liveSong)
+            val stream = de.lucaspape.monstercat.twitch.Stream(view.context.getString(R.string.twitchClientID))
+            stream.playStream(view.context, "monstercat")
         }
 
         val search = view.findViewById<SearchView>(R.id.homeSearch)

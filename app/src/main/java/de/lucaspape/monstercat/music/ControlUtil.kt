@@ -11,6 +11,7 @@ import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import de.lucaspape.monstercat.database.Song
@@ -83,25 +84,49 @@ internal fun play() {
                 ) {
 
                     if (!File(song.getUrl()).exists()) {
-                        mediaPlayer?.prepare(
-                            ProgressiveMediaSource.Factory(
-                                DefaultDataSourceFactory(
-                                    context, Util.getUserAgent(
-                                        context, "MonstercatPlayer"
+                        if(song.hls){
+                            mediaPlayer?.prepare(
+                                HlsMediaSource.Factory(
+                                    DefaultDataSourceFactory(
+                                        context, Util.getUserAgent(
+                                            context, "MonstercatPlayer"
+                                        )
                                     )
-                                )
-                            ).createMediaSource(song.getUrl().toUri())
-                        )
+                                ).createMediaSource(song.getUrl().toUri())
+                            )
+                        }else{
+                            mediaPlayer?.prepare(
+                                ProgressiveMediaSource.Factory(
+                                    DefaultDataSourceFactory(
+                                        context, Util.getUserAgent(
+                                            context, "MonstercatPlayer"
+                                        )
+                                    )
+                                ).createMediaSource(song.getUrl().toUri())
+                            )
+                        }
                     } else {
-                        mediaPlayer?.prepare(
-                            ProgressiveMediaSource.Factory(
-                                DefaultDataSourceFactory(
-                                    context, Util.getUserAgent(
-                                        context, "MonstercatPlayer"
+                        if(song.hls){
+                            mediaPlayer?.prepare(
+                                HlsMediaSource.Factory(
+                                    DefaultDataSourceFactory(
+                                        context, Util.getUserAgent(
+                                            context, "MonstercatPlayer"
+                                        )
                                     )
-                                )
-                            ).createMediaSource(Uri.parse("file://" + song.getUrl()))
-                        )
+                                ).createMediaSource(Uri.parse("file://" + song.getUrl()))
+                            )
+                        }else{
+                            mediaPlayer?.prepare(
+                                ProgressiveMediaSource.Factory(
+                                    DefaultDataSourceFactory(
+                                        context, Util.getUserAgent(
+                                            context, "MonstercatPlayer"
+                                        )
+                                    )
+                                ).createMediaSource(Uri.parse("file://" + song.getUrl()))
+                            )
+                        }
                     }
 
                     mediaPlayer?.playWhenReady = true

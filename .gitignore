@@ -164,3 +164,6 @@ lint/tmp/
 
 #MacOS Files
 *.DS_Store
+
+#password configuration file
+app/src/main/res/values/password_values.xml

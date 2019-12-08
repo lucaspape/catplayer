@@ -43,6 +43,7 @@ data class Song(
 
     var downloadLocation: String = ""
     var streamLocation: String = ""
+    var hls = false
 
     fun getUrl(): String {
         return if (downloadLocation != "") {
