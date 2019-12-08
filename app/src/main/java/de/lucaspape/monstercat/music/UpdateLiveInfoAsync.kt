@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.AsyncTask
 import android.os.StrictMode
+import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.twitch.Stream
 import java.io.FileOutputStream
 import java.lang.ref.WeakReference
@@ -19,9 +20,10 @@ class UpdateLiveInfoAsync(private val contextReference: WeakReference<Context>,p
 
         contextReference.get()?.let { context ->
             updateCover(context, stream)
+            val volleyQueue = Volley.newRequestQueue(context)
 
             while (true) {
-                stream.updateInfo(context) {
+                stream.updateInfo(context, volleyQueue) {
                     if (it.title != previousTitle || it.artist != previousArtist) {
                         setTitle(it.title, "", it.artist)
 
@@ -51,8 +53,9 @@ class UpdateLiveInfoAsync(private val contextReference: WeakReference<Context>,p
     }
 
     private fun updateCover(context: Context, stream: Stream){
-        StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder().permitAll().build())
+       // StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder().permitAll().build())
 
+        println(stream.albumCoverUpdateUrl)
         val connection =
             URL(stream.albumCoverUpdateUrl).openConnection() as HttpURLConnection
         connection.doInput = true
