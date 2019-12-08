@@ -224,8 +224,21 @@ class HomeHandler {
         }
 
         view.findViewById<ImageButton>(R.id.liveButton).setOnClickListener {
+            var lowQuality = false
+
+            if (settings.getSetting("lowLiveStreamQuality") != null) {
+                lowQuality =
+                    settings.getSetting("lowLiveStreamQuality")!!.toBoolean()
+            }
+
             val liveSong = Song(0, "0", view.context.getString(R.string.livestreamTitle), "", "", view.context.getString(R.string.livestreamArtist), "")
-            liveSong.streamLocation = view.context.getString(R.string.streamUrl)
+
+            if(lowQuality){
+                liveSong.streamLocation = view.context.getString(R.string.streamUrlLow)
+            }else{
+                liveSong.streamLocation = view.context.getString(R.string.streamUrl)
+            }
+
             playNow(liveSong)
         }
 
