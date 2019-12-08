@@ -208,7 +208,7 @@ fun playStream(stream: Stream) {
 
                 startTextAnimation()
 
-                //setCover(song, context)
+                setCover(context.filesDir.toString() + "/live.png", stream.artist, stream.title, context)
 
                 setPlayButtonImage(context)
 
@@ -216,7 +216,7 @@ fun playStream(stream: Stream) {
                     stream.title,
                     "",
                     stream.artist,
-                    ""
+                    context.filesDir.toString() + "/live.png"
                 )
 
                 startSeekBarUpdate()

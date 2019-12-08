@@ -261,6 +261,24 @@ internal fun setCover(song: Song, context: Context) {
     }
 }
 
+internal fun setCover(coverLocation:String, title:String, artist: String, context: Context) {
+    val coverFile =
+        File(coverLocation)
+
+    if (coverFile.exists()) {
+        val bitmap = BitmapFactory.decodeFile(coverFile.absolutePath)
+
+        barCoverImageReference?.get()?.setImageBitmap(bitmap)
+
+        fullscreenCoverReference?.get()?.setImageBitmap(bitmap)
+
+        mediaPlayer?.duration?.let { setSongMetadata(artist, title, bitmap, it) }
+
+    } else {
+        mediaPlayer?.duration?.let { setSongMetadata(artist, title, null, it) }
+    }
+}
+
 internal fun setPlayButtonImage(context: Context) {
     if (mediaPlayer?.isPlaying == true) {
         playButtonReference?.get()?.setImageDrawable(

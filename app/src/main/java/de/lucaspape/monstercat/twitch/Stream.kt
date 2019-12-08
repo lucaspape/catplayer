@@ -14,6 +14,7 @@ class Stream(private val clientId: String) {
 
     var streamUrl = ""
     var titleArtistUpdateUrl = ""
+    var albumCoverUpdateUrl = ""
     var artist = ""
     var title = ""
 
@@ -80,6 +81,7 @@ class Stream(private val clientId: String) {
                     artist = jsonObject.getString("artist")
 
                     titleArtistUpdateUrl = context.getString(R.string.liveInfoUrl)
+                    albumCoverUpdateUrl = context.getString(R.string.liveCoverUrl)
 
                     finished(this)
 
