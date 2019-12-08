@@ -37,6 +37,7 @@ import java.lang.ref.WeakReference
 
 var loadContinuousSongListAsyncTask: LoadContinuousSongListAsync? = null
 var downloadTask: DownloadTask? = null
+val noisyReceiver = NoisyReceiver()
 
 /**
  * Main activity
@@ -92,7 +93,7 @@ class MainActivity : AppCompatActivity() {
         createMediaSession(WeakReference(this))
 
         //register receiver which checks if headphones unplugged
-        registerReceiver(NoisyReceiver(), IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY))
+        registerReceiver(noisyReceiver, IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY))
 
         //login to monstercat
         Auth().login(this)
@@ -127,7 +128,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         try {
-            unregisterReceiver(NoisyReceiver())
+            unregisterReceiver(noisyReceiver)
         } catch (e: IllegalArgumentException) {
 
         }
@@ -203,4 +204,5 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(applicationContext, PlayerFullscreenActivity::class.java))
         }
     }
+
 }
