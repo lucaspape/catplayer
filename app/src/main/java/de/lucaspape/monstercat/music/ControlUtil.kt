@@ -5,6 +5,7 @@ import android.content.IntentFilter
 import android.media.AudioManager
 import android.net.ConnectivityManager
 import android.net.Uri
+import android.os.AsyncTask
 import androidx.core.net.toUri
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayerFactory
@@ -14,10 +15,16 @@ import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
+import de.lucaspape.monstercat.activities.downloadTask
 import de.lucaspape.monstercat.database.Song
+import de.lucaspape.monstercat.download.DownloadTask
+import de.lucaspape.monstercat.twitch.Stream
 import de.lucaspape.monstercat.util.Settings
 import java.io.File
 import java.lang.IndexOutOfBoundsException
+import java.lang.ref.WeakReference
+
+var updateLiveInfoAsync:UpdateLiveInfoAsync? = null
 
 /**
  * Music control methods
@@ -84,49 +91,26 @@ internal fun play() {
                 ) {
 
                     if (!File(song.getUrl()).exists()) {
-                        if(song.hls){
-                            mediaPlayer?.prepare(
-                                HlsMediaSource.Factory(
-                                    DefaultDataSourceFactory(
-                                        context, Util.getUserAgent(
-                                            context, "MonstercatPlayer"
-                                        )
+                        mediaPlayer?.prepare(
+                            ProgressiveMediaSource.Factory(
+                                DefaultDataSourceFactory(
+                                    context, Util.getUserAgent(
+                                        context, "MonstercatPlayer"
                                     )
-                                ).createMediaSource(song.getUrl().toUri())
-                            )
-                        }else{
-                            mediaPlayer?.prepare(
-                                ProgressiveMediaSource.Factory(
-                                    DefaultDataSourceFactory(
-                                        context, Util.getUserAgent(
-                                            context, "MonstercatPlayer"
-                                        )
-                                    )
-                                ).createMediaSource(song.getUrl().toUri())
-                            )
-                        }
+                                )
+                            ).createMediaSource(song.getUrl().toUri())
+                        )
+
                     } else {
-                        if(song.hls){
-                            mediaPlayer?.prepare(
-                                HlsMediaSource.Factory(
-                                    DefaultDataSourceFactory(
-                                        context, Util.getUserAgent(
-                                            context, "MonstercatPlayer"
-                                        )
+                        mediaPlayer?.prepare(
+                            ProgressiveMediaSource.Factory(
+                                DefaultDataSourceFactory(
+                                    context, Util.getUserAgent(
+                                        context, "MonstercatPlayer"
                                     )
-                                ).createMediaSource(Uri.parse("file://" + song.getUrl()))
-                            )
-                        }else{
-                            mediaPlayer?.prepare(
-                                ProgressiveMediaSource.Factory(
-                                    DefaultDataSourceFactory(
-                                        context, Util.getUserAgent(
-                                            context, "MonstercatPlayer"
-                                        )
-                                    )
-                                ).createMediaSource(Uri.parse("file://" + song.getUrl()))
-                            )
-                        }
+                                )
+                            ).createMediaSource(Uri.parse("file://" + song.getUrl()))
+                        )
                     }
 
                     mediaPlayer?.playWhenReady = true
@@ -152,6 +136,98 @@ internal fun play() {
             }
         }
     } catch (e: IndexOutOfBoundsException) {
+    }
+}
+
+fun playStream(stream: Stream) {
+    clearListener()
+
+    contextReference?.get()?.let { context ->
+        val settings = Settings(context)
+
+        val disableAudioFocus = if (settings.getSetting("disableAudioFocus") != null) {
+            settings.getSetting("disableAudioFocus")!!.toBoolean()
+        } else {
+            false
+        }
+
+        mediaPlayer?.release()
+        mediaPlayer?.stop()
+
+        val audioAttributes = AudioAttributes.Builder()
+            .setUsage(C.USAGE_MEDIA)
+            .setContentType(C.CONTENT_TYPE_MUSIC)
+            .build()
+
+        val exoPlayer = ExoPlayerFactory.newSimpleInstance(context)
+        exoPlayer.audioAttributes = audioAttributes
+
+        exoPlayer.addListener(object : Player.EventListener {
+            @Override
+            override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
+                setPlayButtonImage(context)
+            }
+        })
+
+        mediaPlayer = exoPlayer
+
+        val requestResult = if (disableAudioFocus) {
+            AudioManager.AUDIOFOCUS_REQUEST_GRANTED
+        } else {
+            val audioManager =
+                contextReference?.get()!!.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            audioManager.requestAudioFocus(
+                audioFocusChangeListener,
+                AudioManager.STREAM_MUSIC,
+                AudioManager.AUDIOFOCUS_GAIN
+            )
+        }
+
+        if (requestResult == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            registerNextListener()
+
+            val connectivityManager =
+                contextReference?.get()!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
+
+            if ((wifi != null && wifi.isConnected) || settings.getSetting("streamOverMobile") == "true") {
+
+                mediaPlayer?.prepare(
+                    HlsMediaSource.Factory(
+                        DefaultDataSourceFactory(
+                            context, Util.getUserAgent(
+                                context, "MonstercatPlayer"
+                            )
+                        )
+                    ).createMediaSource(stream.streamUrl.toUri())
+                )
+
+                mediaPlayer?.playWhenReady = true
+
+                setTitle(stream.title, "", stream.artist)
+
+                startTextAnimation()
+
+                //setCover(song, context)
+
+                setPlayButtonImage(context)
+
+                createSongNotification(
+                    stream.title,
+                    "",
+                    stream.artist,
+                    ""
+                )
+
+                startSeekBarUpdate()
+
+                updateLiveInfoAsync?.cancel(true)
+
+                updateLiveInfoAsync = UpdateLiveInfoAsync(WeakReference(context), stream)
+                updateLiveInfoAsync?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+            }
+
+        }
     }
 }
 
