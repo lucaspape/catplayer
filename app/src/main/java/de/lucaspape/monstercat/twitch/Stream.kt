@@ -76,12 +76,6 @@ class Stream(private val clientId: String) {
                         println(error)
                     })
 
-                artistTitleRequest.retryPolicy = DefaultRetryPolicy(
-                    10000,
-                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
-                )
-
                 volleyQueue.add(artistTitleRequest)
 
             }, Response.ErrorListener {
