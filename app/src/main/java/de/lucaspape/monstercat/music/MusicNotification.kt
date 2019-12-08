@@ -2,11 +2,14 @@ package de.lucaspape.monstercat.music
 
 import android.app.*
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Build
+import android.os.IBinder
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
+import com.google.android.exoplayer2.ui.PlayerNotificationManager.NotificationListener
 
 //notification var
 const val musicChannelID = "Music Notification"
@@ -21,40 +24,19 @@ internal fun createSongNotification(
     artist: String,
     coverLocation: String
 ) {
-    createNotificationChannel()
+    val notificationServiceIntent =
+        Intent(contextReference!!.get()!!, MusicNotificationService::class.java)
 
-    val playerNotificationManager = PlayerNotificationManager(
-        contextReference!!.get()!!,
-        musicChannelID,
-        musicNotificationID,
-        object :
-            PlayerNotificationManager.MediaDescriptionAdapter {
-            override fun getCurrentLargeIcon(
-                player: Player?,
-                callback: PlayerNotificationManager.BitmapCallback?
-            ): Bitmap? {
-                return BitmapFactory.decodeFile(coverLocation)
-            }
+    notificationServiceIntent.putExtra("title", title)
+    notificationServiceIntent.putExtra("version", version)
+    notificationServiceIntent.putExtra("artist", artist)
+    notificationServiceIntent.putExtra("coverLocation", coverLocation)
 
-            override fun getCurrentContentTitle(player: Player?): String {
-                return "$title $version"
-            }
-
-            override fun getCurrentContentText(player: Player?): String? {
-                return artist
-            }
-
-            override fun createCurrentContentIntent(player: Player?): PendingIntent? {
-                return null
-            }
-        })
-
-    playerNotificationManager.setPlayer(mediaPlayer)
-
-    playerNotificationManager.setRewindIncrementMs(0)
-    playerNotificationManager.setFastForwardIncrementMs(0)
-
-    playerNotificationManager.setMediaSessionToken(mediaSession!!.sessionToken)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        contextReference!!.get()!!.startForegroundService(notificationServiceIntent)
+    } else {
+        contextReference!!.get()!!.startService(notificationServiceIntent)
+    }
 }
 
 private fun createNotificationChannel() {
@@ -73,4 +55,73 @@ private fun createNotificationChannel() {
             notificationManager.createNotificationChannel(notificationChannel)
         }
     }
+}
+
+class MusicNotificationService : Service() {
+    override fun onBind(intent: Intent?): IBinder? {
+        return null
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        val title = intent!!.getStringExtra("title")!!
+        val version = intent.getStringExtra("version")!!
+        val artist = intent.getStringExtra("artist")!!
+        val coverLocation = intent.getStringExtra("coverLocation")!!
+
+        createNotificationChannel()
+
+        val playerNotificationManager = PlayerNotificationManager(
+            contextReference!!.get()!!,
+            musicChannelID,
+            musicNotificationID,
+            object :
+                PlayerNotificationManager.MediaDescriptionAdapter {
+                override fun getCurrentLargeIcon(
+                    player: Player?,
+                    callback: PlayerNotificationManager.BitmapCallback?
+                ): Bitmap? {
+                    return BitmapFactory.decodeFile(coverLocation)
+                }
+
+                override fun getCurrentContentTitle(player: Player?): String {
+                    return "$title $version"
+                }
+
+                override fun getCurrentContentText(player: Player?): String? {
+                    return artist
+                }
+
+                override fun createCurrentContentIntent(player: Player?): PendingIntent? {
+                    return null
+                }
+            })
+
+        playerNotificationManager.setPlayer(mediaPlayer)
+
+        playerNotificationManager.setRewindIncrementMs(0)
+        playerNotificationManager.setFastForwardIncrementMs(0)
+
+        playerNotificationManager.setMediaSessionToken(mediaSession!!.sessionToken)
+
+        playerNotificationManager.setNotificationListener(object : NotificationListener {
+            override fun onNotificationStarted(notificationId: Int, notification: Notification?) {
+                startForeground(
+                    musicNotificationID,
+                    notification
+                )
+            }
+
+            override fun onNotificationCancelled(notificationId: Int, dismissedByUser: Boolean) {
+                stopSelf()
+            }
+        })
+
+        return START_NOT_STICKY
+    }
+
+    override fun onDestroy() {
+        stopForeground(true)
+        super.onDestroy()
+    }
+
 }
