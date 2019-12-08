@@ -19,7 +19,7 @@
 
         <Spinner
             android:id="@+id/viewSelector"
-            android:layout_width="170dp"
+            android:layout_width="160dp"
             android:layout_height="wrap_content" />
 
         <ImageButton
