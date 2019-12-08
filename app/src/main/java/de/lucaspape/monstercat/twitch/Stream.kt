@@ -3,6 +3,7 @@ package de.lucaspape.monstercat.twitch
 import android.content.Context
 import com.android.volley.Request
 import com.android.volley.Response
+import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.Song
@@ -40,29 +41,46 @@ class Stream(private val clientId: String) {
         val type = "any"
         val p = floor(Math.random() * 99999) + 1
 
+        val volleyQueue = Volley.newRequestQueue(context)
+
         val playlistRequest = TwitchRequest(Request.Method.GET,
             "https://usher.ttvnw.net/api/channel/hls/$channel.m3u8?player=$player&token=$token&sig=$sig&allow_audio_only=$allowAudioOnly&allow_source=$allowSource&type=$type&p=$p",
             clientId, Response.Listener { response ->
                 val lines = response.lines()
 
-                val song = Song(
-                    0,
-                    "0",
-                    context.getString(R.string.livestreamTitle),
-                    "",
-                    "",
-                    context.getString(R.string.livestreamArtist),
-                    ""
-                )
-                song.streamLocation = lines[lines.size - 1]
-                song.hls = true
+                val artistTitleRequest = StringRequest(Request.Method.GET, context.getString(R.string.liveInfoUrl),
+                    Response.Listener { artistTitleResponse ->
+                        val jsonObject = JSONObject(artistTitleResponse)
 
-                playNow(song)
+                        val currentTitle = jsonObject.getString("title")
+                        val currentArtist = jsonObject.getString("artist")
+
+                        val song = Song(
+                            0,
+                            "0",
+                            currentTitle,
+                            "",
+                            "",
+                            currentArtist,
+                            ""
+                        )
+
+                        song.streamLocation = lines[lines.size - 1]
+                        song.hls = true
+
+                        playNow(song)
+
+                    },
+                    Response.ErrorListener { error ->
+                        println(error)
+                    })
+
+                volleyQueue.add(artistTitleRequest)
+
             }, Response.ErrorListener {
 
             })
 
-        val volleyQueue = Volley.newRequestQueue(context)
         volleyQueue.add(playlistRequest)
     }
 }
