@@ -223,7 +223,8 @@ class HomeHandler {
         }
 
         view.findViewById<ImageButton>(R.id.liveButton).setOnClickListener {
-            val stream = de.lucaspape.monstercat.twitch.Stream(view.context.getString(R.string.twitchClientID))
+            val stream =
+                de.lucaspape.monstercat.twitch.Stream(view.context.getString(R.string.twitchClientID))
             stream.playStream(view.context, "monstercat")
         }
 

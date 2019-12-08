@@ -11,27 +11,27 @@ import de.lucaspape.monstercat.request.TwitchRequest
 import org.json.JSONObject
 import kotlin.math.floor
 
-class Stream(private val clientId:String) {
-    fun playStream(context: Context, channel:String){
+class Stream(private val clientId: String) {
+    fun playStream(context: Context, channel: String) {
         getAccessToken(context, channel)
     }
 
-    private fun getAccessToken(context: Context, channel:String){
+    private fun getAccessToken(context: Context, channel: String) {
         val accessTokenRequest = TwitchRequest(Request.Method.GET,
             "https://api.twitch.tv/channels/$channel/access_token", clientId,
-            Response.Listener {response ->
+            Response.Listener { response ->
                 val jsonObject = JSONObject(response)
 
                 getPlaylist(context, channel, jsonObject)
             },
-            Response.ErrorListener {  }
+            Response.ErrorListener { }
         )
 
         val volleyQueue = Volley.newRequestQueue(context)
         volleyQueue.add(accessTokenRequest)
     }
 
-    private fun getPlaylist(context: Context, channel: String, accessToken:JSONObject){
+    private fun getPlaylist(context: Context, channel: String, accessToken: JSONObject) {
         val player = "twitchweb"
         val token = accessToken.getString("token")
         val sig = accessToken.getString("sig")
@@ -45,8 +45,16 @@ class Stream(private val clientId:String) {
             clientId, Response.Listener { response ->
                 val lines = response.lines()
 
-                val song = Song(0, "0", context.getString(R.string.livestreamTitle), "", "", context.getString(R.string.livestreamArtist), "")
-                song.streamLocation = lines[lines.size-1]
+                val song = Song(
+                    0,
+                    "0",
+                    context.getString(R.string.livestreamTitle),
+                    "",
+                    "",
+                    context.getString(R.string.livestreamArtist),
+                    ""
+                )
+                song.streamLocation = lines[lines.size - 1]
                 song.hls = true
 
                 playNow(song)
