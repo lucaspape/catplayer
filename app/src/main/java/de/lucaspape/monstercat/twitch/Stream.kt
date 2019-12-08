@@ -1,6 +1,7 @@
 package de.lucaspape.monstercat.twitch
 
 import android.content.Context
+import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
@@ -74,6 +75,12 @@ class Stream(private val clientId: String) {
                     Response.ErrorListener { error ->
                         println(error)
                     })
+
+                artistTitleRequest.retryPolicy = DefaultRetryPolicy(
+                    10000,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+                )
 
                 volleyQueue.add(artistTitleRequest)
 
