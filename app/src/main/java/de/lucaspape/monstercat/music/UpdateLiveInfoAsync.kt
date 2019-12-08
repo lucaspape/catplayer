@@ -13,7 +13,10 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 
-class UpdateLiveInfoAsync(private val contextReference: WeakReference<Context>,private val stream: Stream) : AsyncTask<Void, Void, String>(){
+class UpdateLiveInfoAsync(
+    private val contextReference: WeakReference<Context>,
+    private val stream: Stream
+) : AsyncTask<Void, Void, String>() {
     override fun doInBackground(vararg params: Void?): String? {
         var previousTitle = stream.title
         var previousArtist = stream.artist
@@ -34,7 +37,12 @@ class UpdateLiveInfoAsync(private val contextReference: WeakReference<Context>,p
 
                         updateCover(context, it)
 
-                        setCover(context.filesDir.toString() + "/live.png", it.artist, it.title, context)
+                        setCover(
+                            context.filesDir.toString() + "/live.png",
+                            it.artist,
+                            it.title,
+                            context
+                        )
 
                         createSongNotification(
                             stream.title,
@@ -52,8 +60,8 @@ class UpdateLiveInfoAsync(private val contextReference: WeakReference<Context>,p
         return null
     }
 
-    private fun updateCover(context: Context, stream: Stream){
-       // StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder().permitAll().build())
+    private fun updateCover(context: Context, stream: Stream) {
+        // StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder().permitAll().build())
 
         println(stream.albumCoverUpdateUrl)
         val connection =

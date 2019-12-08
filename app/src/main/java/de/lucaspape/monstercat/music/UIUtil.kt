@@ -261,7 +261,7 @@ internal fun setCover(song: Song, context: Context) {
     }
 }
 
-internal fun setCover(coverLocation:String, title:String, artist: String, context: Context) {
+internal fun setCover(coverLocation: String, title: String, artist: String, context: Context) {
     val coverFile =
         File(coverLocation)
 

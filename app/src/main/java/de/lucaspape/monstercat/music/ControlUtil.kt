@@ -24,7 +24,7 @@ import java.io.File
 import java.lang.IndexOutOfBoundsException
 import java.lang.ref.WeakReference
 
-var updateLiveInfoAsync:UpdateLiveInfoAsync? = null
+var updateLiveInfoAsync: UpdateLiveInfoAsync? = null
 
 /**
  * Music control methods
@@ -208,7 +208,12 @@ fun playStream(stream: Stream) {
 
                 startTextAnimation()
 
-                setCover(context.filesDir.toString() + "/live.png", stream.artist, stream.title, context)
+                setCover(
+                    context.filesDir.toString() + "/live.png",
+                    stream.artist,
+                    stream.title,
+                    context
+                )
 
                 setPlayButtonImage(context)
 

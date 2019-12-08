@@ -29,7 +29,7 @@ class Stream(private val clientId: String) {
         finished: (stream: Stream) -> Unit
     ) {
         val accessTokenRequest = TwitchRequest(Request.Method.GET,
-            "https://api.twitch.tv/channels/$channel/access_token", clientId,
+            context.getString(R.string.twitchApiUrl) + "channels/$channel/access_token", clientId,
             Response.Listener { response ->
                 val jsonObject = JSONObject(response)
 
@@ -59,7 +59,7 @@ class Stream(private val clientId: String) {
         val volleyQueue = Volley.newRequestQueue(context)
 
         val playlistRequest = TwitchRequest(Request.Method.GET,
-            "https://usher.ttvnw.net/api/channel/hls/$channel.m3u8?player=$player&token=$token&sig=$sig&allow_audio_only=$allowAudioOnly&allow_source=$allowSource&type=$type&p=$p",
+            context.getString(R.string.twitchPlaylistUrl) + "$channel.m3u8?player=$player&token=$token&sig=$sig&allow_audio_only=$allowAudioOnly&allow_source=$allowSource&type=$type&p=$p",
             clientId, Response.Listener { response ->
                 val lines = response.lines()
                 streamUrl = lines[lines.size - 1]
@@ -73,17 +73,24 @@ class Stream(private val clientId: String) {
         volleyQueue.add(playlistRequest)
     }
 
-    fun updateInfo(context: Context, volleyQueue: RequestQueue, finished: (stream: Stream) -> Unit) {
+    fun updateInfo(
+        context: Context,
+        volleyQueue: RequestQueue,
+        finished: (stream: Stream) -> Unit
+    ) {
         val artistTitleRequest =
-            StringRequest(Request.Method.GET, context.getString(R.string.liveInfoUrl) + "?key=" + context.getString(R.string.lucaspapeApiKey),
+            StringRequest(Request.Method.GET,
+                context.getString(R.string.liveInfoUrl) + "?key=" + context.getString(R.string.lucaspapeApiKey),
                 Response.Listener { artistTitleResponse ->
                     val jsonObject = JSONObject(artistTitleResponse)
 
                     title = jsonObject.getString("title")
                     artist = jsonObject.getString("artist")
 
-                    titleArtistUpdateUrl = context.getString(R.string.liveInfoUrl) + "?key=" + context.getString(R.string.lucaspapeApiKey)
-                    albumCoverUpdateUrl = context.getString(R.string.liveCoverUrl) + "?key=" + context.getString(R.string.lucaspapeApiKey)
+                    titleArtistUpdateUrl =
+                        context.getString(R.string.liveInfoUrl) + "?key=" + context.getString(R.string.lucaspapeApiKey)
+                    albumCoverUpdateUrl =
+                        context.getString(R.string.liveCoverUrl) + "?key=" + context.getString(R.string.lucaspapeApiKey)
 
                 },
                 Response.ErrorListener { error ->
