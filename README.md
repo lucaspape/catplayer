@@ -24,10 +24,10 @@ All album images seen in these screenshots are Copyright Monstercat.
  - Live Radio from Twitch
  - 2FA (currently testing)
 
-## Alpha
+## Beta
 
-If you want to participate in the alpha test you can sign up in this google form [here](https://forms.gle/3XUywPuasvxHGYu16 "Google Forms").
-After the alpha phase, the beta will be accessible to everyone.
+If you want to participate in the beta test you can download it from the google play store [here](https://play.google.com/apps/testing/de.lucaspape.monstercat "Test Android-App").
+The beta is open but currently limited to 1000 participants.
 
 
 ## Additional information
