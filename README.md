@@ -13,6 +13,7 @@ This android app aims to implement the Monstercat API.
  - Browse in catalog and in album view
  - Search songs
  - Dark Mode (Android 9 or higher)
+ - Live Radio from Twitch
 
 <img src="https://raw.githubusercontent.com/lucaspape/catplayer/master/playstore_res/screenshots/Screenshot_20191110-152127_Player_for_Monstercat.png" width="40%">  <img src="https://raw.githubusercontent.com/lucaspape/catplayer/master/playstore_res/screenshots/Screenshot_20191110-152238_Player_for_Monstercat.png" width="40%">
 
@@ -21,8 +22,6 @@ All album images seen in these screenshots are Copyright Monstercat.
 ## Todo
 
  - More playlist features (delete tracks, add public playlists etc.)
- - Live Radio from Twitch
- - 2FA (currently testing)
 
 ## Beta
 
