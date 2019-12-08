@@ -94,6 +94,21 @@ class MusicNotificationService : Service() {
                 override fun createCurrentContentIntent(player: Player?): PendingIntent? {
                     return null
                 }
+            },object : NotificationListener {
+                override fun onNotificationPosted(
+                    notificationId: Int,
+                    notification: Notification?,
+                    ongoing: Boolean
+                ) {
+                    startForeground(
+                        notificationId,
+                        notification
+                    )
+                }
+
+                override fun onNotificationCancelled(notificationId: Int, dismissedByUser: Boolean) {
+                    stopSelf()
+                }
             })
 
         playerNotificationManager.setPlayer(mediaPlayer)
@@ -102,19 +117,6 @@ class MusicNotificationService : Service() {
         playerNotificationManager.setFastForwardIncrementMs(0)
 
         playerNotificationManager.setMediaSessionToken(mediaSession!!.sessionToken)
-
-        playerNotificationManager.setNotificationListener(object : NotificationListener {
-            override fun onNotificationStarted(notificationId: Int, notification: Notification?) {
-                startForeground(
-                    musicNotificationID,
-                    notification
-                )
-            }
-
-            override fun onNotificationCancelled(notificationId: Int, dismissedByUser: Boolean) {
-                stopSelf()
-            }
-        })
 
         return START_NOT_STICKY
     }
