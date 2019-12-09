@@ -16,13 +16,16 @@ import java.net.URL
 class UpdateLiveInfoAsync(
     private val contextReference: WeakReference<Context>,
     private val stream: Stream
-) : AsyncTask<Void, Void, String>() {
+) : AsyncTask<Void, String, String>() {
     override fun doInBackground(vararg params: Void?): String? {
         var previousTitle = stream.title
         var previousArtist = stream.artist
 
         contextReference.get()?.let { context ->
             updateCover(context, stream)
+
+            publishProgress(stream.title, stream.artist, context.filesDir.toString() + "/live.png")
+
             val volleyQueue = Volley.newRequestQueue(context)
 
             while (true) {
@@ -37,19 +40,7 @@ class UpdateLiveInfoAsync(
 
                         updateCover(context, it)
 
-                        setCover(
-                            context.filesDir.toString() + "/live.png",
-                            it.artist,
-                            it.title,
-                            context
-                        )
-
-                        createSongNotification(
-                            stream.title,
-                            "",
-                            stream.artist,
-                            context.filesDir.toString() + "/live.png"
-                        )
+                        publishProgress(it.title, it.artist, context.filesDir.toString() + "/live.png")
                     }
                 }
 
@@ -60,10 +51,37 @@ class UpdateLiveInfoAsync(
         return null
     }
 
-    private fun updateCover(context: Context, stream: Stream) {
-        // StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder().permitAll().build())
+    override fun onProgressUpdate(vararg values: String?) {
+        val title = values[0]
+        val artist = values[1]
+        val coverLocation = values[2]
 
-        println(stream.albumCoverUpdateUrl)
+        title?.let {
+            artist?.let {
+                coverLocation?.let {
+                    contextReference.get()?.let {context ->
+                        setCover(
+                            coverLocation,
+                            artist,
+                            title,
+                            context
+                        )
+
+                        createSongNotification(
+                            title,
+                            "",
+                            artist,
+                            coverLocation
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun updateCover(context: Context, stream: Stream) {
+        StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder().permitAll().build())
+
         val connection =
             URL(stream.albumCoverUpdateUrl).openConnection() as HttpURLConnection
         connection.doInput = true
