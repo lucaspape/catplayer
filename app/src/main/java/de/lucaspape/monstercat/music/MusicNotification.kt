@@ -15,6 +15,8 @@ import com.google.android.exoplayer2.ui.PlayerNotificationManager.NotificationLi
 const val musicChannelID = "Music Notification"
 const val musicNotificationID = 1
 
+var notificationServiceIntent:Intent? = null
+
 /**
  * Show notification
  */
@@ -24,18 +26,22 @@ internal fun createSongNotification(
     artist: String,
     coverLocation: String
 ) {
-    val notificationServiceIntent =
+    notificationServiceIntent?.let {
+        contextReference?.get()?.stopService(notificationServiceIntent)
+    }
+
+    notificationServiceIntent =
         Intent(contextReference!!.get()!!, MusicNotificationService::class.java)
 
-    notificationServiceIntent.putExtra("title", title)
-    notificationServiceIntent.putExtra("version", version)
-    notificationServiceIntent.putExtra("artist", artist)
-    notificationServiceIntent.putExtra("coverLocation", coverLocation)
+    notificationServiceIntent?.putExtra("title", title)
+    notificationServiceIntent?.putExtra("version", version)
+    notificationServiceIntent?.putExtra("artist", artist)
+    notificationServiceIntent?.putExtra("coverLocation", coverLocation)
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        contextReference!!.get()!!.startForegroundService(notificationServiceIntent)
+        contextReference?.get()?.startForegroundService(notificationServiceIntent)
     } else {
-        contextReference!!.get()!!.startService(notificationServiceIntent)
+        contextReference?.get()?.startService(notificationServiceIntent)
     }
 }
 
@@ -123,6 +129,7 @@ class MusicNotificationService : Service() {
 
     override fun onDestroy() {
         stopForeground(true)
+
         super.onDestroy()
     }
 

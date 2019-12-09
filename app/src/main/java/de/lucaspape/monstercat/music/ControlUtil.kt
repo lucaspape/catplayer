@@ -33,6 +33,8 @@ internal fun play() {
     clearListener()
 
     try {
+        updateLiveInfoAsync?.cancel(true)
+
         val song = playList[currentSong]
 
         contextReference?.get()?.let { context ->
