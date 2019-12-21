@@ -18,6 +18,16 @@
             android:enabled="true"
             android:exported="false" />
 
+        <receiver android:name=".music.NotificationIntentReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="de.lucaspape.monstercat.prev"/>
+                <action android:name="de.lucaspape.monstercat.close"/>
+                <action android:name="de.lucaspape.monstercat.playpause"/>
+                <action android:name="de.lucaspape.monstercat.next"/>
+            </intent-filter>
+        </receiver>
+
         <activity
                 android:name=".activities.MainActivity"
                 android:theme="@style/AppTheme"

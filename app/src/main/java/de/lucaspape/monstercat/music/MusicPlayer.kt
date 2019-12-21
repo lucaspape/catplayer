@@ -11,7 +11,6 @@ import com.google.android.exoplayer2.ExoPlayerFactory
 import de.lucaspape.monstercat.activities.loadContinuousSongListAsyncTask
 import de.lucaspape.monstercat.database.Song
 import java.lang.IndexOutOfBoundsException
-import java.lang.NullPointerException
 import java.lang.ref.WeakReference
 import kotlin.collections.ArrayList
 

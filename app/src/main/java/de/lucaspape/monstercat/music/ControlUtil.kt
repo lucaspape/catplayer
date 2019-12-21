@@ -35,6 +35,8 @@ internal fun play() {
     try {
         updateLiveInfoAsync?.cancel(true)
 
+        startPlayerService()
+
         val song = playList[currentSong]
 
         contextReference?.get()?.let { context ->
@@ -63,6 +65,12 @@ internal fun play() {
                 @Override
                 override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
                     setPlayButtonImage(context)
+                    updateNotification(
+                        song.title,
+                        song.version,
+                        song.artist,
+                        contextReference?.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
+                    )
                 }
             })
 
@@ -125,13 +133,6 @@ internal fun play() {
 
                     setPlayButtonImage(context)
 
-                    createSongNotification(
-                        song.title,
-                        song.version,
-                        song.artist,
-                        contextReference?.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
-                    )
-
                     startSeekBarUpdate()
                 }
 
@@ -146,6 +147,8 @@ fun playStream(stream: Stream) {
 
     contextReference?.get()?.let { context ->
         val settings = Settings(context)
+
+        startPlayerService()
 
         val disableAudioFocus = if (settings.getSetting("disableAudioFocus") != null) {
             settings.getSetting("disableAudioFocus")!!.toBoolean()
@@ -243,6 +246,8 @@ internal fun stop() {
         val audioManager =
             contextReference!!.get()!!.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         audioManager.abandonAudioFocus(audioFocusChangeListener)
+
+        stopPlayerService()
     }
 }
 
@@ -260,12 +265,6 @@ fun pause() {
             val song = playList[currentSong]
 
             mediaPlayer?.playWhenReady = false
-            createSongNotification(
-                song.title,
-                song.version,
-                song.artist,
-                contextReference?.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
-            )
 
             setPlayButtonImage(context)
 
@@ -321,16 +320,11 @@ fun resume() {
                     context.registerReceiver(NoisyReceiver(), intentFilter)
                 }
 
-                createSongNotification(
-                    song.title,
-                    song.version,
-                    song.artist,
-                    context.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
-                )
-
                 setPlayButtonImage(context)
 
                 registerNextListener()
+
+                startPlayerService()
             }
 
         } catch (e: IndexOutOfBoundsException) {
