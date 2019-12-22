@@ -26,7 +26,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                 val sSid = getSid()
 
                 if (sSid != null) {
-                    if (wifiConnected(context) == true && settings.getSetting("downloadOverMobile") != "true") {
+                    if (wifiConnected(context) == false && settings.getSetting("downloadOverMobile") != "true") {
                         println("forbidden by user")
                     } else {
 
@@ -63,7 +63,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
             }
 
             try {
-                if (wifiConnected(context) == true && settings.getSetting("downloadCoversOverMobile") != "true") {
+                if (wifiConnected(context) == false && settings.getSetting("downloadCoversOverMobile") != "true") {
                     println("forbidden by user")
                 } else {
                     if (downloadCoverArrayListList[downloadedCoverArrays]?.isNotEmpty() == true) {

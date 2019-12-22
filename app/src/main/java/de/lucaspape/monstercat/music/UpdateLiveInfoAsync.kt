@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory
 import android.os.AsyncTask
 import android.os.StrictMode
 import com.android.volley.toolbox.Volley
+import de.lucaspape.monstercat.music.notification.updateNotification
 import de.lucaspape.monstercat.twitch.Stream
 import java.io.FileOutputStream
 import java.lang.ref.WeakReference

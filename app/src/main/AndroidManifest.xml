@@ -14,11 +14,11 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme" tools:ignore="GoogleAppIndexingWarning">
 
-        <service android:name=".music.MusicNotificationService"
+        <service android:name=".music.notification.PlayerService"
             android:enabled="true"
             android:exported="false" />
 
-        <receiver android:name=".music.NotificationIntentReceiver"
+        <receiver android:name=".music.notification.NotificationIntentReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="de.lucaspape.monstercat.prev"/>

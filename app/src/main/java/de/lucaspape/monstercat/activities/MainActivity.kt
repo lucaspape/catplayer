@@ -3,8 +3,6 @@ package de.lucaspape.monstercat.activities
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlertDialog
-import android.app.NotificationManager
-import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
@@ -31,6 +29,7 @@ import de.lucaspape.monstercat.fragments.PlaylistFragment
 import de.lucaspape.monstercat.handlers.HomeHandler
 import de.lucaspape.monstercat.handlers.async.LoadContinuousSongListAsync
 import de.lucaspape.monstercat.music.*
+import de.lucaspape.monstercat.music.notification.stopPlayerService
 import de.lucaspape.monstercat.util.Settings
 import java.lang.IllegalArgumentException
 import java.lang.ref.WeakReference

@@ -6,6 +6,9 @@ import android.os.AsyncTask
 import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.Player
 import de.lucaspape.monstercat.database.Song
+import de.lucaspape.monstercat.music.notification.startPlayerService
+import de.lucaspape.monstercat.music.notification.stopPlayerService
+import de.lucaspape.monstercat.music.notification.updateNotification
 import de.lucaspape.monstercat.twitch.Stream
 import de.lucaspape.monstercat.util.*
 import java.io.File
