@@ -167,27 +167,6 @@ fun parsePatchedPlaylist(trackArray: JSONArray, song: Song): Array<JSONObject?> 
     return patchedArray
 }
 
-fun parsePlaylistItemToJSONArray(
-    context: Context,
-    playlistItemList: List<PlaylistItem>
-): Array<JSONObject?> {
-    val jsonArray = arrayOfNulls<JSONObject>(playlistItemList.size)
-
-    val songDatabaseHelper = SongDatabaseHelper(context)
-
-    for (i in playlistItemList.indices) {
-        val song = songDatabaseHelper.getSong(playlistItemList[i].songId)
-
-        val songJsonObject = JSONObject()
-        songJsonObject.put("releaseId", song.albumId)
-        songJsonObject.put("trackId", song.songId)
-
-        jsonArray[i] = songJsonObject
-    }
-
-    return jsonArray
-}
-
 fun parsePlaylistToHashMap(playlist: Playlist): HashMap<String, Any?> {
     val playlistHashMap = HashMap<String, Any?>()
     playlistHashMap["playlistName"] = playlist.playlistName
