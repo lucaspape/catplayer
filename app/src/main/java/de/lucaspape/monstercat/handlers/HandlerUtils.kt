@@ -2,6 +2,8 @@ package de.lucaspape.monstercat.handlers
 
 import android.app.AlertDialog
 import android.content.Context
+import android.os.AsyncTask
+import android.widget.ListView
 import android.widget.Toast
 import com.android.volley.AuthFailureError
 import com.android.volley.Response
@@ -9,17 +11,20 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.Request
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.activities.loadContinuousSongListAsyncTask
 import de.lucaspape.monstercat.database.*
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadSong
+import de.lucaspape.monstercat.handlers.async.LoadContinuousSongListAsync
 import de.lucaspape.monstercat.music.addSong
 import de.lucaspape.monstercat.request.AuthorizedRequest
 import de.lucaspape.monstercat.util.*
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
+import java.lang.ref.WeakReference
 
 internal fun playSongFromId(context: Context, songId: String, playNow: Boolean) {
     val settings = Settings(context)
@@ -65,6 +70,80 @@ internal fun playSongFromId(context: Context, songId: String, playNow: Boolean) 
                         } else {
                             addSong(song)
                         }
+                    }
+
+                },
+                Response.ErrorListener { })
+
+            streamHashQueue.add(hashRequest)
+        }
+    }
+}
+
+/**
+ * With next songs
+ */
+internal fun playSongFromId(context: Context, songId: String, playNow: Boolean, musicList:ListView, position:Int) {
+    val settings = Settings(context)
+    val downloadType = settings.getSetting("downloadType")
+
+    val songDatabaseHelper = SongDatabaseHelper(context)
+    val song = songDatabaseHelper.getSong(songId)
+
+    if (song != null) {
+        //check if song is already downloaded
+        val songDownloadLocation =
+            context.getExternalFilesDir(null).toString() + "/" + song.artist + song.title + song.version + "." + downloadType
+
+        if (File(songDownloadLocation).exists()) {
+            song.downloadLocation = songDownloadLocation
+
+            if (playNow) {
+                de.lucaspape.monstercat.music.playNow(song)
+            } else {
+                addSong(song)
+            }
+
+        } else {
+            val streamHashQueue = Volley.newRequestQueue(context)
+
+            //get stream hash
+            val streamHashUrl =
+                context.getString(R.string.loadSongsUrl) + "?albumId=" + song.albumId
+
+            val hashRequest = AuthorizedRequest(
+                Request.Method.GET, streamHashUrl, getSid(),
+                Response.Listener { response ->
+                    val jsonObject = JSONObject(response)
+
+                    val streamHash = parseObjectToStreamHash(jsonObject, song)
+
+                    if (streamHash != null) {
+                        song.streamLocation =
+                            context.getString(R.string.songStreamUrl) + streamHash
+
+                        if (playNow) {
+                            de.lucaspape.monstercat.music.playNow(song)
+                        } else {
+                            addSong(song)
+                        }
+
+                        val continuousList = ArrayList<String>()
+
+                        for (i in (position + 1 until musicList.adapter.count)) {
+                            val nextItemValue = musicList.getItemAtPosition(i) as HashMap<*, *>
+                            continuousList.add(nextItemValue["id"] as String)
+                        }
+
+                        loadContinuousSongListAsyncTask =
+                            LoadContinuousSongListAsync(
+                                continuousList,
+                                WeakReference(context)
+                            )
+
+                        loadContinuousSongListAsyncTask!!.executeOnExecutor(
+                            AsyncTask.THREAD_POOL_EXECUTOR
+                        )
                     }
 
                 },

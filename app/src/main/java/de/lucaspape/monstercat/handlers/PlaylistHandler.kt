@@ -10,8 +10,6 @@ import android.widget.ListView
 import android.widget.SimpleAdapter
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.activities.loadContinuousSongListAsyncTask
-import de.lucaspape.monstercat.handlers.async.LoadContinuousSongListAsync
 import de.lucaspape.monstercat.handlers.async.LoadPlaylistAsync
 import de.lucaspape.monstercat.handlers.async.LoadPlaylistTracksAsync
 import de.lucaspape.monstercat.music.clearContinuous
@@ -109,23 +107,7 @@ class PlaylistHandler {
                 clearContinuous()
 
                 val songId = itemValue["id"] as String
-                playSongFromId(view.context, songId, true)
-
-                val continuousList = ArrayList<String>()
-
-                for (i in (position + 1 until playlistList.adapter.count)) {
-                    val nextItemValue = playlistList.getItemAtPosition(i) as HashMap<*, *>
-                    continuousList.add(nextItemValue["id"] as String)
-                }
-
-                loadContinuousSongListAsyncTask =
-                    LoadContinuousSongListAsync(
-                        continuousList,
-                        WeakReference(view.context)
-                    )
-                loadContinuousSongListAsyncTask!!.executeOnExecutor(
-                    AsyncTask.THREAD_POOL_EXECUTOR
-                )
+                playSongFromId(view.context, songId, true, playlistList, position)
             }
         }
     }

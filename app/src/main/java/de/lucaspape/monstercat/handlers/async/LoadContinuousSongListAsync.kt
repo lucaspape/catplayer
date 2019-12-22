@@ -6,6 +6,7 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.util.getSid
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.music.addContinuous
@@ -37,8 +38,10 @@ class LoadContinuousSongListAsync(
                 }
             }
 
-            for (songId in songIdList) {
+            for(songId in songIdList){
+
                 val song = songDatabaseHelper.getSong(songId)
+
                 if (song != null) {
                     //check if song is already downloaded
                     val songDownloadLocation =
@@ -62,6 +65,7 @@ class LoadContinuousSongListAsync(
                                 if (streamHash != null) {
                                     song.streamLocation =
                                         context.getString(R.string.songStreamUrl) + streamHash
+
                                     addContinuous(song)
                                 }
                             },
@@ -76,8 +80,6 @@ class LoadContinuousSongListAsync(
                 }
 
             }
-
-
         }
 
         return null

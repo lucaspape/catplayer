@@ -83,4 +83,3 @@ fun clearContinuous() {
 fun addContinuous(song: Song) {
     playList.add(song)
 }
-

@@ -146,24 +146,9 @@ class HomeHandler {
                 playSongFromId(
                     view.context,
                     itemValue["id"] as String,
-                    true
-                )
-
-                val continuousList = ArrayList<String>()
-
-                for (i in (position + 1 until musicList.adapter.count)) {
-                    val nextItemValue = musicList.getItemAtPosition(i) as HashMap<*, *>
-                    continuousList.add(nextItemValue["id"] as String)
-                }
-
-                loadContinuousSongListAsyncTask =
-                    LoadContinuousSongListAsync(
-                        continuousList,
-                        WeakReference(view.context)
-                    )
-
-                loadContinuousSongListAsyncTask!!.executeOnExecutor(
-                    AsyncTask.THREAD_POOL_EXECUTOR
+                    true,
+                    musicList,
+                    position
                 )
             }
         }
