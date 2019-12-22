@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="loginUrl" translatable="false">https://connect.monstercat.com/v2/signin</string>
-    <string name="loadSongsUrl" translatable="false">https://connect.monstercat.com/v2/catalog/browse</string>
     <string name="loadAlbumsUrl" translatable="false">https://connect.monstercat.com/v2/releases</string>
     <string name="loadAlbumSongsUrl" translatable="false">https://connect.monstercat.com/v2/catalog/release</string>
-    <string name="songStreamUrl" translatable="false">https://s3.amazonaws.com/data.monstercat.com/blobs/</string>
-    <string name="songDownloadUrl" translatable="false">"https://connect.monstercat.com/api/release/</string>
+    <string name="trackContentUrl" translatable="false">https://connect.monstercat.com/v2/release/</string>
+
     <string name="playlistsUrl" translatable="false">https://connect.monstercat.com/v2/self/playlists</string>
     <string name="playlistUrl" translatable="false">https://connect.monstercat.com/v2/playlist/</string>
     <string name="playlistTrackUrl" translatable="false">https://connect.monstercat.com/v2/playlist/</string>
+
+    <string name="loginUrl" translatable="false">https://connect.monstercat.com/v2/signin</string>
+    <string name="loadSongsUrl" translatable="false">https://connect.monstercat.com/v2/catalog/browse</string>
     <string name="tokenUrl" translatable="false">https://connect.monstercat.com/v2/signin/token</string>
+
     <string name="liveInfoUrl" translatable="false">https://api.lucaspape.de/api/v1/monstercat/liveinfo</string>
     <string name="liveCoverUrl" translatable="false">https://api.lucaspape.de/api/v1/monstercat/livecover</string>
+
     <string name="twitchPlaylistUrl" translatable="false">https://usher.ttvnw.net/api/channel/hls/</string>
     <string name="twitchApiUrl" translatable="false">https://api.twitch.tv/</string>
 </resources>

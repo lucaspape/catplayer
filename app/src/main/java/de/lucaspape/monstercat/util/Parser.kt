@@ -1,6 +1,7 @@
 package de.lucaspape.monstercat.util
 
 import android.content.Context
+import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.*
 import de.lucaspape.monstercat.database.helper.*
 import org.json.JSONArray
@@ -85,9 +86,7 @@ fun parseSongToDB(jsonObject: JSONObject, context: Context): Long? {
         albumId = jsonObject.getJSONObject("release").getString("id")
         title = jsonObject.getString("title")
         artist = jsonObject.getString("artistsTitle")
-        //TODO
-        coverUrl =
-            "https://connect.monstercat.com/v2/release/$albumId/cover"
+        coverUrl = context.getString(R.string.trackContentUrl) + "$albumId/cover"
         version = jsonObject.getString("version")
         id = jsonObject.getString("id")
     } catch (e: InvocationTargetException) {
@@ -141,10 +140,7 @@ fun parseAlbumToDB(jsonObject: JSONObject, context: Context): Long? {
     val id = jsonObject.getString("id")
     val title = jsonObject.getString("title")
     val artist = jsonObject.getString("artistsTitle")
-    //TODO
-    val coverUrl =
-        "https://connect.monstercat.com/v2/release/$id/cover"
-
+    val coverUrl = context.getString(R.string.trackContentUrl) + "$id/cover"
     val mcID = jsonObject.getString("catalogId")
 
     val databaseHelper = AlbumDatabaseHelper(context)
