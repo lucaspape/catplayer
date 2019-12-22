@@ -24,8 +24,6 @@ internal fun play() {
     clearListener()
 
     try {
-        println("CURRENT POSITION $currentSong")
-
         updateLiveInfoAsync?.cancel(true)
 
         startPlayerService()

@@ -48,7 +48,7 @@ internal fun playSongFromId(context: Context, songId: String, playNow: Boolean) 
             }
 
         } else {
-            song.streamLocation = "https://connect.monstercat.com/v2/release/" +  song.albumId + "/track-stream/" + song.songId
+            song.streamLocation = context.getString(R.string.trackContentUrl) +  song.albumId + "/track-stream/" + song.songId
 
             if (playNow) {
                 de.lucaspape.monstercat.music.playNow(song)
@@ -87,11 +87,7 @@ internal fun playSongFromId(context: Context, songId: String, playNow: Boolean, 
             }
 
         } else {
-            song.streamLocation = "https://connect.monstercat.com/v2/release/" +  song.albumId + "/track-stream/" + song.songId
-
-            //get stream hash
-            val streamHashUrl =
-                context.getString(R.string.loadSongsUrl) + "?albumId=" + song.albumId
+            song.streamLocation = context.getString(R.string.trackContentUrl) + song.albumId + "/track-stream/" + song.songId
 
             if (playNow) {
                 de.lucaspape.monstercat.music.playNow(song)
@@ -121,9 +117,9 @@ internal fun playSongFromId(context: Context, songId: String, playNow: Boolean, 
     }
 }
 
-internal fun playAlbumNext(context: Context, albumId: String) {
+internal fun playAlbumNext(context: Context, mcID:String) {
     val requestUrl =
-        context.getString(R.string.loadSongsUrl) + "?albumId=" + albumId
+        context.getString(R.string.loadAlbumSongsUrl) + "/" + mcID
 
     val albumRequestQueue = Volley.newRequestQueue(context)
 
@@ -131,7 +127,7 @@ internal fun playAlbumNext(context: Context, albumId: String) {
         getSid(),
         Response.Listener { response ->
             val jsonObject = JSONObject(response)
-            val jsonArray = jsonObject.getJSONArray("results")
+            val jsonArray = jsonObject.getJSONArray("tracks")
 
             val idArray = ArrayList<Long>()
 
@@ -143,9 +139,29 @@ internal fun playAlbumNext(context: Context, albumId: String) {
 
             val databaseHelper = SongDatabaseHelper(context)
 
+            val settings = Settings(context)
+            val downloadType = settings.getSetting("downloadType")
+
+            idArray.reverse()
+
             for (id in idArray) {
                 val song = databaseHelper.getSong(id)
-                addSong(song)
+
+                //check if song is already downloaded
+                val songDownloadLocation =
+                    context.getExternalFilesDir(null).toString() + "/" + song.artist + song.title + song.version + "." + downloadType
+
+                if (File(songDownloadLocation).exists()) {
+                    song.downloadLocation = songDownloadLocation
+
+                    addSong(song)
+
+                } else {
+                    song.streamLocation =
+                        context.getString(R.string.trackContentUrl) + song.albumId + "/track-stream/" + song.songId
+
+                    addSong(song)
+                }
             }
         },
         Response.ErrorListener { error ->
@@ -197,9 +213,9 @@ internal fun downloadSong(context: Context, song: Song) {
 
 }
 
-internal fun downloadAlbum(context: Context, albumId: String) {
+internal fun downloadAlbum(context: Context, mcID:String) {
     val requestUrl =
-        context.getString(R.string.loadSongsUrl) + "?albumId=" + albumId
+        context.getString(R.string.loadAlbumSongsUrl) + "/" + mcID
 
     val albumRequestQueue = Volley.newRequestQueue(context)
 
@@ -207,7 +223,7 @@ internal fun downloadAlbum(context: Context, albumId: String) {
         getSid(),
         Response.Listener { response ->
             val jsonObject = JSONObject(response)
-            val jsonArray = jsonObject.getJSONArray("results")
+            val jsonArray = jsonObject.getJSONArray("tracks")
 
             val idArray = ArrayList<Long>()
 

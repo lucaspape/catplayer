@@ -96,11 +96,11 @@ class HomeFragment : Fragment() {
                     when (item.title) {
                         getString(R.string.downloadAlbum) -> downloadAlbum(
                             it,
-                            listItem["id"].toString()
+                            listItem["mcID"].toString()
                         )
                         getString(R.string.playAlbumNext) -> playAlbumNext(
                             it,
-                            listItem["id"].toString()
+                            listItem["mcID"].toString()
                         )
                     }
                 }
