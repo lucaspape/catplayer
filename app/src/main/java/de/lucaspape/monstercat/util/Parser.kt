@@ -87,7 +87,7 @@ fun parseSongToDB(jsonObject: JSONObject, context: Context): Long? {
         artist = jsonObject.getString("artistsTitle")
         //TODO
         coverUrl =
-            "https://connect.monstercat.com/v2/release/$albumId/cover?image_width=512&fallbackUrl=https%3A%2F%2Fassets.monstercat.com%2Fartwork-fallback.jpg"
+            "https://connect.monstercat.com/v2/release/$albumId/cover"
         version = jsonObject.getString("version")
         id = jsonObject.getString("id")
     } catch (e: InvocationTargetException) {
@@ -143,7 +143,7 @@ fun parseAlbumToDB(jsonObject: JSONObject, context: Context): Long? {
     val artist = jsonObject.getString("artistsTitle")
     //TODO
     val coverUrl =
-        "https://connect.monstercat.com/v2/release/$id/cover?image_width=512&fallbackUrl=https%3A%2F%2Fassets.monstercat.com%2Fartwork-fallback.jpg"
+        "https://connect.monstercat.com/v2/release/$id/cover"
 
     val mcID = jsonObject.getString("catalogId")
 

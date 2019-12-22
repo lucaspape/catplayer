@@ -9,6 +9,7 @@ import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.music.audioFocusChangeListener
@@ -54,13 +55,11 @@ fun abandonAudioFocus(context: Context) {
 fun songToMediaSource(context: Context, song: Song): ProgressiveMediaSource {
     if (!File(song.getUrl()).exists()) {
 
-        return ProgressiveMediaSource.Factory(
-            DefaultDataSourceFactory(
-                context, Util.getUserAgent(
-                    context, "MonstercatPlayer"
-                )
-            )
-        ).createMediaSource(song.getUrl().toUri())
+        val httpSourceFactory = DefaultHttpDataSourceFactory(Util.getUserAgent(context, "MonstercatPlayer"))
+
+        httpSourceFactory.defaultRequestProperties.set("Cookie", "connect.sid=${getSid()}")
+
+        return ProgressiveMediaSource.Factory(httpSourceFactory).createMediaSource(song.getUrl().toUri())
 
 
     } else {
