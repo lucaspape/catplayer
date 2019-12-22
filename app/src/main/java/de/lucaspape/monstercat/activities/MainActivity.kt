@@ -86,6 +86,7 @@ class MainActivity : AppCompatActivity() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET)
             != PackageManager.PERMISSION_GRANTED
         ) {
+            //TODO add msg
             println("Internet permission not granted!")
         }
 
@@ -132,6 +133,9 @@ class MainActivity : AppCompatActivity() {
         } catch (e: IllegalArgumentException) {
 
         }
+
+        downloadTask?.cancel(true)
+        updateLiveInfoAsync?.cancel(true)
 
         hideDownloadNotification(this)
 

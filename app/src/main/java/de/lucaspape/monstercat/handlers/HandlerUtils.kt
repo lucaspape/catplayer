@@ -70,13 +70,19 @@ internal fun playSongFromId(context: Context, songId: String, playNow: Boolean) 
                         } else {
                             addSong(song)
                         }
+                    }else{
+                        //TODO add msg
                     }
 
                 },
-                Response.ErrorListener { })
+                Response.ErrorListener {
+                    //TODO add msg
+                })
 
             streamHashQueue.add(hashRequest)
         }
+    }else{
+        //TODO add msg
     }
 }
 
@@ -147,10 +153,14 @@ internal fun playSongFromId(context: Context, songId: String, playNow: Boolean, 
                     }
 
                 },
-                Response.ErrorListener { })
+                Response.ErrorListener {
+                    //TODO add msg
+                })
 
             streamHashQueue.add(hashRequest)
         }
+    }else{
+        //TODO add msg
     }
 }
 
@@ -182,7 +192,7 @@ internal fun playAlbumNext(context: Context, albumId: String) {
             }
         },
         Response.ErrorListener { error ->
-            println(error)
+            //TODO add msg
         })
 
     albumRequestQueue.add(albumRequest)
@@ -259,6 +269,7 @@ internal fun downloadAlbum(context: Context, albumId: String) {
         },
         Response.ErrorListener { error ->
             println(error)
+            //TODO add msg
         })
 
     albumRequestQueue.add(albumRequest)
@@ -306,7 +317,9 @@ internal fun addSongToPlaylist(context: Context, song: Song) {
                             }
                         }
                     },
-                    Response.ErrorListener { })
+                    Response.ErrorListener {
+                        //TODO add msg
+                    })
 
 
                 trackCountRequestQueue.addRequestFinishedListener<Any> {
@@ -408,7 +421,9 @@ internal fun addSongToPlaylist(context: Context, song: Song) {
                                     tempList[u * 50 + k] = jsonArray.getJSONObject(k)
                                 }
                             },
-                            Response.ErrorListener { })
+                            Response.ErrorListener {
+                                //TODO add msg
+                            })
 
                         totalRequestsCount++
                         requests.add(playlistTrackRequest)
@@ -423,5 +438,7 @@ internal fun addSongToPlaylist(context: Context, song: Song) {
         }
         alertDialogBuilder.show()
 
+    }else{
+        //TODO add msg
     }
 }

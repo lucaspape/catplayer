@@ -28,6 +28,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                 if (sSid != null) {
                     if (wifiConnected(context) == false && settings.getSetting("downloadOverMobile") != "true") {
                         println("forbidden by user")
+                        //TODO add msg
                     } else {
 
                         if (downloadList[downloadedSongs]?.isNotEmpty() == true) {
