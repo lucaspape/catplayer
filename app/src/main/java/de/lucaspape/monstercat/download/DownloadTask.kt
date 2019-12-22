@@ -1,13 +1,12 @@
 package de.lucaspape.monstercat.download
 
 import android.content.Context
-import android.net.ConnectivityManager
 import android.os.AsyncTask
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.util.getSid
 import de.lucaspape.monstercat.music.contextReference
 import de.lucaspape.monstercat.util.Settings
-import java.lang.NullPointerException
+import de.lucaspape.monstercat.util.wifiConnected
 import java.lang.ref.WeakReference
 
 class DownloadTask(private val weakReference: WeakReference<Context>) :
@@ -20,21 +19,14 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
         var downloadedSongs = 0
         var downloadedCoverArrays = 0
 
-        val connectivityManager =
-            weakReference.get()?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-
         val settings = Settings(weakReference.get()!!)
 
         while (true) {
-            //TODO dont use depraced stuff
-
-            val wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
-
             try {
                 val sSid = getSid()
 
                 if (sSid != null) {
-                    if (wifi != null && !wifi.isConnected && settings.getSetting("downloadOverMobile") != "true") {
+                    if (wifiConnected(context) == true && settings.getSetting("downloadOverMobile") != "true") {
                         println("forbidden by user")
                     } else {
 
@@ -71,7 +63,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
             }
 
             try {
-                if (wifi != null && !wifi.isConnected && settings.getSetting("downloadCoversOverMobile") != "true") {
+                if (wifiConnected(context) == true && settings.getSetting("downloadCoversOverMobile") != "true") {
                     println("forbidden by user")
                 } else {
                     if (downloadCoverArrayListList[downloadedCoverArrays]?.isNotEmpty() == true) {

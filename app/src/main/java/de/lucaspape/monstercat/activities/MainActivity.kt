@@ -133,9 +133,7 @@ class MainActivity : AppCompatActivity() {
 
         }
 
-        val notificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.cancel(musicNotificationID)
+        stopPlayerService()
 
         super.onDestroy()
     }
