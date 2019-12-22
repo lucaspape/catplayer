@@ -78,6 +78,7 @@ class LoadAlbumAsync(
 
     override fun doInBackground(vararg param: Void?): String? {
         val albumId = itemValue["id"] as String
+        val mcID = itemValue["mcID"] as String
 
         contextReference.get()?.let {context ->
             val requestQueue = Volley.newRequestQueue(context)
@@ -98,13 +99,13 @@ class LoadAlbumAsync(
                 }
 
                 val requestUrl =
-                    context.getString(R.string.loadSongsUrl) + "?albumId=" + albumId
+                    context.getString(R.string.loadAlbumSongsUrl) + "/" + mcID
 
                 val listRequest = AuthorizedRequest(
                     Request.Method.GET, requestUrl,
                     getSid(), Response.Listener { response ->
                         val json = JSONObject(response)
-                        val jsonArray = json.getJSONArray("results")
+                        val jsonArray = json.getJSONArray("tracks")
 
                         albumItemDatabaseHelper.reCreateTable()
 

@@ -2,18 +2,10 @@ package de.lucaspape.monstercat.handlers.async
 
 import android.content.Context
 import android.os.AsyncTask
-import com.android.volley.Request
-import com.android.volley.Response
 import com.android.volley.toolbox.Volley
-import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.database.Song
-import de.lucaspape.monstercat.util.getSid
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.music.addContinuous
-import de.lucaspape.monstercat.request.AuthorizedRequest
 import de.lucaspape.monstercat.util.Settings
-import de.lucaspape.monstercat.util.parseObjectToStreamHash
-import org.json.JSONObject
 import java.io.File
 import java.lang.ref.WeakReference
 
@@ -51,27 +43,9 @@ class LoadContinuousSongListAsync(
                         song.downloadLocation = songDownloadLocation
                         addContinuous(song)
                     } else {
-                        //get stream hash
-                        val streamHashUrl =
-                            context.getString(R.string.loadSongsUrl) + "?albumId=" + song.albumId
+                        song.streamLocation = "https://connect.monstercat.com/v2/release/" +  song.albumId + "/track-stream/" + song.songId
 
-                        val hashRequest = AuthorizedRequest(
-                            Request.Method.GET, streamHashUrl, getSid(),
-                            Response.Listener { response ->
-                                val jsonObject = JSONObject(response)
-
-                                val streamHash = parseObjectToStreamHash(jsonObject, song)
-
-                                if (streamHash != null) {
-                                    song.streamLocation =
-                                        context.getString(R.string.songStreamUrl) + streamHash
-
-                                    addContinuous(song)
-                                }
-                            },
-                            Response.ErrorListener { })
-
-                        streamHashQueue.add(hashRequest)
+                        addContinuous(song)
 
                         synchronized(syncObject) {
                             syncObject.wait()

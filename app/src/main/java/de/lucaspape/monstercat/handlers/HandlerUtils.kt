@@ -48,38 +48,14 @@ internal fun playSongFromId(context: Context, songId: String, playNow: Boolean) 
             }
 
         } else {
-            val streamHashQueue = Volley.newRequestQueue(context)
+            song.streamLocation = "https://connect.monstercat.com/v2/release/" +  song.albumId + "/track-stream/" + song.songId
 
-            //get stream hash
-            val streamHashUrl =
-                context.getString(R.string.loadSongsUrl) + "?albumId=" + song.albumId
+            if (playNow) {
+                de.lucaspape.monstercat.music.playNow(song)
+            } else {
+                addSong(song)
+            }
 
-            val hashRequest = AuthorizedRequest(
-                Request.Method.GET, streamHashUrl, getSid(),
-                Response.Listener { response ->
-                    val jsonObject = JSONObject(response)
-
-                    val streamHash = parseObjectToStreamHash(jsonObject, song)
-
-                    if (streamHash != null) {
-                        song.streamLocation =
-                            context.getString(R.string.songStreamUrl) + streamHash
-
-                        if (playNow) {
-                            de.lucaspape.monstercat.music.playNow(song)
-                        } else {
-                            addSong(song)
-                        }
-                    }else{
-                        //TODO add msg
-                    }
-
-                },
-                Response.ErrorListener {
-                    //TODO add msg
-                })
-
-            streamHashQueue.add(hashRequest)
         }
     }else{
         //TODO add msg
@@ -111,53 +87,34 @@ internal fun playSongFromId(context: Context, songId: String, playNow: Boolean, 
             }
 
         } else {
-            val streamHashQueue = Volley.newRequestQueue(context)
+            song.streamLocation = "https://connect.monstercat.com/v2/release/" +  song.albumId + "/track-stream/" + song.songId
 
             //get stream hash
             val streamHashUrl =
                 context.getString(R.string.loadSongsUrl) + "?albumId=" + song.albumId
 
-            val hashRequest = AuthorizedRequest(
-                Request.Method.GET, streamHashUrl, getSid(),
-                Response.Listener { response ->
-                    val jsonObject = JSONObject(response)
+            if (playNow) {
+                de.lucaspape.monstercat.music.playNow(song)
+            } else {
+                addSong(song)
+            }
 
-                    val streamHash = parseObjectToStreamHash(jsonObject, song)
+            val continuousList = ArrayList<String>()
 
-                    if (streamHash != null) {
-                        song.streamLocation =
-                            context.getString(R.string.songStreamUrl) + streamHash
+            for (i in (position + 1 until musicList.adapter.count)) {
+                val nextItemValue = musicList.getItemAtPosition(i) as HashMap<*, *>
+                continuousList.add(nextItemValue["id"] as String)
+            }
 
-                        if (playNow) {
-                            de.lucaspape.monstercat.music.playNow(song)
-                        } else {
-                            addSong(song)
-                        }
+            loadContinuousSongListAsyncTask =
+                LoadContinuousSongListAsync(
+                    continuousList,
+                    WeakReference(context)
+                )
 
-                        val continuousList = ArrayList<String>()
-
-                        for (i in (position + 1 until musicList.adapter.count)) {
-                            val nextItemValue = musicList.getItemAtPosition(i) as HashMap<*, *>
-                            continuousList.add(nextItemValue["id"] as String)
-                        }
-
-                        loadContinuousSongListAsyncTask =
-                            LoadContinuousSongListAsync(
-                                continuousList,
-                                WeakReference(context)
-                            )
-
-                        loadContinuousSongListAsyncTask!!.executeOnExecutor(
-                            AsyncTask.THREAD_POOL_EXECUTOR
-                        )
-                    }
-
-                },
-                Response.ErrorListener {
-                    //TODO add msg
-                })
-
-            streamHashQueue.add(hashRequest)
+            loadContinuousSongListAsyncTask!!.executeOnExecutor(
+                AsyncTask.THREAD_POOL_EXECUTOR
+            )
         }
     }else{
         //TODO add msg

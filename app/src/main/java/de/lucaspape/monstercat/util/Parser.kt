@@ -39,6 +39,7 @@ fun parseAlbumToHashMap(context: Context, album: Album): HashMap<String, Any?> {
     val secondaryResolution = settings.getSetting("secondaryCoverResolution")
 
     val hashMap = HashMap<String, Any?>()
+    hashMap["mcID"] = album.mcID
     hashMap["title"] = album.title
     hashMap["id"] = album.albumId
     hashMap["artist"] = album.artist
@@ -78,14 +79,17 @@ fun parseSongToDB(jsonObject: JSONObject, context: Context): Long? {
     var artist = ""
     var coverUrl = ""
     var version = ""
+    var mcID = ""
 
     try {
-        albumId = jsonObject.getJSONObject("albums").getString("albumId")
+        albumId = jsonObject.getJSONObject("release").getString("id")
         title = jsonObject.getString("title")
         artist = jsonObject.getString("artistsTitle")
-        coverUrl = jsonObject.getJSONObject("release").getString("coverUrl")
+        //TODO
+        coverUrl =
+            "https://connect.monstercat.com/v2/release/$albumId/cover?image_width=512&fallbackUrl=https%3A%2F%2Fassets.monstercat.com%2Fartwork-fallback.jpg"
         version = jsonObject.getString("version")
-        id = jsonObject.getString("_id")
+        id = jsonObject.getString("id")
     } catch (e: InvocationTargetException) {
     }
 
@@ -134,48 +138,20 @@ fun parsAlbumSongToDB(jsonObject: JSONObject, sAlbumId: String, context: Context
 }
 
 fun parseAlbumToDB(jsonObject: JSONObject, context: Context): Long? {
-    val id = jsonObject.getString("_id")
+    val id = jsonObject.getString("id")
     val title = jsonObject.getString("title")
-    val artist = jsonObject.getString("renderedArtists")
-    val coverUrl = jsonObject.getString("coverUrl")
+    val artist = jsonObject.getString("artistsTitle")
+    //TODO
+    val coverUrl =
+        "https://connect.monstercat.com/v2/release/$id/cover?image_width=512&fallbackUrl=https%3A%2F%2Fassets.monstercat.com%2Fartwork-fallback.jpg"
+
+    val mcID = jsonObject.getString("catalogId")
 
     val databaseHelper = AlbumDatabaseHelper(context)
     return if (databaseHelper.getAlbum(id) == null) {
-        databaseHelper.insertAlbum(id, title, artist, coverUrl)
+        databaseHelper.insertAlbum(id, title, artist, coverUrl, mcID)
     } else {
         databaseHelper.getAlbum(id)?.id?.toLong()
-    }
-}
-
-fun parseObjectToStreamHash(jsonObject: JSONObject, song: Song): String? {
-    val jsonArray = jsonObject.getJSONArray("results")
-
-    var streamHash = ""
-    val searchSong = song.artist + song.title + song.version
-
-    for (i in (0 until jsonArray.length())) {
-        val sArtist = jsonArray.getJSONObject(i).getString("artistsTitle")
-        val sTitle = jsonArray.getJSONObject(i).getString("title")
-        var sVersion = jsonArray.getJSONObject(i).getString(
-            "version"
-        )
-
-        if (sVersion == "null") {
-            sVersion = ""
-        }
-
-        val sString = sArtist + sTitle + sVersion
-
-        if (sString == searchSong) {
-            streamHash =
-                jsonArray.getJSONObject(i).getJSONObject("albums").getString("streamHash")
-        }
-    }
-
-    return if (streamHash == "") {
-        null
-    } else {
-        streamHash
     }
 }
 

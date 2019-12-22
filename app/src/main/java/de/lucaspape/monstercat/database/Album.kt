@@ -5,7 +5,8 @@ data class Album(
     val albumId: String,
     val title: String,
     val artist: String,
-    val coverUrl: String
+    val coverUrl: String,
+    val mcID:String
 ) {
     companion object {
         @JvmStatic
@@ -20,6 +21,8 @@ data class Album(
         val COLUMN_ARTIST = "artist"
         @JvmStatic
         val COLUMN_COVER_URL = "coverUrl"
+        @JvmStatic
+        val COLUMN_ALBUM_MCID = "albumMCID"
 
         @JvmStatic
         val CREATE_TABLE =
@@ -28,7 +31,8 @@ data class Album(
                     COLUMN_TITLE + " TEXT," +
                     COLUMN_ALBUM_ID + " TEXT," +
                     COLUMN_ARTIST + " TEXT," +
-                    COLUMN_COVER_URL + " TEXT" +
+                    COLUMN_COVER_URL + " TEXT," +
+                    COLUMN_ALBUM_MCID + " TEXT" +
                     ")"
     }
 }

@@ -17,7 +17,7 @@ class AlbumDatabaseHelper(context: Context) :
     ) {
     companion object {
         @JvmStatic
-        private val DATABASE_VERSION = 2
+        private val DATABASE_VERSION = 3
         @JvmStatic
         private val DATABASE_NAME = "albums_db"
     }
@@ -38,7 +38,7 @@ class AlbumDatabaseHelper(context: Context) :
         onCreate(db)
     }
 
-    fun insertAlbum(albumId: String, title: String, artist: String, coverUrl: String): Long {
+    fun insertAlbum(albumId: String, title: String, artist: String, coverUrl: String, mcID:String): Long {
         val db = writableDatabase
 
         val values = ContentValues()
@@ -47,6 +47,7 @@ class AlbumDatabaseHelper(context: Context) :
         values.put(Album.COLUMN_ALBUM_ID, albumId)
         values.put(Album.COLUMN_ARTIST, artist)
         values.put(Album.COLUMN_COVER_URL, coverUrl)
+        values.put(Album.COLUMN_ALBUM_MCID, mcID)
 
         val id = db.insert(Album.TABLE_NAME, null, values)
         db.close()
@@ -64,7 +65,8 @@ class AlbumDatabaseHelper(context: Context) :
                     Album.COLUMN_ALBUM_ID,
                     Album.COLUMN_TITLE,
                     Album.COLUMN_ARTIST,
-                    Album.COLUMN_COVER_URL
+                    Album.COLUMN_COVER_URL,
+                    Album.COLUMN_ALBUM_MCID
                 ),
                 Album.COLUMN_ALBUM_ID + "=?",
                 arrayOf(albumId), null, null, null, null
@@ -78,7 +80,8 @@ class AlbumDatabaseHelper(context: Context) :
                     cursor.getString(cursor.getColumnIndex(Album.COLUMN_ALBUM_ID)),
                     cursor.getString(cursor.getColumnIndex(Album.COLUMN_TITLE)),
                     cursor.getString(cursor.getColumnIndex(Album.COLUMN_ARTIST)),
-                    cursor.getString(cursor.getColumnIndex(Album.COLUMN_COVER_URL))
+                    cursor.getString(cursor.getColumnIndex(Album.COLUMN_COVER_URL)),
+                    cursor.getString(cursor.getColumnIndex(Album.COLUMN_ALBUM_MCID))
                 )
 
                 cursor.close()
@@ -111,7 +114,8 @@ class AlbumDatabaseHelper(context: Context) :
                     cursor.getString(cursor.getColumnIndex(Album.COLUMN_ALBUM_ID)),
                     cursor.getString(cursor.getColumnIndex(Album.COLUMN_TITLE)),
                     cursor.getString(cursor.getColumnIndex(Album.COLUMN_ARTIST)),
-                    cursor.getString(cursor.getColumnIndex(Album.COLUMN_COVER_URL))
+                    cursor.getString(cursor.getColumnIndex(Album.COLUMN_COVER_URL)),
+                    cursor.getString(cursor.getColumnIndex(Album.COLUMN_ALBUM_MCID))
                 )
                 albums.add(album)
             } while (cursor.moveToNext())

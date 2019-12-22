@@ -159,7 +159,7 @@ class LoadPlaylistTracksAsync(
 
                     for (i in (0..(trackCount / 50))) {
                         val playlistTrackUrl =
-                            context.getString(R.string.loadSongsUrl) + "?playlistId=" + playlistId + "&skip=" + (i * 50).toString() + "&limit=50"
+                            context.getString(R.string.playlistTrackUrl) + playlistId + "/catalog?skip=" + (i * 50).toString() + "&limit=50"
 
                         val playlistTrackRequest = AuthorizedRequest(
                             Request.Method.GET, playlistTrackUrl, getSid(),
