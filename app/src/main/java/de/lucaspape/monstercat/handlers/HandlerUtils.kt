@@ -48,7 +48,8 @@ internal fun playSongFromId(context: Context, songId: String, playNow: Boolean) 
             }
 
         } else {
-            song.streamLocation = context.getString(R.string.trackContentUrl) +  song.albumId + "/track-stream/" + song.songId
+            song.streamLocation =
+                context.getString(R.string.trackContentUrl) + song.albumId + "/track-stream/" + song.songId
 
             if (playNow) {
                 de.lucaspape.monstercat.music.playNow(song)
@@ -57,7 +58,7 @@ internal fun playSongFromId(context: Context, songId: String, playNow: Boolean) 
             }
 
         }
-    }else{
+    } else {
         //TODO add msg
     }
 }
@@ -65,7 +66,13 @@ internal fun playSongFromId(context: Context, songId: String, playNow: Boolean) 
 /**
  * With next songs
  */
-internal fun playSongFromId(context: Context, songId: String, playNow: Boolean, musicList:ListView, position:Int) {
+internal fun playSongFromId(
+    context: Context,
+    songId: String,
+    playNow: Boolean,
+    musicList: ListView,
+    position: Int
+) {
     val settings = Settings(context)
     val downloadType = settings.getSetting("downloadType")
 
@@ -87,7 +94,8 @@ internal fun playSongFromId(context: Context, songId: String, playNow: Boolean, 
             }
 
         } else {
-            song.streamLocation = context.getString(R.string.trackContentUrl) + song.albumId + "/track-stream/" + song.songId
+            song.streamLocation =
+                context.getString(R.string.trackContentUrl) + song.albumId + "/track-stream/" + song.songId
 
             if (playNow) {
                 de.lucaspape.monstercat.music.playNow(song)
@@ -112,12 +120,12 @@ internal fun playSongFromId(context: Context, songId: String, playNow: Boolean, 
                 AsyncTask.THREAD_POOL_EXECUTOR
             )
         }
-    }else{
+    } else {
         //TODO add msg
     }
 }
 
-internal fun playAlbumNext(context: Context, mcID:String) {
+internal fun playAlbumNext(context: Context, mcID: String) {
     val requestUrl =
         context.getString(R.string.loadAlbumSongsUrl) + "/" + mcID
 
@@ -213,7 +221,7 @@ internal fun downloadSong(context: Context, song: Song) {
 
 }
 
-internal fun downloadAlbum(context: Context, mcID:String) {
+internal fun downloadAlbum(context: Context, mcID: String) {
     val requestUrl =
         context.getString(R.string.loadAlbumSongsUrl) + "/" + mcID
 
@@ -228,7 +236,7 @@ internal fun downloadAlbum(context: Context, mcID:String) {
             val idArray = ArrayList<Long>()
 
             for (i in (0 until jsonArray.length())) {
-                parseSongToDB(jsonArray.getJSONObject(i), context)?.let {id ->
+                parseSongToDB(jsonArray.getJSONObject(i), context)?.let { id ->
                     idArray.add(id)
                 }
             }
@@ -298,111 +306,71 @@ internal fun addSongToPlaylist(context: Context, song: Song) {
                 trackCountRequestQueue.addRequestFinishedListener<Any> {
                     val tempList = arrayOfNulls<JSONObject>(trackCount)
 
-                    var finishedRequests = 0
-                    var totalRequestsCount = 0
-
-                    val requests = ArrayList<AuthorizedRequest>()
-
-                    val playlistItemDatabaseHelper =
-                        PlaylistItemDatabaseHelper(
-                            context,
-                            playlistId
-                        )
-
                     val playlistTrackRequestQueue = Volley.newRequestQueue(context)
 
                     playlistTrackRequestQueue.addRequestFinishedListener<Any> {
-                        finishedRequests++
+                        val patchParams = JSONObject()
 
-                        if (finishedRequests >= totalRequestsCount) {
+                        val patchedArray = parsePatchedPlaylist(JSONArray(tempList), song)
+                        patchParams.put("tracks", JSONArray(patchedArray))
 
-                            playlistItemDatabaseHelper.reCreateTable()
-
-                            for (playlistObject in tempList) {
-                                if (playlistObject != null) {
-                                    parsePlaylistTrackToDB(
-                                        playlistId,
-                                        playlistObject,
-                                        context
-                                    )
-                                }
-
-                            }
-
-                            //DONE
-                            trackList[i] = playlistItemDatabaseHelper.getAllData()
-
-                            if (trackList[i] != null) {
-                                val trackArray =
-                                    parsePlaylistItemToJSONArray(context, trackList[i]!!)
-                                val patchParams = JSONObject()
-
-                                val patchedArray = parsePatchedPlaylist(JSONArray(trackArray), song)
-                                patchParams.put("tracks", JSONArray(patchedArray))
-
-                                val patchRequest =
-                                    object : JsonObjectRequest(
-                                        Method.PATCH,
-                                        playlistPatchUrl,
-                                        patchParams,
-                                        Response.Listener {
-                                            //TODO reload playlist
-                                        },
-                                        Response.ErrorListener {
-                                        }) {
-                                        @Throws(AuthFailureError::class)
-                                        override fun getHeaders(): Map<String, String> {
-                                            val params = HashMap<String, String>()
-                                            if (loggedIn) {
-                                                params["Cookie"] = "connect.sid=$sSid"
-                                            }
-                                            return params
-                                        }
+                        val patchRequest =
+                            object : JsonObjectRequest(
+                                Method.PATCH,
+                                playlistPatchUrl,
+                                patchParams,
+                                Response.Listener {
+                                    //TODO reload playlist
+                                },
+                                Response.ErrorListener {
+                                }) {
+                                @Throws(AuthFailureError::class)
+                                override fun getHeaders(): Map<String, String> {
+                                    val params = HashMap<String, String>()
+                                    if (loggedIn) {
+                                        params["Cookie"] = "connect.sid=$sSid"
                                     }
-
-                                val addToPlaylistQueue = Volley.newRequestQueue(context)
-                                addToPlaylistQueue.addRequestFinishedListener<Any> {
-                                    Toast.makeText(
-                                        context,
-                                        context.getString(
-                                            R.string.songAddedToPlaylistMsg,
-                                            song.title + " " + song.version
-                                        ),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                    return params
                                 }
-
-                                addToPlaylistQueue.add(patchRequest)
-
                             }
-                        } else {
-                            playlistTrackRequestQueue.add(requests[finishedRequests])
+
+                        val addToPlaylistQueue = Volley.newRequestQueue(context)
+                        addToPlaylistQueue.addRequestFinishedListener<Any> {
+                            Toast.makeText(
+                                context,
+                                context.getString(
+                                    R.string.songAddedToPlaylistMsg,
+                                    song.title + " " + song.version
+                                ),
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
+
+                        addToPlaylistQueue.add(patchRequest)
+
+
                     }
 
-                    for (u in (0..(trackCount / 50))) {
-                        val playlistTrackUrl =
-                            context.getString(R.string.playlistTrackUrl) + playlistId + "/catalog?skip=" + (i * 50).toString() + "&limit=50"
 
-                        val playlistTrackRequest = AuthorizedRequest(
-                            Request.Method.GET, playlistTrackUrl, getSid(),
-                            Response.Listener { response ->
-                                val jsonObject = JSONObject(response)
-                                val jsonArray = jsonObject.getJSONArray("results")
+                    val playlistTrackUrl =
+                        context.getString(R.string.playlistTrackUrl) + playlistId
 
-                                for (k in (0 until jsonArray.length())) {
-                                    tempList[u * 50 + k] = jsonArray.getJSONObject(k)
-                                }
-                            },
-                            Response.ErrorListener {
-                                //TODO add msg
-                            })
+                    val playlistTrackRequest = AuthorizedRequest(
+                        Request.Method.GET, playlistTrackUrl, getSid(),
+                        Response.Listener { response ->
+                            val jsonObject = JSONObject(response)
+                            val jsonArray = jsonObject.getJSONArray("tracks")
 
-                        totalRequestsCount++
-                        requests.add(playlistTrackRequest)
-                    }
+                            for (k in (0 until jsonArray.length())) {
+                                tempList[k] = jsonArray.getJSONObject(k)
+                            }
+                        },
+                        Response.ErrorListener {
+                            //TODO add msg
+                        })
 
-                    playlistTrackRequestQueue.add(requests[finishedRequests])
+                    playlistTrackRequestQueue.add(playlistTrackRequest)
+
                 }
 
                 trackCountRequestQueue.add(trackCountRequest)
@@ -411,7 +379,7 @@ internal fun addSongToPlaylist(context: Context, song: Song) {
         }
         alertDialogBuilder.show()
 
-    }else{
+    } else {
         //TODO add msg
     }
 }
