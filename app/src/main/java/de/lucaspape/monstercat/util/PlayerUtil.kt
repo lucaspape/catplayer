@@ -23,7 +23,7 @@ fun getAudioAttributes(): AudioAttributes {
         .build()
 }
 
-fun requestAudioFocus(context: Context):Int{
+fun requestAudioFocus(context: Context): Int {
     val settings = Settings(context)
 
     val disableAudioFocus = if (settings.getSetting("disableAudioFocus") != null) {
@@ -45,9 +45,9 @@ fun requestAudioFocus(context: Context):Int{
     }
 }
 
-fun abandonAudioFocus(context: Context){
+fun abandonAudioFocus(context: Context) {
     val audioManager =
-       context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
     audioManager.abandonAudioFocus(audioFocusChangeListener)
 }
 

@@ -10,7 +10,7 @@ import de.lucaspape.monstercat.R
 
 //notification var
 private const val channelID = "Download Notification"
-private const val notificationID = 2
+private const val downloadNotificationID = 2
 
 internal fun showDownloadNotification(
     shownTitle: String,
@@ -30,13 +30,13 @@ internal fun showDownloadNotification(
     notificationBuilder.setProgress(max, progress, indeterminate)
 
     val notificationManagerCompat = NotificationManagerCompat.from(context)
-    notificationManagerCompat.notify(notificationID, notificationBuilder.build())
+    notificationManagerCompat.notify(downloadNotificationID, notificationBuilder.build())
 }
 
-internal fun hideDownloadNotification(context: Context) {
+fun hideDownloadNotification(context: Context) {
     val notificationManager =
         context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-    notificationManager.cancel(notificationID)
+    notificationManager.cancel(downloadNotificationID)
 }
 
 private fun createDownloadNotificationChannel(context: Context) {

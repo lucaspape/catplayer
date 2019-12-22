@@ -24,6 +24,7 @@ import androidx.fragment.app.Fragment
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.util.Auth
 import de.lucaspape.monstercat.download.DownloadTask
+import de.lucaspape.monstercat.download.hideDownloadNotification
 import de.lucaspape.monstercat.fragments.HomeFragment
 import de.lucaspape.monstercat.fragments.PlaylistFragment
 import de.lucaspape.monstercat.handlers.HomeHandler
@@ -131,6 +132,8 @@ class MainActivity : AppCompatActivity() {
         } catch (e: IllegalArgumentException) {
 
         }
+
+        hideDownloadNotification(this)
 
         stopPlayerService()
 

@@ -24,66 +24,92 @@ internal const val CLOSE_ACTION = "de.lucaspape.monstercat.close"
 internal const val musicChannelID = "Music Notification"
 internal const val musicNotificationID = 1
 
-private var lastButtonPress:Long = 0
+private var lastButtonPress: Long = 0
 
-private var playerServiceIntent:Intent? = null
+private var playerServiceIntent: Intent? = null
 
 private var serviceRunning = false
 
-internal fun createPlayerNotification(title:String, version: String, artist:String, coverLocation: String):Notification?{
+internal fun createPlayerNotification(
+    title: String,
+    version: String,
+    artist: String,
+    coverLocation: String
+): Notification? {
     contextReference?.get()?.let { context ->
-        val notificationBuilder = NotificationCompat.Builder(context,
+        val notificationBuilder = NotificationCompat.Builder(
+            context,
             musicChannelID
         )
 
         val notificationStyle = androidx.media.app.NotificationCompat.MediaStyle()
             .setMediaSession(mediaSession?.sessionToken)
-            .setShowActionsInCompactView(0,1,2)
+            .setShowActionsInCompactView(0, 1, 2)
 
         val prevIntent = Intent(PREV_ACTION)
         val playPauseIntent = Intent(PLAY_PAUSE_ACTION)
         val nextIntent = Intent(NEXT_ACTION)
         val closeIntent = Intent(CLOSE_ACTION)
 
-        val prevPendingIntent = PendingIntent.getBroadcast(context,0, prevIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-        val playPausePendingIntent = PendingIntent.getBroadcast(context,0, playPauseIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-        val nextPendingIntent = PendingIntent.getBroadcast(context,0, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-        val closePendingIntent = PendingIntent.getBroadcast(context,0, closeIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val prevPendingIntent =
+            PendingIntent.getBroadcast(context, 0, prevIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val playPausePendingIntent = PendingIntent.getBroadcast(
+            context,
+            0,
+            playPauseIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        val nextPendingIntent =
+            PendingIntent.getBroadcast(context, 0, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val closePendingIntent =
+            PendingIntent.getBroadcast(context, 0, closeIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
         context.registerReceiver(
             NotificationIntentReceiver(), IntentFilter(
                 PREV_ACTION
-            ))
+            )
+        )
         context.registerReceiver(
             NotificationIntentReceiver(), IntentFilter(
                 PLAY_PAUSE_ACTION
-            ))
+            )
+        )
         context.registerReceiver(
             NotificationIntentReceiver(), IntentFilter(
                 NEXT_ACTION
-            ))
+            )
+        )
         context.registerReceiver(
             NotificationIntentReceiver(), IntentFilter(
                 CLOSE_ACTION
-            ))
+            )
+        )
 
-        val prevAction = NotificationCompat.Action.Builder(R.drawable.ic_skip_previous_black_24dp,
-            PREV_ACTION, prevPendingIntent).build()
+        val prevAction = NotificationCompat.Action.Builder(
+            R.drawable.ic_skip_previous_black_24dp,
+            PREV_ACTION, prevPendingIntent
+        ).build()
 
-        val playPauseIcon:Int
+        val playPauseIcon: Int
 
-        if(mediaPlayer?.isPlaying == true){
+        if (mediaPlayer?.isPlaying == true) {
             playPauseIcon = R.drawable.ic_pause_black_24dp
-        }else{
+        } else {
             playPauseIcon = R.drawable.ic_play_arrow_black_24dp
         }
 
-        val playPauseAction = NotificationCompat.Action.Builder(playPauseIcon,
-            PLAY_PAUSE_ACTION, playPausePendingIntent).build()
-        val nextAction = NotificationCompat.Action.Builder(R.drawable.ic_skip_next_black_24dp,
-            NEXT_ACTION, nextPendingIntent).build()
-        val closeAction = NotificationCompat.Action.Builder(R.drawable.ic_close_black_24dp,
-            CLOSE_ACTION, closePendingIntent).build()
+        val playPauseAction = NotificationCompat.Action.Builder(
+            playPauseIcon,
+            PLAY_PAUSE_ACTION, playPausePendingIntent
+        ).build()
+        val nextAction = NotificationCompat.Action.Builder(
+            R.drawable.ic_skip_next_black_24dp,
+            NEXT_ACTION, nextPendingIntent
+        ).build()
+        val closeAction = NotificationCompat.Action.Builder(
+            R.drawable.ic_close_black_24dp,
+            CLOSE_ACTION, closePendingIntent
+        ).build()
 
         notificationBuilder
             .setShowWhen(false)
@@ -105,10 +131,10 @@ internal fun createPlayerNotification(title:String, version: String, artist:Stri
     return null
 }
 
-class NotificationIntentReceiver:BroadcastReceiver(){
+class NotificationIntentReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
-        if(System.currentTimeMillis() - lastButtonPress > 200){
-            when(intent?.action){
+        if (System.currentTimeMillis() - lastButtonPress > 200) {
+            when (intent?.action) {
                 PREV_ACTION -> previous()
                 PLAY_PAUSE_ACTION -> toggleMusic()
                 NEXT_ACTION -> next()
@@ -125,7 +151,7 @@ class NotificationIntentReceiver:BroadcastReceiver(){
  */
 internal fun startPlayerService(
 ) {
-    if(!serviceRunning){
+    if (!serviceRunning) {
         playerServiceIntent =
             Intent(contextReference!!.get()!!, PlayerService::class.java)
 
@@ -148,7 +174,7 @@ internal fun startPlayerService(
     }
 }
 
-fun stopPlayerService(){
+fun stopPlayerService() {
     playerServiceIntent?.let {
         contextReference?.get()?.stopService(
             playerServiceIntent
@@ -158,8 +184,14 @@ fun stopPlayerService(){
     serviceRunning = false
 }
 
-internal fun updateNotification(title: String, version: String, artist: String, coverLocation: String){
-    val notificationManager = contextReference?.get()?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager?
+internal fun updateNotification(
+    title: String,
+    version: String,
+    artist: String,
+    coverLocation: String
+) {
+    val notificationManager =
+        contextReference?.get()?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager?
     notificationManager?.notify(
         musicNotificationID,
         createPlayerNotification(

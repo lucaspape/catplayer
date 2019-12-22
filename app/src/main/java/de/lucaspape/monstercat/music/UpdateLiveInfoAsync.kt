@@ -24,7 +24,12 @@ class UpdateLiveInfoAsync(
         contextReference.get()?.let { context ->
             updateCover(context, stream)
 
-            publishProgress(stream.title, stream.artist, context.filesDir.toString() + "/live.png")
+            publishProgress(
+                stream.title,
+                "",
+                stream.artist,
+                context.filesDir.toString() + "/live.png"
+            )
 
             val volleyQueue = Volley.newRequestQueue(context)
 
@@ -40,7 +45,12 @@ class UpdateLiveInfoAsync(
 
                         updateCover(context, it)
 
-                        publishProgress(it.title, it.artist, context.filesDir.toString() + "/live.png")
+                        publishProgress(
+                            it.title,
+                            "",
+                            it.artist,
+                            context.filesDir.toString() + "/live.png"
+                        )
                     }
                 }
 
@@ -53,26 +63,30 @@ class UpdateLiveInfoAsync(
 
     override fun onProgressUpdate(vararg values: String?) {
         val title = values[0]
-        val artist = values[1]
-        val coverLocation = values[2]
+        val version = values[1]
+        val artist = values[2]
+        val coverLocation = values[3]
 
         title?.let {
-            artist?.let {
-                coverLocation?.let {
-                    contextReference.get()?.let {context ->
-                        setCover(
-                            coverLocation,
-                            artist,
-                            title,
-                            context
-                        )
+            version?.let {
+                artist?.let {
+                    coverLocation?.let {
+                        contextReference.get()?.let { context ->
+                            setCover(
+                                title,
+                                version,
+                                artist,
+                                coverLocation,
+                                context
+                            )
 
-                        updateNotification(
-                            title,
-                            "",
-                            artist,
-                            coverLocation
-                        )
+                            updateNotification(
+                                title,
+                                "",
+                                artist,
+                                coverLocation
+                            )
+                        }
                     }
                 }
             }

@@ -3,7 +3,6 @@ package de.lucaspape.monstercat.music
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.MediaMetadata
 import android.media.session.PlaybackState
@@ -19,9 +18,9 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.Song
+import de.lucaspape.monstercat.music.notification.updateNotification
 import de.lucaspape.monstercat.util.Settings
 import java.io.File
-import java.lang.NullPointerException
 import java.lang.ref.WeakReference
 
 private var textViewReference: WeakReference<TextView>? = null
@@ -247,35 +246,43 @@ internal fun setCover(song: Song, context: Context) {
     val coverFile =
         File(context.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution)
 
-    if (coverFile.exists()) {
+    if (File(coverFile.absolutePath).exists()) {
         val bitmap = BitmapFactory.decodeFile(coverFile.absolutePath)
 
         barCoverImageReference?.get()?.setImageBitmap(bitmap)
 
         fullscreenCoverReference?.get()?.setImageBitmap(bitmap)
 
-        mediaPlayer?.duration?.let { setSongMetadata(song.artist, song.title, bitmap, it) }
-
-    } else {
-        mediaPlayer?.duration?.let { setSongMetadata(song.artist, song.title, null, it) }
+        mediaPlayer?.duration?.let { setSongMetadata(song, coverFile.absolutePath, it) }
     }
 }
 
-internal fun setCover(coverLocation: String, title: String, artist: String, context: Context) {
+internal fun setCover(
+    title: String,
+    version: String,
+    artist: String,
+    coverLocation: String,
+    context: Context
+) {
     val coverFile =
         File(coverLocation)
 
-    if (coverFile.exists()) {
+    if (File(coverFile.absolutePath).exists()) {
         val bitmap = BitmapFactory.decodeFile(coverFile.absolutePath)
 
         barCoverImageReference?.get()?.setImageBitmap(bitmap)
 
         fullscreenCoverReference?.get()?.setImageBitmap(bitmap)
 
-        mediaPlayer?.duration?.let { setSongMetadata(artist, title, bitmap, it) }
-
-    } else {
-        mediaPlayer?.duration?.let { setSongMetadata(artist, title, null, it) }
+        mediaPlayer?.duration?.let {
+            setSongMetadata(
+                title,
+                version,
+                artist,
+                coverFile.absolutePath,
+                it
+            )
+        }
     }
 }
 
@@ -341,12 +348,36 @@ internal fun setPlayerState(progress: Long) {
 /**
  * Set song metadata
  */
-internal fun setSongMetadata(artist: String, title: String, coverImage: Bitmap?, duration: Long) {
+internal fun setSongMetadata(song: Song, coverLocation: String, duration: Long) {
+    val coverImage = BitmapFactory.decodeFile(coverLocation)
+
     val mediaMetadata = MediaMetadataCompat.Builder()
-    mediaMetadata.putString(MediaMetadata.METADATA_KEY_ARTIST, artist)
-    mediaMetadata.putString(MediaMetadata.METADATA_KEY_TITLE, title)
+    mediaMetadata.putString(MediaMetadata.METADATA_KEY_ARTIST, song.artist)
+    mediaMetadata.putString(MediaMetadata.METADATA_KEY_TITLE, "${song.title} ${song.version}")
     mediaMetadata.putLong(MediaMetadata.METADATA_KEY_DURATION, duration)
     mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, coverImage)
     mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ART, coverImage)
     mediaSession?.setMetadata(mediaMetadata.build())
+
+    updateNotification(song.title, song.version, song.artist, coverLocation)
+}
+
+internal fun setSongMetadata(
+    title: String,
+    version: String,
+    artist: String,
+    coverLocation: String,
+    duration: Long
+) {
+    val coverImage = BitmapFactory.decodeFile(coverLocation)
+
+    val mediaMetadata = MediaMetadataCompat.Builder()
+    mediaMetadata.putString(MediaMetadata.METADATA_KEY_ARTIST, artist)
+    mediaMetadata.putString(MediaMetadata.METADATA_KEY_TITLE, "$title $version")
+    mediaMetadata.putLong(MediaMetadata.METADATA_KEY_DURATION, duration)
+    mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, coverImage)
+    mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ART, coverImage)
+    mediaSession?.setMetadata(mediaMetadata.build())
+
+    updateNotification(title, version, artist, coverLocation)
 }
