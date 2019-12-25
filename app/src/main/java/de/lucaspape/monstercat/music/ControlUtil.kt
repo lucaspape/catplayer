@@ -36,30 +36,7 @@ internal fun play() {
         contextReference?.get()?.let { context ->
             val settings = Settings(context)
             val downloadStream = settings.getSetting("downloadStream")?.toBoolean()
-
-            val primaryResolution = settings.getSetting("primaryCoverResolution")
-
-            mediaPlayer?.release()
-            mediaPlayer?.stop()
-
-            val exoPlayer = ExoPlayerFactory.newSimpleInstance(context)
-            exoPlayer.audioAttributes = getAudioAttributes()
-
-            exoPlayer.addListener(object : Player.EventListener {
-                @Override
-                override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-                    setPlayButtonImage(context)
-                    updateNotification(
-                        song.title,
-                        song.version,
-                        song.artist,
-                        contextReference?.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
-                    )
-                }
-            })
-
-            mediaPlayer = exoPlayer
-
+            
             if (downloadStream == true && !File(song.downloadLocation).exists()) {
                 song.downloadLocation = song.downloadLocation + ".stream"
 
@@ -98,6 +75,29 @@ internal fun play() {
 
 private fun playSong(context: Context, song: Song) {
     val settings = Settings(context)
+
+    val primaryResolution = settings.getSetting("primaryCoverResolution")
+
+    mediaPlayer?.release()
+    mediaPlayer?.stop()
+
+    val exoPlayer = ExoPlayerFactory.newSimpleInstance(context)
+    exoPlayer.audioAttributes = getAudioAttributes()
+
+    exoPlayer.addListener(object : Player.EventListener {
+        @Override
+        override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
+            setPlayButtonImage(context)
+            updateNotification(
+                song.title,
+                song.version,
+                song.artist,
+                contextReference?.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
+            )
+        }
+    })
+
+    mediaPlayer = exoPlayer
 
     if (requestAudioFocus(context) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
         registerNextListener()
