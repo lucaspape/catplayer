@@ -1,5 +1,7 @@
 package de.lucaspape.monstercat.database
 
+import java.io.File
+
 data class Song(
     val id: Int,
     val songId: String,
@@ -45,7 +47,7 @@ data class Song(
     var streamLocation: String = ""
 
     fun getUrl(): String {
-        return if (downloadLocation != "") {
+        return if (File(downloadLocation).exists()) {
             downloadLocation
         } else {
             streamLocation

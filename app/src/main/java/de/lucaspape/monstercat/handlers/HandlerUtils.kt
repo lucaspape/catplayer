@@ -34,29 +34,16 @@ internal fun playSongFromId(context: Context, songId: String, playNow: Boolean) 
     val song = songDatabaseHelper.getSong(songId)
 
     if (song != null) {
-        //check if song is already downloaded
-        val songDownloadLocation =
+        song.downloadLocation =
             context.getExternalFilesDir(null).toString() + "/" + song.artist + song.title + song.version + "." + downloadType
 
-        if (File(songDownloadLocation).exists()) {
-            song.downloadLocation = songDownloadLocation
+        song.streamLocation =
+            context.getString(R.string.trackContentUrl) + song.albumId + "/track-stream/" + song.songId
 
-            if (playNow) {
-                de.lucaspape.monstercat.music.playNow(song)
-            } else {
-                addSong(song)
-            }
-
+        if (playNow) {
+            de.lucaspape.monstercat.music.playNow(song)
         } else {
-            song.streamLocation =
-                context.getString(R.string.trackContentUrl) + song.albumId + "/track-stream/" + song.songId
-
-            if (playNow) {
-                de.lucaspape.monstercat.music.playNow(song)
-            } else {
-                addSong(song)
-            }
-
+            addSong(song)
         }
     } else {
         //TODO add msg
@@ -73,56 +60,24 @@ internal fun playSongFromId(
     musicList: ListView,
     position: Int
 ) {
-    val settings = Settings(context)
-    val downloadType = settings.getSetting("downloadType")
+    playSongFromId(context, songId, playNow)
 
-    val songDatabaseHelper = SongDatabaseHelper(context)
-    val song = songDatabaseHelper.getSong(songId)
+    val continuousList = ArrayList<String>()
 
-    if (song != null) {
-        //check if song is already downloaded
-        val songDownloadLocation =
-            context.getExternalFilesDir(null).toString() + "/" + song.artist + song.title + song.version + "." + downloadType
-
-        if (File(songDownloadLocation).exists()) {
-            song.downloadLocation = songDownloadLocation
-
-            if (playNow) {
-                de.lucaspape.monstercat.music.playNow(song)
-            } else {
-                addSong(song)
-            }
-
-        } else {
-            song.streamLocation =
-                context.getString(R.string.trackContentUrl) + song.albumId + "/track-stream/" + song.songId
-
-            if (playNow) {
-                de.lucaspape.monstercat.music.playNow(song)
-            } else {
-                addSong(song)
-            }
-
-            val continuousList = ArrayList<String>()
-
-            for (i in (position + 1 until musicList.adapter.count)) {
-                val nextItemValue = musicList.getItemAtPosition(i) as HashMap<*, *>
-                continuousList.add(nextItemValue["id"] as String)
-            }
-
-            loadContinuousSongListAsyncTask =
-                LoadContinuousSongListAsync(
-                    continuousList,
-                    WeakReference(context)
-                )
-
-            loadContinuousSongListAsyncTask!!.executeOnExecutor(
-                AsyncTask.THREAD_POOL_EXECUTOR
-            )
-        }
-    } else {
-        //TODO add msg
+    for (i in (position + 1 until musicList.adapter.count)) {
+        val nextItemValue = musicList.getItemAtPosition(i) as HashMap<*, *>
+        continuousList.add(nextItemValue["id"] as String)
     }
+
+    loadContinuousSongListAsyncTask =
+        LoadContinuousSongListAsync(
+            continuousList,
+            WeakReference(context)
+        )
+
+    loadContinuousSongListAsyncTask!!.executeOnExecutor(
+        AsyncTask.THREAD_POOL_EXECUTOR
+    )
 }
 
 internal fun playAlbumNext(context: Context, mcID: String) {
@@ -155,21 +110,13 @@ internal fun playAlbumNext(context: Context, mcID: String) {
             for (id in idArray) {
                 val song = databaseHelper.getSong(id)
 
-                //check if song is already downloaded
-                val songDownloadLocation =
+                song.downloadLocation =
                     context.getExternalFilesDir(null).toString() + "/" + song.artist + song.title + song.version + "." + downloadType
 
-                if (File(songDownloadLocation).exists()) {
-                    song.downloadLocation = songDownloadLocation
+                song.streamLocation =
+                    context.getString(R.string.trackContentUrl) + song.albumId + "/track-stream/" + song.songId
 
-                    addSong(song)
-
-                } else {
-                    song.streamLocation =
-                        context.getString(R.string.trackContentUrl) + song.albumId + "/track-stream/" + song.songId
-
-                    addSong(song)
-                }
+                addSong(song)
             }
         },
         Response.ErrorListener { error ->
@@ -263,7 +210,6 @@ internal fun addSongToPlaylist(context: Context, song: Song) {
 
     val playlistNames = arrayOfNulls<String>(playlistList.size)
     val playlistIds = arrayOfNulls<String>(playlistList.size)
-    val trackList = arrayOfNulls<List<PlaylistItem>>(playlistList.size)
 
     for (i in playlistList.indices) {
         playlistNames[i] = playlistList[i].playlistName
