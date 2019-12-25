@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
 import android.media.session.MediaSession
+import android.os.AsyncTask
 import android.os.FileObserver
 import android.support.v4.media.session.MediaSessionCompat
 import com.google.android.exoplayer2.ExoPlayer
@@ -23,7 +24,7 @@ internal var mediaPlayer: ExoPlayer? = null
 internal var currentSong = 0
 internal var playList = ArrayList<Song>(1)
 
-internal var fileObserver:FileObserver? = null
+internal var fileObserver: FileObserver? = null
 
 var mediaSession: MediaSessionCompat? = null
 
@@ -77,22 +78,33 @@ fun addSong(song: Song) {
     }
 }
 
-fun addSong(song: Song, waitForDownload:Boolean) {
-    if(waitForDownload){
-        while(!File(song.downloadLocation).exists()){
+fun addSong(song: Song, waitForDownload: Boolean) {
+    val waitForDownloadTask = object : AsyncTask<Void, Void, String>() {
+        override fun doInBackground(vararg params: Void?): String? {
+            if (waitForDownload) {
+                while (!File(song.downloadLocation).exists()) {
+                    Thread.sleep(10)
+                }
+            }
 
+            return null
         }
+
+        override fun onPostExecute(result: String?) {
+            if (mediaPlayer?.isPlaying == false) {
+                playNow(song)
+            } else {
+                try {
+                    playList.add(currentSong + 1, song)
+                } catch (e: IndexOutOfBoundsException) {
+                    playList.add(song)
+                }
+            }
+        }
+
     }
 
-    if (mediaPlayer?.isPlaying == false) {
-        playNow(song)
-    } else {
-        try {
-            playList.add(currentSong + 1, song)
-        } catch (e: IndexOutOfBoundsException) {
-            playList.add(song)
-        }
-    }
+    waitForDownloadTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }
 
 /**
@@ -110,24 +122,33 @@ fun playNow(song: Song) {
     play()
 }
 
-fun playNow(song: Song, waitForDownload:Boolean) {
-    if(waitForDownload){
-        //TODO this is bullshit
+fun playNow(song: Song, waitForDownload: Boolean) {
+    val waitForDownloadTask = object : AsyncTask<Void, Void, String>() {
+        override fun doInBackground(vararg params: Void?): String? {
+            if (waitForDownload) {
+                while (!File(song.downloadLocation).exists()) {
+                    Thread.sleep(10)
+                }
+            }
 
-        while(!File(song.downloadLocation).exists()){
-
+            return null
         }
+
+        override fun onPostExecute(result: String?) {
+            try {
+                playList.add(currentSong + 1, song)
+                currentSong++
+
+            } catch (e: IndexOutOfBoundsException) {
+                playList.add(song)
+            }
+
+            play()
+        }
+
     }
 
-    try {
-        playList.add(currentSong + 1, song)
-        currentSong++
-
-    } catch (e: IndexOutOfBoundsException) {
-        playList.add(song)
-    }
-
-    play()
+    waitForDownloadTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }
 
 fun clearContinuous() {
