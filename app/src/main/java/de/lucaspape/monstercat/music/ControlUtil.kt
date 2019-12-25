@@ -36,7 +36,7 @@ internal fun play() {
         contextReference?.get()?.let { context ->
             val settings = Settings(context)
             val downloadStream = settings.getSetting("downloadStream")?.toBoolean()
-            
+
             if (downloadStream == true && !File(song.downloadLocation).exists()) {
                 song.downloadLocation = song.downloadLocation + ".stream"
 

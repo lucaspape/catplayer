@@ -66,7 +66,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         if (settings.getSetting("downloadStream") != null) {
-            disableAudioFocusSwitch.isChecked =
+            downloadStreamSwitch.isChecked =
                 settings.getSetting("downloadStream")!!.toBoolean()
         }
 
