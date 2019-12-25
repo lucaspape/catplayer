@@ -21,36 +21,38 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
 
         while (true) {
             try {
-                val sSid = getSid()
+                if (wifiConnected(context) == false && settings.getSetting("downloadOverMobile") != "true") {
+                    println("forbidden by user")
+                    //TODO add msg
+                } else {
 
-                if (sSid != null) {
-                    if (wifiConnected(context) == false && settings.getSetting("downloadOverMobile") != "true") {
-                        println("forbidden by user")
-                        //TODO add msg
-                    } else {
+                    if (downloadList[downloadedSongs]?.isNotEmpty() == true) {
+                        val song = downloadList[downloadedSongs]
+                        song?.let {
+                            val url = it["url"] as String
+                            val location = it["location"] as String
 
-                        if (downloadList[downloadedSongs]?.isNotEmpty() == true) {
-                            val song = downloadList[downloadedSongs]
-                            song?.let {
-                                val url = it["url"] as String
-                                val location = it["location"] as String
-
-                                downloadFile(location, url, context.cacheDir.toString(), sSid) { max, current ->
-                                    publishProgress(
-                                        song["shownTitle"] as String,
-                                        max.toString(),
-                                        current.toString(),
-                                        false.toString()
-                                    )
-                                }
-
-                                downloadList[downloadedSongs] = null
+                            downloadFile(
+                                location,
+                                url,
+                                context.cacheDir.toString(),
+                                getSid()
+                            ) { max, current ->
+                                publishProgress(
+                                    song["shownTitle"] as String,
+                                    max.toString(),
+                                    current.toString(),
+                                    false.toString()
+                                )
                             }
 
+                            downloadList[downloadedSongs] = null
                         }
 
-                        downloadedSongs++
                     }
+
+                    downloadedSongs++
+
                 }
 
             } catch (e: IndexOutOfBoundsException) {

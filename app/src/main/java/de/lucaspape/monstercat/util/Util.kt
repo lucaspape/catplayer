@@ -61,7 +61,7 @@ fun downloadCover(
     }
 }
 
-fun downloadFile(destination:String, source:String, tempDir:String, sid:String, progressUpdate: (max:Int, current:Int) -> Unit){
+fun downloadFile(destination:String, source:String, tempDir:String, sid:String?, progressUpdate: (max:Int, current:Int) -> Unit){
     val destinationFile = File(destination)
     val tempFile = File(tempDir + "/" + UUID.randomUUID().toString())
 

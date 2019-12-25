@@ -33,6 +33,8 @@ internal fun playSongFromId(context: Context, songId: String, playNow: Boolean) 
     val songDatabaseHelper = SongDatabaseHelper(context)
     val song = songDatabaseHelper.getSong(songId)
 
+    val downloadStream = settings.getSetting("downloadStream")?.toBoolean()
+
     if (song != null) {
         song.downloadLocation =
             context.getExternalFilesDir(null).toString() + "/" + song.artist + song.title + song.version + "." + downloadType
@@ -40,11 +42,23 @@ internal fun playSongFromId(context: Context, songId: String, playNow: Boolean) 
         song.streamLocation =
             context.getString(R.string.trackContentUrl) + song.albumId + "/track-stream/" + song.songId
 
-        if (playNow) {
-            de.lucaspape.monstercat.music.playNow(song)
-        } else {
-            addSong(song)
+        if(downloadStream == true){
+            song.downloadLocation = song.downloadLocation + ".stream"
+            addDownloadSong(song.streamLocation, song.downloadLocation, song.title + " " + song.version)
+
+            if (playNow) {
+                de.lucaspape.monstercat.music.playNow(song, true)
+            } else {
+                addSong(song, true)
+            }
+        }else{
+            if (playNow) {
+                de.lucaspape.monstercat.music.playNow(song)
+            } else {
+                addSong(song)
+            }
         }
+
     } else {
         //TODO add msg
     }

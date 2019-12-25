@@ -233,21 +233,6 @@ fun previous() {
 }
 
 /**
- * Play song now
- */
-fun playNow(song: Song) {
-    try {
-        playList.add(currentSong + 1, song)
-        currentSong++
-
-    } catch (e: IndexOutOfBoundsException) {
-        playList.add(song)
-    }
-
-    play()
-}
-
-/**
  * Toggle pause/play
  */
 fun toggleMusic() {
