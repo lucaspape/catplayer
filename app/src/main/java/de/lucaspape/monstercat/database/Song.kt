@@ -49,7 +49,9 @@ data class Song(
     fun getUrl(): String {
         return if (File(downloadLocation).exists()) {
             downloadLocation
-        } else {
+        } else if(File("$downloadLocation.stream").exists()){
+            return "$downloadLocation.stream"
+        }else{
             streamLocation
         }
     }
