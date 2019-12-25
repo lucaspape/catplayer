@@ -78,35 +78,6 @@ fun addSong(song: Song) {
     }
 }
 
-fun addSong(song: Song, waitForDownload: Boolean) {
-    val waitForDownloadTask = object : AsyncTask<Void, Void, String>() {
-        override fun doInBackground(vararg params: Void?): String? {
-            if (waitForDownload) {
-                while (!File(song.downloadLocation).exists()) {
-                    Thread.sleep(10)
-                }
-            }
-
-            return null
-        }
-
-        override fun onPostExecute(result: String?) {
-            if (mediaPlayer?.isPlaying == false) {
-                playNow(song)
-            } else {
-                try {
-                    playList.add(currentSong + 1, song)
-                } catch (e: IndexOutOfBoundsException) {
-                    playList.add(song)
-                }
-            }
-        }
-
-    }
-
-    waitForDownloadTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-}
-
 /**
  * Play song now
  */
@@ -120,35 +91,6 @@ fun playNow(song: Song) {
     }
 
     play()
-}
-
-fun playNow(song: Song, waitForDownload: Boolean) {
-    val waitForDownloadTask = object : AsyncTask<Void, Void, String>() {
-        override fun doInBackground(vararg params: Void?): String? {
-            if (waitForDownload) {
-                while (!File(song.downloadLocation).exists()) {
-                    Thread.sleep(10)
-                }
-            }
-
-            return null
-        }
-
-        override fun onPostExecute(result: String?) {
-            try {
-                playList.add(currentSong + 1, song)
-                currentSong++
-
-            } catch (e: IndexOutOfBoundsException) {
-                playList.add(song)
-            }
-
-            play()
-        }
-
-    }
-
-    waitForDownloadTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }
 
 fun clearContinuous() {

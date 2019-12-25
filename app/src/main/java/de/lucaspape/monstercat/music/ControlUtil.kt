@@ -1,11 +1,13 @@
 package de.lucaspape.monstercat.music
 
+import android.content.Context
 import android.content.IntentFilter
 import android.media.AudioManager
 import android.os.AsyncTask
 import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.Player
 import de.lucaspape.monstercat.database.Song
+import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.music.notification.startPlayerService
 import de.lucaspape.monstercat.music.notification.stopPlayerService
 import de.lucaspape.monstercat.music.notification.updateNotification
@@ -16,6 +18,7 @@ import java.lang.IndexOutOfBoundsException
 import java.lang.ref.WeakReference
 
 var updateLiveInfoAsync: UpdateLiveInfoAsync? = null
+var waitForDownloadTask: AsyncTask<Void, Void, String>? = null
 
 /**
  * Music control methods
@@ -32,6 +35,7 @@ internal fun play() {
 
         contextReference?.get()?.let { context ->
             val settings = Settings(context)
+            val downloadStream = settings.getSetting("downloadStream")?.toBoolean()
 
             val primaryResolution = settings.getSetting("primaryCoverResolution")
 
@@ -56,32 +60,68 @@ internal fun play() {
 
             mediaPlayer = exoPlayer
 
-            if (requestAudioFocus(context) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                registerNextListener()
+            if (downloadStream == true && !File(song.downloadLocation).exists()) {
+                song.downloadLocation = song.downloadLocation + ".stream"
 
-                if (wifiConnected(context) == true || settings.getSetting("streamOverMobile") == "true" || File(
-                        song.getUrl()
-                    ).exists()
-                ) {
+                addDownloadSong(
+                    song.streamLocation,
+                    song.downloadLocation,
+                    song.title + " " + song.version
+                )
 
-                    mediaPlayer?.prepare(songToMediaSource(context, song))
+                waitForDownloadTask?.cancel(true)
 
-                    mediaPlayer?.playWhenReady = true
+                waitForDownloadTask = object : AsyncTask<Void, Void, String>() {
+                    override fun doInBackground(vararg params: Void?): String? {
+                        while (!File(song.downloadLocation).exists()) {
+                            Thread.sleep(100)
+                        }
 
-                    setTitle(song.title, song.version, song.artist)
+                        return null
+                    }
 
-                    startTextAnimation()
+                    override fun onPostExecute(result: String?) {
+                        playSong(context, song)
+                    }
 
-                    setCover(song, context)
-
-                    setPlayButtonImage(context)
-
-                    startSeekBarUpdate()
                 }
 
+                waitForDownloadTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+            }else{
+                playSong(context, song)
             }
+
         }
     } catch (e: IndexOutOfBoundsException) {
+    }
+}
+
+private fun playSong(context: Context, song: Song) {
+    val settings = Settings(context)
+
+    if (requestAudioFocus(context) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+        registerNextListener()
+
+        if (wifiConnected(context) == true || settings.getSetting("streamOverMobile") == "true" || File(
+                song.getUrl()
+            ).exists()
+        ) {
+
+            mediaPlayer?.prepare(songToMediaSource(context, song))
+
+            mediaPlayer?.playWhenReady = true
+
+            setTitle(song.title, song.version, song.artist)
+
+            startTextAnimation()
+
+            setCover(song, context)
+
+            setPlayButtonImage(context)
+
+            startSeekBarUpdate()
+        }
+
     }
 }
 
