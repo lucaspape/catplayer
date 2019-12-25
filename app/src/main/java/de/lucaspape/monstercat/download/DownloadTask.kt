@@ -3,10 +3,8 @@ package de.lucaspape.monstercat.download
 import android.content.Context
 import android.os.AsyncTask
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.util.getSid
 import de.lucaspape.monstercat.music.contextReference
-import de.lucaspape.monstercat.util.Settings
-import de.lucaspape.monstercat.util.wifiConnected
+import de.lucaspape.monstercat.util.*
 import java.lang.ref.WeakReference
 
 class DownloadTask(private val weakReference: WeakReference<Context>) :
@@ -37,14 +35,9 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                                 val url = it["url"] as String
                                 val location = it["location"] as String
 
-                                downloadSong(
-                                    url,
-                                    location,
-                                    sSid,
-                                    song["shownTitle"] as String
-                                ) { shownTitle, max, current ->
+                                downloadFile(location, url, context.cacheDir.toString(), sSid) { max, current ->
                                     publishProgress(
-                                        shownTitle,
+                                        song["shownTitle"] as String,
                                         max.toString(),
                                         current.toString(),
                                         false.toString()
