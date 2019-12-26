@@ -58,8 +58,15 @@ class SongDatabaseHelper(context: Context) :
         values.put(Song.COLUMN_STREAMABLE, streamable.toString())
         values.put(Song.COLUMN_INEARLYACCESS, inEarlyAccess.toString())
 
-        val id = db.insert(Song.TABLE_NAME, null, values)
+        val id = if(getSong(songId) == null){
+            db.insert(Song.TABLE_NAME, null, values)
+        }else{
+            db.update(Song.TABLE_NAME, values, Song.COLUMN_ID + "=" + getSong(songId)?.id.toString(), null)
+            getSong(songId)!!.id.toLong()
+        }
+
         db.close()
+
         return id
     }
 
