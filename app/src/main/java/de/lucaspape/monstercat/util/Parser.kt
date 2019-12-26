@@ -31,6 +31,7 @@ fun parseSongToHashMap(context: Context, song: Song): HashMap<String, Any?> {
         context.filesDir.toString() + "/" + song.albumId + ".png" + secondaryResolution.toString()
     hashMap["downloadable"] = song.isDownloadable.toString()
     hashMap["streamable"] = song.isStreamable.toString()
+    hashMap["inEarlyAccess"] = song.inEarlyAccess.toString()
 
     return hashMap
 }
@@ -84,6 +85,7 @@ fun parseSongToDB(jsonObject: JSONObject, context: Context): Long? {
     var version = ""
     var downloadable = false
     var streamable = false
+    var inEarlyAccess = false
 
     try {
         albumId = jsonObject.getJSONObject("release").getString("id")
@@ -94,6 +96,7 @@ fun parseSongToDB(jsonObject: JSONObject, context: Context): Long? {
         id = jsonObject.getString("id")
         downloadable = jsonObject.getBoolean("downloadable")
         streamable = jsonObject.getBoolean("streamable")
+        inEarlyAccess = jsonObject.getBoolean("inEarlyAccess")
     } catch (e: InvocationTargetException) {
     }
 
@@ -103,7 +106,7 @@ fun parseSongToDB(jsonObject: JSONObject, context: Context): Long? {
 
     val databaseHelper = SongDatabaseHelper(context)
     return if (databaseHelper.getSong(id) == null) {
-        databaseHelper.insertSong(id, title, version, albumId, artist, coverUrl, downloadable, streamable)
+        databaseHelper.insertSong(id, title, version, albumId, artist, coverUrl, downloadable, streamable, inEarlyAccess)
     } else {
         databaseHelper.getSong(id)?.id?.toLong()
     }

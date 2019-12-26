@@ -5,14 +5,11 @@ import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
 import android.media.session.MediaSession
-import android.os.AsyncTask
-import android.os.FileObserver
 import android.support.v4.media.session.MediaSessionCompat
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.ExoPlayerFactory
 import de.lucaspape.monstercat.activities.loadContinuousSongListAsyncTask
 import de.lucaspape.monstercat.database.Song
-import java.io.File
 import java.lang.IndexOutOfBoundsException
 import java.lang.ref.WeakReference
 import kotlin.collections.ArrayList
@@ -23,8 +20,6 @@ internal var mediaPlayer: ExoPlayer? = null
 
 internal var currentSong = 0
 internal var playList = ArrayList<Song>(1)
-
-internal var fileObserver: FileObserver? = null
 
 var mediaSession: MediaSessionCompat? = null
 
