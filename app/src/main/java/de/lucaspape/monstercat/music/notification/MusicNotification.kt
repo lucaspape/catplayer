@@ -133,7 +133,7 @@ internal fun createPlayerNotification(
 
 class NotificationIntentReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
-        if (System.currentTimeMillis() - lastButtonPress > 200) {
+        if (System.currentTimeMillis() - lastButtonPress > 300) {
             when (intent?.action) {
                 PREV_ACTION -> previous()
                 PLAY_PAUSE_ACTION -> toggleMusic()
