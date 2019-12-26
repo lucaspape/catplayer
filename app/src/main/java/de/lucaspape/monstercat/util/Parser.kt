@@ -106,10 +106,6 @@ fun parseSongToDB(jsonObject: JSONObject, context: Context): Long? {
 
     val databaseHelper = SongDatabaseHelper(context)
 
-    if(databaseHelper.getSong(id) != null){
-        databaseHelper.deleteSong(id)
-    }
-
     return databaseHelper.insertSong(id, title, version, albumId, artist, coverUrl, downloadable, streamable, inEarlyAccess)
 }
 
