@@ -29,6 +29,7 @@
         android:layout_marginBottom="78dp"
         android:background="@drawable/toolbar_style"
         android:gravity="bottom"
+        android:contentDescription="@string/musicbarDescription"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"

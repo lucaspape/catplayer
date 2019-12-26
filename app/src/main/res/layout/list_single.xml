@@ -23,6 +23,7 @@
                 app:layout_constraintTop_toTopOf="@+id/title" />
 
             <TextView
+                android:textColor="?attr/colorOnSurface"
                 android:id="@+id/title"
                 android:layout_width="0dp"
                 android:layout_height="32dp"
@@ -32,6 +33,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
+                android:textColor="?attr/colorOnSurface"
                 android:id="@+id/artist"
                 android:layout_width="0dp"
                 android:layout_height="32dp"

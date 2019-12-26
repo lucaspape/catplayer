@@ -44,9 +44,9 @@
     <string name="downloadAlbum">Download Album</string>
     <string name="playAlbumNext">Play Album Next</string>
     <string name="fullscreenAlbumImage">Album Image</string>
-    <string name="fullscreenPlayPause">Play Pause Button</string>
-    <string name="fullscreenNext">Next Button</string>
-    <string name="fullscreenPrevButton">Previous Button</string>
+    <string name="fullscreenPlayPause">Play Pause</string>
+    <string name="fullscreenNext">Next</string>
+    <string name="fullscreenPrevButton">Previous</string>
     <string name="livestreamTitle">Monstercat Livestream</string>
     <string name="livestreamArtist">Monstercat</string>
     <string name="couldNotFindSongMSg">Could not find song</string>
@@ -55,4 +55,6 @@
     <string name="errorUpdatePlaylist">Error updating playlist</string>
     <string name="errorNotLoggedIn">Not logged in</string>
     <string name="downloadStream">Download stream before playback</string>
+    <string name="musicbarDescription">Currently playing</string>
+    <string name="homeSearchDescription">Search song</string>
 </resources>

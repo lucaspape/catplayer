@@ -26,6 +26,7 @@
 
 
             <TextView
+                android:textColor="?attr/colorOnSurface"
                 android:id="@+id/albumTitle"
                 android:layout_width="350dp"
                 android:layout_height="25dp"
@@ -35,6 +36,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/cover" />
 
             <TextView
+                android:textColor="?attr/colorOnSurface"
                 android:id="@+id/albumArtist"
                 android:layout_width="350dp"
                 android:layout_height="25dp"

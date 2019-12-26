@@ -49,6 +49,7 @@
             android:layout_height="40dp"
             app:layout_constraintEnd_toStartOf="@+id/liveButton"
             app:layout_constraintStart_toEndOf="@+id/viewSelector"
+            android:contentDescription="@string/homeSearchDescription"
             tools:layout_editor_absoluteY="14dp" />
 
     </androidx.appcompat.widget.Toolbar>
