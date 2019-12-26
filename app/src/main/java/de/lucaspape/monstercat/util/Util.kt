@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.ConnectivityManager
+import android.widget.Toast
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -106,4 +107,8 @@ fun downloadFile(destination:String, source:String, tempDir:String, sid:String?,
 
         tempFile.renameTo(destinationFile)
     }
+}
+
+fun displayInfo(context: Context, msg:String){
+    Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
 }

@@ -9,7 +9,9 @@ data class Song(
     val version: String,
     val albumId: String,
     val artist: String,
-    val coverUrl: String
+    val coverUrl: String,
+    val isDownloadable:Boolean,
+    val isStreamable:Boolean
 ) {
 
     companion object {
@@ -29,6 +31,10 @@ data class Song(
         val COLUMN_ARTIST = "artist"
         @JvmStatic
         val COLUMN_COVER_URL = "coverUrl"
+        @JvmStatic
+        val COLUMN_DOWNLOADABLE = "downloadable"
+        @JvmStatic
+        val COLUMN_STREAMABLE = "streamable"
 
         @JvmStatic
         val CREATE_TABLE =
@@ -39,7 +45,9 @@ data class Song(
                     COLUMN_VERSION + " TEXT," +
                     COLUMN_ALBUM_ID + " TEXT," +
                     COLUMN_ARTIST + " TEXT," +
-                    COLUMN_COVER_URL + " TEXT" +
+                    COLUMN_COVER_URL + " TEXT," +
+                    COLUMN_DOWNLOADABLE + " TEXT," +
+                    COLUMN_STREAMABLE + " TEXT" +
                     ")"
     }
 

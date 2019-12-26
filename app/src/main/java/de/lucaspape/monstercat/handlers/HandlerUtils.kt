@@ -47,7 +47,7 @@ internal fun playSongFromId(context: Context, songId: String, playNow: Boolean) 
         }
 
     } else {
-        //TODO add msg
+        displayInfo(context, "Could not find song")
     }
 }
 
@@ -121,7 +121,7 @@ internal fun playAlbumNext(context: Context, mcID: String) {
             }
         },
         Response.ErrorListener { error ->
-            //TODO add msg
+            displayInfo(context, "Error retrieving album data")
         })
 
     albumRequestQueue.add(albumRequest)
@@ -141,32 +141,33 @@ internal fun downloadPlaylist(context: Context, playlistId: String) {
 }
 
 internal fun downloadSong(context: Context, song: Song) {
-    val settings = Settings(context)
+    if (song.isDownloadable) {
+        val settings = Settings(context)
 
-    val downloadType = settings.getSetting("downloadType")
-    val downloadQuality = settings.getSetting("downloadQuality")
+        val downloadType = settings.getSetting("downloadType")
+        val downloadQuality = settings.getSetting("downloadQuality")
 
-    val downloadUrl =
-        context.getString(R.string.trackContentUrl) + song.albumId + "/track-download/" + song.songId + "?format=" + downloadType + "_" + downloadQuality
+        val downloadUrl =
+            context.getString(R.string.trackContentUrl) + song.albumId + "/track-download/" + song.songId + "?format=" + downloadType + "_" + downloadQuality
 
-    val downloadLocation =
-        context.getExternalFilesDir(null).toString() + "/" + song.artist + song.title + song.version + "." + downloadType
+        val downloadLocation =
+            context.getExternalFilesDir(null).toString() + "/" + song.artist + song.title + song.version + "." + downloadType
 
-    if (!File(downloadLocation).exists()) {
-        val sSid = getSid()
-        if (sSid != null) {
-            addDownloadSong(downloadUrl, downloadLocation, song.title + " " + song.version)
+        if (!File(downloadLocation).exists()) {
+            val sSid = getSid()
+            if (sSid != null) {
+                addDownloadSong(downloadUrl, downloadLocation, song.title + " " + song.version)
+            }
+
+        } else {
+            displayInfo(
+                context,
+                context.getString(R.string.alreadyDownloadedMsg, song.title + song.version)
+            )
         }
-
     } else {
-        Toast.makeText(
-            context,
-            context.getString(R.string.alreadyDownloadedMsg, song.title + song.version),
-            Toast.LENGTH_SHORT
-        )
-            .show()
+        displayInfo(context, "You are not allowed to download this")
     }
-
 }
 
 internal fun downloadAlbum(context: Context, mcID: String) {
@@ -197,8 +198,7 @@ internal fun downloadAlbum(context: Context, mcID: String) {
             }
         },
         Response.ErrorListener { error ->
-            println(error)
-            //TODO add msg
+            displayInfo(context, "Could not retrieve album data")
         })
 
     albumRequestQueue.add(albumRequest)
@@ -246,7 +246,7 @@ internal fun addSongToPlaylist(context: Context, song: Song) {
                         }
                     },
                     Response.ErrorListener {
-                        //TODO add msg
+                        displayInfo(context, "Could not retrieve playlists")
                     })
 
 
@@ -283,18 +283,15 @@ internal fun addSongToPlaylist(context: Context, song: Song) {
 
                         val addToPlaylistQueue = Volley.newRequestQueue(context)
                         addToPlaylistQueue.addRequestFinishedListener<Any> {
-                            Toast.makeText(
-                                context,
-                                context.getString(
+                            displayInfo(
+                                context, context.getString(
                                     R.string.songAddedToPlaylistMsg,
                                     song.title + " " + song.version
-                                ),
-                                Toast.LENGTH_SHORT
-                            ).show()
+                                )
+                            )
                         }
 
                         addToPlaylistQueue.add(patchRequest)
-
 
                     }
 
@@ -313,7 +310,7 @@ internal fun addSongToPlaylist(context: Context, song: Song) {
                             }
                         },
                         Response.ErrorListener {
-                            //TODO add msg
+                            displayInfo(context, "Could not send new playlist data")
                         })
 
                     playlistTrackRequestQueue.add(playlistTrackRequest)
@@ -327,6 +324,6 @@ internal fun addSongToPlaylist(context: Context, song: Song) {
         alertDialogBuilder.show()
 
     } else {
-        //TODO add msg
+        displayInfo(context, "Not logged in!")
     }
 }

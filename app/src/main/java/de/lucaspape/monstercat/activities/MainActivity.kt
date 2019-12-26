@@ -32,6 +32,7 @@ import de.lucaspape.monstercat.handlers.async.LoadContinuousSongListAsync
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.notification.stopPlayerService
 import de.lucaspape.monstercat.util.Settings
+import de.lucaspape.monstercat.util.displayInfo
 import java.lang.IllegalArgumentException
 import java.lang.ref.WeakReference
 
@@ -86,7 +87,7 @@ class MainActivity : AppCompatActivity() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET)
             != PackageManager.PERMISSION_GRANTED
         ) {
-            //TODO add msg
+            displayInfo(this, "No access to internet!")
             println("Internet permission not granted!")
         }
 

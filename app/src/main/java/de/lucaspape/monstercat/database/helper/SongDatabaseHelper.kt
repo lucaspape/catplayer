@@ -18,7 +18,7 @@ class SongDatabaseHelper(context: Context) :
 
     companion object {
         @JvmStatic
-        private val DATABASE_VERSION = 2
+        private val DATABASE_VERSION = 3
         @JvmStatic
         private val DATABASE_NAME = "songs_db"
     }
@@ -39,7 +39,9 @@ class SongDatabaseHelper(context: Context) :
         version: String,
         albumId: String,
         artist: String,
-        coverUrl: String
+        coverUrl: String,
+        downloadable:Boolean,
+        streamable:Boolean
     ): Long {
         val db = writableDatabase
 
@@ -51,6 +53,8 @@ class SongDatabaseHelper(context: Context) :
         values.put(Song.COLUMN_ALBUM_ID, albumId)
         values.put(Song.COLUMN_ARTIST, artist)
         values.put(Song.COLUMN_COVER_URL, coverUrl)
+        values.put(Song.COLUMN_DOWNLOADABLE, downloadable.toString())
+        values.put(Song.COLUMN_STREAMABLE, streamable.toString())
 
         val id = db.insert(Song.TABLE_NAME, null, values)
         db.close()
@@ -68,7 +72,9 @@ class SongDatabaseHelper(context: Context) :
                 Song.COLUMN_VERSION,
                 Song.COLUMN_ALBUM_ID,
                 Song.COLUMN_ARTIST,
-                Song.COLUMN_COVER_URL
+                Song.COLUMN_COVER_URL,
+                Song.COLUMN_DOWNLOADABLE,
+                Song.COLUMN_STREAMABLE
             ),
             Song.COLUMN_ID + "=?",
             arrayOf(id.toString()), null, null, null, null
@@ -83,7 +89,9 @@ class SongDatabaseHelper(context: Context) :
             cursor.getString(cursor.getColumnIndex(Song.COLUMN_VERSION)),
             cursor.getString(cursor.getColumnIndex(Song.COLUMN_ALBUM_ID)),
             cursor.getString(cursor.getColumnIndex(Song.COLUMN_ARTIST)),
-            cursor.getString(cursor.getColumnIndex(Song.COLUMN_COVER_URL))
+            cursor.getString(cursor.getColumnIndex(Song.COLUMN_COVER_URL)),
+            cursor.getString(cursor.getColumnIndex(Song.COLUMN_DOWNLOADABLE))!!.toBoolean(),
+            cursor.getString(cursor.getColumnIndex(Song.COLUMN_STREAMABLE))!!.toBoolean()
         )
 
         cursor.close()
@@ -104,7 +112,9 @@ class SongDatabaseHelper(context: Context) :
                     Song.COLUMN_VERSION,
                     Song.COLUMN_ALBUM_ID,
                     Song.COLUMN_ARTIST,
-                    Song.COLUMN_COVER_URL
+                    Song.COLUMN_COVER_URL,
+                    Song.COLUMN_DOWNLOADABLE,
+                    Song.COLUMN_STREAMABLE
                 ),
                 Song.COLUMN_SONG_ID + "=?",
                 arrayOf(songId), null, null, null, null
@@ -120,7 +130,9 @@ class SongDatabaseHelper(context: Context) :
                     cursor.getString(cursor.getColumnIndex(Song.COLUMN_VERSION)),
                     cursor.getString(cursor.getColumnIndex(Song.COLUMN_ALBUM_ID)),
                     cursor.getString(cursor.getColumnIndex(Song.COLUMN_ARTIST)),
-                    cursor.getString(cursor.getColumnIndex(Song.COLUMN_COVER_URL))
+                    cursor.getString(cursor.getColumnIndex(Song.COLUMN_COVER_URL)),
+                    cursor.getString(cursor.getColumnIndex(Song.COLUMN_DOWNLOADABLE))!!.toBoolean(),
+                    cursor.getString(cursor.getColumnIndex(Song.COLUMN_STREAMABLE))!!.toBoolean()
                 )
 
                 cursor.close()

@@ -38,32 +38,37 @@ internal fun play() {
             val downloadStream = settings.getSetting("downloadStream")?.toBoolean()
 
             if (downloadStream == true && !File(song.downloadLocation).exists()) {
-                song.downloadLocation = song.downloadLocation + ".stream"
+                if(song.isDownloadable){
+                    song.downloadLocation = song.downloadLocation + ".stream"
 
-                addDownloadSong(
-                    song.streamLocation,
-                    song.downloadLocation,
-                    song.title + " " + song.version
-                )
+                    addDownloadSong(
+                        song.streamLocation,
+                        song.downloadLocation,
+                        song.title + " " + song.version
+                    )
 
-                waitForDownloadTask?.cancel(true)
+                    waitForDownloadTask?.cancel(true)
 
-                waitForDownloadTask = object : AsyncTask<Void, Void, String>() {
-                    override fun doInBackground(vararg params: Void?): String? {
-                        while (!File(song.downloadLocation).exists()) {
-                            Thread.sleep(100)
+                    waitForDownloadTask = object : AsyncTask<Void, Void, String>() {
+                        override fun doInBackground(vararg params: Void?): String? {
+                            while (!File(song.downloadLocation).exists()) {
+                                Thread.sleep(100)
+                            }
+
+                            return null
                         }
 
-                        return null
+                        override fun onPostExecute(result: String?) {
+                            playSong(context, song)
+                        }
+
                     }
 
-                    override fun onPostExecute(result: String?) {
-                        playSong(context, song)
-                    }
-
+                    waitForDownloadTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                }else{
+                    playSong(context, song)
+                    displayInfo(context, "You are not allowed to download this, fallback to streaming.")
                 }
-
-                waitForDownloadTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
             }else{
                 playSong(context, song)
             }
@@ -107,21 +112,26 @@ private fun playSong(context: Context, song: Song) {
             ).exists()
         ) {
 
-            mediaPlayer?.prepare(songToMediaSource(context, song))
+            val mediaSource = songToMediaSource(context, song)
 
-            mediaPlayer?.playWhenReady = true
+            if(mediaSource != null){
+                mediaPlayer?.prepare(songToMediaSource(context, song))
 
-            setTitle(song.title, song.version, song.artist)
+                mediaPlayer?.playWhenReady = true
 
-            startTextAnimation()
+                setTitle(song.title, song.version, song.artist)
 
-            setCover(song, context)
+                startTextAnimation()
 
-            setPlayButtonImage(context)
+                setCover(song, context)
 
-            startSeekBarUpdate()
+                setPlayButtonImage(context)
+
+                startSeekBarUpdate()
+            }else{
+                displayInfo(context, "You cannot play this song")
+            }
         }
-
     }
 }
 

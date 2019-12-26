@@ -52,16 +52,17 @@ fun abandonAudioFocus(context: Context) {
     audioManager.abandonAudioFocus(audioFocusChangeListener)
 }
 
-fun songToMediaSource(context: Context, song: Song): ProgressiveMediaSource {
+fun songToMediaSource(context: Context, song: Song): ProgressiveMediaSource? {
     if (!File(song.getUrl()).exists()) {
+        return if(song.isStreamable){
+            val httpSourceFactory = DefaultHttpDataSourceFactory(Util.getUserAgent(context, "MonstercatPlayer"))
 
-        val httpSourceFactory = DefaultHttpDataSourceFactory(Util.getUserAgent(context, "MonstercatPlayer"))
+            httpSourceFactory.defaultRequestProperties.set("Cookie", "connect.sid=${getSid()}")
 
-        httpSourceFactory.defaultRequestProperties.set("Cookie", "connect.sid=${getSid()}")
-
-        return ProgressiveMediaSource.Factory(httpSourceFactory).createMediaSource(song.getUrl().toUri())
-
-
+            ProgressiveMediaSource.Factory(httpSourceFactory).createMediaSource(song.getUrl().toUri())
+        }else{
+            null
+        }
     } else {
         return ProgressiveMediaSource.Factory(
             DefaultDataSourceFactory(
