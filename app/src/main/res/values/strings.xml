@@ -48,4 +48,10 @@
     <string name="fullscreenPrevButton">Previous Button</string>
     <string name="livestreamTitle">Monstercat Livestream</string>
     <string name="livestreamArtist">Monstercat</string>
+    <string name="couldNotFindSongMSg">Could not find song</string>
+    <string name="errorRetrieveAlbumData">Error retrieving album data</string>
+    <string name="errorRetrievePlaylist">Error retrieving playlist</string>
+    <string name="errorUpdatePlaylist">Error updating playlist</string>
+    <string name="errorNotLoggedIn">Not logged in</string>
+    <string name="downloadStream">Download stream before playback</string>
 </resources>

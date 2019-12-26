@@ -4,7 +4,6 @@ import android.app.AlertDialog
 import android.content.Context
 import android.os.AsyncTask
 import android.widget.ListView
-import android.widget.Toast
 import com.android.volley.AuthFailureError
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
@@ -47,7 +46,7 @@ internal fun playSongFromId(context: Context, songId: String, playNow: Boolean) 
         }
 
     } else {
-        displayInfo(context, "Could not find song")
+        displayInfo(context, context.getString(R.string.couldNotFindSongMSg))
     }
 }
 
@@ -121,7 +120,7 @@ internal fun playAlbumNext(context: Context, mcID: String) {
             }
         },
         Response.ErrorListener { error ->
-            displayInfo(context, "Error retrieving album data")
+            displayInfo(context, context.getString(R.string.errorRetrieveAlbumData))
         })
 
     albumRequestQueue.add(albumRequest)
@@ -162,11 +161,11 @@ internal fun downloadSong(context: Context, song: Song) {
         } else {
             displayInfo(
                 context,
-                context.getString(R.string.alreadyDownloadedMsg, song.title + song.version)
+                context.getString(R.string.alreadyDownloadedMsg, song.title + " " + song.version)
             )
         }
     } else {
-        displayInfo(context, "You are not allowed to download this")
+        displayInfo(context, context.getString(R.string.downloadNotAvailableMsg, song.title + " " + song.version))
     }
 }
 
@@ -198,7 +197,7 @@ internal fun downloadAlbum(context: Context, mcID: String) {
             }
         },
         Response.ErrorListener { error ->
-            displayInfo(context, "Could not retrieve album data")
+            displayInfo(context, context.getString(R.string.errorRetrieveAlbumData))
         })
 
     albumRequestQueue.add(albumRequest)
@@ -246,7 +245,7 @@ internal fun addSongToPlaylist(context: Context, song: Song) {
                         }
                     },
                     Response.ErrorListener {
-                        displayInfo(context, "Could not retrieve playlists")
+                        displayInfo(context, context.getString(R.string.errorRetrievePlaylist))
                     })
 
 
@@ -310,7 +309,7 @@ internal fun addSongToPlaylist(context: Context, song: Song) {
                             }
                         },
                         Response.ErrorListener {
-                            displayInfo(context, "Could not send new playlist data")
+                            displayInfo(context, context.getString(R.string.errorUpdatePlaylist))
                         })
 
                     playlistTrackRequestQueue.add(playlistTrackRequest)
@@ -324,6 +323,6 @@ internal fun addSongToPlaylist(context: Context, song: Song) {
         alertDialogBuilder.show()
 
     } else {
-        displayInfo(context, "Not logged in!")
+        displayInfo(context, context.getString(R.string.errorNotLoggedIn))
     }
 }
