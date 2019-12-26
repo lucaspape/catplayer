@@ -154,4 +154,10 @@ class SongDatabaseHelper(context: Context) :
             return null
         }
     }
+
+    fun deleteSong(songId: String){
+        val db = writableDatabase
+        db.delete(Song.TABLE_NAME, Song.COLUMN_SONG_ID + " = ?", arrayOf(songId))
+        db.close()
+    }
 }
