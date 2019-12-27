@@ -38,7 +38,7 @@ internal fun play() {
             val settings = Settings(context)
             val downloadStream = settings.getSetting("downloadStream")?.toBoolean()
 
-            if (downloadStream == true && !File(song.downloadLocation).exists()) {
+            if (downloadStream == true) {
                 if(song.isDownloadable){
                     addDownloadSong(
                         song.streamLocation,
@@ -50,9 +50,15 @@ internal fun play() {
 
                     waitForDownloadTask = object : AsyncTask<Void, Void, String>() {
                         override fun doInBackground(vararg params: Void?): String? {
-                            while (!File(song.streamDownloadLocation).exists()) {
+                            while (!File(song.streamDownloadLocation).exists() || !File(song.downloadLocation).exists()) {
                                 Thread.sleep(100)
                             }
+
+                            return null
+                        }
+
+                        override fun onPostExecute(result: String?) {
+                            playSong(context, song)
 
                             try{
                                 val nextSong = playList[currentSong + 1]
@@ -64,12 +70,6 @@ internal fun play() {
                             }catch (e: IndexOutOfBoundsException){
 
                             }
-
-                            return null
-                        }
-
-                        override fun onPostExecute(result: String?) {
-                            playSong(context, song)
                         }
 
                     }
