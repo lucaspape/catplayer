@@ -69,17 +69,16 @@ data class Song(
     val streamDownloadLocation: String = "$downloadLocation.stream"
 
     fun getUrl(): String {
-        return when {
-            File(downloadLocation).exists() -> {
-                downloadLocation
-            }
-            File(streamDownloadLocation).exists() -> {
-                streamDownloadLocation
-            }
-            else -> {
-                streamLocation
-            }
+        return if(File(downloadLocation).exists() && File(streamDownloadLocation).exists()){
+            File(streamDownloadLocation).delete()
+
+            downloadLocation
+        }else if(File(downloadLocation).exists()){
+            downloadLocation
+        }else if(File(streamDownloadLocation).exists()){
+            streamDownloadLocation
+        }else{
+            streamLocation
         }
     }
-
 }
