@@ -4,7 +4,6 @@ import android.content.Context
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.util.Settings
 import java.io.File
-import java.lang.ref.WeakReference
 
 data class Song(
     val context: Context,
