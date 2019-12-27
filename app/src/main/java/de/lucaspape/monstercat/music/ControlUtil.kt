@@ -50,8 +50,10 @@ internal fun play() {
 
                     waitForDownloadTask = object : AsyncTask<Void, Void, String>() {
                         override fun doInBackground(vararg params: Void?): String? {
-                            while (!File(song.streamDownloadLocation).exists() || !File(song.downloadLocation).exists()) {
-                                Thread.sleep(100)
+                            if(!File(song.downloadLocation).exists()){
+                                while (!File(song.streamDownloadLocation).exists()) {
+                                    Thread.sleep(100)
+                                }
                             }
 
                             return null
