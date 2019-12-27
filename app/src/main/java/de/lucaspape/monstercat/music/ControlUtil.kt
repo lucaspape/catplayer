@@ -6,6 +6,7 @@ import android.media.AudioManager
 import android.os.AsyncTask
 import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.Player
+import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.music.notification.startPlayerService
@@ -39,11 +40,9 @@ internal fun play() {
 
             if (downloadStream == true && !File(song.downloadLocation).exists()) {
                 if(song.isDownloadable){
-                    song.downloadLocation = song.downloadLocation + ".stream"
-
                     addDownloadSong(
                         song.streamLocation,
-                        song.downloadLocation,
+                        song.streamDownloadLocation,
                         song.title + " " + song.version
                     )
 
@@ -51,8 +50,19 @@ internal fun play() {
 
                     waitForDownloadTask = object : AsyncTask<Void, Void, String>() {
                         override fun doInBackground(vararg params: Void?): String? {
-                            while (!File(song.downloadLocation).exists()) {
+                            while (!File(song.streamDownloadLocation).exists()) {
                                 Thread.sleep(100)
+                            }
+
+                            try{
+                                val nextSong = playList[currentSong + 1]
+
+                                addDownloadSong(nextSong.streamLocation,
+                                    nextSong.streamDownloadLocation,
+                                    nextSong.title + " " + nextSong.version)
+
+                            }catch (e: IndexOutOfBoundsException){
+
                             }
 
                             return null
@@ -67,7 +77,7 @@ internal fun play() {
                     waitForDownloadTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
                 }else{
                     playSong(context, song)
-                    displayInfo(context, "You are not allowed to download this, fallback to streaming.")
+                    displayInfo(context, context.getString(R.string.errorDownloadNotAllowedFallbackStream))
                 }
             }else{
                 playSong(context, song)

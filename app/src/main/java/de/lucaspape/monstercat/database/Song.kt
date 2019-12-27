@@ -1,8 +1,13 @@
 package de.lucaspape.monstercat.database
 
+import android.content.Context
+import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.util.Settings
 import java.io.File
+import java.lang.ref.WeakReference
 
 data class Song(
+    val context: Context,
     val id: Int,
     val songId: String,
     val title: String,
@@ -10,9 +15,9 @@ data class Song(
     val albumId: String,
     val artist: String,
     val coverUrl: String,
-    val isDownloadable:Boolean,
-    val isStreamable:Boolean,
-    val inEarlyAccess:Boolean
+    val isDownloadable: Boolean,
+    val isStreamable: Boolean,
+    val inEarlyAccess: Boolean
 ) {
 
     companion object {
@@ -55,16 +60,25 @@ data class Song(
                     ")"
     }
 
-    var downloadLocation: String = ""
-    var streamLocation: String = ""
+    val downloadLocation: String =
+        context.getExternalFilesDir(null).toString() + "/" + artist + title + version + "." + Settings(
+            context
+        ).getSetting("downloadType")
+    val streamLocation: String =
+        context.getString(R.string.trackContentUrl) + albumId + "/track-stream/" + songId
+    val streamDownloadLocation: String = "$downloadLocation.stream"
 
     fun getUrl(): String {
-        return if (File(downloadLocation).exists()) {
-            downloadLocation
-        } else if(File("$downloadLocation.stream").exists()){
-            return "$downloadLocation.stream"
-        }else{
-            streamLocation
+        return when {
+            File(downloadLocation).exists() -> {
+                downloadLocation
+            }
+            File(streamDownloadLocation).exists() -> {
+                streamDownloadLocation
+            }
+            else -> {
+                streamLocation
+            }
         }
     }
 

@@ -26,7 +26,7 @@ class LoadAlbumAsync(
     private val itemValue: HashMap<*, *>
 ) : AsyncTask<Void, Void, String>() {
     override fun onPreExecute() {
-        viewReference.get()?.let {view ->
+        viewReference.get()?.let { view ->
             val swipeRefreshLayout =
                 view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
             swipeRefreshLayout.isRefreshing = true
@@ -45,11 +45,11 @@ class LoadAlbumAsync(
         val songDatabaseHelper = SongDatabaseHelper(contextReference.get()!!)
 
         for (albumItem in albumItemList) {
-            contextReference.get()?.let {context ->
+            contextReference.get()?.let { context ->
                 dbSongs.add(
                     parseSongToHashMap(
                         context,
-                        songDatabaseHelper.getSong(albumItem.songId)
+                        songDatabaseHelper.getSong(context, albumItem.songId)
                     )
                 )
             }
@@ -80,7 +80,7 @@ class LoadAlbumAsync(
         val albumId = itemValue["id"] as String
         val mcID = itemValue["mcID"] as String
 
-        contextReference.get()?.let {context ->
+        contextReference.get()?.let { context ->
             val requestQueue = Volley.newRequestQueue(context)
 
             val albumItemDatabaseHelper =

@@ -47,7 +47,7 @@ class LoadSongListAsync(
             val songList = ArrayList<Song>()
 
             for (song in songIdList) {
-                songList.add(songDatabaseHelper.getSong(song.songId))
+                songList.add(songDatabaseHelper.getSong(context, song.songId))
             }
 
             for (song in songList) {

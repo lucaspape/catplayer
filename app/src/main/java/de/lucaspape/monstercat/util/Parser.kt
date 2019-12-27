@@ -69,7 +69,7 @@ fun parseSongSearchToSongList(context: Context, jsonArray: JSONArray): ArrayList
 
         songId?.let {
             val databaseHelper = SongDatabaseHelper(context)
-            songList.add(databaseHelper.getSong(it))
+            songList.add(databaseHelper.getSong(context,it))
         }
     }
 
@@ -106,7 +106,7 @@ fun parseSongToDB(jsonObject: JSONObject, context: Context): Long? {
 
     val databaseHelper = SongDatabaseHelper(context)
 
-    return databaseHelper.insertSong(id, title, version, albumId, artist, coverUrl, downloadable, streamable, inEarlyAccess)
+    return databaseHelper.insertSong(context, id, title, version, albumId, artist, coverUrl, downloadable, streamable, inEarlyAccess)
 }
 
 fun parseCatalogSongToDB(jsonObject: JSONObject, context: Context): Long? {

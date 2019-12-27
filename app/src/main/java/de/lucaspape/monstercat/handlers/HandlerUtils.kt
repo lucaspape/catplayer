@@ -26,19 +26,10 @@ import java.io.File
 import java.lang.ref.WeakReference
 
 internal fun playSongFromId(context: Context, songId: String, playNow: Boolean) {
-    val settings = Settings(context)
-    val downloadType = settings.getSetting("downloadType")
-
     val songDatabaseHelper = SongDatabaseHelper(context)
-    val song = songDatabaseHelper.getSong(songId)
+    val song = songDatabaseHelper.getSong(context, songId)
 
     if (song != null) {
-        song.downloadLocation =
-            context.getExternalFilesDir(null).toString() + "/" + song.artist + song.title + song.version + "." + downloadType
-
-        song.streamLocation =
-            context.getString(R.string.trackContentUrl) + song.albumId + "/track-stream/" + song.songId
-
         if (playNow) {
             de.lucaspape.monstercat.music.playNow(song)
         } else {
@@ -102,21 +93,10 @@ internal fun playAlbumNext(context: Context, mcID: String) {
 
             val databaseHelper = SongDatabaseHelper(context)
 
-            val settings = Settings(context)
-            val downloadType = settings.getSetting("downloadType")
-
             idArray.reverse()
 
             for (id in idArray) {
-                val song = databaseHelper.getSong(id)
-
-                song.downloadLocation =
-                    context.getExternalFilesDir(null).toString() + "/" + song.artist + song.title + song.version + "." + downloadType
-
-                song.streamLocation =
-                    context.getString(R.string.trackContentUrl) + song.albumId + "/track-stream/" + song.songId
-
-                addSong(song)
+                addSong(databaseHelper.getSong(context, id))
             }
         },
         Response.ErrorListener { error ->
@@ -133,7 +113,7 @@ internal fun downloadPlaylist(context: Context, playlistId: String) {
 
     for (playlistItem in playlistItemList) {
         val songDatabaseHelper = SongDatabaseHelper(context)
-        val song = songDatabaseHelper.getSong(playlistItem.songId)
+        val song = songDatabaseHelper.getSong(context, playlistItem.songId)
 
         downloadSong(context, song)
     }
@@ -165,7 +145,10 @@ internal fun downloadSong(context: Context, song: Song) {
             )
         }
     } else {
-        displayInfo(context, context.getString(R.string.downloadNotAvailableMsg, song.title + " " + song.version))
+        displayInfo(
+            context,
+            context.getString(R.string.downloadNotAvailableMsg, song.title + " " + song.version)
+        )
     }
 }
 
@@ -192,7 +175,7 @@ internal fun downloadAlbum(context: Context, mcID: String) {
             val databaseHelper = SongDatabaseHelper(context)
 
             for (id in idArray) {
-                val song = databaseHelper.getSong(id)
+                val song = databaseHelper.getSong(context, id)
                 downloadSong(context, song)
             }
         },

@@ -23,7 +23,6 @@ class SongDatabaseHelper(context: Context) :
         private val DATABASE_NAME = "songs_db"
     }
 
-
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
         db?.execSQL("DROP TABLE IF EXISTS " + Song.TABLE_NAME)
         onCreate(db)
@@ -34,15 +33,16 @@ class SongDatabaseHelper(context: Context) :
     }
 
     fun insertSong(
+        context: Context,
         songId: String,
         title: String,
         version: String,
         albumId: String,
         artist: String,
         coverUrl: String,
-        downloadable:Boolean,
-        streamable:Boolean,
-        inEarlyAccess:Boolean
+        downloadable: Boolean,
+        streamable: Boolean,
+        inEarlyAccess: Boolean
     ): Long {
         val db = writableDatabase
 
@@ -58,11 +58,16 @@ class SongDatabaseHelper(context: Context) :
         values.put(Song.COLUMN_STREAMABLE, streamable.toString())
         values.put(Song.COLUMN_INEARLYACCESS, inEarlyAccess.toString())
 
-        val id = if(getSong(songId) == null){
+        val id = if (getSong(context, songId) == null) {
             db.insert(Song.TABLE_NAME, null, values)
-        }else{
-            db.update(Song.TABLE_NAME, values, Song.COLUMN_ID + "=" + getSong(songId)?.id.toString(), null)
-            getSong(songId)!!.id.toLong()
+        } else {
+            db.update(
+                Song.TABLE_NAME,
+                values,
+                Song.COLUMN_ID + "=" + getSong(context, songId)?.id.toString(),
+                null
+            )
+            getSong(context, songId)!!.id.toLong()
         }
 
         db.close()
@@ -70,7 +75,7 @@ class SongDatabaseHelper(context: Context) :
         return id
     }
 
-    fun getSong(id: Long): Song {
+    fun getSong(context: Context, id: Long): Song {
         val db = readableDatabase
 
         val cursor = db.query(
@@ -93,6 +98,7 @@ class SongDatabaseHelper(context: Context) :
         cursor?.moveToFirst()
 
         val song = Song(
+            context,
             cursor.getInt(cursor.getColumnIndex(Song.COLUMN_ID)),
             cursor.getString(cursor.getColumnIndex(Song.COLUMN_SONG_ID)),
             cursor.getString(cursor.getColumnIndex(Song.COLUMN_TITLE)),
@@ -110,7 +116,7 @@ class SongDatabaseHelper(context: Context) :
         return song
     }
 
-    fun getSong(songId: String): Song? {
+    fun getSong(context: Context, songId: String): Song? {
         val db = readableDatabase
         val cursor: Cursor
 
@@ -136,6 +142,7 @@ class SongDatabaseHelper(context: Context) :
 
             try {
                 val song = Song(
+                    context,
                     cursor.getInt(cursor.getColumnIndex(Song.COLUMN_ID)),
                     cursor.getString(cursor.getColumnIndex(Song.COLUMN_SONG_ID)),
                     cursor.getString(cursor.getColumnIndex(Song.COLUMN_TITLE)),

@@ -18,7 +18,6 @@ import de.lucaspape.monstercat.util.parsePlaylistTrackToDB
 import de.lucaspape.monstercat.util.parseSongToHashMap
 import org.json.JSONObject
 import java.lang.ref.WeakReference
-import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
@@ -54,7 +53,7 @@ class LoadPlaylistTracksAsync(
             for (playlistItem in playlistItems) {
                 val hashMap = parseSongToHashMap(
                     context,
-                    songDatabaseHelper.getSong(playlistItem.songId)
+                    songDatabaseHelper.getSong(context, playlistItem.songId)
                 )
                 sortedList.add(hashMap)
             }

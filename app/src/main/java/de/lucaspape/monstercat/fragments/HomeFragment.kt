@@ -70,10 +70,10 @@ class HomeFragment : Fragment() {
 
         val listItem = listView?.getItemAtPosition(position) as HashMap<*, *>
 
-        view?.let {view ->
+        view?.let { view ->
             val songDatabaseHelper =
                 SongDatabaseHelper(view.context)
-            val song = songDatabaseHelper.getSong(listItem["id"] as String)
+            val song = songDatabaseHelper.getSong(view.context, listItem["id"] as String)
 
             context?.let {
                 if (song != null) {

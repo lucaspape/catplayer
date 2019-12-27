@@ -358,8 +358,6 @@ internal fun setSongMetadata(song: Song, coverLocation: String, duration: Long) 
     mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, coverImage)
     mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ART, coverImage)
     mediaSession?.setMetadata(mediaMetadata.build())
-
-    updateNotification(song.title, song.version, song.artist, coverLocation)
 }
 
 internal fun setSongMetadata(
@@ -378,6 +376,4 @@ internal fun setSongMetadata(
     mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, coverImage)
     mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ART, coverImage)
     mediaSession?.setMetadata(mediaMetadata.build())
-
-    updateNotification(title, version, artist, coverLocation)
 }
