@@ -15,7 +15,7 @@ This android app aims to implement the Monstercat API.
  - Dark Mode (Android 9 or higher)
  - Live Radio from Twitch
 
-<img src="https://raw.githubusercontent.com/lucaspape/catplayer/master/playstore_res/screenshots/Screenshot_20191110-152127_Player_for_Monstercat.png" width="40%">  <img src="https://raw.githubusercontent.com/lucaspape/catplayer/master/playstore_res/screenshots/Screenshot_20191110-152238_Player_for_Monstercat.png" width="40%">
+<img src="https://raw.githubusercontent.com/lucaspape/catplayer/master/playstore_res/screenshots/Screenshot_20191228-164712_Player_for_Monstercat.png" width="40%">  <img src="https://raw.githubusercontent.com/lucaspape/catplayer/master/playstore_res/screenshots/Screenshot_20191228-164732_Player_for_Monstercat.png" width="40%">
 
 All album images seen in these screenshots are Copyright Monstercat.
 
