@@ -124,10 +124,10 @@ private fun playSong(context: Context, song: Song) {
             ).exists()
         ) {
 
-            val mediaSource = songToMediaSource(context, song)
+            val mediaSource = song.getMediaSource()
 
             if(mediaSource != null){
-                mediaPlayer?.prepare(songToMediaSource(context, song))
+                mediaPlayer?.prepare(mediaSource)
 
                 mediaPlayer?.playWhenReady = true
 
@@ -175,7 +175,7 @@ fun playStream(stream: Stream) {
 
             if (wifiConnected(context) == true || settings.getSetting("streamOverMobile") == "true") {
 
-                mediaPlayer?.prepare(streamToMediaSource(context, stream))
+                mediaPlayer?.prepare(stream.getMediaSource(context))
 
                 mediaPlayer?.playWhenReady = true
 

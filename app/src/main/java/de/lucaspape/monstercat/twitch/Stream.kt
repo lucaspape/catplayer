@@ -1,11 +1,15 @@
 package de.lucaspape.monstercat.twitch
 
 import android.content.Context
+import androidx.core.net.toUri
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.google.android.exoplayer2.source.hls.HlsMediaSource
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.android.exoplayer2.util.Util
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.request.TwitchRequest
 import org.json.JSONObject
@@ -102,5 +106,15 @@ class Stream(private val clientId: String) {
         }
 
         volleyQueue.add(artistTitleRequest)
+    }
+
+    fun getMediaSource(context: Context): HlsMediaSource {
+        return HlsMediaSource.Factory(
+            DefaultDataSourceFactory(
+                context, Util.getUserAgent(
+                    context, context.getString(R.string.applicationName)
+                )
+            )
+        ).createMediaSource(streamUrl.toUri())
     }
 }

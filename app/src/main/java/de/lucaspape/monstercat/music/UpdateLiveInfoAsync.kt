@@ -71,22 +71,19 @@ class UpdateLiveInfoAsync(
             version?.let {
                 artist?.let {
                     coverLocation?.let {
-                        contextReference.get()?.let { context ->
-                            setCover(
-                                title,
-                                version,
-                                artist,
-                                coverLocation,
-                                context
-                            )
+                        setCover(
+                            title,
+                            version,
+                            artist,
+                            coverLocation
+                        )
 
-                            updateNotification(
-                                title,
-                                "",
-                                artist,
-                                coverLocation
-                            )
-                        }
+                        updateNotification(
+                            title,
+                            "",
+                            artist,
+                            coverLocation
+                        )
                     }
                 }
             }

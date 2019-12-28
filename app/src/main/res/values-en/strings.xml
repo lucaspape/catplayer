@@ -58,4 +58,5 @@
     <string name="musicbarDescription">Currently playing</string>
     <string name="homeSearchDescription">Search song</string>
     <string name="errorDownloadNotAllowedFallbackStream">You are not allowed to download this. Fallback to streaming.</string>
+    <string name="applicationName">Catplayer</string>
 </resources>

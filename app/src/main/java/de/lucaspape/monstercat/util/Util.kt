@@ -28,32 +28,30 @@ fun downloadCover(
     secondaryRes: String
 ): Boolean {
     try {
-        if (!File(location + primaryRes).exists() || !File(location + secondaryRes).exists()) {
-            val connection =
-                URL("$downloadUrl?image_width=$primaryRes").openConnection() as HttpURLConnection
-            connection.doInput = true
-            connection.connect()
-            val input = connection.inputStream
-            val primaryBitmap = BitmapFactory.decodeStream(input)
+        val connection =
+            URL("$downloadUrl?image_width=$primaryRes").openConnection() as HttpURLConnection
+        connection.doInput = true
+        connection.connect()
+        val input = connection.inputStream
+        val primaryBitmap = BitmapFactory.decodeStream(input)
 
-            FileOutputStream(location + primaryRes).use { out ->
-                primaryBitmap?.compress(Bitmap.CompressFormat.PNG, 100, out)
-            }
-
-            val secondaryBitmap =
-                Bitmap.createScaledBitmap(
-                    primaryBitmap,
-                    secondaryRes.toInt(),
-                    secondaryRes.toInt(),
-                    false
-                )
-
-            FileOutputStream(location + secondaryRes).use { out ->
-                secondaryBitmap?.compress(Bitmap.CompressFormat.PNG, 100, out)
-            }
-
-            connection.disconnect()
+        FileOutputStream(location + primaryRes).use { out ->
+            primaryBitmap?.compress(Bitmap.CompressFormat.PNG, 100, out)
         }
+
+        val secondaryBitmap =
+            Bitmap.createScaledBitmap(
+                primaryBitmap,
+                secondaryRes.toInt(),
+                secondaryRes.toInt(),
+                false
+            )
+
+        FileOutputStream(location + secondaryRes).use { out ->
+            secondaryBitmap?.compress(Bitmap.CompressFormat.PNG, 100, out)
+        }
+
+        connection.disconnect()
 
         return true
     } catch (e: IOException) {
@@ -62,53 +60,57 @@ fun downloadCover(
     }
 }
 
-fun downloadFile(destination:String, source:String, tempDir:String, sid:String?, progressUpdate: (max:Int, current:Int) -> Unit){
+fun downloadFile(
+    destination: String,
+    source: String,
+    tempDir: String,
+    sid: String?,
+    progressUpdate: (max: Int, current: Int) -> Unit
+) {
     val destinationFile = File(destination)
     val tempFile = File(tempDir + "/" + UUID.randomUUID().toString())
 
-    if(!File(destination).exists()){
-        val urlConnection = URL(source).openConnection()
-        urlConnection.setRequestProperty("Cookie", "connect.sid=$sid")
-        urlConnection.connect()
+    val urlConnection = URL(source).openConnection()
+    urlConnection.setRequestProperty("Cookie", "connect.sid=$sid")
+    urlConnection.connect()
 
-        val lengthOfFile = urlConnection.contentLength
+    val lengthOfFile = urlConnection.contentLength
 
-        val bufferedInputStream = BufferedInputStream(urlConnection.getInputStream(), 8192)
+    val bufferedInputStream = BufferedInputStream(urlConnection.getInputStream(), 8192)
 
-        val fileOutputStream = FileOutputStream(tempFile)
+    val fileOutputStream = FileOutputStream(tempFile)
 
-        val data = ByteArray(1024)
-        var total: Long = 0
-        var count: Int
-        var updateCount = 0
+    val data = ByteArray(1024)
+    var total: Long = 0
+    var count: Int
+    var updateCount = 0
 
-        do {
-            count = bufferedInputStream.read(data)
+    do {
+        count = bufferedInputStream.read(data)
 
-            if (count == -1) {
-                break
-            }
+        if (count == -1) {
+            break
+        }
 
-            total += count
+        total += count
 
-            fileOutputStream.write(data, 0, count)
+        fileOutputStream.write(data, 0, count)
 
-            updateCount++
+        updateCount++
 
-            if(updateCount > 100){
-                updateCount = 0
-                progressUpdate(lengthOfFile, total.toInt())
-            }
-        } while (true)
+        if (updateCount > 100) {
+            updateCount = 0
+            progressUpdate(lengthOfFile, total.toInt())
+        }
+    } while (true)
 
-        fileOutputStream.flush()
-        fileOutputStream.close()
-        bufferedInputStream.close()
+    fileOutputStream.flush()
+    fileOutputStream.close()
+    bufferedInputStream.close()
 
-        tempFile.renameTo(destinationFile)
-    }
+    tempFile.renameTo(destinationFile)
 }
 
-fun displayInfo(context: Context, msg:String){
+fun displayInfo(context: Context, msg: String) {
     Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
 }

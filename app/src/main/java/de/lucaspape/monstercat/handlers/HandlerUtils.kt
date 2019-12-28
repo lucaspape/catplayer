@@ -99,7 +99,7 @@ internal fun playAlbumNext(context: Context, mcID: String) {
                 addSong(databaseHelper.getSong(context, id))
             }
         },
-        Response.ErrorListener { error ->
+        Response.ErrorListener {
             displayInfo(context, context.getString(R.string.errorRetrieveAlbumData))
         })
 
@@ -179,7 +179,7 @@ internal fun downloadAlbum(context: Context, mcID: String) {
                 downloadSong(context, song)
             }
         },
-        Response.ErrorListener { error ->
+        Response.ErrorListener {
             displayInfo(context, context.getString(R.string.errorRetrieveAlbumData))
         })
 

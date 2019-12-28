@@ -69,19 +69,8 @@ class MainActivity : AppCompatActivity() {
         transaction.commit()
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val settings = Settings(this)
-
-        if (settings.getSetting("darkTheme") != null) {
-            if (settings.getSetting("darkTheme")!!.toBoolean()) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            } else {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            }
-        }
 
         //check for internet
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET)
@@ -90,6 +79,8 @@ class MainActivity : AppCompatActivity() {
             displayInfo(this, "No access to internet!")
             println("Internet permission not granted!")
         }
+
+        changeTheme()
 
         //create the MusicPlayer.kt mediasession
         createMediaSession(WeakReference(this))
@@ -100,6 +91,7 @@ class MainActivity : AppCompatActivity() {
         //login to monstercat
         Auth().login(this)
 
+        val settings = Settings(this)
         //set the correct view
         if (settings.getSetting("albumViewSelected") != null) {
             HomeHandler.albumViewSelected = settings.getSetting("albumView") == true.toString()
@@ -143,6 +135,18 @@ class MainActivity : AppCompatActivity() {
         stopPlayerService()
 
         super.onDestroy()
+    }
+
+    private fun changeTheme(){
+        val settings = Settings(this)
+
+        if (settings.getSetting("darkTheme") != null) {
+            if (settings.getSetting("darkTheme")!!.toBoolean()) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            }
+        }
     }
 
     private fun showPrivacyPolicy() {

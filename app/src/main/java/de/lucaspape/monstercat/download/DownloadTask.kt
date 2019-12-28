@@ -5,6 +5,7 @@ import android.os.AsyncTask
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.music.contextReference
 import de.lucaspape.monstercat.util.*
+import java.io.File
 import java.lang.ref.WeakReference
 
 class DownloadTask(private val weakReference: WeakReference<Context>) :
@@ -32,18 +33,20 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                             val url = it["url"] as String
                             val location = it["location"] as String
 
-                            downloadFile(
-                                location,
-                                url,
-                                context.cacheDir.toString(),
-                                getSid()
-                            ) { max, current ->
-                                publishProgress(
-                                    song["shownTitle"] as String,
-                                    max.toString(),
-                                    current.toString(),
-                                    false.toString()
-                                )
+                            if(!File(location).exists()){
+                                downloadFile(
+                                    location,
+                                    url,
+                                    context.cacheDir.toString(),
+                                    getSid()
+                                ) { max, current ->
+                                    publishProgress(
+                                        song["shownTitle"] as String,
+                                        max.toString(),
+                                        current.toString(),
+                                        false.toString()
+                                    )
+                                }
                             }
 
                             downloadList[downloadedSongs] = null
@@ -67,13 +70,6 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
 
                         coverArray?.let {
                             for (i in it.indices) {
-                                publishProgress(
-                                    context.getString(R.string.downloadingCoversMsg),
-                                    it.size.toString(),
-                                    i.toString(),
-                                    false.toString()
-                                )
-
                                 val cover = it[i]
 
                                 try {
@@ -83,7 +79,17 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                                     val primaryRes = cover["primaryRes"] as String
                                     val secondaryRes = cover["secondaryRes"] as String
 
-                                    downloadCover(url, location, primaryRes, secondaryRes)
+                                    if (!File(location + primaryRes).exists() || !File(location + secondaryRes).exists()) {
+                                        downloadCover(url, location, primaryRes, secondaryRes)
+
+                                        publishProgress(
+                                            context.getString(R.string.downloadingCoversMsg),
+                                            it.size.toString(),
+                                            i.toString(),
+                                            false.toString()
+                                        )
+                                    }
+
                                 } catch (e: TypeCastException) {
 
                                 }

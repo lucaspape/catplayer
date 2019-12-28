@@ -261,8 +261,7 @@ internal fun setCover(
     title: String,
     version: String,
     artist: String,
-    coverLocation: String,
-    context: Context
+    coverLocation: String
 ) {
     val coverFile =
         File(coverLocation)

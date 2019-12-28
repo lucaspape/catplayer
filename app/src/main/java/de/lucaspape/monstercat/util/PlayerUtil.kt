@@ -1,6 +1,7 @@
 package de.lucaspape.monstercat.util
 
 import android.content.Context
+import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.net.Uri
 import androidx.core.net.toUri
@@ -11,6 +12,7 @@ import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
 import com.google.android.exoplayer2.util.Util
+import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.music.audioFocusChangeListener
 import de.lucaspape.monstercat.music.contextReference
@@ -36,13 +38,31 @@ fun requestAudioFocus(context: Context): Int {
     return if (disableAudioFocus) {
         AudioManager.AUDIOFOCUS_REQUEST_GRANTED
     } else {
-        val audioManager =
-            contextReference?.get()!!.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        audioManager.requestAudioFocus(
-            audioFocusChangeListener,
-            AudioManager.STREAM_MUSIC,
-            AudioManager.AUDIOFOCUS_GAIN
-        )
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            val audioAttributes = android.media.AudioAttributes.Builder()
+                .setUsage(android.media.AudioAttributes.USAGE_MEDIA)
+                .setContentType(android.media.AudioAttributes.CONTENT_TYPE_MUSIC)
+                .build()
+
+            val audioFocusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+                .setAudioAttributes(audioAttributes)
+                .setAcceptsDelayedFocusGain(false)
+                .setOnAudioFocusChangeListener(audioFocusChangeListener)
+                .build()
+
+            val audioManager =
+                context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            audioManager.requestAudioFocus(audioFocusRequest)
+        } else {
+            val audioManager =
+                context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
+            audioManager.requestAudioFocus(
+                audioFocusChangeListener,
+                AudioManager.STREAM_MUSIC,
+                AudioManager.AUDIOFOCUS_GAIN
+            )
+        }
     }
 }
 
@@ -50,36 +70,4 @@ fun abandonAudioFocus(context: Context) {
     val audioManager =
         context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
     audioManager.abandonAudioFocus(audioFocusChangeListener)
-}
-
-fun songToMediaSource(context: Context, song: Song): ProgressiveMediaSource? {
-    if (!File(song.getUrl()).exists()) {
-        return if(song.isStreamable){
-            val httpSourceFactory = DefaultHttpDataSourceFactory(Util.getUserAgent(context, "MonstercatPlayer"))
-
-            httpSourceFactory.defaultRequestProperties.set("Cookie", "connect.sid=${getSid()}")
-
-            ProgressiveMediaSource.Factory(httpSourceFactory).createMediaSource(song.getUrl().toUri())
-        }else{
-            null
-        }
-    } else {
-        return ProgressiveMediaSource.Factory(
-            DefaultDataSourceFactory(
-                context, Util.getUserAgent(
-                    context, "MonstercatPlayer"
-                )
-            )
-        ).createMediaSource(Uri.parse("file://" + song.getUrl()))
-    }
-}
-
-fun streamToMediaSource(context: Context, stream: Stream): HlsMediaSource {
-    return HlsMediaSource.Factory(
-        DefaultDataSourceFactory(
-            context, Util.getUserAgent(
-                context, "MonstercatPlayer"
-            )
-        )
-    ).createMediaSource(stream.streamUrl.toUri())
 }
