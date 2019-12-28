@@ -10,6 +10,8 @@ import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.download.addDownloadCoverArray
 import de.lucaspape.monstercat.handlers.HomeHandler
+import de.lucaspape.monstercat.request.AuthorizedRequest
+import de.lucaspape.monstercat.util.getSid
 import de.lucaspape.monstercat.util.parseSongSearchToSongList
 import de.lucaspape.monstercat.util.parseSongToHashMap
 import org.json.JSONObject
@@ -25,8 +27,9 @@ class LoadTitleSearchAsync(
         contextReference.get()?.let {context ->
             val searchQueue = Volley.newRequestQueue(context)
 
-            val searchRequest = StringRequest(Request.Method.GET,
+            val searchRequest = AuthorizedRequest(Request.Method.GET,
                 context.getString(R.string.loadSongsUrl) + "?term=$searchString&limit=50&skip=0&fields=&search=$searchString",
+                getSid(),
                 Response.Listener { response ->
                     val jsonArray = JSONObject(response).getJSONArray("results")
 

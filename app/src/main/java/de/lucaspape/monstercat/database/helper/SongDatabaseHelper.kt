@@ -44,8 +44,6 @@ class SongDatabaseHelper(context: Context) :
         streamable: Boolean,
         inEarlyAccess: Boolean
     ): Long {
-        val db = writableDatabase
-
         val values = ContentValues()
 
         values.put(Song.COLUMN_SONG_ID, songId)
@@ -58,19 +56,26 @@ class SongDatabaseHelper(context: Context) :
         values.put(Song.COLUMN_STREAMABLE, streamable.toString())
         values.put(Song.COLUMN_INEARLYACCESS, inEarlyAccess.toString())
 
-        val id = if (getSong(context, songId) == null) {
-            db.insert(Song.TABLE_NAME, null, values)
+        val id:Long
+
+        if (getSong(context, songId) == null) {
+            val db = writableDatabase
+            id = db.insert(Song.TABLE_NAME, null, values)
+
+            db.close()
         } else {
+            val db = writableDatabase
             db.update(
                 Song.TABLE_NAME,
                 values,
                 Song.COLUMN_ID + "=" + getSong(context, songId)?.id.toString(),
                 null
             )
-            getSong(context, songId)!!.id.toLong()
-        }
 
-        db.close()
+            id = getSong(context, songId)!!.id.toLong()
+
+            db.close()
+        }
 
         return id
     }
