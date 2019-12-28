@@ -18,7 +18,6 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.Song
-import de.lucaspape.monstercat.music.notification.updateNotification
 import de.lucaspape.monstercat.util.Settings
 import java.io.File
 import java.lang.ref.WeakReference
