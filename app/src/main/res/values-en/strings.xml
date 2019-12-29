@@ -59,4 +59,5 @@
     <string name="homeSearchDescription">Search song</string>
     <string name="errorDownloadNotAllowedFallbackStream">You are not allowed to download this. Fallback to streaming.</string>
     <string name="applicationName">Catplayer</string>
+    <string name="email">Email</string>
 </resources>
