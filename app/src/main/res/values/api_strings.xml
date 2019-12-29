@@ -8,6 +8,8 @@
     <string name="playlistUrl" translatable="false">https://connect.monstercat.com/v2/playlist/</string>
     <string name="playlistTrackUrl" translatable="false">https://connect.monstercat.com/v2/playlist/</string>
 
+    <string name="addToPlaylistUrl" translatable="false">https://api.lucaspape.de/monstercat/v1/playlist/</string>
+
     <string name="loginUrl" translatable="false">https://connect.monstercat.com/v2/signin</string>
     <string name="loadSongsUrl" translatable="false">https://connect.monstercat.com/v2/catalog/browse</string>
     <string name="tokenUrl" translatable="false">https://connect.monstercat.com/v2/signin/token</string>
