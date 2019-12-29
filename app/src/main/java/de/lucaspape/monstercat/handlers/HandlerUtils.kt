@@ -244,8 +244,10 @@ internal fun createPlaylist(context:Context){
         val newPlaylistRequest = object:JsonObjectRequest(
             Method.POST, playlistPostUrl, postObject,
             Response.Listener { response ->
+                //TODO add msg
             },
             Response.ErrorListener { error ->
+                //TODO add msg
             }
         ) {
             override fun getHeaders(): Map<String, String> {
@@ -263,4 +265,22 @@ internal fun createPlaylist(context:Context){
     }
 
     alertDialogBuilder.show()
+}
+
+internal fun deletePlaylist(context: Context, playlistId:String){
+    val sid = getSid()
+
+    val deletePlaylistVolleyQueue = Volley.newRequestQueue(context)
+
+    val deletePlaylistUrl = context.getString(R.string.playlistUrl) + playlistId
+
+    val deletePlaylistRequest = AuthorizedRequest(Request.Method.DELETE, deletePlaylistUrl, sid,
+        Response.Listener {
+            //TODO add msg
+        },
+        Response.ErrorListener {
+            //TODO add msg
+        })
+
+    deletePlaylistVolleyQueue.add(deletePlaylistRequest)
 }

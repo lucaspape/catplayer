@@ -6,13 +6,15 @@ import android.widget.AdapterView
 import android.widget.ListView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import de.lucaspape.monstercat.handlers.PlaylistHandler
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
+import de.lucaspape.monstercat.handlers.*
+import de.lucaspape.monstercat.handlers.deletePlaylist
 import de.lucaspape.monstercat.handlers.downloadPlaylist
 import de.lucaspape.monstercat.handlers.downloadSong
 import de.lucaspape.monstercat.handlers.playSongFromId
 import de.lucaspape.monstercat.util.Settings
+import de.lucaspape.monstercat.util.displayInfo
 
 class PlaylistFragment : Fragment() {
     private val playlistHandler = PlaylistHandler()
@@ -67,6 +69,7 @@ class PlaylistFragment : Fragment() {
 
         menu.add(0, v.id, 0, getString(R.string.download))
         menu.add(0, v.id, 0, getString(R.string.playNext))
+        menu.add(0, v.id, 0, "Delete")
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
@@ -99,9 +102,16 @@ class PlaylistFragment : Fragment() {
                 playSongFromId(
                     it,
                     listItem["id"] as String,
-                    false
-                )
-            } else {
+                    false)
+
+            } else if(item.title == "Delete"){
+                if (listItem["type"] == "playlist") {
+                    deletePlaylist(it, listItem["playlistId"] as String)
+                }else{
+                    displayInfo(it, "Not implemented")
+                }
+            }else{
+
             }
         }
 
