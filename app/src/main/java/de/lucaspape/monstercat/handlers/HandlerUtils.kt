@@ -4,9 +4,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.os.AsyncTask
 import android.widget.ListView
-import com.android.volley.AuthFailureError
 import com.android.volley.Response
-import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.Request
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
@@ -16,11 +14,11 @@ import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadSong
+import de.lucaspape.monstercat.handlers.async.AddToPlaylistAsync
 import de.lucaspape.monstercat.handlers.async.LoadContinuousSongListAsync
 import de.lucaspape.monstercat.music.addSong
 import de.lucaspape.monstercat.request.AuthorizedRequest
 import de.lucaspape.monstercat.util.*
-import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.lang.ref.WeakReference
@@ -199,43 +197,14 @@ internal fun addSongToPlaylist(context: Context, song: Song) {
         playlistIds[i] = playlistList[i].playlistId
     }
 
-    val sSid = getSid()
-
-    if (sSid != null) {
-        val alertDialogBuilder = AlertDialog.Builder(context)
-        alertDialogBuilder.setTitle(context.getString(R.string.pickPlaylistMsg))
-        alertDialogBuilder.setItems(playlistNames) { _, i ->
-            playlistIds[i]?.let { playlistId ->
-               val addToPlaylistUrl = context.getString(R.string.addToPlaylistUrl)
-
-                val addToPlaylistQueue = Volley.newRequestQueue(context)
-
-                val songJsonObject = JSONObject()
-                songJsonObject.put("releaseId", song.albumId)
-                songJsonObject.put("trackId", song.songId)
-
-                val putJsonObject = JSONObject()
-                putJsonObject.put("playlistId", playlistId)
-                putJsonObject.put("newSong", songJsonObject)
-                putJsonObject.put("sid", getSid())
-
-                val addToPlaylistRequest = JsonObjectRequest(Request.Method.POST, addToPlaylistUrl, putJsonObject,
-                    Response.Listener {response ->
-                        //TODO reload playlist from response
-                        displayInfo(context, context.getString(R.string.songAddedToPlaylistMsg, song.shownTitle))
-                    },
-                    Response.ErrorListener { error ->
-                        displayInfo(context, context.getString(R.string.errorUpdatePlaylist))
-                    }
-                )
-
-                addToPlaylistQueue.add(addToPlaylistRequest)
-            }
-
+    val alertDialogBuilder = AlertDialog.Builder(context)
+    alertDialogBuilder.setTitle(context.getString(R.string.pickPlaylistMsg))
+    alertDialogBuilder.setItems(playlistNames) { _, i ->
+        playlistIds[i]?.let { playlistId ->
+            val addToPlaylistAsync = AddToPlaylistAsync(WeakReference(context), playlistId, song)
+            addToPlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         }
-        alertDialogBuilder.show()
 
-    } else {
-        displayInfo(context, context.getString(R.string.errorNotLoggedIn))
     }
+    alertDialogBuilder.show()
 }
