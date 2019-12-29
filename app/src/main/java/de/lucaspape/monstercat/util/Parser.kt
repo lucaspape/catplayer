@@ -197,11 +197,7 @@ fun parsePlaylistTrackToDB(
         )
 
         songId?.let {
-            return if (databaseHelper.getItemFromSongId(it) == null) {
-                databaseHelper.insertSongId(it)
-            } else {
-                databaseHelper.getItemFromSongId(it)?.songId
-            }
+            return databaseHelper.insertSongId(it)
         }
 
         return null
