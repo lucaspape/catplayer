@@ -281,7 +281,10 @@ fun resume() {
 fun next() {
     clearListener()
 
-    currentSong++
+    if(!repeat){
+        currentSong++
+    }
+
     play()
 }
 

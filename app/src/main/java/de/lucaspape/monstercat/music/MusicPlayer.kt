@@ -21,6 +21,8 @@ internal var mediaPlayer: ExoPlayer? = null
 internal var currentSong = 0
 internal var playList = ArrayList<Song>(1)
 
+internal var repeat = false
+
 var mediaSession: MediaSessionCompat? = null
 
 val audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener {

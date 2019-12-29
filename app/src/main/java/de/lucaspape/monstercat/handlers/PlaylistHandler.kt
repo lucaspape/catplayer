@@ -6,6 +6,7 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import android.widget.AdapterView
+import android.widget.ImageButton
 import android.widget.ListView
 import android.widget.SimpleAdapter
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -109,6 +110,10 @@ class PlaylistHandler {
                 val songId = itemValue["id"] as String
                 playSongFromId(view.context, songId, true, playlistList, position)
             }
+        }
+
+        view.findViewById<ImageButton>(R.id.newPlaylistButton).setOnClickListener {
+            createPlaylist(view.context)
         }
     }
 

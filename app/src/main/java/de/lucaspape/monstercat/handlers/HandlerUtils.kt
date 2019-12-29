@@ -3,9 +3,12 @@ package de.lucaspape.monstercat.handlers
 import android.app.AlertDialog
 import android.content.Context
 import android.os.AsyncTask
+import android.view.LayoutInflater
+import android.widget.EditText
 import android.widget.ListView
 import com.android.volley.Response
 import com.android.volley.Request
+import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.activities.loadContinuousSongListAsyncTask
@@ -19,6 +22,7 @@ import de.lucaspape.monstercat.handlers.async.LoadContinuousSongListAsync
 import de.lucaspape.monstercat.music.addSong
 import de.lucaspape.monstercat.request.AuthorizedRequest
 import de.lucaspape.monstercat.util.*
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.lang.ref.WeakReference
@@ -206,5 +210,57 @@ internal fun addSongToPlaylist(context: Context, song: Song) {
         }
 
     }
+    alertDialogBuilder.show()
+}
+
+internal fun createPlaylist(context:Context){
+    val alertDialogBuilder = AlertDialog.Builder(context)
+    val layoutInflater =
+        context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+
+    val playlistNameInputLayout = layoutInflater.inflate(R.layout.playlistname_input_layout, null)
+
+    alertDialogBuilder.setView(playlistNameInputLayout)
+    alertDialogBuilder.setCancelable(false)
+
+    alertDialogBuilder.setPositiveButton("OK"){ _,_ ->
+        val twoFAEditText = playlistNameInputLayout.findViewById<EditText>(R.id.playlistNameInput)
+        val playlistName = twoFAEditText.text.toString()
+
+        val playlistPostUrl = context.getString(R.string.newPlaylistUrl)
+
+        val postObject = JSONObject()
+
+        postObject.put("name", playlistName)
+        postObject.put("public", false)
+        postObject.put("tracks", JSONArray())
+
+        println(postObject.toString())
+
+        val sid = getSid()
+
+        val newPlaylistVolleyQueue = Volley.newRequestQueue(context)
+
+        val newPlaylistRequest = object:JsonObjectRequest(
+            Method.POST, playlistPostUrl, postObject,
+            Response.Listener { response ->
+            },
+            Response.ErrorListener { error ->
+            }
+        ) {
+            override fun getHeaders(): Map<String, String> {
+                return if (sid != null) {
+                    val params = HashMap<String, String>()
+                    params["Cookie"] = "connect.sid=$sid"
+                    params
+                } else {
+                    super.getHeaders()
+                }
+            }
+        }
+
+        newPlaylistVolleyQueue.add(newPlaylistRequest)
+    }
+
     alertDialogBuilder.show()
 }
