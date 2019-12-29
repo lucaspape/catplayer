@@ -21,7 +21,12 @@ All album images seen in these screenshots are Copyright Monstercat.
 
 ## Todo
 
- - More playlist features (delete tracks, add public playlists etc.)
+ - More playlist features (add public playlists etc.)
+ - Favorites
+ - Shuffle, Repeat
+ - More song info
+ - Browse by artist
+ - Mirror playlists from spotify
 
 ## Beta
 
