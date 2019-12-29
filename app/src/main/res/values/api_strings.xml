@@ -12,8 +12,8 @@
     <string name="loadSongsUrl" translatable="false">https://connect.monstercat.com/v2/catalog/browse</string>
     <string name="tokenUrl" translatable="false">https://connect.monstercat.com/v2/signin/token</string>
 
-    <string name="liveInfoUrl" translatable="false">https://api.lucaspape.de/api/v1/monstercat/liveinfo</string>
-    <string name="liveCoverUrl" translatable="false">https://api.lucaspape.de/api/v1/monstercat/livecover</string>
+    <string name="liveInfoUrl" translatable="false">https://api.lucaspape.de/monstercat/v1/liveinfo</string>
+    <string name="liveCoverUrl" translatable="false">https://api.lucaspape.de/monstercat/v1/livecover</string>
 
     <string name="twitchPlaylistUrl" translatable="false">https://usher.ttvnw.net/api/channel/hls/</string>
     <string name="twitchApiUrl" translatable="false">https://api.twitch.tv/</string>
