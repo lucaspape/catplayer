@@ -244,10 +244,10 @@ internal fun createPlaylist(context:Context){
         val newPlaylistRequest = object:JsonObjectRequest(
             Method.POST, playlistPostUrl, postObject,
             Response.Listener { response ->
-                //TODO add msg
+                displayInfo(context, context.getString(R.string.playlistCreatedMsg))
             },
             Response.ErrorListener { error ->
-                //TODO add msg
+                displayInfo(context, context.getString(R.string.errorCreatingPlaylist))
             }
         ) {
             override fun getHeaders(): Map<String, String> {
@@ -276,10 +276,10 @@ internal fun deletePlaylist(context: Context, playlistId:String){
 
     val deletePlaylistRequest = AuthorizedRequest(Request.Method.DELETE, deletePlaylistUrl, sid,
         Response.Listener {
-            //TODO add msg
+            displayInfo(context, context.getString(R.string.playlistDeletedMsg))
         },
         Response.ErrorListener {
-            //TODO add msg
+            displayInfo(context, context.getString(R.string.errorDeletingPlaylist))
         })
 
     deletePlaylistVolleyQueue.add(deletePlaylistRequest)
@@ -304,10 +304,10 @@ internal fun deletePlaylistSong(context: Context, song: Song, playlistId: String
 
         val deleteSongRequest = JsonObjectRequest(Request.Method.POST, context.getString(R.string.removeFromPlaylistUrl), deleteObject,
             Response.Listener {response ->
-                //TODO add msg
+                displayInfo(context, context.getString(R.string.removedSongFromPlaylistMsg))
             },
             Response.ErrorListener {error ->
-                //TODO add msg
+                displayInfo(context, context.getString(R.string.errorRemovingSongFromPlaylist))
             })
 
         deleteSongVolleyQueue.add(deleteSongRequest)

@@ -14,7 +14,6 @@ import de.lucaspape.monstercat.handlers.downloadPlaylist
 import de.lucaspape.monstercat.handlers.downloadSong
 import de.lucaspape.monstercat.handlers.playSongFromId
 import de.lucaspape.monstercat.util.Settings
-import de.lucaspape.monstercat.util.displayInfo
 
 class PlaylistFragment : Fragment() {
     private val playlistHandler = PlaylistHandler()

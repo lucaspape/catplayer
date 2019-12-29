@@ -59,4 +59,10 @@
     <string name="errorDownloadNotAllowedFallbackStream">You are not allowed to download this. Fallback to streaming.</string>
     <string name="applicationName">Catplayer</string>
     <string name="email">Email</string>
+    <string name="playlistDeletedMsg">Playlist deleted!</string>
+    <string name="errorDeletingPlaylist">Could not delete playlist</string>
+    <string name="removedSongFromPlaylistMsg">Removed song from playlist!</string>
+    <string name="errorRemovingSongFromPlaylist">Could not remove song from playlist!</string>
+    <string name="playlistCreatedMsg">Playlist created!</string>
+    <string name="errorCreatingPlaylist">Could not create playlist!</string>
 </resources>
