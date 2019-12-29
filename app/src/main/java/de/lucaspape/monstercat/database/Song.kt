@@ -66,6 +66,8 @@ data class Song(
                     ")"
     }
 
+    val shownTitle = "$title $version"
+
     val downloadLocation: String =
         context.getExternalFilesDir(null).toString() + "/" + artist + title + version + "." + Settings(
             context

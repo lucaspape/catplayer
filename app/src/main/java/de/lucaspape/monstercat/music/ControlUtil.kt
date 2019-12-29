@@ -40,11 +40,13 @@ internal fun play() {
 
             if (downloadStream == true) {
                 if(song.isDownloadable){
-                    addDownloadSong(
-                        song.streamLocation,
-                        song.streamDownloadLocation,
-                        song.title + " " + song.version
-                    )
+                    if(!File(song.downloadLocation).exists() && !File(song.streamDownloadLocation).exists()){
+                        addDownloadSong(
+                            song.streamLocation,
+                            song.streamDownloadLocation,
+                            song.shownTitle
+                        )
+                    }
 
                     waitForDownloadTask?.cancel(true)
 
@@ -65,9 +67,11 @@ internal fun play() {
                             try{
                                 val nextSong = playList[currentSong + 1]
 
-                                addDownloadSong(nextSong.streamLocation,
-                                    nextSong.streamDownloadLocation,
-                                    nextSong.title + " " + nextSong.version)
+                                if(!File(nextSong.downloadLocation).exists() && !File(nextSong.streamDownloadLocation).exists()){
+                                    addDownloadSong(nextSong.streamLocation,
+                                        nextSong.streamDownloadLocation,
+                                        nextSong.shownTitle)
+                                }
 
                             }catch (e: IndexOutOfBoundsException){
 
