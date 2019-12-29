@@ -108,7 +108,20 @@ class PlaylistFragment : Fragment() {
                 if (listItem["type"] == "playlist") {
                     deletePlaylist(it, listItem["playlistId"] as String)
                 }else{
-                    displayInfo(it, "Not implemented")
+                    view?.let { view ->
+                        val songDatabaseHelper =
+                            SongDatabaseHelper(view.context)
+                        val song =
+                            songDatabaseHelper.getSong(view.context, listItem["id"] as String)
+
+                        if (song != null) {
+                            PlaylistHandler.currentPlaylistId?.let { playlistId ->
+                                playlistView?.adapter?.count?.let { count ->
+                                    deletePlaylistSong(it, song, playlistId, position + 1, count)
+                                }
+                            }
+                        }
+                    }
                 }
             }else{
 

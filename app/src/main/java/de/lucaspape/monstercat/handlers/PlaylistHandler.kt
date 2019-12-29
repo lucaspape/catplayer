@@ -26,7 +26,7 @@ class PlaylistHandler {
         @JvmStatic
         private var simpleAdapter: SimpleAdapter? = null
 
-        private var currentPlaylistId: String? = null
+        var currentPlaylistId: String? = null
 
         /**
          * Updates listView content

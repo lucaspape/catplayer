@@ -284,3 +284,33 @@ internal fun deletePlaylist(context: Context, playlistId:String){
 
     deletePlaylistVolleyQueue.add(deletePlaylistRequest)
 }
+internal fun deletePlaylistSong(context: Context, song: Song, playlistId: String, index:Int, playlistMax:Int){
+    val playlistSortedByNew = true
+
+    if(playlistSortedByNew){
+        val songDeleteIndex = playlistMax - index
+
+        val deleteSongObject = JSONObject()
+        deleteSongObject.put("songDeleteIndex", songDeleteIndex)
+        deleteSongObject.put("releaseId", song.albumId)
+        deleteSongObject.put("trackId", song.songId)
+
+        val deleteObject = JSONObject()
+        deleteObject.put("songDelete", deleteSongObject)
+        deleteObject.put("sid", getSid())
+        deleteObject.put("playlistId", playlistId)
+
+        val deleteSongVolleyQueue = Volley.newRequestQueue(context)
+
+        val deleteSongRequest = JsonObjectRequest(Request.Method.POST, context.getString(R.string.removeFromPlaylistUrl), deleteObject,
+            Response.Listener {response ->
+                //TODO add msg
+            },
+            Response.ErrorListener {error ->
+                //TODO add msg
+            })
+
+        deleteSongVolleyQueue.add(deleteSongRequest)
+
+    }
+}
