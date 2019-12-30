@@ -17,12 +17,10 @@ import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadSong
-import de.lucaspape.monstercat.handlers.async.AddToPlaylistAsync
-import de.lucaspape.monstercat.handlers.async.LoadContinuousSongListAsync
+import de.lucaspape.monstercat.handlers.async.*
 import de.lucaspape.monstercat.music.addSong
 import de.lucaspape.monstercat.request.AuthorizedRequest
 import de.lucaspape.monstercat.util.*
-import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.lang.ref.WeakReference
@@ -224,65 +222,19 @@ internal fun createPlaylist(context:Context){
     alertDialogBuilder.setCancelable(false)
 
     alertDialogBuilder.setPositiveButton("OK"){ _,_ ->
-        val twoFAEditText = playlistNameInputLayout.findViewById<EditText>(R.id.playlistNameInput)
-        val playlistName = twoFAEditText.text.toString()
+        val playlistNameEditText = playlistNameInputLayout.findViewById<EditText>(R.id.playlistNameInput)
+        val playlistName = playlistNameEditText.text.toString()
 
-        val playlistPostUrl = context.getString(R.string.newPlaylistUrl)
-
-        val postObject = JSONObject()
-
-        postObject.put("name", playlistName)
-        postObject.put("public", false)
-        postObject.put("tracks", JSONArray())
-
-        println(postObject.toString())
-
-        val sid = getSid()
-
-        val newPlaylistVolleyQueue = Volley.newRequestQueue(context)
-
-        val newPlaylistRequest = object:JsonObjectRequest(
-            Method.POST, playlistPostUrl, postObject,
-            Response.Listener { response ->
-                displayInfo(context, context.getString(R.string.playlistCreatedMsg))
-            },
-            Response.ErrorListener { error ->
-                displayInfo(context, context.getString(R.string.errorCreatingPlaylist))
-            }
-        ) {
-            override fun getHeaders(): Map<String, String> {
-                return if (sid != null) {
-                    val params = HashMap<String, String>()
-                    params["Cookie"] = "connect.sid=$sid"
-                    params
-                } else {
-                    super.getHeaders()
-                }
-            }
-        }
-
-        newPlaylistVolleyQueue.add(newPlaylistRequest)
+        val createPlaylistAsync = CreatePlaylistAsync(WeakReference(context), playlistName)
+        createPlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 
     alertDialogBuilder.show()
 }
 
 internal fun deletePlaylist(context: Context, playlistId:String){
-    val sid = getSid()
-
-    val deletePlaylistVolleyQueue = Volley.newRequestQueue(context)
-
-    val deletePlaylistUrl = context.getString(R.string.playlistUrl) + playlistId
-
-    val deletePlaylistRequest = AuthorizedRequest(Request.Method.DELETE, deletePlaylistUrl, sid,
-        Response.Listener {
-            displayInfo(context, context.getString(R.string.playlistDeletedMsg))
-        },
-        Response.ErrorListener {
-            displayInfo(context, context.getString(R.string.errorDeletingPlaylist))
-        })
-
-    deletePlaylistVolleyQueue.add(deletePlaylistRequest)
+    val deletePlaylistAsync = DeletePlaylistAsync(WeakReference(context), playlistId)
+    deletePlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }
 internal fun deletePlaylistSong(context: Context, song: Song, playlistId: String, index:Int, playlistMax:Int){
     val playlistSortedByNew = true
@@ -290,27 +242,7 @@ internal fun deletePlaylistSong(context: Context, song: Song, playlistId: String
     if(playlistSortedByNew){
         val songDeleteIndex = playlistMax - index
 
-        val deleteSongObject = JSONObject()
-        deleteSongObject.put("songDeleteIndex", songDeleteIndex)
-        deleteSongObject.put("releaseId", song.albumId)
-        deleteSongObject.put("trackId", song.songId)
-
-        val deleteObject = JSONObject()
-        deleteObject.put("songDelete", deleteSongObject)
-        deleteObject.put("sid", getSid())
-        deleteObject.put("playlistId", playlistId)
-
-        val deleteSongVolleyQueue = Volley.newRequestQueue(context)
-
-        val deleteSongRequest = JsonObjectRequest(Request.Method.POST, context.getString(R.string.removeFromPlaylistUrl), deleteObject,
-            Response.Listener {response ->
-                displayInfo(context, context.getString(R.string.removedSongFromPlaylistMsg))
-            },
-            Response.ErrorListener {error ->
-                displayInfo(context, context.getString(R.string.errorRemovingSongFromPlaylist))
-            })
-
-        deleteSongVolleyQueue.add(deleteSongRequest)
-
+        val deletePlaylistTrackAsync = DeletePlaylistTrackAsync(WeakReference(context), song , playlistId, songDeleteIndex)
+        deletePlaylistTrackAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 }

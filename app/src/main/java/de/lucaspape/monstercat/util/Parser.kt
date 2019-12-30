@@ -1,15 +1,12 @@
 package de.lucaspape.monstercat.util
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.*
 import de.lucaspape.monstercat.database.helper.*
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
-import java.io.FileOutputStream
 import java.lang.reflect.InvocationTargetException
 
 fun parseSongToHashMap(context: Context, song: Song): HashMap<String, Any?> {
