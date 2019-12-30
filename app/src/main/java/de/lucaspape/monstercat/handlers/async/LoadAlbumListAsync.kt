@@ -64,9 +64,6 @@ class LoadAlbumListAsync(
                     listView.setSelectionFromTop(lastScroll.toInt(), top.toInt())
                 }
 
-                settings.saveSetting("currentListAlbumViewLastScrollIndex", 0.toString())
-                settings.saveSetting("currentListAlbumViewTop", 0.toString())
-
                 val swipeRefreshLayout =
                     view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
                 swipeRefreshLayout.isRefreshing = false

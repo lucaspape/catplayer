@@ -16,6 +16,7 @@
 
         <service android:name=".music.notification.PlayerService"
             android:enabled="true"
+            android:stopWithTask="true"
             android:exported="false" />
 
         <receiver android:name=".music.notification.NotificationIntentReceiver"

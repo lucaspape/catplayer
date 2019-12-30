@@ -9,13 +9,11 @@ import android.content.pm.PackageManager
 import android.media.AudioManager
 import android.os.AsyncTask
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.text.SpannableString
 import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.SeekBar
-import android.widget.TextView
+import android.widget.*
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -30,10 +28,8 @@ import de.lucaspape.monstercat.fragments.PlaylistFragment
 import de.lucaspape.monstercat.handlers.HomeHandler
 import de.lucaspape.monstercat.handlers.async.LoadContinuousSongListAsync
 import de.lucaspape.monstercat.music.*
-import de.lucaspape.monstercat.music.notification.stopPlayerService
 import de.lucaspape.monstercat.util.Settings
 import de.lucaspape.monstercat.util.displayInfo
-import java.lang.IllegalArgumentException
 import java.lang.ref.WeakReference
 
 var loadContinuousSongListAsyncTask: LoadContinuousSongListAsync? = null
@@ -50,6 +46,28 @@ class MainActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.navigation_home -> {
                     openFragment(HomeFragment.newInstance())
+
+                    val settings = Settings(this)
+
+                    if(HomeHandler.albumView){
+                        settings.saveSetting(
+                            "currentListAlbumViewLastScrollIndex",
+                            0.toString()
+                        )
+                        settings.saveSetting(
+                            "currentListAlbumViewTop",
+                            0.toString()
+                        )
+                    }else{
+                        settings.saveSetting(
+                            "currentListViewLastScrollIndex",
+                            0.toString()
+                        )
+                        settings.saveSetting(
+                            "currentListViewTop",
+                            0.toString()
+                        )
+                    }
 
                     return@OnNavigationItemSelectedListener true
                 }
@@ -85,9 +103,6 @@ class MainActivity : AppCompatActivity() {
         //create the MusicPlayer.kt mediasession
         createMediaSession(WeakReference(this))
 
-        //register receiver which checks if headphones unplugged
-        registerReceiver(noisyReceiver, IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY))
-
         //login to monstercat
         Auth().login(this)
 
@@ -121,18 +136,42 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        try {
-            unregisterReceiver(noisyReceiver)
-        } catch (e: IllegalArgumentException) {
+        val listView = findViewById<ListView>(R.id.musiclistview)
 
+        val settings = Settings(this)
+
+        if(listView != null) {
+            val topChild = listView.getChildAt(0)?.top
+            val paddingTop = listView.paddingTop
+            val firstVisiblePosition = listView.firstVisiblePosition
+
+            if(topChild != null){
+                if(HomeHandler.albumView){
+                    settings.saveSetting(
+                        "currentListAlbumViewLastScrollIndex",
+                        firstVisiblePosition.toString()
+                    )
+                    settings.saveSetting(
+                        "currentListAlbumViewTop",
+                        (topChild - paddingTop).toString()
+                    )
+                }else{
+                    settings.saveSetting(
+                        "currentListViewLastScrollIndex",
+                        firstVisiblePosition.toString()
+                    )
+                    settings.saveSetting(
+                        "currentListViewTop",
+                        (topChild - paddingTop).toString()
+                    )
+                }
+            }
         }
 
         downloadTask?.cancel(true)
         updateLiveInfoAsync?.cancel(true)
 
         hideDownloadNotification(this)
-
-        stopPlayerService()
 
         super.onDestroy()
     }
@@ -213,5 +252,4 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(applicationContext, PlayerFullscreenActivity::class.java))
         }
     }
-
 }

@@ -23,6 +23,8 @@ internal var playList = ArrayList<Song>(1)
 
 internal var repeat = false
 
+private var sessionCreated = false
+
 var mediaSession: MediaSessionCompat? = null
 
 val audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener {
@@ -45,17 +47,24 @@ class NoisyReceiver : BroadcastReceiver() {
  * Create mediaSession and listen for callbacks (pause, play buttons on headphones etc.)
  */
 fun createMediaSession(context: WeakReference<Context>) {
-    mediaPlayer = ExoPlayerFactory.newSimpleInstance(context.get()!!)
-
     context.get()?.let {
-        mediaSession = MediaSessionCompat.fromMediaSession(
-            it,
-            MediaSession(it, "de.lucaspape.monstercat.music")
-        )
+        if(!sessionCreated){
+            mediaPlayer = ExoPlayerFactory.newSimpleInstance(context.get()!!)
 
-        mediaSession?.setCallback(MediaSessionCallback())
 
-        mediaSession?.isActive = true
+            mediaSession = MediaSessionCompat.fromMediaSession(
+                it,
+                MediaSession(it, "de.lucaspape.monstercat.music")
+            )
+
+            mediaSession?.setCallback(MediaSessionCallback())
+
+            mediaSession?.isActive = true
+
+            sessionCreated = true
+
+        }
+
         contextReference = context
     }
 }

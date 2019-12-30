@@ -3,6 +3,7 @@ package de.lucaspape.monstercat.handlers.async
 import android.content.Context
 import android.os.AsyncTask
 import android.view.View
+import android.widget.ListView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.android.volley.Response
 import com.android.volley.Request
@@ -15,6 +16,7 @@ import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadCoverArray
 import de.lucaspape.monstercat.handlers.HomeHandler
 import de.lucaspape.monstercat.request.AuthorizedRequest
+import de.lucaspape.monstercat.util.Settings
 import de.lucaspape.monstercat.util.parseCatalogSongToDB
 import de.lucaspape.monstercat.util.parseSongToHashMap
 import org.json.JSONObject
@@ -63,6 +65,17 @@ class LoadSongListAsync(
 
                 //download cover art
                 addDownloadCoverArray(HomeHandler.currentListViewData)
+
+                val listView = view.findViewById<ListView>(R.id.musiclistview)
+                val settings = Settings(view.context)
+                val lastScroll = settings.getSetting("currentListViewLastScrollIndex")
+                val top = settings.getSetting("currentListViewTop")
+
+                if (top != null && lastScroll != null) {
+                    listView.setSelectionFromTop(lastScroll.toInt(), top.toInt())
+                }else{
+                    println("IT IS NULL")
+                }
 
                 val swipeRefreshLayout =
                     view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
