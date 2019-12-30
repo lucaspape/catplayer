@@ -84,7 +84,7 @@ class Stream(private val clientId: String) {
     ) {
         val artistTitleRequest =
             StringRequest(Request.Method.GET,
-                context.getString(R.string.liveInfoUrl)),
+                context.getString(R.string.liveInfoUrl),
                 Response.Listener { artistTitleResponse ->
                     val jsonObject = JSONObject(artistTitleResponse)
 
@@ -92,9 +92,9 @@ class Stream(private val clientId: String) {
                     artist = jsonObject.getString("artist")
 
                     titleArtistUpdateUrl =
-                        context.getString(R.string.liveInfoUrl))
+                        context.getString(R.string.liveInfoUrl)
                     albumCoverUpdateUrl =
-                        context.getString(R.string.liveCoverUrl))
+                        context.getString(R.string.liveCoverUrl)
 
                 },
                 Response.ErrorListener { error ->
