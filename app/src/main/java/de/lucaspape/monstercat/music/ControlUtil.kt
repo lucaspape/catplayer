@@ -22,25 +22,25 @@ var updateLiveInfoAsync: UpdateLiveInfoAsync? = null
 var waitForDownloadTask: AsyncTask<Void, Void, String>? = null
 
 /**
- * Music control methods
+ * Get current song and play it
  */
 internal fun play() {
     clearListener()
 
-    try {
-        updateLiveInfoAsync?.cancel(true)
+    updateLiveInfoAsync?.cancel(true)
 
-        startPlayerService()
+    startPlayerService()
 
-        val song = playList[currentSong]
+    val song = getCurrentSong()
 
+    song?.let {
         contextReference?.get()?.let { context ->
             val settings = Settings(context)
             val downloadStream = settings.getSetting("downloadStream")?.toBoolean()
 
             if (downloadStream == true) {
-                if(song.isDownloadable){
-                    if(!File(song.downloadLocation).exists() && !File(song.streamDownloadLocation).exists()){
+                if (song.isDownloadable) {
+                    if (!File(song.downloadLocation).exists() && !File(song.streamDownloadLocation).exists()) {
                         addDownloadSong(
                             song.streamLocation,
                             song.streamDownloadLocation,
@@ -52,7 +52,7 @@ internal fun play() {
 
                     waitForDownloadTask = object : AsyncTask<Void, Void, String>() {
                         override fun doInBackground(vararg params: Void?): String? {
-                            if(!File(song.downloadLocation).exists()){
+                            if (!File(song.downloadLocation).exists()) {
                                 while (!File(song.streamDownloadLocation).exists()) {
                                     Thread.sleep(100)
                                 }
@@ -64,16 +64,18 @@ internal fun play() {
                         override fun onPostExecute(result: String?) {
                             playSong(context, song)
 
-                            try{
+                            try {
                                 val nextSong = playList[currentSong + 1]
 
-                                if(!File(nextSong.downloadLocation).exists() && !File(nextSong.streamDownloadLocation).exists()){
-                                    addDownloadSong(nextSong.streamLocation,
+                                if (!File(nextSong.downloadLocation).exists() && !File(nextSong.streamDownloadLocation).exists()) {
+                                    addDownloadSong(
+                                        nextSong.streamLocation,
                                         nextSong.streamDownloadLocation,
-                                        nextSong.shownTitle)
+                                        nextSong.shownTitle
+                                    )
                                 }
 
-                            }catch (e: IndexOutOfBoundsException){
+                            } catch (e: IndexOutOfBoundsException) {
 
                             }
                         }
@@ -81,27 +83,24 @@ internal fun play() {
                     }
 
                     waitForDownloadTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-                }else{
+                } else {
                     playSong(context, song)
-                    displayInfo(context, context.getString(R.string.errorDownloadNotAllowedFallbackStream))
+                    displayInfo(
+                        context,
+                        context.getString(R.string.errorDownloadNotAllowedFallbackStream)
+                    )
                 }
-            }else{
+            } else {
                 playSong(context, song)
             }
 
         }
-    } catch (e: IndexOutOfBoundsException) {
     }
 }
 
-fun getCurrentSong():Song?{
-    return try{
-        playList[currentSong]
-    }catch (e: IndexOutOfBoundsException){
-        null
-    }
-}
-
+/**
+ * Play specific song
+ */
 private fun playSong(context: Context, song: Song) {
     val settings = Settings(context)
 
@@ -138,7 +137,7 @@ private fun playSong(context: Context, song: Song) {
 
             val mediaSource = song.getMediaSource()
 
-            if(mediaSource != null){
+            if (mediaSource != null) {
                 mediaPlayer?.prepare(mediaSource)
 
                 mediaPlayer?.playWhenReady = true
@@ -152,13 +151,16 @@ private fun playSong(context: Context, song: Song) {
                 setPlayButtonImage(context)
 
                 startSeekBarUpdate()
-            }else{
+            } else {
                 displayInfo(context, "You cannot play this song")
             }
         }
     }
 }
 
+/**
+ * Play specific stream
+ */
 fun playStream(stream: Stream) {
     clearListener()
 
@@ -296,7 +298,7 @@ fun resume() {
 fun next() {
     clearListener()
 
-    if(!repeat){
+    if (!repeat) {
         currentSong++
     }
 
@@ -324,6 +326,17 @@ fun toggleMusic() {
         pause()
     } else {
         resume()
+    }
+}
+
+/**
+ * Returns current song from playlist
+ */
+fun getCurrentSong(): Song? {
+    return try {
+        playList[currentSong]
+    } catch (e: IndexOutOfBoundsException) {
+        null
     }
 }
 
