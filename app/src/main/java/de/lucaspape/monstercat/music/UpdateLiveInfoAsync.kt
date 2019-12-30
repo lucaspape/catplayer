@@ -17,9 +17,17 @@ class UpdateLiveInfoAsync(
     private val contextReference: WeakReference<Context>,
     private val stream: Stream
 ) : AsyncTask<Void, String, String>() {
+
+    companion object{
+        @JvmStatic
+        var previousTitle = ""
+        @JvmStatic
+        var previousArtist = ""
+    }
+
     override fun doInBackground(vararg params: Void?): String? {
-        var previousTitle = stream.title
-        var previousArtist = stream.artist
+        previousTitle = stream.title
+        previousArtist = stream.artist
 
         contextReference.get()?.let { context ->
             updateCover(context, stream)

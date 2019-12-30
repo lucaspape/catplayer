@@ -94,6 +94,14 @@ internal fun play() {
     }
 }
 
+fun getCurrentSong():Song?{
+    return try{
+        playList[currentSong]
+    }catch (e: IndexOutOfBoundsException){
+        null
+    }
+}
+
 private fun playSong(context: Context, song: Song) {
     val settings = Settings(context)
 

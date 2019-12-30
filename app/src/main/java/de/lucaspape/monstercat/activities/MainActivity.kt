@@ -25,6 +25,7 @@ import de.lucaspape.monstercat.fragments.PlaylistFragment
 import de.lucaspape.monstercat.handlers.HomeHandler
 import de.lucaspape.monstercat.handlers.async.LoadContinuousSongListAsync
 import de.lucaspape.monstercat.music.*
+import de.lucaspape.monstercat.music.notification.updateNotification
 import de.lucaspape.monstercat.util.Settings
 import de.lucaspape.monstercat.util.displayInfo
 import java.lang.ref.WeakReference
@@ -130,6 +131,24 @@ class MainActivity : AppCompatActivity() {
         setupMusicPlayer()
 
         registerButtonListeners()
+
+        //update notification after restart of activity (screen orientation change etc)
+        if(mediaPlayer?.isPlaying == true){
+            if(updateLiveInfoAsync?.status != AsyncTask.Status.RUNNING){
+                val currentSong = getCurrentSong()
+
+                currentSong?.let {song ->
+                    updateNotification(song.title, song.version, song.artist, filesDir.toString() + "/" + song.albumId + ".png" + settings.getSetting("primaryCoverResolution"))
+                }
+            }else{
+                updateNotification(
+                    UpdateLiveInfoAsync.previousTitle,
+                    "",
+                    UpdateLiveInfoAsync.previousArtist,
+                    "$filesDir/live.png"
+                )
+            }
+        }
     }
 
     override fun onDestroy() {
@@ -166,7 +185,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         downloadTask?.cancel(true)
-        updateLiveInfoAsync?.cancel(true)
 
         hideDownloadNotification(this)
 

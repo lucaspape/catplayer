@@ -184,7 +184,7 @@ fun stopPlayerService() {
     serviceRunning = false
 }
 
-internal fun updateNotification(
+fun updateNotification(
     title: String,
     version: String,
     artist: String,
