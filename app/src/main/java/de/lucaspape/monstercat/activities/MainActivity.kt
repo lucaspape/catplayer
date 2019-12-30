@@ -193,26 +193,22 @@ class MainActivity : AppCompatActivity() {
 
         //for new privacy policy change version number
         if (settings.getSetting("privacypolicy") != "1.0") {
-            val textView = TextView(this)
-            val spannableString = SpannableString(
-                getString(
-                    R.string.reviewPrivacyPolicyMsg, getString(
-                        R.string.privacypolicyUrl
-                    )
+            AlertDialog.Builder(this).apply {
+                setTitle(getString(R.string.privacyPolicy))
+                setPositiveButton(getString(R.string.ok), null)
+                setMessage(
+                    getString(R.string.reviewPrivacyPolicyMsg, getString(R.string.privacypolicyUrl))
                 )
-            )
-
-            Linkify.addLinks(spannableString, Linkify.WEB_URLS)
-            textView.text = spannableString
-            textView.textSize = 18f
-            textView.movementMethod = LinkMovementMethod.getInstance()
-
-            val alertDialogBuilder = AlertDialog.Builder(this)
-            alertDialogBuilder.setTitle(getString(R.string.privacyPolicy))
-            alertDialogBuilder.setCancelable(true)
-            alertDialogBuilder.setPositiveButton(getString(R.string.ok), null)
-            alertDialogBuilder.setView(textView)
-            alertDialogBuilder.show()
+            }.create().run {
+                show()
+                // Now that we've called show(), we can get a reference to the dialog's TextView
+                // and modify it as we wish
+                findViewById<TextView>(android.R.id.message).apply {
+                    textSize = 18f
+                    autoLinkMask = Linkify.WEB_URLS
+                    movementMethod = LinkMovementMethod.getInstance()
+                }
+            }
             settings.saveSetting("privacypolicy", "1.0")
         }
     }
