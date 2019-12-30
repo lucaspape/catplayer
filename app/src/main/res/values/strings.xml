@@ -65,4 +65,5 @@
     <string name="errorRemovingSongFromPlaylist">Could not remove song from playlist!</string>
     <string name="playlistCreatedMsg">Playlist created!</string>
     <string name="errorCreatingPlaylist">Could not create playlist!</string>
+    <string name="createPlaylist">Create new playlist</string>
 </resources>

@@ -2,6 +2,7 @@ package de.lucaspape.monstercat.handlers
 
 import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.os.AsyncTask
 import android.view.LayoutInflater
 import android.widget.EditText
@@ -211,24 +212,25 @@ internal fun addSongToPlaylist(context: Context, song: Song) {
 }
 
 internal fun createPlaylist(context:Context){
-    val alertDialogBuilder = AlertDialog.Builder(context)
     val layoutInflater =
         context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
     val playlistNameInputLayout = layoutInflater.inflate(R.layout.playlistname_input_layout, null)
 
-    alertDialogBuilder.setView(playlistNameInputLayout)
-    alertDialogBuilder.setCancelable(false)
+    AlertDialog.Builder(context).apply {
+        setTitle(context.getString(R.string.createPlaylist))
+        setPositiveButton(context.getString(R.string.ok)) { _, _ ->
+            val playlistNameEditText = playlistNameInputLayout.findViewById<EditText>(R.id.playlistNameInput)
+            val playlistName = playlistNameEditText.text.toString()
 
-    alertDialogBuilder.setPositiveButton("OK"){ _,_ ->
-        val playlistNameEditText = playlistNameInputLayout.findViewById<EditText>(R.id.playlistNameInput)
-        val playlistName = playlistNameEditText.text.toString()
-
-        val createPlaylistAsync = CreatePlaylistAsync(WeakReference(context), playlistName)
-        createPlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+            val createPlaylistAsync = CreatePlaylistAsync(WeakReference(context), playlistName)
+            createPlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        }
+        setView(playlistNameInputLayout)
+        setCancelable(true)
+    }.create().run {
+        show()
     }
-
-    alertDialogBuilder.show()
 }
 
 internal fun deletePlaylist(context: Context, playlistId:String){
@@ -236,6 +238,7 @@ internal fun deletePlaylist(context: Context, playlistId:String){
     deletePlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }
 internal fun deletePlaylistSong(context: Context, song: Song, playlistId: String, index:Int, playlistMax:Int){
+    //for playlist sorting features
     val playlistSortedByNew = true
 
     if(playlistSortedByNew){

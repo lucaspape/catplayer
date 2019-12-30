@@ -71,7 +71,7 @@
             android:id="@+id/musiclistview"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:divider="@null"
+            android:divider="@android:color/transparent"
             android:dividerHeight="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.497"
