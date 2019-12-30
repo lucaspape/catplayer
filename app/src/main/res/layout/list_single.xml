@@ -19,8 +19,9 @@
                 android:layout_height="70dp"
                 android:layout_marginStart="4dp"
                 android:contentDescription="@string/coverImage"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/title" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
                 android:id="@+id/titleDownloadStatus"
@@ -32,29 +33,29 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:textColor="?attr/colorOnSurface"
                 android:id="@+id/title"
                 android:layout_width="0dp"
-                android:layout_height="32dp"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                app:layout_constraintEnd_toStartOf="@+id/titleDownloadStatus"
-                app:layout_constraintStart_toEndOf="@+id/cover"
+                android:textColor="?attr/colorOnSurface"
+                app:layout_constraintBottom_toTopOf="@id/artist"
+                app:layout_constraintEnd_toStartOf="@id/titleDownloadStatus"
+                app:layout_constraintStart_toEndOf="@id/cover"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:textColor="?attr/colorOnSurface"
                 android:id="@+id/artist"
                 android:layout_width="0dp"
-                android:layout_height="32dp"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
+                android:textColor="?attr/colorOnSurface"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/titleDownloadStatus"
-                app:layout_constraintStart_toEndOf="@+id/cover" />
+                app:layout_constraintEnd_toStartOf="@id/titleDownloadStatus"
+                app:layout_constraintStart_toEndOf="@id/cover"
+                app:layout_constraintTop_toBottomOf="@id/title" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </com.google.android.material.card.MaterialCardView>
 
-
 </TableRow>
-
