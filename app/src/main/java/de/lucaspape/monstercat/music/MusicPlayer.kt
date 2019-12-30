@@ -93,8 +93,14 @@ fun playNow(song: Song) {
 fun clearContinuous() {
     loadContinuousSongListAsyncTask?.cancel(true)
 
-    playList = ArrayList(playList.subList(0, currentSong))
-    currentSong = playList.size
+    try{
+        playList = ArrayList(playList.subList(0, currentSong))
+        currentSong = playList.size
+    }catch(e: IndexOutOfBoundsException){
+        playList = ArrayList()
+        currentSong = 0
+    }
+
 }
 
 fun addContinuous(song: Song) {
