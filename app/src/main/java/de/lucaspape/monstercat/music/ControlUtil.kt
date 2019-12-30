@@ -177,6 +177,13 @@ fun playStream(stream: Stream) {
             @Override
             override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
                 setPlayButtonImage(context)
+
+                updateNotification(
+                    UpdateLiveInfoAsync.previousTitle,
+                    "",
+                    UpdateLiveInfoAsync.previousArtist,
+                    context.filesDir.toString() + "/live.png"
+                )
             }
         })
 
