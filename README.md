@@ -19,6 +19,11 @@ This android app aims to implement the Monstercat API.
 
 All album images seen in these screenshots are Copyright Monstercat.
 
+## API
+
+This app uses the official Monstercat Connect API for most functions but for some features a custom API is used.
+This custom API is open source and available [here](https://github.com/lucaspape/catplayer-helper-api.git).
+
 ## Todo
 
  - More playlist features (add public playlists etc.)
