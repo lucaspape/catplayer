@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.AsyncTask
 import android.os.Bundle
-import android.text.SpannableString
 import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
 import android.widget.*
@@ -96,6 +95,7 @@ class MainActivity : AppCompatActivity() {
             println("Internet permission not granted!")
         }
 
+        //adjust theme
         changeTheme()
 
         //create the MusicPlayer.kt mediasession
@@ -152,6 +152,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        //TODO this is slow and not great
+
         val listView = findViewById<ListView>(R.id.musiclistview)
 
         val settings = Settings(this)

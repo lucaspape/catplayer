@@ -22,16 +22,23 @@ import java.lang.ref.WeakReference
 class HomeHandler {
 
     companion object {
+        //if albumView selected in spinner
         @JvmStatic
         var albumViewSelected = false
+
+        //for UI
         @JvmStatic
         var albumView = false
+
         @JvmStatic
         var currentListViewData = ArrayList<HashMap<String, Any?>>()
         @JvmStatic
         private var simpleAdapter: SimpleAdapter? = null
+
+        //if contents of an album currently displayed
         @JvmStatic
         var albumContentsDisplayed = false
+
         @JvmStatic
         var currentAlbumId = ""
 
@@ -153,6 +160,8 @@ class HomeHandler {
             }
         }
 
+        //spinner (select catalog or albumview)
+
         val viewSelector = view.findViewById<Spinner>(R.id.viewSelector)
 
         if (albumViewSelected) {
@@ -203,10 +212,12 @@ class HomeHandler {
             }
         }
 
+        //settings button
         view.findViewById<ImageButton>(R.id.settingsButton).setOnClickListener {
             view.context.startActivity(Intent(view.context, SettingsActivity::class.java))
         }
 
+        //livestream button
         view.findViewById<ImageButton>(R.id.liveButton).setOnClickListener {
             val stream =
                 de.lucaspape.monstercat.twitch.Stream(view.context.getString(R.string.twitchClientID))
@@ -216,6 +227,7 @@ class HomeHandler {
             }
         }
 
+        //search
         val search = view.findViewById<SearchView>(R.id.homeSearch)
 
         search.setOnCloseListener {
@@ -309,6 +321,7 @@ class HomeHandler {
         )
     }
 
+    //search for string
     fun searchSong(view: View, searchString: String) {
         val contextReference = WeakReference<Context>(view.context)
         val viewReference = WeakReference<View>(view)

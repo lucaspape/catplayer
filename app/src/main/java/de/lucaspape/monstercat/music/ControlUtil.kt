@@ -25,10 +25,12 @@ var waitForDownloadTask: AsyncTask<Void, Void, String>? = null
  * Get current song and play it
  */
 internal fun play() {
+    //remove play next listener
     clearListener()
 
     updateLiveInfoAsync?.cancel(true)
 
+    //start the player service (with its notification)
     startPlayerService()
 
     val song = getCurrentSong()
@@ -38,6 +40,7 @@ internal fun play() {
             val settings = Settings(context)
             val downloadStream = settings.getSetting("downloadStream")?.toBoolean()
 
+            //This downloads the stream before playing it (and it pre-downloads the next stream)
             if (downloadStream == true) {
                 if (song.isDownloadable) {
                     if (!File(song.downloadLocation).exists() && !File(song.streamDownloadLocation).exists()) {
@@ -84,13 +87,18 @@ internal fun play() {
 
                     waitForDownloadTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
                 } else {
+                    //No permission to download
+
                     playSong(context, song)
                     displayInfo(
                         context,
                         context.getString(R.string.errorDownloadNotAllowedFallbackStream)
                     )
                 }
+
             } else {
+                //Stream normally
+
                 playSong(context, song)
             }
 
@@ -109,9 +117,11 @@ private fun playSong(context: Context, song: Song) {
     mediaPlayer?.release()
     mediaPlayer?.stop()
 
+    //new exoplayer
     val exoPlayer = ExoPlayerFactory.newSimpleInstance(context)
     exoPlayer.audioAttributes = getAudioAttributes()
 
+    //for play/pause button change
     exoPlayer.addListener(object : Player.EventListener {
         @Override
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
@@ -127,9 +137,12 @@ private fun playSong(context: Context, song: Song) {
 
     mediaPlayer = exoPlayer
 
+    //request audio focus
     if (requestAudioFocus(context) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+        //if song ended play next
         registerNextListener()
 
+        //dont stream if not allowed
         if (wifiConnected(context) == true || settings.getSetting("streamOverMobile") == "true" || File(
                 song.getUrl()
             ).exists()
@@ -142,16 +155,14 @@ private fun playSong(context: Context, song: Song) {
 
                 mediaPlayer?.playWhenReady = true
 
+                //UI stuff
                 setTitle(song.title, song.version, song.artist)
-
                 startTextAnimation()
-
                 setCover(song, context)
-
                 setPlayButtonImage(context)
-
                 startSeekBarUpdate()
             } else {
+                //TODO msg
                 displayInfo(context, "You cannot play this song")
             }
         }
@@ -172,9 +183,11 @@ fun playStream(stream: Stream) {
         mediaPlayer?.release()
         mediaPlayer?.stop()
 
+        //new exoplayer
         val exoPlayer = ExoPlayerFactory.newSimpleInstance(context)
         exoPlayer.audioAttributes = getAudioAttributes()
 
+        //for play/pause button change
         exoPlayer.addListener(object : Player.EventListener {
             @Override
             override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
@@ -191,23 +204,21 @@ fun playStream(stream: Stream) {
 
         mediaPlayer = exoPlayer
 
+        //request audio focus
         if (requestAudioFocus(context) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-            registerNextListener()
-
+            //only play stream if allowed
             if (wifiConnected(context) == true || settings.getSetting("streamOverMobile") == "true") {
-
                 mediaPlayer?.prepare(stream.getMediaSource(context))
 
                 mediaPlayer?.playWhenReady = true
 
+                //UI stuff
                 setTitle(stream.title, "", stream.artist)
-
                 startTextAnimation()
-
                 setPlayButtonImage(context)
-
                 startSeekBarUpdate()
 
+                //this will update the title and artist of the stream in the background (from an api)
                 updateLiveInfoAsync?.cancel(true)
 
                 updateLiveInfoAsync = UpdateLiveInfoAsync(WeakReference(context), stream)

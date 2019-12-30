@@ -25,6 +25,9 @@ import org.json.JSONObject
 import java.io.File
 import java.lang.ref.WeakReference
 
+/**
+ * Play a song from ID
+ */
 internal fun playSongFromId(context: Context, songId: String, playNow: Boolean) {
     val songDatabaseHelper = SongDatabaseHelper(context)
     val song = songDatabaseHelper.getSong(context, songId)
@@ -42,7 +45,7 @@ internal fun playSongFromId(context: Context, songId: String, playNow: Boolean) 
 }
 
 /**
- * With next songs
+ * Play a song from ID with next songs (-> songs which are listed under the current song in listView)
  */
 internal fun playSongFromId(
     context: Context,
@@ -71,6 +74,9 @@ internal fun playSongFromId(
     )
 }
 
+/**
+ * Play an entire album after the current song
+ */
 internal fun playAlbumNext(context: Context, mcID: String) {
     val requestUrl =
         context.getString(R.string.loadAlbumSongsUrl) + "/" + mcID
@@ -106,6 +112,9 @@ internal fun playAlbumNext(context: Context, mcID: String) {
     albumRequestQueue.add(albumRequest)
 }
 
+/**
+ * Download an entire playlist (playlist items must be loaded before TODO)
+ */
 internal fun downloadPlaylist(context: Context, playlistId: String) {
     val playlistItemDatabaseHelper =
         PlaylistItemDatabaseHelper(context, playlistId)
@@ -119,6 +128,9 @@ internal fun downloadPlaylist(context: Context, playlistId: String) {
     }
 }
 
+/**
+ * Download song
+ */
 internal fun downloadSong(context: Context, song: Song) {
     if (song.isDownloadable) {
         val settings = Settings(context)
@@ -152,6 +164,9 @@ internal fun downloadSong(context: Context, song: Song) {
     }
 }
 
+/**
+ * Download an entire album
+ */
 internal fun downloadAlbum(context: Context, mcID: String) {
     val requestUrl =
         context.getString(R.string.loadAlbumSongsUrl) + "/" + mcID
@@ -186,6 +201,9 @@ internal fun downloadAlbum(context: Context, mcID: String) {
     albumRequestQueue.add(albumRequest)
 }
 
+/**
+ * Add single song to playlist, will ask for playlist with alertDialog (will only show loaded playlists TODO)
+ */
 internal fun addSongToPlaylist(context: Context, song: Song) {
     val playlistDatabaseHelper =
         PlaylistDatabaseHelper(context)
@@ -211,6 +229,9 @@ internal fun addSongToPlaylist(context: Context, song: Song) {
     alertDialogBuilder.show()
 }
 
+/**
+ * Create a new playlist, will ask for name with alertDialog
+ */
 internal fun createPlaylist(context:Context){
     val layoutInflater =
         context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
@@ -233,15 +254,23 @@ internal fun createPlaylist(context:Context){
     }
 }
 
+/**
+ * Delete playlist with given playlistId
+ */
 internal fun deletePlaylist(context: Context, playlistId:String){
     val deletePlaylistAsync = DeletePlaylistAsync(WeakReference(context), playlistId)
     deletePlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }
+
+/**
+ * Delete one song from playlist, index required because double songs can exist in one playlist
+ */
 internal fun deletePlaylistSong(context: Context, song: Song, playlistId: String, index:Int, playlistMax:Int){
     //for playlist sorting features
     val playlistSortedByNew = true
 
     if(playlistSortedByNew){
+        //required because api sorts by oldest songs added
         val songDeleteIndex = playlistMax - index
 
         val deletePlaylistTrackAsync = DeletePlaylistTrackAsync(WeakReference(context), song , playlistId, songDeleteIndex)
