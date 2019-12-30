@@ -8,7 +8,6 @@ import android.widget.EditText
 import android.widget.ListView
 import com.android.volley.Response
 import com.android.volley.Request
-import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.activities.loadContinuousSongListAsyncTask
