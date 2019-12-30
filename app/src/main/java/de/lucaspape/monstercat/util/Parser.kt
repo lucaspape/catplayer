@@ -1,11 +1,15 @@
 package de.lucaspape.monstercat.util
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.*
 import de.lucaspape.monstercat.database.helper.*
 import org.json.JSONArray
 import org.json.JSONObject
+import java.io.File
+import java.io.FileOutputStream
 import java.lang.reflect.InvocationTargetException
 
 fun parseSongToHashMap(context: Context, song: Song): HashMap<String, Any?> {
@@ -32,6 +36,14 @@ fun parseSongToHashMap(context: Context, song: Song): HashMap<String, Any?> {
     hashMap["downloadable"] = song.isDownloadable.toString()
     hashMap["streamable"] = song.isStreamable.toString()
     hashMap["inEarlyAccess"] = song.inEarlyAccess.toString()
+
+    if(File(song.downloadLocation).exists()){
+        hashMap["downloadedCheck"] = "android.resource://de.lucaspape.monstercat/drawable/ic_check_green_24dp"
+    }else if(File(song.streamDownloadLocation).exists()){
+        hashMap["downloadedCheck"] = "android.resource://de.lucaspape.monstercat/drawable/ic_check_orange_24dp"
+    }else{
+        hashMap["downloadedCheck"] = "android.resource://de.lucaspape.monstercat/drawable/ic_empty_24dp"
+    }
 
     return hashMap
 }
