@@ -15,6 +15,7 @@ import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadCoverArray
+import de.lucaspape.monstercat.handlers.async.BackgroundAsync
 import de.lucaspape.monstercat.handlers.async.LoadPlaylistAsync
 import de.lucaspape.monstercat.handlers.async.LoadPlaylistTracksAsync
 import de.lucaspape.monstercat.music.clearContinuous
@@ -133,25 +134,33 @@ class PlaylistHandler {
             contextReference,
             forceReload
         ) {
-            val playlistDatabaseHelper =
-                PlaylistDatabaseHelper(view.context)
-            val playlists = playlistDatabaseHelper.getAllPlaylists()
+            BackgroundAsync({
 
-            val playlistHashMaps = ArrayList<HashMap<String, Any?>>()
+                val playlistDatabaseHelper =
+                    PlaylistDatabaseHelper(view.context)
+                val playlists = playlistDatabaseHelper.getAllPlaylists()
 
-            for (playlist in playlists) {
-                playlistHashMaps.add(parsePlaylistToHashMap(playlist))
-            }
+                val playlistHashMaps = ArrayList<HashMap<String, Any?>>()
 
-            if (showAfter) {
+                for (playlist in playlists) {
+                    playlistHashMaps.add(parsePlaylistToHashMap(playlist))
+                }
+
+                if (showAfter) {
                     currentListViewData = playlistHashMaps
+                }
+
+            }, {
+                if (showAfter) {
+
                     listViewDataIsPlaylistView = true
 
                     updateListView(view)
                     redrawListView(view)
 
                     swipeRefreshLayout.isRefreshing = false
-            }
+                }
+            }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 
@@ -174,43 +183,45 @@ class PlaylistHandler {
             forceReload,
             playlistId
         ) {
-            val playlistItemDatabaseHelper =
-                PlaylistItemDatabaseHelper(
-                    view.context,
-                    playlistId
-                )
+            BackgroundAsync({
+                val playlistItemDatabaseHelper =
+                    PlaylistItemDatabaseHelper(
+                        view.context,
+                        playlistId
+                    )
 
-            val sortedList = ArrayList<HashMap<String, Any?>>()
+                val sortedList = ArrayList<HashMap<String, Any?>>()
 
-            val playlistItems = playlistItemDatabaseHelper.getAllData()
+                val playlistItems = playlistItemDatabaseHelper.getAllData()
 
-            val songDatabaseHelper =
-                SongDatabaseHelper(view.context)
+                val songDatabaseHelper =
+                    SongDatabaseHelper(view.context)
 
-            for (playlistItem in playlistItems) {
-                val hashMap = parseSongToHashMap(
-                    view.context,
-                    songDatabaseHelper.getSong(view.context, playlistItem.songId)
-                )
-                sortedList.add(hashMap)
-            }
+                for (playlistItem in playlistItems) {
+                    val hashMap = parseSongToHashMap(
+                        view.context,
+                        songDatabaseHelper.getSong(view.context, playlistItem.songId)
+                    )
+                    sortedList.add(hashMap)
+                }
 
-            //display list
-            currentListViewData = ArrayList()
+                //display list
+                currentListViewData = ArrayList()
 
-            for (i in (sortedList.size - 1) downTo 0) {
-                currentListViewData.add(sortedList[i])
-            }
+                for (i in (sortedList.size - 1) downTo 0) {
+                    currentListViewData.add(sortedList[i])
+                }
+            }, {
+                listViewDataIsPlaylistView = false
 
-            listViewDataIsPlaylistView = false
+                updateListView(view)
+                redrawListView(view)
 
-            updateListView(view)
-            redrawListView(view)
+                //download cover art
+                addDownloadCoverArray(currentListViewData)
 
-            //download cover art
-            addDownloadCoverArray(currentListViewData)
-
-            swipeRefreshLayout.isRefreshing = false
+                swipeRefreshLayout.isRefreshing = false
+            }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }

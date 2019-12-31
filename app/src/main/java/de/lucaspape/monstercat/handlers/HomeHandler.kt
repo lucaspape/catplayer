@@ -274,8 +274,6 @@ class HomeHandler {
                 view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
             swipeRefreshLayout.isRefreshing = true
 
-            val dbSongs = ArrayList<HashMap<String, Any?>>()
-
             LoadSongListAsync(
                 contextReference,
                 forceReload,
@@ -294,14 +292,16 @@ class HomeHandler {
                         songList.add(songDatabaseHelper.getSong(view.context, song.songId))
                     }
 
+                    val dbSongs = ArrayList<HashMap<String, Any?>>()
+
                     for (song in songList) {
                         dbSongs.add(parseSongToHashMap(view.context, song))
                     }
 
-                }, {
                     //display list
                     currentListViewData = dbSongs
 
+                }, {
                     updateListView(view)
                     redrawListView(view)
 
@@ -345,36 +345,38 @@ class HomeHandler {
                 forceReload,
                 Integer.parseInt(it)
             ) {
-                val albumDatabaseHelper =
-                    AlbumDatabaseHelper(view.context)
-                val albumList = albumDatabaseHelper.getAllAlbums()
+                BackgroundAsync({
+                    val albumDatabaseHelper =
+                        AlbumDatabaseHelper(view.context)
+                    val albumList = albumDatabaseHelper.getAllAlbums()
 
-                val sortedList = ArrayList<HashMap<String, Any?>>()
+                    val sortedList = ArrayList<HashMap<String, Any?>>()
 
-                for (album in albumList) {
-                    sortedList.add(parseAlbumToHashMap(view.context, album))
-                }
+                    for (album in albumList) {
+                        sortedList.add(parseAlbumToHashMap(view.context, album))
+                    }
 
-                currentListViewData = sortedList
+                    currentListViewData = sortedList
+                }, {
+                    updateListView(view)
+                    redrawListView(view)
 
-                updateListView(view)
-                redrawListView(view)
+                    //download cover art
+                    addDownloadCoverArray(currentListViewData)
 
-                //download cover art
-                addDownloadCoverArray(currentListViewData)
+                    val listView = view.findViewById<ListView>(R.id.musiclistview)
+                    val settings = Settings(view.context)
+                    val lastScroll = settings.getSetting("currentListAlbumViewLastScrollIndex")
+                    val top = settings.getSetting("currentListAlbumViewTop")
 
-                val listView = view.findViewById<ListView>(R.id.musiclistview)
-                val settings = Settings(view.context)
-                val lastScroll = settings.getSetting("currentListAlbumViewLastScrollIndex")
-                val top = settings.getSetting("currentListAlbumViewTop")
+                    if (top != null && lastScroll != null) {
+                        listView.setSelectionFromTop(lastScroll.toInt(), top.toInt())
+                    }
 
-                if (top != null && lastScroll != null) {
-                    listView.setSelectionFromTop(lastScroll.toInt(), top.toInt())
-                }
+                    swipeRefreshLayout.isRefreshing = false
 
-                swipeRefreshLayout.isRefreshing = false
-
-                albumContentsDisplayed = false
+                    albumContentsDisplayed = false
+                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 
             }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         }
@@ -407,42 +409,45 @@ class HomeHandler {
             forceReload,
             itemValue
         ) {
-            val albumId = itemValue["id"] as String
+            BackgroundAsync({
+                val albumId = itemValue["id"] as String
 
-            val albumItemDatabaseHelper =
-                AlbumItemDatabaseHelper(contextReference.get()!!, albumId)
-            val albumItemList = albumItemDatabaseHelper.getAllData()
+                val albumItemDatabaseHelper =
+                    AlbumItemDatabaseHelper(contextReference.get()!!, albumId)
+                val albumItemList = albumItemDatabaseHelper.getAllData()
 
-            val dbSongs = ArrayList<HashMap<String, Any?>>()
+                val dbSongs = ArrayList<HashMap<String, Any?>>()
 
-            val songDatabaseHelper = SongDatabaseHelper(contextReference.get()!!)
+                val songDatabaseHelper = SongDatabaseHelper(contextReference.get()!!)
 
-            for (albumItem in albumItemList) {
-                contextReference.get()?.let { context ->
-                    dbSongs.add(
-                        parseSongToHashMap(
-                            context,
-                            songDatabaseHelper.getSong(context, albumItem.songId)
+                for (albumItem in albumItemList) {
+                    contextReference.get()?.let { context ->
+                        dbSongs.add(
+                            parseSongToHashMap(
+                                context,
+                                songDatabaseHelper.getSong(context, albumItem.songId)
+                            )
                         )
-                    )
+                    }
+
                 }
 
-            }
+                currentListViewData = dbSongs
+            }, {
+                albumView = false
 
-            currentListViewData = dbSongs
+                updateListView(view)
+                redrawListView(view)
 
-            albumView = false
+                //download cover art
+                addDownloadCoverArray(currentListViewData)
 
-            updateListView(view)
-            redrawListView(view)
+                swipeRefreshLayout.isRefreshing = false
 
-            //download cover art
-            addDownloadCoverArray(currentListViewData)
+                albumContentsDisplayed = true
+                currentAlbumId = itemValue["id"] as String
+            }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 
-            swipeRefreshLayout.isRefreshing = false
-
-            albumContentsDisplayed = true
-            currentAlbumId = itemValue["id"] as String
         }.executeOnExecutor(
             AsyncTask.THREAD_POOL_EXECUTOR
         )
