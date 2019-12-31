@@ -14,6 +14,9 @@ import org.json.JSONObject
 import java.lang.ref.WeakReference
 import kotlin.collections.ArrayList
 
+/**
+ * Load playlist tracks into database
+ */
 class LoadPlaylistTracksAsync(
     private val contextReference: WeakReference<Context>,
     private val forceReload: Boolean,

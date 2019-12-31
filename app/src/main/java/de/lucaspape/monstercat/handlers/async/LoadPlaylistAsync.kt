@@ -13,6 +13,9 @@ import de.lucaspape.monstercat.util.parsePlaylistToDB
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
+/**
+ * Load playlists into database
+ */
 class LoadPlaylistAsync(
     private val contextReference: WeakReference<Context>,
     private val forceReload: Boolean,

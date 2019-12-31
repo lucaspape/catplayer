@@ -13,6 +13,9 @@ import de.lucaspape.monstercat.util.parsAlbumSongToDB
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
+/**
+ * Loads an album into database
+ */
 class LoadAlbumAsync(
     private val contextReference: WeakReference<Context>,
     private val forceReload: Boolean,

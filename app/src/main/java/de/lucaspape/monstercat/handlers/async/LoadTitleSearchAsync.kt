@@ -14,6 +14,9 @@ import de.lucaspape.monstercat.util.parseSongToHashMap
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
+/**
+ * Load title search into HomeHandler.searchResults
+ */
 class LoadTitleSearchAsync(
     private val contextReference: WeakReference<Context>,
     private val searchString: String,

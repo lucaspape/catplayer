@@ -13,6 +13,9 @@ import de.lucaspape.monstercat.util.parseCatalogSongToDB
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
+/**
+ * Load song list into database
+ */
 class LoadSongListAsync(
     private val contextReference: WeakReference<Context>,
     private val forceReload: Boolean,
