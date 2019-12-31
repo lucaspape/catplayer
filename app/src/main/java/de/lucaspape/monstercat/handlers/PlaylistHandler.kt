@@ -25,49 +25,44 @@ import java.lang.ref.WeakReference
 class PlaylistHandler {
     companion object {
         @JvmStatic
-        var currentListViewData = ArrayList<HashMap<String, Any?>>()
-        @JvmStatic
-        var listViewDataIsPlaylistView = true
-
-        @JvmStatic
-        private var simpleAdapter: SimpleAdapter? = null
-
         var currentPlaylistId: String? = null
+    }
 
-        /**
-         * Updates listView content
-         */
-        @JvmStatic
-        fun updateListView(view: View) {
-            val playlistList = view.findViewById<ListView>(R.id.playlistView)
+    private var currentListViewData = ArrayList<HashMap<String, Any?>>()
+    private var listViewDataIsPlaylistView = true
+    private var simpleAdapter: SimpleAdapter? = null
 
-            var from = arrayOf("shownTitle", "artist", "secondaryImage", "downloadedCheck")
-            var to = arrayOf(R.id.title, R.id.artist, R.id.cover, R.id.titleDownloadStatus)
+    /**
+     * Updates listView content
+     */
+    private fun updateListView(view: View) {
+        val playlistList = view.findViewById<ListView>(R.id.playlistView)
 
-            if (listViewDataIsPlaylistView) {
-                from = arrayOf("playlistName", "coverUrl")
-                to = arrayOf(R.id.title, R.id.cover)
-            }
+        var from = arrayOf("shownTitle", "artist", "secondaryImage", "downloadedCheck")
+        var to = arrayOf(R.id.title, R.id.artist, R.id.cover, R.id.titleDownloadStatus)
 
-            simpleAdapter = SimpleAdapter(
-                view.context,
-                currentListViewData,
-                R.layout.list_single,
-                from,
-                to.toIntArray()
-            )
-
-            playlistList.adapter = simpleAdapter
-
+        if (listViewDataIsPlaylistView) {
+            from = arrayOf("playlistName", "coverUrl")
+            to = arrayOf(R.id.title, R.id.cover)
         }
 
-        @JvmStatic
-        fun redrawListView(view: View) {
-            val playlistList = view.findViewById<ListView>(R.id.playlistView)
-            simpleAdapter!!.notifyDataSetChanged()
-            playlistList.invalidateViews()
-            playlistList.refreshDrawableState()
-        }
+        simpleAdapter = SimpleAdapter(
+            view.context,
+            currentListViewData,
+            R.layout.list_single,
+            from,
+            to.toIntArray()
+        )
+
+        playlistList.adapter = simpleAdapter
+
+    }
+
+    private fun redrawListView(view: View) {
+        val playlistList = view.findViewById<ListView>(R.id.playlistView)
+        simpleAdapter!!.notifyDataSetChanged()
+        playlistList.invalidateViews()
+        playlistList.refreshDrawableState()
     }
 
     /**
