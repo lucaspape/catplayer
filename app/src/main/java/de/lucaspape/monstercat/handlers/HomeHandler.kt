@@ -269,57 +269,60 @@ class HomeHandler {
     fun loadSongList(view: View, forceReload: Boolean) {
         Settings(view.context).getSetting("maximumLoad")?.let {
             val contextReference = WeakReference<Context>(view.context)
-            val viewReference = WeakReference<View>(view)
+
+            val swipeRefreshLayout =
+                view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
+            swipeRefreshLayout.isRefreshing = true
+
+            val dbSongs = ArrayList<HashMap<String, Any?>>()
 
             LoadSongListAsync(
-                viewReference,
                 contextReference,
                 forceReload,
                 Integer.parseInt(it)
             ) {
-                val catalogSongDatabaseHelper =
-                    CatalogSongDatabaseHelper(view.context)
-                val songIdList = catalogSongDatabaseHelper.getAllSongs()
+                BackgroundAsync({
+                    val catalogSongDatabaseHelper =
+                        CatalogSongDatabaseHelper(view.context)
+                    val songIdList = catalogSongDatabaseHelper.getAllSongs()
 
-                val dbSongs = ArrayList<HashMap<String, Any?>>()
+                    val songDatabaseHelper =
+                        SongDatabaseHelper(view.context)
+                    val songList = ArrayList<Song>()
 
-                val songDatabaseHelper =
-                    SongDatabaseHelper(view.context)
-                val songList = ArrayList<Song>()
+                    for (song in songIdList) {
+                        songList.add(songDatabaseHelper.getSong(view.context, song.songId))
+                    }
 
-                for (song in songIdList) {
-                    songList.add(songDatabaseHelper.getSong(view.context, song.songId))
-                }
+                    for (song in songList) {
+                        dbSongs.add(parseSongToHashMap(view.context, song))
+                    }
 
-                for (song in songList) {
-                    dbSongs.add(parseSongToHashMap(view.context, song))
-                }
+                }, {
+                    //display list
+                    currentListViewData = dbSongs
 
-                //display list
-                currentListViewData = dbSongs
+                    updateListView(view)
+                    redrawListView(view)
 
-                updateListView(view)
-                redrawListView(view)
+                    //download cover art
+                    addDownloadCoverArray(currentListViewData)
 
-                //download cover art
-                addDownloadCoverArray(currentListViewData)
+                    val listView = view.findViewById<ListView>(R.id.musiclistview)
+                    val settings = Settings(view.context)
+                    val lastScroll = settings.getSetting("currentListViewLastScrollIndex")
+                    val top = settings.getSetting("currentListViewTop")
 
-                val listView = view.findViewById<ListView>(R.id.musiclistview)
-                val settings = Settings(view.context)
-                val lastScroll = settings.getSetting("currentListViewLastScrollIndex")
-                val top = settings.getSetting("currentListViewTop")
+                    if (top != null && lastScroll != null) {
+                        listView.setSelectionFromTop(lastScroll.toInt(), top.toInt())
+                    } else {
+                        println("IT IS NULL")
+                    }
 
-                if (top != null && lastScroll != null) {
-                    listView.setSelectionFromTop(lastScroll.toInt(), top.toInt())
-                } else {
-                    println("IT IS NULL")
-                }
+                    swipeRefreshLayout.isRefreshing = false
 
-                val swipeRefreshLayout =
-                    view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
-                swipeRefreshLayout.isRefreshing = false
-
-                albumContentsDisplayed = false
+                    albumContentsDisplayed = false
+                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 
             }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         }
