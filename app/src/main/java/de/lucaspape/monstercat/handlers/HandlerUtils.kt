@@ -229,7 +229,7 @@ internal fun addSongToPlaylist(context: Context, song: Song) {
 
         }
         alertDialogBuilder.show()
-    }
+    }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }
 
 /**
