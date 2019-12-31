@@ -24,7 +24,8 @@ class LoadAlbumListAsync(
     private val viewReference: WeakReference<View>,
     private val contextReference: WeakReference<Context>,
     private val forceReload: Boolean,
-    private val loadMax: Int
+    private val loadMax: Int,
+    private val requestFinished : () -> Unit
 ) : AsyncTask<Void, Void, String>() {
     override fun onPreExecute() {
         viewReference.get()?.let {view ->
@@ -35,42 +36,7 @@ class LoadAlbumListAsync(
     }
 
     override fun onPostExecute(result: String?) {
-        contextReference.get()?.let { context ->
-            val albumDatabaseHelper =
-                AlbumDatabaseHelper(context)
-            val albumList = albumDatabaseHelper.getAllAlbums()
-
-            val sortedList = ArrayList<HashMap<String, Any?>>()
-
-            for (album in albumList) {
-                sortedList.add(parseAlbumToHashMap(context, album))
-            }
-
-            HomeHandler.currentListViewData = sortedList
-
-            viewReference.get()?.let {view ->
-                HomeHandler.updateListView(view)
-                HomeHandler.redrawListView(view)
-
-                //download cover art
-                addDownloadCoverArray(HomeHandler.currentListViewData)
-
-                val listView = view.findViewById<ListView>(R.id.musiclistview)
-                val settings = Settings(view.context)
-                val lastScroll = settings.getSetting("currentListAlbumViewLastScrollIndex")
-                val top = settings.getSetting("currentListAlbumViewTop")
-
-                if (top != null && lastScroll != null) {
-                    listView.setSelectionFromTop(lastScroll.toInt(), top.toInt())
-                }
-
-                val swipeRefreshLayout =
-                    view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
-                swipeRefreshLayout.isRefreshing = false
-
-                HomeHandler.albumContentsDisplayed = false
-            }
-        }
+        requestFinished()
     }
 
     override fun doInBackground(vararg param: Void?): String? {

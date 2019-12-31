@@ -13,7 +13,12 @@ import de.lucaspape.monstercat.util.getSid
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
-class DeletePlaylistTrackAsync(private val contextReference:WeakReference<Context>, private val song: Song, private val playlistId:String, private val songDeleteIndex:Int) : AsyncTask<Void, Void, String>(){
+class DeletePlaylistTrackAsync(
+    private val contextReference: WeakReference<Context>,
+    private val song: Song,
+    private val playlistId: String,
+    private val songDeleteIndex: Int
+) : AsyncTask<Void, Void, String>() {
     override fun doInBackground(vararg params: Void?): String? {
         contextReference.get()?.let { context ->
             val deleteSongObject = JSONObject()
@@ -29,7 +34,9 @@ class DeletePlaylistTrackAsync(private val contextReference:WeakReference<Contex
             val deleteSongVolleyQueue = Volley.newRequestQueue(context)
 
             val deleteSongRequest = JsonObjectRequest(
-                Request.Method.POST, context.getString(R.string.removeFromPlaylistUrl), deleteObject,
+                Request.Method.POST,
+                context.getString(R.string.removeFromPlaylistUrl),
+                deleteObject,
                 Response.Listener { response ->
                     displayInfo(context, context.getString(R.string.removedSongFromPlaylistMsg))
                 },

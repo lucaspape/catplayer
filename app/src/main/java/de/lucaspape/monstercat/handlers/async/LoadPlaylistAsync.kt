@@ -21,7 +21,8 @@ class LoadPlaylistAsync(
     private val viewReference: WeakReference<View>,
     private val contextReference: WeakReference<Context>,
     private val forceReload: Boolean,
-    private val showAfter: Boolean
+    private val showAfter: Boolean,
+    private val requestFinished : () -> Unit
 ) : AsyncTask<Void, Void, String>() {
     override fun onPreExecute() {
         if (showAfter) {
@@ -34,31 +35,7 @@ class LoadPlaylistAsync(
     }
 
     override fun onPostExecute(result: String?) {
-        contextReference.get()?.let { context ->
-            val playlistDatabaseHelper =
-                PlaylistDatabaseHelper(context)
-            val playlists = playlistDatabaseHelper.getAllPlaylists()
-
-            val playlistHashMaps = ArrayList<HashMap<String, Any?>>()
-
-            for (playlist in playlists) {
-                playlistHashMaps.add(parsePlaylistToHashMap(playlist))
-            }
-
-            if (showAfter) {
-                viewReference.get()?.let { view ->
-                    PlaylistHandler.currentListViewData = playlistHashMaps
-                    PlaylistHandler.listViewDataIsPlaylistView = true
-
-                    PlaylistHandler.updateListView(view)
-                    PlaylistHandler.redrawListView(view)
-
-                    val swipeRefreshLayout =
-                        view.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
-                    swipeRefreshLayout.isRefreshing = false
-                }
-            }
-        }
+        requestFinished()
     }
 
     override fun doInBackground(vararg param: Void?): String? {

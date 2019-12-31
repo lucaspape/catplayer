@@ -23,7 +23,8 @@ class LoadAlbumAsync(
     private val viewReference: WeakReference<View>,
     private val contextReference: WeakReference<Context>,
     private val forceReload: Boolean,
-    private val itemValue: HashMap<*, *>
+    private val itemValue: HashMap<*, *>,
+    private val requestFinished : () -> Unit
 ) : AsyncTask<Void, Void, String>() {
     override fun onPreExecute() {
         viewReference.get()?.let { view ->
@@ -34,46 +35,7 @@ class LoadAlbumAsync(
     }
 
     override fun onPostExecute(result: String?) {
-        val albumId = itemValue["id"] as String
-
-        val albumItemDatabaseHelper =
-            AlbumItemDatabaseHelper(contextReference.get()!!, albumId)
-        val albumItemList = albumItemDatabaseHelper.getAllData()
-
-        val dbSongs = ArrayList<HashMap<String, Any?>>()
-
-        val songDatabaseHelper = SongDatabaseHelper(contextReference.get()!!)
-
-        for (albumItem in albumItemList) {
-            contextReference.get()?.let { context ->
-                dbSongs.add(
-                    parseSongToHashMap(
-                        context,
-                        songDatabaseHelper.getSong(context, albumItem.songId)
-                    )
-                )
-            }
-
-        }
-
-        HomeHandler.currentListViewData = dbSongs
-
-        HomeHandler.albumView = false
-
-        viewReference.get()?.let { view ->
-            HomeHandler.updateListView(view)
-            HomeHandler.redrawListView(view)
-        }
-
-        //download cover art
-        addDownloadCoverArray(HomeHandler.currentListViewData)
-
-        val swipeRefreshLayout =
-            viewReference.get()!!.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
-        swipeRefreshLayout.isRefreshing = false
-
-        HomeHandler.albumContentsDisplayed = true
-        HomeHandler.currentAlbumId = itemValue["id"] as String
+        requestFinished()
     }
 
     override fun doInBackground(vararg param: Void?): String? {

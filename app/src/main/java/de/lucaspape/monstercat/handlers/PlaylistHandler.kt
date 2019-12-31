@@ -11,9 +11,15 @@ import android.widget.ListView
 import android.widget.SimpleAdapter
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
+import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
+import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
+import de.lucaspape.monstercat.download.addDownloadCoverArray
 import de.lucaspape.monstercat.handlers.async.LoadPlaylistAsync
 import de.lucaspape.monstercat.handlers.async.LoadPlaylistTracksAsync
 import de.lucaspape.monstercat.music.clearContinuous
+import de.lucaspape.monstercat.util.parsePlaylistToHashMap
+import de.lucaspape.monstercat.util.parseSongToHashMap
 import java.lang.ref.WeakReference
 
 class PlaylistHandler {
@@ -128,7 +134,31 @@ class PlaylistHandler {
             contextReference,
             forceReload,
             showAfter
-        ).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        ) {
+            val playlistDatabaseHelper =
+                PlaylistDatabaseHelper(view.context)
+            val playlists = playlistDatabaseHelper.getAllPlaylists()
+
+            val playlistHashMaps = ArrayList<HashMap<String, Any?>>()
+
+            for (playlist in playlists) {
+                playlistHashMaps.add(parsePlaylistToHashMap(playlist))
+            }
+
+            if (showAfter) {
+                viewReference.get()?.let { view ->
+                    currentListViewData = playlistHashMaps
+                    listViewDataIsPlaylistView = true
+
+                    updateListView(view)
+                    redrawListView(view)
+
+                    val swipeRefreshLayout =
+                        view.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
+                    swipeRefreshLayout.isRefreshing = false
+                }
+            }
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 
     /**
@@ -146,6 +176,47 @@ class PlaylistHandler {
             contextReference,
             forceReload,
             playlistId
-        ).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        ) {
+            val playlistItemDatabaseHelper =
+                PlaylistItemDatabaseHelper(
+                    view.context,
+                    playlistId
+                )
+
+            val sortedList = ArrayList<HashMap<String, Any?>>()
+
+            val playlistItems = playlistItemDatabaseHelper.getAllData()
+
+            val songDatabaseHelper =
+                SongDatabaseHelper(view.context)
+
+            for (playlistItem in playlistItems) {
+                val hashMap = parseSongToHashMap(
+                    view.context,
+                    songDatabaseHelper.getSong(view.context, playlistItem.songId)
+                )
+                sortedList.add(hashMap)
+            }
+
+            //display list
+            currentListViewData = ArrayList()
+
+            for (i in (sortedList.size - 1) downTo 0) {
+                currentListViewData.add(sortedList[i])
+            }
+
+            listViewDataIsPlaylistView = false
+
+            updateListView(view)
+            redrawListView(view)
+
+            //download cover art
+            addDownloadCoverArray(currentListViewData)
+
+            val swipeRefreshLayout =
+                view.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
+            swipeRefreshLayout.isRefreshing = false
+
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 }

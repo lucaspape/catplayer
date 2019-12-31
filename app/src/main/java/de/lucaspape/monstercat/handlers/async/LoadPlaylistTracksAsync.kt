@@ -25,7 +25,8 @@ class LoadPlaylistTracksAsync(
     private val viewReference: WeakReference<View>,
     private val contextReference: WeakReference<Context>,
     private val forceReload: Boolean,
-    private val playlistId: String
+    private val playlistId: String,
+    private val requestFinished : () -> Unit
 ) : AsyncTask<Void, Void, String>() {
     override fun onPreExecute() {
         viewReference.get()?.let { view ->
@@ -36,51 +37,7 @@ class LoadPlaylistTracksAsync(
     }
 
     override fun onPostExecute(result: String?) {
-        contextReference.get()?.let { context ->
-            val playlistItemDatabaseHelper =
-                PlaylistItemDatabaseHelper(
-                    context,
-                    playlistId
-                )
-
-            val sortedList = ArrayList<HashMap<String, Any?>>()
-
-            val playlistItems = playlistItemDatabaseHelper.getAllData()
-
-            val songDatabaseHelper =
-                SongDatabaseHelper(context)
-
-            for (playlistItem in playlistItems) {
-                val hashMap = parseSongToHashMap(
-                    context,
-                    songDatabaseHelper.getSong(context, playlistItem.songId)
-                )
-                sortedList.add(hashMap)
-            }
-
-            //display list
-            PlaylistHandler.currentListViewData = ArrayList()
-
-            for (i in (sortedList.size - 1) downTo 0) {
-                PlaylistHandler.currentListViewData.add(sortedList[i])
-            }
-
-            PlaylistHandler.listViewDataIsPlaylistView = false
-
-            viewReference.get()?.let { view ->
-                PlaylistHandler.updateListView(view)
-                PlaylistHandler.redrawListView(view)
-
-                //download cover art
-                addDownloadCoverArray(PlaylistHandler.currentListViewData)
-
-                val swipeRefreshLayout =
-                    view.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
-                swipeRefreshLayout.isRefreshing = false
-            }
-
-
-        }
+        requestFinished()
     }
 
     override fun doInBackground(vararg param: Void?): String? {

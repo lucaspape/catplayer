@@ -8,6 +8,7 @@ import android.os.StrictMode
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.music.notification.updateNotification
 import de.lucaspape.monstercat.twitch.Stream
+import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.lang.ref.WeakReference
 import java.net.HttpURLConnection
@@ -105,15 +106,19 @@ class UpdateLiveInfoAsync(
     private fun updateCover(context: Context, stream: Stream) {
         StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder().permitAll().build())
 
-        val connection =
-            URL(stream.albumCoverUpdateUrl).openConnection() as HttpURLConnection
-        connection.doInput = true
-        connection.connect()
-        val input = connection.inputStream
-        val primaryBitmap = BitmapFactory.decodeStream(input)
+        try{
+            val connection =
+                URL(stream.albumCoverUpdateUrl).openConnection() as HttpURLConnection
+            connection.doInput = true
+            connection.connect()
+            val input = connection.inputStream
+            val primaryBitmap = BitmapFactory.decodeStream(input)
 
-        FileOutputStream(context.filesDir.toString() + "/live.png").use { out ->
-            primaryBitmap?.compress(Bitmap.CompressFormat.PNG, 100, out)
+            FileOutputStream(context.filesDir.toString() + "/live.png").use { out ->
+                primaryBitmap?.compress(Bitmap.CompressFormat.PNG, 100, out)
+            }
+        }catch (e: FileNotFoundException){
+
         }
     }
 

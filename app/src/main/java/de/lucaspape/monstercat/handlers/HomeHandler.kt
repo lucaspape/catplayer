@@ -10,9 +10,17 @@ import android.widget.*
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.activities.SettingsActivity
+import de.lucaspape.monstercat.database.Song
+import de.lucaspape.monstercat.database.helper.AlbumDatabaseHelper
+import de.lucaspape.monstercat.database.helper.AlbumItemDatabaseHelper
+import de.lucaspape.monstercat.database.helper.CatalogSongDatabaseHelper
+import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
+import de.lucaspape.monstercat.download.addDownloadCoverArray
 import de.lucaspape.monstercat.handlers.async.*
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.util.Settings
+import de.lucaspape.monstercat.util.parseAlbumToHashMap
+import de.lucaspape.monstercat.util.parseSongToHashMap
 import java.lang.ref.WeakReference
 
 /**
@@ -271,7 +279,52 @@ class HomeHandler {
                 contextReference,
                 forceReload,
                 Integer.parseInt(it)
-            ).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+            ) {
+                val catalogSongDatabaseHelper =
+                    CatalogSongDatabaseHelper(view.context)
+                val songIdList = catalogSongDatabaseHelper.getAllSongs()
+
+                val dbSongs = ArrayList<HashMap<String, Any?>>()
+
+                val songDatabaseHelper =
+                    SongDatabaseHelper(view.context)
+                val songList = ArrayList<Song>()
+
+                for (song in songIdList) {
+                    songList.add(songDatabaseHelper.getSong(view.context, song.songId))
+                }
+
+                for (song in songList) {
+                    dbSongs.add(parseSongToHashMap(view.context, song))
+                }
+
+                //display list
+                currentListViewData = dbSongs
+
+                updateListView(view)
+                redrawListView(view)
+
+                //download cover art
+                addDownloadCoverArray(currentListViewData)
+
+                val listView = view.findViewById<ListView>(R.id.musiclistview)
+                val settings = Settings(view.context)
+                val lastScroll = settings.getSetting("currentListViewLastScrollIndex")
+                val top = settings.getSetting("currentListViewTop")
+
+                if (top != null && lastScroll != null) {
+                    listView.setSelectionFromTop(lastScroll.toInt(), top.toInt())
+                } else {
+                    println("IT IS NULL")
+                }
+
+                val swipeRefreshLayout =
+                    view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
+                swipeRefreshLayout.isRefreshing = false
+
+                albumContentsDisplayed = false
+
+            }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         }
 
     }
@@ -288,7 +341,41 @@ class HomeHandler {
                 contextReference,
                 forceReload,
                 Integer.parseInt(it)
-            ).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+            ) {
+                val albumDatabaseHelper =
+                    AlbumDatabaseHelper(view.context)
+                val albumList = albumDatabaseHelper.getAllAlbums()
+
+                val sortedList = ArrayList<HashMap<String, Any?>>()
+
+                for (album in albumList) {
+                    sortedList.add(parseAlbumToHashMap(view.context, album))
+                }
+
+                currentListViewData = sortedList
+
+                updateListView(view)
+                redrawListView(view)
+
+                //download cover art
+                addDownloadCoverArray(currentListViewData)
+
+                val listView = view.findViewById<ListView>(R.id.musiclistview)
+                val settings = Settings(view.context)
+                val lastScroll = settings.getSetting("currentListAlbumViewLastScrollIndex")
+                val top = settings.getSetting("currentListAlbumViewTop")
+
+                if (top != null && lastScroll != null) {
+                    listView.setSelectionFromTop(lastScroll.toInt(), top.toInt())
+                }
+
+                val swipeRefreshLayout =
+                    view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
+                swipeRefreshLayout.isRefreshing = false
+
+                albumContentsDisplayed = false
+
+            }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         }
     }
 
@@ -315,7 +402,48 @@ class HomeHandler {
             contextReference,
             forceReload,
             itemValue
-        ).executeOnExecutor(
+        ) {
+            val albumId = itemValue["id"] as String
+
+            val albumItemDatabaseHelper =
+                AlbumItemDatabaseHelper(contextReference.get()!!, albumId)
+            val albumItemList = albumItemDatabaseHelper.getAllData()
+
+            val dbSongs = ArrayList<HashMap<String, Any?>>()
+
+            val songDatabaseHelper = SongDatabaseHelper(contextReference.get()!!)
+
+            for (albumItem in albumItemList) {
+                contextReference.get()?.let { context ->
+                    dbSongs.add(
+                        parseSongToHashMap(
+                            context,
+                            songDatabaseHelper.getSong(context, albumItem.songId)
+                        )
+                    )
+                }
+
+            }
+
+            currentListViewData = dbSongs
+
+            albumView = false
+
+            viewReference.get()?.let { view ->
+                updateListView(view)
+                redrawListView(view)
+            }
+
+            //download cover art
+            addDownloadCoverArray(currentListViewData)
+
+            val swipeRefreshLayout =
+                viewReference.get()!!.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
+            swipeRefreshLayout.isRefreshing = false
+
+            albumContentsDisplayed = true
+            currentAlbumId = itemValue["id"] as String
+        }.executeOnExecutor(
             AsyncTask.THREAD_POOL_EXECUTOR
         )
     }

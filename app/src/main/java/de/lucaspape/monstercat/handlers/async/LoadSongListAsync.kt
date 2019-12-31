@@ -26,7 +26,8 @@ class LoadSongListAsync(
     private val viewReference: WeakReference<View>,
     private val contextReference: WeakReference<Context>,
     private val forceReload: Boolean,
-    private val loadMax: Int
+    private val loadMax: Int,
+    private val requestFinished : () -> Unit
 ) : AsyncTask<Void, Void, String>() {
     override fun onPreExecute() {
         viewReference.get()?.let { view ->
@@ -37,53 +38,7 @@ class LoadSongListAsync(
     }
 
     override fun onPostExecute(result: String?) {
-        contextReference.get()?.let { context ->
-            val catalogSongDatabaseHelper =
-                CatalogSongDatabaseHelper(context)
-            val songIdList = catalogSongDatabaseHelper.getAllSongs()
-
-            val dbSongs = ArrayList<HashMap<String, Any?>>()
-
-            val songDatabaseHelper =
-                SongDatabaseHelper(context)
-            val songList = ArrayList<Song>()
-
-            for (song in songIdList) {
-                songList.add(songDatabaseHelper.getSong(context, song.songId))
-            }
-
-            for (song in songList) {
-                dbSongs.add(parseSongToHashMap(context, song))
-            }
-
-            //display list
-            HomeHandler.currentListViewData = dbSongs
-
-            viewReference.get()?.let { view ->
-                HomeHandler.updateListView(view)
-                HomeHandler.redrawListView(view)
-
-                //download cover art
-                addDownloadCoverArray(HomeHandler.currentListViewData)
-
-                val listView = view.findViewById<ListView>(R.id.musiclistview)
-                val settings = Settings(view.context)
-                val lastScroll = settings.getSetting("currentListViewLastScrollIndex")
-                val top = settings.getSetting("currentListViewTop")
-
-                if (top != null && lastScroll != null) {
-                    listView.setSelectionFromTop(lastScroll.toInt(), top.toInt())
-                }else{
-                    println("IT IS NULL")
-                }
-
-                val swipeRefreshLayout =
-                    view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
-                swipeRefreshLayout.isRefreshing = false
-
-                HomeHandler.albumContentsDisplayed = false
-            }
-        }
+        requestFinished()
     }
 
     override fun doInBackground(vararg param: Void?): String? {
