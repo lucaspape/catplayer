@@ -112,19 +112,21 @@ internal fun playAlbumNext(context: Context, mcID: String) {
 }
 
 /**
- * Download an entire playlist (playlist items must be loaded before TODO)
+ * Download an entire playlist
  */
 internal fun downloadPlaylist(context: Context, playlistId: String) {
-    val playlistItemDatabaseHelper =
-        PlaylistItemDatabaseHelper(context, playlistId)
-    val playlistItemList = playlistItemDatabaseHelper.getAllData()
+    LoadPlaylistTracksAsync(WeakReference(context), true, playlistId) {
+        val playlistItemDatabaseHelper =
+            PlaylistItemDatabaseHelper(context, playlistId)
+        val playlistItemList = playlistItemDatabaseHelper.getAllData()
 
-    for (playlistItem in playlistItemList) {
-        val songDatabaseHelper = SongDatabaseHelper(context)
-        val song = songDatabaseHelper.getSong(context, playlistItem.songId)
+        for (playlistItem in playlistItemList) {
+            val songDatabaseHelper = SongDatabaseHelper(context)
+            val song = songDatabaseHelper.getSong(context, playlistItem.songId)
 
-        downloadSong(context, song)
-    }
+            downloadSong(context, song)
+        }
+    }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }
 
 /**
@@ -201,31 +203,33 @@ internal fun downloadAlbum(context: Context, mcID: String) {
 }
 
 /**
- * Add single song to playlist, will ask for playlist with alertDialog (will only show loaded playlists TODO)
+ * Add single song to playlist, will ask for playlist with alertDialog
  */
 internal fun addSongToPlaylist(context: Context, song: Song) {
-    val playlistDatabaseHelper =
-        PlaylistDatabaseHelper(context)
-    val playlistList = playlistDatabaseHelper.getAllPlaylists()
+    LoadPlaylistAsync(WeakReference(context), true) {
+        val playlistDatabaseHelper =
+            PlaylistDatabaseHelper(context)
+        val playlistList = playlistDatabaseHelper.getAllPlaylists()
 
-    val playlistNames = arrayOfNulls<String>(playlistList.size)
-    val playlistIds = arrayOfNulls<String>(playlistList.size)
+        val playlistNames = arrayOfNulls<String>(playlistList.size)
+        val playlistIds = arrayOfNulls<String>(playlistList.size)
 
-    for (i in playlistList.indices) {
-        playlistNames[i] = playlistList[i].playlistName
-        playlistIds[i] = playlistList[i].playlistId
-    }
-
-    val alertDialogBuilder = AlertDialog.Builder(context)
-    alertDialogBuilder.setTitle(context.getString(R.string.pickPlaylistMsg))
-    alertDialogBuilder.setItems(playlistNames) { _, i ->
-        playlistIds[i]?.let { playlistId ->
-            val addToPlaylistAsync = AddToPlaylistAsync(WeakReference(context), playlistId, song)
-            addToPlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        for (i in playlistList.indices) {
+            playlistNames[i] = playlistList[i].playlistName
+            playlistIds[i] = playlistList[i].playlistId
         }
 
+        val alertDialogBuilder = AlertDialog.Builder(context)
+        alertDialogBuilder.setTitle(context.getString(R.string.pickPlaylistMsg))
+        alertDialogBuilder.setItems(playlistNames) { _, i ->
+            playlistIds[i]?.let { playlistId ->
+                val addToPlaylistAsync = AddToPlaylistAsync(WeakReference(context), playlistId, song)
+                addToPlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+            }
+
+        }
+        alertDialogBuilder.show()
     }
-    alertDialogBuilder.show()
 }
 
 /**
