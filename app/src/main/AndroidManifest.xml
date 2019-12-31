@@ -19,6 +19,11 @@
             android:stopWithTask="true"
             android:exported="false" />
 
+        <service android:name=".background.BackgroundService"
+            android:enabled="true"
+            android:stopWithTask="true"
+            android:exported="false" />
+
         <receiver android:name=".music.notification.NotificationIntentReceiver"
             android:exported="false">
             <intent-filter>

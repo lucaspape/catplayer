@@ -8,7 +8,7 @@ import android.media.session.MediaSession
 import android.support.v4.media.session.MediaSessionCompat
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.ExoPlayerFactory
-import de.lucaspape.monstercat.activities.loadContinuousSongListAsyncTask
+import de.lucaspape.monstercat.background.BackgroundService.Companion.loadContinuousSongListAsyncTask
 import de.lucaspape.monstercat.database.Song
 import java.lang.IndexOutOfBoundsException
 import java.lang.ref.WeakReference

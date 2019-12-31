@@ -2,7 +2,6 @@ package de.lucaspape.monstercat.handlers
 
 import android.app.AlertDialog
 import android.content.Context
-import android.content.DialogInterface
 import android.os.AsyncTask
 import android.view.LayoutInflater
 import android.widget.EditText
@@ -10,8 +9,8 @@ import android.widget.ListView
 import com.android.volley.Response
 import com.android.volley.Request
 import com.android.volley.toolbox.Volley
+import de.lucaspape.monstercat.background.BackgroundService.Companion.loadContinuousSongListAsyncTask
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.activities.loadContinuousSongListAsyncTask
 import de.lucaspape.monstercat.database.*
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper

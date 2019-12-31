@@ -15,23 +15,22 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import de.lucaspape.monstercat.background.BackgroundService
+import de.lucaspape.monstercat.background.BackgroundService.Companion.updateLiveInfoAsync
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.util.Auth
-import de.lucaspape.monstercat.download.DownloadTask
 import de.lucaspape.monstercat.download.hideDownloadNotification
+import de.lucaspape.monstercat.util.Auth
 import de.lucaspape.monstercat.fragments.HomeFragment
 import de.lucaspape.monstercat.fragments.PlaylistFragment
 import de.lucaspape.monstercat.handlers.HomeHandler
-import de.lucaspape.monstercat.handlers.async.LoadContinuousSongListAsync
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.notification.updateNotification
 import de.lucaspape.monstercat.util.Settings
 import de.lucaspape.monstercat.util.displayInfo
 import java.lang.ref.WeakReference
 
-var loadContinuousSongListAsyncTask: LoadContinuousSongListAsync? = null
-var downloadTask: DownloadTask? = null
 val noisyReceiver = NoisyReceiver()
+var backgroundServiceIntent:Intent? = null
 
 /**
  * Main activity
@@ -110,12 +109,6 @@ class MainActivity : AppCompatActivity() {
             HomeHandler.albumViewSelected = settings.getSetting("albumView") == true.toString()
         }
 
-        //start download background task
-        downloadTask?.cancel(true)
-
-        downloadTask = DownloadTask(WeakReference(applicationContext))
-        downloadTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-
         //show privacy policy
         showPrivacyPolicy()
 
@@ -148,6 +141,11 @@ class MainActivity : AppCompatActivity() {
                     "$filesDir/live.png"
                 )
             }
+        }
+
+        if(!BackgroundService.serviceRunning || backgroundServiceIntent == null){
+            backgroundServiceIntent = Intent(this, BackgroundService::class.java)
+            startService(backgroundServiceIntent)
         }
     }
 
@@ -186,8 +184,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        downloadTask?.cancel(true)
-
+        //if app closed
         hideDownloadNotification(this)
 
         super.onDestroy()

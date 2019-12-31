@@ -6,6 +6,8 @@ import android.media.AudioManager
 import android.os.AsyncTask
 import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.Player
+import de.lucaspape.monstercat.background.BackgroundService.Companion.updateLiveInfoAsync
+import de.lucaspape.monstercat.background.BackgroundService.Companion.waitForDownloadTask
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.download.addDownloadSong
@@ -17,9 +19,6 @@ import de.lucaspape.monstercat.util.*
 import java.io.File
 import java.lang.IndexOutOfBoundsException
 import java.lang.ref.WeakReference
-
-var updateLiveInfoAsync: UpdateLiveInfoAsync? = null
-var waitForDownloadTask: AsyncTask<Void, Void, String>? = null
 
 /**
  * Get current song and play it
