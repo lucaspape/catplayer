@@ -23,18 +23,21 @@ class UpdateLiveInfoAsync(
         var previousTitle = ""
         @JvmStatic
         var previousArtist = ""
+        @JvmStatic
+        var previousVersion = ""
     }
 
     override fun doInBackground(vararg params: Void?): String? {
         previousTitle = stream.title
         previousArtist = stream.artist
+        previousVersion = stream.version
 
         contextReference.get()?.let { context ->
             updateCover(context, stream)
 
             publishProgress(
                 stream.title,
-                "",
+                stream.version,
                 stream.artist,
                 context.filesDir.toString() + "/live.png"
             )
@@ -43,19 +46,20 @@ class UpdateLiveInfoAsync(
 
             while (true) {
                 stream.updateInfo(context, volleyQueue) {
-                    if (it.title != previousTitle || it.artist != previousArtist) {
-                        setTitle(it.title, "", it.artist)
+                    if (it.title != previousTitle || it.artist != previousArtist || it.version != previousVersion) {
+                        setTitle(it.title, it.version, it.artist)
 
                         startTextAnimation()
 
                         previousTitle = it.title
                         previousArtist = it.artist
+                        previousVersion = it.version
 
                         updateCover(context, it)
 
                         publishProgress(
                             it.title,
-                            "",
+                            it.version,
                             it.artist,
                             context.filesDir.toString() + "/live.png"
                         )

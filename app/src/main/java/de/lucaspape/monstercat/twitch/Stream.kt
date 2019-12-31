@@ -22,6 +22,8 @@ class Stream(private val clientId: String) {
     var albumCoverUpdateUrl = ""
     var artist = ""
     var title = ""
+    var version = ""
+    var releaseId = ""
 
     fun getStreamInfo(context: Context, channel: String, finished: (stream: Stream) -> Unit) {
         getAccessToken(context, channel, finished)
@@ -89,12 +91,14 @@ class Stream(private val clientId: String) {
                     val jsonObject = JSONObject(artistTitleResponse)
 
                     title = jsonObject.getString("title")
+                    version = jsonObject.getString("version")
                     artist = jsonObject.getString("artist")
+                    releaseId = jsonObject.getString("releaseId")
 
                     titleArtistUpdateUrl =
                         context.getString(R.string.liveInfoUrl)
                     albumCoverUpdateUrl =
-                        context.getString(R.string.liveCoverUrl)
+                        context.getString(R.string.trackContentUrl) + releaseId + "/cover?image_width=512"
 
                 },
                 Response.ErrorListener { error ->

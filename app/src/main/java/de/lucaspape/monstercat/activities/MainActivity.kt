@@ -136,7 +136,7 @@ class MainActivity : AppCompatActivity() {
             }else{
                 updateNotification(
                     UpdateLiveInfoAsync.previousTitle,
-                    "",
+                    UpdateLiveInfoAsync.previousVersion,
                     UpdateLiveInfoAsync.previousArtist,
                     "$filesDir/live.png"
                 )
