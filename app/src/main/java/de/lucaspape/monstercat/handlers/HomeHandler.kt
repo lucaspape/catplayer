@@ -29,6 +29,9 @@ import java.lang.ref.WeakReference
 class HomeHandler {
 
     companion object {
+        @JvmStatic
+        var searchResults = ArrayList<HashMap<String, Any?>>()
+
         //if albumView selected in spinner
         @JvmStatic
         var albumViewSelected = false
@@ -36,59 +39,53 @@ class HomeHandler {
         //for UI
         @JvmStatic
         var albumView = false
+    }
 
-        @JvmStatic
-        var currentListViewData = ArrayList<HashMap<String, Any?>>()
-        @JvmStatic
-        private var simpleAdapter: SimpleAdapter? = null
+    var currentListViewData = ArrayList<HashMap<String, Any?>>()
+    private var simpleAdapter: SimpleAdapter? = null
 
-        //if contents of an album currently displayed
-        @JvmStatic
-        var albumContentsDisplayed = false
+    //if contents of an album currently displayed
+    var albumContentsDisplayed = false
 
-        @JvmStatic
-        var currentAlbumId = ""
+    var currentAlbumId = ""
 
-        @JvmStatic
-        fun redrawListView(view: View) {
-            val musicList = view.findViewById<ListView>(R.id.musiclistview)
-            simpleAdapter?.notifyDataSetChanged()
-            musicList.invalidateViews()
-            musicList.refreshDrawableState()
+    fun redrawListView(view: View) {
+        val musicList = view.findViewById<ListView>(R.id.musiclistview)
+        simpleAdapter?.notifyDataSetChanged()
+        musicList.invalidateViews()
+        musicList.refreshDrawableState()
+    }
+
+    /**
+     * Updates content of listView
+     */
+    fun updateListView(view: View) {
+        val musicList = view.findViewById<ListView>(R.id.musiclistview)
+
+        if (albumView) {
+            val from = arrayOf("title", "artist", "primaryImage")
+            val to = arrayOf(R.id.albumTitle, R.id.albumArtist, R.id.cover)
+            simpleAdapter = SimpleAdapter(
+                view.context,
+                currentListViewData,
+                R.layout.list_album_view,
+                from,
+                to.toIntArray()
+            )
+            musicList.adapter = simpleAdapter
+        } else {
+            val from = arrayOf("shownTitle", "artist", "secondaryImage", "downloadedCheck")
+            val to = arrayOf(R.id.title, R.id.artist, R.id.cover, R.id.titleDownloadStatus)
+            simpleAdapter = SimpleAdapter(
+                view.context,
+                currentListViewData,
+                R.layout.list_single,
+                from,
+                to.toIntArray()
+            )
+            musicList.adapter = simpleAdapter
         }
 
-        /**
-         * Updates content of listView
-         */
-        @JvmStatic
-        fun updateListView(view: View) {
-            val musicList = view.findViewById<ListView>(R.id.musiclistview)
-
-            if (albumView) {
-                val from = arrayOf("title", "artist", "primaryImage")
-                val to = arrayOf(R.id.albumTitle, R.id.albumArtist, R.id.cover)
-                simpleAdapter = SimpleAdapter(
-                    view.context,
-                    currentListViewData,
-                    R.layout.list_album_view,
-                    from,
-                    to.toIntArray()
-                )
-                musicList.adapter = simpleAdapter
-            } else {
-                val from = arrayOf("shownTitle", "artist", "secondaryImage", "downloadedCheck")
-                val to = arrayOf(R.id.title, R.id.artist, R.id.cover, R.id.titleDownloadStatus)
-                simpleAdapter = SimpleAdapter(
-                    view.context,
-                    currentListViewData,
-                    R.layout.list_single,
-                    from,
-                    to.toIntArray()
-                )
-                musicList.adapter = simpleAdapter
-            }
-
-        }
     }
 
     /**
@@ -456,7 +453,15 @@ class HomeHandler {
             viewReference,
             contextReference,
             searchString
-        ).executeOnExecutor(
+        ) {
+            updateListView(view)
+            redrawListView(view)
+
+            //download cover art
+            addDownloadCoverArray(searchResults)
+
+            albumContentsDisplayed = false
+        }.executeOnExecutor(
             AsyncTask.THREAD_POOL_EXECUTOR
         )
     }

@@ -20,8 +20,13 @@ import java.lang.ref.WeakReference
 class LoadTitleSearchAsync(
     private val viewReference: WeakReference<View>,
     private val contextReference: WeakReference<Context>,
-    private val searchString: String
+    private val searchString: String,
+    private val requestFinished : () -> Unit
 ) : AsyncTask<Void, Void, String>() {
+
+    override fun onPostExecute(result: String?) {
+        requestFinished()
+    }
 
     override fun doInBackground(vararg params: Void?): String? {
         contextReference.get()?.let {context ->
@@ -43,17 +48,7 @@ class LoadTitleSearchAsync(
                     }
 
                     //display list
-                    HomeHandler.currentListViewData = hashMapList
-
-                    viewReference.get()?.let {view ->
-                        HomeHandler.updateListView(view)
-                        HomeHandler.redrawListView(view)
-
-                        //download cover art
-                        addDownloadCoverArray(HomeHandler.currentListViewData)
-
-                        HomeHandler.albumContentsDisplayed = false
-                    }
+                    HomeHandler.searchResults = hashMapList
 
                 },
                 Response.ErrorListener { error ->
