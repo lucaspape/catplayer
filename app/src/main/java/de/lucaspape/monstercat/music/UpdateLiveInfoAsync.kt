@@ -92,7 +92,7 @@ class UpdateLiveInfoAsync(
 
                         updateNotification(
                             title,
-                            "",
+                            version,
                             artist,
                             coverLocation
                         )
