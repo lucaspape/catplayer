@@ -49,7 +49,7 @@ class HomeHandler {
 
     var currentAlbumId = ""
 
-    fun redrawListView(view: View) {
+    private fun redrawListView(view: View) {
         val musicList = view.findViewById<ListView>(R.id.musiclistview)
         simpleAdapter?.notifyDataSetChanged()
         musicList.invalidateViews()
@@ -59,7 +59,7 @@ class HomeHandler {
     /**
      * Updates content of listView
      */
-    fun updateListView(view: View) {
+    private fun updateListView(view: View) {
         val musicList = view.findViewById<ListView>(R.id.musiclistview)
 
         if (albumView) {
@@ -332,9 +332,12 @@ class HomeHandler {
     fun loadAlbumList(view: View, forceReload: Boolean) {
         Settings(view.context).getSetting("maximumLoad")?.let {
             val contextReference = WeakReference<Context>(view.context)
-            val viewReference = WeakReference<View>(view)
+
+            val swipeRefreshLayout =
+                view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
+            swipeRefreshLayout.isRefreshing = true
+
             LoadAlbumListAsync(
-                viewReference,
                 contextReference,
                 forceReload,
                 Integer.parseInt(it)
@@ -366,8 +369,6 @@ class HomeHandler {
                     listView.setSelectionFromTop(lastScroll.toInt(), top.toInt())
                 }
 
-                val swipeRefreshLayout =
-                    view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
                 swipeRefreshLayout.isRefreshing = false
 
                 albumContentsDisplayed = false
@@ -393,9 +394,12 @@ class HomeHandler {
         )
 
         val contextReference = WeakReference<Context>(view.context)
-        val viewReference = WeakReference<View>(view)
+
+        val swipeRefreshLayout =
+            view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
+        swipeRefreshLayout.isRefreshing = true
+
         LoadAlbumAsync(
-            viewReference,
             contextReference,
             forceReload,
             itemValue
@@ -426,16 +430,12 @@ class HomeHandler {
 
             albumView = false
 
-            viewReference.get()?.let { view ->
-                updateListView(view)
-                redrawListView(view)
-            }
+            updateListView(view)
+            redrawListView(view)
 
             //download cover art
             addDownloadCoverArray(currentListViewData)
 
-            val swipeRefreshLayout =
-                viewReference.get()!!.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
             swipeRefreshLayout.isRefreshing = false
 
             albumContentsDisplayed = true
@@ -448,9 +448,8 @@ class HomeHandler {
     //search for string
     fun searchSong(view: View, searchString: String) {
         val contextReference = WeakReference<Context>(view.context)
-        val viewReference = WeakReference<View>(view)
+
         LoadTitleSearchAsync(
-            viewReference,
             contextReference,
             searchString
         ) {

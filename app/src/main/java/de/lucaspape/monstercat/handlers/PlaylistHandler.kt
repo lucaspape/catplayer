@@ -123,12 +123,15 @@ class PlaylistHandler {
      */
     fun loadPlaylist(view: View, forceReload: Boolean, showAfter: Boolean) {
         val contextReference = WeakReference<Context>(view.context)
-        val viewReference = WeakReference<View>(view)
+
+        val swipeRefreshLayout =
+            view.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
+        swipeRefreshLayout.isRefreshing = true
+
+
         LoadPlaylistAsync(
-            viewReference,
             contextReference,
-            forceReload,
-            showAfter
+            forceReload
         ) {
             val playlistDatabaseHelper =
                 PlaylistDatabaseHelper(view.context)
@@ -141,17 +144,13 @@ class PlaylistHandler {
             }
 
             if (showAfter) {
-                viewReference.get()?.let { view ->
                     currentListViewData = playlistHashMaps
                     listViewDataIsPlaylistView = true
 
                     updateListView(view)
                     redrawListView(view)
 
-                    val swipeRefreshLayout =
-                        view.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
                     swipeRefreshLayout.isRefreshing = false
-                }
             }
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
@@ -165,9 +164,12 @@ class PlaylistHandler {
         playlistId: String
     ) {
         val contextReference = WeakReference<Context>(view.context)
-        val viewReference = WeakReference<View>(view)
+
+        val swipeRefreshLayout =
+            view.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
+        swipeRefreshLayout.isRefreshing = true
+
         LoadPlaylistTracksAsync(
-            viewReference,
             contextReference,
             forceReload,
             playlistId
@@ -208,8 +210,6 @@ class PlaylistHandler {
             //download cover art
             addDownloadCoverArray(currentListViewData)
 
-            val swipeRefreshLayout =
-                view.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
             swipeRefreshLayout.isRefreshing = false
 
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)

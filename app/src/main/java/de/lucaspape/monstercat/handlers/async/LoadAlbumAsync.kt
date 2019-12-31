@@ -2,37 +2,23 @@ package de.lucaspape.monstercat.handlers.async
 
 import android.content.Context
 import android.os.AsyncTask
-import android.view.View
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.android.volley.Response
 import com.android.volley.Request
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.util.getSid
 import de.lucaspape.monstercat.database.helper.AlbumItemDatabaseHelper
-import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
-import de.lucaspape.monstercat.download.addDownloadCoverArray
-import de.lucaspape.monstercat.handlers.HomeHandler
 import de.lucaspape.monstercat.request.AuthorizedRequest
 import de.lucaspape.monstercat.util.parsAlbumSongToDB
-import de.lucaspape.monstercat.util.parseSongToHashMap
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
 class LoadAlbumAsync(
-    private val viewReference: WeakReference<View>,
     private val contextReference: WeakReference<Context>,
     private val forceReload: Boolean,
     private val itemValue: HashMap<*, *>,
     private val requestFinished : () -> Unit
 ) : AsyncTask<Void, Void, String>() {
-    override fun onPreExecute() {
-        viewReference.get()?.let { view ->
-            val swipeRefreshLayout =
-                view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
-            swipeRefreshLayout.isRefreshing = true
-        }
-    }
 
     override fun onPostExecute(result: String?) {
         requestFinished()

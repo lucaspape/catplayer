@@ -2,37 +2,22 @@ package de.lucaspape.monstercat.handlers.async
 
 import android.content.Context
 import android.os.AsyncTask
-import android.view.View
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.android.volley.Response
 import com.android.volley.Request
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.util.getSid
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
-import de.lucaspape.monstercat.handlers.PlaylistHandler
 import de.lucaspape.monstercat.request.AuthorizedRequest
 import de.lucaspape.monstercat.util.parsePlaylistToDB
-import de.lucaspape.monstercat.util.parsePlaylistToHashMap
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
 class LoadPlaylistAsync(
-    private val viewReference: WeakReference<View>,
     private val contextReference: WeakReference<Context>,
     private val forceReload: Boolean,
-    private val showAfter: Boolean,
-    private val requestFinished : () -> Unit
+    private val requestFinished: () -> Unit
 ) : AsyncTask<Void, Void, String>() {
-    override fun onPreExecute() {
-        if (showAfter) {
-            viewReference.get()?.let {
-                val swipeRefreshLayout =
-                    it.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
-                swipeRefreshLayout.isRefreshing = true
-            }
-        }
-    }
 
     override fun onPostExecute(result: String?) {
         requestFinished()

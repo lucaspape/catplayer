@@ -2,13 +2,10 @@ package de.lucaspape.monstercat.handlers.async
 
 import android.content.Context
 import android.os.AsyncTask
-import android.view.View
 import com.android.volley.Request
 import com.android.volley.Response
-import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.download.addDownloadCoverArray
 import de.lucaspape.monstercat.handlers.HomeHandler
 import de.lucaspape.monstercat.request.AuthorizedRequest
 import de.lucaspape.monstercat.util.getSid
@@ -18,7 +15,6 @@ import org.json.JSONObject
 import java.lang.ref.WeakReference
 
 class LoadTitleSearchAsync(
-    private val viewReference: WeakReference<View>,
     private val contextReference: WeakReference<Context>,
     private val searchString: String,
     private val requestFinished : () -> Unit
