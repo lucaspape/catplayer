@@ -6,6 +6,10 @@ General information:
 IDE: Android Studio
 Main programming language: Kotlin
 
+To build this application you need to add
+<string name="twitchClientID" translatable="false">CHANGEME</string>
+to strings.xml in res/values.
+
 How does the app retrieve the monstercat data?
 
 The app retrieves the data the exact same way as the website. Monstercat has an API (connect.monstercat.com) which returns JSON.
