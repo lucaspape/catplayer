@@ -2,7 +2,7 @@ package de.lucaspape.monstercat.util
 
 import android.content.Context
 
-private const val version = "1.1"
+private const val version = "1.2"
 
 class Settings(private val context: Context) {
 
@@ -43,8 +43,8 @@ class Settings(private val context: Context) {
      */
     private fun setDefaultSettings(overwrite: Boolean) {
         val defaultDownloadType = "mp3_320"
-        val defaultPrimaryCoverResolution = "2048"
-        val defaultSecondaryCoverResolution = "128"
+        val defaultPrimaryCoverResolution = "1024"
+        val defaultSecondaryCoverResolution = "64"
         val defaultStreamOverMobile = false.toString()
         val defaultDownloadOverMobile = false.toString()
         val defaultDownloadCoversMobile = false.toString()

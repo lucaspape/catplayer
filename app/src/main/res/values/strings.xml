@@ -66,4 +66,6 @@
     <string name="playlistCreatedMsg">Playlist created!</string>
     <string name="errorCreatingPlaylist">Could not create playlist!</string>
     <string name="createPlaylist">Create new playlist</string>
+    <string name="downloadFlacInsteadMp3">Download FLAC insted of MP3</string>
+    <string name="coverResolution">Cover resolution</string>
 </resources>
