@@ -33,7 +33,9 @@ class Settings(private val context: Context) {
     }
 
     private fun onUpgrade(){
+        println("OVERWRITE")
         setDefaultSettings(true)
+        saveSetting("settings-version", version)
     }
 
     /**
@@ -41,7 +43,7 @@ class Settings(private val context: Context) {
      */
     private fun setDefaultSettings(overwrite: Boolean) {
         val defaultDownloadType = "mp3_320"
-        val defaultPrimaryCoverResolution = "1024"
+        val defaultPrimaryCoverResolution = "2048"
         val defaultSecondaryCoverResolution = "128"
         val defaultStreamOverMobile = false.toString()
         val defaultDownloadOverMobile = false.toString()
@@ -59,7 +61,7 @@ class Settings(private val context: Context) {
             saveSetting("downloadCoversOverMobile", defaultDownloadCoversMobile)
             saveSetting("maximumLoad", defaultMaximumLoad)
         }else{
-            if (getSetting("audioQuality") == null) {
+            if (getSetting("downloadType") == null) {
                 saveSetting("downloadType", defaultDownloadType)
             }
 
