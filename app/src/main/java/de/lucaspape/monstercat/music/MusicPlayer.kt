@@ -21,7 +21,9 @@ internal var mediaPlayer: ExoPlayer? = null
 internal var currentSong = 0
 internal var playList = ArrayList<Song>(1)
 
-internal var repeat = false
+var shuffle = false
+var loop = false
+var loopSingle = false
 
 private var sessionCreated = false
 

@@ -32,6 +32,18 @@
         android:contentDescription="@string/fullscreenPlayPause" />
 
     <ImageButton
+        android:id="@+id/fullscreenLoop"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="20dp"
+        android:background="@null"
+        android:src="@drawable/ic_repeat_24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/fullscreenNext"
+        android:contentDescription="Loop" />
+
+    <ImageButton
         android:id="@+id/fullscreenNext"
         android:layout_width="50dp"
         android:layout_height="50dp"
@@ -39,7 +51,7 @@
         android:background="@null"
         android:src="@drawable/ic_skip_next_24dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/fullscreenLoop"
         app:layout_constraintStart_toEndOf="@+id/fullScreenPlay"
         android:contentDescription="@string/fullscreenNext" />
 
@@ -52,8 +64,20 @@
         android:src="@drawable/ic_skip_previous_24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/fullScreenPlay"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/fullscreenShuffle"
         android:contentDescription="@string/fullscreenPrevButton" />
+
+    <ImageButton
+        android:id="@+id/fullscreenShuffle"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="20dp"
+        android:background="@null"
+        android:src="@drawable/ic_shuffle_24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/fullscreenPrev"
+        app:layout_constraintStart_toStartOf="parent"
+        android:contentDescription="Shuffle" />
 
     <TextView
         android:id="@+id/fullscreenSongCurrent1"

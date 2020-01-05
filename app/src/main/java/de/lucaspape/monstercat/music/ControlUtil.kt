@@ -19,6 +19,7 @@ import de.lucaspape.monstercat.util.*
 import java.io.File
 import java.lang.IndexOutOfBoundsException
 import java.lang.ref.WeakReference
+import kotlin.random.Random
 
 /**
  * Get current song and play it
@@ -311,8 +312,12 @@ fun resume() {
 fun next() {
     clearListener()
 
-    if (!repeat) {
-        currentSong++
+    if (!loopSingle) {
+        if(shuffle){
+            currentSong = Random.nextInt(0,playList.size + 1)
+        }else{
+            currentSong++
+        }
     }
 
     play()
@@ -346,10 +351,20 @@ fun toggleMusic() {
  * Returns current song from playlist
  */
 fun getCurrentSong(): Song? {
-    return try {
-        playList[currentSong]
+    try {
+        return playList[currentSong]
     } catch (e: IndexOutOfBoundsException) {
-        null
+        return if(loop){
+            currentSong = 0
+
+            return try{
+                playList[currentSong]
+            }catch (e: IndexOutOfBoundsException){
+                null
+            }
+        }else{
+            null
+        }
     }
 }
 
