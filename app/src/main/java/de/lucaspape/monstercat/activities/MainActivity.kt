@@ -100,10 +100,18 @@ class MainActivity : AppCompatActivity() {
         //create the MusicPlayer.kt mediasession
         createMediaSession(WeakReference(this))
 
-        //login to monstercat
-        Auth().login(this)
-
         val settings = Settings(this)
+
+        val sUsername = settings.getSetting("email")
+        val sPassword = settings.getSetting("password")
+
+        sUsername?.let {username ->
+            sPassword?.let {password ->
+                //login to monstercat
+                Auth().login(this, username, password, {println("SUCC")}, {println("FAIL")})
+            }
+        }
+
         //set the correct view
         if (settings.getSetting("albumViewSelected") != null) {
             HomeHandler.albumViewSelected = settings.getSetting("albumView") == true.toString()

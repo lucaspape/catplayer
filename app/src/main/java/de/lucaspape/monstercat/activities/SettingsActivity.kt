@@ -32,7 +32,7 @@ class SettingsActivity : AppCompatActivity() {
             settings.saveSetting("email", username)
             settings.saveSetting("password", password)
 
-            Auth().login(this)
+            Auth().login(this, username, password, {println("SUCC")}, {println("FAIL")})
         }
 
         //set the switches to the saved value
