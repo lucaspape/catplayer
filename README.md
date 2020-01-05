@@ -14,6 +14,7 @@ This android app aims to implement the Monstercat API.
  - Search songs
  - Dark Mode (Android 9 or higher)
  - Live Radio from Twitch
+ - Flac download support
 
 <img src="https://raw.githubusercontent.com/lucaspape/catplayer/master/playstore_res/screenshots/Screenshot_20191228-164712_Player_for_Monstercat.png" width="40%">  <img src="https://raw.githubusercontent.com/lucaspape/catplayer/master/playstore_res/screenshots/Screenshot_20191228-164732_Player_for_Monstercat.png" width="40%">
 
@@ -38,6 +39,10 @@ This custom API is open source and available [here](https://github.com/lucaspape
 If you want to participate in the beta test you can download it from the google play store [here](https://play.google.com/apps/testing/de.lucaspape.monstercat "Test Android-App").
 The beta is open but currently limited to 1000 participants.
 
+## Build from source
+
+To build this app from source you will need Android Studio and the ExoPlayer V2 sourcecode as well as the ExoPlayer FLAC extension. Please refer to [here](https://github.com/google/ExoPlayer/blob/release-v2/README.md) and [here](https://github.com/google/ExoPlayer/tree/release-v2/extensions/flac) for more information on how to get the ExoPlayer V2 and the FLAC extension source code. 
+Please also read the developers guide (DEVELOPERS_GUIDE.txt) in this project.
 
 ## Additional information
 Disclamer: this is not an official app from monstercat.com!
