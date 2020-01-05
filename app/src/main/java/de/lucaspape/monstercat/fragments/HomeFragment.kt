@@ -6,7 +6,7 @@ import android.widget.AdapterView
 import android.widget.ListView
 import androidx.fragment.app.Fragment
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.activities.isPlaylistView
+import de.lucaspape.monstercat.activities.fragmentBackPressedCallback
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.handlers.*
 import de.lucaspape.monstercat.handlers.addSongToPlaylist
@@ -35,8 +35,6 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        isPlaylistView = false
-
         val settings = Settings(view.context)
         if (settings.getSetting("albumViewSelected") != null) {
             HomeHandler.albumViewSelected = settings.getSetting("albumViewSelected")!!.toBoolean()
@@ -48,6 +46,15 @@ class HomeFragment : Fragment() {
 
         listView = view.findViewById(R.id.musiclistview)
         registerForContextMenu(listView as ListView)
+
+        fragmentBackPressedCallback = {
+            if (HomeHandler.albumViewSelected) {
+                HomeHandler.albumView = true
+                homeHandler.loadAlbumList(view, false)
+            } else {
+                homeHandler.loadSongList(view, false)
+            }
+        }
     }
 
     override fun onCreateContextMenu(

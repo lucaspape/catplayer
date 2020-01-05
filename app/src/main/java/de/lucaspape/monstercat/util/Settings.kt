@@ -43,7 +43,7 @@ class Settings(private val context: Context) {
      */
     private fun setDefaultSettings(overwrite: Boolean) {
         val defaultDownloadType = "mp3_320"
-        val defaultPrimaryCoverResolution = "1024"
+        val defaultPrimaryCoverResolution = "512"
         val defaultSecondaryCoverResolution = "64"
         val defaultStreamOverMobile = false.toString()
         val defaultDownloadOverMobile = false.toString()

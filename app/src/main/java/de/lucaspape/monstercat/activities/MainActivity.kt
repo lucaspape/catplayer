@@ -34,8 +34,7 @@ val noisyReceiver = NoisyReceiver()
 var backgroundServiceIntent:Intent? = null
 
 //callback function for back pressed, TODO this is not great
-var isPlaylistView = false
-var playlistBackPressed:() -> Unit = {}
+var fragmentBackPressedCallback:() -> Unit = {}
 
 /**
  * Main activity
@@ -254,11 +253,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if(isPlaylistView){
-            playlistBackPressed()
-        }else{
-            openFragment(HomeFragment.newInstance())
-        }
+        fragmentBackPressedCallback()
     }
 
     /**

@@ -4,11 +4,9 @@ import android.os.Bundle
 import android.view.*
 import android.widget.AdapterView
 import android.widget.ListView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.activities.isPlaylistView
-import de.lucaspape.monstercat.activities.playlistBackPressed
+import de.lucaspape.monstercat.activities.fragmentBackPressedCallback
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.handlers.*
 import de.lucaspape.monstercat.handlers.deletePlaylist
@@ -16,6 +14,7 @@ import de.lucaspape.monstercat.handlers.downloadPlaylist
 import de.lucaspape.monstercat.handlers.downloadSong
 import de.lucaspape.monstercat.handlers.playSongFromId
 import de.lucaspape.monstercat.util.Settings
+import de.lucaspape.monstercat.util.displayInfo
 
 class PlaylistFragment() : Fragment() {
     private val playlistHandler = PlaylistHandler()
@@ -36,11 +35,6 @@ class PlaylistFragment() : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        isPlaylistView = true
-        playlistBackPressed = {
-            playlistHandler.loadPlaylist(view, false, true)
-        }
-
         playlistView = view.findViewById(R.id.playlistView)
 
         val settings = Settings(view.context)
@@ -49,12 +43,11 @@ class PlaylistFragment() : Fragment() {
         val password = settings.getSetting("password")
 
         if (username == null || password == null) {
-            Toast.makeText(
-                view.context,
-                view.context.getString(R.string.setUsernamePasswordSettingsMsg),
-                Toast.LENGTH_SHORT
-            )
-                .show()
+            displayInfo(view.context, view.context.getString(R.string.setUsernamePasswordSettingsMsg))
+
+            fragmentBackPressedCallback = {
+
+            }
         } else {
             playlistHandler.setupListView(view)
 
@@ -63,12 +56,11 @@ class PlaylistFragment() : Fragment() {
             playlistHandler.loadPlaylist(view, false, true)
 
             registerForContextMenu(playlistView as ListView)
-        }
-    }
 
-    override fun onDestroy() {
-        isPlaylistView = false
-        super.onDestroy()
+            fragmentBackPressedCallback = {
+                playlistHandler.loadPlaylist(view, false, true)
+            }
+        }
     }
 
     override fun onCreateContextMenu(
