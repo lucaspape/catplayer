@@ -33,6 +33,10 @@ import java.lang.ref.WeakReference
 val noisyReceiver = NoisyReceiver()
 var backgroundServiceIntent:Intent? = null
 
+//callback function for back pressed, TODO this is not great
+var isPlaylistView = false
+var playlistBackPressed:() -> Unit = {}
+
 /**
  * Main activity
  */
@@ -250,8 +254,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        //open the home fragment
-        openFragment(HomeFragment.newInstance())
+        if(isPlaylistView){
+            playlistBackPressed()
+        }else{
+            openFragment(HomeFragment.newInstance())
+        }
     }
 
     /**

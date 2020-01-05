@@ -7,6 +7,8 @@ import android.widget.ListView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.activities.isPlaylistView
+import de.lucaspape.monstercat.activities.playlistBackPressed
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.handlers.*
 import de.lucaspape.monstercat.handlers.deletePlaylist
@@ -15,7 +17,7 @@ import de.lucaspape.monstercat.handlers.downloadSong
 import de.lucaspape.monstercat.handlers.playSongFromId
 import de.lucaspape.monstercat.util.Settings
 
-class PlaylistFragment : Fragment() {
+class PlaylistFragment() : Fragment() {
     private val playlistHandler = PlaylistHandler()
     private var playlistView: ListView? = null
 
@@ -33,6 +35,11 @@ class PlaylistFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        isPlaylistView = true
+        playlistBackPressed = {
+            playlistHandler.loadPlaylist(view, false, true)
+        }
 
         playlistView = view.findViewById(R.id.playlistView)
 
@@ -57,6 +64,11 @@ class PlaylistFragment : Fragment() {
 
             registerForContextMenu(playlistView as ListView)
         }
+    }
+
+    override fun onDestroy() {
+        isPlaylistView = false
+        super.onDestroy()
     }
 
     override fun onCreateContextMenu(

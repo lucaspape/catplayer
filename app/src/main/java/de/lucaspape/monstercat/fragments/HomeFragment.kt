@@ -6,6 +6,7 @@ import android.widget.AdapterView
 import android.widget.ListView
 import androidx.fragment.app.Fragment
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.activities.isPlaylistView
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.handlers.*
 import de.lucaspape.monstercat.handlers.addSongToPlaylist
@@ -33,6 +34,8 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        isPlaylistView = false
 
         val settings = Settings(view.context)
         if (settings.getSetting("albumViewSelected") != null) {
