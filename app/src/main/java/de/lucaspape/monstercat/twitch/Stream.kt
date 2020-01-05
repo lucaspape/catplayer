@@ -12,6 +12,7 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.request.TwitchRequest
+import org.json.JSONException
 import org.json.JSONObject
 import kotlin.math.floor
 
@@ -88,17 +89,21 @@ class Stream(private val clientId: String) {
             StringRequest(Request.Method.GET,
                 context.getString(R.string.liveInfoUrl),
                 Response.Listener { artistTitleResponse ->
-                    val jsonObject = JSONObject(artistTitleResponse)
+                    try{
+                        val jsonObject = JSONObject(artistTitleResponse)
 
-                    title = jsonObject.getString("title")
-                    version = jsonObject.getString("version")
-                    artist = jsonObject.getString("artist")
-                    releaseId = jsonObject.getString("releaseId")
+                        title = jsonObject.getString("title")
+                        version = jsonObject.getString("version")
+                        artist = jsonObject.getString("artist")
+                        releaseId = jsonObject.getString("releaseId")
 
-                    titleArtistUpdateUrl =
-                        context.getString(R.string.liveInfoUrl)
-                    albumCoverUpdateUrl =
-                        context.getString(R.string.trackContentUrl) + releaseId + "/cover?image_width=512"
+                        titleArtistUpdateUrl =
+                            context.getString(R.string.liveInfoUrl)
+                        albumCoverUpdateUrl =
+                            context.getString(R.string.trackContentUrl) + releaseId + "/cover?image_width=512"
+                    }catch (e: JSONException){
+
+                    }
 
                 },
                 Response.ErrorListener { error ->

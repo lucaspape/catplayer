@@ -128,9 +128,6 @@ class MainActivity : AppCompatActivity() {
             HomeHandler.albumViewSelected = settings.getSetting("albumView") == true.toString()
         }
 
-        //show privacy policy
-        showPrivacyPolicy()
-
         //open the home fragment
         openFragment(HomeFragment.newInstance())
 
@@ -166,6 +163,9 @@ class MainActivity : AppCompatActivity() {
             backgroundServiceIntent = Intent(this, BackgroundService::class.java)
             startService(backgroundServiceIntent)
         }
+
+        //show privacy policy
+        showPrivacyPolicy()
     }
 
     override fun onDestroy() {
