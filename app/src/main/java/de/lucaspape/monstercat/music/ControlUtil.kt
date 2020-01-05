@@ -124,7 +124,10 @@ private fun playSong(context: Context, song: Song) {
     exoPlayer.addListener(object : Player.EventListener {
         @Override
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
+            setCover(song, context)
             setPlayButtonImage(context)
+            startSeekBarUpdate()
+
             updateNotification(
                 song.title,
                 song.version,

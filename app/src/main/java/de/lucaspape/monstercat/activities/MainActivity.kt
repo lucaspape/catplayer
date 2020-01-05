@@ -217,6 +217,8 @@ class MainActivity : AppCompatActivity() {
         //if app closed
         hideDownloadNotification(this)
 
+        fragmentBackPressedCallback = {}
+
         super.onDestroy()
     }
 
