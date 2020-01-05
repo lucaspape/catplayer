@@ -27,6 +27,7 @@ import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.notification.updateNotification
 import de.lucaspape.monstercat.util.Settings
 import de.lucaspape.monstercat.util.displayInfo
+import de.lucaspape.monstercat.util.loggedIn
 import java.lang.ref.WeakReference
 
 val noisyReceiver = NoisyReceiver()
@@ -102,26 +103,28 @@ class MainActivity : AppCompatActivity() {
 
         val settings = Settings(this)
 
-        Auth().loadLogin(this, {
-            //login success
-            displayInfo(this, getString(R.string.loginSuccessfulMsg))
-        }, {
-            //login failed, retrieve new SID
+        if(!loggedIn){
+            Auth().loadLogin(this, {
+                //login success
+                displayInfo(this, getString(R.string.loginSuccessfulMsg))
+            }, {
+                //login failed, retrieve new SID
 
-            val sUsername = settings.getSetting("email")
-            val sPassword = settings.getSetting("password")
+                val sUsername = settings.getSetting("email")
+                val sPassword = settings.getSetting("password")
 
-            sUsername?.let {username ->
-                sPassword?.let {password ->
-                    //login to monstercat
-                    Auth().login(this, username, password, {
-                        displayInfo(this, getString(R.string.loginSuccessfulMsg))
-                    }, {
-                        displayInfo(this, getString(R.string.loginFailedMsg))
-                    })
+                sUsername?.let {username ->
+                    sPassword?.let {password ->
+                        //login to monstercat
+                        Auth().login(this, username, password, {
+                            displayInfo(this, getString(R.string.loginSuccessfulMsg))
+                        }, {
+                            displayInfo(this, getString(R.string.loginFailedMsg))
+                        })
+                    }
                 }
-            }
-        })
+            })
+        }
 
         //set the correct view
         if (settings.getSetting("albumViewSelected") != null) {
