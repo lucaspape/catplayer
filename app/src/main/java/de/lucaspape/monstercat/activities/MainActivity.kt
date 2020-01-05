@@ -102,15 +102,26 @@ class MainActivity : AppCompatActivity() {
 
         val settings = Settings(this)
 
-        val sUsername = settings.getSetting("email")
-        val sPassword = settings.getSetting("password")
+        Auth().loadLogin(this, {
+            //login success
+            displayInfo(this, getString(R.string.loginSuccessfulMsg))
+        }, {
+            //login failed, retrieve new SID
 
-        sUsername?.let {username ->
-            sPassword?.let {password ->
-                //login to monstercat
-                Auth().login(this, username, password, {println("SUCC")}, {println("FAIL")})
+            val sUsername = settings.getSetting("email")
+            val sPassword = settings.getSetting("password")
+
+            sUsername?.let {username ->
+                sPassword?.let {password ->
+                    //login to monstercat
+                    Auth().login(this, username, password, {
+                        displayInfo(this, getString(R.string.loginSuccessfulMsg))
+                    }, {
+                        displayInfo(this, getString(R.string.loginFailedMsg))
+                    })
+                }
             }
-        }
+        })
 
         //set the correct view
         if (settings.getSetting("albumViewSelected") != null) {

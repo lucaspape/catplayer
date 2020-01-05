@@ -178,7 +178,7 @@ class Auth {
         settings.saveSetting("sid", sid)
     }
 
-    private fun loadLogin(context: Context, loginSuccess: () -> Unit, loginFailed: () -> Unit) {
+    fun loadLogin(context: Context, loginSuccess: () -> Unit, loginFailed: () -> Unit) {
         val settings = Settings(context)
 
         val sSid = settings.getSetting("sid")
@@ -190,6 +190,9 @@ class Auth {
         }
     }
 
+    /**
+     * Checks if sid is valid
+     */
     private fun checkLogin(context: Context, loginSuccess: () -> Unit, loginFailed: () -> Unit) {
         val checkLoginRequest =
             AuthorizedRequest(Request.Method.GET, context.getString
@@ -206,14 +209,19 @@ class Auth {
 
                     if (userId != "null" && userId != "") {
                         loggedIn = true
+                        saveLogin(context)
                         loginSuccess()
                     } else {
                         loggedIn = false
+                        sid = ""
+                        saveLogin(context)
                         loginFailed()
                     }
                 },
                 Response.ErrorListener {
                     loggedIn = false
+                    sid = ""
+                    saveLogin(context)
                     loginFailed()
                 })
 

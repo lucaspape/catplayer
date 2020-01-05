@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.util.Auth
 import de.lucaspape.monstercat.util.Settings
+import de.lucaspape.monstercat.util.displayInfo
 import kotlinx.android.synthetic.main.activity_settings.*
 
 /**
@@ -32,7 +33,11 @@ class SettingsActivity : AppCompatActivity() {
             settings.saveSetting("email", username)
             settings.saveSetting("password", password)
 
-            Auth().login(this, username, password, {println("SUCC")}, {println("FAIL")})
+            Auth().login(this, username, password, {
+                displayInfo(this, getString(R.string.loginSuccessfulMsg))
+            }, {
+                displayInfo(this, getString(R.string.loginFailedMsg))
+            })
         }
 
         //set the switches to the saved value
