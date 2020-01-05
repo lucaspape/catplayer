@@ -31,10 +31,10 @@ import de.lucaspape.monstercat.util.loggedIn
 import java.lang.ref.WeakReference
 
 val noisyReceiver = NoisyReceiver()
-var backgroundServiceIntent:Intent? = null
+var backgroundServiceIntent: Intent? = null
 
 //callback function for back pressed, TODO this is not great
-var fragmentBackPressedCallback:() -> Unit = {}
+var fragmentBackPressedCallback: () -> Unit = {}
 
 /**
  * Main activity
@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
 
                     val settings = Settings(this)
 
-                    if(HomeHandler.albumView){
+                    if (HomeHandler.albumView) {
                         settings.saveSetting(
                             "currentListAlbumViewLastScrollIndex",
                             0.toString()
@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
                             "currentListAlbumViewTop",
                             0.toString()
                         )
-                    }else{
+                    } else {
                         settings.saveSetting(
                             "currentListViewLastScrollIndex",
                             0.toString()
@@ -106,7 +106,7 @@ class MainActivity : AppCompatActivity() {
 
         val settings = Settings(this)
 
-        if(!loggedIn){
+        if (!loggedIn) {
             Auth().loadLogin(this, {
                 //login success
                 displayInfo(this, getString(R.string.loginSuccessfulMsg))
@@ -116,8 +116,8 @@ class MainActivity : AppCompatActivity() {
                 val sUsername = settings.getSetting("email")
                 val sPassword = settings.getSetting("password")
 
-                sUsername?.let {username ->
-                    sPassword?.let {password ->
+                sUsername?.let { username ->
+                    sPassword?.let { password ->
                         //login to monstercat
                         Auth().login(this, username, password, {
                             displayInfo(this, getString(R.string.loginSuccessfulMsg))
@@ -148,14 +148,19 @@ class MainActivity : AppCompatActivity() {
         registerButtonListeners()
 
         //update notification after restart of activity (screen orientation change etc)
-        if(mediaPlayer?.isPlaying == true){
-            if(updateLiveInfoAsync?.status != AsyncTask.Status.RUNNING){
+        if (mediaPlayer?.isPlaying == true) {
+            if (updateLiveInfoAsync?.status != AsyncTask.Status.RUNNING) {
                 val currentSong = getCurrentSong()
 
-                currentSong?.let {song ->
-                    updateNotification(song.title, song.version, song.artist, filesDir.toString() + "/" + song.albumId + ".png" + settings.getSetting("primaryCoverResolution"))
+                currentSong?.let { song ->
+                    updateNotification(
+                        song.title,
+                        song.version,
+                        song.artist,
+                        filesDir.toString() + "/" + song.albumId + ".png" + settings.getSetting("primaryCoverResolution")
+                    )
                 }
-            }else{
+            } else {
                 updateNotification(
                     UpdateLiveInfoAsync.previousTitle,
                     UpdateLiveInfoAsync.previousVersion,
@@ -165,7 +170,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        if(!BackgroundService.serviceRunning || backgroundServiceIntent == null){
+        if (!BackgroundService.serviceRunning || backgroundServiceIntent == null) {
             backgroundServiceIntent = Intent(this, BackgroundService::class.java)
             startService(backgroundServiceIntent)
         }
@@ -181,13 +186,13 @@ class MainActivity : AppCompatActivity() {
 
         val settings = Settings(this)
 
-        if(listView != null) {
+        if (listView != null) {
             val topChild = listView.getChildAt(0)?.top
             val paddingTop = listView.paddingTop
             val firstVisiblePosition = listView.firstVisiblePosition
 
-            if(topChild != null){
-                if(HomeHandler.albumView){
+            if (topChild != null) {
+                if (HomeHandler.albumView) {
                     settings.saveSetting(
                         "currentListAlbumViewLastScrollIndex",
                         firstVisiblePosition.toString()
@@ -196,7 +201,7 @@ class MainActivity : AppCompatActivity() {
                         "currentListAlbumViewTop",
                         (topChild - paddingTop).toString()
                     )
-                }else{
+                } else {
                     settings.saveSetting(
                         "currentListViewLastScrollIndex",
                         firstVisiblePosition.toString()
@@ -215,7 +220,7 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-    private fun changeTheme(){
+    private fun changeTheme() {
         val settings = Settings(this)
 
         if (settings.getSetting("darkTheme") != null) {

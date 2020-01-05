@@ -33,7 +33,6 @@ class Settings(private val context: Context) {
     }
 
     private fun onUpgrade(){
-        println("OVERWRITE")
         setDefaultSettings(true)
         saveSetting("settings-version", version)
     }

@@ -123,7 +123,7 @@ internal fun playPlaylistNext(context: Context, playlistId: String){
 
             playSongFromId(context, song.songId, false)
         }
-    }
+    }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }
 
 /**
