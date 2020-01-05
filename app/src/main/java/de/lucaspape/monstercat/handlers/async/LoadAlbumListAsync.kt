@@ -20,11 +20,27 @@ class LoadAlbumListAsync(
     private val contextReference: WeakReference<Context>,
     private val forceReload: Boolean,
     private val loadMax: Int,
+    private val displayLoading: () -> Unit,
     private val requestFinished : () -> Unit
 ) : AsyncTask<Void, Void, String>() {
 
     override fun onPostExecute(result: String?) {
         requestFinished()
+    }
+
+    override fun onPreExecute() {
+        contextReference.get()?.let { context ->
+            val albumDatabaseHelper =
+                AlbumDatabaseHelper(context)
+            val albumList = albumDatabaseHelper.getAllAlbums()
+
+            if (!forceReload && albumList.isNotEmpty()) {
+                requestFinished()
+                cancel(true)
+            }else{
+                displayLoading()
+            }
+        }
     }
 
     override fun doInBackground(vararg param: Void?): String? {

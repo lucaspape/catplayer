@@ -272,12 +272,13 @@ class HomeHandler {
 
             val swipeRefreshLayout =
                 view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
-            swipeRefreshLayout.isRefreshing = true
 
             LoadSongListAsync(
                 contextReference,
                 forceReload,
-                Integer.parseInt(it)
+                Integer.parseInt(it), {
+                    swipeRefreshLayout.isRefreshing = true
+                }
             ) {
                 BackgroundAsync({
                     val catalogSongDatabaseHelper =
@@ -338,12 +339,13 @@ class HomeHandler {
 
             val swipeRefreshLayout =
                 view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
-            swipeRefreshLayout.isRefreshing = true
 
             LoadAlbumListAsync(
                 contextReference,
                 forceReload,
-                Integer.parseInt(it)
+                Integer.parseInt(it), {
+                    swipeRefreshLayout.isRefreshing = true
+                }
             ) {
                 BackgroundAsync({
                     val albumDatabaseHelper =
@@ -402,12 +404,13 @@ class HomeHandler {
 
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
-        swipeRefreshLayout.isRefreshing = true
 
         LoadAlbumAsync(
             contextReference,
             forceReload,
-            itemValue
+            itemValue, {
+                swipeRefreshLayout.isRefreshing = true
+            }
         ) {
             BackgroundAsync({
                 val albumId = itemValue["id"] as String
@@ -457,6 +460,11 @@ class HomeHandler {
     fun searchSong(view: View, searchString: String) {
         val contextReference = WeakReference<Context>(view.context)
 
+        val swipeRefreshLayout =
+            view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
+
+        swipeRefreshLayout.isRefreshing = true
+
         LoadTitleSearchAsync(
             contextReference,
             searchString
@@ -468,6 +476,8 @@ class HomeHandler {
             addDownloadCoverArray(searchResults)
 
             albumContentsDisplayed = false
+
+            swipeRefreshLayout.isRefreshing = false
         }.executeOnExecutor(
             AsyncTask.THREAD_POOL_EXECUTOR
         )

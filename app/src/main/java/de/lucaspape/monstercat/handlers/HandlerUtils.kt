@@ -112,7 +112,7 @@ internal fun playAlbumNext(context: Context, mcID: String) {
 }
 
 internal fun playPlaylistNext(context: Context, playlistId: String){
-    LoadPlaylistTracksAsync(WeakReference(context), true, playlistId){
+    LoadPlaylistTracksAsync(WeakReference(context), true, playlistId, {}){
         val playlistItemDatabaseHelper =
             PlaylistItemDatabaseHelper(context, playlistId)
         val playlistItemList = playlistItemDatabaseHelper.getAllData()
@@ -130,7 +130,7 @@ internal fun playPlaylistNext(context: Context, playlistId: String){
  * Download an entire playlist
  */
 internal fun downloadPlaylist(context: Context, playlistId: String) {
-    LoadPlaylistTracksAsync(WeakReference(context), true, playlistId) {
+    LoadPlaylistTracksAsync(WeakReference(context), true, playlistId, {}) {
         val playlistItemDatabaseHelper =
             PlaylistItemDatabaseHelper(context, playlistId)
         val playlistItemList = playlistItemDatabaseHelper.getAllData()
@@ -221,7 +221,7 @@ internal fun downloadAlbum(context: Context, mcID: String) {
  * Add single song to playlist, will ask for playlist with alertDialog
  */
 internal fun addSongToPlaylist(context: Context, song: Song) {
-    LoadPlaylistAsync(WeakReference(context), true) {
+    LoadPlaylistAsync(WeakReference(context), true, {}) {
         val playlistDatabaseHelper =
             PlaylistDatabaseHelper(context)
         val playlistList = playlistDatabaseHelper.getAllPlaylists()

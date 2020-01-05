@@ -19,6 +19,7 @@ import java.lang.ref.WeakReference
 class LoadPlaylistAsync(
     private val contextReference: WeakReference<Context>,
     private val forceReload: Boolean,
+    private val displayLoading: () -> Unit,
     private val requestFinished: () -> Unit
 ) : AsyncTask<Void, Void, String>() {
 
@@ -26,54 +27,65 @@ class LoadPlaylistAsync(
         requestFinished()
     }
 
+    override fun onPreExecute() {
+        contextReference.get()?.let { context ->
+            val playlistDatabaseHelper =
+                PlaylistDatabaseHelper(context)
+            val playlists = playlistDatabaseHelper.getAllPlaylists()
+
+            if (!forceReload && playlists.isNotEmpty()) {
+                requestFinished()
+                cancel(true)
+            }else{
+                displayLoading()
+            }
+        }
+    }
+
     override fun doInBackground(vararg param: Void?): String? {
-        val playlistDatabaseHelper =
-            PlaylistDatabaseHelper(contextReference.get()!!)
-        val playlists = playlistDatabaseHelper.getAllPlaylists()
+        contextReference.get()?.let { context ->
+            val playlistDatabaseHelper =
+                PlaylistDatabaseHelper(context)
 
-        if (!forceReload && playlists.isNotEmpty()) {
-            return null
-        } else {
-            contextReference.get()?.let { context ->
-                val playlistRequestQueue = Volley.newRequestQueue(context)
+            val playlistRequestQueue = Volley.newRequestQueue(context)
 
-                val playlistUrl = context.getString(R.string.playlistsUrl)
+            val playlistUrl = context.getString(R.string.playlistsUrl)
 
-                val syncObject = Object()
+            val syncObject = Object()
 
-                playlistRequestQueue.addRequestFinishedListener<Any> {
-                    synchronized(syncObject) {
-                        syncObject.notify()
-                    }
-                }
-
-                val playlistRequest = AuthorizedRequest(
-                    Request.Method.GET, playlistUrl, getSid(),
-                    Response.Listener { response ->
-                        val jsonObject = JSONObject(response)
-                        val jsonArray = jsonObject.getJSONArray("results")
-
-                        playlistDatabaseHelper.reCreateTable()
-
-                        for (i in (0 until jsonArray.length())) {
-                            parsePlaylistToDB(
-                                context,
-                                jsonArray.getJSONObject(i)
-                            )
-                        }
-
-                    },
-                    Response.ErrorListener { })
-
-                playlistRequestQueue.add(playlistRequest)
-
+            playlistRequestQueue.addRequestFinishedListener<Any> {
                 synchronized(syncObject) {
-                    syncObject.wait()
+                    syncObject.notify()
                 }
             }
 
-            return null
+            val playlistRequest = AuthorizedRequest(
+                Request.Method.GET, playlistUrl, getSid(),
+                Response.Listener { response ->
+                    val jsonObject = JSONObject(response)
+                    val jsonArray = jsonObject.getJSONArray("results")
+
+                    playlistDatabaseHelper.reCreateTable()
+
+                    for (i in (0 until jsonArray.length())) {
+                        parsePlaylistToDB(
+                            context,
+                            jsonArray.getJSONObject(i)
+                        )
+                    }
+
+                },
+                Response.ErrorListener { })
+
+            playlistRequestQueue.add(playlistRequest)
+
+            synchronized(syncObject) {
+                syncObject.wait()
+            }
         }
+
+        return null
+
     }
 
 }

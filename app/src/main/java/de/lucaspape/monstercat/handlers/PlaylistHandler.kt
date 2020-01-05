@@ -94,7 +94,7 @@ class PlaylistHandler {
         val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
         swipeRefreshLayout.setOnRefreshListener {
             if (listViewDataIsPlaylistView) {
-                loadPlaylist(view, forceReload = true, showAfter = true)
+                loadPlaylist(view, forceReload = true)
             } else {
                 loadPlaylistTracks(view, true, currentPlaylistId!!)
             }
@@ -122,17 +122,17 @@ class PlaylistHandler {
     /**
      * Load playlists
      */
-    fun loadPlaylist(view: View, forceReload: Boolean, showAfter: Boolean) {
+    fun loadPlaylist(view: View, forceReload: Boolean) {
         val contextReference = WeakReference<Context>(view.context)
 
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
-        swipeRefreshLayout.isRefreshing = true
-
 
         LoadPlaylistAsync(
             contextReference,
-            forceReload
+            forceReload,{
+                swipeRefreshLayout.isRefreshing = true
+            }
         ) {
             BackgroundAsync({
 
@@ -146,20 +146,16 @@ class PlaylistHandler {
                     playlistHashMaps.add(parsePlaylistToHashMap(playlist))
                 }
 
-                if (showAfter) {
-                    currentListViewData = playlistHashMaps
-                }
+                currentListViewData = playlistHashMaps
 
             }, {
-                if (showAfter) {
+                listViewDataIsPlaylistView = true
 
-                    listViewDataIsPlaylistView = true
+                updateListView(view)
+                redrawListView(view)
 
-                    updateListView(view)
-                    redrawListView(view)
+                swipeRefreshLayout.isRefreshing = false
 
-                    swipeRefreshLayout.isRefreshing = false
-                }
             }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
@@ -176,12 +172,13 @@ class PlaylistHandler {
 
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
-        swipeRefreshLayout.isRefreshing = true
 
         LoadPlaylistTracksAsync(
             contextReference,
             forceReload,
-            playlistId
+            playlistId, {
+                swipeRefreshLayout.isRefreshing = true
+            }
         ) {
             BackgroundAsync({
                 val playlistItemDatabaseHelper =

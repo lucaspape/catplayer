@@ -20,11 +20,30 @@ class LoadAlbumAsync(
     private val contextReference: WeakReference<Context>,
     private val forceReload: Boolean,
     private val itemValue: HashMap<*, *>,
-    private val requestFinished : () -> Unit
+    private val displayLoading: () -> Unit,
+    private val requestFinished: () -> Unit
 ) : AsyncTask<Void, Void, String>() {
 
     override fun onPostExecute(result: String?) {
         requestFinished()
+    }
+
+    override fun onPreExecute() {
+        val albumId = itemValue["id"] as String
+
+        contextReference.get()?.let { context ->
+            val albumItemDatabaseHelper =
+                AlbumItemDatabaseHelper(context, albumId)
+            val albumItems = albumItemDatabaseHelper.getAllData()
+
+            if (!forceReload && albumItems.isNotEmpty()) {
+                requestFinished()
+                cancel(true)
+            } else {
+                displayLoading()
+                //continue to background task
+            }
+        }
     }
 
     override fun doInBackground(vararg param: Void?): String? {
@@ -36,49 +55,46 @@ class LoadAlbumAsync(
 
             val albumItemDatabaseHelper =
                 AlbumItemDatabaseHelper(context, albumId)
-            val albumItems = albumItemDatabaseHelper.getAllData()
 
-            if (!forceReload && albumItems.isNotEmpty()) {
-                return null
-            } else {
-                val syncObject = Object()
+            displayLoading()
 
-                requestQueue.addRequestFinishedListener<Any> {
-                    synchronized(syncObject) {
-                        syncObject.notify()
-                    }
-                }
+            val syncObject = Object()
 
-                val requestUrl =
-                    context.getString(R.string.loadAlbumSongsUrl) + "/" + mcID
-
-                val listRequest = AuthorizedRequest(
-                    Request.Method.GET, requestUrl,
-                    getSid(), Response.Listener { response ->
-                        val json = JSONObject(response)
-                        val jsonArray = json.getJSONArray("tracks")
-
-                        albumItemDatabaseHelper.reCreateTable()
-
-                        //parse every single song into list
-                        for (k in (0 until jsonArray.length())) {
-                            parsAlbumSongToDB(
-                                jsonArray.getJSONObject(k),
-                                albumId,
-                                context
-                            )
-                        }
-
-                    }, Response.ErrorListener { }
-                )
-
-                requestQueue.add(listRequest)
+            requestQueue.addRequestFinishedListener<Any> {
                 synchronized(syncObject) {
-                    syncObject.wait()
+                    syncObject.notify()
                 }
-
-
             }
+
+            val requestUrl =
+                context.getString(R.string.loadAlbumSongsUrl) + "/" + mcID
+
+            val listRequest = AuthorizedRequest(
+                Request.Method.GET, requestUrl,
+                getSid(), Response.Listener { response ->
+                    val json = JSONObject(response)
+                    val jsonArray = json.getJSONArray("tracks")
+
+                    albumItemDatabaseHelper.reCreateTable()
+
+                    //parse every single song into list
+                    for (k in (0 until jsonArray.length())) {
+                        parsAlbumSongToDB(
+                            jsonArray.getJSONObject(k),
+                            albumId,
+                            context
+                        )
+                    }
+
+                }, Response.ErrorListener { }
+            )
+
+            requestQueue.add(listRequest)
+            synchronized(syncObject) {
+                syncObject.wait()
+            }
+
+
         }
 
         return null

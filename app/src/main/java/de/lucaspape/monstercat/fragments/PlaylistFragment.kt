@@ -16,7 +16,7 @@ import de.lucaspape.monstercat.handlers.playSongFromId
 import de.lucaspape.monstercat.util.Settings
 import de.lucaspape.monstercat.util.displayInfo
 
-class PlaylistFragment() : Fragment() {
+class PlaylistFragment : Fragment() {
     private val playlistHandler = PlaylistHandler()
     private var playlistView: ListView? = null
 
@@ -53,12 +53,12 @@ class PlaylistFragment() : Fragment() {
 
             playlistHandler.registerListeners(view)
 
-            playlistHandler.loadPlaylist(view, false, true)
+            playlistHandler.loadPlaylist(view, false)
 
             registerForContextMenu(playlistView as ListView)
 
             fragmentBackPressedCallback = {
-                playlistHandler.loadPlaylist(view, false, true)
+                playlistHandler.loadPlaylist(view, false)
             }
         }
     }
