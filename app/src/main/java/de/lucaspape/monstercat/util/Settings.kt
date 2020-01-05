@@ -5,7 +5,7 @@ import android.content.Context
 class Settings(private val context: Context) {
 
     init {
-        setDefaultSettings(false)
+        setDefaultSettings(true)
     }
 
     /**
@@ -31,13 +31,12 @@ class Settings(private val context: Context) {
      */
     private fun setDefaultSettings(overwrite: Boolean) {
         if (getSetting("audioQuality") == null) {
-            saveSetting("downloadType", "mp3")
-            saveSetting("downloadQuality", "320")
+            saveSetting("downloadType", "flac")
         }
 
         if (getSetting("primaryCoverResolution") == null) {
-            saveSetting("primaryCoverResolution", "512")
-            saveSetting("secondaryCoverResolution", "64")
+            saveSetting("primaryCoverResolution", "1024")
+            saveSetting("secondaryCoverResolution", "128")
         }
 
         if (getSetting("streamOverMobile") == null) {
@@ -57,16 +56,17 @@ class Settings(private val context: Context) {
         }
 
         if (overwrite) {
-            saveSetting("downloadType", "mp3")
-            saveSetting("downloadQuality", "320")
+            saveSetting("downloadType", "flac")
 
-            saveSetting("primaryCoverResolution", "512")
-            saveSetting("secondaryCoverResolution", "64")
+            saveSetting("primaryCoverResolution", "1024")
+            saveSetting("secondaryCoverResolution", "128")
 
             saveSetting("streamOverMobile", "false")
             saveSetting("downloadOverMobile", "false")
             saveSetting("downloadCoversOverMobile", "false")
             saveSetting("maximumLoad", 50.toString())
+        }else{
+
         }
 
     }

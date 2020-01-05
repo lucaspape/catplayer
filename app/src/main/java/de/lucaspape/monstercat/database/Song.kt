@@ -3,6 +3,7 @@ package de.lucaspape.monstercat.database
 import android.content.Context
 import android.net.Uri
 import androidx.core.net.toUri
+import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
@@ -90,17 +91,17 @@ data class Song(
         }
     }
 
-    fun getMediaSource(): ProgressiveMediaSource? {
-        if (File(downloadLocation).exists() && File(streamDownloadLocation).exists()) {
+    fun getMediaSource(): MediaSource? {
+        return if (File(downloadLocation).exists() && File(streamDownloadLocation).exists()) {
             File(streamDownloadLocation).delete()
 
-            return fileToMediaSource(downloadLocation)
+            fileToMediaSource(downloadLocation)
         } else if (File(downloadLocation).exists()) {
-            return fileToMediaSource(downloadLocation)
+            fileToMediaSource(downloadLocation)
         } else if (File(streamDownloadLocation).exists()) {
-            return fileToMediaSource(streamDownloadLocation)
+            fileToMediaSource(streamDownloadLocation)
         } else {
-            return if (isStreamable) {
+            if (isStreamable) {
                 urlToMediaSource(streamLocation)
             } else {
                 null

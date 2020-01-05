@@ -140,7 +140,7 @@ internal fun downloadSong(context: Context, song: Song) {
         val downloadQuality = settings.getSetting("downloadQuality")
 
         val downloadUrl =
-            context.getString(R.string.trackContentUrl) + song.albumId + "/track-download/" + song.songId + "?format=" + downloadType + "_" + downloadQuality
+            context.getString(R.string.trackContentUrl) + song.albumId + "/track-download/" + song.songId + "?format=" + downloadType
 
         val downloadLocation =
             context.getExternalFilesDir(null).toString() + "/" + song.artist + song.title + song.version + "." + downloadType

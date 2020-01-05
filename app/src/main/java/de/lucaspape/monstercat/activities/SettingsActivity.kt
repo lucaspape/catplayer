@@ -49,6 +49,7 @@ class SettingsActivity : AppCompatActivity() {
         val downloadStreamSwitch = findViewById<Switch>(R.id.streamDownloadSwitch)
         val maxLoadSeekBar = findViewById<SeekBar>(R.id.maximumLoadSeekBar)
         val shownMaxValue = findViewById<TextView>(R.id.shownMaxValue)
+        val downloadFlacSwitch = findViewById<Switch>(R.id.downloadFlacSwitch)
 
         maxLoadSeekBar.max = 200 / 50
 
@@ -90,6 +91,9 @@ class SettingsActivity : AppCompatActivity() {
             darkThemeSwitch.isChecked = settings.getSetting("darkTheme")!!.toBoolean()
         }
 
+        if (settings.getSetting("downloadType") != null) {
+            downloadFlacSwitch.isChecked = settings.getSetting("downloadType") == "flac"
+        }
 
         //set switch listeners
         streamMobileSwitch.setOnCheckedChangeListener { _, isChecked ->
@@ -143,5 +147,13 @@ class SettingsActivity : AppCompatActivity() {
             override fun onStopTrackingTouch(seekBar: SeekBar) {
             }
         })
+
+        downloadFlacSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if(isChecked){
+                settings.saveSetting("downloadType", "flac")
+            }else{
+                settings.saveSetting("downloadType", "mp3_320")
+            }
+        }
     }
 }
