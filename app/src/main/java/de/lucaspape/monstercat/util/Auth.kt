@@ -34,6 +34,10 @@ fun getSid(): String? {
  * Auth - Login to monstercat
  */
 class Auth {
+
+    /**
+     * Posts username and password to API, goal is to get sid cookie
+     */
     fun login(
         context: Context,
         username: String,
@@ -41,8 +45,6 @@ class Auth {
         loginSuccess: () -> Unit,
         loginFailed: () -> Unit
     ) {
-        //loadLogin(context)
-
         val loginPostParams = JSONObject()
         loginPostParams.put("email", username)
         loginPostParams.put("password", password)
@@ -54,8 +56,10 @@ class Auth {
                 Response.Listener { response ->
                     val cookies = response.getString("cookies")
 
+                    //parse sid
                     sid = cookies.substringBefore(';').replace("connect.sid=", "")
 
+                    //check if 2FA is needed
                     try {
                         val networkResponse = response.get("data") as String
                         val responseJsonObject = JSONObject(networkResponse)
@@ -74,6 +78,7 @@ class Auth {
                 override fun parseNetworkResponse(response: NetworkResponse?): Response<JSONObject> {
                     val jsonResponse = JSONObject()
 
+                    //set cookie in response object
                     val responseHeaders = response?.headers
                     val cookies = responseHeaders?.get("Set-Cookie")
 
@@ -104,6 +109,9 @@ class Auth {
         loginQueue.add(loginPostRequest)
     }
 
+    /**
+     * Shows 2FA input, if this fails the sid will be invalid
+     */
     private fun showTwoFAInput(
         context: Context,
         loginSuccess: () -> Unit,
@@ -120,6 +128,8 @@ class Auth {
         alertDialogBuilder.setCancelable(false)
 
         alertDialogBuilder.setPositiveButton("OK") { _, _ ->
+            //post token to API
+
             val twoFAEditText = twoFAInputView.findViewById<EditText>(R.id.twoFAInput)
             val twoFACode = twoFAEditText.text.toString()
 
@@ -130,10 +140,13 @@ class Auth {
                 context.getString(R.string.tokenUrl),
                 twoFaTokenParams,
                 Response.Listener {
+                    //all good
                 },
                 Response.ErrorListener {
+                    //TODO show 2FA again/request new code
                 }) {
 
+                //this also needs authentication, pass sid
                 override fun getHeaders(): Map<String, String> {
                     val params = HashMap<String, String>()
                     params["Cookie"] = "connect.sid=$sid"
@@ -173,11 +186,13 @@ class Auth {
         alertDialogBuilder.show()
     }
 
+    //saves the login sid
     private fun saveLogin(context: Context) {
         val settings = Settings(context)
         settings.saveSetting("sid", sid)
     }
 
+    //get the sid and check if it is valid
     fun loadLogin(context: Context, loginSuccess: () -> Unit, loginFailed: () -> Unit) {
         val settings = Settings(context)
 
@@ -194,6 +209,8 @@ class Auth {
      * Checks if sid is valid
      */
     private fun checkLogin(context: Context, loginSuccess: () -> Unit, loginFailed: () -> Unit) {
+
+        //check if sid is valid, get session and user id, if it is null or "" the sid is NOT valid -> login fail
         val checkLoginRequest =
             AuthorizedRequest(Request.Method.GET, context.getString
                 (R.string.sessionUrl), sid,
