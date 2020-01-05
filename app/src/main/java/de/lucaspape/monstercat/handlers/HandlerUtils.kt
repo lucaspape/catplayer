@@ -111,6 +111,21 @@ internal fun playAlbumNext(context: Context, mcID: String) {
     albumRequestQueue.add(albumRequest)
 }
 
+internal fun playPlaylistNext(context: Context, playlistId: String){
+    LoadPlaylistTracksAsync(WeakReference(context), true, playlistId){
+        val playlistItemDatabaseHelper =
+            PlaylistItemDatabaseHelper(context, playlistId)
+        val playlistItemList = playlistItemDatabaseHelper.getAllData()
+
+        for (playlistItem in playlistItemList) {
+            val songDatabaseHelper = SongDatabaseHelper(context)
+            val song = songDatabaseHelper.getSong(context, playlistItem.songId)
+
+            playSongFromId(context, song.songId, false)
+        }
+    }
+}
+
 /**
  * Download an entire playlist
  */

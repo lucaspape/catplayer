@@ -98,15 +98,20 @@ class PlaylistFragment : Fragment() {
                 }
 
             } else if (item.title == getString(R.string.playNext)) {
-                playSongFromId(
-                    it,
-                    listItem["id"] as String,
-                    false)
+                if (listItem["type"] == "playlist") {
+                    playPlaylistNext(it, listItem["playlistId"] as String)
+                } else {
+                    playSongFromId(
+                        it,
+                        listItem["id"] as String,
+                        false
+                    )
+                }
 
-            } else if(item.title == "Delete"){
+            } else if (item.title == "Delete") {
                 if (listItem["type"] == "playlist") {
                     deletePlaylist(it, listItem["playlistId"] as String)
-                }else{
+                } else {
                     view?.let { view ->
                         val songDatabaseHelper =
                             SongDatabaseHelper(view.context)
@@ -122,7 +127,7 @@ class PlaylistFragment : Fragment() {
                         }
                     }
                 }
-            }else{
+            } else {
 
             }
         }
