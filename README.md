@@ -29,7 +29,6 @@ This custom API is open source and available [here](https://github.com/lucaspape
 
  - More playlist features (add public playlists etc.)
  - Favorites
- - Shuffle, Repeat
  - More song info
  - Browse by artist
  - Mirror playlists from spotify
