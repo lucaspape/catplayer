@@ -2,10 +2,16 @@ package de.lucaspape.monstercat.util
 
 import android.content.Context
 
+private const val version = "1.1"
+
 class Settings(private val context: Context) {
 
     init {
-        setDefaultSettings(true)
+        if(getSetting("settings-version") != version){
+            onUpgrade()
+        }else{
+            setDefaultSettings(false)
+        }
     }
 
     /**
@@ -26,49 +32,57 @@ class Settings(private val context: Context) {
         editor.apply()
     }
 
+    private fun onUpgrade(){
+        setDefaultSettings(true)
+    }
+
     /**
      * Set default
      */
     private fun setDefaultSettings(overwrite: Boolean) {
-        if (getSetting("audioQuality") == null) {
-            saveSetting("downloadType", "flac")
-        }
-
-        if (getSetting("primaryCoverResolution") == null) {
-            saveSetting("primaryCoverResolution", "1024")
-            saveSetting("secondaryCoverResolution", "128")
-        }
-
-        if (getSetting("streamOverMobile") == null) {
-            saveSetting("streamOverMobile", "false")
-        }
-
-        if (getSetting("downloadOverMobile") == null) {
-            saveSetting("downloadOverMobile", "false")
-        }
-
-        if (getSetting("downloadCoversOverMobile") == null) {
-            saveSetting("downloadCoversOverMobile", "false")
-        }
-
-        if (getSetting("maximumLoad") == null) {
-            saveSetting("maximumLoad", 50.toString())
-        }
+        val defaultDownloadType = "mp3_320"
+        val defaultPrimaryCoverResolution = "1024"
+        val defaultSecondaryCoverResolution = "128"
+        val defaultStreamOverMobile = false.toString()
+        val defaultDownloadOverMobile = false.toString()
+        val defaultDownloadCoversMobile = false.toString()
+        val defaultMaximumLoad = 50.toString()
 
         if (overwrite) {
-            saveSetting("downloadType", "flac")
+            saveSetting("downloadType", defaultDownloadType)
 
-            saveSetting("primaryCoverResolution", "1024")
-            saveSetting("secondaryCoverResolution", "128")
+            saveSetting("primaryCoverResolution", defaultPrimaryCoverResolution)
+            saveSetting("secondaryCoverResolution", defaultSecondaryCoverResolution)
 
-            saveSetting("streamOverMobile", "false")
-            saveSetting("downloadOverMobile", "false")
-            saveSetting("downloadCoversOverMobile", "false")
-            saveSetting("maximumLoad", 50.toString())
+            saveSetting("streamOverMobile", defaultStreamOverMobile)
+            saveSetting("downloadOverMobile", defaultDownloadOverMobile)
+            saveSetting("downloadCoversOverMobile", defaultDownloadCoversMobile)
+            saveSetting("maximumLoad", defaultMaximumLoad)
         }else{
+            if (getSetting("audioQuality") == null) {
+                saveSetting("downloadType", defaultDownloadType)
+            }
 
+            if (getSetting("primaryCoverResolution") == null || getSetting("secondaryCoverResolution") == null) {
+                saveSetting("primaryCoverResolution", defaultPrimaryCoverResolution)
+                saveSetting("secondaryCoverResolution", defaultSecondaryCoverResolution)
+            }
+
+            if (getSetting("streamOverMobile") == null) {
+                saveSetting("streamOverMobile", defaultStreamOverMobile)
+            }
+
+            if (getSetting("downloadOverMobile") == null) {
+                saveSetting("downloadOverMobile", defaultDownloadOverMobile)
+            }
+
+            if (getSetting("downloadCoversOverMobile") == null) {
+                saveSetting("downloadCoversOverMobile", defaultDownloadCoversMobile)
+            }
+
+            if (getSetting("maximumLoad") == null) {
+                saveSetting("maximumLoad", defaultMaximumLoad)
+            }
         }
-
     }
-
 }
