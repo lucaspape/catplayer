@@ -17,6 +17,7 @@ import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.handlers.async.*
+import de.lucaspape.monstercat.music.addContinuous
 import de.lucaspape.monstercat.music.addSong
 import de.lucaspape.monstercat.music.addSongList
 import de.lucaspape.monstercat.request.AuthorizedRequest
@@ -89,17 +90,13 @@ internal fun playAlbumNext(context: Context, mcID: String) {
                 }
             }
 
-            idArray.reverse()
-
             val songDatabaseHelper = SongDatabaseHelper(context)
 
-            val songIdList = ArrayList<String>()
+            addSong(songDatabaseHelper.getSong(context, idArray[0]).songId)
 
-            for (id in idArray) {
-                songIdList.add(songDatabaseHelper.getSong(context, id).songId)
+            for (i in (1 until idArray.size)) {
+                addContinuous((songDatabaseHelper.getSong(context, idArray[i]).songId))
             }
-
-            addSongList(songIdList)
         },
         Response.ErrorListener {
             displayInfo(context, context.getString(R.string.errorRetrieveAlbumData))
@@ -112,17 +109,15 @@ internal fun playPlaylistNext(context: Context, playlistId: String){
     LoadPlaylistTracksAsync(WeakReference(context), true, playlistId, {}){
         val playlistItemDatabaseHelper =
             PlaylistItemDatabaseHelper(context, playlistId)
-        val playlistItemList = playlistItemDatabaseHelper.getAllData()
+        val playlistItemList = playlistItemDatabaseHelper.getAllData().reversed()
 
         val songDatabaseHelper = SongDatabaseHelper(context)
 
-        val songIdArray = ArrayList<String>()
+        addSong(songDatabaseHelper.getSong(context, playlistItemList[0].songId).songId)
 
-        for (playlistItem in playlistItemList) {
-            songIdArray.add(songDatabaseHelper.getSong(context, playlistItem.songId).songId)
+        for (i in (1 until playlistItemList.size)) {
+            addContinuous(songDatabaseHelper.getSong(context, playlistItemList[i].songId).songId)
         }
-
-        addSongList(songIdArray)
     }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }
 
