@@ -18,6 +18,7 @@ import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.handlers.async.*
 import de.lucaspape.monstercat.music.addSong
+import de.lucaspape.monstercat.music.addSongList
 import de.lucaspape.monstercat.request.AuthorizedRequest
 import de.lucaspape.monstercat.util.*
 import org.json.JSONObject
@@ -28,18 +29,10 @@ import java.lang.ref.WeakReference
  * Play a song from ID
  */
 internal fun playSongFromId(context: Context, songId: String, playNow: Boolean) {
-    val songDatabaseHelper = SongDatabaseHelper(context)
-    val song = songDatabaseHelper.getSong(context, songId)
-
-    if (song != null) {
-        if (playNow) {
-            de.lucaspape.monstercat.music.playNow(song)
-        } else {
-            addSong(song)
-        }
-
+    if (playNow) {
+        de.lucaspape.monstercat.music.playNow(songId)
     } else {
-        displayInfo(context, context.getString(R.string.couldNotFindSongMSg))
+        addSong(songId)
     }
 }
 
@@ -96,13 +89,17 @@ internal fun playAlbumNext(context: Context, mcID: String) {
                 }
             }
 
-            val databaseHelper = SongDatabaseHelper(context)
-
             idArray.reverse()
 
+            val songDatabaseHelper = SongDatabaseHelper(context)
+
+            val songIdList = ArrayList<String>()
+
             for (id in idArray) {
-                addSong(databaseHelper.getSong(context, id))
+                songIdList.add(songDatabaseHelper.getSong(context, id).songId)
             }
+
+            addSongList(songIdList)
         },
         Response.ErrorListener {
             displayInfo(context, context.getString(R.string.errorRetrieveAlbumData))
@@ -117,12 +114,15 @@ internal fun playPlaylistNext(context: Context, playlistId: String){
             PlaylistItemDatabaseHelper(context, playlistId)
         val playlistItemList = playlistItemDatabaseHelper.getAllData()
 
-        for (playlistItem in playlistItemList) {
-            val songDatabaseHelper = SongDatabaseHelper(context)
-            val song = songDatabaseHelper.getSong(context, playlistItem.songId)
+        val songDatabaseHelper = SongDatabaseHelper(context)
 
-            playSongFromId(context, song.songId, false)
+        val songIdArray = ArrayList<String>()
+
+        for (playlistItem in playlistItemList) {
+            songIdArray.add(songDatabaseHelper.getSong(context, playlistItem.songId).songId)
         }
+
+        addSongList(songIdArray)
     }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }
 
@@ -152,7 +152,6 @@ internal fun downloadSong(context: Context, song: Song) {
         val settings = Settings(context)
 
         val downloadType = settings.getSetting("downloadType")
-        val downloadQuality = settings.getSetting("downloadQuality")
 
         val downloadUrl =
             context.getString(R.string.trackContentUrl) + song.albumId + "/track-download/" + song.songId + "?format=" + downloadType

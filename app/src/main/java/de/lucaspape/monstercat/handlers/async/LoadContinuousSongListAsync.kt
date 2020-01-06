@@ -19,7 +19,7 @@ class LoadContinuousSongListAsync(
                 val song = songDatabaseHelper.getSong(context, songId)
 
                 if (song != null) {
-                    addContinuous(song)
+                    addContinuous(song.songId)
                 }
             }
         }

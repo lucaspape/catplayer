@@ -9,7 +9,6 @@ import android.support.v4.media.session.MediaSessionCompat
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.ExoPlayerFactory
 import de.lucaspape.monstercat.background.BackgroundService.Companion.loadContinuousSongListAsyncTask
-import de.lucaspape.monstercat.database.Song
 import java.lang.IndexOutOfBoundsException
 import java.lang.ref.WeakReference
 import kotlin.collections.ArrayList
@@ -19,7 +18,7 @@ internal var contextReference: WeakReference<Context>? = null
 internal var mediaPlayer: ExoPlayer? = null
 
 internal var currentSong = 0
-internal var playList = ArrayList<Song>(1)
+internal var playList = ArrayList<String>(1)
 
 var shuffle = false
 var loop = false
@@ -71,17 +70,31 @@ fun createMediaSession(context: WeakReference<Context>) {
     }
 }
 
+fun addSongList(songList:ArrayList<String>){
+    for(songId in songList){
+        try {
+            playList.add(currentSong + 1, songId)
+        } catch (e: IndexOutOfBoundsException) {
+            playList.add(songId)
+        }
+    }
+
+    if (mediaPlayer?.isPlaying == false) {
+        playNow(songList[0])
+    }
+}
+
 /**
  * Play song after
  */
-fun addSong(song: Song) {
+fun addSong(songId: String) {
     if (mediaPlayer?.isPlaying == false) {
-        playNow(song)
+        playNow(songId)
     } else {
         try {
-            playList.add(currentSong + 1, song)
+            playList.add(currentSong + 1, songId)
         } catch (e: IndexOutOfBoundsException) {
-            playList.add(song)
+            playList.add(songId)
         }
     }
 }
@@ -89,13 +102,13 @@ fun addSong(song: Song) {
 /**
  * Play song now
  */
-fun playNow(song: Song) {
+fun playNow(songId: String) {
     try {
-        playList.add(currentSong + 1, song)
+        playList.add(currentSong + 1, songId)
         currentSong++
 
     } catch (e: IndexOutOfBoundsException) {
-        playList.add(song)
+        playList.add(songId)
     }
 
     play()
@@ -114,6 +127,6 @@ fun clearContinuous() {
 
 }
 
-fun addContinuous(song: Song) {
-    playList.add(song)
+fun addContinuous(songId: String) {
+    playList.add(songId)
 }

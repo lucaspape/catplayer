@@ -10,6 +10,7 @@ import de.lucaspape.monstercat.background.BackgroundService.Companion.updateLive
 import de.lucaspape.monstercat.background.BackgroundService.Companion.waitForDownloadTask
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.Song
+import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.music.notification.startPlayerService
 import de.lucaspape.monstercat.music.notification.stopPlayerService
@@ -68,14 +69,16 @@ internal fun play() {
                             playSong(context, song)
 
                             try {
-                                val nextSong = playList[currentSong + 1]
+                                val nextSong = getSong(currentSong + 1)
 
-                                if (!File(nextSong.downloadLocation).exists() && !File(nextSong.streamDownloadLocation).exists()) {
-                                    addDownloadSong(
-                                        nextSong.streamLocation,
-                                        nextSong.streamDownloadLocation,
-                                        nextSong.shownTitle
-                                    )
+                                if(nextSong != null){
+                                    if (!File(nextSong.downloadLocation).exists() && !File(nextSong.streamDownloadLocation).exists()) {
+                                        addDownloadSong(
+                                            nextSong.streamLocation,
+                                            nextSong.streamDownloadLocation,
+                                            nextSong.shownTitle
+                                        )
+                                    }
                                 }
 
                             } catch (e: IndexOutOfBoundsException) {
@@ -352,13 +355,13 @@ fun toggleMusic() {
  */
 fun getCurrentSong(): Song? {
     try {
-        return playList[currentSong]
+        return getSong(currentSong)
     } catch (e: IndexOutOfBoundsException) {
         return if(loop){
             currentSong = 0
 
             return try{
-                playList[currentSong]
+                getSong(currentSong)
             }catch (e: IndexOutOfBoundsException){
                 null
             }
@@ -366,6 +369,18 @@ fun getCurrentSong(): Song? {
             null
         }
     }
+}
+
+fun getSong(index:Int):Song?{
+    val songId = playList[index]
+
+    contextReference?.get()?.let {context ->
+        val songDatabaseHelper = SongDatabaseHelper(context)
+
+        return songDatabaseHelper.getSong(context, songId)
+    }
+
+    return null
 }
 
 private fun clearListener() {
