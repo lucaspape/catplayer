@@ -11,6 +11,7 @@ import android.widget.ListView
 import android.widget.SimpleAdapter
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.activities.monstercatPlayer
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
@@ -18,7 +19,6 @@ import de.lucaspape.monstercat.download.addDownloadCoverArray
 import de.lucaspape.monstercat.handlers.async.BackgroundAsync
 import de.lucaspape.monstercat.handlers.async.LoadPlaylistAsync
 import de.lucaspape.monstercat.handlers.async.LoadPlaylistTracksAsync
-import de.lucaspape.monstercat.music.clearContinuous
 import de.lucaspape.monstercat.util.parsePlaylistToHashMap
 import de.lucaspape.monstercat.util.parseSongToHashMap
 import java.lang.ref.WeakReference
@@ -107,7 +107,7 @@ class PlaylistHandler {
                 currentPlaylistId = itemValue["playlistId"] as String
                 loadPlaylistTracks(view, false, currentPlaylistId!!)
             } else {
-                clearContinuous()
+                monstercatPlayer.clearContinuous()
 
                 val songId = itemValue["id"] as String
                 playSongFromId(view.context, songId, true, playlistList, position)

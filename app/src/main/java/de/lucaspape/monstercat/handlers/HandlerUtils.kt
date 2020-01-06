@@ -11,14 +11,13 @@ import com.android.volley.Request
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.background.BackgroundService.Companion.loadContinuousSongListAsyncTask
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.activities.monstercatPlayer
 import de.lucaspape.monstercat.database.*
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.handlers.async.*
-import de.lucaspape.monstercat.music.addContinuous
-import de.lucaspape.monstercat.music.addSong
 import de.lucaspape.monstercat.request.AuthorizedRequest
 import de.lucaspape.monstercat.util.*
 import org.json.JSONObject
@@ -28,11 +27,11 @@ import java.lang.ref.WeakReference
 /**
  * Play a song from ID
  */
-internal fun playSongFromId(context: Context, songId: String, playNow: Boolean) {
+internal fun playSongFromId(songId: String, playNow: Boolean) {
     if (playNow) {
-        de.lucaspape.monstercat.music.playNow(songId)
+        monstercatPlayer.playNow(songId)
     } else {
-        addSong(songId)
+        monstercatPlayer.addSong(songId)
     }
 }
 
@@ -46,7 +45,7 @@ internal fun playSongFromId(
     musicList: ListView,
     position: Int
 ) {
-    playSongFromId(context, songId, playNow)
+    playSongFromId(songId, playNow)
 
     val continuousList = ArrayList<String>()
 
@@ -91,10 +90,15 @@ internal fun playAlbumNext(context: Context, mcID: String) {
 
             val songDatabaseHelper = SongDatabaseHelper(context)
 
-            addSong(songDatabaseHelper.getSong(context, idArray[0]).songId)
+            monstercatPlayer.addSong(songDatabaseHelper.getSong(context, idArray[0]).songId)
 
             for (i in (1 until idArray.size)) {
-                addContinuous((songDatabaseHelper.getSong(context, idArray[i]).songId))
+                monstercatPlayer.addContinuous(
+                    (songDatabaseHelper.getSong(
+                        context,
+                        idArray[i]
+                    ).songId)
+                )
             }
         },
         Response.ErrorListener {
@@ -104,18 +108,28 @@ internal fun playAlbumNext(context: Context, mcID: String) {
     albumRequestQueue.add(albumRequest)
 }
 
-internal fun playPlaylistNext(context: Context, playlistId: String){
-    LoadPlaylistTracksAsync(WeakReference(context), true, playlistId, {}){
+internal fun playPlaylistNext(context: Context, playlistId: String) {
+    LoadPlaylistTracksAsync(WeakReference(context), true, playlistId, {}) {
         val playlistItemDatabaseHelper =
             PlaylistItemDatabaseHelper(context, playlistId)
         val playlistItemList = playlistItemDatabaseHelper.getAllData().reversed()
 
         val songDatabaseHelper = SongDatabaseHelper(context)
 
-        addSong(songDatabaseHelper.getSong(context, playlistItemList[0].songId).songId)
+        monstercatPlayer.addSong(
+            songDatabaseHelper.getSong(
+                context,
+                playlistItemList[0].songId
+            ).songId
+        )
 
         for (i in (1 until playlistItemList.size)) {
-            addContinuous(songDatabaseHelper.getSong(context, playlistItemList[i].songId).songId)
+            monstercatPlayer.addContinuous(
+                songDatabaseHelper.getSong(
+                    context,
+                    playlistItemList[i].songId
+                ).songId
+            )
         }
     }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }
@@ -231,7 +245,8 @@ internal fun addSongToPlaylist(context: Context, song: Song) {
         alertDialogBuilder.setTitle(context.getString(R.string.pickPlaylistMsg))
         alertDialogBuilder.setItems(playlistNames) { _, i ->
             playlistIds[i]?.let { playlistId ->
-                val addToPlaylistAsync = AddToPlaylistAsync(WeakReference(context), playlistId, song)
+                val addToPlaylistAsync =
+                    AddToPlaylistAsync(WeakReference(context), playlistId, song)
                 addToPlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
             }
 
@@ -243,7 +258,7 @@ internal fun addSongToPlaylist(context: Context, song: Song) {
 /**
  * Create a new playlist, will ask for name with alertDialog
  */
-internal fun createPlaylist(context:Context){
+internal fun createPlaylist(context: Context) {
     val layoutInflater =
         context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
@@ -252,7 +267,8 @@ internal fun createPlaylist(context:Context){
     AlertDialog.Builder(context).apply {
         setTitle(context.getString(R.string.createPlaylist))
         setPositiveButton(context.getString(R.string.ok)) { _, _ ->
-            val playlistNameEditText = playlistNameInputLayout.findViewById<EditText>(R.id.playlistNameInput)
+            val playlistNameEditText =
+                playlistNameInputLayout.findViewById<EditText>(R.id.playlistNameInput)
             val playlistName = playlistNameEditText.text.toString()
 
             val createPlaylistAsync = CreatePlaylistAsync(WeakReference(context), playlistName)
@@ -268,7 +284,7 @@ internal fun createPlaylist(context:Context){
 /**
  * Delete playlist with given playlistId
  */
-internal fun deletePlaylist(context: Context, playlistId:String){
+internal fun deletePlaylist(context: Context, playlistId: String) {
     val deletePlaylistAsync = DeletePlaylistAsync(WeakReference(context), playlistId)
     deletePlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }
@@ -276,15 +292,22 @@ internal fun deletePlaylist(context: Context, playlistId:String){
 /**
  * Delete one song from playlist, index required because double songs can exist in one playlist
  */
-internal fun deletePlaylistSong(context: Context, song: Song, playlistId: String, index:Int, playlistMax:Int){
+internal fun deletePlaylistSong(
+    context: Context,
+    song: Song,
+    playlistId: String,
+    index: Int,
+    playlistMax: Int
+) {
     //for playlist sorting features
     val playlistSortedByNew = true
 
-    if(playlistSortedByNew){
+    if (playlistSortedByNew) {
         //required because api sorts by oldest songs added
         val songDeleteIndex = playlistMax - index
 
-        val deletePlaylistTrackAsync = DeletePlaylistTrackAsync(WeakReference(context), song , playlistId, songDeleteIndex)
+        val deletePlaylistTrackAsync =
+            DeletePlaylistTrackAsync(WeakReference(context), song, playlistId, songDeleteIndex)
         deletePlaylistTrackAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 }

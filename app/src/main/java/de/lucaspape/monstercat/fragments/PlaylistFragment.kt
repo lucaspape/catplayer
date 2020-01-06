@@ -43,7 +43,10 @@ class PlaylistFragment : Fragment() {
         val password = settings.getSetting("password")
 
         if (username == null || password == null) {
-            displayInfo(view.context, view.context.getString(R.string.setUsernamePasswordSettingsMsg))
+            displayInfo(
+                view.context,
+                view.context.getString(R.string.setUsernamePasswordSettingsMsg)
+            )
 
             fragmentBackPressedCallback = {
 
@@ -106,7 +109,6 @@ class PlaylistFragment : Fragment() {
                     playPlaylistNext(it, listItem["playlistId"] as String)
                 } else {
                     playSongFromId(
-                        it,
                         listItem["id"] as String,
                         false
                     )

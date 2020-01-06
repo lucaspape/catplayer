@@ -10,6 +10,7 @@ import android.widget.*
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.activities.SettingsActivity
+import de.lucaspape.monstercat.activities.monstercatPlayer
 import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.database.helper.AlbumDatabaseHelper
 import de.lucaspape.monstercat.database.helper.AlbumItemDatabaseHelper
@@ -151,7 +152,7 @@ class HomeHandler {
                 val itemValue = musicList.getItemAtPosition(position) as HashMap<*, *>
                 loadAlbum(view, itemValue, false)
             } else {
-                clearContinuous()
+                monstercatPlayer.clearContinuous()
 
                 val itemValue = musicList.getItemAtPosition(position) as HashMap<*, *>
                 playSongFromId(

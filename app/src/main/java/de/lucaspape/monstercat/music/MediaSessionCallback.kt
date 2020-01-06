@@ -1,6 +1,7 @@
 package de.lucaspape.monstercat.music
 
 import android.support.v4.media.session.MediaSessionCompat
+import de.lucaspape.monstercat.music.MonstercatPlayer.Companion.mediaPlayer
 
 class MediaSessionCallback : MediaSessionCompat.Callback() {
     override fun onPause() {

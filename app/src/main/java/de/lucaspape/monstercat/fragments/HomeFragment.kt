@@ -93,7 +93,6 @@ class HomeFragment : Fragment() {
                             song
                         )
                         getString(R.string.playNext) -> playSongFromId(
-                            it,
                             listItem["id"].toString(),
                             false
                         )

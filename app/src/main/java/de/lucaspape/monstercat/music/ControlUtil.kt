@@ -26,9 +26,6 @@ import kotlin.random.Random
  * Get current song and play it
  */
 internal fun play() {
-    //remove play next listener
-    clearListener()
-
     updateLiveInfoAsync?.cancel(true)
 
     //start the player service (with its notification)
@@ -37,7 +34,7 @@ internal fun play() {
     val song = getCurrentSong()
 
     song?.let {
-        contextReference?.get()?.let { context ->
+        MonstercatPlayer.contextReference?.get()?.let { context ->
             val settings = Settings(context)
             val downloadStream = settings.getSetting("downloadStream")?.toBoolean()
 
@@ -69,7 +66,7 @@ internal fun play() {
                             playSong(context, song)
 
                             try {
-                                val nextSong = getSong(currentSong + 1)
+                                val nextSong = getSong(MonstercatPlayer.currentSong + 1)
 
                                 if(nextSong != null){
                                     if (!File(nextSong.downloadLocation).exists() && !File(nextSong.streamDownloadLocation).exists()) {
@@ -117,8 +114,8 @@ private fun playSong(context: Context, song: Song) {
 
     val primaryResolution = settings.getSetting("primaryCoverResolution")
 
-    mediaPlayer?.release()
-    mediaPlayer?.stop()
+    MonstercatPlayer.mediaPlayer?.release()
+    MonstercatPlayer.mediaPlayer?.stop()
 
     //new exoplayer
     val exoPlayer = ExoPlayerFactory.newSimpleInstance(context)
@@ -136,12 +133,12 @@ private fun playSong(context: Context, song: Song) {
                 song.title,
                 song.version,
                 song.artist,
-                contextReference?.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
+                MonstercatPlayer.contextReference?.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
             )
         }
     })
 
-    mediaPlayer = exoPlayer
+    MonstercatPlayer.mediaPlayer = exoPlayer
 
     //request audio focus
     if (requestAudioFocus(context) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
@@ -157,9 +154,9 @@ private fun playSong(context: Context, song: Song) {
             val mediaSource = song.getMediaSource()
 
             if (mediaSource != null) {
-                mediaPlayer?.prepare(mediaSource)
+                MonstercatPlayer.mediaPlayer?.prepare(mediaSource)
 
-                mediaPlayer?.playWhenReady = true
+                MonstercatPlayer.mediaPlayer?.playWhenReady = true
 
                 //UI stuff
                 setTitle(song.title, song.version, song.artist)
@@ -179,15 +176,13 @@ private fun playSong(context: Context, song: Song) {
  * Play specific stream
  */
 fun playStream(stream: Stream) {
-    clearListener()
-
-    contextReference?.get()?.let { context ->
+    MonstercatPlayer.contextReference?.get()?.let { context ->
         val settings = Settings(context)
 
         startPlayerService()
 
-        mediaPlayer?.release()
-        mediaPlayer?.stop()
+        MonstercatPlayer.mediaPlayer?.release()
+        MonstercatPlayer.mediaPlayer?.stop()
 
         //new exoplayer
         val exoPlayer = ExoPlayerFactory.newSimpleInstance(context)
@@ -208,15 +203,15 @@ fun playStream(stream: Stream) {
             }
         })
 
-        mediaPlayer = exoPlayer
+        MonstercatPlayer.mediaPlayer = exoPlayer
 
         //request audio focus
         if (requestAudioFocus(context) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             //only play stream if allowed
             if (wifiConnected(context) == true || settings.getSetting("streamOverMobile") == "true") {
-                mediaPlayer?.prepare(stream.getMediaSource(context))
+                MonstercatPlayer.mediaPlayer?.prepare(stream.getMediaSource(context))
 
-                mediaPlayer?.playWhenReady = true
+                MonstercatPlayer.mediaPlayer?.playWhenReady = true
 
                 //UI stuff
                 setTitle(stream.title, "", stream.artist)
@@ -239,19 +234,17 @@ fun playStream(stream: Stream) {
  * Stop playback
  */
 internal fun stop() {
-    if (mediaPlayer?.isPlaying == true) {
-
-        clearListener()
+    if (MonstercatPlayer.mediaPlayer?.isPlaying == true) {
 
         hideTitle()
 
-        setPlayButtonImage(contextReference?.get()!!)
+        setPlayButtonImage(MonstercatPlayer.contextReference?.get()!!)
 
-        mediaPlayer?.stop()
+        MonstercatPlayer.mediaPlayer?.stop()
 
         registerNextListener()
 
-        contextReference?.get()?.let { context ->
+        MonstercatPlayer.contextReference?.get()?.let { context ->
             abandonAudioFocus(context)
         }
     }
@@ -263,11 +256,9 @@ internal fun stop() {
  * Pause playback
  */
 fun pause() {
-    clearListener()
-
-    contextReference?.get()?.let { context ->
+    MonstercatPlayer.contextReference?.get()?.let { context ->
         try {
-            mediaPlayer?.playWhenReady = false
+            MonstercatPlayer.mediaPlayer?.playWhenReady = false
 
             setPlayButtonImage(context)
 
@@ -284,16 +275,14 @@ fun pause() {
  * Resume playback
  */
 fun resume() {
-    clearListener()
-
-    contextReference?.get()?.let { context ->
+    MonstercatPlayer.contextReference?.get()?.let { context ->
         try {
-            if (mediaPlayer?.isPlaying == false) {
+            if (MonstercatPlayer.mediaPlayer?.isPlaying == false) {
                 if (requestAudioFocus(context) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                    mediaPlayer!!.playWhenReady = true
+                    MonstercatPlayer.mediaPlayer!!.playWhenReady = true
 
                     val intentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
-                    context.registerReceiver(NoisyReceiver(), intentFilter)
+                    context.registerReceiver(MonstercatPlayer.Companion.NoisyReceiver(), intentFilter)
                 }
 
                 setPlayButtonImage(context)
@@ -313,13 +302,11 @@ fun resume() {
  * Next song
  */
 fun next() {
-    clearListener()
-
-    if (!loopSingle) {
-        if(shuffle){
-            currentSong = Random.nextInt(0,playList.size + 1)
+    if (!MonstercatPlayer.loopSingle) {
+        if(MonstercatPlayer.shuffle){
+            MonstercatPlayer.currentSong = Random.nextInt(0,MonstercatPlayer.playlist.size + 1)
         }else{
-            currentSong++
+            MonstercatPlayer.currentSong++
         }
     }
 
@@ -330,10 +317,8 @@ fun next() {
  * Previous song
  */
 fun previous() {
-    if (currentSong != 0) {
-        clearListener()
-
-        currentSong--
+    if (MonstercatPlayer.currentSong != 0) {
+        MonstercatPlayer.currentSong--
 
         play()
     }
@@ -343,7 +328,7 @@ fun previous() {
  * Toggle pause/play
  */
 fun toggleMusic() {
-    if (mediaPlayer?.isPlaying == true) {
+    if (MonstercatPlayer.mediaPlayer?.isPlaying == true) {
         pause()
     } else {
         resume()
@@ -355,13 +340,13 @@ fun toggleMusic() {
  */
 fun getCurrentSong(): Song? {
     try {
-        return getSong(currentSong)
+        return getSong(MonstercatPlayer.currentSong)
     } catch (e: IndexOutOfBoundsException) {
-        return if(loop){
-            currentSong = 0
+        return if(MonstercatPlayer.loop){
+            MonstercatPlayer.currentSong = 0
 
             return try{
-                getSong(currentSong)
+                getSong(MonstercatPlayer.currentSong)
             }catch (e: IndexOutOfBoundsException){
                 null
             }
@@ -372,9 +357,9 @@ fun getCurrentSong(): Song? {
 }
 
 fun getSong(index:Int):Song?{
-    val songId = playList[index]
+    val songId = MonstercatPlayer.playlist[index]
 
-    contextReference?.get()?.let {context ->
+    MonstercatPlayer.contextReference?.get()?.let {context ->
         val songDatabaseHelper = SongDatabaseHelper(context)
 
         return songDatabaseHelper.getSong(context, songId)
@@ -383,18 +368,16 @@ fun getSong(index:Int):Song?{
     return null
 }
 
-private fun clearListener() {
-    mediaPlayer?.addListener(object : Player.EventListener {
-        override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-        }
-    })
-}
-
 private fun registerNextListener() {
-    mediaPlayer?.addListener(object : Player.EventListener {
+    var nextRun = false
+
+    MonstercatPlayer.mediaPlayer?.addListener(object : Player.EventListener {
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-            when (playbackState) {
-                Player.STATE_ENDED -> next()
+            if(playbackState == Player.STATE_ENDED){
+                if(!nextRun){
+                    nextRun = true
+                    next()
+                }
             }
         }
     })

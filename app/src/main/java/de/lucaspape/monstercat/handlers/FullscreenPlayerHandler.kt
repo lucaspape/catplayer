@@ -28,18 +28,22 @@ class FullscreenPlayerHandler {
         val shuffleButton = view.findViewById<ImageButton>(R.id.fullscreenShuffle)
         val loopButton = view.findViewById<ImageButton>(R.id.fullscreenLoop)
 
-        if(shuffle){
+        if(MonstercatPlayer.shuffle){
             shuffleButton.setImageResource(R.drawable.ic_shuffle_green_24dp)
         }else{
             shuffleButton.setImageResource(R.drawable.ic_shuffle_24dp)
         }
 
-        if(loop){
-            loopButton.setImageResource(R.drawable.ic_repeat_green_24dp)
-        }else if(loopSingle){
-            loopButton.setImageResource(R.drawable.ic_repeat_one_green_24dp)
-        }else{
-            loopButton.setImageResource(R.drawable.ic_repeat_24dp)
+        when {
+            MonstercatPlayer.loop -> {
+                loopButton.setImageResource(R.drawable.ic_repeat_green_24dp)
+            }
+            MonstercatPlayer.loopSingle -> {
+                loopButton.setImageResource(R.drawable.ic_repeat_one_green_24dp)
+            }
+            else -> {
+                loopButton.setImageResource(R.drawable.ic_repeat_24dp)
+            }
         }
 
         playButton.setOnClickListener {
@@ -55,30 +59,30 @@ class FullscreenPlayerHandler {
         }
 
         shuffleButton.setOnClickListener {
-            if(shuffle){
-                shuffle = false
+            if(MonstercatPlayer.shuffle){
+                MonstercatPlayer.shuffle = false
                 shuffleButton.setImageResource(R.drawable.ic_shuffle_24dp)
             }else{
-                shuffle = true
+                MonstercatPlayer.shuffle = true
                 shuffleButton.setImageResource(R.drawable.ic_shuffle_green_24dp)
             }
         }
 
         loopButton.setOnClickListener {
             when {
-                loop -> {
-                    loop = false
+                MonstercatPlayer.loop -> {
+                    MonstercatPlayer.loop = false
 
-                    loopSingle = true
+                    MonstercatPlayer.loopSingle = true
 
                     loopButton.setImageResource(R.drawable.ic_repeat_one_green_24dp)
                 }
-                loopSingle -> {
-                    loopSingle = false
+                MonstercatPlayer.loopSingle -> {
+                    MonstercatPlayer.loopSingle = false
                     loopButton.setImageResource(R.drawable.ic_repeat_24dp)
                 }
                 else -> {
-                    loop = true
+                    MonstercatPlayer.loop = true
                     loopButton.setImageResource(R.drawable.ic_repeat_green_24dp)
                 }
             }

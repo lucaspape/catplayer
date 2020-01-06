@@ -3,7 +3,7 @@ package de.lucaspape.monstercat.download
 import android.content.Context
 import android.os.AsyncTask
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.music.contextReference
+import de.lucaspape.monstercat.music.MonstercatPlayer
 import de.lucaspape.monstercat.util.*
 import java.io.File
 import java.lang.ref.WeakReference
@@ -126,7 +126,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                             current,
                             max,
                             int,
-                            contextReference!!.get()!!
+                            MonstercatPlayer.contextReference!!.get()!!
                         )
                     }
                 }

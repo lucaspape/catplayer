@@ -11,8 +11,9 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.music.*
-import de.lucaspape.monstercat.music.contextReference
-import de.lucaspape.monstercat.music.mediaPlayer
+import de.lucaspape.monstercat.music.MonstercatPlayer.Companion.contextReference
+import de.lucaspape.monstercat.music.MonstercatPlayer.Companion.mediaPlayer
+import de.lucaspape.monstercat.music.MonstercatPlayer.Companion.mediaSession
 import de.lucaspape.monstercat.music.stop
 
 internal const val PLAY_PAUSE_ACTION = "de.lucaspape.monstercat.playpause"
@@ -90,12 +91,10 @@ internal fun createPlayerNotification(
             PREV_ACTION, prevPendingIntent
         ).build()
 
-        val playPauseIcon: Int
-
-        if (mediaPlayer?.isPlaying == true) {
-            playPauseIcon = R.drawable.ic_pause_black_24dp
+        val playPauseIcon: Int = if (mediaPlayer?.isPlaying == true) {
+            R.drawable.ic_pause_black_24dp
         } else {
-            playPauseIcon = R.drawable.ic_play_arrow_black_24dp
+            R.drawable.ic_play_arrow_black_24dp
         }
 
         val playPauseAction = NotificationCompat.Action.Builder(

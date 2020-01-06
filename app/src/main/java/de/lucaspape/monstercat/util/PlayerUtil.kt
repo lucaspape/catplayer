@@ -3,21 +3,9 @@ package de.lucaspape.monstercat.util
 import android.content.Context
 import android.media.AudioFocusRequest
 import android.media.AudioManager
-import android.net.Uri
-import androidx.core.net.toUri
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.audio.AudioAttributes
-import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.source.hls.HlsMediaSource
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
-import com.google.android.exoplayer2.util.Util
-import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.database.Song
-import de.lucaspape.monstercat.music.audioFocusChangeListener
-import de.lucaspape.monstercat.music.contextReference
-import de.lucaspape.monstercat.twitch.Stream
-import java.io.File
+import de.lucaspape.monstercat.music.MonstercatPlayer.Companion.audioFocusChangeListener
 
 fun getAudioAttributes(): AudioAttributes {
     return AudioAttributes.Builder()

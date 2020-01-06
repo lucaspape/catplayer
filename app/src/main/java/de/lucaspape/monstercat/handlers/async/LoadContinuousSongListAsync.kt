@@ -2,8 +2,9 @@ package de.lucaspape.monstercat.handlers.async
 
 import android.content.Context
 import android.os.AsyncTask
+import de.lucaspape.monstercat.activities.monstercatPlayer
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
-import de.lucaspape.monstercat.music.addContinuous
+import de.lucaspape.monstercat.music.MonstercatPlayer
 import java.lang.ref.WeakReference
 
 class LoadContinuousSongListAsync(
@@ -19,7 +20,7 @@ class LoadContinuousSongListAsync(
                 val song = songDatabaseHelper.getSong(context, songId)
 
                 if (song != null) {
-                    addContinuous(song.songId)
+                    monstercatPlayer.addContinuous(song.songId)
                 }
             }
         }

@@ -24,17 +24,19 @@ import de.lucaspape.monstercat.fragments.HomeFragment
 import de.lucaspape.monstercat.fragments.PlaylistFragment
 import de.lucaspape.monstercat.handlers.HomeHandler
 import de.lucaspape.monstercat.music.*
+import de.lucaspape.monstercat.music.MonstercatPlayer.Companion.mediaPlayer
 import de.lucaspape.monstercat.music.notification.updateNotification
 import de.lucaspape.monstercat.util.Settings
 import de.lucaspape.monstercat.util.displayInfo
 import de.lucaspape.monstercat.util.loggedIn
-import java.lang.ref.WeakReference
 
-val noisyReceiver = NoisyReceiver()
+val noisyReceiver = MonstercatPlayer.Companion.NoisyReceiver()
 var backgroundServiceIntent: Intent? = null
 
 //callback function for back pressed, TODO this is not great
 var fragmentBackPressedCallback: () -> Unit = {}
+
+val monstercatPlayer = MonstercatPlayer()
 
 /**
  * Main activity
@@ -101,8 +103,9 @@ class MainActivity : AppCompatActivity() {
         //adjust theme
         changeTheme()
 
+        monstercatPlayer.setContext(this)
         //create the MusicPlayer.kt mediasession
-        createMediaSession(WeakReference(this))
+        monstercatPlayer.createMediaSession()
 
         val settings = Settings(this)
 
