@@ -70,20 +70,6 @@ fun createMediaSession(context: WeakReference<Context>) {
     }
 }
 
-fun addSongList(songList:ArrayList<String>){
-    for(songId in songList){
-        try {
-            playList.add(currentSong + 1, songId)
-        } catch (e: IndexOutOfBoundsException) {
-            playList.add(songId)
-        }
-    }
-
-    if (mediaPlayer?.isPlaying == false) {
-        playNow(songList[0])
-    }
-}
-
 /**
  * Play song after
  */
