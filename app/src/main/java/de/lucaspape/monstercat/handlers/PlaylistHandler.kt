@@ -11,7 +11,6 @@ import android.widget.AdapterView
 import android.widget.ImageButton
 import android.widget.ListView
 import android.widget.SimpleAdapter
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.activities.monstercatPlayer
@@ -64,22 +63,6 @@ class PlaylistHandler {
 
                 button.setOnClickListener {
                     showContextMenu(view, position)
-                }
-
-                val listItem = v.findViewById<ConstraintLayout>(R.id.list_single_layout)
-
-                listItem.setOnClickListener {
-                    val itemValue = playlistList.getItemAtPosition(position) as HashMap<*, *>
-
-                    if (listViewDataIsPlaylistView) {
-                        currentPlaylistId = itemValue["playlistId"] as String
-                        loadPlaylistTracks(view, false, currentPlaylistId!!)
-                    } else {
-                        monstercatPlayer.clearContinuous()
-
-                        val songId = itemValue["id"] as String
-                        playSongFromId(view.context, songId, true, playlistList, position)
-                    }
                 }
 
                 return v

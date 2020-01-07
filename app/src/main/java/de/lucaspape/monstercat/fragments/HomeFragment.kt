@@ -7,12 +7,7 @@ import android.widget.ListView
 import androidx.fragment.app.Fragment
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.activities.fragmentBackPressedCallback
-import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.handlers.*
-import de.lucaspape.monstercat.handlers.addSongToPlaylist
-import de.lucaspape.monstercat.handlers.downloadAlbum
-import de.lucaspape.monstercat.handlers.downloadSong
-import de.lucaspape.monstercat.handlers.playSongFromId
 import de.lucaspape.monstercat.util.Settings
 
 class HomeFragment : Fragment() {

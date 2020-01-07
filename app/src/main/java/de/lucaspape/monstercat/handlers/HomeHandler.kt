@@ -9,7 +9,6 @@ import android.os.Looper
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.activities.SettingsActivity
@@ -96,26 +95,11 @@ class HomeHandler {
                         showContextMenu(view, position)
                     }
 
-                    val listItem = v.findViewById<ConstraintLayout>(R.id.list_single_layout)
-                    listItem.setOnClickListener {
-                        monstercatPlayer.clearContinuous()
-
-                        val itemValue = musicList.getItemAtPosition(position) as HashMap<*, *>
-                        playSongFromId(
-                            view.context,
-                            itemValue["id"] as String,
-                            true,
-                            musicList,
-                            position
-                        )
-                    }
-
                     return v
                 }
             }
             musicList.adapter = simpleAdapter
         }
-
     }
 
     fun showContextMenu(view: View, listViewPosition: Int) {
