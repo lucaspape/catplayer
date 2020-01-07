@@ -41,6 +41,9 @@ The beta is open but currently limited to 1000 participants.
 ## Build from source
 
 To build this app from source you will need Android Studio and the ExoPlayer V2 sourcecode as well as the ExoPlayer FLAC extension. Please refer to [here](https://github.com/google/ExoPlayer/blob/release-v2/README.md) and [here](https://github.com/google/ExoPlayer/tree/release-v2/extensions/flac) for more information on how to get the ExoPlayer V2 and the FLAC extension source code. 
+
+You can also build this project without FLAC support by using this patch: [no_flac_support.patch ](https://gist.github.com/lucaspape/6b9f537cb3e3b3c337bab5e09eb6ebff)
+
 Please also read the developers guide ([DEVELOPERS_GUIDE.txt](https://github.com/lucaspape/catplayer/blob/master/DEVELOPERS_GUIDE.txt)) in this project.
 
 ## Additional information
