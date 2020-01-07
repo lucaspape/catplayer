@@ -70,4 +70,5 @@
     <string name="coverResolution">Cover resolution</string>
     <string name="loop">Loop</string>
     <string name="shuffle">Shuffle</string>
+    <string name="delete">Delete</string>
 </resources>

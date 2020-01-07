@@ -73,11 +73,14 @@ class PlaylistHandler {
 
     }
 
+    /**
+     * Context menu
+     */
     fun showContextMenu(view: View, listViewPosition: Int) {
         val menuItems: Array<String> = arrayOf(
             view.context.getString(R.string.download),
             view.context.getString(R.string.playNext),
-            "Delete"
+            view.context.getString(R.string.delete)
         )
 
         val alertDialogBuilder = AlertDialog.Builder(view.context)
@@ -119,7 +122,7 @@ class PlaylistHandler {
                         )
                     }
 
-                } else if (item == "Delete") {
+                } else if (item == view.context.getString(R.string.delete)) {
                     if (listItem["type"] == "playlist") {
                         deletePlaylist(context, listItem["playlistId"] as String)
                     } else {
