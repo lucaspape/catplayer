@@ -88,6 +88,8 @@ class PlaylistHandler {
         alertDialogBuilder.setItems(menuItems) { dialog, which ->
             val playlistView = view.findViewById<ListView>(R.id.playlistView)
 
+            println("POSITION: " + listViewPosition)
+
             val listItem = playlistView.getItemAtPosition(listViewPosition) as HashMap<*, *>
 
             view.context.let { context ->
@@ -211,7 +213,7 @@ class PlaylistHandler {
             }
         }
 
-        playlistList.setOnItemLongClickListener { parent, view, position, id ->
+        playlistList.setOnItemLongClickListener { _, _, position, _ ->
             showContextMenu(view, position)
             true
         }
