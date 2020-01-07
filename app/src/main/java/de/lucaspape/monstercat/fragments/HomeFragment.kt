@@ -2,7 +2,6 @@ package de.lucaspape.monstercat.fragments
 
 import android.os.Bundle
 import android.view.*
-import android.widget.AdapterView
 import android.widget.ListView
 import androidx.fragment.app.Fragment
 import de.lucaspape.monstercat.R

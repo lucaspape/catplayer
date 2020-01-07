@@ -9,9 +9,9 @@ import android.widget.ListView
 import com.android.volley.Response
 import com.android.volley.Request
 import com.android.volley.toolbox.Volley
-import de.lucaspape.monstercat.background.BackgroundService.Companion.loadContinuousSongListAsyncTask
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.activities.monstercatPlayer
+import de.lucaspape.monstercat.background.BackgroundService.Companion.loadContinuousSongListAsyncTask
 import de.lucaspape.monstercat.database.*
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
@@ -54,15 +54,22 @@ internal fun playSongFromId(
         continuousList.add(nextItemValue["id"] as String)
     }
 
-    loadContinuousSongListAsyncTask =
-        LoadContinuousSongListAsync(
-            continuousList,
-            WeakReference(context)
-        )
+    loadContinuousSongListAsyncTask?.cancel(true)
 
-    loadContinuousSongListAsyncTask!!.executeOnExecutor(
-        AsyncTask.THREAD_POOL_EXECUTOR
-    )
+    loadContinuousSongListAsyncTask =  BackgroundAsync({
+        val songDatabaseHelper = SongDatabaseHelper(context)
+
+        for (cSongId in continuousList) {
+
+            val song = songDatabaseHelper.getSong(context, cSongId)
+
+            if (song != null) {
+                monstercatPlayer.addContinuous(song.songId)
+            }
+        }
+    }, {})
+
+    loadContinuousSongListAsyncTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }
 
 /**
@@ -92,14 +99,20 @@ internal fun playAlbumNext(context: Context, mcID: String) {
 
             monstercatPlayer.addSong(songDatabaseHelper.getSong(context, idArray[0]).songId)
 
-            for (i in (1 until idArray.size)) {
-                monstercatPlayer.addContinuous(
-                    (songDatabaseHelper.getSong(
-                        context,
-                        idArray[i]
-                    ).songId)
-                )
-            }
+            loadContinuousSongListAsyncTask?.cancel(true)
+
+            loadContinuousSongListAsyncTask =  BackgroundAsync({
+                for (i in (1 until idArray.size)) {
+                    monstercatPlayer.addContinuous(
+                        (songDatabaseHelper.getSong(
+                            context,
+                            idArray[i]
+                        ).songId)
+                    )
+                }
+            }, {})
+
+            loadContinuousSongListAsyncTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         },
         Response.ErrorListener {
             displayInfo(context, context.getString(R.string.errorRetrieveAlbumData))
@@ -123,14 +136,20 @@ internal fun playPlaylistNext(context: Context, playlistId: String) {
             ).songId
         )
 
-        for (i in (1 until playlistItemList.size)) {
-            monstercatPlayer.addContinuous(
-                songDatabaseHelper.getSong(
-                    context,
-                    playlistItemList[i].songId
-                ).songId
-            )
-        }
+        loadContinuousSongListAsyncTask?.cancel(true)
+
+        loadContinuousSongListAsyncTask =  BackgroundAsync({
+            for (i in (1 until playlistItemList.size)) {
+                monstercatPlayer.addContinuous(
+                    songDatabaseHelper.getSong(
+                        context,
+                        playlistItemList[i].songId
+                    ).songId
+                )
+            }
+        }, {})
+
+        loadContinuousSongListAsyncTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }
 

@@ -85,10 +85,8 @@ class PlaylistHandler {
 
         val alertDialogBuilder = AlertDialog.Builder(view.context)
         alertDialogBuilder.setTitle("")
-        alertDialogBuilder.setItems(menuItems) { dialog, which ->
+        alertDialogBuilder.setItems(menuItems) { _, which ->
             val playlistView = view.findViewById<ListView>(R.id.playlistView)
-
-            println("POSITION: " + listViewPosition)
 
             val listItem = playlistView.getItemAtPosition(listViewPosition) as HashMap<*, *>
 
@@ -149,8 +147,6 @@ class PlaylistHandler {
                             }
                         }
                     }
-                } else {
-
                 }
             }
         }
