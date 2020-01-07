@@ -53,24 +53,9 @@ class PlaylistFragment : Fragment() {
 
             playlistHandler.loadPlaylist(view, false)
 
-            registerForContextMenu(playlistView as ListView)
-
             fragmentBackPressedCallback = {
                 playlistHandler.loadPlaylist(view, false)
             }
         }
-    }
-
-    override fun onCreateContextMenu(
-        menu: ContextMenu,
-        v: View,
-        menuInfo: ContextMenu.ContextMenuInfo?
-    ) {
-        super.onCreateContextMenu(menu, v, menuInfo)
-
-        val adapterContextInfo = menuInfo as AdapterView.AdapterContextMenuInfo
-        val position = adapterContextInfo.position
-
-        playlistHandler.showContextMenu(v, position)
     }
 }

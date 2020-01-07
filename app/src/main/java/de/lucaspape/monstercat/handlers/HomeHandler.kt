@@ -239,6 +239,11 @@ class HomeHandler {
             }
         }
 
+        musicList.setOnItemLongClickListener { _, _, position, _ ->
+            showContextMenu(view, position)
+            true
+        }
+
         //spinner (select catalog or albumview)
 
         val viewSelector = view.findViewById<Spinner>(R.id.viewSelector)
