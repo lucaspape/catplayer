@@ -34,12 +34,16 @@ fun parseSongToHashMap(context: Context, song: Song): HashMap<String, Any?> {
     hashMap["streamable"] = song.isStreamable.toString()
     hashMap["inEarlyAccess"] = song.inEarlyAccess.toString()
 
-    if(File(song.downloadLocation).exists()){
-        hashMap["downloadedCheck"] = "android.resource://de.lucaspape.monstercat/drawable/ic_check_green_24dp"
-    }else if(File(song.streamDownloadLocation).exists()){
-        hashMap["downloadedCheck"] = "android.resource://de.lucaspape.monstercat/drawable/ic_check_orange_24dp"
-    }else{
-        hashMap["downloadedCheck"] = "android.resource://de.lucaspape.monstercat/drawable/ic_empty_24dp"
+    when {
+        File(song.downloadLocation).exists() -> {
+            hashMap["downloadedCheck"] = "android.resource://de.lucaspape.monstercat/drawable/ic_check_green_24dp"
+        }
+        File(song.streamDownloadLocation).exists() -> {
+            hashMap["downloadedCheck"] = "android.resource://de.lucaspape.monstercat/drawable/ic_check_orange_24dp"
+        }
+        else -> {
+            hashMap["downloadedCheck"] = "android.resource://de.lucaspape.monstercat/drawable/ic_empty_24dp"
+        }
     }
 
     return hashMap

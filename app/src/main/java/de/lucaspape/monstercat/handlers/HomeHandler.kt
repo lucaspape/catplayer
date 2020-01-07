@@ -1,12 +1,15 @@
 package de.lucaspape.monstercat.handlers
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.AsyncTask
 import android.os.Handler
 import android.os.Looper
 import android.view.View
+import android.view.ViewGroup
 import android.widget.*
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.activities.SettingsActivity
@@ -46,9 +49,9 @@ class HomeHandler {
     private var simpleAdapter: SimpleAdapter? = null
 
     //if contents of an album currently displayed
-    var albumContentsDisplayed = false
+    private var albumContentsDisplayed = false
 
-    var currentAlbumId = ""
+    private var currentAlbumId = ""
 
     private fun redrawListView(view: View) {
         val musicList = view.findViewById<ListView>(R.id.musiclistview)
@@ -77,16 +80,103 @@ class HomeHandler {
         } else {
             val from = arrayOf("shownTitle", "artist", "secondaryImage", "downloadedCheck")
             val to = arrayOf(R.id.title, R.id.artist, R.id.cover, R.id.titleDownloadStatus)
-            simpleAdapter = SimpleAdapter(
+            simpleAdapter = object : SimpleAdapter(
                 view.context,
                 currentListViewData,
                 R.layout.list_single,
                 from,
                 to.toIntArray()
-            )
+            ) {
+                override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+                    val v = super.getView(position, convertView, parent)
+
+                    val button = v.findViewById<ImageButton>(R.id.titleMenuButton)
+
+                    button.setOnClickListener {
+                        showContextMenu(view, position)
+                    }
+
+                    val listItem = v.findViewById<ConstraintLayout>(R.id.list_single_layout)
+                    listItem.setOnClickListener {
+                        monstercatPlayer.clearContinuous()
+
+                        val itemValue = musicList.getItemAtPosition(position) as HashMap<*, *>
+                        playSongFromId(
+                            view.context,
+                            itemValue["id"] as String,
+                            true,
+                            musicList,
+                            position
+                        )
+                    }
+
+                    return v
+                }
+            }
             musicList.adapter = simpleAdapter
         }
 
+    }
+
+    fun showContextMenu(view: View, listViewPosition: Int) {
+        val menuItems: Array<String> = if (!albumView) {
+            arrayOf(
+                view.context.getString(R.string.download),
+                view.context.getString(R.string.playNext),
+                view.context.getString(R.string.addToPlaylist)
+            )
+        } else {
+            arrayOf(
+                view.context.getString(R.string.downloadAlbum),
+                view.context.getString(R.string.playAlbumNext)
+            )
+        }
+
+        val alertDialogBuilder = AlertDialog.Builder(view.context)
+        alertDialogBuilder.setTitle("")
+        alertDialogBuilder.setItems(menuItems) { _, which ->
+            val listView = view.findViewById<ListView>(R.id.musiclistview)
+
+            val listItem = listView?.getItemAtPosition(listViewPosition) as HashMap<*, *>
+
+            view.context.let { context ->
+                val songDatabaseHelper =
+                    SongDatabaseHelper(context)
+                val song = songDatabaseHelper.getSong(context, listItem["id"] as String)
+
+                val item = menuItems[which]
+
+                if (song != null) {
+                    when (item) {
+                        context.getString(R.string.download) -> downloadSong(
+                            context,
+                            song
+                        )
+                        context.getString(R.string.playNext) -> playSongFromId(
+                            listItem["id"].toString(),
+                            false
+                        )
+                        context.getString(R.string.addToPlaylist) -> addSongToPlaylist(
+                            context,
+                            song
+                        )
+                    }
+                } else {
+                    when (item) {
+                        context.getString(R.string.downloadAlbum) -> downloadAlbum(
+                            context,
+                            listItem["mcID"].toString()
+                        )
+                        context.getString(R.string.playAlbumNext) -> playAlbumNext(
+                            context,
+                            listItem["mcID"].toString()
+                        )
+                    }
+                }
+            }
+        }
+
+        alertDialogBuilder.create().show()
     }
 
     /**
@@ -317,8 +407,6 @@ class HomeHandler {
 
                     if (top != null && lastScroll != null) {
                         listView.setSelectionFromTop(lastScroll.toInt(), top.toInt())
-                    } else {
-                        println("IT IS NULL")
                     }
 
                     swipeRefreshLayout.isRefreshing = false

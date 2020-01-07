@@ -64,58 +64,9 @@ class HomeFragment : Fragment() {
     ) {
         super.onCreateContextMenu(menu, v, menuInfo)
 
-        if (!HomeHandler.albumView) {
-            menu.add(0, v.id, 0, getString(R.string.download))
-            menu.add(0, v.id, 0, getString(R.string.playNext))
-            menu.add(0, v.id, 0, getString(R.string.addToPlaylist))
-        } else {
-            menu.add(0, v.id, 0, getString(R.string.downloadAlbum))
-            menu.add(0, v.id, 0, getString(R.string.playAlbumNext))
-        }
-    }
-
-    override fun onContextItemSelected(item: MenuItem): Boolean {
-        val adapterContextInfo = item.menuInfo as AdapterView.AdapterContextMenuInfo
+        val adapterContextInfo = menuInfo as AdapterView.AdapterContextMenuInfo
         val position = adapterContextInfo.position
 
-        val listItem = listView?.getItemAtPosition(position) as HashMap<*, *>
-
-        view?.let { view ->
-            val songDatabaseHelper =
-                SongDatabaseHelper(view.context)
-            val song = songDatabaseHelper.getSong(view.context, listItem["id"] as String)
-
-            context?.let {
-                if (song != null) {
-                    when (item.title) {
-                        getString(R.string.download) -> downloadSong(
-                            it,
-                            song
-                        )
-                        getString(R.string.playNext) -> playSongFromId(
-                            listItem["id"].toString(),
-                            false
-                        )
-                        getString(R.string.addToPlaylist) -> addSongToPlaylist(
-                            it,
-                            song
-                        )
-                    }
-                } else {
-                    when (item.title) {
-                        getString(R.string.downloadAlbum) -> downloadAlbum(
-                            it,
-                            listItem["mcID"].toString()
-                        )
-                        getString(R.string.playAlbumNext) -> playAlbumNext(
-                            it,
-                            listItem["mcID"].toString()
-                        )
-                    }
-                }
-            }
-        }
-
-        return super.onContextItemSelected(item)
+        homeHandler.showContextMenu(v, position)
     }
 }

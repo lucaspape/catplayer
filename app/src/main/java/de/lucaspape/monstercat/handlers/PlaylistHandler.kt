@@ -1,14 +1,17 @@
 package de.lucaspape.monstercat.handlers
 
+import android.app.AlertDialog
 import android.content.Context
 import android.os.AsyncTask
 import android.os.Handler
 import android.os.Looper
 import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ImageButton
 import android.widget.ListView
 import android.widget.SimpleAdapter
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.activities.monstercatPlayer
@@ -47,16 +50,124 @@ class PlaylistHandler {
             to = arrayOf(R.id.title, R.id.cover)
         }
 
-        simpleAdapter = SimpleAdapter(
+        simpleAdapter = object : SimpleAdapter(
             view.context,
             currentListViewData,
             R.layout.list_single,
             from,
             to.toIntArray()
-        )
+        ) {
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+                val v = super.getView(position, convertView, parent)
+
+                val button = v.findViewById<ImageButton>(R.id.titleMenuButton)
+
+                button.setOnClickListener {
+                    showContextMenu(view, position)
+                }
+
+                val listItem = v.findViewById<ConstraintLayout>(R.id.list_single_layout)
+
+                listItem.setOnClickListener {
+                    val itemValue = playlistList.getItemAtPosition(position) as HashMap<*, *>
+
+                    if (listViewDataIsPlaylistView) {
+                        currentPlaylistId = itemValue["playlistId"] as String
+                        loadPlaylistTracks(view, false, currentPlaylistId!!)
+                    } else {
+                        monstercatPlayer.clearContinuous()
+
+                        val songId = itemValue["id"] as String
+                        playSongFromId(view.context, songId, true, playlistList, position)
+                    }
+                }
+
+                return v
+            }
+        }
 
         playlistList.adapter = simpleAdapter
 
+    }
+
+    fun showContextMenu(view: View, listViewPosition: Int) {
+        val menuItems: Array<String> = arrayOf(
+            view.context.getString(R.string.download),
+            view.context.getString(R.string.playNext),
+            "Delete"
+        )
+
+        val alertDialogBuilder = AlertDialog.Builder(view.context)
+        alertDialogBuilder.setTitle("")
+        alertDialogBuilder.setItems(menuItems) { dialog, which ->
+            val playlistView = view.findViewById<ListView>(R.id.playlistView)
+
+            val listItem = playlistView.getItemAtPosition(listViewPosition) as HashMap<*, *>
+
+            view.context.let { context ->
+                val item = menuItems[which]
+
+                if (item == context.getString(R.string.download)) {
+                    if (listItem["type"] == "playlist") {
+                        downloadPlaylist(
+                            context,
+                            listItem["playlistId"] as String
+                        )
+                    } else {
+                        view.let { view ->
+                            val songDatabaseHelper =
+                                SongDatabaseHelper(view.context)
+                            val song =
+                                songDatabaseHelper.getSong(view.context, listItem["id"] as String)
+
+                            if (song != null) {
+                                downloadSong(context, song)
+                            }
+                        }
+                    }
+
+                } else if (item == context.getString(R.string.playNext)) {
+                    if (listItem["type"] == "playlist") {
+                        playPlaylistNext(context, listItem["playlistId"] as String)
+                    } else {
+                        playSongFromId(
+                            listItem["id"] as String,
+                            false
+                        )
+                    }
+
+                } else if (item == "Delete") {
+                    if (listItem["type"] == "playlist") {
+                        deletePlaylist(context, listItem["playlistId"] as String)
+                    } else {
+                        view.let { view ->
+                            val songDatabaseHelper =
+                                SongDatabaseHelper(view.context)
+                            val song =
+                                songDatabaseHelper.getSong(view.context, listItem["id"] as String)
+
+                            if (song != null) {
+                                currentPlaylistId?.let { playlistId ->
+                                    playlistView?.adapter?.count?.let { count ->
+                                        deletePlaylistSong(
+                                            context,
+                                            song,
+                                            playlistId,
+                                            listViewPosition + 1,
+                                            count
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else {
+
+                }
+            }
+        }
+
+        alertDialogBuilder.create().show()
     }
 
     private fun redrawListView(view: View) {
@@ -114,6 +225,11 @@ class PlaylistHandler {
             }
         }
 
+        playlistList.setOnItemLongClickListener { parent, view, position, id ->
+            showContextMenu(view, position)
+            true
+        }
+
         view.findViewById<ImageButton>(R.id.newPlaylistButton).setOnClickListener {
             createPlaylist(view.context)
         }
@@ -130,7 +246,7 @@ class PlaylistHandler {
 
         LoadPlaylistAsync(
             contextReference,
-            forceReload,{
+            forceReload, {
                 swipeRefreshLayout.isRefreshing = true
             }
         ) {

@@ -73,71 +73,9 @@ class PlaylistFragment : Fragment() {
     ) {
         super.onCreateContextMenu(menu, v, menuInfo)
 
-        menu.add(0, v.id, 0, getString(R.string.download))
-        menu.add(0, v.id, 0, getString(R.string.playNext))
-        menu.add(0, v.id, 0, "Delete")
-    }
-
-    override fun onContextItemSelected(item: MenuItem): Boolean {
-        val adapterContextInfo = item.menuInfo as AdapterView.AdapterContextMenuInfo
+        val adapterContextInfo = menuInfo as AdapterView.AdapterContextMenuInfo
         val position = adapterContextInfo.position
 
-        val listItem = playlistView?.getItemAtPosition(position) as HashMap<*, *>
-
-        context?.let {
-            if (item.title == getString(R.string.download)) {
-                if (listItem["type"] == "playlist") {
-                    downloadPlaylist(
-                        it,
-                        listItem["playlistId"] as String
-                    )
-                } else {
-                    view?.let { view ->
-                        val songDatabaseHelper =
-                            SongDatabaseHelper(view.context)
-                        val song =
-                            songDatabaseHelper.getSong(view.context, listItem["id"] as String)
-
-                        if (song != null) {
-                            downloadSong(it, song)
-                        }
-                    }
-                }
-
-            } else if (item.title == getString(R.string.playNext)) {
-                if (listItem["type"] == "playlist") {
-                    playPlaylistNext(it, listItem["playlistId"] as String)
-                } else {
-                    playSongFromId(
-                        listItem["id"] as String,
-                        false
-                    )
-                }
-
-            } else if (item.title == "Delete") {
-                if (listItem["type"] == "playlist") {
-                    deletePlaylist(it, listItem["playlistId"] as String)
-                } else {
-                    view?.let { view ->
-                        val songDatabaseHelper =
-                            SongDatabaseHelper(view.context)
-                        val song =
-                            songDatabaseHelper.getSong(view.context, listItem["id"] as String)
-
-                        if (song != null) {
-                            PlaylistHandler.currentPlaylistId?.let { playlistId ->
-                                playlistView?.adapter?.count?.let { count ->
-                                    deletePlaylistSong(it, song, playlistId, position + 1, count)
-                                }
-                            }
-                        }
-                    }
-                }
-            } else {
-
-            }
-        }
-
-        return super.onContextItemSelected(item)
+        playlistHandler.showContextMenu(v, position)
     }
 }
