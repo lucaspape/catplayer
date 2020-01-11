@@ -9,6 +9,7 @@ import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
 import com.squareup.picasso.Picasso
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.util.Settings
 
 open class CatalogItem(
     private var title: String?,
@@ -39,7 +40,9 @@ open class CatalogItem(
             titleTextView.text = item.title
             artistTextView.text = item.artist
 
-            Picasso.with(context).load(item.coverUrl + "?image_width=256").into(coverImageView)
+            val settings = Settings(context)
+
+            Picasso.with(context).load(item.coverUrl + "?image_width=" + settings.getSetting("secondaryResolution")).into(coverImageView)
             titleDownloadStatusImageView.setImageURI(item.titleDownloadStatus?.toUri())
         }
 

@@ -3,11 +3,11 @@ package de.lucaspape.monstercat.handlers.abstract_items
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.net.toUri
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
 import com.squareup.picasso.Picasso
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.util.Settings
 
 open class AlbumItem(private var title:String?, private var artist:String?, private var coverUrl:String?) : AbstractItem<AlbumItem.ViewHolder>(){
     override val type: Int = 100
@@ -31,7 +31,8 @@ open class AlbumItem(private var title:String?, private var artist:String?, priv
             titleTextView.text = item.title
             artistTextView.text = item.artist
 
-            Picasso.with(context).load(item.coverUrl + "?image_width=512").into(coverImageView)
+            val settings = Settings(context)
+            Picasso.with(context).load(item.coverUrl + "?image_width=" + settings.getSetting("primaryResolution")).into(coverImageView)
         }
 
         override fun unbindView(item: AlbumItem) {
