@@ -48,15 +48,10 @@ class SettingsActivity : AppCompatActivity() {
         val disableAudioFocusSwitch = findViewById<Switch>(R.id.audioFocusSwitch)
         val downloadStreamSwitch = findViewById<Switch>(R.id.streamDownloadSwitch)
 
-        val maxLoadSeekBar = findViewById<SeekBar>(R.id.maximumLoadSeekBar)
-        val shownMaxValue = findViewById<TextView>(R.id.shownMaxValue)
-
         val downloadFlacSwitch = findViewById<Switch>(R.id.downloadFlacSwitch)
 
         val coverResolutionSeekBar = findViewById<SeekBar>(R.id.coverResolutionSeekbar)
         val shownCoverResolution = findViewById<TextView>(R.id.shownCoverResolution)
-
-        maxLoadSeekBar.max = 200 / 50
 
         coverResolutionSeekBar.max = 2048 / 256
 
@@ -81,11 +76,6 @@ class SettingsActivity : AppCompatActivity() {
         if (settings.getSetting("downloadStream") != null) {
             downloadStreamSwitch.isChecked =
                 settings.getSetting("downloadStream")!!.toBoolean()
-        }
-
-        if (settings.getSetting("maximumLoad") != null) {
-            maxLoadSeekBar.progress = Integer.parseInt(settings.getSetting("maximumLoad")!!) / 50
-            shownMaxValue.text = settings.getSetting("maximumLoad")!!
         }
 
         if (settings.getSetting("primaryCoverResolution") != null) {
@@ -139,26 +129,6 @@ class SettingsActivity : AppCompatActivity() {
             }
 
         }
-
-        maximumLoadSeekBar.setOnSeekBarChangeListener(object :
-            SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(
-                seekBar: SeekBar,
-                progress: Int,
-                fromUser: Boolean
-            ) {
-                if (fromUser) {
-                    settings.saveSetting("maximumLoad", (progress * 50).toString())
-                    settings.getSetting("maximumLoad")?.let { shownMaxValue.text = it }
-                }
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar) {
-            }
-
-            override fun onStopTrackingTouch(seekBar: SeekBar) {
-            }
-        })
 
         coverResolutionSeekBar.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener{
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {

@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.RecyclerView
 import de.lucaspape.monstercat.background.BackgroundService
 import de.lucaspape.monstercat.background.BackgroundService.Companion.updateLiveInfoAsync
 import de.lucaspape.monstercat.R
@@ -94,9 +95,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        CatalogSongDatabaseHelper(this).reCreateTable()
-        AlbumDatabaseHelper(this).reCreateTable()
 
         //check for internet
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET)
@@ -189,40 +187,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        //TODO this is slow and not great
-
-        val listView = findViewById<ListView>(R.id.musiclistview)
-
-        val settings = Settings(this)
-
-        if (listView != null) {
-            val topChild = listView.getChildAt(0)?.top
-            val paddingTop = listView.paddingTop
-            val firstVisiblePosition = listView.firstVisiblePosition
-
-            if (topChild != null) {
-                if (HomeHandler.albumView) {
-                    settings.saveSetting(
-                        "currentListAlbumViewLastScrollIndex",
-                        firstVisiblePosition.toString()
-                    )
-                    settings.saveSetting(
-                        "currentListAlbumViewTop",
-                        (topChild - paddingTop).toString()
-                    )
-                } else {
-                    settings.saveSetting(
-                        "currentListViewLastScrollIndex",
-                        firstVisiblePosition.toString()
-                    )
-                    settings.saveSetting(
-                        "currentListViewTop",
-                        (topChild - paddingTop).toString()
-                    )
-                }
-            }
-        }
-
         //if app closed
         hideDownloadNotification(this)
 

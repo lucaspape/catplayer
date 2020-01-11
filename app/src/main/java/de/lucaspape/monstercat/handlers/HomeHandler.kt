@@ -377,35 +377,19 @@ class HomeHandler {
     }
 
     fun initSongListLoad(view: View) {
+        CatalogSongDatabaseHelper(view.context).reCreateTable()
+
+        val swipeRefreshLayout =
+            view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
+
         currentListViewData = ArrayList()
 
         val catalogSongDatabaseHelper =
             CatalogSongDatabaseHelper(view.context)
 
-        var songIdList = catalogSongDatabaseHelper.getAllSongs()
+        LoadSongListAsync(WeakReference(view.context), true, 0, {}, {
+            val songIdList = catalogSongDatabaseHelper.getAllSongs()
 
-        if (songIdList.isEmpty()) {
-            LoadSongListAsync(WeakReference(view.context), true, 0, {}, {
-                songIdList = catalogSongDatabaseHelper.getAllSongs()
-
-                val songDatabaseHelper =
-                    SongDatabaseHelper(view.context)
-                val songList = ArrayList<Song>()
-
-                for (song in songIdList) {
-                    songList.add(songDatabaseHelper.getSong(view.context, song.songId))
-                }
-
-                for (song in songList) {
-                    val hashMap = parseSongToHashMap(view.context, song)
-                    currentListViewData.add(hashMap)
-                }
-
-                updateRecyclerView(view)
-
-                addDownloadCoverArray(currentListViewData)
-            }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-        } else {
             val songDatabaseHelper =
                 SongDatabaseHelper(view.context)
             val songList = ArrayList<Song>()
@@ -422,7 +406,9 @@ class HomeHandler {
             updateRecyclerView(view)
 
             addDownloadCoverArray(currentListViewData)
-        }
+
+            swipeRefreshLayout.isRefreshing = false
+        }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 
     fun loadSongList(view: View, itemAdapter: ItemAdapter<CatalogItem>) {
@@ -502,6 +488,7 @@ class HomeHandler {
     }
 
     fun initAlbumListLoad(view: View) {
+        AlbumDatabaseHelper(view.context).reCreateTable()
         val contextReference = WeakReference<Context>(view.context)
 
         val swipeRefreshLayout =
@@ -535,6 +522,8 @@ class HomeHandler {
                 swipeRefreshLayout.isRefreshing = false
 
                 albumContentsDisplayed = false
+
+                swipeRefreshLayout.isRefreshing = false
             }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
