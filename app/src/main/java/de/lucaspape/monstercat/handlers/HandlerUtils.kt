@@ -42,15 +42,15 @@ internal fun playSongFromId(
     context: Context,
     songId: String,
     playNow: Boolean,
-    musicList: ListView,
+    listViewData: ArrayList<HashMap<String, Any?>>,
     position: Int
 ) {
     playSongFromId(songId, playNow)
 
     val continuousList = ArrayList<String>()
 
-    for (i in (position + 1 until musicList.adapter.count)) {
-        val nextItemValue = musicList.getItemAtPosition(i) as HashMap<*, *>
+    for (i in (position + 1 until listViewData.size)) {
+        val nextItemValue = listViewData[i] as HashMap<*, *>
         continuousList.add(nextItemValue["id"] as String)
     }
 

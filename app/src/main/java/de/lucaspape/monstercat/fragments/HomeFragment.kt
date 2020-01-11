@@ -38,7 +38,7 @@ class HomeFragment : Fragment() {
         homeHandler.setupSpinner(view)
         homeHandler.registerListeners(view)
 
-        listView = view.findViewById(R.id.musiclistview)
+     //   listView = view.findViewById(R.id.musiclistview)
 
         fragmentBackPressedCallback = {
             if (HomeHandler.albumViewSelected) {

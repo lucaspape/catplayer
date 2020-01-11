@@ -67,7 +67,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
-        <ListView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/musiclistview"
             android:layout_width="0dp"
             android:layout_height="0dp"

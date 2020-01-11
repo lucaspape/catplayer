@@ -4,12 +4,14 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.AsyncTask
-import android.os.Handler
-import android.os.Looper
 import android.view.View
-import android.view.ViewGroup
 import android.widget.*
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.mikepenz.fastadapter.FastAdapter
+import com.mikepenz.fastadapter.adapters.ItemAdapter
+import com.mikepenz.fastadapter.listeners.ClickEventHook
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.activities.SettingsActivity
 import de.lucaspape.monstercat.activities.monstercatPlayer
@@ -19,8 +21,8 @@ import de.lucaspape.monstercat.database.helper.AlbumItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.CatalogSongDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadCoverArray
-import de.lucaspape.monstercat.handlers.adapter.AlbumViewAdapter
-import de.lucaspape.monstercat.handlers.adapter.CatalogViewAdapter
+import de.lucaspape.monstercat.handlers.abstract_items.AlbumItem
+import de.lucaspape.monstercat.handlers.abstract_items.CatalogItem
 import de.lucaspape.monstercat.handlers.async.*
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.util.Settings
@@ -46,36 +48,115 @@ class HomeHandler {
         var albumView = false
     }
 
-    var currentListViewData = ArrayList<HashMap<String, Any?>>()
-    private var adapter: SimpleAdapter? = null
+    private var currentListViewData = ArrayList<HashMap<String, Any?>>()
 
     //if contents of an album currently displayed
     private var albumContentsDisplayed = false
 
     private var currentAlbumId = ""
 
-    private fun redrawListView(view: View) {
-        val musicList = view.findViewById<ListView>(R.id.musiclistview)
-        adapter?.notifyDataSetChanged()
-        musicList.invalidateViews()
-        musicList.refreshDrawableState()
-    }
 
     /**
      * Updates content of listView
      */
     private fun updateListView(view: View) {
-        val musicList = view.findViewById<ListView>(R.id.musiclistview)
+        val musicList = view.findViewById<RecyclerView>(R.id.musiclistview)
+
+        musicList.layoutManager =
+            LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
 
         if (albumView) {
-            adapter = AlbumViewAdapter(view.context, currentListViewData)
-        } else {
-            adapter = CatalogViewAdapter(view.context, currentListViewData) { position ->
-                showContextMenu(view, position)
-            }
-        }
+            val itemAdapter = ItemAdapter<AlbumItem>()
+            val fastAdapter = FastAdapter.with(itemAdapter)
 
-        musicList.adapter = adapter
+            for (hashMap in currentListViewData) {
+                val title = hashMap["title"] as String
+                val artist = hashMap["artist"] as String
+                val cover = hashMap["primaryImage"] as String
+
+                itemAdapter.add(
+                    AlbumItem(
+                        title,
+                        artist,
+                        cover
+                    )
+                )
+            }
+
+            musicList.adapter = fastAdapter
+
+            fastAdapter.onClickListener = { _, _, _, position ->
+                val itemValue = currentListViewData[position] as HashMap<*, *>
+                loadAlbum(view, itemValue, false)
+
+                false
+            }
+
+            fastAdapter.onLongClickListener = { _, _, _, position ->
+                showContextMenu(view, position)
+
+                false
+            }
+        } else {
+            val itemAdapter = ItemAdapter<CatalogItem>()
+            val fastAdapter = FastAdapter.with(itemAdapter)
+
+            for (hashMap in currentListViewData) {
+                val title = hashMap["title"] as String
+                val artist = hashMap["artist"] as String
+                val cover = hashMap["secondaryImage"] as String
+                val titleDownloadStatus = hashMap["downloadedCheck"] as String
+
+                itemAdapter.add(
+                    CatalogItem(
+                        title,
+                        artist,
+                        cover,
+                        titleDownloadStatus
+                    )
+                )
+            }
+
+            musicList.adapter = fastAdapter
+
+            fastAdapter.onClickListener = { _, _, _, position ->
+                monstercatPlayer.clearContinuous()
+
+                val itemValue = currentListViewData[position] as HashMap<*, *>
+                playSongFromId(
+                    view.context,
+                    itemValue["id"] as String,
+                    true,
+                    currentListViewData,
+                    position
+                )
+
+                false
+            }
+
+            fastAdapter.onLongClickListener = { _, _, _, position ->
+                showContextMenu(view, position)
+
+                false
+            }
+
+            fastAdapter.addEventHook(object : ClickEventHook<CatalogItem>() {
+                override fun onBind(viewHolder: RecyclerView.ViewHolder): View? {
+                    return if (viewHolder is CatalogItem.ViewHolder) {
+                        viewHolder.titleMenuButton
+                    } else null
+                }
+
+                override fun onClick(
+                    v: View,
+                    position: Int,
+                    fastAdapter: FastAdapter<CatalogItem>,
+                    item: CatalogItem
+                ) {
+                    showContextMenu(view, position)
+                }
+            })
+        }
     }
 
     private fun showContextMenu(view: View, listViewPosition: Int) {
@@ -95,9 +176,7 @@ class HomeHandler {
         val alertDialogBuilder = AlertDialog.Builder(view.context)
         alertDialogBuilder.setTitle("")
         alertDialogBuilder.setItems(menuItems) { _, which ->
-            val listView = view.findViewById<ListView>(R.id.musiclistview)
-
-            val listItem = listView?.getItemAtPosition(listViewPosition) as HashMap<*, *>
+            val listItem = currentListViewData[listViewPosition] as HashMap<*, *>
 
             view.context.let { context ->
                 val songDatabaseHelper =
@@ -144,16 +223,6 @@ class HomeHandler {
      */
     fun setupListView(view: View) {
         updateListView(view)
-        redrawListView(view)
-
-        //setup auto reload
-        Thread(Runnable {
-            while (true) {
-                Handler(Looper.getMainLooper()).post { redrawListView(view) }
-                Thread.sleep(200)
-            }
-
-        }).start()
     }
 
     /**
@@ -194,33 +263,6 @@ class HomeHandler {
                 loadSongList(view, true)
             }
         }
-
-        //click on list
-        val musicList = view.findViewById<ListView>(R.id.musiclistview)
-        musicList.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
-            if (albumView) {
-                val itemValue = musicList.getItemAtPosition(position) as HashMap<*, *>
-                loadAlbum(view, itemValue, false)
-            } else {
-                monstercatPlayer.clearContinuous()
-
-                val itemValue = musicList.getItemAtPosition(position) as HashMap<*, *>
-                playSongFromId(
-                    view.context,
-                    itemValue["id"] as String,
-                    true,
-                    musicList,
-                    position
-                )
-            }
-        }
-
-        musicList.setOnItemLongClickListener { _, _, position, _ ->
-            showContextMenu(view, position)
-            true
-        }
-
-        //spinner (select catalog or albumview)
 
         val viewSelector = view.findViewById<Spinner>(R.id.viewSelector)
 
@@ -360,19 +402,9 @@ class HomeHandler {
 
                 }, {
                     updateListView(view)
-                    redrawListView(view)
 
                     //download cover art
                     addDownloadCoverArray(currentListViewData)
-
-                    val listView = view.findViewById<ListView>(R.id.musiclistview)
-                    val settings = Settings(view.context)
-                    val lastScroll = settings.getSetting("currentListViewLastScrollIndex")
-                    val top = settings.getSetting("currentListViewTop")
-
-                    if (top != null && lastScroll != null) {
-                        listView.setSelectionFromTop(lastScroll.toInt(), top.toInt())
-                    }
 
                     swipeRefreshLayout.isRefreshing = false
 
@@ -415,19 +447,9 @@ class HomeHandler {
                     currentListViewData = sortedList
                 }, {
                     updateListView(view)
-                    redrawListView(view)
 
                     //download cover art
                     addDownloadCoverArray(currentListViewData)
-
-                    val listView = view.findViewById<ListView>(R.id.musiclistview)
-                    val settings = Settings(view.context)
-                    val lastScroll = settings.getSetting("currentListAlbumViewLastScrollIndex")
-                    val top = settings.getSetting("currentListAlbumViewTop")
-
-                    if (top != null && lastScroll != null) {
-                        listView.setSelectionFromTop(lastScroll.toInt(), top.toInt())
-                    }
 
                     swipeRefreshLayout.isRefreshing = false
 
@@ -442,18 +464,6 @@ class HomeHandler {
      * Load single album
      */
     private fun loadAlbum(view: View, itemValue: HashMap<*, *>, forceReload: Boolean) {
-        val listView = view.findViewById<ListView>(R.id.musiclistview)
-
-        val settings = Settings(view.context)
-        settings.saveSetting(
-            "currentListAlbumViewLastScrollIndex",
-            listView.firstVisiblePosition.toString()
-        )
-        settings.saveSetting(
-            "currentListAlbumViewTop",
-            (listView.getChildAt(0).top - listView.paddingTop).toString()
-        )
-
         val contextReference = WeakReference<Context>(view.context)
 
         val swipeRefreshLayout =
@@ -494,7 +504,6 @@ class HomeHandler {
                 albumView = false
 
                 updateListView(view)
-                redrawListView(view)
 
                 //download cover art
                 addDownloadCoverArray(currentListViewData)
@@ -524,7 +533,6 @@ class HomeHandler {
             searchString
         ) {
             updateListView(view)
-            redrawListView(view)
 
             //download cover art
             addDownloadCoverArray(searchResults)
