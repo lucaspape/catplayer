@@ -38,7 +38,7 @@ class UpdateLiveInfoAsync(
                 stream.title,
                 stream.version,
                 stream.artist,
-                context.filesDir.toString() + "/live.png"
+                stream.albumCoverUpdateUrl
             )
 
             val volleyQueue = Volley.newRequestQueue(context)
