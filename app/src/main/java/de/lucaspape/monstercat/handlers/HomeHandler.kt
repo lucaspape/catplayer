@@ -19,6 +19,8 @@ import de.lucaspape.monstercat.database.helper.AlbumItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.CatalogSongDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadCoverArray
+import de.lucaspape.monstercat.handlers.adapter.AlbumViewAdapter
+import de.lucaspape.monstercat.handlers.adapter.CatalogViewAdapter
 import de.lucaspape.monstercat.handlers.async.*
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.util.Settings
@@ -45,7 +47,7 @@ class HomeHandler {
     }
 
     var currentListViewData = ArrayList<HashMap<String, Any?>>()
-    private var simpleAdapter: SimpleAdapter? = null
+    private var adapter: SimpleAdapter? = null
 
     //if contents of an album currently displayed
     private var albumContentsDisplayed = false
@@ -54,7 +56,7 @@ class HomeHandler {
 
     private fun redrawListView(view: View) {
         val musicList = view.findViewById<ListView>(R.id.musiclistview)
-        simpleAdapter?.notifyDataSetChanged()
+        adapter?.notifyDataSetChanged()
         musicList.invalidateViews()
         musicList.refreshDrawableState()
     }
@@ -66,43 +68,17 @@ class HomeHandler {
         val musicList = view.findViewById<ListView>(R.id.musiclistview)
 
         if (albumView) {
-            val from = arrayOf("title", "artist", "primaryImage")
-            val to = arrayOf(R.id.albumTitle, R.id.albumArtist, R.id.cover)
-            simpleAdapter = SimpleAdapter(
-                view.context,
-                currentListViewData,
-                R.layout.list_album_view,
-                from,
-                to.toIntArray()
-            )
-            musicList.adapter = simpleAdapter
+            adapter = AlbumViewAdapter(view.context, currentListViewData)
         } else {
-            val from = arrayOf("shownTitle", "artist", "secondaryImage", "downloadedCheck")
-            val to = arrayOf(R.id.title, R.id.artist, R.id.cover, R.id.titleDownloadStatus)
-            simpleAdapter = object : SimpleAdapter(
-                view.context,
-                currentListViewData,
-                R.layout.list_single,
-                from,
-                to.toIntArray()
-            ) {
-                override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-                    val v = super.getView(position, convertView, parent)
-
-                    val button = v.findViewById<ImageButton>(R.id.titleMenuButton)
-
-                    button.setOnClickListener {
-                        showContextMenu(view, position)
-                    }
-
-                    return v
-                }
+            adapter = CatalogViewAdapter(view.context, currentListViewData) { position ->
+                showContextMenu(view, position)
             }
-            musicList.adapter = simpleAdapter
         }
+
+        musicList.adapter = adapter
     }
 
-    fun showContextMenu(view: View, listViewPosition: Int) {
+    private fun showContextMenu(view: View, listViewPosition: Int) {
         val menuItems: Array<String> = if (!albumView) {
             arrayOf(
                 view.context.getString(R.string.download),

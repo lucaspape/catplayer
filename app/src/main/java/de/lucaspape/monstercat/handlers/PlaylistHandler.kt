@@ -18,6 +18,8 @@ import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadCoverArray
+import de.lucaspape.monstercat.handlers.adapter.CatalogViewAdapter
+import de.lucaspape.monstercat.handlers.adapter.PlaylistViewAdapter
 import de.lucaspape.monstercat.handlers.async.BackgroundAsync
 import de.lucaspape.monstercat.handlers.async.LoadPlaylistAsync
 import de.lucaspape.monstercat.handlers.async.LoadPlaylistTracksAsync
@@ -33,7 +35,7 @@ class PlaylistHandler {
 
     private var currentListViewData = ArrayList<HashMap<String, Any?>>()
     private var listViewDataIsPlaylistView = true
-    private var simpleAdapter: SimpleAdapter? = null
+    private var adapter: SimpleAdapter? = null
 
     /**
      * Updates listView content
@@ -41,36 +43,17 @@ class PlaylistHandler {
     private fun updateListView(view: View) {
         val playlistList = view.findViewById<ListView>(R.id.playlistView)
 
-        var from = arrayOf("shownTitle", "artist", "secondaryImage", "downloadedCheck")
-        var to = arrayOf(R.id.title, R.id.artist, R.id.cover, R.id.titleDownloadStatus)
-
         if (listViewDataIsPlaylistView) {
-            from = arrayOf("playlistName", "coverUrl")
-            to = arrayOf(R.id.title, R.id.cover)
-        }
-
-        simpleAdapter = object : SimpleAdapter(
-            view.context,
-            currentListViewData,
-            R.layout.list_single,
-            from,
-            to.toIntArray()
-        ) {
-            override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-                val v = super.getView(position, convertView, parent)
-
-                val button = v.findViewById<ImageButton>(R.id.titleMenuButton)
-
-                button.setOnClickListener {
-                    showContextMenu(view, position)
-                }
-
-                return v
+            adapter = PlaylistViewAdapter(view.context, currentListViewData) { position ->
+                showContextMenu(view, position)
+            }
+        }else{
+            adapter = CatalogViewAdapter(view.context, currentListViewData) { position ->
+                showContextMenu(view, position)
             }
         }
 
-        playlistList.adapter = simpleAdapter
-
+        playlistList.adapter = adapter
     }
 
     /**
@@ -156,7 +139,7 @@ class PlaylistHandler {
 
     private fun redrawListView(view: View) {
         val playlistList = view.findViewById<ListView>(R.id.playlistView)
-        simpleAdapter!!.notifyDataSetChanged()
+        adapter!!.notifyDataSetChanged()
         playlistList.invalidateViews()
         playlistList.refreshDrawableState()
     }
