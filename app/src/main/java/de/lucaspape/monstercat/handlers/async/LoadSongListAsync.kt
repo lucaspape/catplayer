@@ -5,11 +5,14 @@ import android.os.AsyncTask
 import com.android.volley.Response
 import com.android.volley.Request
 import com.android.volley.toolbox.Volley
+import com.google.gson.JsonObject
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.CatalogSongDatabaseHelper
 import de.lucaspape.monstercat.request.AuthorizedRequest
 import de.lucaspape.monstercat.util.parseCatalogSongToDB
 import de.lucaspape.monstercat.util.sid
+import org.json.JSONArray
+import org.json.JSONException
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
@@ -44,15 +47,10 @@ class LoadSongListAsync(
     }
 
     override fun doInBackground(vararg param: Void?): String? {
+        val syncObject = Object()
+
         contextReference.get()?.let { context ->
-            val catalogSongDatabaseHelper =
-                CatalogSongDatabaseHelper(context)
-
             val requestQueue = Volley.newRequestQueue(context)
-
-            val sortedList = arrayOfNulls<JSONObject>(50)
-
-            val syncObject = Object()
 
             requestQueue.addRequestFinishedListener<Any> {
                 synchronized(syncObject) {
@@ -69,34 +67,32 @@ class LoadSongListAsync(
                     val json = JSONObject(response)
                     val jsonArray = json.getJSONArray("results")
 
+                    val sortedJsonArray = ArrayList<JSONObject>()
+
+                    for(i in (0 until jsonArray.length())){
+                        try {
+                            sortedJsonArray.add(jsonArray.getJSONObject(jsonArray.length() - i))
+                        }catch (e:JSONException){
+
+                        }
+                    }
+
                     //parse every single song into list
-                    for (k in (0 until jsonArray.length())) {
-                        sortedList[k] = jsonArray.getJSONObject(k)
+                    for (jsonObject in sortedJsonArray) {
+                        parseCatalogSongToDB(
+                            jsonObject,
+                            context
+                        )
                     }
 
                 }, Response.ErrorListener { }
             )
 
             requestQueue.add(listRequest)
+        }
 
-            synchronized(syncObject) {
-                syncObject.wait()
-            }
-
-
-            sortedList.reverse()
-
-           // catalogSongDatabaseHelper.reCreateTable()
-
-            for (jsonObject in sortedList) {
-                if (jsonObject != null) {
-
-                    parseCatalogSongToDB(
-                        jsonObject,
-                        context
-                    )
-                }
-            }
+        synchronized(syncObject) {
+            syncObject.wait()
         }
 
         return null

@@ -10,6 +10,7 @@ import de.lucaspape.monstercat.database.helper.AlbumDatabaseHelper
 import de.lucaspape.monstercat.request.AuthorizedRequest
 import de.lucaspape.monstercat.util.parseAlbumToDB
 import de.lucaspape.monstercat.util.sid
+import org.json.JSONException
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
@@ -19,9 +20,9 @@ import java.lang.ref.WeakReference
 class LoadAlbumListAsync(
     private val contextReference: WeakReference<Context>,
     private val forceReload: Boolean,
-    private val loadMax: Int,
+    private val skip: Int,
     private val displayLoading: () -> Unit,
-    private val requestFinished : () -> Unit
+    private val requestFinished: () -> Unit
 ) : AsyncTask<Void, Void, String>() {
 
     override fun onPostExecute(result: String?) {
@@ -37,69 +38,55 @@ class LoadAlbumListAsync(
             if (!forceReload && albumList.isNotEmpty()) {
                 requestFinished()
                 cancel(true)
-            }else{
+            } else {
                 displayLoading()
             }
         }
     }
 
     override fun doInBackground(vararg param: Void?): String? {
+        val syncObject = Object()
+
         contextReference.get()?.let { context ->
             val requestQueue = Volley.newRequestQueue(context)
 
-            val tempList = arrayOfNulls<JSONObject>(loadMax)
-
-            val albumDatabaseHelper =
-                AlbumDatabaseHelper(context)
-            val albumList = albumDatabaseHelper.getAllAlbums()
-
-            if (!forceReload && albumList.isNotEmpty()) {
-                return null
-            } else {
-                val syncObject = Object()
-
-                requestQueue.addRequestFinishedListener<Any> {
-
-                    synchronized(syncObject) {
-                        syncObject.notify()
-                    }
-                }
-
-                for (i in (0 until loadMax / 50)) {
-                    val requestUrl =
-                        context.getString(R.string.loadAlbumsUrl) + "?limit=50&skip=" + i * 50
-                    val albumsRequest = AuthorizedRequest(
-                        Request.Method.GET, requestUrl, sid,
-                        Response.Listener { response ->
-                            val json = JSONObject(response)
-                            val jsonArray = json.getJSONArray("results")
-
-                            for (k in (0 until jsonArray.length())) {
-                                val jsonObject = jsonArray.getJSONObject(k)
-
-                                tempList[i * 50 + k] = jsonObject
-                            }
-                        },
-                        Response.ErrorListener { }
-                    )
-
-                    requestQueue.add(albumsRequest)
-
-                    synchronized(syncObject) {
-                        syncObject.wait()
-                    }
-                }
-
-                tempList.reverse()
-
-                albumDatabaseHelper.reCreateTable()
-
-                for (jsonObject in tempList) {
-                    if (jsonObject != null) {
-                        parseAlbumToDB(jsonObject, context)
-                    }
+            requestQueue.addRequestFinishedListener<Any?> {
+                synchronized(syncObject){
+                    syncObject.notify()
                 }
             }
+
+            val requestUrl =
+                context.getString(R.string.loadAlbumsUrl) + "?limit=50&skip=" + skip.toString()
+            val albumsRequest = AuthorizedRequest(
+                Request.Method.GET, requestUrl, sid,
+                Response.Listener { response ->
+                    val json = JSONObject(response)
+                    val jsonArray = json.getJSONArray("results")
+
+                    val sortedJsonArray = ArrayList<JSONObject>()
+
+                    for(i in(0..jsonArray.length())){
+                        try {
+                            sortedJsonArray.add(jsonArray.getJSONObject(jsonArray.length() - i))
+                        }catch (e:JSONException){
+
+                        }
+                    }
+
+                    for (jsonObject in sortedJsonArray) {
+                        parseAlbumToDB(jsonObject, context)
+                    }
+                },
+                Response.ErrorListener { }
+            )
+
+            requestQueue.add(albumsRequest)
+
+        }
+
+        synchronized(syncObject){
+            syncObject.wait()
         }
 
         return null

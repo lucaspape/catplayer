@@ -105,7 +105,7 @@ class HomeHandler {
                     footerAdapter.clear()
                     footerAdapter.add(ProgressItem())
 
-                    println("LOADING")
+                    loadAlbumList(view, itemAdapter)
                 }
             })
         } else {
@@ -272,10 +272,10 @@ class HomeHandler {
                     itemValue["id"] = currentAlbumId
                     loadAlbum(view, itemValue, true)
                 } else {
-                    loadAlbumList(view, true)
+                    initAlbumListLoad(view)
                 }
             } else {
-                intitialSongListLoad(view)
+                initSongListLoad(view)
             }
         }
 
@@ -322,9 +322,9 @@ class HomeHandler {
                 }
 
                 if (albumView) {
-                    loadAlbumList(view, false)
+                    initAlbumListLoad(view)
                 } else {
-                    intitialSongListLoad(view)
+                    initSongListLoad(view)
                 }
             }
         }
@@ -349,9 +349,9 @@ class HomeHandler {
 
         search.setOnCloseListener {
             if (albumView) {
-                loadAlbumList(view, false)
+                initAlbumListLoad(view)
             } else {
-                intitialSongListLoad(view)
+                initSongListLoad(view)
             }
 
             false
@@ -376,7 +376,7 @@ class HomeHandler {
         })
     }
 
-    fun intitialSongListLoad(view:View){
+    fun initSongListLoad(view: View) {
         currentListViewData = ArrayList()
 
         val catalogSongDatabaseHelper =
@@ -384,7 +384,7 @@ class HomeHandler {
 
         var songIdList = catalogSongDatabaseHelper.getAllSongs()
 
-        if(songIdList.isEmpty()){
+        if (songIdList.isEmpty()) {
             LoadSongListAsync(WeakReference(view.context), true, 0, {}, {
                 songIdList = catalogSongDatabaseHelper.getAllSongs()
 
@@ -405,7 +405,7 @@ class HomeHandler {
 
                 addDownloadCoverArray(currentListViewData)
             }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-        }else{
+        } else {
             val songDatabaseHelper =
                 SongDatabaseHelper(view.context)
             val songList = ArrayList<Song>()
@@ -435,7 +435,7 @@ class HomeHandler {
             val allSongs = catalogSongDatabaseHelper.getAllSongs()
             val songIdList = ArrayList<CatalogSong>()
 
-            for(i in (0 until allSongs.size-loaded)){
+            for (i in (0 until allSongs.size - loaded)) {
                 songIdList.add(allSongs[i])
             }
 
@@ -463,48 +463,81 @@ class HomeHandler {
         }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 
-    /**
-     * Load album list ("album view")
-     */
-    fun loadAlbumList(view: View, forceReload: Boolean) {
-        Settings(view.context).getSetting("maximumLoad")?.let {
-            val contextReference = WeakReference<Context>(view.context)
+    fun loadAlbumList(view: View, itemAdapter: ItemAdapter<AlbumItem>) {
+        val loaded = AlbumDatabaseHelper(view.context).getAllAlbums().size
 
-            val swipeRefreshLayout =
-                view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
+        LoadAlbumListAsync(WeakReference(view.context),
+            true, loaded, {}, {
+                val albumDatabaseHelper =
+                    AlbumDatabaseHelper(view.context)
+                val albumList = albumDatabaseHelper.getAllAlbums()
 
-            LoadAlbumListAsync(
-                contextReference,
-                forceReload,
-                Integer.parseInt(it), {
-                    swipeRefreshLayout.isRefreshing = true
+                val sortedList = ArrayList<HashMap<String, Any?>>()
+
+                for (album in albumList) {
+                    val hashMap = parseAlbumToHashMap(view.context, album)
+
+                    sortedList.add(hashMap)
+
+                    val title = hashMap["title"] as String
+                    val artist = hashMap["artist"] as String
+                    val cover = hashMap["primaryImage"] as String
+
+                    itemAdapter.add(
+                        AlbumItem(
+                            title,
+                            artist,
+                            cover
+                        )
+                    )
+
+                    currentListViewData.add(hashMap)
                 }
-            ) {
-                BackgroundAsync({
-                    val albumDatabaseHelper =
-                        AlbumDatabaseHelper(view.context)
-                    val albumList = albumDatabaseHelper.getAllAlbums()
 
-                    val sortedList = ArrayList<HashMap<String, Any?>>()
+                //download cover art
+                addDownloadCoverArray(currentListViewData)
 
-                    for (album in albumList) {
-                        sortedList.add(parseAlbumToHashMap(view.context, album))
-                    }
+                albumContentsDisplayed = false
+            }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    }
 
-                    currentListViewData = sortedList
-                }, {
-                    updateRecyclerView(view)
+    fun initAlbumListLoad(view: View) {
+        val contextReference = WeakReference<Context>(view.context)
 
-                    //download cover art
-                    addDownloadCoverArray(currentListViewData)
+        val swipeRefreshLayout =
+            view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
 
-                    swipeRefreshLayout.isRefreshing = false
+        LoadAlbumListAsync(
+            contextReference,
+            true,
+            0, {
+                swipeRefreshLayout.isRefreshing = true
+            }
+        ) {
+            BackgroundAsync({
+                val albumDatabaseHelper =
+                    AlbumDatabaseHelper(view.context)
+                val albumList = albumDatabaseHelper.getAllAlbums()
 
-                    albumContentsDisplayed = false
-                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                val sortedList = ArrayList<HashMap<String, Any?>>()
 
-            }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-        }
+                for (album in albumList) {
+                    sortedList.add(parseAlbumToHashMap(view.context, album))
+                }
+
+                currentListViewData = sortedList
+            }, {
+                updateRecyclerView(view)
+
+                //download cover art
+                addDownloadCoverArray(currentListViewData)
+
+                swipeRefreshLayout.isRefreshing = false
+
+                albumContentsDisplayed = false
+            }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 
     /**
