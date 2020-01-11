@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.adapters.ItemAdapter
+import com.mikepenz.fastadapter.listeners.ClickEventHook
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.activities.monstercatPlayer
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
@@ -72,6 +73,23 @@ class PlaylistHandler {
                 false
             }
 
+            fastAdapter.addEventHook(object : ClickEventHook<PlaylistItem>() {
+                override fun onBind(viewHolder: RecyclerView.ViewHolder): View? {
+                    return if (viewHolder is PlaylistItem.ViewHolder) {
+                        viewHolder.titleMenuButton
+                    } else null
+                }
+
+                override fun onClick(
+                    v: View,
+                    position: Int,
+                    fastAdapter: FastAdapter<PlaylistItem>,
+                    item: PlaylistItem
+                ) {
+                    showContextMenu(view, position)
+                }
+            })
+
         }else{
             val itemAdapter = ItemAdapter<CatalogItem>()
             val fastAdapter = FastAdapter.with(itemAdapter)
@@ -105,6 +123,23 @@ class PlaylistHandler {
                 showContextMenu(view, position)
                 false
             }
+
+            fastAdapter.addEventHook(object : ClickEventHook<CatalogItem>() {
+                override fun onBind(viewHolder: RecyclerView.ViewHolder): View? {
+                    return if (viewHolder is CatalogItem.ViewHolder) {
+                        viewHolder.titleMenuButton
+                    } else null
+                }
+
+                override fun onClick(
+                    v: View,
+                    position: Int,
+                    fastAdapter: FastAdapter<CatalogItem>,
+                    item: CatalogItem
+                ) {
+                    showContextMenu(view, position)
+                }
+            })
         }
     }
 
