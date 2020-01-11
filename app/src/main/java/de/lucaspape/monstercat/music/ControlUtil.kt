@@ -68,7 +68,7 @@ internal fun play() {
                             try {
                                 val nextSong = getSong(MonstercatPlayer.currentSong + 1)
 
-                                if(nextSong != null){
+                                if (nextSong != null) {
                                     if (!File(nextSong.downloadLocation).exists() && !File(nextSong.streamDownloadLocation).exists()) {
                                         addDownloadSong(
                                             nextSong.streamLocation,
@@ -112,8 +112,6 @@ internal fun play() {
 private fun playSong(context: Context, song: Song) {
     val settings = Settings(context)
 
-    val primaryResolution = settings.getSetting("primaryCoverResolution")
-
     MonstercatPlayer.mediaPlayer?.release()
     MonstercatPlayer.mediaPlayer?.stop()
 
@@ -125,16 +123,17 @@ private fun playSong(context: Context, song: Song) {
     exoPlayer.addListener(object : Player.EventListener {
         @Override
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-            setCover(song, context)
+            setCover(song, context) {
+                updateNotification(
+                    song.title,
+                    song.version,
+                    song.artist,
+                    it
+                )
+            }
+
             setPlayButtonImage(context)
             startSeekBarUpdate()
-
-            updateNotification(
-                song.title,
-                song.version,
-                song.artist,
-                MonstercatPlayer.contextReference?.get()!!.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution
-            )
         }
     })
 
@@ -161,9 +160,10 @@ private fun playSong(context: Context, song: Song) {
                 //UI stuff
                 setTitle(song.title, song.version, song.artist)
                 startTextAnimation()
-                setCover(song, context)
-                setPlayButtonImage(context)
-                startSeekBarUpdate()
+                setCover(song, context) {
+                    setPlayButtonImage(context)
+                    startSeekBarUpdate()
+                }
             } else {
                 //TODO msg
                 displayInfo(context, "You cannot play this song")
@@ -194,12 +194,19 @@ fun playStream(stream: Stream) {
             override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
                 setPlayButtonImage(context)
 
-                updateNotification(
+                setCover(
                     UpdateLiveInfoAsync.previousTitle,
-                    "",
+                    UpdateLiveInfoAsync.previousVersion,
                     UpdateLiveInfoAsync.previousArtist,
-                    context.filesDir.toString() + "/live.png"
-                )
+                    stream.albumCoverUpdateUrl
+                ) { bitmap ->
+                    updateNotification(
+                        UpdateLiveInfoAsync.previousTitle,
+                        UpdateLiveInfoAsync.previousVersion,
+                        UpdateLiveInfoAsync.previousArtist,
+                        bitmap
+                    )
+                }
             }
         })
 
@@ -282,7 +289,10 @@ fun resume() {
                     MonstercatPlayer.mediaPlayer!!.playWhenReady = true
 
                     val intentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
-                    context.registerReceiver(MonstercatPlayer.Companion.NoisyReceiver(), intentFilter)
+                    context.registerReceiver(
+                        MonstercatPlayer.Companion.NoisyReceiver(),
+                        intentFilter
+                    )
                 }
 
                 setPlayButtonImage(context)
@@ -303,9 +313,9 @@ fun resume() {
  */
 fun next() {
     if (!MonstercatPlayer.loopSingle) {
-        if(MonstercatPlayer.shuffle){
-            MonstercatPlayer.currentSong = Random.nextInt(0,MonstercatPlayer.playlist.size + 1)
-        }else{
+        if (MonstercatPlayer.shuffle) {
+            MonstercatPlayer.currentSong = Random.nextInt(0, MonstercatPlayer.playlist.size + 1)
+        } else {
             MonstercatPlayer.currentSong++
         }
     }
@@ -342,24 +352,24 @@ fun getCurrentSong(): Song? {
     try {
         return getSong(MonstercatPlayer.currentSong)
     } catch (e: IndexOutOfBoundsException) {
-        return if(MonstercatPlayer.loop){
+        return if (MonstercatPlayer.loop) {
             MonstercatPlayer.currentSong = 0
 
-            return try{
+            return try {
                 getSong(MonstercatPlayer.currentSong)
-            }catch (e: IndexOutOfBoundsException){
+            } catch (e: IndexOutOfBoundsException) {
                 null
             }
-        }else{
+        } else {
             null
         }
     }
 }
 
-fun getSong(index:Int):Song?{
+fun getSong(index: Int): Song? {
     val songId = MonstercatPlayer.playlist[index]
 
-    MonstercatPlayer.contextReference?.get()?.let {context ->
+    MonstercatPlayer.contextReference?.get()?.let { context ->
         val songDatabaseHelper = SongDatabaseHelper(context)
 
         return songDatabaseHelper.getSong(context, songId)
@@ -373,8 +383,8 @@ private fun registerNextListener() {
 
     MonstercatPlayer.mediaPlayer?.addListener(object : Player.EventListener {
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-            if(playbackState == Player.STATE_ENDED){
-                if(!nextRun){
+            if (playbackState == Player.STATE_ENDED) {
+                if (!nextRun) {
                     nextRun = true
                     next()
                 }

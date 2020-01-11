@@ -22,7 +22,6 @@ import de.lucaspape.monstercat.database.helper.AlbumDatabaseHelper
 import de.lucaspape.monstercat.database.helper.AlbumItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.CatalogSongDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
-import de.lucaspape.monstercat.download.addDownloadCoverArray
 import de.lucaspape.monstercat.handlers.abstract_items.AlbumItem
 import de.lucaspape.monstercat.handlers.abstract_items.CatalogItem
 import de.lucaspape.monstercat.handlers.abstract_items.ProgressItem
@@ -72,13 +71,12 @@ class HomeHandler {
             for (hashMap in currentListViewData) {
                 val title = hashMap["title"] as String
                 val artist = hashMap["artist"] as String
-                val cover = hashMap["primaryImage"] as String
 
                 itemAdapter.add(
                     AlbumItem(
                         title,
                         artist,
-                        cover
+                        hashMap["coverUrl"] as String
                     )
                 )
             }
@@ -115,14 +113,13 @@ class HomeHandler {
             for (hashMap in currentListViewData) {
                 val title = hashMap["title"] as String
                 val artist = hashMap["artist"] as String
-                val cover = hashMap["secondaryImage"] as String
                 val titleDownloadStatus = hashMap["downloadedCheck"] as String
 
                 itemAdapter.add(
                     CatalogItem(
                         title,
                         artist,
-                        cover,
+                        (hashMap["coverUrl"] as String),
                         titleDownloadStatus
                     )
                 )
@@ -172,10 +169,12 @@ class HomeHandler {
             recyclerView.addOnScrollListener(object :
                 EndlessRecyclerOnScrollListener(footerAdapter) {
                 override fun onLoadMore(currentPage: Int) {
-                    footerAdapter.clear()
-                    footerAdapter.add(ProgressItem())
+                    if (!albumContentsDisplayed) {
+                        footerAdapter.clear()
+                        footerAdapter.add(ProgressItem())
 
-                    loadSongList(view, itemAdapter)
+                        loadSongList(view, itemAdapter)
+                    }
                 }
             })
         }
@@ -377,8 +376,6 @@ class HomeHandler {
     }
 
     fun initSongListLoad(view: View) {
-        CatalogSongDatabaseHelper(view.context).reCreateTable()
-
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
 
@@ -398,14 +395,14 @@ class HomeHandler {
                 songList.add(songDatabaseHelper.getSong(view.context, song.songId))
             }
 
+            songList.reverse()
+
             for (song in songList) {
-                val hashMap = parseSongToHashMap(view.context, song)
+                val hashMap = parseSongToHashMap(song)
                 currentListViewData.add(hashMap)
             }
 
             updateRecyclerView(view)
-
-            addDownloadCoverArray(currentListViewData)
 
             swipeRefreshLayout.isRefreshing = false
         }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
@@ -433,19 +430,25 @@ class HomeHandler {
                 songList.add(songDatabaseHelper.getSong(view.context, song.songId))
             }
 
+            songList.reverse()
+
             for (song in songList) {
-                val hashMap = parseSongToHashMap(view.context, song)
+                val hashMap = parseSongToHashMap(song)
 
                 val title = hashMap["title"] as String
                 val artist = hashMap["artist"] as String
-                val cover = hashMap["secondaryImage"] as String
                 val titleDownloadStatus = hashMap["downloadedCheck"] as String
 
-                itemAdapter.add(CatalogItem(title, artist, cover, titleDownloadStatus))
+                itemAdapter.add(
+                    CatalogItem(
+                        title,
+                        artist,
+                        (hashMap["coverUrl"] as String),
+                        titleDownloadStatus
+                    )
+                )
                 currentListViewData.add(hashMap)
             }
-
-            addDownloadCoverArray(currentListViewData)
         }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 
@@ -456,9 +459,15 @@ class HomeHandler {
             true, loaded, {}, {
                 val albumDatabaseHelper =
                     AlbumDatabaseHelper(view.context)
-                val albumList = albumDatabaseHelper.getAllAlbums()
+                val allAlbums = albumDatabaseHelper.getAllAlbums()
 
                 val sortedList = ArrayList<HashMap<String, Any?>>()
+
+                val albumList = ArrayList<de.lucaspape.monstercat.database.Album>()
+
+                for (i in (0 until allAlbums.size - loaded)) {
+                    albumList.add(allAlbums[i])
+                }
 
                 for (album in albumList) {
                     val hashMap = parseAlbumToHashMap(view.context, album)
@@ -467,28 +476,23 @@ class HomeHandler {
 
                     val title = hashMap["title"] as String
                     val artist = hashMap["artist"] as String
-                    val cover = hashMap["primaryImage"] as String
 
                     itemAdapter.add(
                         AlbumItem(
                             title,
                             artist,
-                            cover
+                            hashMap["coverUrl"] as String
                         )
                     )
 
                     currentListViewData.add(hashMap)
                 }
 
-                //download cover art
-                addDownloadCoverArray(currentListViewData)
-
                 albumContentsDisplayed = false
             }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 
     fun initAlbumListLoad(view: View) {
-        AlbumDatabaseHelper(view.context).reCreateTable()
         val contextReference = WeakReference<Context>(view.context)
 
         val swipeRefreshLayout =
@@ -504,9 +508,11 @@ class HomeHandler {
             BackgroundAsync({
                 val albumDatabaseHelper =
                     AlbumDatabaseHelper(view.context)
-                val albumList = albumDatabaseHelper.getAllAlbums()
+                var albumList = albumDatabaseHelper.getAllAlbums()
 
                 val sortedList = ArrayList<HashMap<String, Any?>>()
+
+                albumList = albumList.reversed()
 
                 for (album in albumList) {
                     sortedList.add(parseAlbumToHashMap(view.context, album))
@@ -515,9 +521,6 @@ class HomeHandler {
                 currentListViewData = sortedList
             }, {
                 updateRecyclerView(view)
-
-                //download cover art
-                addDownloadCoverArray(currentListViewData)
 
                 swipeRefreshLayout.isRefreshing = false
 
@@ -560,7 +563,6 @@ class HomeHandler {
                     contextReference.get()?.let { context ->
                         dbSongs.add(
                             parseSongToHashMap(
-                                context,
                                 songDatabaseHelper.getSong(context, albumItem.songId)
                             )
                         )
@@ -573,9 +575,6 @@ class HomeHandler {
                 albumView = false
 
                 updateRecyclerView(view)
-
-                //download cover art
-                addDownloadCoverArray(currentListViewData)
 
                 swipeRefreshLayout.isRefreshing = false
 
@@ -602,9 +601,6 @@ class HomeHandler {
             searchString
         ) {
             updateRecyclerView(view)
-
-            //download cover art
-            addDownloadCoverArray(searchResults)
 
             albumContentsDisplayed = false
 

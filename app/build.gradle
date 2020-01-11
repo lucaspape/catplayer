@@ -12,8 +12,8 @@ android {
         applicationId "de.lucaspape.monstercat"
         minSdkVersion 24
         targetSdkVersion 29
-        versionCode 84
-        versionName "0.0.8.4"
+        versionCode 85
+        versionName "0.0.8.5"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -45,4 +45,5 @@ dependencies {
 
     implementation "com.mikepenz:fastadapter:4.1.0"
     implementation "com.mikepenz:fastadapter-extensions-scroll:4.1.0"
+    implementation 'com.squareup.picasso:picasso:2.5.2'
 }

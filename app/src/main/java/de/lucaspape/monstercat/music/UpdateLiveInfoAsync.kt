@@ -34,8 +34,6 @@ class UpdateLiveInfoAsync(
         previousVersion = stream.version
 
         contextReference.get()?.let { context ->
-            updateCover(context, stream)
-
             publishProgress(
                 stream.title,
                 stream.version,
@@ -56,13 +54,11 @@ class UpdateLiveInfoAsync(
                         previousArtist = it.artist
                         previousVersion = it.version
 
-                        updateCover(context, it)
-
                         publishProgress(
                             it.title,
                             it.version,
                             it.artist,
-                            context.filesDir.toString() + "/live.png"
+                            it.albumCoverUpdateUrl
                         )
                     }
                 }
@@ -78,47 +74,23 @@ class UpdateLiveInfoAsync(
         val title = values[0]
         val version = values[1]
         val artist = values[2]
-        val coverLocation = values[3]
+        val coverUrl = values[3]
 
         title?.let {
             version?.let {
                 artist?.let {
-                    coverLocation?.let {
-                        setCover(
-                            title,
-                            version,
-                            artist,
-                            coverLocation
-                        )
-
-                        updateNotification(
-                            title,
-                            version,
-                            artist,
-                            coverLocation
-                        )
+                    coverUrl?.let {
+                        setCover(previousTitle, previousVersion, previousArtist, coverUrl) { bitmap ->
+                            updateNotification(
+                                title,
+                                version,
+                                artist,
+                                bitmap
+                            )
+                        }
                     }
                 }
             }
-        }
-    }
-
-    private fun updateCover(context: Context, stream: Stream) {
-        StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder().permitAll().build())
-
-        try{
-            val connection =
-                URL(stream.albumCoverUpdateUrl).openConnection() as HttpURLConnection
-            connection.doInput = true
-            connection.connect()
-            val input = connection.inputStream
-            val primaryBitmap = BitmapFactory.decodeStream(input)
-
-            FileOutputStream(context.filesDir.toString() + "/live.png").use { out ->
-                primaryBitmap?.compress(Bitmap.CompressFormat.PNG, 100, out)
-            }
-        }catch (e: FileNotFoundException){
-
         }
     }
 

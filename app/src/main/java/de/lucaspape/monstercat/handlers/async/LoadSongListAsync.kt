@@ -69,18 +69,10 @@ class LoadSongListAsync(
 
                     val sortedJsonArray = ArrayList<JSONObject>()
 
-                    for(i in (0 until jsonArray.length())){
-                        try {
-                            sortedJsonArray.add(jsonArray.getJSONObject(jsonArray.length() - i))
-                        }catch (e:JSONException){
-
-                        }
-                    }
-
                     //parse every single song into list
-                    for (jsonObject in sortedJsonArray) {
+                    for (k in (0 until jsonArray.length())) {
                         parseCatalogSongToDB(
-                            jsonObject,
+                            jsonArray.getJSONObject(k),
                             context
                         )
                     }

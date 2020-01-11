@@ -14,7 +14,6 @@ import de.lucaspape.monstercat.activities.monstercatPlayer
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
-import de.lucaspape.monstercat.download.addDownloadCoverArray
 import de.lucaspape.monstercat.handlers.abstract_items.CatalogItem
 import de.lucaspape.monstercat.handlers.abstract_items.PlaylistItem
 import de.lucaspape.monstercat.handlers.async.BackgroundAsync
@@ -76,14 +75,13 @@ class PlaylistHandler {
             for(hashMap in currentListViewData){
                 val title = hashMap["title"] as String
                 val artist = hashMap["artist"] as String
-                val cover = hashMap["secondaryImage"] as String
                 val titleDownloadStatus = hashMap["downloadedCheck"] as String
 
                 itemAdapter.add(
                     CatalogItem(
                         title,
                         artist,
-                        cover,
+                        (hashMap["coverUrl"] as String),
                         titleDownloadStatus
                     )
                 )
@@ -285,7 +283,6 @@ class PlaylistHandler {
 
                 for (playlistItem in playlistItems) {
                     val hashMap = parseSongToHashMap(
-                        view.context,
                         songDatabaseHelper.getSong(view.context, playlistItem.songId)
                     )
                     sortedList.add(hashMap)
@@ -301,9 +298,6 @@ class PlaylistHandler {
                 listViewDataIsPlaylistView = false
 
                 updateListView(view)
-
-                //download cover art
-                addDownloadCoverArray(currentListViewData)
 
                 swipeRefreshLayout.isRefreshing = false
             }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)

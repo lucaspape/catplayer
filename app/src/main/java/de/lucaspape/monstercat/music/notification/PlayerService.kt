@@ -32,7 +32,7 @@ class PlayerService : Service() {
                 title,
                 version,
                 artist,
-                coverLocation
+                null
             )
         )
 

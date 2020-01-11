@@ -9,12 +9,7 @@ import org.json.JSONObject
 import java.io.File
 import java.lang.reflect.InvocationTargetException
 
-fun parseSongToHashMap(context: Context, song: Song): HashMap<String, Any?> {
-    val settings = Settings(context)
-
-    val primaryResolution = settings.getSetting("primaryCoverResolution")
-    val secondaryResolution = settings.getSetting("secondaryCoverResolution")
-
+fun parseSongToHashMap(song: Song): HashMap<String, Any?> {
     val hashMap = HashMap<String, Any?>()
     hashMap["title"] = song.title
     hashMap["version"] = song.version
@@ -23,13 +18,6 @@ fun parseSongToHashMap(context: Context, song: Song): HashMap<String, Any?> {
     hashMap["artist"] = song.artist
     hashMap["shownTitle"] = song.shownTitle
     hashMap["coverUrl"] = song.coverUrl
-    hashMap["coverLocation"] = context.filesDir.toString() + "/" + song.albumId + ".png"
-    hashMap["primaryRes"] = primaryResolution
-    hashMap["secondaryRes"] = secondaryResolution
-    hashMap["primaryImage"] =
-        context.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution.toString()
-    hashMap["secondaryImage"] =
-        context.filesDir.toString() + "/" + song.albumId + ".png" + secondaryResolution.toString()
     hashMap["downloadable"] = song.isDownloadable.toString()
     hashMap["streamable"] = song.isStreamable.toString()
     hashMap["inEarlyAccess"] = song.inEarlyAccess.toString()

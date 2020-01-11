@@ -3,7 +3,8 @@ package de.lucaspape.monstercat.music
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.BitmapFactory
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.media.MediaMetadata
 import android.media.session.PlaybackState
 import android.os.Handler
@@ -16,23 +17,23 @@ import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import com.squareup.picasso.Picasso
+import com.squareup.picasso.Target
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.music.MonstercatPlayer.Companion.contextReference
 import de.lucaspape.monstercat.music.MonstercatPlayer.Companion.mediaPlayer
 import de.lucaspape.monstercat.music.MonstercatPlayer.Companion.mediaSession
-import de.lucaspape.monstercat.util.Settings
-import java.io.File
 import java.lang.ref.WeakReference
 
 var textViewReference: WeakReference<TextView>? = null
-    set(newTextView){
+    set(newTextView) {
         newTextView?.get()?.text = textViewReference?.get()?.text
         field = newTextView
     }
 
 var seekBarReference: WeakReference<SeekBar>? = null
-    set(newSeekBar){
+    set(newSeekBar) {
         seekBarReference?.get()?.progress?.let { newSeekBar?.get()?.progress = it }
         newSeekBar?.get()?.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
@@ -51,7 +52,7 @@ var seekBarReference: WeakReference<SeekBar>? = null
     }
 
 var barCoverImageReference: WeakReference<ImageView>? = null
-    set(newImageView){
+    set(newImageView) {
         newImageView?.get()?.setImageDrawable(barCoverImageReference?.get()?.drawable)
 
         field = newImageView
@@ -60,7 +61,7 @@ var barCoverImageReference: WeakReference<ImageView>? = null
 var musicBarReference: WeakReference<androidx.appcompat.widget.Toolbar>? = null
 
 var playButtonReference: WeakReference<ImageButton>? = null
-    set(newPlayButton){
+    set(newPlayButton) {
         contextReference?.get()?.let { context ->
             if (mediaPlayer?.isPlaying == true) {
                 newPlayButton?.get()?.setImageDrawable(
@@ -85,19 +86,19 @@ var playButtonReference: WeakReference<ImageButton>? = null
     }
 
 var fullscreenTextView1Reference: WeakReference<TextView>? = null
-    set(newTextView1){
+    set(newTextView1) {
         newTextView1?.get()?.text = textViewReference?.get()?.text
         field = newTextView1
     }
 
 var fullscreenTextView2Reference: WeakReference<TextView>? = null
-    set(newTextView2){
+    set(newTextView2) {
         newTextView2?.get()?.text = textViewReference?.get()?.text
         field = newTextView2
     }
 
 var fullscreenSeekBarReference: WeakReference<SeekBar>? = null
-    set(newSeekBar){
+    set(newSeekBar) {
         seekBarReference?.get()?.progress?.let { newSeekBar?.get()?.progress = it }
 
         newSeekBar?.get()?.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -117,14 +118,14 @@ var fullscreenSeekBarReference: WeakReference<SeekBar>? = null
     }
 
 var fullscreenCoverReference: WeakReference<ImageView>? = null
-    set(newImageView){
+    set(newImageView) {
         newImageView?.get()?.setImageDrawable(barCoverImageReference?.get()?.drawable)
 
         field = newImageView
     }
 
 var fullscreenPlayButtonReference: WeakReference<ImageButton>? = null
-    set(newPlayButton){
+    set(newPlayButton) {
         contextReference?.get()?.let { context ->
             if (mediaPlayer?.isPlaying == true) {
                 newPlayButton?.get()?.setImageDrawable(
@@ -237,49 +238,75 @@ internal fun startSeekBarUpdate() {
     })
 }
 
-internal fun setCover(song: Song, context: Context) {
-    val settings = Settings(context)
-    val primaryResolution = settings.getSetting("primaryCoverResolution")
-
-    val coverFile =
-        File(context.filesDir.toString() + "/" + song.albumId + ".png" + primaryResolution)
-
-    if (File(coverFile.absolutePath).exists()) {
-        val bitmap = BitmapFactory.decodeFile(coverFile.absolutePath)
-
-        barCoverImageReference?.get()?.setImageBitmap(bitmap)
-
-        fullscreenCoverReference?.get()?.setImageBitmap(bitmap)
-
-        mediaPlayer?.duration?.let { setSongMetadata(song, coverFile.absolutePath, it) }
+internal fun setCover(song: Song, context: Context, callback: (bitmap:Bitmap) -> Unit) {
+    barCoverImageReference?.get()?.let {
+        Picasso.with(context).load(song.coverUrl + "?image_width=512").into(it)
     }
+
+    fullscreenCoverReference?.get()?.let {
+        Picasso.with(context).load(song.coverUrl + "?image_width=512").into(it)
+    }
+
+    val picassoTarget = object:com.squareup.picasso.Target{
+        override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
+        }
+
+        override fun onBitmapFailed(errorDrawable: Drawable?) {
+        }
+
+        override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+            bitmap?.let {
+                mediaPlayer?.duration?.let { setSongMetadata(song, bitmap, it) }
+                callback(bitmap)
+            }
+        }
+    }
+
+    Picasso.with(context).load(song.coverUrl + "?image_width=512").into(picassoTarget)
 }
 
 internal fun setCover(
     title: String,
     version: String,
     artist: String,
-    coverLocation: String
+    coverUrl:String,
+    callback: (bitmap:Bitmap) -> Unit
 ) {
-    val coverFile =
-        File(coverLocation)
 
-    if (File(coverFile.absolutePath).exists()) {
-        val bitmap = BitmapFactory.decodeFile(coverFile.absolutePath)
-
-        barCoverImageReference?.get()?.setImageBitmap(bitmap)
-
-        fullscreenCoverReference?.get()?.setImageBitmap(bitmap)
-
-        mediaPlayer?.duration?.let {
-            setSongMetadata(
-                title,
-                version,
-                artist,
-                coverFile.absolutePath,
-                it
-            )
+    contextReference?.get()?.let{context ->
+        barCoverImageReference?.get()?.let {
+            Picasso.with(context).load(coverUrl).into(it)
         }
+
+        fullscreenCoverReference?.get()?.let {
+            Picasso.with(context).load(coverUrl).into(it)
+        }
+
+        val picassoTarget = object:Target{
+            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
+            }
+
+            override fun onBitmapFailed(errorDrawable: Drawable?) {
+            }
+
+            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                bitmap?.let {
+                    mediaPlayer?.duration?.let {
+                        setSongMetadata(
+                            title,
+                            version,
+                            artist,
+                            bitmap,
+                            it
+                        )
+                    }
+                    callback(bitmap)
+                }
+            }
+        }
+
+        Picasso.with(context).load(coverUrl).into(picassoTarget)
+
     }
 }
 
@@ -345,15 +372,13 @@ internal fun setPlayerState(progress: Long) {
 /**
  * Set song metadata
  */
-internal fun setSongMetadata(song: Song, coverLocation: String, duration: Long) {
-    val coverImage = BitmapFactory.decodeFile(coverLocation)
-
+internal fun setSongMetadata(song: Song, cover:Bitmap, duration: Long) {
     val mediaMetadata = MediaMetadataCompat.Builder()
     mediaMetadata.putString(MediaMetadata.METADATA_KEY_ARTIST, song.artist)
     mediaMetadata.putString(MediaMetadata.METADATA_KEY_TITLE, "${song.title} ${song.version}")
     mediaMetadata.putLong(MediaMetadata.METADATA_KEY_DURATION, duration)
-    mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, coverImage)
-    mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ART, coverImage)
+    mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, cover)
+    mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ART, cover)
     mediaSession?.setMetadata(mediaMetadata.build())
 }
 
@@ -361,16 +386,14 @@ internal fun setSongMetadata(
     title: String,
     version: String,
     artist: String,
-    coverLocation: String,
+    cover: Bitmap,
     duration: Long
 ) {
-    val coverImage = BitmapFactory.decodeFile(coverLocation)
-
     val mediaMetadata = MediaMetadataCompat.Builder()
     mediaMetadata.putString(MediaMetadata.METADATA_KEY_ARTIST, artist)
     mediaMetadata.putString(MediaMetadata.METADATA_KEY_TITLE, "$title $version")
     mediaMetadata.putLong(MediaMetadata.METADATA_KEY_DURATION, duration)
-    mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, coverImage)
-    mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ART, coverImage)
+    mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, cover)
+    mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ART, cover)
     mediaSession?.setMetadata(mediaMetadata.build())
 }

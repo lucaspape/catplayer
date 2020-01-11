@@ -7,12 +7,13 @@ import android.widget.TextView
 import androidx.core.net.toUri
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
+import com.squareup.picasso.Picasso
 import de.lucaspape.monstercat.R
 
 open class CatalogItem(
     private var title: String?,
     private var artist: String?,
-    private var cover: String?,
+    private var coverUrl:String?,
     private var titleDownloadStatus: String?
 ) : AbstractItem<CatalogItem.ViewHolder>() {
     override val type: Int = 101
@@ -32,11 +33,13 @@ open class CatalogItem(
         val titleMenuButton = view.findViewById<ImageButton>(R.id.titleMenuButton)
         val coverImageView = view.findViewById<ImageView>(R.id.cover)
         val titleDownloadStatusImageView = view.findViewById<ImageView>(R.id.titleDownloadStatus)
+        val context = view.context
 
         override fun bindView(item: CatalogItem, payloads: MutableList<Any>) {
             titleTextView.text = item.title
             artistTextView.text = item.artist
-            coverImageView.setImageURI(item.cover?.toUri())
+
+            Picasso.with(context).load(item.coverUrl + "?image_width=256").into(coverImageView)
             titleDownloadStatusImageView.setImageURI(item.titleDownloadStatus?.toUri())
         }
 

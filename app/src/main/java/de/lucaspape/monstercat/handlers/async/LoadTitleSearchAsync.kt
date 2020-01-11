@@ -43,7 +43,7 @@ class LoadTitleSearchAsync(
                     val hashMapList = ArrayList<HashMap<String, Any?>>()
 
                     for (song in songList) {
-                        hashMapList.add(parseSongToHashMap(context, song))
+                        hashMapList.add(parseSongToHashMap(song))
                     }
 
                     //display list

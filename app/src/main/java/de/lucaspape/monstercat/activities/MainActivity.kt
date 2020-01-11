@@ -160,20 +160,24 @@ class MainActivity : AppCompatActivity() {
                 val currentSong = getCurrentSong()
 
                 currentSong?.let { song ->
-                    updateNotification(
-                        song.title,
-                        song.version,
-                        song.artist,
-                        filesDir.toString() + "/" + song.albumId + ".png" + settings.getSetting("primaryCoverResolution")
-                    )
+                    setCover(song.title, song.version, song.artist, song.coverUrl) { bitmap ->
+                        updateNotification(
+                            song.title,
+                            song.version,
+                            song.artist,
+                            bitmap
+                        )
+                    }
                 }
             } else {
-                updateNotification(
-                    UpdateLiveInfoAsync.previousTitle,
-                    UpdateLiveInfoAsync.previousVersion,
-                    UpdateLiveInfoAsync.previousArtist,
-                    "$filesDir/live.png"
-                )
+                setCover(UpdateLiveInfoAsync.previousTitle, UpdateLiveInfoAsync.previousVersion, UpdateLiveInfoAsync.previousArtist, "") { bitmap ->
+                    updateNotification(
+                        UpdateLiveInfoAsync.previousTitle,
+                        UpdateLiveInfoAsync.previousVersion,
+                        UpdateLiveInfoAsync.previousArtist,
+                        bitmap
+                    )
+                }
             }
         }
 

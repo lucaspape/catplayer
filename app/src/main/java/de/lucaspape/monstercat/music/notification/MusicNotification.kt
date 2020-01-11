@@ -5,7 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.graphics.BitmapFactory
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Build
 import androidx.core.app.NotificationCompat
@@ -35,7 +35,7 @@ internal fun createPlayerNotification(
     title: String,
     version: String,
     artist: String,
-    coverLocation: String
+    bitmap: Bitmap?
 ): Notification? {
     contextReference?.get()?.let { context ->
         val notificationBuilder = NotificationCompat.Builder(
@@ -114,7 +114,7 @@ internal fun createPlayerNotification(
             .setShowWhen(false)
             .setStyle(notificationStyle)
             .setSmallIcon(R.drawable.ic_play_arrow_black_24dp)
-            .setLargeIcon(BitmapFactory.decodeFile(coverLocation))
+            .setLargeIcon(bitmap)
             .setColor(Color.LTGRAY)
             .setContentTitle("$title $version")
             .setContentText(artist)
@@ -187,7 +187,7 @@ fun updateNotification(
     title: String,
     version: String,
     artist: String,
-    coverLocation: String
+    bitmap: Bitmap
 ) {
     val notificationManager =
         contextReference?.get()?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager?
@@ -197,7 +197,7 @@ fun updateNotification(
             title,
             version,
             artist,
-            coverLocation
+            bitmap
         )
     )
 }
