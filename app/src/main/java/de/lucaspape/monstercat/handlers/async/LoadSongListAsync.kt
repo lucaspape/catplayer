@@ -19,7 +19,7 @@ import java.lang.ref.WeakReference
 class LoadSongListAsync(
     private val contextReference: WeakReference<Context>,
     private val forceReload: Boolean,
-    private val loadMax: Int,
+    private val skip: Int,
     private val displayLoading: () -> Unit,
     private val requestFinished: () -> Unit
 ) : AsyncTask<Void, Void, String>() {
@@ -50,7 +50,7 @@ class LoadSongListAsync(
 
             val requestQueue = Volley.newRequestQueue(context)
 
-            val sortedList = arrayOfNulls<JSONObject>(loadMax)
+            val sortedList = arrayOfNulls<JSONObject>(50)
 
             val syncObject = Object()
 
@@ -60,34 +60,33 @@ class LoadSongListAsync(
                 }
             }
 
-            for (i in (0 until loadMax / 50)) {
-                val requestUrl =
-                    context.getString(R.string.loadSongsUrl) + "?limit=50&skip=" + i * 50
+            val requestUrl =
+                context.getString(R.string.loadSongsUrl) + "?limit=50&skip=" + skip.toString()
 
-                val listRequest = AuthorizedRequest(
-                    Request.Method.GET, requestUrl, sid,
-                    Response.Listener { response ->
-                        val json = JSONObject(response)
-                        val jsonArray = json.getJSONArray("results")
+            val listRequest = AuthorizedRequest(
+                Request.Method.GET, requestUrl, sid,
+                Response.Listener { response ->
+                    val json = JSONObject(response)
+                    val jsonArray = json.getJSONArray("results")
 
-                        //parse every single song into list
-                        for (k in (0 until jsonArray.length())) {
-                            sortedList[i * 50 + k] = jsonArray.getJSONObject(k)
-                        }
+                    //parse every single song into list
+                    for (k in (0 until jsonArray.length())) {
+                        sortedList[k] = jsonArray.getJSONObject(k)
+                    }
 
-                    }, Response.ErrorListener { }
-                )
+                }, Response.ErrorListener { }
+            )
 
-                requestQueue.add(listRequest)
+            requestQueue.add(listRequest)
 
-                synchronized(syncObject) {
-                    syncObject.wait()
-                }
+            synchronized(syncObject) {
+                syncObject.wait()
             }
+
 
             sortedList.reverse()
 
-            catalogSongDatabaseHelper.reCreateTable()
+           // catalogSongDatabaseHelper.reCreateTable()
 
             for (jsonObject in sortedList) {
                 if (jsonObject != null) {

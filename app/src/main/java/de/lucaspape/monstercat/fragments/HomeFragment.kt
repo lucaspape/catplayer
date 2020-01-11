@@ -2,7 +2,6 @@ package de.lucaspape.monstercat.fragments
 
 import android.os.Bundle
 import android.view.*
-import android.widget.ListView
 import androidx.fragment.app.Fragment
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.activities.fragmentBackPressedCallback
@@ -10,7 +9,6 @@ import de.lucaspape.monstercat.handlers.*
 import de.lucaspape.monstercat.util.Settings
 
 class HomeFragment : Fragment() {
-    private var listView: ListView? = null
     private val homeHandler = HomeHandler()
 
     override fun onCreateView(
@@ -34,18 +32,15 @@ class HomeFragment : Fragment() {
             HomeHandler.albumViewSelected = settings.getSetting("albumViewSelected")!!.toBoolean()
         }
 
-        homeHandler.setupListView(view)
         homeHandler.setupSpinner(view)
         homeHandler.registerListeners(view)
-
-     //   listView = view.findViewById(R.id.musiclistview)
 
         fragmentBackPressedCallback = {
             if (HomeHandler.albumViewSelected) {
                 HomeHandler.albumView = true
                 homeHandler.loadAlbumList(view, false)
             } else {
-                homeHandler.loadSongList(view, false)
+                homeHandler.intitialSongListLoad(view)
             }
         }
     }

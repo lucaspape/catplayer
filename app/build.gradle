@@ -42,5 +42,7 @@ dependencies {
     implementation project(':exoplayer-library-core')
     implementation project(':exoplayer-library-hls')
     implementation project(':exoplayer-extension-flac')
+
     implementation "com.mikepenz:fastadapter:4.1.0"
+    implementation "com.mikepenz:fastadapter-extensions-scroll:4.1.0"
 }

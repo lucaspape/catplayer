@@ -18,6 +18,7 @@ import androidx.fragment.app.Fragment
 import de.lucaspape.monstercat.background.BackgroundService
 import de.lucaspape.monstercat.background.BackgroundService.Companion.updateLiveInfoAsync
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.database.helper.CatalogSongDatabaseHelper
 import de.lucaspape.monstercat.download.hideDownloadNotification
 import de.lucaspape.monstercat.util.Auth
 import de.lucaspape.monstercat.fragments.HomeFragment
@@ -92,6 +93,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        CatalogSongDatabaseHelper(this).reCreateTable()
 
         //check for internet
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET)
