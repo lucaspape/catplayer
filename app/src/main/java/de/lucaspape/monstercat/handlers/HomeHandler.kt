@@ -384,28 +384,55 @@ class HomeHandler {
         val catalogSongDatabaseHelper =
             CatalogSongDatabaseHelper(view.context)
 
-        LoadSongListAsync(WeakReference(view.context), true, 0, {}, {
-            val songIdList = catalogSongDatabaseHelper.getAllSongs()
+        if(catalogSongDatabaseHelper.getAllSongs().isEmpty()){
+            LoadSongListAsync(WeakReference(view.context), true, 0, {}, {
+                BackgroundAsync({
+                    val songIdList = catalogSongDatabaseHelper.getAllSongs()
 
-            val songDatabaseHelper =
-                SongDatabaseHelper(view.context)
-            val songList = ArrayList<Song>()
+                    val songDatabaseHelper =
+                        SongDatabaseHelper(view.context)
+                    val songList = ArrayList<Song>()
 
-            for (song in songIdList) {
-                songList.add(songDatabaseHelper.getSong(view.context, song.songId))
-            }
+                    for (song in songIdList) {
+                        songList.add(songDatabaseHelper.getSong(view.context, song.songId))
+                    }
 
-            songList.reverse()
+                    songList.reverse()
 
-            for (song in songList) {
-                val hashMap = parseSongToHashMap(song)
-                currentListViewData.add(hashMap)
-            }
+                    for (song in songList) {
+                        val hashMap = parseSongToHashMap(song)
+                        currentListViewData.add(hashMap)
+                    }
+                },{
+                    updateRecyclerView(view)
 
-            updateRecyclerView(view)
+                    swipeRefreshLayout.isRefreshing = false
+                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+            }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        }else{
+            BackgroundAsync({
+                val songIdList = catalogSongDatabaseHelper.getAllSongs()
 
-            swipeRefreshLayout.isRefreshing = false
-        }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                val songDatabaseHelper =
+                    SongDatabaseHelper(view.context)
+                val songList = ArrayList<Song>()
+
+                for (song in songIdList) {
+                    songList.add(songDatabaseHelper.getSong(view.context, song.songId))
+                }
+
+                songList.reverse()
+
+                for (song in songList) {
+                    val hashMap = parseSongToHashMap(song)
+                    currentListViewData.add(hashMap)
+                }
+            },{
+                updateRecyclerView(view)
+
+                swipeRefreshLayout.isRefreshing = false
+            }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        }
     }
 
     fun loadSongList(view: View, itemAdapter: ItemAdapter<CatalogItem>) {
@@ -498,16 +525,41 @@ class HomeHandler {
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
 
-        LoadAlbumListAsync(
-            contextReference,
-            true,
-            0, {
-                swipeRefreshLayout.isRefreshing = true
-            }
-        ) {
+        val albumDatabaseHelper = AlbumDatabaseHelper(view.context)
+
+        if(albumDatabaseHelper.getAllAlbums().isEmpty()){
+            LoadAlbumListAsync(
+                contextReference,
+                true,
+                0, {
+                    swipeRefreshLayout.isRefreshing = true
+                }
+            ) {
+                BackgroundAsync({
+                    var albumList = albumDatabaseHelper.getAllAlbums()
+
+                    val sortedList = ArrayList<HashMap<String, Any?>>()
+
+                    albumList = albumList.reversed()
+
+                    for (album in albumList) {
+                        sortedList.add(parseAlbumToHashMap(view.context, album))
+                    }
+
+                    currentListViewData = sortedList
+                }, {
+                    updateRecyclerView(view)
+
+                    swipeRefreshLayout.isRefreshing = false
+
+                    albumContentsDisplayed = false
+
+                    swipeRefreshLayout.isRefreshing = false
+                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+
+            }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        }else{
             BackgroundAsync({
-                val albumDatabaseHelper =
-                    AlbumDatabaseHelper(view.context)
                 var albumList = albumDatabaseHelper.getAllAlbums()
 
                 val sortedList = ArrayList<HashMap<String, Any?>>()
@@ -528,8 +580,8 @@ class HomeHandler {
 
                 swipeRefreshLayout.isRefreshing = false
             }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        }
 
-        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 
     /**
