@@ -29,10 +29,10 @@ class CreatePlaylistAsync(private val contextReference:WeakReference<Context>, p
 
             val newPlaylistRequest = object: JsonObjectRequest(
                 Method.POST, playlistPostUrl, postObject,
-                Response.Listener { response ->
+                Response.Listener { _ ->
                     displayInfo(context, context.getString(R.string.playlistCreatedMsg))
                 },
-                Response.ErrorListener { error ->
+                Response.ErrorListener { _ ->
                     displayInfo(context, context.getString(R.string.errorCreatingPlaylist))
                 }
             ) {

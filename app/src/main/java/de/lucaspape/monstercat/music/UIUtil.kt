@@ -18,138 +18,135 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.Song
+import de.lucaspape.monstercat.music.MonstercatPlayer.Companion.contextReference
 import de.lucaspape.monstercat.music.MonstercatPlayer.Companion.mediaPlayer
 import de.lucaspape.monstercat.music.MonstercatPlayer.Companion.mediaSession
 import de.lucaspape.monstercat.util.Settings
 import java.io.File
 import java.lang.ref.WeakReference
 
-private var textViewReference: WeakReference<TextView>? = null
-private var seekBarReference: WeakReference<SeekBar>? = null
-private var barCoverImageReference: WeakReference<ImageView>? = null
-private var musicBarReference: WeakReference<androidx.appcompat.widget.Toolbar>? = null
-private var playButtonReference: WeakReference<ImageButton>? = null
-
-private var fullscreenTextView1Reference: WeakReference<TextView>? = null
-private var fullscreenTextView2Reference: WeakReference<TextView>? = null
-private var fullscreenSeekBarReference: WeakReference<SeekBar>? = null
-private var fullscreenCoverReference: WeakReference<ImageView>? = null
-private var fullscreenPlayButtonReference: WeakReference<ImageButton>? = null
-
-/**
- * UI update methods
- */
-fun setTextView(newTextView: TextView) {
-    newTextView.text = textViewReference?.get()?.text
-
-    textViewReference = WeakReference(newTextView)
-}
-
-fun setFullscreenTextView(newTextView1: TextView, newTextView2: TextView) {
-    newTextView1.text = textViewReference?.get()?.text
-    newTextView2.text = textViewReference?.get()?.text
-
-    fullscreenTextView1Reference = WeakReference(newTextView1)
-    fullscreenTextView2Reference = WeakReference(newTextView2)
-}
-
-fun setSeekBar(newSeekBar: SeekBar) {
-    seekBarReference?.get()?.progress?.let { newSeekBar.progress = it }
-
-    newSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-        override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-            if (fromUser)
-                mediaPlayer?.seekTo(progress.toLong())
-        }
-
-        override fun onStartTrackingTouch(seekBar: SeekBar) {
-        }
-
-        override fun onStopTrackingTouch(seekBar: SeekBar) {
-        }
-    })
-
-    seekBarReference = WeakReference(newSeekBar)
-}
-
-fun setFullscreenSeekBar(newSeekBar: SeekBar) {
-    seekBarReference?.get()?.progress?.let { newSeekBar.progress = it }
-
-    newSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-        override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-            if (fromUser)
-                mediaPlayer?.seekTo(progress.toLong())
-        }
-
-        override fun onStartTrackingTouch(seekBar: SeekBar) {
-        }
-
-        override fun onStopTrackingTouch(seekBar: SeekBar) {
-        }
-    })
-
-    fullscreenSeekBarReference = WeakReference(newSeekBar)
-}
-
-fun setBarCoverImageView(newImageView: ImageView) {
-    newImageView.setImageDrawable(barCoverImageReference?.get()?.drawable)
-
-    barCoverImageReference = WeakReference(newImageView)
-}
-
-fun setFullscreenCoverImageView(newImageView: ImageView) {
-    newImageView.setImageDrawable(barCoverImageReference?.get()?.drawable)
-
-    fullscreenCoverReference = WeakReference(newImageView)
-}
-
-fun setMusicBar(newToolbar: androidx.appcompat.widget.Toolbar) {
-    musicBarReference = WeakReference(newToolbar)
-}
-
-fun setPlayButton(newPlayButton: ImageButton, context: Context) {
-    if (mediaPlayer?.isPlaying == true) {
-        newPlayButton.setImageDrawable(
-            ContextCompat.getDrawable(
-                context,
-                R.drawable.ic_pause_24dp
-            )
-        )
-
-    } else {
-        newPlayButton.setImageDrawable(
-            ContextCompat.getDrawable(
-                context,
-                R.drawable.ic_play_arrow_24dp
-            )
-        )
-
+var textViewReference: WeakReference<TextView>? = null
+    set(newTextView){
+        newTextView?.get()?.text = textViewReference?.get()?.text
+        field = newTextView
     }
 
-    playButtonReference = WeakReference(newPlayButton)
-}
+var seekBarReference: WeakReference<SeekBar>? = null
+    set(newSeekBar){
+        seekBarReference?.get()?.progress?.let { newSeekBar?.get()?.progress = it }
+        newSeekBar?.get()?.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                if (fromUser)
+                    mediaPlayer?.seekTo(progress.toLong())
+            }
 
-fun setFullscreenPlayButton(newPlayButton: ImageButton, context: Context) {
-    if (mediaPlayer?.isPlaying == true) {
-        newPlayButton.setImageDrawable(
-            ContextCompat.getDrawable(
-                context,
-                R.drawable.ic_pause_24dp
-            )
-        )
+            override fun onStartTrackingTouch(seekBar: SeekBar) {
+            }
 
-    } else {
-        newPlayButton.setImageDrawable(
-            ContextCompat.getDrawable(
-                context,
-                R.drawable.ic_play_arrow_24dp
-            )
-        )
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
+            }
+        })
 
+        field = newSeekBar
     }
 
-    fullscreenPlayButtonReference = WeakReference(newPlayButton)
-}
+var barCoverImageReference: WeakReference<ImageView>? = null
+    set(newImageView){
+        newImageView?.get()?.setImageDrawable(barCoverImageReference?.get()?.drawable)
+
+        field = newImageView
+    }
+
+var musicBarReference: WeakReference<androidx.appcompat.widget.Toolbar>? = null
+
+var playButtonReference: WeakReference<ImageButton>? = null
+    set(newPlayButton){
+        contextReference?.get()?.let { context ->
+            if (mediaPlayer?.isPlaying == true) {
+                newPlayButton?.get()?.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        context,
+                        R.drawable.ic_pause_24dp
+                    )
+                )
+
+            } else {
+                newPlayButton?.get()?.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        context,
+                        R.drawable.ic_play_arrow_24dp
+                    )
+                )
+
+            }
+        }
+
+        field = newPlayButton
+    }
+
+var fullscreenTextView1Reference: WeakReference<TextView>? = null
+    set(newTextView1){
+        newTextView1?.get()?.text = textViewReference?.get()?.text
+        field = newTextView1
+    }
+
+var fullscreenTextView2Reference: WeakReference<TextView>? = null
+    set(newTextView2){
+        newTextView2?.get()?.text = textViewReference?.get()?.text
+        field = newTextView2
+    }
+
+var fullscreenSeekBarReference: WeakReference<SeekBar>? = null
+    set(newSeekBar){
+        seekBarReference?.get()?.progress?.let { newSeekBar?.get()?.progress = it }
+
+        newSeekBar?.get()?.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                if (fromUser)
+                    mediaPlayer?.seekTo(progress.toLong())
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
+            }
+        })
+
+        field = newSeekBar
+    }
+
+var fullscreenCoverReference: WeakReference<ImageView>? = null
+    set(newImageView){
+        newImageView?.get()?.setImageDrawable(barCoverImageReference?.get()?.drawable)
+
+        field = newImageView
+    }
+
+var fullscreenPlayButtonReference: WeakReference<ImageButton>? = null
+    set(newPlayButton){
+        contextReference?.get()?.let { context ->
+            if (mediaPlayer?.isPlaying == true) {
+                newPlayButton?.get()?.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        context,
+                        R.drawable.ic_pause_24dp
+                    )
+                )
+
+            } else {
+                newPlayButton?.get()?.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        context,
+                        R.drawable.ic_play_arrow_24dp
+                    )
+                )
+
+            }
+
+            field = newPlayButton
+        }
+    }
 
 internal fun setTitle(title: String, version: String, artist: String) {
 

@@ -29,6 +29,7 @@ import de.lucaspape.monstercat.music.notification.updateNotification
 import de.lucaspape.monstercat.util.Settings
 import de.lucaspape.monstercat.util.displayInfo
 import de.lucaspape.monstercat.util.loggedIn
+import java.lang.ref.WeakReference
 
 val noisyReceiver = MonstercatPlayer.Companion.NoisyReceiver()
 var backgroundServiceIntent: Intent? = null
@@ -277,12 +278,11 @@ class MainActivity : AppCompatActivity() {
         val playButton = findViewById<ImageButton>(R.id.playButton)
         val seekBar = findViewById<SeekBar>(R.id.seekBar)
 
-        //setup musicPlayer
-        setTextView(textView)
-        setSeekBar(seekBar)
-        setBarCoverImageView(coverBarImageView)
-        setMusicBar(musicToolBar)
-        setPlayButton(playButton, this)
+        textViewReference = WeakReference(textView)
+        seekBarReference = WeakReference(seekBar)
+        barCoverImageReference = WeakReference(coverBarImageView)
+        musicBarReference = WeakReference(musicToolBar)
+        playButtonReference = WeakReference(playButton)
 
         seekBar.setOnTouchListener { _, _ -> true }
     }
