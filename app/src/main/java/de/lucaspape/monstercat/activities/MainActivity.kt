@@ -104,7 +104,7 @@ class MainActivity : AppCompatActivity() {
         //adjust theme
         changeTheme()
 
-        monstercatPlayer.setContext(this)
+        MonstercatPlayer.contextReference = WeakReference(this)
         //create the MusicPlayer.kt mediasession
         monstercatPlayer.createMediaSession()
 

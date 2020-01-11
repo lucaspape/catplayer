@@ -18,8 +18,9 @@ import kotlin.math.floor
 
 class Stream(private val clientId: String) {
 
-    var streamUrl = ""
-    var titleArtistUpdateUrl = ""
+    private var streamUrl = ""
+    private var titleArtistUpdateUrl = ""
+
     var albumCoverUpdateUrl = ""
     var artist = ""
     var title = ""

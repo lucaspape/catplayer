@@ -18,8 +18,11 @@ class MonstercatPlayer {
 
         @JvmStatic
         var playlist = ArrayList<String>()
+            internal set
+
         @JvmStatic
         var currentSong = 0
+            internal set
 
         @JvmStatic
         var shuffle = false
@@ -32,6 +35,7 @@ class MonstercatPlayer {
         private var sessionCreated = false
         @JvmStatic
         var mediaSession: MediaSessionCompat? = null
+            internal set
         @JvmStatic
         internal var mediaPlayer: ExoPlayer? = null
 
@@ -47,10 +51,6 @@ class MonstercatPlayer {
                 }
             }
         }
-    }
-
-    fun setContext(context: Context) {
-        contextReference = WeakReference(context)
     }
 
     /**
