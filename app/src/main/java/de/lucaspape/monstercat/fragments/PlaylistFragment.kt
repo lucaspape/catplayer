@@ -2,7 +2,6 @@ package de.lucaspape.monstercat.fragments
 
 import android.os.Bundle
 import android.view.*
-import android.widget.ListView
 import androidx.fragment.app.Fragment
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.activities.fragmentBackPressedCallback
@@ -12,7 +11,6 @@ import de.lucaspape.monstercat.util.displayInfo
 
 class PlaylistFragment : Fragment() {
     private val playlistHandler = PlaylistHandler()
-    private var playlistView: ListView? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -28,8 +26,6 @@ class PlaylistFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        playlistView = view.findViewById(R.id.playlistView)
 
         val settings = Settings(view.context)
 

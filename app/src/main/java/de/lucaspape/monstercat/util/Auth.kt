@@ -19,14 +19,6 @@ import java.io.UnsupportedEncodingException
 
 //static vars
 var sid:String? = ""
-    get(){
-        return if (loggedIn && field != "") {
-            field
-        } else {
-            null
-        }
-    }
-
 
 var loggedIn = false
     private set

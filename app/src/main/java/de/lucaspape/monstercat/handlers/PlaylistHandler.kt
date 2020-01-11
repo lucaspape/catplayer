@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.AsyncTask
 import android.view.View
 import android.widget.ImageButton
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.mikepenz.fastadapter.FastAdapter
@@ -37,6 +38,9 @@ class PlaylistHandler {
      */
     private fun updateListView(view: View) {
         val playlistList = view.findViewById<RecyclerView>(R.id.playlistView)
+
+        playlistList.layoutManager =
+            LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
 
         if (listViewDataIsPlaylistView) {
             val itemAdapter = ItemAdapter<PlaylistItem>()
