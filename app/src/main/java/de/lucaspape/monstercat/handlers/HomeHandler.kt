@@ -598,7 +598,8 @@ class HomeHandler {
 
         LoadTitleSearchAsync(
             contextReference,
-            searchString
+            searchString,
+            0
         ) {
             updateRecyclerView(view)
 
@@ -616,8 +617,6 @@ class HomeHandler {
                 val title = hashMap["title"] as String
                 val artist = hashMap["artist"] as String
                 val titleDownloadStatus = hashMap["downloadedCheck"] as String
-
-                println(title)
 
                 itemAdapter.add(
                     CatalogItem(

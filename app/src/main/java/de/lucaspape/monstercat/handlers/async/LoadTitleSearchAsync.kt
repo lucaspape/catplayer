@@ -20,6 +20,7 @@ import java.lang.ref.WeakReference
 class LoadTitleSearchAsync(
     private val contextReference: WeakReference<Context>,
     private val searchString: String,
+    private val skip: Int,
     private val requestFinished : () -> Unit
 ) : AsyncTask<Void, Void, String>() {
 
@@ -40,7 +41,7 @@ class LoadTitleSearchAsync(
             }
 
             val searchRequest = AuthorizedRequest(Request.Method.GET,
-                context.getString(R.string.loadSongsUrl) + "?term=$searchString&limit=50&skip=0&fields=&search=$searchString",
+                context.getString(R.string.loadSongsUrl) + "?term=$searchString&limit=50&skip=" + skip.toString() + "&fields=&search=$searchString",
                 sid,
                 Response.Listener { response ->
                     val jsonArray = JSONObject(response).getJSONArray("results")
