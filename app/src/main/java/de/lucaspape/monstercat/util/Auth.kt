@@ -18,16 +18,18 @@ import org.json.JSONObject
 import java.io.UnsupportedEncodingException
 
 //static vars
-private var sid = ""
-var loggedIn = false
-
-fun getSid(): String? {
-    return if (loggedIn && sid != "") {
-        sid
-    } else {
-        null
+var sid:String? = ""
+    get(){
+        return if (loggedIn && field != "") {
+            field
+        } else {
+            null
+        }
     }
-}
+
+
+var loggedIn = false
+    private set
 
 /**
  * Auth - Login to monstercat
@@ -188,7 +190,9 @@ class Auth {
     //saves the login sid
     private fun saveLogin(context: Context) {
         val settings = Settings(context)
-        settings.saveSetting("sid", sid)
+        sid?.let {
+            settings.saveSetting("sid", it)
+        }
     }
 
     //get the sid and check if it is valid

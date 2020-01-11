@@ -9,7 +9,7 @@ import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.util.displayInfo
-import de.lucaspape.monstercat.util.getSid
+import de.lucaspape.monstercat.util.sid
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
@@ -21,40 +21,34 @@ class AddToPlaylistAsync(
 
     override fun doInBackground(vararg params: Void?): String? {
         contextReference.get()?.let { context ->
-            val sid = getSid()
+            val addToPlaylistUrl = context.getString(R.string.addToPlaylistUrl)
 
-            if (sid != null) {
-                val addToPlaylistUrl = context.getString(R.string.addToPlaylistUrl)
+            val addToPlaylistQueue = Volley.newRequestQueue(context)
 
-                val addToPlaylistQueue = Volley.newRequestQueue(context)
+            val songJsonObject = JSONObject()
+            songJsonObject.put("releaseId", song.albumId)
+            songJsonObject.put("trackId", song.songId)
 
-                val songJsonObject = JSONObject()
-                songJsonObject.put("releaseId", song.albumId)
-                songJsonObject.put("trackId", song.songId)
+            val putJsonObject = JSONObject()
+            putJsonObject.put("playlistId", playlistId)
+            putJsonObject.put("newSong", songJsonObject)
+            putJsonObject.put("sid", sid)
 
-                val putJsonObject = JSONObject()
-                putJsonObject.put("playlistId", playlistId)
-                putJsonObject.put("newSong", songJsonObject)
-                putJsonObject.put("sid", getSid())
+            val addToPlaylistRequest =
+                JsonObjectRequest(Request.Method.POST, addToPlaylistUrl, putJsonObject,
+                    Response.Listener { response ->
+                        //TODO reload playlist from response
+                        displayInfo(
+                            context,
+                            context.getString(R.string.songAddedToPlaylistMsg, song.shownTitle)
+                        )
+                    },
+                    Response.ErrorListener { error ->
+                        displayInfo(context, context.getString(R.string.errorUpdatePlaylist))
+                    }
+                )
 
-                val addToPlaylistRequest =
-                    JsonObjectRequest(Request.Method.POST, addToPlaylistUrl, putJsonObject,
-                        Response.Listener { response ->
-                            //TODO reload playlist from response
-                            displayInfo(
-                                context,
-                                context.getString(R.string.songAddedToPlaylistMsg, song.shownTitle)
-                            )
-                        },
-                        Response.ErrorListener { error ->
-                            displayInfo(context, context.getString(R.string.errorUpdatePlaylist))
-                        }
-                    )
-
-                addToPlaylistQueue.add(addToPlaylistRequest)
-            } else {
-                displayInfo(context, context.getString(R.string.errorNotLoggedIn))
-            }
+            addToPlaylistQueue.add(addToPlaylistRequest)
         }
 
         return null

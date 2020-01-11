@@ -7,7 +7,7 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.util.displayInfo
-import de.lucaspape.monstercat.util.getSid
+import de.lucaspape.monstercat.util.sid
 import org.json.JSONArray
 import org.json.JSONObject
 import java.lang.ref.WeakReference
@@ -22,8 +22,6 @@ class CreatePlaylistAsync(private val contextReference:WeakReference<Context>, p
             postObject.put("name", playlistName)
             postObject.put("public", false)
             postObject.put("tracks", JSONArray())
-
-            val sid = getSid()
 
             val newPlaylistVolleyQueue = Volley.newRequestQueue(context)
 

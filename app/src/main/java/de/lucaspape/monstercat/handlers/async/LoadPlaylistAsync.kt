@@ -6,10 +6,10 @@ import com.android.volley.Response
 import com.android.volley.Request
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.util.getSid
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.request.AuthorizedRequest
 import de.lucaspape.monstercat.util.parsePlaylistToDB
+import de.lucaspape.monstercat.util.sid
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
@@ -60,7 +60,7 @@ class LoadPlaylistAsync(
             }
 
             val playlistRequest = AuthorizedRequest(
-                Request.Method.GET, playlistUrl, getSid(),
+                Request.Method.GET, playlistUrl, sid,
                 Response.Listener { response ->
                     val jsonObject = JSONObject(response)
                     val jsonArray = jsonObject.getJSONArray("results")

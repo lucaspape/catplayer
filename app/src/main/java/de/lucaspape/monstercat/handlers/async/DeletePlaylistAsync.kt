@@ -8,14 +8,12 @@ import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.request.AuthorizedRequest
 import de.lucaspape.monstercat.util.displayInfo
-import de.lucaspape.monstercat.util.getSid
+import de.lucaspape.monstercat.util.sid
 import java.lang.ref.WeakReference
 
 class DeletePlaylistAsync(private val contextReference:WeakReference<Context>, private val playlistId:String) : AsyncTask<Void, Void, String>(){
     override fun doInBackground(vararg params: Void?): String? {
         contextReference.get()?.let { context ->
-            val sid = getSid()
-
             val deletePlaylistVolleyQueue = Volley.newRequestQueue(context)
 
             val deletePlaylistUrl = context.getString(R.string.playlistUrl) + playlistId

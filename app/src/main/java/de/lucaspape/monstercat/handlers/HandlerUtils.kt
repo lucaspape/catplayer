@@ -82,7 +82,7 @@ internal fun playAlbumNext(context: Context, mcID: String) {
     val albumRequestQueue = Volley.newRequestQueue(context)
 
     val albumRequest = AuthorizedRequest(Request.Method.GET, requestUrl,
-        getSid(),
+        sid,
         Response.Listener { response ->
             val jsonObject = JSONObject(response)
             val jsonArray = jsonObject.getJSONArray("tracks")
@@ -187,8 +187,7 @@ internal fun downloadSong(context: Context, song: Song) {
             context.getExternalFilesDir(null).toString() + "/" + song.artist + song.title + song.version + "." + downloadType
 
         if (!File(downloadLocation).exists()) {
-            val sSid = getSid()
-            if (sSid != null) {
+            sid?.let {
                 addDownloadSong(downloadUrl, downloadLocation, song.title + " " + song.version)
             }
 
@@ -216,7 +215,7 @@ internal fun downloadAlbum(context: Context, mcID: String) {
     val albumRequestQueue = Volley.newRequestQueue(context)
 
     val albumRequest = AuthorizedRequest(Request.Method.GET, requestUrl,
-        getSid(),
+        sid,
         Response.Listener { response ->
             val jsonObject = JSONObject(response)
             val jsonArray = jsonObject.getJSONArray("tracks")

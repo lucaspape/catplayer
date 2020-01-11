@@ -38,7 +38,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                                     location,
                                     url,
                                     context.cacheDir.toString(),
-                                    getSid()
+                                    sid
                                 ) { max, current ->
                                     publishProgress(
                                         song["shownTitle"] as String,

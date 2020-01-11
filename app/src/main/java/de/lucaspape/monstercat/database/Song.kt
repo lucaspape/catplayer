@@ -10,7 +10,7 @@ import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.util.Settings
-import de.lucaspape.monstercat.util.getSid
+import de.lucaspape.monstercat.util.sid
 import java.io.File
 
 data class Song(
@@ -128,7 +128,7 @@ data class Song(
                 )
             )
 
-        httpSourceFactory.defaultRequestProperties.set("Cookie", "connect.sid=${getSid()}")
+        httpSourceFactory.defaultRequestProperties.set("Cookie", "connect.sid=$sid}")
 
         return ProgressiveMediaSource.Factory(httpSourceFactory)
             .createMediaSource(url.toUri())
