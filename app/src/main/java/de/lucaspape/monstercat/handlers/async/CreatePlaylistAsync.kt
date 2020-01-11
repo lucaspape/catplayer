@@ -27,18 +27,18 @@ class CreatePlaylistAsync(private val contextReference:WeakReference<Context>, p
 
             val newPlaylistRequest = object: JsonObjectRequest(
                 Method.POST, playlistPostUrl, postObject,
-                Response.Listener { _ ->
+                Response.Listener {
                     displayInfo(context, context.getString(R.string.playlistCreatedMsg))
                 },
-                Response.ErrorListener { _ ->
+                Response.ErrorListener {
                     displayInfo(context, context.getString(R.string.errorCreatingPlaylist))
                 }
             ) {
                 override fun getHeaders(): Map<String, String> {
                     return if (sid != null) {
-                        val params = HashMap<String, String>()
-                        params["Cookie"] = "connect.sid=$sid"
-                        params
+                        val headerParams = HashMap<String, String>()
+                        headerParams["Cookie"] = "connect.sid=$sid"
+                        headerParams
                     } else {
                         super.getHeaders()
                     }

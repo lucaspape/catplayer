@@ -10,7 +10,6 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.util.Auth
 import de.lucaspape.monstercat.util.Settings
 import de.lucaspape.monstercat.util.displayInfo
-import kotlinx.android.synthetic.main.activity_settings.*
 
 /**
  * SettingsActivity

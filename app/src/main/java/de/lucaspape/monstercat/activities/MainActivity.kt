@@ -15,12 +15,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.RecyclerView
 import de.lucaspape.monstercat.background.BackgroundService
 import de.lucaspape.monstercat.background.BackgroundService.Companion.updateLiveInfoAsync
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.database.helper.AlbumDatabaseHelper
-import de.lucaspape.monstercat.database.helper.CatalogSongDatabaseHelper
 import de.lucaspape.monstercat.download.hideDownloadNotification
 import de.lucaspape.monstercat.util.Auth
 import de.lucaspape.monstercat.fragments.HomeFragment

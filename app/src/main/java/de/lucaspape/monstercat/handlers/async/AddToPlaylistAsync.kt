@@ -36,14 +36,14 @@ class AddToPlaylistAsync(
 
             val addToPlaylistRequest =
                 JsonObjectRequest(Request.Method.POST, addToPlaylistUrl, putJsonObject,
-                    Response.Listener { response ->
+                    Response.Listener {
                         //TODO reload playlist from response
                         displayInfo(
                             context,
                             context.getString(R.string.songAddedToPlaylistMsg, song.shownTitle)
                         )
                     },
-                    Response.ErrorListener { error ->
+                    Response.ErrorListener {
                         displayInfo(context, context.getString(R.string.errorUpdatePlaylist))
                     }
                 )

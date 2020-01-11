@@ -22,7 +22,6 @@ class PlayerService : Service() {
         val title = intent!!.getStringExtra("title")!!
         val version = intent.getStringExtra("version")!!
         val artist = intent.getStringExtra("artist")!!
-        val coverLocation = intent.getStringExtra("coverLocation")!!
 
         createNotificationChannel()
 

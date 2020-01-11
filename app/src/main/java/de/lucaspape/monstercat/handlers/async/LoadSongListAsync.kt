@@ -5,14 +5,11 @@ import android.os.AsyncTask
 import com.android.volley.Response
 import com.android.volley.Request
 import com.android.volley.toolbox.Volley
-import com.google.gson.JsonObject
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.CatalogSongDatabaseHelper
 import de.lucaspape.monstercat.request.AuthorizedRequest
 import de.lucaspape.monstercat.util.parseCatalogSongToDB
 import de.lucaspape.monstercat.util.sid
-import org.json.JSONArray
-import org.json.JSONException
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
@@ -66,8 +63,6 @@ class LoadSongListAsync(
                 Response.Listener { response ->
                     val json = JSONObject(response)
                     val jsonArray = json.getJSONArray("results")
-
-                    val sortedJsonArray = ArrayList<JSONObject>()
 
                     //parse every single song into list
                     for (k in (0 until jsonArray.length())) {
