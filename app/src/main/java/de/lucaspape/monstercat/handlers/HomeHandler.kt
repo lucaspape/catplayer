@@ -91,7 +91,7 @@ class HomeHandler {
             }
 
             fastAdapter.onLongClickListener = { _, _, _, position ->
-                showContextMenu(view, position)
+                showContextMenu(view, currentListViewData, position)
 
                 false
             }
@@ -143,7 +143,7 @@ class HomeHandler {
             }
 
             fastAdapter.onLongClickListener = { _, _, _, position ->
-                showContextMenu(view, position)
+                showContextMenu(view, currentListViewData, position)
 
                 false
             }
@@ -161,7 +161,7 @@ class HomeHandler {
                     fastAdapter: FastAdapter<CatalogItem>,
                     item: CatalogItem
                 ) {
-                    showContextMenu(view, position)
+                    showContextMenu(view, currentListViewData, position)
                 }
             })
 
@@ -180,7 +180,7 @@ class HomeHandler {
         }
     }
 
-    private fun showContextMenu(view: View, listViewPosition: Int) {
+    private fun showContextMenu(view: View, contentList:ArrayList<HashMap<String, Any?>> ,listViewPosition: Int) {
         val menuItems: Array<String> = if (!albumView) {
             arrayOf(
                 view.context.getString(R.string.download),
@@ -197,7 +197,7 @@ class HomeHandler {
         val alertDialogBuilder = AlertDialog.Builder(view.context)
         alertDialogBuilder.setTitle("")
         alertDialogBuilder.setItems(menuItems) { _, which ->
-            val listItem = currentListViewData[listViewPosition] as HashMap<*, *>
+            val listItem = contentList[listViewPosition] as HashMap<*, *>
 
             view.context.let { context ->
                 val songDatabaseHelper =
@@ -603,6 +603,71 @@ class HomeHandler {
             updateRecyclerView(view)
 
             albumContentsDisplayed = false
+
+            val recyclerView = view.findViewById<RecyclerView>(R.id.musiclistview)
+
+            recyclerView.layoutManager =
+                LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
+
+            val itemAdapter = ItemAdapter<CatalogItem>()
+            val fastAdapter = FastAdapter.with(itemAdapter)
+
+            for (hashMap in searchResults) {
+                val title = hashMap["title"] as String
+                val artist = hashMap["artist"] as String
+                val titleDownloadStatus = hashMap["downloadedCheck"] as String
+
+                println(title)
+
+                itemAdapter.add(
+                    CatalogItem(
+                        title,
+                        artist,
+                        (hashMap["coverUrl"] as String),
+                        titleDownloadStatus
+                    )
+                )
+            }
+
+            recyclerView.adapter = fastAdapter
+
+            fastAdapter.onClickListener = { _, _, _, position ->
+                monstercatPlayer.clearContinuous()
+
+                val itemValue = searchResults[position] as HashMap<*, *>
+                playSongFromId(
+                    view.context,
+                    itemValue["id"] as String,
+                    true,
+                    searchResults,
+                    position
+                )
+
+                false
+            }
+
+            fastAdapter.onLongClickListener = { _, _, _, position ->
+                showContextMenu(view, searchResults ,position)
+
+                false
+            }
+
+            fastAdapter.addEventHook(object : ClickEventHook<CatalogItem>() {
+                override fun onBind(viewHolder: RecyclerView.ViewHolder): View? {
+                    return if (viewHolder is CatalogItem.ViewHolder) {
+                        viewHolder.titleMenuButton
+                    } else null
+                }
+
+                override fun onClick(
+                    v: View,
+                    position: Int,
+                    fastAdapter: FastAdapter<CatalogItem>,
+                    item: CatalogItem
+                ) {
+                    showContextMenu(view, searchResults, position)
+                }
+            })
 
             swipeRefreshLayout.isRefreshing = false
         }.executeOnExecutor(

@@ -28,8 +28,16 @@ class LoadTitleSearchAsync(
     }
 
     override fun doInBackground(vararg params: Void?): String? {
+        val syncObject = Object()
+
         contextReference.get()?.let {context ->
             val searchQueue = Volley.newRequestQueue(context)
+
+            searchQueue.addRequestFinishedListener<Any?> {
+                synchronized(syncObject){
+                    syncObject.notify()
+                }
+            }
 
             val searchRequest = AuthorizedRequest(Request.Method.GET,
                 context.getString(R.string.loadSongsUrl) + "?term=$searchString&limit=50&skip=0&fields=&search=$searchString",
@@ -55,6 +63,10 @@ class LoadTitleSearchAsync(
                 })
 
             searchQueue.add(searchRequest)
+        }
+
+        synchronized(syncObject){
+            syncObject.wait()
         }
 
         return null
