@@ -204,7 +204,7 @@ fun updateNotification(
 
 internal fun createNotificationChannel() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        contextReference!!.get()?.let { context ->
+        contextReference?.get()?.let { context ->
             val channelName = "Music Notification"
             val channelDescription = "Handy dandy description"
             val importance = NotificationManager.IMPORTANCE_LOW

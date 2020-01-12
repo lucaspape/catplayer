@@ -17,7 +17,6 @@ import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import com.squareup.picasso.OkHttpDownloader
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import de.lucaspape.monstercat.R
@@ -244,18 +243,14 @@ internal fun setCover(song: Song, context: Context, callback: (bitmap:Bitmap) ->
     val settings = Settings(context)
 
     barCoverImageReference?.get()?.let {
-        Picasso.Builder(context)
-            .downloader(OkHttpDownloader(context, Long.MAX_VALUE))
-            .build()
+        Picasso.with(context)
             .load(song.coverUrl + "?image_width=" + settings.getSetting("primaryResolution"))
             .placeholder(Drawable.createFromPath(context.dataDir.toString() + "/fallback.jpg"))
             .into(it)
     }
 
     fullscreenCoverReference?.get()?.let {
-        Picasso.Builder(context)
-            .downloader(OkHttpDownloader(context, Long.MAX_VALUE))
-            .build()
+        Picasso.with(context)
             .load(song.coverUrl + "?image_width=" + settings.getSetting("primaryResolution"))
             .placeholder(Drawable.createFromPath(context.dataDir.toString() + "/fallback.jpg"))
             .into(it)
@@ -276,8 +271,7 @@ internal fun setCover(song: Song, context: Context, callback: (bitmap:Bitmap) ->
         }
     }
 
-    Picasso.Builder(context)
-        .build()
+    Picasso.with(context)
         .load(song.coverUrl + "?image_width=" + settings.getSetting("primaryResolution"))
         .into(picassoTarget)
 }
@@ -294,18 +288,14 @@ internal fun setCover(
         val settings = Settings(context)
 
         barCoverImageReference?.get()?.let {
-            Picasso.Builder(context)
-                .downloader(OkHttpDownloader(context, Long.MAX_VALUE))
-                .build()
+            Picasso.with(context)
                 .load(coverUrl + "?image_width=" + settings.getSetting("primaryResolution"))
                 .placeholder(Drawable.createFromPath(context.dataDir.toString() + "/fallback.jpg"))
                 .into(it)
         }
 
         fullscreenCoverReference?.get()?.let {
-            Picasso.Builder(context)
-                .downloader(OkHttpDownloader(context, Long.MAX_VALUE))
-                .build()
+            Picasso.with(context)
                 .load(coverUrl + "?image_width=" + settings.getSetting("primaryResolution"))
                 .placeholder(Drawable.createFromPath(context.dataDir.toString() + "/fallback.jpg"))
                 .into(it)

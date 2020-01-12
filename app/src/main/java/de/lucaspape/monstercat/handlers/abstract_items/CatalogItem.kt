@@ -8,7 +8,6 @@ import android.widget.TextView
 import androidx.core.net.toUri
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
-import com.squareup.picasso.OkHttpDownloader
 import com.squareup.picasso.Picasso
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.util.Settings
@@ -44,9 +43,7 @@ open class CatalogItem(
 
             val settings = Settings(context)
 
-            Picasso.Builder(context)
-                .downloader(OkHttpDownloader(context, Long.MAX_VALUE))
-                .build()
+            Picasso.with(context)
                 .load(item.coverUrl + "?image_width=" + settings.getSetting("primaryResolution"))
                 .placeholder(Drawable.createFromPath(context.dataDir.toString() + "/fallback.jpg"))
                 .into(coverImageView)
