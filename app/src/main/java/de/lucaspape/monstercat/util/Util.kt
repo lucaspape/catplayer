@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.widget.Toast
 import java.io.BufferedInputStream
 import java.io.File
@@ -16,9 +17,9 @@ import java.util.*
 fun wifiConnected(context: Context): Boolean? {
     val connectivityManager =
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    val wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
 
-    return wifi?.isConnected
+    val activeNetwork = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+    return activeNetwork?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ?: false
 }
 
 fun downloadCover(

@@ -7,7 +7,7 @@ import android.media.AudioManager
 import android.media.session.MediaSession
 import android.support.v4.media.session.MediaSessionCompat
 import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.ExoPlayerFactory
+import com.google.android.exoplayer2.SimpleExoPlayer
 import de.lucaspape.monstercat.background.BackgroundService.Companion.loadContinuousSongListAsyncTask
 import java.lang.ref.WeakReference
 
@@ -59,7 +59,7 @@ class MonstercatPlayer {
     fun createMediaSession() {
         contextReference?.get()?.let {
             if (!sessionCreated) {
-                mediaPlayer = ExoPlayerFactory.newSimpleInstance(it)
+                mediaPlayer = SimpleExoPlayer.Builder(it).build()
 
 
                 mediaSession = MediaSessionCompat.fromMediaSession(

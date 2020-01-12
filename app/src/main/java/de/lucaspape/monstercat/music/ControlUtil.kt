@@ -4,8 +4,8 @@ import android.content.Context
 import android.content.IntentFilter
 import android.media.AudioManager
 import android.os.AsyncTask
-import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.SimpleExoPlayer
 import de.lucaspape.monstercat.background.BackgroundService.Companion.updateLiveInfoAsync
 import de.lucaspape.monstercat.background.BackgroundService.Companion.waitForDownloadTask
 import de.lucaspape.monstercat.R
@@ -116,7 +116,7 @@ private fun playSong(context: Context, song: Song) {
     MonstercatPlayer.mediaPlayer?.stop()
 
     //new exoplayer
-    val exoPlayer = ExoPlayerFactory.newSimpleInstance(context)
+    val exoPlayer = SimpleExoPlayer.Builder(context).build()
     exoPlayer.audioAttributes = getAudioAttributes()
 
     //for play/pause button change
@@ -185,7 +185,7 @@ fun playStream(stream: Stream) {
         MonstercatPlayer.mediaPlayer?.stop()
 
         //new exoplayer
-        val exoPlayer = ExoPlayerFactory.newSimpleInstance(context)
+        val exoPlayer = SimpleExoPlayer.Builder(context).build()
         exoPlayer.audioAttributes = getAudioAttributes()
 
         //for play/pause button change

@@ -45,6 +45,7 @@ fun requestAudioFocus(context: Context): Int {
             val audioManager =
                 context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
+            @Suppress("DEPRECATION")
             audioManager.requestAudioFocus(
                 audioFocusChangeListener,
                 AudioManager.STREAM_MUSIC,
@@ -57,5 +58,7 @@ fun requestAudioFocus(context: Context): Int {
 fun abandonAudioFocus(context: Context) {
     val audioManager =
         context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
+    @Suppress("DEPRECATION")
     audioManager.abandonAudioFocus(audioFocusChangeListener)
 }
