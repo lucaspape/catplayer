@@ -54,6 +54,7 @@ class HomeHandler {
     private var albumContentsDisplayed = false
 
     private var currentAlbumId = ""
+    private var currentMCID = ""
 
     /**
      * Updates content of listView
@@ -100,10 +101,12 @@ class HomeHandler {
             recyclerView.addOnScrollListener(object :
                 EndlessRecyclerOnScrollListener(footerAdapter) {
                 override fun onLoadMore(currentPage: Int) {
-                    footerAdapter.clear()
-                    footerAdapter.add(ProgressItem())
+                    if(!albumContentsDisplayed){
+                        footerAdapter.clear()
+                        footerAdapter.add(ProgressItem())
 
-                    loadAlbumList(view, itemAdapter)
+                        loadAlbumList(view, itemAdapter)
+                    }
                 }
             })
         } else {
@@ -169,6 +172,8 @@ class HomeHandler {
             recyclerView.addOnScrollListener(object :
                 EndlessRecyclerOnScrollListener(footerAdapter) {
                 override fun onLoadMore(currentPage: Int) {
+                    println("LOADMORE")
+
                     if (!albumContentsDisplayed) {
                         footerAdapter.clear()
                         footerAdapter.add(ProgressItem())
@@ -269,6 +274,7 @@ class HomeHandler {
                 if (albumContentsDisplayed) {
                     val itemValue = HashMap<String, Any?>()
                     itemValue["id"] = currentAlbumId
+                    itemValue["mcID"] = currentMCID
                     loadAlbum(view, itemValue, true)
                 } else {
                     initAlbumListLoad(view)
@@ -632,6 +638,7 @@ class HomeHandler {
 
                 albumContentsDisplayed = true
                 currentAlbumId = itemValue["id"] as String
+                currentMCID = itemValue["mcID"] as String
             }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 
         }.executeOnExecutor(
