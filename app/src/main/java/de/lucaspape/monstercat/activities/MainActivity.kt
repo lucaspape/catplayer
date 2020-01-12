@@ -92,13 +92,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if(!File("$dataDir/fallback.jpg").exists()){
-            BackgroundAsync({
-                downloadFile("$dataDir/fallback.jpg", getString(R.string.fallbackCoverUrl), cacheDir.toString(), "") { max, current ->
-                }
-            }, {}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-        }
-
         //check for internet
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET)
             != PackageManager.PERMISSION_GRANTED
@@ -173,7 +166,12 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             } else {
-                setCover(UpdateLiveInfoAsync.previousTitle, UpdateLiveInfoAsync.previousVersion, UpdateLiveInfoAsync.previousArtist, "") { bitmap ->
+                setCover(
+                    UpdateLiveInfoAsync.previousTitle,
+                    UpdateLiveInfoAsync.previousVersion,
+                    UpdateLiveInfoAsync.previousArtist,
+                    ""
+                ) { bitmap ->
                     updateNotification(
                         UpdateLiveInfoAsync.previousTitle,
                         UpdateLiveInfoAsync.previousVersion,
@@ -208,8 +206,29 @@ class MainActivity : AppCompatActivity() {
         if (settings.getSetting("darkTheme") != null) {
             if (settings.getSetting("darkTheme")!!.toBoolean()) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+
+                BackgroundAsync({
+                    downloadFile(
+                        "$dataDir/fallback.jpg",
+                        getString(R.string.fallbackCoverBlackUrl),
+                        cacheDir.toString(),
+                        ""
+                    ) { max, current ->
+                    }
+                }, {}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+
             } else {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+
+                BackgroundAsync({
+                    downloadFile(
+                        "$dataDir/fallback.jpg",
+                        getString(R.string.fallbackCoverUrl),
+                        cacheDir.toString(),
+                        ""
+                    ) { max, current ->
+                    }
+                }, {}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
             }
         }
     }
