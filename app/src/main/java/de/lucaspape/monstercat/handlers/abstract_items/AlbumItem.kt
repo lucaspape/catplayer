@@ -1,10 +1,14 @@
 package de.lucaspape.monstercat.handlers.abstract_items
 
+import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.net.toUri
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
+import com.squareup.okhttp.OkHttpClient
+import com.squareup.picasso.OkHttpDownloader
 import com.squareup.picasso.Picasso
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.util.Settings
@@ -32,7 +36,13 @@ open class AlbumItem(private var title:String?, private var artist:String?, priv
             artistTextView.text = item.artist
 
             val settings = Settings(context)
-            Picasso.with(context).load(item.coverUrl + "?image_width=" + settings.getSetting("primaryResolution")).into(coverImageView)
+
+            Picasso.Builder(context)
+                .downloader(OkHttpDownloader(context, Long.MAX_VALUE))
+                .build()
+                .load(item.coverUrl + "?image_width=" + settings.getSetting("primaryResolution"))
+                .placeholder(Drawable.createFromPath(context.dataDir.toString() + "/fallback.jpg"))
+                .into(coverImageView)
         }
 
         override fun unbindView(item: AlbumItem) {

@@ -19,7 +19,7 @@ class UpdateLiveInfoAsync(
     private val stream: Stream
 ) : AsyncTask<Void, String, String>() {
 
-    companion object{
+    companion object {
         @JvmStatic
         var previousTitle = ""
         @JvmStatic
@@ -80,7 +80,12 @@ class UpdateLiveInfoAsync(
             version?.let {
                 artist?.let {
                     coverUrl?.let {
-                        setCover(previousTitle, previousVersion, previousArtist, coverUrl) { bitmap ->
+                        setCover(
+                            previousTitle,
+                            previousVersion,
+                            previousArtist,
+                            coverUrl
+                        ) { bitmap ->
                             updateNotification(
                                 title,
                                 version,
@@ -88,6 +93,7 @@ class UpdateLiveInfoAsync(
                                 bitmap
                             )
                         }
+
                     }
                 }
             }

@@ -17,6 +17,7 @@ import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import com.squareup.picasso.OkHttpDownloader
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import de.lucaspape.monstercat.R
@@ -24,6 +25,7 @@ import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.music.MonstercatPlayer.Companion.contextReference
 import de.lucaspape.monstercat.music.MonstercatPlayer.Companion.mediaPlayer
 import de.lucaspape.monstercat.music.MonstercatPlayer.Companion.mediaSession
+import de.lucaspape.monstercat.util.Settings
 import java.lang.ref.WeakReference
 
 var textViewReference: WeakReference<TextView>? = null
@@ -239,15 +241,27 @@ internal fun startSeekBarUpdate() {
 }
 
 internal fun setCover(song: Song, context: Context, callback: (bitmap:Bitmap) -> Unit) {
+    val settings = Settings(context)
+
     barCoverImageReference?.get()?.let {
-        Picasso.with(context).load(song.coverUrl + "?image_width=512").into(it)
+        Picasso.Builder(context)
+            .downloader(OkHttpDownloader(context, Long.MAX_VALUE))
+            .build()
+            .load(song.coverUrl + "?image_width=" + settings.getSetting("primaryResolution"))
+            .placeholder(Drawable.createFromPath(context.dataDir.toString() + "/fallback.jpg"))
+            .into(it)
     }
 
     fullscreenCoverReference?.get()?.let {
-        Picasso.with(context).load(song.coverUrl + "?image_width=512").into(it)
+        Picasso.Builder(context)
+            .downloader(OkHttpDownloader(context, Long.MAX_VALUE))
+            .build()
+            .load(song.coverUrl + "?image_width=" + settings.getSetting("primaryResolution"))
+            .placeholder(Drawable.createFromPath(context.dataDir.toString() + "/fallback.jpg"))
+            .into(it)
     }
 
-    val picassoTarget = object:com.squareup.picasso.Target{
+    val picassoTarget = object: Target{
         override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
         }
 
@@ -262,7 +276,10 @@ internal fun setCover(song: Song, context: Context, callback: (bitmap:Bitmap) ->
         }
     }
 
-    Picasso.with(context).load(song.coverUrl + "?image_width=512").into(picassoTarget)
+    Picasso.Builder(context)
+        .build()
+        .load(song.coverUrl + "?image_width=" + settings.getSetting("primaryResolution"))
+        .into(picassoTarget)
 }
 
 internal fun setCover(
@@ -274,12 +291,24 @@ internal fun setCover(
 ) {
 
     contextReference?.get()?.let{context ->
+        val settings = Settings(context)
+
         barCoverImageReference?.get()?.let {
-            Picasso.with(context).load(coverUrl).into(it)
+            Picasso.Builder(context)
+                .downloader(OkHttpDownloader(context, Long.MAX_VALUE))
+                .build()
+                .load(coverUrl + "?image_width=" + settings.getSetting("primaryResolution"))
+                .placeholder(Drawable.createFromPath(context.dataDir.toString() + "/fallback.jpg"))
+                .into(it)
         }
 
         fullscreenCoverReference?.get()?.let {
-            Picasso.with(context).load(coverUrl).into(it)
+            Picasso.Builder(context)
+                .downloader(OkHttpDownloader(context, Long.MAX_VALUE))
+                .build()
+                .load(coverUrl + "?image_width=" + settings.getSetting("primaryResolution"))
+                .placeholder(Drawable.createFromPath(context.dataDir.toString() + "/fallback.jpg"))
+                .into(it)
         }
 
         val picassoTarget = object:Target{
