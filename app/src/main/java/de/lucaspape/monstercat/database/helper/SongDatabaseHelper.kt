@@ -117,6 +117,7 @@ class SongDatabaseHelper(context: Context) :
         )
 
         cursor.close()
+        db.close()
 
         return song
     }
