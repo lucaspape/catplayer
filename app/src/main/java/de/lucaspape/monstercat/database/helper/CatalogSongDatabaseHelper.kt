@@ -17,7 +17,7 @@ class CatalogSongDatabaseHelper(context: Context) :
 
     companion object {
         @JvmStatic
-        private val DATABASE_VERSION = 2
+        private val DATABASE_VERSION = 3
         @JvmStatic
         private val DATABASE_NAME = "catalog_songs_db"
     }
