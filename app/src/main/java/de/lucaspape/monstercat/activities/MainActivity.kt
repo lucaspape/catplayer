@@ -28,7 +28,6 @@ import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.MonstercatPlayer.Companion.mediaPlayer
 import de.lucaspape.monstercat.music.notification.updateNotification
 import de.lucaspape.monstercat.util.*
-import java.io.File
 import java.lang.ref.WeakReference
 
 val noisyReceiver = MonstercatPlayer.Companion.NoisyReceiver()
