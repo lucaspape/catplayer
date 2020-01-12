@@ -65,13 +65,13 @@ class HomeHandler {
         val itemAdapter = ItemAdapter<CatalogItem>()
         val fastAdapter = FastAdapter.with(itemAdapter)
 
+        recyclerView.adapter = fastAdapter
+
         for (hashMap in data) {
             itemAdapter.add(
                 parseHashMapToAbstractCatalogItem(hashMap)
             )
         }
-
-        recyclerView.adapter = fastAdapter
 
         fastAdapter.onClickListener = { _, _, _, position ->
             monstercatPlayer.clearContinuous()
@@ -134,13 +134,13 @@ class HomeHandler {
         val itemAdapter = ItemAdapter<AlbumItem>()
         val fastAdapter = FastAdapter.with(itemAdapter)
 
+        recyclerView.adapter = fastAdapter
+
         for (hashMap in data) {
             itemAdapter.add(
                 parseHashMapToAbstractAlbumItem(hashMap)
             )
         }
-
-        recyclerView.adapter = fastAdapter
 
         fastAdapter.onClickListener = { _, _, _, position ->
             val itemValue = data[position] as HashMap<*, *>
@@ -405,18 +405,12 @@ class HomeHandler {
 
                 val songDatabaseHelper =
                     SongDatabaseHelper(view.context)
-                val songList = ArrayList<Song>()
 
-                for (song in songIdList) {
-                    songList.add(songDatabaseHelper.getSong(view.context, song.songId))
+                for(i in(1 until songIdList.size + 1)){
+                        val hashMap = parseSongToHashMap(songDatabaseHelper.getSong(view.context, songIdList[songIdList.size-i].songId))
+                        currentListViewData.add(hashMap)
                 }
 
-                songList.reverse()
-
-                for (song in songList) {
-                    val hashMap = parseSongToHashMap(song)
-                    currentListViewData.add(hashMap)
-                }
             },{
                 updateCatalogRecyclerView(view, currentListViewData)
 
@@ -441,16 +435,9 @@ class HomeHandler {
 
             val songDatabaseHelper =
                 SongDatabaseHelper(view.context)
-            val songList = ArrayList<Song>()
 
-            for (song in songIdList) {
-                songList.add(songDatabaseHelper.getSong(view.context, song.songId))
-            }
-
-            songList.reverse()
-
-            for (song in songList) {
-                val hashMap = parseSongToHashMap(song)
+            for(i in(1 until songIdList.size+1)){
+                val hashMap = parseSongToHashMap(songDatabaseHelper.getSong(view.context, songIdList[songIdList.size-i].songId))
 
                 itemAdapter.add(
                     parseHashMapToAbstractCatalogItem(hashMap)

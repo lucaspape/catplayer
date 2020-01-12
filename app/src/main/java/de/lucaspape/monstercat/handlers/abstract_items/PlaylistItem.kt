@@ -26,10 +26,10 @@ open class PlaylistItem(
     }
 
     class ViewHolder(view: View) : FastAdapter.ViewHolder<PlaylistItem>(view) {
-        val titleTextView = view.findViewById<TextView>(R.id.title)
-        val titleMenuButton = view.findViewById<ImageButton>(R.id.titleMenuButton)
-        val coverImageView = view.findViewById<ImageView>(R.id.cover)
-        val titleDownloadStatusImageView = view.findViewById<ImageView>(R.id.titleDownloadStatus)
+        private val titleTextView: TextView = view.findViewById(R.id.title)
+        val titleMenuButton:ImageButton = view.findViewById(R.id.titleMenuButton)
+        private val coverImageView:ImageView = view.findViewById(R.id.cover)
+        private val titleDownloadStatusImageView:ImageView = view.findViewById(R.id.titleDownloadStatus)
 
         override fun bindView(item: PlaylistItem, payloads: MutableList<Any>) {
             titleTextView.text = item.name

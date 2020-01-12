@@ -29,12 +29,12 @@ open class CatalogItem(
     }
 
     class ViewHolder(view: View) : FastAdapter.ViewHolder<CatalogItem>(view) {
-        val titleTextView = view.findViewById<TextView>(R.id.title)
-        val artistTextView = view.findViewById<TextView>(R.id.artist)
-        val titleMenuButton = view.findViewById<ImageButton>(R.id.titleMenuButton)
-        val coverImageView = view.findViewById<ImageView>(R.id.cover)
-        val titleDownloadStatusImageView = view.findViewById<ImageView>(R.id.titleDownloadStatus)
-        val context = view.context
+        private val titleTextView:TextView = view.findViewById(R.id.title)
+        private val artistTextView:TextView = view.findViewById(R.id.artist)
+        val titleMenuButton:ImageButton = view.findViewById(R.id.titleMenuButton)
+        private val coverImageView:ImageView = view.findViewById(R.id.cover)
+        private val titleDownloadStatusImageView:ImageView = view.findViewById(R.id.titleDownloadStatus)
+        private val context = view.context
 
         override fun bindView(item: CatalogItem, payloads: MutableList<Any>) {
             titleTextView.text = item.title

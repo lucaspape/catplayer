@@ -45,13 +45,13 @@ class PlaylistHandler {
         val itemAdapter = ItemAdapter<CatalogItem>()
         val fastAdapter = FastAdapter.with(itemAdapter)
 
+        playlistList.adapter = fastAdapter
+
         for(hashMap in data){
             itemAdapter.add(
                 parseHashMapToAbstractCatalogItem(hashMap)
             )
         }
-
-        playlistList.adapter = fastAdapter
 
         fastAdapter.onClickListener = { _, _, _, position ->
             monstercatPlayer.clearContinuous()
@@ -94,13 +94,13 @@ class PlaylistHandler {
         val itemAdapter = ItemAdapter<PlaylistItem>()
         val fastAdapter = FastAdapter.with(itemAdapter)
 
+        playlistList.adapter = fastAdapter
+
         for(hashMap in data){
             itemAdapter.add(
                 parseHashMapToAbstractPlaylistItem(hashMap)
             )
         }
-
-        playlistList.adapter = fastAdapter
 
         fastAdapter.onClickListener = { _, _, _, position ->
             currentPlaylistId = data[position]["playlistId"] as String

@@ -22,10 +22,10 @@ open class AlbumItem(private var title:String?, private var artist:String?, priv
     }
 
     class ViewHolder(view:View) : FastAdapter.ViewHolder<AlbumItem>(view){
-        val titleTextView = view.findViewById<TextView>(R.id.albumTitle)
-        val artistTextView = view.findViewById<TextView>(R.id.albumArtist)
-        val coverImageView = view.findViewById<ImageView>(R.id.cover)
-        val context = view.context
+        private val titleTextView:TextView = view.findViewById(R.id.albumTitle)
+        private val artistTextView:TextView = view.findViewById(R.id.albumArtist)
+        private val coverImageView:ImageView = view.findViewById(R.id.cover)
+        private val context = view.context
 
         override fun bindView(item: AlbumItem, payloads: MutableList<Any>) {
             titleTextView.text = item.title
