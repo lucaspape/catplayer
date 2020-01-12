@@ -42,8 +42,6 @@ class PlaylistFragment : Fragment() {
 
             }
         } else {
-            playlistHandler.setupListView(view)
-
             playlistHandler.registerListeners(view)
 
             playlistHandler.loadPlaylist(view, false)

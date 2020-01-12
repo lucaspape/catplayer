@@ -21,6 +21,8 @@ import de.lucaspape.monstercat.handlers.abstract_items.PlaylistItem
 import de.lucaspape.monstercat.handlers.async.BackgroundAsync
 import de.lucaspape.monstercat.handlers.async.LoadPlaylistAsync
 import de.lucaspape.monstercat.handlers.async.LoadPlaylistTracksAsync
+import de.lucaspape.monstercat.util.parseHashMapToAbstractCatalogItem
+import de.lucaspape.monstercat.util.parseHashMapToAbstractPlaylistItem
 import de.lucaspape.monstercat.util.parsePlaylistToHashMap
 import de.lucaspape.monstercat.util.parseSongToHashMap
 import java.lang.ref.WeakReference
@@ -34,119 +36,105 @@ class PlaylistHandler {
     private var currentListViewData = ArrayList<HashMap<String, Any?>>()
     private var listViewDataIsPlaylistView = true
 
-    /**
-     * Updates listView content
-     */
-    private fun updateListView(view: View) {
+    private fun updateCatalogRecyclerView(view: View, data:ArrayList<HashMap<String, Any?>>){
         val playlistList = view.findViewById<RecyclerView>(R.id.playlistView)
 
         playlistList.layoutManager =
             LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
 
-        if (listViewDataIsPlaylistView) {
-            val itemAdapter = ItemAdapter<PlaylistItem>()
-            val fastAdapter = FastAdapter.with(itemAdapter)
+        val itemAdapter = ItemAdapter<CatalogItem>()
+        val fastAdapter = FastAdapter.with(itemAdapter)
 
-            for(hashMap in currentListViewData){
-                val name = hashMap["playlistName"] as String
-                val coverUrl = hashMap["coverUrl"] as String
-
-                itemAdapter.add(
-                    PlaylistItem(
-                        name,
-                        coverUrl,
-                        ""
-                    )
-                )
-            }
-
-            playlistList.adapter = fastAdapter
-
-            fastAdapter.onClickListener = { _, _, _, position ->
-                currentPlaylistId = currentListViewData[position]["playlistId"] as String
-                loadPlaylistTracks(view, false, currentPlaylistId!!)
-                false
-            }
-
-            fastAdapter.onLongClickListener = { _, _, _, position ->
-                showContextMenu(view, position)
-                false
-            }
-
-            fastAdapter.addEventHook(object : ClickEventHook<PlaylistItem>() {
-                override fun onBind(viewHolder: RecyclerView.ViewHolder): View? {
-                    return if (viewHolder is PlaylistItem.ViewHolder) {
-                        viewHolder.titleMenuButton
-                    } else null
-                }
-
-                override fun onClick(
-                    v: View,
-                    position: Int,
-                    fastAdapter: FastAdapter<PlaylistItem>,
-                    item: PlaylistItem
-                ) {
-                    showContextMenu(view, position)
-                }
-            })
-
-        }else{
-            val itemAdapter = ItemAdapter<CatalogItem>()
-            val fastAdapter = FastAdapter.with(itemAdapter)
-
-            for(hashMap in currentListViewData){
-                val title = hashMap["title"] as String
-                val artist = hashMap["artist"] as String
-                val titleDownloadStatus = hashMap["downloadedCheck"] as String
-
-                itemAdapter.add(
-                    CatalogItem(
-                        title,
-                        artist,
-                        (hashMap["coverUrl"] as String),
-                        titleDownloadStatus
-                    )
-                )
-            }
-
-            playlistList.adapter = fastAdapter
-
-            fastAdapter.onClickListener = { _, _, _, position ->
-                monstercatPlayer.clearContinuous()
-
-                val songId = currentListViewData[position]["id"] as String
-                playSongFromId(view.context, songId, true, currentListViewData, position)
-                false
-            }
-
-            fastAdapter.onLongClickListener = { _, _, _, position ->
-                showContextMenu(view, position)
-                false
-            }
-
-            fastAdapter.addEventHook(object : ClickEventHook<CatalogItem>() {
-                override fun onBind(viewHolder: RecyclerView.ViewHolder): View? {
-                    return if (viewHolder is CatalogItem.ViewHolder) {
-                        viewHolder.titleMenuButton
-                    } else null
-                }
-
-                override fun onClick(
-                    v: View,
-                    position: Int,
-                    fastAdapter: FastAdapter<CatalogItem>,
-                    item: CatalogItem
-                ) {
-                    showContextMenu(view, position)
-                }
-            })
+        for(hashMap in data){
+            itemAdapter.add(
+                parseHashMapToAbstractCatalogItem(hashMap)
+            )
         }
+
+        playlistList.adapter = fastAdapter
+
+        fastAdapter.onClickListener = { _, _, _, position ->
+            monstercatPlayer.clearContinuous()
+
+            val songId = data[position]["id"] as String
+            playSongFromId(view.context, songId, true, data, position)
+            false
+        }
+
+        fastAdapter.onLongClickListener = { _, _, _, position ->
+            showContextMenu(view, data, position)
+            false
+        }
+
+        fastAdapter.addEventHook(object : ClickEventHook<CatalogItem>() {
+            override fun onBind(viewHolder: RecyclerView.ViewHolder): View? {
+                return if (viewHolder is CatalogItem.ViewHolder) {
+                    viewHolder.titleMenuButton
+                } else null
+            }
+
+            override fun onClick(
+                v: View,
+                position: Int,
+                fastAdapter: FastAdapter<CatalogItem>,
+                item: CatalogItem
+            ) {
+                showContextMenu(view, data, position)
+            }
+        })
+
+    }
+
+    private fun updatePlaylistRecyclerView(view: View, data: ArrayList<HashMap<String, Any?>>){
+        val playlistList = view.findViewById<RecyclerView>(R.id.playlistView)
+
+        playlistList.layoutManager =
+            LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
+
+        val itemAdapter = ItemAdapter<PlaylistItem>()
+        val fastAdapter = FastAdapter.with(itemAdapter)
+
+        for(hashMap in data){
+            itemAdapter.add(
+                parseHashMapToAbstractPlaylistItem(hashMap)
+            )
+        }
+
+        playlistList.adapter = fastAdapter
+
+        fastAdapter.onClickListener = { _, _, _, position ->
+            currentPlaylistId = data[position]["playlistId"] as String
+            loadPlaylistTracks(view, false, currentPlaylistId!!)
+            false
+        }
+
+        fastAdapter.onLongClickListener = { _, _, _, position ->
+            showContextMenu(view, data, position)
+            false
+        }
+
+        fastAdapter.addEventHook(object : ClickEventHook<PlaylistItem>() {
+            override fun onBind(viewHolder: RecyclerView.ViewHolder): View? {
+                return if (viewHolder is PlaylistItem.ViewHolder) {
+                    viewHolder.titleMenuButton
+                } else null
+            }
+
+            override fun onClick(
+                v: View,
+                position: Int,
+                fastAdapter: FastAdapter<PlaylistItem>,
+                item: PlaylistItem
+            ) {
+                showContextMenu(view, data, position)
+            }
+        })
     }
 
     /**
      * Context menu
      */
-    private fun showContextMenu(view: View, listViewPosition: Int) {
+    private fun showContextMenu(view: View, data: ArrayList<HashMap<String, Any?>>, listViewPosition: Int) {
         val menuItems: Array<String> = arrayOf(
             view.context.getString(R.string.download),
             view.context.getString(R.string.playNext),
@@ -156,7 +144,7 @@ class PlaylistHandler {
         val alertDialogBuilder = AlertDialog.Builder(view.context)
         alertDialogBuilder.setTitle("")
         alertDialogBuilder.setItems(menuItems) { _, which ->
-            val listItem = currentListViewData[listViewPosition]
+            val listItem = data[listViewPosition]
 
             view.context.let { context ->
                 val item = menuItems[which]
@@ -207,7 +195,7 @@ class PlaylistHandler {
                                         song,
                                         playlistId,
                                         listViewPosition + 1,
-                                        currentListViewData.size
+                                        data.size
                                     )
                                 }
                             }
@@ -218,13 +206,6 @@ class PlaylistHandler {
         }
 
         alertDialogBuilder.create().show()
-    }
-
-    /**
-     * Update listView every second (for album covers)
-     */
-    fun setupListView(view: View) {
-        updateListView(view)
     }
 
     /**
@@ -278,7 +259,7 @@ class PlaylistHandler {
             }, {
                 listViewDataIsPlaylistView = true
 
-                updateListView(view)
+                updatePlaylistRecyclerView(view, currentListViewData)
 
                 swipeRefreshLayout.isRefreshing = false
 
@@ -336,7 +317,7 @@ class PlaylistHandler {
             }, {
                 listViewDataIsPlaylistView = false
 
-                updateListView(view)
+                updateCatalogRecyclerView(view, currentListViewData)
 
                 swipeRefreshLayout.isRefreshing = false
             }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)

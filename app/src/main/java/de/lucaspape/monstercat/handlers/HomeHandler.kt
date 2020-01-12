@@ -56,133 +56,117 @@ class HomeHandler {
     private var currentAlbumId = ""
     private var currentMCID = ""
 
-    /**
-     * Updates content of listView
-     */
-    private fun updateRecyclerView(view: View) {
+    private fun updateCatalogRecyclerView(view: View, data: ArrayList<HashMap<String, Any?>>){
         val recyclerView = view.findViewById<RecyclerView>(R.id.musiclistview)
 
         recyclerView.layoutManager =
             LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
 
-        if (albumView) {
-            val itemAdapter = ItemAdapter<AlbumItem>()
-            val fastAdapter = FastAdapter.with(itemAdapter)
+        val itemAdapter = ItemAdapter<CatalogItem>()
+        val fastAdapter = FastAdapter.with(itemAdapter)
 
-            for (hashMap in currentListViewData) {
-                val title = hashMap["title"] as String
-                val artist = hashMap["artist"] as String
-
-                itemAdapter.add(
-                    AlbumItem(
-                        title,
-                        artist,
-                        hashMap["coverUrl"] as String
-                    )
-                )
-            }
-
-            recyclerView.adapter = fastAdapter
-
-            fastAdapter.onClickListener = { _, _, _, position ->
-                val itemValue = currentListViewData[position] as HashMap<*, *>
-                loadAlbum(view, itemValue, false)
-
-                false
-            }
-
-            fastAdapter.onLongClickListener = { _, _, _, position ->
-                showContextMenu(view, currentListViewData, position)
-
-                false
-            }
-
-            val footerAdapter = ItemAdapter<ProgressItem>()
-            recyclerView.addOnScrollListener(object :
-                EndlessRecyclerOnScrollListener(footerAdapter) {
-                override fun onLoadMore(currentPage: Int) {
-                    if(!albumContentsDisplayed){
-                        footerAdapter.clear()
-                        footerAdapter.add(ProgressItem())
-
-                        loadAlbumList(view, itemAdapter)
-                    }
-                }
-            })
-        } else {
-            val itemAdapter = ItemAdapter<CatalogItem>()
-            val fastAdapter = FastAdapter.with(itemAdapter)
-
-            for (hashMap in currentListViewData) {
-                val title = hashMap["title"] as String
-                val artist = hashMap["artist"] as String
-                val titleDownloadStatus = hashMap["downloadedCheck"] as String
-
-                itemAdapter.add(
-                    CatalogItem(
-                        title,
-                        artist,
-                        (hashMap["coverUrl"] as String),
-                        titleDownloadStatus
-                    )
-                )
-            }
-
-            recyclerView.adapter = fastAdapter
-
-            fastAdapter.onClickListener = { _, _, _, position ->
-                monstercatPlayer.clearContinuous()
-
-                val itemValue = currentListViewData[position] as HashMap<*, *>
-                playSongFromId(
-                    view.context,
-                    itemValue["id"] as String,
-                    true,
-                    currentListViewData,
-                    position
-                )
-
-                false
-            }
-
-            fastAdapter.onLongClickListener = { _, _, _, position ->
-                showContextMenu(view, currentListViewData, position)
-
-                false
-            }
-
-            fastAdapter.addEventHook(object : ClickEventHook<CatalogItem>() {
-                override fun onBind(viewHolder: RecyclerView.ViewHolder): View? {
-                    return if (viewHolder is CatalogItem.ViewHolder) {
-                        viewHolder.titleMenuButton
-                    } else null
-                }
-
-                override fun onClick(
-                    v: View,
-                    position: Int,
-                    fastAdapter: FastAdapter<CatalogItem>,
-                    item: CatalogItem
-                ) {
-                    showContextMenu(view, currentListViewData, position)
-                }
-            })
-
-            val footerAdapter = ItemAdapter<ProgressItem>()
-            recyclerView.addOnScrollListener(object :
-                EndlessRecyclerOnScrollListener(footerAdapter) {
-                override fun onLoadMore(currentPage: Int) {
-                    println("LOADMORE")
-
-                    if (!albumContentsDisplayed) {
-                        footerAdapter.clear()
-                        footerAdapter.add(ProgressItem())
-
-                        loadSongList(view, itemAdapter)
-                    }
-                }
-            })
+        for (hashMap in data) {
+            itemAdapter.add(
+                parseHashMapToAbstractCatalogItem(hashMap)
+            )
         }
+
+        recyclerView.adapter = fastAdapter
+
+        fastAdapter.onClickListener = { _, _, _, position ->
+            monstercatPlayer.clearContinuous()
+
+            val itemValue = data[position] as HashMap<*, *>
+            playSongFromId(
+                view.context,
+                itemValue["id"] as String,
+                true,
+                data,
+                position
+            )
+
+            false
+        }
+
+        fastAdapter.onLongClickListener = { _, _, _, position ->
+            showContextMenu(view, data, position)
+
+            false
+        }
+
+        fastAdapter.addEventHook(object : ClickEventHook<CatalogItem>() {
+            override fun onBind(viewHolder: RecyclerView.ViewHolder): View? {
+                return if (viewHolder is CatalogItem.ViewHolder) {
+                    viewHolder.titleMenuButton
+                } else null
+            }
+
+            override fun onClick(
+                v: View,
+                position: Int,
+                fastAdapter: FastAdapter<CatalogItem>,
+                item: CatalogItem
+            ) {
+                showContextMenu(view, data, position)
+            }
+        })
+
+        val footerAdapter = ItemAdapter<ProgressItem>()
+        recyclerView.addOnScrollListener(object :
+            EndlessRecyclerOnScrollListener(footerAdapter) {
+            override fun onLoadMore(currentPage: Int) {
+                if (!albumContentsDisplayed) {
+                    footerAdapter.clear()
+                    footerAdapter.add(ProgressItem())
+
+                    loadSongList(view, itemAdapter)
+                }
+            }
+        })
+    }
+
+    private fun updateAlbumRecyclerView(view: View, data:ArrayList<HashMap<String, Any?>>){
+        val recyclerView = view.findViewById<RecyclerView>(R.id.musiclistview)
+
+        recyclerView.layoutManager =
+            LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
+
+        val itemAdapter = ItemAdapter<AlbumItem>()
+        val fastAdapter = FastAdapter.with(itemAdapter)
+
+        for (hashMap in data) {
+            itemAdapter.add(
+                parseHashMapToAbstractAlbumItem(hashMap)
+            )
+        }
+
+        recyclerView.adapter = fastAdapter
+
+        fastAdapter.onClickListener = { _, _, _, position ->
+            val itemValue = data[position] as HashMap<*, *>
+            loadAlbum(view, itemValue, false)
+
+            false
+        }
+
+        fastAdapter.onLongClickListener = { _, _, _, position ->
+            showContextMenu(view, data, position)
+
+            false
+        }
+
+        val footerAdapter = ItemAdapter<ProgressItem>()
+        recyclerView.addOnScrollListener(object :
+            EndlessRecyclerOnScrollListener(footerAdapter) {
+            override fun onLoadMore(currentPage: Int) {
+                if(!albumContentsDisplayed){
+                    footerAdapter.clear()
+                    footerAdapter.add(ProgressItem())
+
+                    loadAlbumList(view, itemAdapter)
+                }
+            }
+        })
     }
 
     private fun showContextMenu(view: View, contentList:ArrayList<HashMap<String, Any?>> ,listViewPosition: Int) {
@@ -277,10 +261,10 @@ class HomeHandler {
                     itemValue["mcID"] = currentMCID
                     loadAlbum(view, itemValue, true)
                 } else {
-                    initAlbumListLoad(view)
+                    initAlbumListLoad(view, true)
                 }
             } else {
-                initSongListLoad(view)
+                initSongListLoad(view, true)
             }
         }
 
@@ -300,11 +284,11 @@ class HomeHandler {
 
                 if (albumViewSelected) {
                     viewSelector.setSelection(1)
+                    updateAlbumRecyclerView(view, currentListViewData)
                 } else {
                     viewSelector.setSelection(0)
+                    updateCatalogRecyclerView(view, currentListViewData)
                 }
-
-                updateRecyclerView(view)
             }
 
             override fun onItemSelected(
@@ -327,9 +311,9 @@ class HomeHandler {
                 }
 
                 if (albumView) {
-                    initAlbumListLoad(view)
+                    initAlbumListLoad(view, false)
                 } else {
-                    initSongListLoad(view)
+                    initSongListLoad(view, false)
                 }
             }
         }
@@ -354,9 +338,9 @@ class HomeHandler {
 
         search.setOnCloseListener {
             if (albumView) {
-                initAlbumListLoad(view)
+                initAlbumListLoad(view, false)
             } else {
-                initSongListLoad(view)
+                initSongListLoad(view, false)
             }
 
             false
@@ -381,7 +365,7 @@ class HomeHandler {
         })
     }
 
-    fun initSongListLoad(view: View) {
+    fun initSongListLoad(view: View, forceReload: Boolean) {
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
 
@@ -390,7 +374,7 @@ class HomeHandler {
         val catalogSongDatabaseHelper =
             CatalogSongDatabaseHelper(view.context)
 
-        if(catalogSongDatabaseHelper.getAllSongs().isEmpty()){
+        if(catalogSongDatabaseHelper.getAllSongs().isEmpty() || forceReload){
             LoadSongListAsync(WeakReference(view.context), true, 0, {}, {
                 BackgroundAsync({
                     val songIdList = catalogSongDatabaseHelper.getAllSongs()
@@ -410,7 +394,7 @@ class HomeHandler {
                         currentListViewData.add(hashMap)
                     }
                 },{
-                    updateRecyclerView(view)
+                    updateCatalogRecyclerView(view, currentListViewData)
 
                     swipeRefreshLayout.isRefreshing = false
                 }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
@@ -434,7 +418,7 @@ class HomeHandler {
                     currentListViewData.add(hashMap)
                 }
             },{
-                updateRecyclerView(view)
+                updateCatalogRecyclerView(view, currentListViewData)
 
                 swipeRefreshLayout.isRefreshing = false
             }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
@@ -468,17 +452,8 @@ class HomeHandler {
             for (song in songList) {
                 val hashMap = parseSongToHashMap(song)
 
-                val title = hashMap["title"] as String
-                val artist = hashMap["artist"] as String
-                val titleDownloadStatus = hashMap["downloadedCheck"] as String
-
                 itemAdapter.add(
-                    CatalogItem(
-                        title,
-                        artist,
-                        (hashMap["coverUrl"] as String),
-                        titleDownloadStatus
-                    )
+                    parseHashMapToAbstractCatalogItem(hashMap)
                 )
                 currentListViewData.add(hashMap)
             }
@@ -507,15 +482,8 @@ class HomeHandler {
 
                     sortedList.add(hashMap)
 
-                    val title = hashMap["title"] as String
-                    val artist = hashMap["artist"] as String
-
                     itemAdapter.add(
-                        AlbumItem(
-                            title,
-                            artist,
-                            hashMap["coverUrl"] as String
-                        )
+                        parseHashMapToAbstractAlbumItem(hashMap)
                     )
 
                     currentListViewData.add(hashMap)
@@ -525,7 +493,7 @@ class HomeHandler {
             }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 
-    fun initAlbumListLoad(view: View) {
+    fun initAlbumListLoad(view: View, forceReload: Boolean) {
         val contextReference = WeakReference<Context>(view.context)
 
         val swipeRefreshLayout =
@@ -533,7 +501,7 @@ class HomeHandler {
 
         val albumDatabaseHelper = AlbumDatabaseHelper(view.context)
 
-        if(albumDatabaseHelper.getAllAlbums().isEmpty()){
+        if(albumDatabaseHelper.getAllAlbums().isEmpty() || forceReload){
             LoadAlbumListAsync(
                 contextReference,
                 true,
@@ -554,7 +522,7 @@ class HomeHandler {
 
                     currentListViewData = sortedList
                 }, {
-                    updateRecyclerView(view)
+                    updateAlbumRecyclerView(view, currentListViewData)
 
                     swipeRefreshLayout.isRefreshing = false
 
@@ -578,7 +546,7 @@ class HomeHandler {
 
                 currentListViewData = sortedList
             }, {
-                updateRecyclerView(view)
+                updateAlbumRecyclerView(view, currentListViewData)
 
                 swipeRefreshLayout.isRefreshing = false
 
@@ -632,7 +600,7 @@ class HomeHandler {
             }, {
                 albumView = false
 
-                updateRecyclerView(view)
+                updateCatalogRecyclerView(view, currentListViewData)
 
                 swipeRefreshLayout.isRefreshing = false
 
@@ -660,72 +628,9 @@ class HomeHandler {
             searchString,
             0
         ) {
-            updateRecyclerView(view)
+            updateCatalogRecyclerView(view, searchResults)
 
             albumContentsDisplayed = false
-
-            val recyclerView = view.findViewById<RecyclerView>(R.id.musiclistview)
-
-            recyclerView.layoutManager =
-                LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
-
-            val itemAdapter = ItemAdapter<CatalogItem>()
-            val fastAdapter = FastAdapter.with(itemAdapter)
-
-            for (hashMap in searchResults) {
-                val title = hashMap["title"] as String
-                val artist = hashMap["artist"] as String
-                val titleDownloadStatus = hashMap["downloadedCheck"] as String
-
-                itemAdapter.add(
-                    CatalogItem(
-                        title,
-                        artist,
-                        (hashMap["coverUrl"] as String),
-                        titleDownloadStatus
-                    )
-                )
-            }
-
-            recyclerView.adapter = fastAdapter
-
-            fastAdapter.onClickListener = { _, _, _, position ->
-                monstercatPlayer.clearContinuous()
-
-                val itemValue = searchResults[position] as HashMap<*, *>
-                playSongFromId(
-                    view.context,
-                    itemValue["id"] as String,
-                    true,
-                    searchResults,
-                    position
-                )
-
-                false
-            }
-
-            fastAdapter.onLongClickListener = { _, _, _, position ->
-                showContextMenu(view, searchResults ,position)
-
-                false
-            }
-
-            fastAdapter.addEventHook(object : ClickEventHook<CatalogItem>() {
-                override fun onBind(viewHolder: RecyclerView.ViewHolder): View? {
-                    return if (viewHolder is CatalogItem.ViewHolder) {
-                        viewHolder.titleMenuButton
-                    } else null
-                }
-
-                override fun onClick(
-                    v: View,
-                    position: Int,
-                    fastAdapter: FastAdapter<CatalogItem>,
-                    item: CatalogItem
-                ) {
-                    showContextMenu(view, searchResults, position)
-                }
-            })
 
             swipeRefreshLayout.isRefreshing = false
         }.executeOnExecutor(

@@ -38,9 +38,9 @@ class HomeFragment : Fragment() {
         fragmentBackPressedCallback = {
             if (HomeHandler.albumViewSelected) {
                 HomeHandler.albumView = true
-                homeHandler.initAlbumListLoad(view)
+                homeHandler.initAlbumListLoad(view, false)
             } else {
-                homeHandler.initSongListLoad(view)
+                homeHandler.initSongListLoad(view, false)
             }
         }
     }

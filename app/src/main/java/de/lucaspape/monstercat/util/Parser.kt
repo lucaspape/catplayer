@@ -4,6 +4,9 @@ import android.content.Context
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.*
 import de.lucaspape.monstercat.database.helper.*
+import de.lucaspape.monstercat.handlers.abstract_items.AlbumItem
+import de.lucaspape.monstercat.handlers.abstract_items.CatalogItem
+import de.lucaspape.monstercat.handlers.abstract_items.PlaylistItem
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -24,17 +27,55 @@ fun parseSongToHashMap(song: Song): HashMap<String, Any?> {
 
     when {
         File(song.downloadLocation).exists() -> {
-            hashMap["downloadedCheck"] = "android.resource://de.lucaspape.monstercat/drawable/ic_check_green_24dp"
+            hashMap["downloadedCheck"] =
+                "android.resource://de.lucaspape.monstercat/drawable/ic_check_green_24dp"
         }
         File(song.streamDownloadLocation).exists() -> {
-            hashMap["downloadedCheck"] = "android.resource://de.lucaspape.monstercat/drawable/ic_check_orange_24dp"
+            hashMap["downloadedCheck"] =
+                "android.resource://de.lucaspape.monstercat/drawable/ic_check_orange_24dp"
         }
         else -> {
-            hashMap["downloadedCheck"] = "android.resource://de.lucaspape.monstercat/drawable/ic_empty_24dp"
+            hashMap["downloadedCheck"] =
+                "android.resource://de.lucaspape.monstercat/drawable/ic_empty_24dp"
         }
     }
 
     return hashMap
+}
+
+fun parseHashMapToAbstractCatalogItem(hashMap: HashMap<String, Any?>): CatalogItem {
+    val title = hashMap["title"] as String + " " + hashMap["version"] as String
+    val artist = hashMap["artist"] as String
+    val titleDownloadStatus = hashMap["downloadedCheck"] as String
+
+    return CatalogItem(
+        title,
+        artist,
+        (hashMap["coverUrl"] as String),
+        titleDownloadStatus
+    )
+}
+
+fun parseHashMapToAbstractAlbumItem(hashMap: HashMap<String, Any?>): AlbumItem {
+    val title = hashMap["title"] as String
+    val artist = hashMap["artist"] as String
+
+    return AlbumItem(
+        title,
+        artist,
+        hashMap["coverUrl"] as String
+    )
+}
+
+fun parseHashMapToAbstractPlaylistItem(hashMap: HashMap<String, Any?>): PlaylistItem {
+    val name = hashMap["playlistName"] as String
+    val coverUrl = hashMap["coverUrl"] as String
+
+    return PlaylistItem(
+        name,
+        coverUrl,
+        ""
+    )
 }
 
 fun parseAlbumToHashMap(context: Context, album: Album): HashMap<String, Any?> {
@@ -70,7 +111,7 @@ fun parseSongSearchToSongList(context: Context, jsonArray: JSONArray): ArrayList
 
         songId?.let {
             val databaseHelper = SongDatabaseHelper(context)
-            songList.add(databaseHelper.getSong(context,it))
+            songList.add(databaseHelper.getSong(context, it))
         }
     }
 
@@ -107,7 +148,18 @@ fun parseSongToDB(jsonObject: JSONObject, context: Context): Long? {
 
     val databaseHelper = SongDatabaseHelper(context)
 
-    return databaseHelper.insertSong(context, id, title, version, albumId, artist, coverUrl, downloadable, streamable, inEarlyAccess)
+    return databaseHelper.insertSong(
+        context,
+        id,
+        title,
+        version,
+        albumId,
+        artist,
+        coverUrl,
+        downloadable,
+        streamable,
+        inEarlyAccess
+    )
 }
 
 fun parseCatalogSongToDB(jsonObject: JSONObject, context: Context): Long? {
