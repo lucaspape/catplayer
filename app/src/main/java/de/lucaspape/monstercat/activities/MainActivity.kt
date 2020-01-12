@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.os.AsyncTask
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
@@ -213,10 +214,9 @@ class MainActivity : AppCompatActivity() {
                         getString(R.string.fallbackCoverBlackUrl),
                         cacheDir.toString(),
                         ""
-                    ) { max, current ->
+                    ) { _, _ ->
                     }
                 }, {}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-
             } else {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
@@ -226,10 +226,18 @@ class MainActivity : AppCompatActivity() {
                         getString(R.string.fallbackCoverUrl),
                         cacheDir.toString(),
                         ""
-                    ) { max, current ->
+                    ) { _, _ ->
                     }
                 }, {}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
             }
+        }else{
+            if(resources.configuration.uiMode.and(Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES){
+                settings.saveSetting("darkTheme", true.toString())
+            }else{
+                settings.saveSetting("darkTheme", false.toString())
+            }
+
+            changeTheme()
         }
     }
 
