@@ -23,7 +23,8 @@ class AlbumDatabaseHelper(context: Context) :
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        reCreateTable()
+        db?.execSQL("DROP TABLE IF EXISTS " + Album.TABLE_NAME)
+        onCreate(db)
     }
 
     override fun onCreate(db: SQLiteDatabase?) {

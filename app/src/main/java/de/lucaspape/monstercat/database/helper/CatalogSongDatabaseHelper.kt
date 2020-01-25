@@ -23,7 +23,8 @@ class CatalogSongDatabaseHelper(context: Context) :
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        reCreateTable()
+        db?.execSQL("DROP TABLE IF EXISTS " + CatalogSong.TABLE_NAME)
+        onCreate(db)
     }
 
     override fun onCreate(db: SQLiteDatabase?) {

@@ -22,7 +22,14 @@ class PlaylistItemDatabaseHelper(context: Context, var playlistId: String) :
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        reCreateTable()
+        db?.execSQL(
+            "DROP TABLE IF EXISTS " + PlaylistItem(
+                playlistId,
+                0,
+                0
+            ).TABLE_NAME
+        )
+        onCreate(db)
     }
 
     override fun onOpen(db: SQLiteDatabase?) {
