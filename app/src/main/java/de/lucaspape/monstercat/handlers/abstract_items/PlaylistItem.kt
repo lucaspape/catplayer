@@ -13,7 +13,7 @@ open class PlaylistItem(
     val name:String,
     val id:String,
     val cover: String,
-    val titleDownloadStatus: String
+    val playlistDownloadStatus: String
 ) : AbstractItem<PlaylistItem.ViewHolder>() {
     override val type: Int = 102
 
@@ -34,8 +34,8 @@ open class PlaylistItem(
 
         override fun bindView(item: PlaylistItem, payloads: MutableList<Any>) {
             titleTextView.text = item.name
-            coverImageView.setImageURI(item.cover?.toUri())
-            titleDownloadStatusImageView.setImageURI(item.titleDownloadStatus?.toUri())
+            coverImageView.setImageURI(item.cover.toUri())
+            titleDownloadStatusImageView.setImageURI(item.playlistDownloadStatus.toUri())
         }
 
         override fun unbindView(item: PlaylistItem) {

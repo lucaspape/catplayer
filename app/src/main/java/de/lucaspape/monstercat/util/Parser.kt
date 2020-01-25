@@ -6,6 +6,7 @@ import de.lucaspape.monstercat.database.*
 import de.lucaspape.monstercat.database.helper.*
 import de.lucaspape.monstercat.handlers.abstract_items.AlbumItem
 import de.lucaspape.monstercat.handlers.abstract_items.CatalogItem
+import de.lucaspape.monstercat.handlers.abstract_items.PlaylistItem
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -25,6 +26,33 @@ fun parseSongToAbstractCatalogItem(song: Song):CatalogItem{
     }
 
     return CatalogItem(song.title, song.version, song.artist, song.songId, song.albumId, song.isDownloadable, song.isStreamable, song.inEarlyAccess,songDownloadStatus)
+}
+
+fun parsePlaylistToAbstractPlaylistItem(context: Context, playlist: Playlist):PlaylistItem{
+    val playlistTracks = PlaylistItemDatabaseHelper(context, playlist.playlistId).getAllData()
+
+    var downloaded = true
+    var streamDownloaded = true
+
+    for(track in playlistTracks){
+        val song = SongDatabaseHelper(context).getSong(context, track.songId)
+
+        if(!File(song.downloadLocation).exists()){
+            downloaded = false
+        }else if(!File(song.streamDownloadLocation).exists()){
+            streamDownloaded = false
+        }
+    }
+
+    val playlistDownloadStatus = if(downloaded){
+        "android.resource://de.lucaspape.monstercat/drawable/ic_check_green_24dp"
+    }else if(streamDownloaded){
+        "android.resource://de.lucaspape.monstercat/drawable/ic_check_orange_24dp"
+    }else{
+        "android.resource://de.lucaspape.monstercat/drawable/ic_empty_24dp"
+    }
+
+    return PlaylistItem(playlist.playlistName, playlist.playlistId, "", playlistDownloadStatus)
 }
 
 fun parseAlbumToAbstractAlbumItem(album: Album):AlbumItem{

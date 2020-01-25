@@ -21,6 +21,7 @@ import de.lucaspape.monstercat.handlers.abstract_items.PlaylistItem
 import de.lucaspape.monstercat.handlers.async.BackgroundAsync
 import de.lucaspape.monstercat.handlers.async.LoadPlaylistAsync
 import de.lucaspape.monstercat.handlers.async.LoadPlaylistTracksAsync
+import de.lucaspape.monstercat.util.parsePlaylistToAbstractPlaylistItem
 import de.lucaspape.monstercat.util.parseSongToAbstractCatalogItem
 import java.lang.ref.WeakReference
 
@@ -283,7 +284,7 @@ class PlaylistHandler {
 
                 for (playlist in playlists) {
                     //TODO
-                    playlistItems.add(PlaylistItem(playlist.playlistName, playlist.playlistId, "", ""))
+                    playlistItems.add(parsePlaylistToAbstractPlaylistItem(view.context, playlist))
                 }
 
                 currentPlaylistsData = playlistItems
