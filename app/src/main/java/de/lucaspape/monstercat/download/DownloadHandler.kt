@@ -13,7 +13,6 @@ import java.io.FileOutputStream
 
 //this lists contain the urls that should be downloaded
 internal val downloadList = ArrayList<HashMap<String, Any?>?>()
-internal val downloadCoverArrayListList = ArrayList<ArrayList<HashMap<String, Any?>>?>()
 
 internal val targetList = ArrayList<com.squareup.picasso.Target>()
 
@@ -108,6 +107,9 @@ fun downloadCoverIntoBitmap(
             }
         }
     }
+
+    //prevent garbage collect
+    targetList.add(picassoTarget)
 
     Picasso.with(context)
         .load("$url?image_width=$resolution")

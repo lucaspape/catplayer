@@ -1,16 +1,12 @@
 package de.lucaspape.monstercat.util
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.widget.Toast
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
-import java.io.IOException
-import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
 
@@ -20,45 +16,6 @@ fun wifiConnected(context: Context): Boolean? {
 
     val activeNetwork = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
     return activeNetwork?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ?: false
-}
-
-fun downloadCover(
-    downloadUrl: String,
-    location: String,
-    primaryRes: String,
-    secondaryRes: String
-): Boolean {
-    try {
-        val connection =
-            URL("$downloadUrl?image_width=$primaryRes").openConnection() as HttpURLConnection
-        connection.doInput = true
-        connection.connect()
-        val input = connection.inputStream
-        val primaryBitmap = BitmapFactory.decodeStream(input)
-
-        FileOutputStream(location + primaryRes).use { out ->
-            primaryBitmap?.compress(Bitmap.CompressFormat.PNG, 100, out)
-        }
-
-        val secondaryBitmap =
-            Bitmap.createScaledBitmap(
-                primaryBitmap,
-                secondaryRes.toInt(),
-                secondaryRes.toInt(),
-                false
-            )
-
-        FileOutputStream(location + secondaryRes).use { out ->
-            secondaryBitmap?.compress(Bitmap.CompressFormat.PNG, 100, out)
-        }
-
-        connection.disconnect()
-
-        return true
-    } catch (e: IOException) {
-        // Log exception
-        return false
-    }
 }
 
 fun downloadFile(
