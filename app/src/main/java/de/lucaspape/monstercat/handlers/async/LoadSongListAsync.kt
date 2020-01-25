@@ -32,7 +32,7 @@ class LoadSongListAsync(
         contextReference.get()?.let { context ->
             val catalogSongDatabaseHelper =
                 CatalogSongDatabaseHelper(context)
-            val songIdList = catalogSongDatabaseHelper.getAllSongs()
+            val songIdList = catalogSongDatabaseHelper.getSongs(0,1)
 
             if (!forceReload && songIdList.isNotEmpty()) {
                 requestFinished()

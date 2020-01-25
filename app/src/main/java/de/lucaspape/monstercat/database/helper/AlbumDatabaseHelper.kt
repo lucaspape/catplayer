@@ -98,11 +98,11 @@ class AlbumDatabaseHelper(context: Context) :
         }
     }
 
-    fun getAllAlbums(): List<Album> {
+    fun getAlbums(skip:Long, limit:Long):List<Album>{
         val albums: ArrayList<Album> = ArrayList()
 
         val selectQuery = "SELECT * FROM " + Album.TABLE_NAME + " ORDER BY " +
-                Album.COLUMN_ID + " DESC"
+                Album.COLUMN_ID + " ASC LIMIT $skip,$limit"
 
         val db = writableDatabase
         val cursor = db.rawQuery(selectQuery, null)
@@ -124,6 +124,10 @@ class AlbumDatabaseHelper(context: Context) :
         cursor.close()
         db.close()
 
+        albums.reverse()
+
         return albums
     }
+
+
 }

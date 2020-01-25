@@ -85,11 +85,11 @@ class CatalogSongDatabaseHelper(context: Context) :
         }
     }
 
-    fun getAllSongs(): List<CatalogSong> {
+    fun getSongs(skip:Long, limit:Long): List<CatalogSong>{
         val catalogSongs: ArrayList<CatalogSong> = ArrayList()
 
         val selectQuery = "SELECT * FROM " + CatalogSong.TABLE_NAME + " ORDER BY " +
-                CatalogSong.COLUMN_ID + " DESC"
+                CatalogSong.COLUMN_ID + " ASC LIMIT $skip,$limit"
 
         val db = writableDatabase
         val cursor = db.rawQuery(selectQuery, null)
@@ -107,6 +107,8 @@ class CatalogSongDatabaseHelper(context: Context) :
 
         cursor.close()
         db.close()
+
+        catalogSongs.reverse()
 
         return catalogSongs
     }
