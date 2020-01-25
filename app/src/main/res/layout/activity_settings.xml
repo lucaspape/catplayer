@@ -170,6 +170,15 @@
                 app:layout_constraintEnd_toStartOf="@+id/shownCoverResolution"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/coverResolutionText" />
+
+            <Button
+                android:layout_width="200dp"
+                android:layout_height="50dp"
+                android:text="@string/resetDatabase"
+                android:id="@+id/resetDatabaseButton"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/coverResolutionSeekbar"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,15 +1,22 @@
 package de.lucaspape.monstercat.activities
 
+import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.database.helper.AlbumDatabaseHelper
+import de.lucaspape.monstercat.database.helper.CatalogSongDatabaseHelper
+import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.util.Auth
 import de.lucaspape.monstercat.util.Settings
 import de.lucaspape.monstercat.util.displayInfo
+
 
 /**
  * SettingsActivity
@@ -52,6 +59,8 @@ class SettingsActivity : AppCompatActivity() {
         val coverResolutionSeekBar = findViewById<SeekBar>(R.id.coverResolutionSeekbar)
         val shownCoverResolution = findViewById<TextView>(R.id.shownCoverResolution)
 
+        val resetDatabaseButton = findViewById<Button>(R.id.resetDatabaseButton)
+
         coverResolutionSeekBar.max = 2048 / 256
 
         if (settings.getSetting("streamOverMobile") != null) {
@@ -78,7 +87,8 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         if (settings.getSetting("primaryCoverResolution") != null) {
-            coverResolutionSeekBar.progress = Integer.parseInt(settings.getSetting("primaryCoverResolution")!!) / 256
+            coverResolutionSeekBar.progress =
+                Integer.parseInt(settings.getSetting("primaryCoverResolution")!!) / 256
             shownCoverResolution.text = settings.getSetting("primaryCoverResolution")!!
         }
 
@@ -129,18 +139,22 @@ class SettingsActivity : AppCompatActivity() {
 
         }
 
-        coverResolutionSeekBar.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener{
+        coverResolutionSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                if(fromUser){
-                    if(progress != 0){
-                        settings.saveSetting("primaryCoverResolution", (progress*256).toString())
-                        settings.saveSetting("secondaryCoverResolution", (((progress)*256)/10).toString())
-                    }else{
+                if (fromUser) {
+                    if (progress != 0) {
+                        settings.saveSetting("primaryCoverResolution", (progress * 256).toString())
+                        settings.saveSetting(
+                            "secondaryCoverResolution",
+                            (((progress) * 256) / 10).toString()
+                        )
+                    } else {
                         settings.saveSetting("primaryCoverResolution", (128).toString())
                         settings.saveSetting("secondaryCoverResolution", (64).toString())
                     }
 
-                    settings.getSetting("primaryCoverResolution")?.let { shownCoverResolution.text = it }
+                    settings.getSetting("primaryCoverResolution")
+                        ?.let { shownCoverResolution.text = it }
                 }
             }
 
@@ -154,11 +168,32 @@ class SettingsActivity : AppCompatActivity() {
         })
 
         downloadFlacSwitch.setOnCheckedChangeListener { _, isChecked ->
-            if(isChecked){
+            if (isChecked) {
                 settings.saveSetting("downloadType", "flac")
-            }else{
+            } else {
                 settings.saveSetting("downloadType", "mp3_320")
             }
+        }
+
+        resetDatabaseButton.setOnClickListener {
+            AlertDialog.Builder(this)
+                .setTitle(getString(R.string.resetDatabase))
+                .setMessage(getString(R.string.resetDatabaseQuestion))
+                .setPositiveButton(android.R.string.yes) { _, _ ->
+                    AlbumDatabaseHelper(this).reCreateTable()
+                    CatalogSongDatabaseHelper(this).reCreateTable()
+                    PlaylistDatabaseHelper(this).reCreateTable()
+
+                    val intent = Intent(this, MainActivity::class.java)
+                    intent.addFlags(FLAG_ACTIVITY_NEW_TASK)
+                    startActivity(intent)
+
+                    finish()
+
+                    Runtime.getRuntime().exit(0)
+                }
+                .setNegativeButton(android.R.string.no, null)
+                .show()
         }
     }
 }

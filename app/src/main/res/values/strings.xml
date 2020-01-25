@@ -71,4 +71,6 @@
     <string name="loop">Loop</string>
     <string name="shuffle">Shuffle</string>
     <string name="delete">Delete</string>
+    <string name="resetDatabase">Reset Database</string>
+    <string name="resetDatabaseQuestion">Are you sure you want to reset the database (requires app restart)?</string>
 </resources>
