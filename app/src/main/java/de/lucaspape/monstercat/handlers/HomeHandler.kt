@@ -383,7 +383,7 @@ class HomeHandler {
         val catalogSongDatabaseHelper =
             CatalogSongDatabaseHelper(view.context)
 
-        if (catalogSongDatabaseHelper.getSongs(0,1).isEmpty() || forceReload) {
+        if (catalogSongDatabaseHelper.getSongs(0, 1).isEmpty() || forceReload) {
             LoadSongListAsync(WeakReference(view.context), true, 0, {}, {
                 BackgroundAsync({
                     val songIdList = catalogSongDatabaseHelper.getSongs(0, 50)
@@ -411,7 +411,7 @@ class HomeHandler {
             }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         } else {
             BackgroundAsync({
-                val songIdList = catalogSongDatabaseHelper.getSongs(0,50)
+                val songIdList = catalogSongDatabaseHelper.getSongs(0, 50)
 
                 val songDatabaseHelper =
                     SongDatabaseHelper(view.context)
