@@ -11,11 +11,15 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.download.downloadCoverIntoImageView
 
 open class CatalogItem(
-    private var title: String?,
-    private var version:String?,
-    private var artist: String?,
-    private var albumId:String?,
-    private var titleDownloadStatus: String?
+    val title: String,
+    val version:String,
+    val artist: String,
+    val id:String,
+    val albumId:String,
+    val downloadable:Boolean,
+    val streamable:Boolean,
+    val inEarlyAccess:Boolean,
+    val titleDownloadStatus: String
 ) : AbstractItem<CatalogItem.ViewHolder>() {
     override val type: Int = 101
 
@@ -40,11 +44,9 @@ open class CatalogItem(
             titleTextView.text = "${item.title} ${item.version}"
             artistTextView.text = item.artist
 
-            item.albumId?.let {
-                downloadCoverIntoImageView(context, coverImageView, it, true)
-            }
+            downloadCoverIntoImageView(context, coverImageView, item.albumId, true)
 
-            titleDownloadStatusImageView.setImageURI(item.titleDownloadStatus?.toUri())
+            titleDownloadStatusImageView.setImageURI(item.titleDownloadStatus.toUri())
         }
 
         override fun unbindView(item: CatalogItem) {

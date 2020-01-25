@@ -10,9 +10,10 @@ import com.mikepenz.fastadapter.items.AbstractItem
 import de.lucaspape.monstercat.R
 
 open class PlaylistItem(
-    private var name:String?,
-    private var cover: String?,
-    private var titleDownloadStatus: String?
+    val name:String,
+    val id:String,
+    val cover: String,
+    val titleDownloadStatus: String
 ) : AbstractItem<PlaylistItem.ViewHolder>() {
     override val type: Int = 102
 

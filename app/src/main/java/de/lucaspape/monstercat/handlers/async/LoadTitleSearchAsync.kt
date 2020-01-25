@@ -7,9 +7,10 @@ import com.android.volley.Response
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.handlers.HomeHandler
+import de.lucaspape.monstercat.handlers.abstract_items.CatalogItem
 import de.lucaspape.monstercat.request.AuthorizedRequest
 import de.lucaspape.monstercat.util.parseSongSearchToSongList
-import de.lucaspape.monstercat.util.parseSongToHashMap
+import de.lucaspape.monstercat.util.parseSongToAbstractCatalogItem
 import de.lucaspape.monstercat.util.sid
 import org.json.JSONObject
 import java.lang.ref.WeakReference
@@ -49,14 +50,14 @@ class LoadTitleSearchAsync(
                     val songList =
                         parseSongSearchToSongList(context, jsonArray)
 
-                    val hashMapList = ArrayList<HashMap<String, Any?>>()
+                    val catalogItemList = ArrayList<CatalogItem>()
 
                     for (song in songList) {
-                        hashMapList.add(parseSongToHashMap(song))
+                        catalogItemList.add(parseSongToAbstractCatalogItem(song))
                     }
 
                     //display list
-                    HomeHandler.searchResults = hashMapList
+                    HomeHandler.searchResults = catalogItemList
 
                 },
                 Response.ErrorListener { error ->

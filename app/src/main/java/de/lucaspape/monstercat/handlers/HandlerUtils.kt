@@ -41,16 +41,14 @@ internal fun playSongFromId(
     context: Context,
     songId: String,
     playNow: Boolean,
-    listViewData: ArrayList<HashMap<String, Any?>>,
-    position: Int
+    nextSongIds:ArrayList<String>
 ) {
     playSongFromId(songId, playNow)
 
     val continuousList = ArrayList<String>()
 
-    for (i in (position + 1 until listViewData.size)) {
-        val nextItemValue = listViewData[i] as HashMap<*, *>
-        continuousList.add(nextItemValue["id"] as String)
+    for(nextSongId in (nextSongIds)){
+        continuousList.add(nextSongId)
     }
 
     loadContinuousSongListAsyncTask?.cancel(true)

@@ -9,9 +9,10 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.download.downloadCoverIntoImageView
 
 open class AlbumItem(
-    private var title: String?,
-    private var artist: String?,
-    private var albumId: String?
+    val title: String,
+    val artist: String,
+    val mcID: String,
+    val albumId: String
 ) : AbstractItem<AlbumItem.ViewHolder>() {
     override val type: Int = 100
 

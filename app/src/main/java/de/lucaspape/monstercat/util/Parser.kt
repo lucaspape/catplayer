@@ -6,103 +6,29 @@ import de.lucaspape.monstercat.database.*
 import de.lucaspape.monstercat.database.helper.*
 import de.lucaspape.monstercat.handlers.abstract_items.AlbumItem
 import de.lucaspape.monstercat.handlers.abstract_items.CatalogItem
-import de.lucaspape.monstercat.handlers.abstract_items.PlaylistItem
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.lang.reflect.InvocationTargetException
 
-fun parseSongToHashMap(song: Song): HashMap<String, Any?> {
-    val hashMap = HashMap<String, Any?>()
-    hashMap["title"] = song.title
-    hashMap["version"] = song.version
-    hashMap["id"] = song.songId
-    hashMap["albumId"] = song.albumId
-    hashMap["artist"] = song.artist
-    hashMap["shownTitle"] = song.shownTitle
-    hashMap["coverUrl"] = song.coverUrl
-    hashMap["downloadable"] = song.isDownloadable.toString()
-    hashMap["streamable"] = song.isStreamable.toString()
-    hashMap["inEarlyAccess"] = song.inEarlyAccess.toString()
-
-    when {
+fun parseSongToAbstractCatalogItem(song: Song):CatalogItem{
+    val songDownloadStatus:String = when {
         File(song.downloadLocation).exists() -> {
-            hashMap["downloadedCheck"] =
-                "android.resource://de.lucaspape.monstercat/drawable/ic_check_green_24dp"
+            "android.resource://de.lucaspape.monstercat/drawable/ic_check_green_24dp"
         }
         File(song.streamDownloadLocation).exists() -> {
-            hashMap["downloadedCheck"] =
-                "android.resource://de.lucaspape.monstercat/drawable/ic_check_orange_24dp"
+            "android.resource://de.lucaspape.monstercat/drawable/ic_check_orange_24dp"
         }
         else -> {
-            hashMap["downloadedCheck"] =
-                "android.resource://de.lucaspape.monstercat/drawable/ic_empty_24dp"
+            "android.resource://de.lucaspape.monstercat/drawable/ic_empty_24dp"
         }
     }
 
-    return hashMap
+    return CatalogItem(song.title, song.version, song.artist, song.songId, song.albumId, song.isDownloadable, song.isStreamable, song.inEarlyAccess,songDownloadStatus)
 }
 
-fun parseHashMapToAbstractCatalogItem(hashMap: HashMap<String, Any?>): CatalogItem {
-    val title = hashMap["title"] as String
-    val version = hashMap["version"] as String
-    val artist = hashMap["artist"] as String
-    val titleDownloadStatus = hashMap["downloadedCheck"] as String
-    val albumId = hashMap["albumId"] as String
-
-    return CatalogItem(
-        title,
-        version,
-        artist,
-        albumId,
-        titleDownloadStatus
-    )
-}
-
-fun parseHashMapToAbstractAlbumItem(hashMap: HashMap<String, Any?>): AlbumItem {
-    val title = hashMap["title"] as String
-    val artist = hashMap["artist"] as String
-    val albumId = hashMap["id"] as String
-
-    return AlbumItem(
-        title,
-        artist,
-        albumId
-    )
-}
-
-fun parseHashMapToAbstractPlaylistItem(hashMap: HashMap<String, Any?>): PlaylistItem {
-    val name = hashMap["playlistName"] as String
-    val coverUrl = hashMap["coverUrl"] as String
-
-    return PlaylistItem(
-        name,
-        coverUrl,
-        ""
-    )
-}
-
-fun parseAlbumToHashMap(context: Context, album: Album): HashMap<String, Any?> {
-    val settings = Settings(context)
-
-    val primaryResolution = settings.getSetting("primaryCoverResolution")
-    val secondaryResolution = settings.getSetting("secondaryCoverResolution")
-
-    val hashMap = HashMap<String, Any?>()
-    hashMap["mcID"] = album.mcID
-    hashMap["title"] = album.title
-    hashMap["id"] = album.albumId
-    hashMap["artist"] = album.artist
-    hashMap["coverUrl"] = album.coverUrl
-    hashMap["coverLocation"] = context.filesDir.toString() + "/" + album.albumId + ".png"
-    hashMap["primaryRes"] = primaryResolution
-    hashMap["secondaryRes"] = secondaryResolution
-    hashMap["primaryImage"] =
-        context.filesDir.toString() + "/" + album.albumId + ".png" + primaryResolution.toString()
-    hashMap["secondaryImage"] =
-        context.filesDir.toString() + "/" + album.albumId + ".png" + secondaryResolution.toString()
-
-    return hashMap
+fun parseAlbumToAbstractAlbumItem(album: Album):AlbumItem{
+    return AlbumItem(album.title, album.artist, album.mcID, album.albumId)
 }
 
 fun parseSongSearchToSongList(context: Context, jsonArray: JSONArray): ArrayList<Song> {
@@ -211,18 +137,6 @@ fun parseAlbumToDB(jsonObject: JSONObject, context: Context): Long? {
     } else {
         databaseHelper.getAlbum(id)?.id?.toLong()
     }
-}
-
-fun parsePlaylistToHashMap(playlist: Playlist): HashMap<String, Any?> {
-    val playlistHashMap = HashMap<String, Any?>()
-    playlistHashMap["playlistName"] = playlist.playlistName
-    playlistHashMap["coverUrl"] = ""
-    playlistHashMap["titles"] = null
-    playlistHashMap["playlistId"] = playlist.playlistId
-    playlistHashMap["type"] = "playlist"
-    playlistHashMap["trackCount"] = playlist.trackCount
-
-    return playlistHashMap
 }
 
 fun parsePlaylistToDB(context: Context, jsonObject: JSONObject): Long? {

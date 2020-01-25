@@ -16,7 +16,6 @@ import com.mikepenz.fastadapter.scroll.EndlessRecyclerOnScrollListener
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.activities.SettingsActivity
 import de.lucaspape.monstercat.activities.monstercatPlayer
-import de.lucaspape.monstercat.database.CatalogSong
 import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.database.helper.AlbumDatabaseHelper
 import de.lucaspape.monstercat.database.helper.AlbumItemDatabaseHelper
@@ -37,7 +36,7 @@ class HomeHandler {
 
     companion object {
         @JvmStatic
-        var searchResults = ArrayList<HashMap<String, Any?>>()
+        var searchResults = ArrayList<CatalogItem>()
 
         //if albumView selected in spinner
         @JvmStatic
@@ -48,7 +47,8 @@ class HomeHandler {
         var albumView = false
     }
 
-    private var currentListViewData = ArrayList<HashMap<String, Any?>>()
+    private var currentCatalogViewData = ArrayList<CatalogItem>()
+    private var currentAlbumViewData = ArrayList<AlbumItem>()
 
     //if contents of an album currently displayed
     private var albumContentsDisplayed = false
@@ -57,7 +57,7 @@ class HomeHandler {
     private var currentMCID = ""
     private var loaded = 0
 
-    private fun updateCatalogRecyclerView(view: View, data: ArrayList<HashMap<String, Any?>>) {
+    private fun updateCatalogRecyclerView(view: View, data: ArrayList<CatalogItem>) {
         val recyclerView = view.findViewById<RecyclerView>(R.id.musiclistview)
 
         recyclerView.layoutManager =
@@ -68,29 +68,41 @@ class HomeHandler {
 
         recyclerView.adapter = fastAdapter
 
-        for (hashMap in data) {
+        for (catalogItem in data) {
             itemAdapter.add(
-                parseHashMapToAbstractCatalogItem(hashMap)
+                catalogItem
             )
         }
 
         fastAdapter.onClickListener = { _, _, _, position ->
             monstercatPlayer.clearContinuous()
 
-            val itemValue = data[position] as HashMap<*, *>
+            val catalogItem = data[position]
+
+            val nextSongIdsList = ArrayList<String>()
+
+            for (i in (position + 1 until data.size)) {
+                nextSongIdsList.add(data[i].id)
+            }
+
             playSongFromId(
                 view.context,
-                itemValue["id"] as String,
+                catalogItem.id,
                 true,
-                data,
-                position
+                nextSongIdsList
             )
 
             false
         }
 
         fastAdapter.onLongClickListener = { _, _, _, position ->
-            showContextMenu(view, data, position)
+            val idList = ArrayList<String>()
+
+            for (catalogItem in data) {
+                idList.add(catalogItem.id)
+            }
+
+            showContextMenu(view, idList, position)
 
             false
         }
@@ -108,7 +120,13 @@ class HomeHandler {
                 fastAdapter: FastAdapter<CatalogItem>,
                 item: CatalogItem
             ) {
-                showContextMenu(view, data, position)
+                val idList = ArrayList<String>()
+
+                for (catalogItem in data) {
+                    idList.add(catalogItem.id)
+                }
+
+                showContextMenu(view, idList, position)
             }
         })
 
@@ -121,14 +139,12 @@ class HomeHandler {
                     footerAdapter.add(ProgressItem())
 
                     loadSongList(view, itemAdapter)
-
-                    println("LOAD MORE")
                 }
             }
         })
     }
 
-    private fun updateAlbumRecyclerView(view: View, data: ArrayList<HashMap<String, Any?>>) {
+    private fun updateAlbumRecyclerView(view: View, data: ArrayList<AlbumItem>) {
         val recyclerView = view.findViewById<RecyclerView>(R.id.musiclistview)
 
         recyclerView.layoutManager =
@@ -139,21 +155,27 @@ class HomeHandler {
 
         recyclerView.adapter = fastAdapter
 
-        for (hashMap in data) {
+        for (albumItem in data) {
             itemAdapter.add(
-                parseHashMapToAbstractAlbumItem(hashMap)
+                albumItem
             )
         }
 
         fastAdapter.onClickListener = { _, _, _, position ->
-            val itemValue = data[position] as HashMap<*, *>
-            loadAlbum(view, itemValue, false)
+            val albumItem = data[position]
+            loadAlbum(view, albumItem.albumId, albumItem.mcID, false)
 
             false
         }
 
         fastAdapter.onLongClickListener = { _, _, _, position ->
-            showContextMenu(view, data, position)
+            val albumMcIdList = ArrayList<String>()
+
+            for (albumItem in data) {
+                albumMcIdList.add(albumItem.mcID)
+            }
+
+            showContextMenu(view, albumMcIdList, position)
 
             false
         }
@@ -174,7 +196,7 @@ class HomeHandler {
 
     private fun showContextMenu(
         view: View,
-        contentList: ArrayList<HashMap<String, Any?>>,
+        contentList: ArrayList<String>,
         listViewPosition: Int
     ) {
         val menuItems: Array<String> = if (!albumView) {
@@ -193,12 +215,12 @@ class HomeHandler {
         val alertDialogBuilder = AlertDialog.Builder(view.context)
         alertDialogBuilder.setTitle("")
         alertDialogBuilder.setItems(menuItems) { _, which ->
-            val listItem = contentList[listViewPosition] as HashMap<*, *>
+            val id = contentList[listViewPosition]
 
             view.context.let { context ->
                 val songDatabaseHelper =
                     SongDatabaseHelper(context)
-                val song = songDatabaseHelper.getSong(context, listItem["id"] as String)
+                val song = songDatabaseHelper.getSong(context, id)
 
                 val item = menuItems[which]
 
@@ -209,7 +231,7 @@ class HomeHandler {
                             song
                         )
                         context.getString(R.string.playNext) -> playSongFromId(
-                            listItem["id"].toString(),
+                            id,
                             false
                         )
                         context.getString(R.string.addToPlaylist) -> addSongToPlaylist(
@@ -221,11 +243,11 @@ class HomeHandler {
                     when (item) {
                         context.getString(R.string.downloadAlbum) -> downloadAlbum(
                             context,
-                            listItem["mcID"].toString()
+                            id
                         )
                         context.getString(R.string.playAlbumNext) -> playAlbumNext(
                             context,
-                            listItem["mcID"].toString()
+                            id
                         )
                     }
                 }
@@ -263,10 +285,7 @@ class HomeHandler {
         swipeRefreshLayout.setOnRefreshListener {
             if (albumView || albumContentsDisplayed) {
                 if (albumContentsDisplayed) {
-                    val itemValue = HashMap<String, Any?>()
-                    itemValue["id"] = currentAlbumId
-                    itemValue["mcID"] = currentMCID
-                    loadAlbum(view, itemValue, true)
+                    loadAlbum(view, currentAlbumId, currentMCID, true)
                 } else {
                     initAlbumListLoad(view, true)
                 }
@@ -291,10 +310,10 @@ class HomeHandler {
 
                 if (albumViewSelected) {
                     viewSelector.setSelection(1)
-                    updateAlbumRecyclerView(view, currentListViewData)
+                    updateAlbumRecyclerView(view, currentAlbumViewData)
                 } else {
                     viewSelector.setSelection(0)
-                    updateCatalogRecyclerView(view, currentListViewData)
+                    updateCatalogRecyclerView(view, currentCatalogViewData)
                 }
             }
 
@@ -378,7 +397,7 @@ class HomeHandler {
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
 
-        currentListViewData = ArrayList()
+        currentCatalogViewData = ArrayList()
 
         val catalogSongDatabaseHelper =
             CatalogSongDatabaseHelper(view.context)
@@ -399,12 +418,11 @@ class HomeHandler {
                     songList.reverse()
 
                     for (song in songList) {
-                        val hashMap = parseSongToHashMap(song)
-                        currentListViewData.add(hashMap)
+                        currentCatalogViewData.add(parseSongToAbstractCatalogItem(song))
                         loaded++
                     }
                 }, {
-                    updateCatalogRecyclerView(view, currentListViewData)
+                    updateCatalogRecyclerView(view, currentCatalogViewData)
 
                     swipeRefreshLayout.isRefreshing = false
                 }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
@@ -417,18 +435,18 @@ class HomeHandler {
                     SongDatabaseHelper(view.context)
 
                 for (i in (1 until songIdList.size + 1)) {
-                    val hashMap = parseSongToHashMap(
+                    val catalogItem = parseSongToAbstractCatalogItem(
                         songDatabaseHelper.getSong(
                             view.context,
                             songIdList[songIdList.size - i].songId
                         )
                     )
-                    currentListViewData.add(hashMap)
+                    currentCatalogViewData.add(catalogItem)
                     loaded++
                 }
 
             }, {
-                updateCatalogRecyclerView(view, currentListViewData)
+                updateCatalogRecyclerView(view, currentCatalogViewData)
 
                 swipeRefreshLayout.isRefreshing = false
             }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
@@ -446,7 +464,7 @@ class HomeHandler {
                 SongDatabaseHelper(view.context)
 
             for (i in (1 until songList.size + 1)) {
-                val hashMap = parseSongToHashMap(
+                val catalogItem = parseSongToAbstractCatalogItem(
                     songDatabaseHelper.getSong(
                         view.context,
                         songList[songList.size - i].songId
@@ -454,9 +472,10 @@ class HomeHandler {
                 )
 
                 itemAdapter.add(
-                    parseHashMapToAbstractCatalogItem(hashMap)
+                    catalogItem
                 )
-                currentListViewData.add(hashMap)
+
+                currentCatalogViewData.add(catalogItem)
 
                 loaded++
             }
@@ -470,18 +489,14 @@ class HomeHandler {
                     AlbumDatabaseHelper(view.context)
                 val albumList = albumDatabaseHelper.getAlbums(loaded.toLong(), 50)
 
-                val sortedList = ArrayList<HashMap<String, Any?>>()
-
                 for (album in albumList) {
-                    val hashMap = parseAlbumToHashMap(view.context, album)
-
-                    sortedList.add(hashMap)
+                    val albumItem = parseAlbumToAbstractAlbumItem(album)
 
                     itemAdapter.add(
-                        parseHashMapToAbstractAlbumItem(hashMap)
+                        albumItem
                     )
 
-                    currentListViewData.add(hashMap)
+                    currentAlbumViewData.add(albumItem)
 
                     loaded++
                 }
@@ -491,6 +506,8 @@ class HomeHandler {
     }
 
     fun initAlbumListLoad(view: View, forceReload: Boolean) {
+        currentAlbumViewData = ArrayList()
+
         loaded = 0
 
         val contextReference = WeakReference<Context>(view.context)
@@ -511,18 +528,18 @@ class HomeHandler {
                 BackgroundAsync({
                     var albumList = albumDatabaseHelper.getAlbums(0, 50)
 
-                    val sortedList = ArrayList<HashMap<String, Any?>>()
+                    val sortedList = ArrayList<AlbumItem>()
 
                     albumList = albumList.reversed()
 
                     for (album in albumList) {
-                        sortedList.add(parseAlbumToHashMap(view.context, album))
+                        sortedList.add(parseAlbumToAbstractAlbumItem(album))
                         loaded++
                     }
 
-                    currentListViewData = sortedList
+                    currentAlbumViewData = sortedList
                 }, {
-                    updateAlbumRecyclerView(view, currentListViewData)
+                    updateAlbumRecyclerView(view, currentAlbumViewData)
 
                     swipeRefreshLayout.isRefreshing = false
 
@@ -536,18 +553,18 @@ class HomeHandler {
             BackgroundAsync({
                 var albumList = albumDatabaseHelper.getAlbums(0, 50)
 
-                val sortedList = ArrayList<HashMap<String, Any?>>()
+                val sortedList = ArrayList<AlbumItem>()
 
                 albumList = albumList.reversed()
 
                 for (album in albumList) {
-                    sortedList.add(parseAlbumToHashMap(view.context, album))
+                    sortedList.add(parseAlbumToAbstractAlbumItem(album))
                     loaded++
                 }
 
-                currentListViewData = sortedList
+                currentAlbumViewData = sortedList
             }, {
-                updateAlbumRecyclerView(view, currentListViewData)
+                updateAlbumRecyclerView(view, currentAlbumViewData)
 
                 swipeRefreshLayout.isRefreshing = false
 
@@ -562,7 +579,7 @@ class HomeHandler {
     /**
      * Load single album
      */
-    private fun loadAlbum(view: View, itemValue: HashMap<*, *>, forceReload: Boolean) {
+    private fun loadAlbum(view: View, albumId:String, mcId:String, forceReload: Boolean) {
         val contextReference = WeakReference<Context>(view.context)
 
         val swipeRefreshLayout =
@@ -571,25 +588,24 @@ class HomeHandler {
         LoadAlbumAsync(
             contextReference,
             forceReload,
-            itemValue, {
+            albumId,
+            mcId, {
                 swipeRefreshLayout.isRefreshing = true
             }
         ) {
             BackgroundAsync({
-                val albumId = itemValue["id"] as String
-
                 val albumItemDatabaseHelper =
                     AlbumItemDatabaseHelper(contextReference.get()!!, albumId)
                 val albumItemList = albumItemDatabaseHelper.getAllData()
 
-                val dbSongs = ArrayList<HashMap<String, Any?>>()
+                val dbSongs = ArrayList<CatalogItem>()
 
                 val songDatabaseHelper = SongDatabaseHelper(contextReference.get()!!)
 
                 for (albumItem in albumItemList) {
                     contextReference.get()?.let { context ->
                         dbSongs.add(
-                            parseSongToHashMap(
+                            parseSongToAbstractCatalogItem(
                                 songDatabaseHelper.getSong(context, albumItem.songId)
                             )
                         )
@@ -597,17 +613,17 @@ class HomeHandler {
 
                 }
 
-                currentListViewData = dbSongs
+                currentCatalogViewData = dbSongs
             }, {
                 albumView = false
 
-                updateCatalogRecyclerView(view, currentListViewData)
+                updateCatalogRecyclerView(view, currentCatalogViewData)
 
                 swipeRefreshLayout.isRefreshing = false
 
                 albumContentsDisplayed = true
-                currentAlbumId = itemValue["id"] as String
-                currentMCID = itemValue["mcID"] as String
+                currentAlbumId = albumId
+                currentMCID = mcId
             }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 
         }.executeOnExecutor(

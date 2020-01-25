@@ -19,7 +19,8 @@ import java.lang.ref.WeakReference
 class LoadAlbumAsync(
     private val contextReference: WeakReference<Context>,
     private val forceReload: Boolean,
-    private val itemValue: HashMap<*, *>,
+    private val albumId: String,
+    private val mcId: String,
     private val displayLoading: () -> Unit,
     private val requestFinished: () -> Unit
 ) : AsyncTask<Void, Void, String>() {
@@ -29,8 +30,6 @@ class LoadAlbumAsync(
     }
 
     override fun onPreExecute() {
-        val albumId = itemValue["id"] as String
-
         contextReference.get()?.let { context ->
             val albumItemDatabaseHelper =
                 AlbumItemDatabaseHelper(context, albumId)
@@ -47,9 +46,6 @@ class LoadAlbumAsync(
     }
 
     override fun doInBackground(vararg param: Void?): String? {
-        val albumId = itemValue["id"] as String
-        val mcID = itemValue["mcID"] as String
-
         contextReference.get()?.let { context ->
             val requestQueue = Volley.newRequestQueue(context)
 
@@ -67,7 +63,7 @@ class LoadAlbumAsync(
             }
 
             val requestUrl =
-                context.getString(R.string.loadAlbumSongsUrl) + "/" + mcID
+                context.getString(R.string.loadAlbumSongsUrl) + "/" + mcId
 
             val listRequest = AuthorizedRequest(
                 Request.Method.GET, requestUrl,
@@ -93,7 +89,6 @@ class LoadAlbumAsync(
             synchronized(syncObject) {
                 syncObject.wait()
             }
-
 
         }
 
