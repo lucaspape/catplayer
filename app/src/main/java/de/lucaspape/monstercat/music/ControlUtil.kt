@@ -123,7 +123,7 @@ private fun playSong(context: Context, song: Song) {
     exoPlayer.addListener(object : Player.EventListener {
         @Override
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-            setCover(song, context) {
+            setCover(context, song.title, song.version, song.artist, song.albumId) {
                 updateNotification(
                     song.title,
                     song.version,
@@ -160,7 +160,7 @@ private fun playSong(context: Context, song: Song) {
                 //UI stuff
                 setTitle(song.title, song.version, song.artist)
                 startTextAnimation()
-                setCover(song, context) {
+                setCover(context, song.title, song.version, song.artist, song.albumId) {
                     setPlayButtonImage(context)
                     startSeekBarUpdate()
                 }
@@ -195,10 +195,11 @@ fun playStream(stream: Stream) {
                 setPlayButtonImage(context)
 
                 setCover(
+                    context,
                     UpdateLiveInfoAsync.previousTitle,
                     UpdateLiveInfoAsync.previousVersion,
                     UpdateLiveInfoAsync.previousArtist,
-                    stream.albumCoverUpdateUrl
+                    stream.releaseId
                 ) { bitmap ->
                     updateNotification(
                         UpdateLiveInfoAsync.previousTitle,

@@ -1,6 +1,5 @@
 package de.lucaspape.monstercat.handlers.abstract_items
 
-import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -8,14 +7,14 @@ import android.widget.TextView
 import androidx.core.net.toUri
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
-import com.squareup.picasso.Picasso
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.util.Settings
+import de.lucaspape.monstercat.download.downloadCoverIntoImageView
 
 open class CatalogItem(
     private var title: String?,
+    private var version:String?,
     private var artist: String?,
-    private var coverUrl:String?,
+    private var albumId:String?,
     private var titleDownloadStatus: String?
 ) : AbstractItem<CatalogItem.ViewHolder>() {
     override val type: Int = 101
@@ -38,15 +37,12 @@ open class CatalogItem(
         private val context = view.context
 
         override fun bindView(item: CatalogItem, payloads: MutableList<Any>) {
-            titleTextView.text = item.title
+            titleTextView.text = "${item.title} ${item.version}"
             artistTextView.text = item.artist
 
-            val settings = Settings(context)
-
-            Picasso.with(context)
-                .load(item.coverUrl + "?image_width=" + settings.getSetting("primaryResolution"))
-                .placeholder(Drawable.createFromPath(context.dataDir.toString() + "/fallback.jpg"))
-                .into(coverImageView)
+            item.albumId?.let {
+                downloadCoverIntoImageView(context, coverImageView, it, true)
+            }
 
             titleDownloadStatusImageView.setImageURI(item.titleDownloadStatus?.toUri())
         }

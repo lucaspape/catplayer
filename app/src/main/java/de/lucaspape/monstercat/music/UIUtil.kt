@@ -4,7 +4,6 @@ import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.media.MediaMetadata
 import android.media.session.PlaybackState
 import android.os.Handler
@@ -17,14 +16,12 @@ import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import com.squareup.picasso.Picasso
-import com.squareup.picasso.Target
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.database.Song
+import de.lucaspape.monstercat.download.downloadCoverIntoBitmap
+import de.lucaspape.monstercat.download.downloadCoverIntoImageView
 import de.lucaspape.monstercat.music.MonstercatPlayer.Companion.contextReference
 import de.lucaspape.monstercat.music.MonstercatPlayer.Companion.mediaPlayer
 import de.lucaspape.monstercat.music.MonstercatPlayer.Companion.mediaSession
-import de.lucaspape.monstercat.util.Settings
 import java.lang.ref.WeakReference
 
 var textViewReference: WeakReference<TextView>? = null
@@ -239,94 +236,35 @@ internal fun startSeekBarUpdate() {
     })
 }
 
-internal fun setCover(song: Song, context: Context, callback: (bitmap:Bitmap) -> Unit) {
-    val settings = Settings(context)
-
-    barCoverImageReference?.get()?.let {
-        Picasso.with(context)
-            .load(song.coverUrl + "?image_width=" + settings.getSetting("primaryResolution"))
-            .placeholder(Drawable.createFromPath(context.dataDir.toString() + "/fallback.jpg"))
-            .into(it)
-    }
-
-    fullscreenCoverReference?.get()?.let {
-        Picasso.with(context)
-            .load(song.coverUrl + "?image_width=" + settings.getSetting("primaryResolution"))
-            .placeholder(Drawable.createFromPath(context.dataDir.toString() + "/fallback.jpg"))
-            .into(it)
-    }
-
-    val picassoTarget = object: Target{
-        override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
-        }
-
-        override fun onBitmapFailed(errorDrawable: Drawable?) {
-        }
-
-        override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-            bitmap?.let {
-                mediaPlayer?.duration?.let { setSongMetadata(song, bitmap, it) }
-                callback(bitmap)
-            }
-        }
-    }
-
-    Picasso.with(context)
-        .load(song.coverUrl + "?image_width=" + settings.getSetting("primaryResolution"))
-        .into(picassoTarget)
-}
-
 internal fun setCover(
+    context: Context,
     title: String,
     version: String,
     artist: String,
-    coverUrl:String,
-    callback: (bitmap:Bitmap) -> Unit
+    albumId: String,
+    callback: (bitmap: Bitmap) -> Unit
 ) {
 
-    contextReference?.get()?.let{context ->
-        val settings = Settings(context)
-
-        barCoverImageReference?.get()?.let {
-            Picasso.with(context)
-                .load(coverUrl + "?image_width=" + settings.getSetting("primaryResolution"))
-                .placeholder(Drawable.createFromPath(context.dataDir.toString() + "/fallback.jpg"))
-                .into(it)
-        }
-
-        fullscreenCoverReference?.get()?.let {
-            Picasso.with(context)
-                .load(coverUrl + "?image_width=" + settings.getSetting("primaryResolution"))
-                .placeholder(Drawable.createFromPath(context.dataDir.toString() + "/fallback.jpg"))
-                .into(it)
-        }
-
-        val picassoTarget = object:Target{
-            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
-            }
-
-            override fun onBitmapFailed(errorDrawable: Drawable?) {
-            }
-
-            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                bitmap?.let {
-                    mediaPlayer?.duration?.let {
-                        setSongMetadata(
-                            title,
-                            version,
-                            artist,
-                            bitmap,
-                            it
-                        )
-                    }
-                    callback(bitmap)
-                }
-            }
-        }
-
-        Picasso.with(context).load(coverUrl).into(picassoTarget)
-
+    barCoverImageReference?.get()?.let {
+        downloadCoverIntoImageView(context, it, albumId, true)
     }
+
+    fullscreenCoverReference?.get()?.let {
+        downloadCoverIntoImageView(context, it, albumId, false)
+    }
+
+    downloadCoverIntoBitmap(context, { bitmap ->
+        mediaPlayer?.duration?.let {
+            setSongMetadata(
+                title,
+                version,
+                artist,
+                bitmap,
+                it
+            )
+        }
+        callback(bitmap)
+    }, albumId, false)
 }
 
 internal fun setPlayButtonImage(context: Context) {
@@ -391,16 +329,6 @@ internal fun setPlayerState(progress: Long) {
 /**
  * Set song metadata
  */
-internal fun setSongMetadata(song: Song, cover:Bitmap, duration: Long) {
-    val mediaMetadata = MediaMetadataCompat.Builder()
-    mediaMetadata.putString(MediaMetadata.METADATA_KEY_ARTIST, song.artist)
-    mediaMetadata.putString(MediaMetadata.METADATA_KEY_TITLE, "${song.title} ${song.version}")
-    mediaMetadata.putLong(MediaMetadata.METADATA_KEY_DURATION, duration)
-    mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, cover)
-    mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ART, cover)
-    mediaSession?.setMetadata(mediaMetadata.build())
-}
-
 internal fun setSongMetadata(
     title: String,
     version: String,

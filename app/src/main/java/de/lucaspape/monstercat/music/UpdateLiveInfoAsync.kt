@@ -58,7 +58,7 @@ class UpdateLiveInfoAsync(
                             it.title,
                             it.version,
                             it.artist,
-                            it.albumCoverUpdateUrl
+                            it.releaseId
                         )
                     }
                 }
@@ -74,26 +74,28 @@ class UpdateLiveInfoAsync(
         val title = values[0]
         val version = values[1]
         val artist = values[2]
-        val coverUrl = values[3]
+        val albumId = values[3]
 
         title?.let {
             version?.let {
                 artist?.let {
-                    coverUrl?.let {
-                        setCover(
-                            previousTitle,
-                            previousVersion,
-                            previousArtist,
-                            coverUrl
-                        ) { bitmap ->
-                            updateNotification(
-                                title,
-                                version,
-                                artist,
-                                bitmap
-                            )
+                    albumId?.let {
+                        contextReference.get()?.let { context ->
+                            setCover(
+                                context,
+                                previousTitle,
+                                previousVersion,
+                                previousArtist,
+                                albumId
+                            ) { bitmap ->
+                                updateNotification(
+                                    title,
+                                    version,
+                                    artist,
+                                    bitmap
+                                )
+                            }
                         }
-
                     }
                 }
             }

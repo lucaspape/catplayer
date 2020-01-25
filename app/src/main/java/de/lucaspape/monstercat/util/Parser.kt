@@ -44,14 +44,17 @@ fun parseSongToHashMap(song: Song): HashMap<String, Any?> {
 }
 
 fun parseHashMapToAbstractCatalogItem(hashMap: HashMap<String, Any?>): CatalogItem {
-    val title = hashMap["title"] as String + " " + hashMap["version"] as String
+    val title = hashMap["title"] as String
+    val version = hashMap["version"] as String
     val artist = hashMap["artist"] as String
     val titleDownloadStatus = hashMap["downloadedCheck"] as String
+    val albumId = hashMap["albumId"] as String
 
     return CatalogItem(
         title,
+        version,
         artist,
-        (hashMap["coverUrl"] as String),
+        albumId,
         titleDownloadStatus
     )
 }
@@ -59,11 +62,12 @@ fun parseHashMapToAbstractCatalogItem(hashMap: HashMap<String, Any?>): CatalogIt
 fun parseHashMapToAbstractAlbumItem(hashMap: HashMap<String, Any?>): AlbumItem {
     val title = hashMap["title"] as String
     val artist = hashMap["artist"] as String
+    val albumId = hashMap["id"] as String
 
     return AlbumItem(
         title,
         artist,
-        hashMap["coverUrl"] as String
+        albumId
     )
 }
 
