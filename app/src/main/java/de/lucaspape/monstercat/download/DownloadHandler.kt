@@ -116,6 +116,13 @@ fun downloadCoverIntoBitmap(
                 override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
                     bitmap?.let {
                         downloadFinished(bitmap)
+
+                        //possible that it changed by this time
+                        if (!cacheFile.exists()) {
+                            FileOutputStream(cacheFile).use { out ->
+                                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+                            }
+                        }
                     }
                 }
             }
