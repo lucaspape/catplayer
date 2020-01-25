@@ -283,7 +283,6 @@ class PlaylistHandler {
                 val playlistItems = ArrayList<PlaylistItem>()
 
                 for (playlist in playlists) {
-                    //TODO
                     playlistItems.add(parsePlaylistToAbstractPlaylistItem(view.context, playlist))
                 }
 

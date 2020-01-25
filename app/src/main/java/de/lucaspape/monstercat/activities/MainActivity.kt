@@ -6,6 +6,8 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.AsyncTask
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
@@ -28,6 +30,8 @@ import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.MonstercatPlayer.Companion.mediaPlayer
 import de.lucaspape.monstercat.music.notification.updateNotification
 import de.lucaspape.monstercat.util.*
+import java.io.File
+import java.io.FileOutputStream
 import java.lang.ref.WeakReference
 
 val noisyReceiver = MonstercatPlayer.Companion.NoisyReceiver()
@@ -217,7 +221,13 @@ class MainActivity : AppCompatActivity() {
                         ""
                     ) { _, _ ->
                     }
-                }, {}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                }, {
+                    val lowResFallback = File("$dataDir/fallback_low.jpg")
+
+                    FileOutputStream(lowResFallback).use { out ->
+                        Bitmap.createScaledBitmap(BitmapFactory.decodeFile("$dataDir/fallback.jpg"), 128, 128, false).compress(Bitmap.CompressFormat.JPEG, 100, out)
+                    }
+                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
             } else {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
@@ -229,7 +239,13 @@ class MainActivity : AppCompatActivity() {
                         ""
                     ) { _, _ ->
                     }
-                }, {}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                }, {
+                    val lowResFallback = File("$dataDir/fallback_low.jpg")
+
+                    FileOutputStream(lowResFallback).use { out ->
+                        Bitmap.createScaledBitmap(BitmapFactory.decodeFile("$dataDir/fallback.jpg"), 128, 128, false).compress(Bitmap.CompressFormat.JPEG, 100, out)
+                    }
+                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
             }
         }else{
             if(resources.configuration.uiMode.and(Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES){

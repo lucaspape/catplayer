@@ -39,6 +39,12 @@ fun downloadCoverIntoImageView(
         settings.getSetting("secondaryResolution")
     }
 
+    val placeholder = if(!lowRes){
+        Drawable.createFromPath(context.dataDir.toString() + "/fallback.jpg")
+    }else{
+        Drawable.createFromPath(context.dataDir.toString() + "/fallback_low.jpg")
+    }
+
     val url = context.getString(R.string.trackContentUrl) + "$albumId/cover"
 
     val cacheFile = File(context.cacheDir.toString() + "/$albumId.png.$resolution")
@@ -74,11 +80,10 @@ fun downloadCoverIntoImageView(
 
             Picasso.with(context)
                 .load("$url?image_width=$resolution")
-                .placeholder(Drawable.createFromPath(context.dataDir.toString() + "/fallback.jpg"))
+                .placeholder(placeholder)
                 .into(picassoTarget)
         } else {
-            val bitmap = BitmapFactory.decodeFile(context.dataDir.toString() + "/fallback.jpg")
-            imageView.setImageBitmap(bitmap)
+            imageView.setImageDrawable(placeholder)
         }
     }
 }
