@@ -13,17 +13,17 @@ import java.io.File
 import java.io.FileOutputStream
 
 //this lists contain the urls that should be downloaded
-internal val downloadList = ArrayList<HashMap<String, Any?>?>()
+internal val downloadList = ArrayList<String>()
+internal val streamDownloadList = ArrayList<String>()
 
 internal val targetList = ArrayList<com.squareup.picasso.Target>()
 
-fun addDownloadSong(url: String, location: String, shownTitle: String) {
-    val downloadTrack = HashMap<String, Any?>()
-    downloadTrack["url"] = url
-    downloadTrack["location"] = location
-    downloadTrack["shownTitle"] = shownTitle
+fun addDownloadSong(songId: String) {
+    downloadList.add(songId)
+}
 
-    downloadList.add(downloadTrack)
+fun addStreamDownloadSong(songId: String){
+    streamDownloadList.add(songId)
 }
 
 fun downloadCoverIntoImageView(

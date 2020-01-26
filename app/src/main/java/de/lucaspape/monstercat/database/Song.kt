@@ -73,8 +73,15 @@ data class Song(
         context.getExternalFilesDir(null).toString() + "/" + artist + title + version + "." + Settings(
             context
         ).getSetting("downloadType")
-    val streamLocation: String =
+
+    val downloadUrl =
+        context.getString(R.string.trackContentUrl) + albumId + "/track-download/" + songId + "?format=" + Settings(
+            context
+        ).getSetting("downloadType")
+
+    val streamUrl: String =
         context.getString(R.string.trackContentUrl) + albumId + "/track-stream/" + songId
+
     val streamDownloadLocation: String = "$downloadLocation.stream"
 
     fun getUrl(): String {
@@ -87,7 +94,7 @@ data class Song(
         } else if (File(streamDownloadLocation).exists()) {
             streamDownloadLocation
         } else {
-            streamLocation
+            streamUrl
         }
     }
 
@@ -102,7 +109,7 @@ data class Song(
             fileToMediaSource(streamDownloadLocation)
         } else {
             if (isStreamable) {
-                urlToMediaSource(streamLocation)
+                urlToMediaSource(streamUrl)
             } else {
                 null
             }

@@ -11,7 +11,7 @@ import de.lucaspape.monstercat.background.BackgroundService.Companion.waitForDow
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
-import de.lucaspape.monstercat.download.addDownloadSong
+import de.lucaspape.monstercat.download.addStreamDownloadSong
 import de.lucaspape.monstercat.music.notification.startPlayerService
 import de.lucaspape.monstercat.music.notification.stopPlayerService
 import de.lucaspape.monstercat.music.notification.updateNotification
@@ -42,11 +42,7 @@ internal fun play() {
             if (downloadStream == true) {
                 if (song.isDownloadable) {
                     if (!File(song.downloadLocation).exists() && !File(song.streamDownloadLocation).exists()) {
-                        addDownloadSong(
-                            song.streamLocation,
-                            song.streamDownloadLocation,
-                            song.shownTitle
-                        )
+                        addStreamDownloadSong(song.songId)
                     }
 
                     waitForDownloadTask?.cancel(true)
@@ -70,11 +66,7 @@ internal fun play() {
 
                                 if (nextSong != null) {
                                     if (!File(nextSong.downloadLocation).exists() && !File(nextSong.streamDownloadLocation).exists()) {
-                                        addDownloadSong(
-                                            nextSong.streamLocation,
-                                            nextSong.streamDownloadLocation,
-                                            nextSong.shownTitle
-                                        )
+                                        addStreamDownloadSong(nextSong.songId)
                                     }
                                 }
 

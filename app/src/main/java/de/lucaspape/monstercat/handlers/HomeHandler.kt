@@ -20,6 +20,7 @@ import de.lucaspape.monstercat.database.helper.AlbumDatabaseHelper
 import de.lucaspape.monstercat.database.helper.AlbumItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.CatalogSongDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
+import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.handlers.abstract_items.AlbumItem
 import de.lucaspape.monstercat.handlers.abstract_items.CatalogItem
 import de.lucaspape.monstercat.handlers.abstract_items.ProgressItem
@@ -255,10 +256,7 @@ class HomeHandler {
 
                 if (song != null) {
                     when (item) {
-                        context.getString(R.string.download) -> downloadSong(
-                            context,
-                            song
-                        )
+                        context.getString(R.string.download) -> addDownloadSong(song.songId)
                         context.getString(R.string.playNext) -> playSongFromId(
                             id,
                             false

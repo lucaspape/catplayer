@@ -16,6 +16,7 @@ import de.lucaspape.monstercat.activities.monstercatPlayer
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
+import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.handlers.abstract_items.CatalogItem
 import de.lucaspape.monstercat.handlers.abstract_items.PlaylistItem
 import de.lucaspape.monstercat.handlers.async.BackgroundAsync
@@ -219,7 +220,7 @@ class PlaylistHandler {
                                 songDatabaseHelper.getSong(view.context, id)
 
                             if (song != null) {
-                                downloadSong(context, song)
+                                addDownloadSong(song.songId)
                             }
                         }
                     }
