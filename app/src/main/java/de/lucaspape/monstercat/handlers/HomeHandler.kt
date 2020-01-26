@@ -56,6 +56,9 @@ class HomeHandler {
     private var currentAlbumId = ""
     private var currentMCID = ""
 
+    /**
+     * Setup catalog view
+     */
     private fun updateCatalogRecyclerView(view: View, data: ArrayList<CatalogItem>) {
         val recyclerView = view.findViewById<RecyclerView>(R.id.musiclistview)
 
@@ -73,6 +76,9 @@ class HomeHandler {
             )
         }
 
+        /**
+         * On song click
+         */
         fastAdapter.onClickListener = { _, _, _, position ->
             monstercatPlayer.clearContinuous()
 
@@ -94,6 +100,9 @@ class HomeHandler {
             false
         }
 
+        /**
+         * On song long click
+         */
         fastAdapter.onLongClickListener = { _, _, _, position ->
             val idList = ArrayList<String>()
 
@@ -106,6 +115,9 @@ class HomeHandler {
             false
         }
 
+        /**
+         * On menu button click
+         */
         fastAdapter.addEventHook(object : ClickEventHook<CatalogItem>() {
             override fun onBind(viewHolder: RecyclerView.ViewHolder): View? {
                 return if (viewHolder is CatalogItem.ViewHolder) {
@@ -129,6 +141,9 @@ class HomeHandler {
             }
         })
 
+        /**
+         * On scroll down (load next)
+         */
         val footerAdapter = ItemAdapter<ProgressItem>()
         recyclerView.addOnScrollListener(object :
             EndlessRecyclerOnScrollListener(footerAdapter) {
@@ -143,6 +158,9 @@ class HomeHandler {
         })
     }
 
+    /**
+     * Setup album view
+     */
     private fun updateAlbumRecyclerView(view: View, data: ArrayList<AlbumItem>) {
         val recyclerView = view.findViewById<RecyclerView>(R.id.musiclistview)
 
@@ -160,6 +178,9 @@ class HomeHandler {
             )
         }
 
+        /**
+         * On item click
+         */
         fastAdapter.onClickListener = { _, _, _, position ->
             val albumItem = data[position]
             loadAlbum(view, albumItem.albumId, albumItem.mcID, false)
@@ -167,6 +188,9 @@ class HomeHandler {
             false
         }
 
+        /**
+         * On item long click
+         */
         fastAdapter.onLongClickListener = { _, _, _, position ->
             val albumMcIdList = ArrayList<String>()
 
@@ -179,6 +203,9 @@ class HomeHandler {
             false
         }
 
+        /**
+         * On scroll down (load more)
+         */
         val footerAdapter = ItemAdapter<ProgressItem>()
         recyclerView.addOnScrollListener(object :
             EndlessRecyclerOnScrollListener(footerAdapter) {
@@ -193,6 +220,9 @@ class HomeHandler {
         })
     }
 
+    /**
+     * Context menu
+     */
     private fun showContextMenu(
         view: View,
         contentList: ArrayList<String>,
@@ -390,6 +420,9 @@ class HomeHandler {
         })
     }
 
+    /**
+     * Loads first 50 catalog songs
+     */
     fun initSongListLoad(view: View, forceReload: Boolean) {
         currentCatalogViewData = ArrayList()
 
@@ -446,6 +479,9 @@ class HomeHandler {
         }
     }
 
+    /**
+     * Loads next 50 songs
+     */
     fun loadSongList(view: View, itemAdapter: ItemAdapter<CatalogItem>) {
         LoadSongListAsync(WeakReference(view.context), true, currentCatalogViewData.size, {}, {
             val catalogSongDatabaseHelper =
@@ -477,6 +513,9 @@ class HomeHandler {
         }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 
+    /**
+     * Loads first 50 albums
+     */
     fun initAlbumListLoad(view: View, forceReload: Boolean) {
         currentAlbumViewData = ArrayList()
 
@@ -534,6 +573,9 @@ class HomeHandler {
         }
     }
 
+    /**
+     * Loads next 50 albums
+     */
     fun loadAlbumList(view: View, itemAdapter: ItemAdapter<AlbumItem>) {
         LoadAlbumListAsync(WeakReference(view.context),
             true, currentAlbumViewData.size, {}, {
@@ -611,7 +653,9 @@ class HomeHandler {
         )
     }
 
-    //search for string
+    /**
+     * Search for string TODO load more
+     */
     fun searchSong(view: View, searchString: String) {
         val contextReference = WeakReference<Context>(view.context)
 
