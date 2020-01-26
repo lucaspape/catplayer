@@ -41,7 +41,9 @@ open class CatalogItem(
         private val context = view.context
 
         override fun bindView(item: CatalogItem, payloads: MutableList<Any>) {
-            titleTextView.text = "${item.title} ${item.version}"
+            val shownTitle = "${item.title} ${item.version}"
+
+            titleTextView.text = shownTitle
             artistTextView.text = item.artist
 
             downloadCoverIntoImageView(context, coverImageView, item.albumId, true)
