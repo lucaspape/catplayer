@@ -33,7 +33,7 @@ class LoadAlbumListAsync(
         contextReference.get()?.let { context ->
             val albumDatabaseHelper =
                 AlbumDatabaseHelper(context)
-            val albumList = albumDatabaseHelper.getAlbums(0, 1)
+            val albumList = albumDatabaseHelper.getAlbums(skip.toLong(), 1)
 
             if (!forceReload && albumList.isNotEmpty()) {
                 requestFinished()

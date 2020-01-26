@@ -483,7 +483,7 @@ class HomeHandler {
      * Loads next 50 songs
      */
     fun loadSongList(view: View, itemAdapter: ItemAdapter<CatalogItem>) {
-        LoadSongListAsync(WeakReference(view.context), true, currentCatalogViewData.size, {}, {
+        LoadSongListAsync(WeakReference(view.context), false, currentCatalogViewData.size, {}, {
             val catalogSongDatabaseHelper =
                 CatalogSongDatabaseHelper(view.context)
 
@@ -578,7 +578,7 @@ class HomeHandler {
      */
     fun loadAlbumList(view: View, itemAdapter: ItemAdapter<AlbumItem>) {
         LoadAlbumListAsync(WeakReference(view.context),
-            true, currentAlbumViewData.size, {}, {
+            false, currentAlbumViewData.size, {}, {
                 val albumDatabaseHelper =
                     AlbumDatabaseHelper(view.context)
                 val albumList =
