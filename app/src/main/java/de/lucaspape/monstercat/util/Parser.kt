@@ -44,12 +44,16 @@ fun parsePlaylistToAbstractPlaylistItem(context: Context, playlist: Playlist):Pl
         }
     }
 
-    val playlistDownloadStatus = if(downloaded){
-        "android.resource://de.lucaspape.monstercat/drawable/ic_check_green_24dp"
-    }else if(streamDownloaded){
-        "android.resource://de.lucaspape.monstercat/drawable/ic_check_orange_24dp"
-    }else{
-        "android.resource://de.lucaspape.monstercat/drawable/ic_empty_24dp"
+    val playlistDownloadStatus = when {
+        downloaded -> {
+            "android.resource://de.lucaspape.monstercat/drawable/ic_check_green_24dp"
+        }
+        streamDownloaded -> {
+            "android.resource://de.lucaspape.monstercat/drawable/ic_check_orange_24dp"
+        }
+        else -> {
+            "android.resource://de.lucaspape.monstercat/drawable/ic_empty_24dp"
+        }
     }
 
     return PlaylistItem(playlist.playlistName, playlist.playlistId, "", playlistDownloadStatus)

@@ -37,10 +37,10 @@ class DeletePlaylistTrackAsync(
                 Request.Method.POST,
                 context.getString(R.string.removeFromPlaylistUrl),
                 deleteObject,
-                Response.Listener { _ ->
+                Response.Listener {
                     displayInfo(context, context.getString(R.string.removedSongFromPlaylistMsg))
                 },
-                Response.ErrorListener { _ ->
+                Response.ErrorListener {
                     displayInfo(context, context.getString(R.string.errorRemovingSongFromPlaylist))
                 })
 

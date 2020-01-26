@@ -10,9 +10,7 @@ import de.lucaspape.monstercat.database.helper.CatalogSongDatabaseHelper
 import de.lucaspape.monstercat.request.AuthorizedRequest
 import de.lucaspape.monstercat.util.parseCatalogSongToDB
 import de.lucaspape.monstercat.util.sid
-import org.json.JSONException
 import org.json.JSONObject
-import java.lang.IndexOutOfBoundsException
 import java.lang.ref.WeakReference
 
 /**

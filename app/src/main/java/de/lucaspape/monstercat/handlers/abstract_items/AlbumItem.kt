@@ -35,9 +35,7 @@ open class AlbumItem(
             titleTextView.text = item.title
             artistTextView.text = item.artist
 
-            item.albumId?.let {
-                downloadCoverIntoImageView(context, coverImageView, it, false)
-            }
+            downloadCoverIntoImageView(context, coverImageView, item.albumId, false)
         }
 
         override fun unbindView(item: AlbumItem) {

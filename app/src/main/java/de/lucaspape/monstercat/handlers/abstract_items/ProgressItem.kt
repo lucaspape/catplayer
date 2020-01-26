@@ -19,7 +19,7 @@ open class ProgressItem : AbstractItem<ProgressItem.ViewHolder>() {
     }
 
     class ViewHolder(view: View) : FastAdapter.ViewHolder<ProgressItem>(view) {
-        val loadingBar = view.findViewById<ProgressBar>(R.id.loadingBar)
+        private val loadingBar = view.findViewById<ProgressBar>(R.id.loadingBar)
 
         override fun bindView(item: ProgressItem, payloads: MutableList<Any>) {
             loadingBar.visibility = View.VISIBLE

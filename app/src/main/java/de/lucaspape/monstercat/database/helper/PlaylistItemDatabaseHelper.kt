@@ -3,7 +3,6 @@ package de.lucaspape.monstercat.database.helper
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
-import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
 import de.lucaspape.monstercat.database.PlaylistItem
 
@@ -63,41 +62,6 @@ class PlaylistItemDatabaseHelper(context: Context, var playlistId: String) :
         val id = db.insert(PlaylistItem(playlistId, 0, 0).TABLE_NAME, null, values)
         db.close()
         return id
-    }
-
-    fun getItemFromSongId(songId: Long): PlaylistItem? {
-        val db = readableDatabase
-
-        try {
-            val cursor = db.query(
-                PlaylistItem(playlistId, 0, 0).TABLE_NAME, arrayOf(
-                    PlaylistItem.COLUMN_ID,
-                    PlaylistItem.COLUMN_SONG_ID
-                ),
-                PlaylistItem.COLUMN_SONG_ID + "=?",
-                arrayOf(songId.toString()), null, null, null, null
-            )
-
-            cursor?.moveToFirst()
-
-            return try {
-                val playlistItem = PlaylistItem(
-                    playlistId,
-                    cursor.getLong(cursor.getColumnIndex(PlaylistItem.COLUMN_ID)),
-                    cursor.getLong(cursor.getColumnIndex(PlaylistItem.COLUMN_SONG_ID))
-                )
-
-                cursor.close()
-
-                playlistItem
-            } catch (e: IndexOutOfBoundsException) {
-                cursor.close()
-                db.close()
-                null
-            }
-        } catch (e: SQLiteException) {
-            return null
-        }
     }
 
     fun getAllData(): List<PlaylistItem> {

@@ -10,7 +10,6 @@ import de.lucaspape.monstercat.database.helper.AlbumDatabaseHelper
 import de.lucaspape.monstercat.request.AuthorizedRequest
 import de.lucaspape.monstercat.util.parseAlbumToDB
 import de.lucaspape.monstercat.util.sid
-import org.json.JSONException
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 

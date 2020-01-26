@@ -1,18 +1,11 @@
 package de.lucaspape.monstercat.music
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.AsyncTask
-import android.os.StrictMode
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.music.notification.updateNotification
 import de.lucaspape.monstercat.twitch.Stream
-import java.io.FileNotFoundException
-import java.io.FileOutputStream
 import java.lang.ref.WeakReference
-import java.net.HttpURLConnection
-import java.net.URL
 
 class UpdateLiveInfoAsync(
     private val contextReference: WeakReference<Context>,
