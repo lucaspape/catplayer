@@ -64,9 +64,10 @@ class LoadAlbumListAsync(
                     val json = JSONObject(response)
                     val jsonArray = json.getJSONArray("results")
 
-                    for (i in(0 until jsonArray.length())) {
+                    for(i in (jsonArray.length()-1 downTo 0)){
                         parseAlbumToDB(jsonArray.getJSONObject(i), context)
                     }
+
                 },
                 Response.ErrorListener { }
             )

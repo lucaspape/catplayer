@@ -16,7 +16,7 @@ class AlbumItemDatabaseHelper(context: Context, var albumId: String) :
 
     companion object {
         @JvmStatic
-        private val DATABASE_VERSION = 2 + AlbumDatabaseHelper.DATABASE_VERSION
+        private val DATABASE_VERSION = 2 * AlbumDatabaseHelper.DATABASE_VERSION
         @JvmStatic
         private val DATABASE_NAME = "album_items_db"
     }

@@ -10,7 +10,9 @@ import de.lucaspape.monstercat.database.helper.CatalogSongDatabaseHelper
 import de.lucaspape.monstercat.request.AuthorizedRequest
 import de.lucaspape.monstercat.util.parseCatalogSongToDB
 import de.lucaspape.monstercat.util.sid
+import org.json.JSONException
 import org.json.JSONObject
+import java.lang.IndexOutOfBoundsException
 import java.lang.ref.WeakReference
 
 /**
@@ -32,7 +34,7 @@ class LoadSongListAsync(
         contextReference.get()?.let { context ->
             val catalogSongDatabaseHelper =
                 CatalogSongDatabaseHelper(context)
-            val songIdList = catalogSongDatabaseHelper.getSongs(0,1)
+            val songIdList = catalogSongDatabaseHelper.getSongs(skip.toLong(), 50)
 
             if (!forceReload && songIdList.isNotEmpty()) {
                 requestFinished()
@@ -64,10 +66,10 @@ class LoadSongListAsync(
                     val json = JSONObject(response)
                     val jsonArray = json.getJSONArray("results")
 
-                    //parse every single song into list
-                    for (k in (0 until jsonArray.length())) {
+                    for (i in (jsonArray.length() - 1 downTo 0)) {
+
                         parseCatalogSongToDB(
-                            jsonArray.getJSONObject(k),
+                            jsonArray.getJSONObject(i),
                             context
                         )
                     }
