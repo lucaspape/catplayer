@@ -7,6 +7,7 @@ import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.music.MonstercatPlayer
 import de.lucaspape.monstercat.util.*
 import java.io.File
+import java.lang.Exception
 import java.lang.ref.WeakReference
 
 class DownloadTask(private val weakReference: WeakReference<Context>) :
@@ -40,6 +41,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                                         sid
                                     ) { max, current ->
                                         publishProgress(
+                                            "progressUpdate",
                                             currentStreamDownloadSong.shownTitle,
                                             max.toString(),
                                             current.toString(),
@@ -47,22 +49,10 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                                         )
                                     }
                                 } else {
-                                    displayInfo(
-                                        context,
-                                        context.getString(
-                                            R.string.alreadyDownloadedMsg,
-                                            currentStreamDownloadSong.shownTitle
-                                        )
-                                    )
+                                    publishProgress("alreadyDownloadedError", currentStreamDownloadSong.shownTitle)
                                 }
                             } else {
-                                displayInfo(
-                                    context,
-                                    context.getString(
-                                        R.string.downloadNotAvailableMsg,
-                                        currentStreamDownloadSong.shownTitle
-                                    )
-                                )
+                                publishProgress("downloadNotAllowedError", currentStreamDownloadSong.shownTitle)
                             }
 
                             streamDownloadedSongs++
@@ -89,6 +79,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                                         sid
                                     ) { max, current ->
                                         publishProgress(
+                                            "progressUpdate",
                                             currentDownloadSong.shownTitle,
                                             max.toString(),
                                             current.toString(),
@@ -96,22 +87,10 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                                         )
                                     }
                                 } else {
-                                    displayInfo(
-                                        context,
-                                        context.getString(
-                                            R.string.alreadyDownloadedMsg,
-                                            currentDownloadSong.shownTitle
-                                        )
-                                    )
+                                    publishProgress("alreadyDownloadedError", currentDownloadSong.shownTitle)
                                 }
                             } else {
-                                displayInfo(
-                                    context,
-                                    context.getString(
-                                        R.string.downloadNotAvailableMsg,
-                                        currentDownloadSong.shownTitle
-                                    )
-                                )
+                                publishProgress("downloadNotAllowedError", currentDownloadSong.shownTitle)
                             }
 
                             downloadedSongs++
@@ -131,24 +110,55 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
     }
 
     override fun onProgressUpdate(vararg values: String?) {
-        val title = values[0]
-        val max = values[1]?.toInt()
-        val current = values[2]?.toInt()
-        val int = values[3]?.toBoolean()
+        val type = values[0]
 
-        title?.let {
-            max?.let {
-                current?.let {
-                    int?.let {
-                        showDownloadNotification(
-                            title,
-                            current,
-                            max,
-                            int,
-                            MonstercatPlayer.contextReference!!.get()!!
+        MonstercatPlayer.contextReference?.get()?.let { context ->
+            when (type) {
+                "alreadyDownloadedError" -> {
+                    val shownTitle = values[1]
+
+                    displayInfo(
+                        context,
+                        context.getString(
+                            R.string.alreadyDownloadedMsg,
+                            shownTitle
                         )
+                    )
+                }
+                "downloadNotAllowedError" -> {
+                    val shownTitle = values[1]
+
+                    displayInfo(
+                        context,
+                        context.getString(
+                            R.string.downloadNotAvailableMsg,
+                            shownTitle
+                        )
+                    )
+                }
+                "progressUpdate" -> {
+                    val title = values[1]
+                    val max = values[2]?.toInt()
+                    val current = values[3]?.toInt()
+                    val int = values[4]?.toBoolean()
+
+                    title?.let {
+                        max?.let {
+                            current?.let {
+                                int?.let {
+                                    showDownloadNotification(
+                                        title,
+                                        current,
+                                        max,
+                                        int,
+                                        context
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
+                else -> throw Exception("Unknown type exception")
             }
         }
     }
