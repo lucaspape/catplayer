@@ -104,6 +104,8 @@ class MainActivity : AppCompatActivity() {
             println("Internet permission not granted!")
         }
 
+        downloadFallbackCoverImages()
+
         //adjust theme
         changeTheme()
 
@@ -206,46 +208,81 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
+    private fun downloadFallbackCoverImages(){
+        val fallbackBlackFile = File("$dataDir/fallback_black.jpg")
+        val fallbackBlackFileLow = File("$dataDir/fallback_black_low.jpg")
+        val fallbackWhiteFile = File("$dataDir/fallback_white.jpg")
+        val fallbackWhiteFileLow = File("$dataDir/fallback_white_low.jpg")
+
+        if(!fallbackBlackFile.exists() || !fallbackBlackFileLow.exists()){
+            BackgroundAsync({
+                downloadFile(
+                    fallbackBlackFile.absolutePath,
+                    getString(R.string.fallbackCoverBlackUrl),
+                    cacheDir.toString(),
+                    ""
+                ) { _, _ ->
+                }
+            }, {
+                FileOutputStream(fallbackBlackFileLow).use { out ->
+                    val originalBitmap = BitmapFactory.decodeFile(fallbackBlackFile.absolutePath)
+                    originalBitmap?.let {
+                        Bitmap.createScaledBitmap(it, 128, 128, false).compress(Bitmap.CompressFormat.JPEG, 100, out)
+                    }
+                }
+
+                changeTheme()
+            }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        }
+
+        if(!fallbackWhiteFile.exists() || !fallbackWhiteFileLow.exists()){
+            BackgroundAsync({
+                downloadFile(
+                    fallbackWhiteFile.absolutePath,
+                    getString(R.string.fallbackCoverUrl),
+                    cacheDir.toString(),
+                    ""
+                ) { _, _ ->
+                }
+            }, {
+                FileOutputStream(fallbackWhiteFileLow).use { out ->
+                    val originalBitmap = BitmapFactory.decodeFile(fallbackWhiteFile.absolutePath)
+                    originalBitmap?.let {
+                        Bitmap.createScaledBitmap(it, 128, 128, false).compress(Bitmap.CompressFormat.JPEG, 100, out)
+                    }
+                }
+
+                changeTheme()
+            }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        }
+    }
+
     private fun changeTheme() {
+        val fallbackFile = File("$dataDir/fallback.jpg")
+        val fallbackFileLow = File("$dataDir/fallback_low.jpg")
+
+        val fallbackBlackFile = File("$dataDir/fallback_black.jpg")
+        val fallbackBlackFileLow = File("$dataDir/fallback_black_low.jpg")
+        val fallbackWhiteFile = File("$dataDir/fallback_white.jpg")
+        val fallbackWhiteFileLow = File("$dataDir/fallback_white_low.jpg")
+
         val settings = Settings(this)
 
         if (settings.getSetting("darkTheme") != null) {
             if (settings.getSetting("darkTheme")!!.toBoolean()) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
 
-                BackgroundAsync({
-                    downloadFile(
-                        "$dataDir/fallback.jpg",
-                        getString(R.string.fallbackCoverBlackUrl),
-                        cacheDir.toString(),
-                        ""
-                    ) { _, _ ->
-                    }
-                }, {
-                    val lowResFallback = File("$dataDir/fallback_low.jpg")
-
-                    FileOutputStream(lowResFallback).use { out ->
-                        Bitmap.createScaledBitmap(BitmapFactory.decodeFile("$dataDir/fallback.jpg"), 128, 128, false).compress(Bitmap.CompressFormat.JPEG, 100, out)
-                    }
-                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                if(fallbackBlackFile.exists() && fallbackBlackFileLow.exists()){
+                    fallbackBlackFile.copyTo(fallbackFile, true)
+                    fallbackBlackFileLow.copyTo(fallbackFileLow, true)
+                }
             } else {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
-                BackgroundAsync({
-                    downloadFile(
-                        "$dataDir/fallback.jpg",
-                        getString(R.string.fallbackCoverUrl),
-                        cacheDir.toString(),
-                        ""
-                    ) { _, _ ->
-                    }
-                }, {
-                    val lowResFallback = File("$dataDir/fallback_low.jpg")
-
-                    FileOutputStream(lowResFallback).use { out ->
-                        Bitmap.createScaledBitmap(BitmapFactory.decodeFile("$dataDir/fallback.jpg"), 128, 128, false).compress(Bitmap.CompressFormat.JPEG, 100, out)
-                    }
-                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                if(fallbackWhiteFile.exists() && fallbackWhiteFileLow.exists()){
+                    fallbackWhiteFile.copyTo(fallbackFile, true)
+                    fallbackWhiteFileLow.copyTo(fallbackFileLow, true)
+                }
             }
         }else{
             if(resources.configuration.uiMode.and(Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES){

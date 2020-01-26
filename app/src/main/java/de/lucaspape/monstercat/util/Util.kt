@@ -7,6 +7,7 @@ import android.widget.Toast
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.lang.Exception
 import java.net.URL
 import java.util.*
 
@@ -28,45 +29,49 @@ fun downloadFile(
     val destinationFile = File(destination)
     val tempFile = File(tempDir + "/" + UUID.randomUUID().toString())
 
-    val urlConnection = URL(source).openConnection()
-    urlConnection.setRequestProperty("Cookie", "connect.sid=$sid")
-    urlConnection.connect()
+    try {
+        val urlConnection = URL(source).openConnection()
+        urlConnection.setRequestProperty("Cookie", "connect.sid=$sid")
+        urlConnection.connect()
 
-    val lengthOfFile = urlConnection.contentLength
+        val lengthOfFile = urlConnection.contentLength
 
-    val bufferedInputStream = BufferedInputStream(urlConnection.getInputStream(), 8192)
+        val bufferedInputStream = BufferedInputStream(urlConnection.getInputStream(), 8192)
 
-    val fileOutputStream = FileOutputStream(tempFile)
+        val fileOutputStream = FileOutputStream(tempFile)
 
-    val data = ByteArray(1024)
-    var total: Long = 0
-    var count: Int
-    var updateCount = 0
+        val data = ByteArray(1024)
+        var total: Long = 0
+        var count: Int
+        var updateCount = 0
 
-    do {
-        count = bufferedInputStream.read(data)
+        do {
+            count = bufferedInputStream.read(data)
 
-        if (count == -1) {
-            break
-        }
+            if (count == -1) {
+                break
+            }
 
-        total += count
+            total += count
 
-        fileOutputStream.write(data, 0, count)
+            fileOutputStream.write(data, 0, count)
 
-        updateCount++
+            updateCount++
 
-        if (updateCount > 100) {
-            updateCount = 0
-            progressUpdate(lengthOfFile, total.toInt())
-        }
-    } while (true)
+            if (updateCount > 100) {
+                updateCount = 0
+                progressUpdate(lengthOfFile, total.toInt())
+            }
+        } while (true)
 
-    fileOutputStream.flush()
-    fileOutputStream.close()
-    bufferedInputStream.close()
+        fileOutputStream.flush()
+        fileOutputStream.close()
+        bufferedInputStream.close()
 
-    tempFile.renameTo(destinationFile)
+        tempFile.renameTo(destinationFile)
+    }catch (e: Exception){
+        println(e.stackTrace)
+    }
 }
 
 fun displayInfo(context: Context, msg: String) {
