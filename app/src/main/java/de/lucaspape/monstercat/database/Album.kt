@@ -6,7 +6,7 @@ data class Album(
     val title: String,
     val artist: String,
     val coverUrl: String,
-    val mcID:String
+    val mcID: String
 ) {
     companion object {
         @JvmStatic

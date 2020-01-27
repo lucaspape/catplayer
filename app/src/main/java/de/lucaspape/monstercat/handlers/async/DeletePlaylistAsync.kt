@@ -11,7 +11,10 @@ import de.lucaspape.monstercat.util.displayInfo
 import de.lucaspape.monstercat.util.sid
 import java.lang.ref.WeakReference
 
-class DeletePlaylistAsync(private val contextReference:WeakReference<Context>, private val playlistId:String) : AsyncTask<Void, Void, String>(){
+class DeletePlaylistAsync(
+    private val contextReference: WeakReference<Context>,
+    private val playlistId: String
+) : AsyncTask<Void, Void, String>() {
     override fun doInBackground(vararg params: Void?): String? {
         contextReference.get()?.let { context ->
             val deletePlaylistVolleyQueue = Volley.newRequestQueue(context)

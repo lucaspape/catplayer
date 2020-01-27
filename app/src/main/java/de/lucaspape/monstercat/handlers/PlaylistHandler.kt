@@ -39,7 +39,7 @@ class PlaylistHandler {
     /**
      * List for playlist content
      */
-    private fun updateCatalogRecyclerView(view: View, data:ArrayList<CatalogItem>){
+    private fun updateCatalogRecyclerView(view: View, data: ArrayList<CatalogItem>) {
         val playlistList = view.findViewById<RecyclerView>(R.id.playlistView)
 
         playlistList.layoutManager =
@@ -50,7 +50,7 @@ class PlaylistHandler {
 
         playlistList.adapter = fastAdapter
 
-        for(catalogItem in data){
+        for (catalogItem in data) {
             itemAdapter.add(
                 catalogItem
             )
@@ -119,7 +119,7 @@ class PlaylistHandler {
     /**
      * List for playlists
      */
-    private fun updatePlaylistRecyclerView(view: View, data: ArrayList<PlaylistItem>){
+    private fun updatePlaylistRecyclerView(view: View, data: ArrayList<PlaylistItem>) {
         val playlistList = view.findViewById<RecyclerView>(R.id.playlistView)
 
         playlistList.layoutManager =
@@ -130,7 +130,7 @@ class PlaylistHandler {
 
         playlistList.adapter = fastAdapter
 
-        for(playlist in data){
+        for (playlist in data) {
             itemAdapter.add(
                 playlist
             )
@@ -151,7 +151,7 @@ class PlaylistHandler {
         fastAdapter.onLongClickListener = { _, _, _, position ->
             val playlistIdList = ArrayList<String>()
 
-            for(playlist in data){
+            for (playlist in data) {
                 playlistIdList.add(playlist.playlistId)
             }
 
@@ -177,7 +177,7 @@ class PlaylistHandler {
             ) {
                 val playlistIdList = ArrayList<String>()
 
-                for(playlist in data){
+                for (playlist in data) {
                     playlistIdList.add(playlist.playlistId)
                 }
 
@@ -189,7 +189,12 @@ class PlaylistHandler {
     /**
      * Context menu
      */
-    private fun showContextMenu(view: View, data: ArrayList<String>, isPlaylist:Boolean, listViewPosition: Int) {
+    private fun showContextMenu(
+        view: View,
+        data: ArrayList<String>,
+        isPlaylist: Boolean,
+        listViewPosition: Int
+    ) {
         val menuItems: Array<String> = arrayOf(
             view.context.getString(R.string.download),
             view.context.getString(R.string.playNext),
@@ -352,7 +357,7 @@ class PlaylistHandler {
 
                 val playlistItems = playlistItemDatabaseHelper.getAllData()
 
-                for(i in (playlistItems.size-1 downTo 0)){
+                for (i in (playlistItems.size - 1 downTo 0)) {
                     currentPlaylistContentData.add(CatalogItem(playlistItems[i].songId))
                 }
 

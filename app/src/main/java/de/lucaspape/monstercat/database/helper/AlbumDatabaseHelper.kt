@@ -38,7 +38,13 @@ class AlbumDatabaseHelper(context: Context) :
         onCreate(db)
     }
 
-    fun insertAlbum(albumId: String, title: String, artist: String, coverUrl: String, mcID:String): Long {
+    fun insertAlbum(
+        albumId: String,
+        title: String,
+        artist: String,
+        coverUrl: String,
+        mcID: String
+    ): Long {
         val db = writableDatabase
 
         val values = ContentValues()
@@ -98,7 +104,7 @@ class AlbumDatabaseHelper(context: Context) :
         }
     }
 
-    fun getAlbums(skip:Long, limit:Long):List<Album>{
+    fun getAlbums(skip: Long, limit: Long): List<Album> {
         val albums: ArrayList<Album> = ArrayList()
 
         val selectQuery = "SELECT * FROM " + Album.TABLE_NAME + " ORDER BY " +

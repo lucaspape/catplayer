@@ -10,7 +10,8 @@ import de.lucaspape.monstercat.database.CatalogSong
 import java.lang.IndexOutOfBoundsException
 
 class CatalogSongDatabaseHelper(context: Context) :
-    SQLiteOpenHelper(context,
+    SQLiteOpenHelper(
+        context,
         DATABASE_NAME, null,
         DATABASE_VERSION
     ) {
@@ -31,7 +32,7 @@ class CatalogSongDatabaseHelper(context: Context) :
         db?.execSQL(CatalogSong.CREATE_TABLE)
     }
 
-    fun reCreateTable(){
+    fun reCreateTable() {
         val db = writableDatabase
 
         db?.execSQL("DROP TABLE IF EXISTS " + CatalogSong.TABLE_NAME)
@@ -85,7 +86,7 @@ class CatalogSongDatabaseHelper(context: Context) :
         }
     }
 
-    fun getSongs(skip:Long, limit:Long): List<CatalogSong>{
+    fun getSongs(skip: Long, limit: Long): List<CatalogSong> {
         val catalogSongs: ArrayList<CatalogSong> = ArrayList()
 
         val selectQuery = "SELECT * FROM " + CatalogSong.TABLE_NAME + " ORDER BY " +

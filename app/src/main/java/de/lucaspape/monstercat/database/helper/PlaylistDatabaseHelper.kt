@@ -31,7 +31,7 @@ class PlaylistDatabaseHelper(context: Context) :
         db?.execSQL(Playlist.CREATE_TABLE)
     }
 
-    fun reCreateTable(){
+    fun reCreateTable() {
         val db = writableDatabase
 
         db?.execSQL("DROP TABLE IF EXISTS " + Playlist.TABLE_NAME)

@@ -36,7 +36,7 @@ class LoadPlaylistAsync(
             if (!forceReload && playlists.isNotEmpty()) {
                 requestFinished()
                 cancel(true)
-            }else{
+            } else {
                 displayLoading()
             }
         }

@@ -12,7 +12,7 @@ import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.downloadCoverIntoImageView
 
 open class CatalogItem(
-    val songId:String
+    val songId: String
 ) : AbstractItem<CatalogItem.ViewHolder>() {
     override val type: Int = 101
 
@@ -26,11 +26,12 @@ open class CatalogItem(
     }
 
     class ViewHolder(view: View) : FastAdapter.ViewHolder<CatalogItem>(view) {
-        private val titleTextView:TextView = view.findViewById(R.id.title)
-        private val artistTextView:TextView = view.findViewById(R.id.artist)
-        val titleMenuButton:ImageButton = view.findViewById(R.id.titleMenuButton)
-        private val coverImageView:ImageView = view.findViewById(R.id.cover)
-        private val titleDownloadStatusImageView:ImageView = view.findViewById(R.id.titleDownloadStatus)
+        private val titleTextView: TextView = view.findViewById(R.id.title)
+        private val artistTextView: TextView = view.findViewById(R.id.artist)
+        val titleMenuButton: ImageButton = view.findViewById(R.id.titleMenuButton)
+        private val coverImageView: ImageView = view.findViewById(R.id.cover)
+        private val titleDownloadStatusImageView: ImageView =
+            view.findViewById(R.id.titleDownloadStatus)
         private val context = view.context
 
         override fun bindView(item: CatalogItem, payloads: MutableList<Any>) {

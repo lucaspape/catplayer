@@ -10,8 +10,8 @@ import de.lucaspape.monstercat.handlers.async.BackgroundAsync
 import de.lucaspape.monstercat.music.UpdateLiveInfoAsync
 import java.lang.ref.WeakReference
 
-class BackgroundService : Service(){
-    companion object{
+class BackgroundService : Service() {
+    companion object {
         @JvmStatic
         var loadContinuousSongListAsyncTask: BackgroundAsync? = null
         @JvmStatic

@@ -187,7 +187,7 @@ class HomeHandler {
         fastAdapter.onClickListener = { _, _, _, position ->
             val albumItem = data[position]
 
-            albumDatabaseHelper.getAlbum(albumItem.albumId)?.mcID?.let { mcID->
+            albumDatabaseHelper.getAlbum(albumItem.albumId)?.mcID?.let { mcID ->
                 loadAlbum(view, albumItem.albumId, mcID, false)
             }
 
@@ -442,7 +442,7 @@ class HomeHandler {
                 BackgroundAsync({
                     val songIdList = catalogSongDatabaseHelper.getSongs(0, 50)
 
-                    for(i in (songIdList.size-1 downTo 0)){
+                    for (i in (songIdList.size - 1 downTo 0)) {
                         currentCatalogViewData.add(CatalogItem(songIdList[i].songId))
                     }
 

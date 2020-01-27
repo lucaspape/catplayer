@@ -49,10 +49,16 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                                         )
                                     }
                                 } else {
-                                    publishProgress("alreadyDownloadedError", currentStreamDownloadSong.shownTitle)
+                                    publishProgress(
+                                        "alreadyDownloadedError",
+                                        currentStreamDownloadSong.shownTitle
+                                    )
                                 }
                             } else {
-                                publishProgress("downloadNotAllowedError", currentStreamDownloadSong.shownTitle)
+                                publishProgress(
+                                    "downloadNotAllowedError",
+                                    currentStreamDownloadSong.shownTitle
+                                )
                             }
 
                             streamDownloadedSongs++
@@ -87,10 +93,16 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                                         )
                                     }
                                 } else {
-                                    publishProgress("alreadyDownloadedError", currentDownloadSong.shownTitle)
+                                    publishProgress(
+                                        "alreadyDownloadedError",
+                                        currentDownloadSong.shownTitle
+                                    )
                                 }
                             } else {
-                                publishProgress("downloadNotAllowedError", currentDownloadSong.shownTitle)
+                                publishProgress(
+                                    "downloadNotAllowedError",
+                                    currentDownloadSong.shownTitle
+                                )
                             }
 
                             downloadedSongs++

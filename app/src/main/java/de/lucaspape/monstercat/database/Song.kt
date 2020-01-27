@@ -80,7 +80,7 @@ data class Song(
 
     val streamDownloadLocation: String = "$downloadLocation.stream"
 
-    fun getSongDownloadStatus():String{
+    fun getSongDownloadStatus(): String {
         return when {
             File(downloadLocation).exists() -> {
                 "android.resource://de.lucaspape.monstercat/drawable/ic_check_green_24dp"

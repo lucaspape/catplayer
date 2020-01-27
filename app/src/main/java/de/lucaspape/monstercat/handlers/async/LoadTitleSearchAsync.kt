@@ -21,7 +21,7 @@ class LoadTitleSearchAsync(
     private val contextReference: WeakReference<Context>,
     private val searchString: String,
     private val skip: Int,
-    private val requestFinished : () -> Unit
+    private val requestFinished: () -> Unit
 ) : AsyncTask<Void, Void, String>() {
 
     override fun onPostExecute(result: String?) {
@@ -31,11 +31,11 @@ class LoadTitleSearchAsync(
     override fun doInBackground(vararg params: Void?): String? {
         val syncObject = Object()
 
-        contextReference.get()?.let {context ->
+        contextReference.get()?.let { context ->
             val searchQueue = Volley.newRequestQueue(context)
 
             searchQueue.addRequestFinishedListener<Any?> {
-                synchronized(syncObject){
+                synchronized(syncObject) {
                     syncObject.notify()
                 }
             }
@@ -66,7 +66,7 @@ class LoadTitleSearchAsync(
             searchQueue.add(searchRequest)
         }
 
-        synchronized(syncObject){
+        synchronized(syncObject) {
             syncObject.wait()
         }
 

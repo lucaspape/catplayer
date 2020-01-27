@@ -7,9 +7,9 @@ private const val version = "1.2"
 class Settings(private val context: Context) {
 
     init {
-        if(getSetting("settings-version") != version){
+        if (getSetting("settings-version") != version) {
             onUpgrade()
-        }else{
+        } else {
             setDefaultSettings(false)
         }
     }
@@ -32,7 +32,7 @@ class Settings(private val context: Context) {
         editor.apply()
     }
 
-    private fun onUpgrade(){
+    private fun onUpgrade() {
         setDefaultSettings(true)
         saveSetting("settings-version", version)
     }
@@ -59,7 +59,7 @@ class Settings(private val context: Context) {
             saveSetting("downloadOverMobile", defaultDownloadOverMobile)
             saveSetting("downloadCoversOverMobile", defaultDownloadCoversMobile)
             saveSetting("maximumLoad", defaultMaximumLoad)
-        }else{
+        } else {
             if (getSetting("downloadType") == null) {
                 saveSetting("downloadType", defaultDownloadType)
             }

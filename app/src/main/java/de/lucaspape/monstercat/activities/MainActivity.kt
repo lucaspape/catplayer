@@ -208,13 +208,13 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-    private fun downloadFallbackCoverImages(){
+    private fun downloadFallbackCoverImages() {
         val fallbackBlackFile = File("$dataDir/fallback_black.jpg")
         val fallbackBlackFileLow = File("$dataDir/fallback_black_low.jpg")
         val fallbackWhiteFile = File("$dataDir/fallback_white.jpg")
         val fallbackWhiteFileLow = File("$dataDir/fallback_white_low.jpg")
 
-        if(!fallbackBlackFile.exists() || !fallbackBlackFileLow.exists()){
+        if (!fallbackBlackFile.exists() || !fallbackBlackFileLow.exists()) {
             BackgroundAsync({
                 downloadFile(
                     fallbackBlackFile.absolutePath,
@@ -227,7 +227,8 @@ class MainActivity : AppCompatActivity() {
                 FileOutputStream(fallbackBlackFileLow).use { out ->
                     val originalBitmap = BitmapFactory.decodeFile(fallbackBlackFile.absolutePath)
                     originalBitmap?.let {
-                        Bitmap.createScaledBitmap(it, 128, 128, false).compress(Bitmap.CompressFormat.JPEG, 100, out)
+                        Bitmap.createScaledBitmap(it, 128, 128, false)
+                            .compress(Bitmap.CompressFormat.JPEG, 100, out)
                     }
                 }
 
@@ -235,7 +236,7 @@ class MainActivity : AppCompatActivity() {
             }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         }
 
-        if(!fallbackWhiteFile.exists() || !fallbackWhiteFileLow.exists()){
+        if (!fallbackWhiteFile.exists() || !fallbackWhiteFileLow.exists()) {
             BackgroundAsync({
                 downloadFile(
                     fallbackWhiteFile.absolutePath,
@@ -248,7 +249,8 @@ class MainActivity : AppCompatActivity() {
                 FileOutputStream(fallbackWhiteFileLow).use { out ->
                     val originalBitmap = BitmapFactory.decodeFile(fallbackWhiteFile.absolutePath)
                     originalBitmap?.let {
-                        Bitmap.createScaledBitmap(it, 128, 128, false).compress(Bitmap.CompressFormat.JPEG, 100, out)
+                        Bitmap.createScaledBitmap(it, 128, 128, false)
+                            .compress(Bitmap.CompressFormat.JPEG, 100, out)
                     }
                 }
 
@@ -272,22 +274,22 @@ class MainActivity : AppCompatActivity() {
             if (settings.getSetting("darkTheme")!!.toBoolean()) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
 
-                if(fallbackBlackFile.exists() && fallbackBlackFileLow.exists()){
+                if (fallbackBlackFile.exists() && fallbackBlackFileLow.exists()) {
                     fallbackBlackFile.copyTo(fallbackFile, true)
                     fallbackBlackFileLow.copyTo(fallbackFileLow, true)
                 }
             } else {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
-                if(fallbackWhiteFile.exists() && fallbackWhiteFileLow.exists()){
+                if (fallbackWhiteFile.exists() && fallbackWhiteFileLow.exists()) {
                     fallbackWhiteFile.copyTo(fallbackFile, true)
                     fallbackWhiteFileLow.copyTo(fallbackFileLow, true)
                 }
             }
-        }else{
-            if(resources.configuration.uiMode.and(Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES){
+        } else {
+            if (resources.configuration.uiMode.and(Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) {
                 settings.saveSetting("darkTheme", true.toString())
-            }else{
+            } else {
                 settings.saveSetting("darkTheme", false.toString())
             }
 

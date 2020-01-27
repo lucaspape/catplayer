@@ -17,7 +17,6 @@ import de.lucaspape.monstercat.util.Auth
 import de.lucaspape.monstercat.util.Settings
 import de.lucaspape.monstercat.util.displayInfo
 
-
 /**
  * SettingsActivity
  */

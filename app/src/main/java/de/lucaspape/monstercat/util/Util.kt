@@ -15,7 +15,8 @@ fun wifiConnected(context: Context): Boolean? {
     val connectivityManager =
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-    val activeNetwork = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+    val activeNetwork =
+        connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
     return activeNetwork?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ?: false
 }
 
@@ -69,7 +70,7 @@ fun downloadFile(
         bufferedInputStream.close()
 
         tempFile.renameTo(destinationFile)
-    }catch (e: Exception){
+    } catch (e: Exception) {
         println(e.stackTrace)
     }
 }

@@ -18,7 +18,7 @@ import org.json.JSONObject
 import java.io.UnsupportedEncodingException
 
 //static vars
-var sid:String? = ""
+var sid: String? = ""
 
 var loggedIn = false
     private set

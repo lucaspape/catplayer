@@ -22,7 +22,7 @@ fun addDownloadSong(songId: String) {
     downloadList.add(songId)
 }
 
-fun addStreamDownloadSong(songId: String){
+fun addStreamDownloadSong(songId: String) {
     streamDownloadList.add(songId)
 }
 
@@ -39,9 +39,9 @@ fun downloadCoverIntoImageView(
         settings.getSetting("secondaryResolution")
     }
 
-    val placeholder = if(!lowRes){
+    val placeholder = if (!lowRes) {
         Drawable.createFromPath(context.dataDir.toString() + "/fallback.jpg")
-    }else{
+    } else {
         Drawable.createFromPath(context.dataDir.toString() + "/fallback_low.jpg")
     }
 

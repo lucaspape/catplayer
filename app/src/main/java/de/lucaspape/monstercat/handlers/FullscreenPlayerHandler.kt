@@ -30,9 +30,9 @@ class FullscreenPlayerHandler {
         val shuffleButton = view.findViewById<ImageButton>(R.id.fullscreenShuffle)
         val loopButton = view.findViewById<ImageButton>(R.id.fullscreenLoop)
 
-        if(MonstercatPlayer.shuffle){
+        if (MonstercatPlayer.shuffle) {
             shuffleButton.setImageResource(R.drawable.ic_shuffle_green_24dp)
-        }else{
+        } else {
             shuffleButton.setImageResource(R.drawable.ic_shuffle_24dp)
         }
 
@@ -61,10 +61,10 @@ class FullscreenPlayerHandler {
         }
 
         shuffleButton.setOnClickListener {
-            if(MonstercatPlayer.shuffle){
+            if (MonstercatPlayer.shuffle) {
                 MonstercatPlayer.shuffle = false
                 shuffleButton.setImageResource(R.drawable.ic_shuffle_24dp)
-            }else{
+            } else {
                 MonstercatPlayer.shuffle = true
                 shuffleButton.setImageResource(R.drawable.ic_shuffle_green_24dp)
             }

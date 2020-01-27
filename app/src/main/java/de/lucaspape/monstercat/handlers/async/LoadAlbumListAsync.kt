@@ -50,7 +50,7 @@ class LoadAlbumListAsync(
             val requestQueue = Volley.newRequestQueue(context)
 
             requestQueue.addRequestFinishedListener<Any?> {
-                synchronized(syncObject){
+                synchronized(syncObject) {
                     syncObject.notify()
                 }
             }
@@ -63,7 +63,7 @@ class LoadAlbumListAsync(
                     val json = JSONObject(response)
                     val jsonArray = json.getJSONArray("results")
 
-                    for(i in (jsonArray.length()-1 downTo 0)){
+                    for (i in (jsonArray.length() - 1 downTo 0)) {
                         parseAlbumToDB(jsonArray.getJSONObject(i), context)
                     }
 
@@ -75,7 +75,7 @@ class LoadAlbumListAsync(
 
         }
 
-        synchronized(syncObject){
+        synchronized(syncObject) {
             syncObject.wait()
         }
 

@@ -14,7 +14,7 @@ import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import java.io.File
 
 open class PlaylistItem(
-    val playlistId:String
+    val playlistId: String
 ) : AbstractItem<PlaylistItem.ViewHolder>() {
     override val type: Int = 102
 
@@ -29,9 +29,10 @@ open class PlaylistItem(
 
     class ViewHolder(view: View) : FastAdapter.ViewHolder<PlaylistItem>(view) {
         private val titleTextView: TextView = view.findViewById(R.id.title)
-        val titleMenuButton:ImageButton = view.findViewById(R.id.titleMenuButton)
-        private val coverImageView:ImageView = view.findViewById(R.id.cover)
-        private val titleDownloadStatusImageView:ImageView = view.findViewById(R.id.titleDownloadStatus)
+        val titleMenuButton: ImageButton = view.findViewById(R.id.titleMenuButton)
+        private val coverImageView: ImageView = view.findViewById(R.id.cover)
+        private val titleDownloadStatusImageView: ImageView =
+            view.findViewById(R.id.titleDownloadStatus)
         private val context = view.context
 
         override fun bindView(item: PlaylistItem, payloads: MutableList<Any>) {
@@ -43,18 +44,19 @@ open class PlaylistItem(
                 titleTextView.text = playlist.playlistName
                 coverImageView.setImageURI("".toUri())
 
-                val playlistTracks = PlaylistItemDatabaseHelper(context, playlist.playlistId).getAllData()
+                val playlistTracks =
+                    PlaylistItemDatabaseHelper(context, playlist.playlistId).getAllData()
 
                 var downloaded = true
                 var streamDownloaded = true
 
-                for(track in playlistTracks){
+                for (track in playlistTracks) {
                     val song = SongDatabaseHelper(context).getSong(context, track.songId)
 
                     song?.let {
-                        if(!File(song.downloadLocation).exists()){
+                        if (!File(song.downloadLocation).exists()) {
                             downloaded = false
-                        }else if(!File(song.streamDownloadLocation).exists()){
+                        } else if (!File(song.streamDownloadLocation).exists()) {
                             streamDownloaded = false
                         }
                     }

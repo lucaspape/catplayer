@@ -90,7 +90,7 @@ class Stream(private val clientId: String) {
             StringRequest(Request.Method.GET,
                 context.getString(R.string.liveInfoUrl),
                 Response.Listener { artistTitleResponse ->
-                    try{
+                    try {
                         val jsonObject = JSONObject(artistTitleResponse)
 
                         title = jsonObject.getString("title")
@@ -102,7 +102,7 @@ class Stream(private val clientId: String) {
                             context.getString(R.string.liveInfoUrl)
                         albumCoverUpdateUrl =
                             context.getString(R.string.trackContentUrl) + releaseId + "/cover?image_width=512"
-                    }catch (e: JSONException){
+                    } catch (e: JSONException) {
 
                     }
 
