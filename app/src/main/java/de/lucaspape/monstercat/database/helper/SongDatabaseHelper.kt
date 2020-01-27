@@ -62,7 +62,6 @@ class SongDatabaseHelper(context: Context) :
 
             db.close()
         } else {
-            println()
             val db = writableDatabase
             db.update(
                 Song.TABLE_NAME,
