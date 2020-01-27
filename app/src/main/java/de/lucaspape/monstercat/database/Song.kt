@@ -15,7 +15,6 @@ import java.io.File
 
 data class Song(
     val context: Context,
-    val id: Int,
     val songId: String,
     val title: String,
     val version: String,
@@ -30,8 +29,6 @@ data class Song(
     companion object {
         @JvmStatic
         val TABLE_NAME = "song"
-        @JvmStatic
-        val COLUMN_ID = "id"
         @JvmStatic
         val COLUMN_SONG_ID = "songId"
         @JvmStatic
@@ -54,8 +51,7 @@ data class Song(
         @JvmStatic
         val CREATE_TABLE =
             "CREATE TABLE " + TABLE_NAME + " (" +
-                    COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    COLUMN_SONG_ID + " TEXT," +
+                    COLUMN_SONG_ID + " TEXT PRIMARY KEY," +
                     COLUMN_TITLE + " TEXT," +
                     COLUMN_VERSION + " TEXT," +
                     COLUMN_ALBUM_ID + " TEXT," +
@@ -83,6 +79,20 @@ data class Song(
         context.getString(R.string.trackContentUrl) + albumId + "/track-stream/" + songId
 
     val streamDownloadLocation: String = "$downloadLocation.stream"
+
+    fun getSongDownloadStatus():String{
+        return when {
+            File(downloadLocation).exists() -> {
+                "android.resource://de.lucaspape.monstercat/drawable/ic_check_green_24dp"
+            }
+            File(streamDownloadLocation).exists() -> {
+                "android.resource://de.lucaspape.monstercat/drawable/ic_check_orange_24dp"
+            }
+            else -> {
+                "android.resource://de.lucaspape.monstercat/drawable/ic_empty_24dp"
+            }
+        }
+    }
 
     fun getUrl(): String {
         return if (File(downloadLocation).exists() && File(streamDownloadLocation).exists()) {

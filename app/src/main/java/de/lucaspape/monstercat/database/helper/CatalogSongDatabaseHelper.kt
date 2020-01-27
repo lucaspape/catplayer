@@ -17,7 +17,7 @@ class CatalogSongDatabaseHelper(context: Context) :
 
     companion object {
         @JvmStatic
-        private val DATABASE_VERSION = 4 * SongDatabaseHelper.DATABASE_VERSION
+        private val DATABASE_VERSION = 5 * SongDatabaseHelper.DATABASE_VERSION
         @JvmStatic
         private val DATABASE_NAME = "catalog_songs_db"
     }
@@ -38,7 +38,7 @@ class CatalogSongDatabaseHelper(context: Context) :
         onCreate(db)
     }
 
-    fun insertSong(songId: Long): Long {
+    fun insertSong(songId: String): Long {
         val db = writableDatabase
 
         val values = ContentValues()
@@ -50,7 +50,7 @@ class CatalogSongDatabaseHelper(context: Context) :
         return id
     }
 
-    fun getCatalogSong(songId: Long): CatalogSong? {
+    fun getCatalogSong(songId: String): CatalogSong? {
 
         val db = readableDatabase
         val cursor: Cursor
@@ -62,7 +62,7 @@ class CatalogSongDatabaseHelper(context: Context) :
                     CatalogSong.COLUMN_SONG_ID
                 ),
                 CatalogSong.COLUMN_SONG_ID + "=?",
-                arrayOf(songId.toString()), null, null, null, null
+                arrayOf(songId), null, null, null, null
             )
 
             cursor.moveToFirst()
@@ -70,7 +70,7 @@ class CatalogSongDatabaseHelper(context: Context) :
             return try {
                 val catalogSongs = CatalogSong(
                     cursor.getInt(cursor.getColumnIndex(CatalogSong.COLUMN_ID)),
-                    cursor.getLong(cursor.getColumnIndex(CatalogSong.COLUMN_SONG_ID))
+                    cursor.getString(cursor.getColumnIndex(CatalogSong.COLUMN_SONG_ID))
                 )
 
                 cursor.close()
@@ -98,7 +98,7 @@ class CatalogSongDatabaseHelper(context: Context) :
             do {
                 val catalogSong = CatalogSong(
                     cursor.getInt(cursor.getColumnIndex(CatalogSong.COLUMN_ID)),
-                    cursor.getLong(cursor.getColumnIndex(CatalogSong.COLUMN_SONG_ID))
+                    cursor.getString(cursor.getColumnIndex(CatalogSong.COLUMN_SONG_ID))
                 )
 
                 catalogSongs.add(catalogSong)

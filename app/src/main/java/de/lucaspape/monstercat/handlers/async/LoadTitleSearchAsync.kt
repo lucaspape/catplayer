@@ -10,7 +10,6 @@ import de.lucaspape.monstercat.handlers.HomeHandler
 import de.lucaspape.monstercat.handlers.abstract_items.CatalogItem
 import de.lucaspape.monstercat.request.AuthorizedRequest
 import de.lucaspape.monstercat.util.parseSongSearchToSongList
-import de.lucaspape.monstercat.util.parseSongToAbstractCatalogItem
 import de.lucaspape.monstercat.util.sid
 import org.json.JSONObject
 import java.lang.ref.WeakReference
@@ -53,7 +52,7 @@ class LoadTitleSearchAsync(
                     val catalogItemList = ArrayList<CatalogItem>()
 
                     for (song in songList) {
-                        catalogItemList.add(parseSongToAbstractCatalogItem(song))
+                        catalogItemList.add(CatalogItem(song.songId))
                     }
 
                     //display list

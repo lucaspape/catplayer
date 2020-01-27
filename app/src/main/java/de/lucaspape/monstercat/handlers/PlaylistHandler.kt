@@ -22,8 +22,6 @@ import de.lucaspape.monstercat.handlers.abstract_items.PlaylistItem
 import de.lucaspape.monstercat.handlers.async.BackgroundAsync
 import de.lucaspape.monstercat.handlers.async.LoadPlaylistAsync
 import de.lucaspape.monstercat.handlers.async.LoadPlaylistTracksAsync
-import de.lucaspape.monstercat.util.parsePlaylistToAbstractPlaylistItem
-import de.lucaspape.monstercat.util.parseSongToAbstractCatalogItem
 import java.lang.ref.WeakReference
 
 class PlaylistHandler {
@@ -64,12 +62,12 @@ class PlaylistHandler {
         fastAdapter.onClickListener = { _, _, _, position ->
             monstercatPlayer.clearContinuous()
 
-            val songId = data[position].id
+            val songId = data[position].songId
 
             val nextSongIdsList = ArrayList<String>()
 
             for (i in (position + 1 until data.size)) {
-                nextSongIdsList.add(data[i].id)
+                nextSongIdsList.add(data[i].songId)
             }
 
             playSongFromId(view.context, songId, true, nextSongIdsList)
@@ -83,7 +81,7 @@ class PlaylistHandler {
             val idList = ArrayList<String>()
 
             for (catalogItem in data) {
-                idList.add(catalogItem.id)
+                idList.add(catalogItem.songId)
             }
 
             showContextMenu(view, idList, false, position)
@@ -109,7 +107,7 @@ class PlaylistHandler {
                 val idList = ArrayList<String>()
 
                 for (catalogItem in data) {
-                    idList.add(catalogItem.id)
+                    idList.add(catalogItem.songId)
                 }
 
                 showContextMenu(view, idList, false, position)
@@ -142,7 +140,7 @@ class PlaylistHandler {
          * On playlist click
          */
         fastAdapter.onClickListener = { _, _, _, position ->
-            currentPlaylistId = data[position].id
+            currentPlaylistId = data[position].playlistId
             loadPlaylistTracks(view, false, currentPlaylistId!!)
             false
         }
@@ -154,7 +152,7 @@ class PlaylistHandler {
             val playlistIdList = ArrayList<String>()
 
             for(playlist in data){
-                playlistIdList.add(playlist.id)
+                playlistIdList.add(playlist.playlistId)
             }
 
             showContextMenu(view, playlistIdList, true, position)
@@ -180,7 +178,7 @@ class PlaylistHandler {
                 val playlistIdList = ArrayList<String>()
 
                 for(playlist in data){
-                    playlistIdList.add(playlist.id)
+                    playlistIdList.add(playlist.playlistId)
                 }
 
                 showContextMenu(view, playlistIdList, true, position)
@@ -309,7 +307,7 @@ class PlaylistHandler {
                 val playlists = playlistDatabaseHelper.getAllPlaylists()
 
                 for (playlist in playlists) {
-                    currentPlaylistsData.add(parsePlaylistToAbstractPlaylistItem(view.context, playlist))
+                    currentPlaylistsData.add(PlaylistItem(playlist.playlistId))
                 }
 
             }, {
@@ -354,13 +352,8 @@ class PlaylistHandler {
 
                 val playlistItems = playlistItemDatabaseHelper.getAllData()
 
-                val songDatabaseHelper =
-                    SongDatabaseHelper(view.context)
-
                 for(i in (playlistItems.size-1 downTo 0)){
-                    currentPlaylistContentData.add(parseSongToAbstractCatalogItem(
-                        songDatabaseHelper.getSong(view.context, playlistItems[i].songId)
-                    ))
+                    currentPlaylistContentData.add(CatalogItem(playlistItems[i].songId))
                 }
 
             }, {

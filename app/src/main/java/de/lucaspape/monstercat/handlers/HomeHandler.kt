@@ -88,12 +88,12 @@ class HomeHandler {
             val nextSongIdsList = ArrayList<String>()
 
             for (i in (position + 1 until data.size)) {
-                nextSongIdsList.add(data[i].id)
+                nextSongIdsList.add(data[i].songId)
             }
 
             playSongFromId(
                 view.context,
-                catalogItem.id,
+                catalogItem.songId,
                 true,
                 nextSongIdsList
             )
@@ -108,7 +108,7 @@ class HomeHandler {
             val idList = ArrayList<String>()
 
             for (catalogItem in data) {
-                idList.add(catalogItem.id)
+                idList.add(catalogItem.songId)
             }
 
             showContextMenu(view, idList, position)
@@ -135,7 +135,7 @@ class HomeHandler {
                 val idList = ArrayList<String>()
 
                 for (catalogItem in data) {
-                    idList.add(catalogItem.id)
+                    idList.add(catalogItem.songId)
                 }
 
                 showContextMenu(view, idList, position)
@@ -179,12 +179,17 @@ class HomeHandler {
             )
         }
 
+        val albumDatabaseHelper = AlbumDatabaseHelper(view.context)
+
         /**
          * On item click
          */
         fastAdapter.onClickListener = { _, _, _, position ->
             val albumItem = data[position]
-            loadAlbum(view, albumItem.albumId, albumItem.mcID, false)
+
+            albumDatabaseHelper.getAlbum(albumItem.albumId)?.mcID?.let { mcID->
+                loadAlbum(view, albumItem.albumId, mcID, false)
+            }
 
             false
         }
@@ -196,7 +201,9 @@ class HomeHandler {
             val albumMcIdList = ArrayList<String>()
 
             for (albumItem in data) {
-                albumMcIdList.add(albumItem.mcID)
+                albumDatabaseHelper.getAlbum(albumItem.albumId)?.mcID?.let { mcID ->
+                    albumMcIdList.add(mcID)
+                }
             }
 
             showContextMenu(view, albumMcIdList, position)
@@ -435,11 +442,8 @@ class HomeHandler {
                 BackgroundAsync({
                     val songIdList = catalogSongDatabaseHelper.getSongs(0, 50)
 
-                    val songDatabaseHelper =
-                        SongDatabaseHelper(view.context)
-
                     for(i in (songIdList.size-1 downTo 0)){
-                        currentCatalogViewData.add(parseSongToAbstractCatalogItem(songDatabaseHelper.getSong(view.context, songIdList[i].songId)))
+                        currentCatalogViewData.add(CatalogItem(songIdList[i].songId))
                     }
 
                 }, {
@@ -454,17 +458,8 @@ class HomeHandler {
             BackgroundAsync({
                 val songIdList = catalogSongDatabaseHelper.getSongs(0, 50)
 
-                val songDatabaseHelper =
-                    SongDatabaseHelper(view.context)
-
                 for (i in (songIdList.size - 1 downTo 0)) {
-                    val catalogItem = parseSongToAbstractCatalogItem(
-                        songDatabaseHelper.getSong(
-                            view.context,
-                            songIdList[i].songId
-                        )
-                    )
-                    currentCatalogViewData.add(catalogItem)
+                    currentCatalogViewData.add(CatalogItem(songIdList[i].songId))
                 }
 
             }, {
@@ -488,16 +483,8 @@ class HomeHandler {
             val songList =
                 catalogSongDatabaseHelper.getSongs(currentCatalogViewData.size.toLong(), 50)
 
-            val songDatabaseHelper =
-                SongDatabaseHelper(view.context)
-
             for (i in (songList.size - 1 downTo 0)) {
-                val catalogItem = parseSongToAbstractCatalogItem(
-                    songDatabaseHelper.getSong(
-                        view.context,
-                        songList[i].songId
-                    )
-                )
+                val catalogItem = CatalogItem(songList[i].songId)
 
                 itemAdapter.add(
                     catalogItem
@@ -536,7 +523,7 @@ class HomeHandler {
                     val albumList = albumDatabaseHelper.getAlbums(0, 50)
 
                     for (i in (albumList.size - 1 downTo 0)) {
-                        currentAlbumViewData.add(parseAlbumToAbstractAlbumItem(albumList[i]))
+                        currentAlbumViewData.add(AlbumItem(albumList[i].albumId))
                     }
                 }, {
                     updateAlbumRecyclerView(view, currentAlbumViewData)
@@ -555,7 +542,7 @@ class HomeHandler {
                 val albumList = albumDatabaseHelper.getAlbums(0, 50)
 
                 for (i in (albumList.size - 1 downTo 0)) {
-                    currentAlbumViewData.add(parseAlbumToAbstractAlbumItem(albumList[i]))
+                    currentAlbumViewData.add(AlbumItem(albumList[i].albumId))
                 }
 
             }, {
@@ -583,7 +570,7 @@ class HomeHandler {
                     albumDatabaseHelper.getAlbums(currentAlbumViewData.size.toLong(), 50)
 
                 for (album in albumList) {
-                    val albumItem = parseAlbumToAbstractAlbumItem(album)
+                    val albumItem = AlbumItem(album.albumId)
 
                     itemAdapter.add(
                         albumItem
@@ -621,13 +608,9 @@ class HomeHandler {
 
                 val dbSongs = ArrayList<CatalogItem>()
 
-                val songDatabaseHelper = SongDatabaseHelper(contextReference.get()!!)
-
                 for (albumItem in albumItemList) {
                     dbSongs.add(
-                        parseSongToAbstractCatalogItem(
-                            songDatabaseHelper.getSong(view.context, albumItem.songId)
-                        )
+                        CatalogItem(albumItem.songId)
                     )
                 }
 

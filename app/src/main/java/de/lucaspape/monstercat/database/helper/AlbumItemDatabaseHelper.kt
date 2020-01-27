@@ -16,7 +16,7 @@ class AlbumItemDatabaseHelper(context: Context, var albumId: String) :
 
     companion object {
         @JvmStatic
-        private val DATABASE_VERSION = 2 * AlbumDatabaseHelper.DATABASE_VERSION
+        private val DATABASE_VERSION = 3 * AlbumDatabaseHelper.DATABASE_VERSION
         @JvmStatic
         private val DATABASE_NAME = "album_items_db"
     }
@@ -26,18 +26,18 @@ class AlbumItemDatabaseHelper(context: Context, var albumId: String) :
             "DROP TABLE IF EXISTS " + AlbumItem(
                 albumId,
                 0,
-                0
+                ""
             ).TABLE_NAME
         )
         onCreate(db)
     }
 
     override fun onOpen(db: SQLiteDatabase?) {
-        db?.execSQL(AlbumItem(albumId, 0, 0).CREATE_TABLE)
+        db?.execSQL(AlbumItem(albumId, 0, "").CREATE_TABLE)
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
-        db?.execSQL(AlbumItem(albumId, 0, 0).CREATE_TABLE)
+        db?.execSQL(AlbumItem(albumId, 0, "").CREATE_TABLE)
     }
 
     fun reCreateTable() {
@@ -47,35 +47,35 @@ class AlbumItemDatabaseHelper(context: Context, var albumId: String) :
             "DROP TABLE IF EXISTS " + AlbumItem(
                 albumId,
                 0,
-                0
+                ""
             ).TABLE_NAME
         )
         onCreate(db)
     }
 
-    fun insertSongId(songId: Long): Long {
+    fun insertSongId(songId: String): Long {
         val db = writableDatabase
 
         val values = ContentValues()
 
         values.put(AlbumItem.COLUMN_SONG_ID, songId)
 
-        val id = db.insert(AlbumItem(albumId, 0, 0).TABLE_NAME, null, values)
+        val id = db.insert(AlbumItem(albumId, 0, "").TABLE_NAME, null, values)
         db.close()
         return id
     }
 
-    fun getItemFromSongId(songId: Long): AlbumItem? {
+    fun getItemFromSongId(songId: String): AlbumItem? {
         val db = readableDatabase
 
         try {
             val cursor = db.query(
-                AlbumItem(albumId, 0, 0).TABLE_NAME, arrayOf(
+                AlbumItem(albumId, 0, "").TABLE_NAME, arrayOf(
                     AlbumItem.COLUMN_ID,
                     AlbumItem.COLUMN_SONG_ID
                 ),
                 AlbumItem.COLUMN_SONG_ID + "=?",
-                arrayOf(songId.toString()), null, null, null, null
+                arrayOf(songId), null, null, null, null
             )
 
             cursor?.moveToFirst()
@@ -84,7 +84,7 @@ class AlbumItemDatabaseHelper(context: Context, var albumId: String) :
                 val albumItem = AlbumItem(
                     albumId,
                     cursor.getLong(cursor.getColumnIndex(AlbumItem.COLUMN_ID)),
-                    cursor.getLong(cursor.getColumnIndex(AlbumItem.COLUMN_SONG_ID))
+                    cursor.getString(cursor.getColumnIndex(AlbumItem.COLUMN_SONG_ID))
                 )
 
                 cursor.close()
@@ -106,7 +106,7 @@ class AlbumItemDatabaseHelper(context: Context, var albumId: String) :
         val selectQuery = "SELECT * FROM " + AlbumItem(
             albumId,
             0,
-            0
+            ""
         ).TABLE_NAME + " ORDER BY " +
                 AlbumItem.COLUMN_ID + " ASC "
 
@@ -118,7 +118,7 @@ class AlbumItemDatabaseHelper(context: Context, var albumId: String) :
                 val newAlbumItem = AlbumItem(
                     albumId,
                     cursor.getLong(cursor.getColumnIndex(AlbumItem.COLUMN_ID)),
-                    cursor.getLong(cursor.getColumnIndex(AlbumItem.COLUMN_SONG_ID))
+                    cursor.getString(cursor.getColumnIndex(AlbumItem.COLUMN_SONG_ID))
                 )
 
                 albumItems.add(newAlbumItem)

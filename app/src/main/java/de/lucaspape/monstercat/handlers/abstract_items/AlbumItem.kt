@@ -6,12 +6,10 @@ import android.widget.TextView
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.database.helper.AlbumDatabaseHelper
 import de.lucaspape.monstercat.download.downloadCoverIntoImageView
 
 open class AlbumItem(
-    val title: String,
-    val artist: String,
-    val mcID: String,
     val albumId: String
 ) : AbstractItem<AlbumItem.ViewHolder>() {
     override val type: Int = 100
@@ -32,8 +30,14 @@ open class AlbumItem(
         private val context = view.context
 
         override fun bindView(item: AlbumItem, payloads: MutableList<Any>) {
-            titleTextView.text = item.title
-            artistTextView.text = item.artist
+            val albumDatabaseHelper = AlbumDatabaseHelper(context)
+
+            val album = albumDatabaseHelper.getAlbum(item.albumId)
+
+            album?.let {
+                titleTextView.text = album.title
+                artistTextView.text = album.artist
+            }
 
             downloadCoverIntoImageView(context, coverImageView, item.albumId, false)
         }

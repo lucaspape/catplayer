@@ -18,7 +18,7 @@ class SongDatabaseHelper(context: Context) :
 
     companion object {
         @JvmStatic
-        val DATABASE_VERSION = 3
+        val DATABASE_VERSION = 4
         @JvmStatic
         private val DATABASE_NAME = "songs_db"
     }
@@ -43,7 +43,7 @@ class SongDatabaseHelper(context: Context) :
         downloadable: Boolean,
         streamable: Boolean,
         inEarlyAccess: Boolean
-    ): Long {
+    ): String {
         val values = ContentValues()
 
         values.put(Song.COLUMN_SONG_ID, songId)
@@ -56,70 +56,25 @@ class SongDatabaseHelper(context: Context) :
         values.put(Song.COLUMN_STREAMABLE, streamable.toString())
         values.put(Song.COLUMN_INEARLYACCESS, inEarlyAccess.toString())
 
-        val id:Long
-
         if (getSong(context, songId) == null) {
             val db = writableDatabase
-            id = db.insert(Song.TABLE_NAME, null, values)
+            db.insert(Song.TABLE_NAME, null, values)
 
             db.close()
         } else {
+            println()
             val db = writableDatabase
             db.update(
                 Song.TABLE_NAME,
                 values,
-                Song.COLUMN_ID + "=" + getSong(context, songId)?.id.toString(),
+                Song.COLUMN_SONG_ID + "=\"" + songId + "\"",
                 null
             )
-
-            id = getSong(context, songId)!!.id.toLong()
 
             db.close()
         }
 
-        return id
-    }
-
-    fun getSong(context: Context, id: Long): Song {
-        val db = readableDatabase
-
-        val cursor = db.query(
-            Song.TABLE_NAME, arrayOf(
-                Song.COLUMN_ID,
-                Song.COLUMN_SONG_ID,
-                Song.COLUMN_TITLE,
-                Song.COLUMN_VERSION,
-                Song.COLUMN_ALBUM_ID,
-                Song.COLUMN_ARTIST,
-                Song.COLUMN_COVER_URL,
-                Song.COLUMN_DOWNLOADABLE,
-                Song.COLUMN_STREAMABLE,
-                Song.COLUMN_INEARLYACCESS
-            ),
-            Song.COLUMN_ID + "=?",
-            arrayOf(id.toString()), null, null, null, null
-        )
-
-        cursor?.moveToFirst()
-
-        val song = Song(
-            context,
-            cursor.getInt(cursor.getColumnIndex(Song.COLUMN_ID)),
-            cursor.getString(cursor.getColumnIndex(Song.COLUMN_SONG_ID)),
-            cursor.getString(cursor.getColumnIndex(Song.COLUMN_TITLE)),
-            cursor.getString(cursor.getColumnIndex(Song.COLUMN_VERSION)),
-            cursor.getString(cursor.getColumnIndex(Song.COLUMN_ALBUM_ID)),
-            cursor.getString(cursor.getColumnIndex(Song.COLUMN_ARTIST)),
-            cursor.getString(cursor.getColumnIndex(Song.COLUMN_COVER_URL)),
-            cursor.getString(cursor.getColumnIndex(Song.COLUMN_DOWNLOADABLE))!!.toBoolean(),
-            cursor.getString(cursor.getColumnIndex(Song.COLUMN_STREAMABLE))!!.toBoolean(),
-            cursor.getString(cursor.getColumnIndex(Song.COLUMN_INEARLYACCESS))!!.toBoolean()
-        )
-
-        cursor.close()
-        db.close()
-
-        return song
+        return songId
     }
 
     fun getSong(context: Context, songId: String): Song? {
@@ -129,7 +84,6 @@ class SongDatabaseHelper(context: Context) :
         try {
             cursor = db.query(
                 Song.TABLE_NAME, arrayOf(
-                    Song.COLUMN_ID,
                     Song.COLUMN_SONG_ID,
                     Song.COLUMN_TITLE,
                     Song.COLUMN_VERSION,
@@ -149,7 +103,6 @@ class SongDatabaseHelper(context: Context) :
             try {
                 val song = Song(
                     context,
-                    cursor.getInt(cursor.getColumnIndex(Song.COLUMN_ID)),
                     cursor.getString(cursor.getColumnIndex(Song.COLUMN_SONG_ID)),
                     cursor.getString(cursor.getColumnIndex(Song.COLUMN_TITLE)),
                     cursor.getString(cursor.getColumnIndex(Song.COLUMN_VERSION)),

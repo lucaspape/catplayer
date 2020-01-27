@@ -8,12 +8,13 @@ import androidx.core.net.toUri
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
+import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
+import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
+import java.io.File
 
 open class PlaylistItem(
-    val name:String,
-    val id:String,
-    val cover: String,
-    val playlistDownloadStatus: String
+    val playlistId:String
 ) : AbstractItem<PlaylistItem.ViewHolder>() {
     override val type: Int = 102
 
@@ -31,11 +32,48 @@ open class PlaylistItem(
         val titleMenuButton:ImageButton = view.findViewById(R.id.titleMenuButton)
         private val coverImageView:ImageView = view.findViewById(R.id.cover)
         private val titleDownloadStatusImageView:ImageView = view.findViewById(R.id.titleDownloadStatus)
+        private val context = view.context
 
         override fun bindView(item: PlaylistItem, payloads: MutableList<Any>) {
-            titleTextView.text = item.name
-            coverImageView.setImageURI(item.cover.toUri())
-            titleDownloadStatusImageView.setImageURI(item.playlistDownloadStatus.toUri())
+            val playlistDatabaseHelper = PlaylistDatabaseHelper(context)
+
+            val playlist = playlistDatabaseHelper.getPlaylist(item.playlistId)
+
+            playlist?.let {
+                titleTextView.text = playlist.playlistName
+                coverImageView.setImageURI("".toUri())
+
+                val playlistTracks = PlaylistItemDatabaseHelper(context, playlist.playlistId).getAllData()
+
+                var downloaded = true
+                var streamDownloaded = true
+
+                for(track in playlistTracks){
+                    val song = SongDatabaseHelper(context).getSong(context, track.songId)
+
+                    song?.let {
+                        if(!File(song.downloadLocation).exists()){
+                            downloaded = false
+                        }else if(!File(song.streamDownloadLocation).exists()){
+                            streamDownloaded = false
+                        }
+                    }
+                }
+
+                val playlistDownloadStatus = when {
+                    downloaded -> {
+                        "android.resource://de.lucaspape.monstercat/drawable/ic_check_green_24dp"
+                    }
+                    streamDownloaded -> {
+                        "android.resource://de.lucaspape.monstercat/drawable/ic_check_orange_24dp"
+                    }
+                    else -> {
+                        "android.resource://de.lucaspape.monstercat/drawable/ic_empty_24dp"
+                    }
+                }
+
+                titleDownloadStatusImageView.setImageURI(playlistDownloadStatus.toUri())
+            }
         }
 
         override fun unbindView(item: PlaylistItem) {

@@ -15,7 +15,7 @@ class PlaylistItemDatabaseHelper(context: Context, var playlistId: String) :
 
     companion object {
         @JvmStatic
-        private val DATABASE_VERSION = 2 * PlaylistDatabaseHelper.DATABASE_VERSION
+        private val DATABASE_VERSION = 3 * PlaylistDatabaseHelper.DATABASE_VERSION
         @JvmStatic
         private val DATABASE_NAME = "playlist_items_db"
     }
@@ -25,18 +25,18 @@ class PlaylistItemDatabaseHelper(context: Context, var playlistId: String) :
             "DROP TABLE IF EXISTS " + PlaylistItem(
                 playlistId,
                 0,
-                0
+                ""
             ).TABLE_NAME
         )
         onCreate(db)
     }
 
     override fun onOpen(db: SQLiteDatabase?) {
-        db?.execSQL(PlaylistItem(playlistId, 0, 0).CREATE_TABLE)
+        db?.execSQL(PlaylistItem(playlistId, 0, "").CREATE_TABLE)
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
-        db?.execSQL(PlaylistItem(playlistId, 0, 0).CREATE_TABLE)
+        db?.execSQL(PlaylistItem(playlistId, 0, "").CREATE_TABLE)
     }
 
     fun reCreateTable() {
@@ -46,20 +46,20 @@ class PlaylistItemDatabaseHelper(context: Context, var playlistId: String) :
             "DROP TABLE IF EXISTS " + PlaylistItem(
                 playlistId,
                 0,
-                0
+                ""
             ).TABLE_NAME
         )
         onCreate(db)
     }
 
-    fun insertSongId(songId: Long): Long {
+    fun insertSongId(songId: String): Long {
         val db = writableDatabase
 
         val values = ContentValues()
 
         values.put(PlaylistItem.COLUMN_SONG_ID, songId)
 
-        val id = db.insert(PlaylistItem(playlistId, 0, 0).TABLE_NAME, null, values)
+        val id = db.insert(PlaylistItem(playlistId, 0, "").TABLE_NAME, null, values)
         db.close()
         return id
     }
@@ -70,7 +70,7 @@ class PlaylistItemDatabaseHelper(context: Context, var playlistId: String) :
         val selectQuery = "SELECT * FROM " + PlaylistItem(
             playlistId,
             0,
-            0
+            ""
         ).TABLE_NAME + " ORDER BY " +
                 PlaylistItem.COLUMN_ID + " ASC"
 
@@ -82,7 +82,7 @@ class PlaylistItemDatabaseHelper(context: Context, var playlistId: String) :
                 val newPlaylistItem = PlaylistItem(
                     playlistId,
                     cursor.getLong(cursor.getColumnIndex(PlaylistItem.COLUMN_ID)),
-                    cursor.getLong(cursor.getColumnIndex(PlaylistItem.COLUMN_SONG_ID))
+                    cursor.getString(cursor.getColumnIndex(PlaylistItem.COLUMN_SONG_ID))
                 )
 
                 playlistItems.add(newPlaylistItem)

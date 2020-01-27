@@ -8,18 +8,11 @@ import androidx.core.net.toUri
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.downloadCoverIntoImageView
 
 open class CatalogItem(
-    val title: String,
-    val version:String,
-    val artist: String,
-    val id:String,
-    val albumId:String,
-    val downloadable:Boolean,
-    val streamable:Boolean,
-    val inEarlyAccess:Boolean,
-    val titleDownloadStatus: String
+    val songId:String
 ) : AbstractItem<CatalogItem.ViewHolder>() {
     override val type: Int = 101
 
@@ -41,14 +34,19 @@ open class CatalogItem(
         private val context = view.context
 
         override fun bindView(item: CatalogItem, payloads: MutableList<Any>) {
-            val shownTitle = "${item.title} ${item.version}"
+            val songDatabaseHelper = SongDatabaseHelper(context)
+            val song = songDatabaseHelper.getSong(context, item.songId)
 
-            titleTextView.text = shownTitle
-            artistTextView.text = item.artist
+            song?.let {
+                val shownTitle = "${song.title} ${song.version}"
 
-            downloadCoverIntoImageView(context, coverImageView, item.albumId, true)
+                titleTextView.text = shownTitle
+                artistTextView.text = song.artist
 
-            titleDownloadStatusImageView.setImageURI(item.titleDownloadStatus.toUri())
+                downloadCoverIntoImageView(context, coverImageView, song.albumId, true)
+
+                titleDownloadStatusImageView.setImageURI(song.getSongDownloadStatus().toUri())
+            }
         }
 
         override fun unbindView(item: CatalogItem) {

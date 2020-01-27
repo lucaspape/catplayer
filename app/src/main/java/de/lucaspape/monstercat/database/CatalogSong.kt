@@ -1,6 +1,6 @@
 package de.lucaspape.monstercat.database
 
-data class CatalogSong(val id: Int, val songId: Long) {
+data class CatalogSong(val id: Int, val songId: String) {
     companion object {
         @JvmStatic
         val TABLE_NAME = "catalog_song"
@@ -13,7 +13,7 @@ data class CatalogSong(val id: Int, val songId: Long) {
         val CREATE_TABLE =
             "CREATE TABLE " + TABLE_NAME + " (" +
                     COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    COLUMN_SONG_ID + " INTEGER" +
+                    COLUMN_SONG_ID + " TEXT" +
                     ")"
     }
 

@@ -1,11 +1,11 @@
 package de.lucaspape.monstercat.database
 
-data class AlbumItem(val albumId: String, val id: Long, val songId: Long) {
+data class AlbumItem(val albumId: String, val id: Long, val songId: String) {
     val TABLE_NAME = "\"" + albumId + "_item\""
     val CREATE_TABLE =
         "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
                 COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                COLUMN_SONG_ID + " INTEGER" +
+                COLUMN_SONG_ID + " TEXT" +
                 ")"
 
     companion object {

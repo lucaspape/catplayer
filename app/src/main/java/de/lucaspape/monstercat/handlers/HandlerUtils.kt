@@ -83,7 +83,7 @@ internal fun playAlbumNext(context: Context, mcID: String) {
             val jsonObject = JSONObject(response)
             val jsonArray = jsonObject.getJSONArray("tracks")
 
-            val idArray = ArrayList<Long>()
+            val idArray = ArrayList<String>()
 
             for (i in (0 until jsonArray.length())) {
                 parseSongToDB(jsonArray.getJSONObject(i), context)?.let { id ->
@@ -91,20 +91,13 @@ internal fun playAlbumNext(context: Context, mcID: String) {
                 }
             }
 
-            val songDatabaseHelper = SongDatabaseHelper(context)
-
-            monstercatPlayer.addSong(songDatabaseHelper.getSong(context, idArray[0]).songId)
+            monstercatPlayer.addSong(idArray[0])
 
             loadContinuousSongListAsyncTask?.cancel(true)
 
             loadContinuousSongListAsyncTask = BackgroundAsync({
                 for (i in (1 until idArray.size)) {
-                    monstercatPlayer.addContinuous(
-                        (songDatabaseHelper.getSong(
-                            context,
-                            idArray[i]
-                        ).songId)
-                    )
+                    monstercatPlayer.addContinuous(idArray[i])
                 }
             }, {})
 
@@ -125,23 +118,23 @@ internal fun playPlaylistNext(context: Context, playlistId: String) {
 
         val songDatabaseHelper = SongDatabaseHelper(context)
 
-        monstercatPlayer.addSong(
-            songDatabaseHelper.getSong(
-                context,
-                playlistItemList[0].songId
-            ).songId
-        )
+        songDatabaseHelper.getSong(
+            context,
+            playlistItemList[0].songId
+        )?.songId?.let { songId ->
+            monstercatPlayer.addSong(songId)
+        }
 
         loadContinuousSongListAsyncTask?.cancel(true)
 
         loadContinuousSongListAsyncTask = BackgroundAsync({
             for (i in (1 until playlistItemList.size)) {
-                monstercatPlayer.addContinuous(
-                    songDatabaseHelper.getSong(
-                        context,
-                        playlistItemList[i].songId
-                    ).songId
-                )
+                songDatabaseHelper.getSong(
+                    context,
+                    playlistItemList[i].songId
+                )?.songId?.let { songId ->
+                    monstercatPlayer.addContinuous(songId)
+                }
             }
         }, {})
 
@@ -162,7 +155,7 @@ internal fun downloadPlaylist(context: Context, playlistId: String) {
             val songDatabaseHelper = SongDatabaseHelper(context)
             val song = songDatabaseHelper.getSong(context, playlistItem.songId)
 
-            addDownloadSong(song.songId)
+            song?.songId?.let { addDownloadSong(it) }
         }
     }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }
@@ -182,7 +175,7 @@ internal fun downloadAlbum(context: Context, mcID: String) {
             val jsonObject = JSONObject(response)
             val jsonArray = jsonObject.getJSONArray("tracks")
 
-            val idArray = ArrayList<Long>()
+            val idArray = ArrayList<String>()
 
             for (i in (0 until jsonArray.length())) {
                 parseSongToDB(jsonArray.getJSONObject(i), context)?.let { id ->
@@ -194,7 +187,7 @@ internal fun downloadAlbum(context: Context, mcID: String) {
 
             for (id in idArray) {
                 val song = databaseHelper.getSong(context, id)
-                addDownloadSong(song.songId)
+                song?.songId?.let { addDownloadSong(it) }
             }
         },
         Response.ErrorListener {
