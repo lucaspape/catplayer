@@ -5,8 +5,6 @@ FOSS LITERALLY ANYTHING PUBLIC SOFTWARE LICENCE
 Catplayer Copyright (C) 2020 Lucas Pape lucas.pape@web.de
 
 -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
-If you want to amend this license, do it and change the name, or suggest chan-
-ges on github.
  
           FOSS LITERALLY ANYTHING PUBLIC SOFTWARE LICENCE
   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
