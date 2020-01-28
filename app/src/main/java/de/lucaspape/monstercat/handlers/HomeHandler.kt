@@ -437,24 +437,11 @@ class HomeHandler {
         val catalogSongDatabaseHelper =
             CatalogSongDatabaseHelper(view.context)
 
-        if (catalogSongDatabaseHelper.getSongs(0, 1).isEmpty() || forceReload) {
-            LoadSongListAsync(WeakReference(view.context), true, 0, {}, {
-                BackgroundAsync({
-                    val songIdList = catalogSongDatabaseHelper.getSongs(0, 50)
+        if (forceReload) {
+            catalogSongDatabaseHelper.reCreateTable()
+        }
 
-                    for (i in (songIdList.size - 1 downTo 0)) {
-                        currentCatalogViewData.add(CatalogItem(songIdList[i].songId))
-                    }
-
-                }, {
-                    updateCatalogRecyclerView(view, currentCatalogViewData)
-
-                    swipeRefreshLayout.isRefreshing = false
-                    searchContentsDisplayed = false
-                    albumContentsDisplayed = false
-                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-            }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-        } else {
+        LoadSongListAsync(WeakReference(view.context), forceReload, 0, {}, {
             BackgroundAsync({
                 val songIdList = catalogSongDatabaseHelper.getSongs(0, 50)
 
@@ -469,7 +456,7 @@ class HomeHandler {
                 searchContentsDisplayed = false
                 albumContentsDisplayed = false
             }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-        }
+        }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 
     /**
@@ -511,40 +498,23 @@ class HomeHandler {
 
         val albumDatabaseHelper = AlbumDatabaseHelper(view.context)
 
-        if (albumDatabaseHelper.getAlbums(0, 1).isEmpty() || forceReload) {
-            LoadAlbumListAsync(
-                contextReference,
-                true,
-                0, {
-                    swipeRefreshLayout.isRefreshing = true
-                }
-            ) {
-                BackgroundAsync({
-                    val albumList = albumDatabaseHelper.getAlbums(0, 50)
+        if(forceReload){
+            albumDatabaseHelper.reCreateTable()
+        }
 
-                    for (i in (albumList.size - 1 downTo 0)) {
-                        currentAlbumViewData.add(AlbumItem(albumList[i].albumId))
-                    }
-                }, {
-                    updateAlbumRecyclerView(view, currentAlbumViewData)
-
-                    swipeRefreshLayout.isRefreshing = false
-
-                    searchContentsDisplayed = false
-                    albumContentsDisplayed = false
-
-                    swipeRefreshLayout.isRefreshing = false
-                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-
-            }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-        } else {
+        LoadAlbumListAsync(
+            contextReference,
+            forceReload,
+            0, {
+                swipeRefreshLayout.isRefreshing = true
+            }
+        ) {
             BackgroundAsync({
                 val albumList = albumDatabaseHelper.getAlbums(0, 50)
 
                 for (i in (albumList.size - 1 downTo 0)) {
                     currentAlbumViewData.add(AlbumItem(albumList[i].albumId))
                 }
-
             }, {
                 updateAlbumRecyclerView(view, currentAlbumViewData)
 
@@ -555,7 +525,9 @@ class HomeHandler {
 
                 swipeRefreshLayout.isRefreshing = false
             }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-        }
+
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+
     }
 
     /**
