@@ -53,28 +53,6 @@ class MainActivity : AppCompatActivity() {
                 R.id.navigation_home -> {
                     openFragment(HomeFragment.newInstance())
 
-                    val settings = Settings(this)
-
-                    if (HomeHandler.albumView) {
-                        settings.saveSetting(
-                            "currentListAlbumViewLastScrollIndex",
-                            0.toString()
-                        )
-                        settings.saveSetting(
-                            "currentListAlbumViewTop",
-                            0.toString()
-                        )
-                    } else {
-                        settings.saveSetting(
-                            "currentListViewLastScrollIndex",
-                            0.toString()
-                        )
-                        settings.saveSetting(
-                            "currentListViewTop",
-                            0.toString()
-                        )
-                    }
-
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.navigation_dashboard -> {
