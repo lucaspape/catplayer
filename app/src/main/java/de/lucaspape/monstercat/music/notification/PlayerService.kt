@@ -5,8 +5,8 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.media.AudioManager
 import android.os.IBinder
-import de.lucaspape.monstercat.background.BackgroundService.Companion.updateLiveInfoAsync
 import de.lucaspape.monstercat.activities.noisyReceiver
+import de.lucaspape.monstercat.background.BackgroundService
 import de.lucaspape.monstercat.music.MonstercatPlayer
 import java.lang.IllegalArgumentException
 
@@ -43,14 +43,13 @@ class PlayerService : Service() {
 
         MonstercatPlayer.mediaPlayer?.release()
         MonstercatPlayer.mediaPlayer?.stop()
+        BackgroundService.streamInfoUpdateAsync?.cancel(true)
 
         try {
             unregisterReceiver(noisyReceiver)
         } catch (e: IllegalArgumentException) {
 
         }
-
-        updateLiveInfoAsync?.cancel(true)
 
         super.onDestroy()
     }

@@ -6,9 +6,9 @@ import android.media.AudioManager
 import android.os.AsyncTask
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
-import de.lucaspape.monstercat.background.BackgroundService.Companion.updateLiveInfoAsync
 import de.lucaspape.monstercat.background.BackgroundService.Companion.waitForDownloadTask
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.background.BackgroundService.Companion.streamInfoUpdateAsync
 import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addStreamDownloadSong
@@ -26,9 +26,8 @@ import kotlin.random.Random
  * Get current song and play it
  */
 internal fun play() {
-    updateLiveInfoAsync?.cancel(true)
-
     //start the player service (with its notification)
+    streamInfoUpdateAsync?.cancel(true)
     startPlayerService()
 
     val song = getCurrentSong()
@@ -102,6 +101,7 @@ internal fun play() {
  * Play specific song
  */
 private fun playSong(context: Context, song: Song) {
+    streamInfoUpdateAsync?.cancel(true)
     val settings = Settings(context)
 
     MonstercatPlayer.mediaPlayer?.release()
@@ -169,6 +169,8 @@ private fun playSong(context: Context, song: Song) {
  */
 fun playStream(stream: Stream) {
     MonstercatPlayer.contextReference?.get()?.let { context ->
+        streamInfoUpdateAsync?.cancel(true)
+
         val settings = Settings(context)
 
         startPlayerService()
@@ -188,15 +190,15 @@ fun playStream(stream: Stream) {
 
                 setCover(
                     context,
-                    UpdateLiveInfoAsync.previousTitle,
-                    UpdateLiveInfoAsync.previousVersion,
-                    UpdateLiveInfoAsync.previousArtist,
-                    stream.releaseId
+                    StreamInfoUpdateAsync.liveTitle,
+                    StreamInfoUpdateAsync.liveVersion,
+                    StreamInfoUpdateAsync.liveArtist,
+                    StreamInfoUpdateAsync.liveAlbumId
                 ) { bitmap ->
                     updateNotification(
-                        UpdateLiveInfoAsync.previousTitle,
-                        UpdateLiveInfoAsync.previousVersion,
-                        UpdateLiveInfoAsync.previousArtist,
+                        StreamInfoUpdateAsync.liveTitle,
+                        StreamInfoUpdateAsync.liveVersion,
+                        StreamInfoUpdateAsync.liveArtist,
                         bitmap
                     )
                 }
@@ -214,16 +216,13 @@ fun playStream(stream: Stream) {
                 MonstercatPlayer.mediaPlayer?.playWhenReady = true
 
                 //UI stuff
-                setTitle(stream.title, "", stream.artist)
+                setTitle(stream.title, stream.version, stream.artist)
                 startTextAnimation()
                 setPlayButtonImage(context)
                 startSeekBarUpdate()
 
-                //this will update the title and artist of the stream in the background (from an api)
-                updateLiveInfoAsync?.cancel(true)
-
-                updateLiveInfoAsync = UpdateLiveInfoAsync(WeakReference(context), stream)
-                updateLiveInfoAsync?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                streamInfoUpdateAsync = StreamInfoUpdateAsync(WeakReference(context), stream)
+                streamInfoUpdateAsync?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
             }
 
         }

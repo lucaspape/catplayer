@@ -19,8 +19,8 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import de.lucaspape.monstercat.background.BackgroundService
-import de.lucaspape.monstercat.background.BackgroundService.Companion.updateLiveInfoAsync
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.background.BackgroundService.Companion.streamInfoUpdateAsync
 import de.lucaspape.monstercat.download.hideDownloadNotification
 import de.lucaspape.monstercat.fragments.HomeFragment
 import de.lucaspape.monstercat.fragments.PlaylistFragment
@@ -136,7 +136,7 @@ class MainActivity : AppCompatActivity() {
 
         //update notification after restart of activity (screen orientation change etc)
         if (mediaPlayer?.isPlaying == true) {
-            if (updateLiveInfoAsync?.status != AsyncTask.Status.RUNNING) {
+            if (streamInfoUpdateAsync?.status != AsyncTask.Status.RUNNING) {
                 val currentSong = getCurrentSong()
 
                 currentSong?.let { song ->
@@ -150,18 +150,17 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             } else {
-                //TODO cover
                 setCover(
                     this,
-                    UpdateLiveInfoAsync.previousTitle,
-                    UpdateLiveInfoAsync.previousVersion,
-                    UpdateLiveInfoAsync.previousArtist,
-                    ""
+                    StreamInfoUpdateAsync.liveTitle,
+                    StreamInfoUpdateAsync.liveVersion,
+                    StreamInfoUpdateAsync.liveArtist,
+                    StreamInfoUpdateAsync.liveAlbumId
                 ) { bitmap ->
                     updateNotification(
-                        UpdateLiveInfoAsync.previousTitle,
-                        UpdateLiveInfoAsync.previousVersion,
-                        UpdateLiveInfoAsync.previousArtist,
+                        StreamInfoUpdateAsync.liveTitle,
+                        StreamInfoUpdateAsync.liveVersion,
+                        StreamInfoUpdateAsync.liveArtist,
                         bitmap
                     )
                 }

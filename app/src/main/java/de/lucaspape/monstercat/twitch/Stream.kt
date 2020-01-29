@@ -21,20 +21,19 @@ class Stream(private val clientId: String) {
     private var streamUrl = ""
     private var titleArtistUpdateUrl = ""
 
-    var albumCoverUpdateUrl = ""
     var artist = ""
     var title = ""
     var version = ""
-    var releaseId = ""
+    var albumId = ""
 
-    fun getStreamInfo(context: Context, channel: String, finished: (stream: Stream) -> Unit) {
+    fun getStreamInfo(context: Context, channel: String, finished: (title: String, version:String, artist:String, albumId:String) -> Unit) {
         getAccessToken(context, channel, finished)
     }
 
     private fun getAccessToken(
         context: Context,
         channel: String,
-        finished: (stream: Stream) -> Unit
+        finished: (title: String, version:String, artist:String, albumId:String) -> Unit
     ) {
         val accessTokenRequest = TwitchRequest(Request.Method.GET,
             context.getString(R.string.twitchApiUrl) + "channels/$channel/access_token", clientId,
@@ -54,7 +53,7 @@ class Stream(private val clientId: String) {
         context: Context,
         channel: String,
         accessToken: JSONObject,
-        finished: (stream: Stream) -> Unit
+        finished: (title: String, version:String, artist:String, albumId:String) -> Unit
     ) {
         val player = "twitchweb"
         val token = accessToken.getString("token")
@@ -84,7 +83,7 @@ class Stream(private val clientId: String) {
     fun updateInfo(
         context: Context,
         volleyQueue: RequestQueue,
-        finished: (stream: Stream) -> Unit
+        finished: (title: String, version:String, artist:String, albumId:String) -> Unit
     ) {
         val artistTitleRequest =
             StringRequest(Request.Method.GET,
@@ -96,12 +95,10 @@ class Stream(private val clientId: String) {
                         title = jsonObject.getString("title")
                         version = jsonObject.getString("version")
                         artist = jsonObject.getString("artist")
-                        releaseId = jsonObject.getString("releaseId")
+                        albumId = jsonObject.getString("releaseId")
 
                         titleArtistUpdateUrl =
                             context.getString(R.string.liveInfoUrl)
-                        albumCoverUpdateUrl =
-                            context.getString(R.string.trackContentUrl) + releaseId + "/cover?image_width=512"
                     } catch (e: JSONException) {
 
                     }
@@ -112,7 +109,7 @@ class Stream(private val clientId: String) {
                 })
 
         volleyQueue.addRequestFinishedListener<Any> {
-            finished(this)
+            finished(title, version, artist, albumId)
         }
 
         volleyQueue.add(artistTitleRequest)

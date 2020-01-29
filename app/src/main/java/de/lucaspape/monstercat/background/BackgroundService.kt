@@ -7,7 +7,7 @@ import android.os.IBinder
 import de.lucaspape.monstercat.download.DownloadTask
 import de.lucaspape.monstercat.download.hideDownloadNotification
 import de.lucaspape.monstercat.handlers.async.BackgroundAsync
-import de.lucaspape.monstercat.music.UpdateLiveInfoAsync
+import de.lucaspape.monstercat.music.StreamInfoUpdateAsync
 import java.lang.ref.WeakReference
 
 class BackgroundService : Service() {
@@ -17,9 +17,9 @@ class BackgroundService : Service() {
         @JvmStatic
         var downloadTask: DownloadTask? = null
         @JvmStatic
-        var updateLiveInfoAsync: UpdateLiveInfoAsync? = null
-        @JvmStatic
         var waitForDownloadTask: AsyncTask<Void, Void, String>? = null
+        @JvmStatic
+        var streamInfoUpdateAsync: StreamInfoUpdateAsync? = null
         @JvmStatic
         var serviceRunning = false
     }
@@ -40,8 +40,8 @@ class BackgroundService : Service() {
     override fun onDestroy() {
         loadContinuousSongListAsyncTask?.cancel(true)
         downloadTask?.cancel(true)
-        updateLiveInfoAsync?.cancel(true)
         waitForDownloadTask?.cancel(true)
+        streamInfoUpdateAsync?.cancel(true)
 
         hideDownloadNotification(this)
 

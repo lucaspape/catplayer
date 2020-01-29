@@ -403,8 +403,8 @@ class HomeHandler {
             val stream =
                 de.lucaspape.monstercat.twitch.Stream(view.context.getString(R.string.twitchClientID))
 
-            stream.getStreamInfo(view.context, "monstercat") {
-                playStream(it)
+            stream.getStreamInfo(view.context, "monstercat") {_, _, _, _ ->
+                playStream(stream)
             }
         }
 

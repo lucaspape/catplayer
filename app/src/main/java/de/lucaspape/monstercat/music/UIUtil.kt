@@ -223,9 +223,10 @@ internal fun startSeekBarUpdate() {
             progress: Int,
             fromUser: Boolean
         ) {
-            if (fromUser)
+            if (fromUser) {
                 mediaPlayer?.seekTo(progress.toLong())
-            setPlayerState(progress.toLong())
+                setPlayerState(progress.toLong())
+            }
         }
 
         override fun onStartTrackingTouch(seekBar: SeekBar) {
