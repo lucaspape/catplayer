@@ -27,11 +27,12 @@ This custom API is open source and available [here](https://github.com/lucaspape
 
 ## Todo
 
- - More playlist features (add public playlists etc.)
+ - Retain position of list
+ - Restore last played song and position after app restart
  - Favorites
  - More song info
  - Browse by artist
- - Mirror playlists from spotify
+ - Mirror playlists from spotify / public playlists
 
 ## Beta
 
