@@ -225,7 +225,7 @@ internal fun downloadAlbum(context: Context, mcID: String) {
 }
 
 /**
- * Add single song to playlist, will ask for playlist with alertDialog
+ * Add single song to playlist, will ask for playlist with alertDialog TODO check if logged in
  */
 internal fun addSongToPlaylist(context: Context, song: Song) {
     LoadPlaylistAsync(WeakReference(context), true, {}) {
@@ -256,7 +256,7 @@ internal fun addSongToPlaylist(context: Context, song: Song) {
 }
 
 /**
- * Create a new playlist, will ask for name with alertDialog
+ * Create a new playlist, will ask for name with alertDialog TODO check if logged in
  */
 internal fun createPlaylist(context: Context) {
     val layoutInflater =

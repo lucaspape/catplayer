@@ -13,6 +13,8 @@ import java.io.File
 import java.io.FileOutputStream
 import java.lang.ref.SoftReference
 
+//TODO cancel downloads
+
 //this lists contain the urls that should be downloaded
 internal val downloadList = ArrayList<SoftReference<HashMap<String, Any?>>>()
 internal val streamDownloadList = ArrayList<SoftReference<HashMap<String, Any?>>>()
