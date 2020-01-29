@@ -145,10 +145,9 @@ data class Song(
                 )
             )
 
-        httpSourceFactory.defaultRequestProperties.set("Cookie", "connect.sid=$sid}")
+        httpSourceFactory.defaultRequestProperties.set("Cookie", "connect.sid=$sid")
 
         return ProgressiveMediaSource.Factory(httpSourceFactory)
             .createMediaSource(url.toUri())
-
     }
 }
