@@ -25,11 +25,13 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageView
-                android:id="@+id/titleDownloadStatus"
+            <ImageButton
+                android:id="@+id/titleDownloadButton"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_marginEnd="10dp"
+                android:src="@drawable/ic_file_download_24dp"
+                android:background="@null"
                 app:layout_constraintStart_toEndOf="@id/title"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/titleMenuButton"
@@ -43,7 +45,7 @@
                 android:layout_marginEnd="10dp"
                 android:src="@drawable/ic_more_vert_24dp"
                 android:background="@null"
-                app:layout_constraintStart_toEndOf="@id/titleDownloadStatus"
+                app:layout_constraintStart_toEndOf="@id/titleDownloadButton"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -55,7 +57,7 @@
                 android:layout_marginStart="10dp"
                 android:textColor="?attr/colorOnSurface"
                 app:layout_constraintBottom_toTopOf="@id/artist"
-                app:layout_constraintEnd_toStartOf="@id/titleDownloadStatus"
+                app:layout_constraintEnd_toStartOf="@id/titleDownloadButton"
                 app:layout_constraintStart_toEndOf="@id/cover"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -66,7 +68,7 @@
                 android:layout_marginStart="10dp"
                 android:textColor="?attr/colorOnSurface"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/titleDownloadStatus"
+                app:layout_constraintEnd_toStartOf="@id/titleDownloadButton"
                 app:layout_constraintStart_toEndOf="@id/cover"
                 app:layout_constraintTop_toBottomOf="@id/title" />
 

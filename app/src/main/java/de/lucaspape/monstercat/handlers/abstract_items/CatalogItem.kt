@@ -10,10 +10,12 @@ import com.mikepenz.fastadapter.items.AbstractItem
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.downloadCoverIntoImageView
+import java.io.File
 
 open class CatalogItem(
     val songId: String
 ) : AbstractItem<CatalogItem.ViewHolder>() {
+
     override val type: Int = 101
 
     override val layoutRes: Int
@@ -30,8 +32,8 @@ open class CatalogItem(
         private val artistTextView: TextView = view.findViewById(R.id.artist)
         val titleMenuButton: ImageButton = view.findViewById(R.id.titleMenuButton)
         private val coverImageView: ImageView = view.findViewById(R.id.cover)
-        private val titleDownloadStatusImageView: ImageView =
-            view.findViewById(R.id.titleDownloadStatus)
+        val titleDownloadButton: ImageButton =
+            view.findViewById(R.id.titleDownloadButton)
         private val context = view.context
 
         override fun bindView(item: CatalogItem, payloads: MutableList<Any>) {
@@ -46,7 +48,7 @@ open class CatalogItem(
 
                 downloadCoverIntoImageView(context, coverImageView, song.albumId, true)
 
-                titleDownloadStatusImageView.setImageURI(song.getSongDownloadStatus().toUri())
+                titleDownloadButton.setImageURI(song.getSongDownloadStatus().toUri())
             }
         }
 
@@ -54,7 +56,7 @@ open class CatalogItem(
             titleTextView.text = null
             artistTextView.text = null
             coverImageView.setImageURI(null)
-            titleDownloadStatusImageView.setImageURI(null)
+            titleDownloadButton.setImageURI(null)
         }
     }
 }

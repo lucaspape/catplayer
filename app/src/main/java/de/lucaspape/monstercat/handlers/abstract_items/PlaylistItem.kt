@@ -1,5 +1,6 @@
 package de.lucaspape.monstercat.handlers.abstract_items
 
+import android.content.Context
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -16,6 +17,40 @@ import java.io.File
 open class PlaylistItem(
     val playlistId: String
 ) : AbstractItem<PlaylistItem.ViewHolder>() {
+
+    fun getDownloadStatus(context:Context):String{
+        val playlistTracks =
+            PlaylistItemDatabaseHelper(context, playlistId).getAllData()
+
+        var downloaded = true
+        var streamDownloaded = true
+
+        for (track in playlistTracks) {
+            val song = SongDatabaseHelper(context).getSong(context, track.songId)
+
+            song?.let {
+                if (!File(song.downloadLocation).exists()) {
+                    downloaded = false
+                }
+                if (!File(song.streamDownloadLocation).exists()) {
+                    streamDownloaded = false
+                }
+            }
+        }
+
+        return when {
+            downloaded -> {
+                "android.resource://de.lucaspape.monstercat/drawable/ic_offline_pin_green_24dp"
+            }
+            streamDownloaded -> {
+                "android.resource://de.lucaspape.monstercat/drawable/ic_offline_pin_orange_24dp"
+            }
+            else -> {
+                "android.resource://de.lucaspape.monstercat/drawable/ic_file_download_24dp"
+            }
+        }
+    }
+
     override val type: Int = 102
 
     override val layoutRes: Int
@@ -31,8 +66,8 @@ open class PlaylistItem(
         private val titleTextView: TextView = view.findViewById(R.id.title)
         val titleMenuButton: ImageButton = view.findViewById(R.id.titleMenuButton)
         private val coverImageView: ImageView = view.findViewById(R.id.cover)
-        private val titleDownloadStatusImageView: ImageView =
-            view.findViewById(R.id.titleDownloadStatus)
+        val titleDownloadButton: ImageButton =
+            view.findViewById(R.id.titleDownloadButton)
         private val context = view.context
 
         override fun bindView(item: PlaylistItem, payloads: MutableList<Any>) {
@@ -44,44 +79,14 @@ open class PlaylistItem(
                 titleTextView.text = playlist.playlistName
                 coverImageView.setImageURI("".toUri())
 
-                val playlistTracks =
-                    PlaylistItemDatabaseHelper(context, playlist.playlistId).getAllData()
-
-                var downloaded = true
-                var streamDownloaded = true
-
-                for (track in playlistTracks) {
-                    val song = SongDatabaseHelper(context).getSong(context, track.songId)
-
-                    song?.let {
-                        if (!File(song.downloadLocation).exists()) {
-                            downloaded = false
-                        } else if (!File(song.streamDownloadLocation).exists()) {
-                            streamDownloaded = false
-                        }
-                    }
-                }
-
-                val playlistDownloadStatus = when {
-                    downloaded -> {
-                        "android.resource://de.lucaspape.monstercat/drawable/ic_check_green_24dp"
-                    }
-                    streamDownloaded -> {
-                        "android.resource://de.lucaspape.monstercat/drawable/ic_check_orange_24dp"
-                    }
-                    else -> {
-                        "android.resource://de.lucaspape.monstercat/drawable/ic_empty_24dp"
-                    }
-                }
-
-                titleDownloadStatusImageView.setImageURI(playlistDownloadStatus.toUri())
+                titleDownloadButton.setImageURI(item.getDownloadStatus(context).toUri())
             }
         }
 
         override fun unbindView(item: PlaylistItem) {
             titleTextView.text = null
             coverImageView.setImageURI(null)
-            titleDownloadStatusImageView.setImageURI(null)
+            titleDownloadButton.setImageURI(null)
         }
     }
 }

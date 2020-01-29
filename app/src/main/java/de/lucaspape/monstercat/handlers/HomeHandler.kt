@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.AsyncTask
 import android.view.View
 import android.widget.*
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -27,6 +28,7 @@ import de.lucaspape.monstercat.handlers.abstract_items.ProgressItem
 import de.lucaspape.monstercat.handlers.async.*
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.util.*
+import java.io.File
 import java.lang.ref.WeakReference
 
 /**
@@ -141,6 +143,45 @@ class HomeHandler {
                 }
 
                 showContextMenu(view, idList, position)
+            }
+        })
+
+        /**
+         * On download button click
+         */
+        fastAdapter.addEventHook(object : ClickEventHook<CatalogItem>() {
+            override fun onBind(viewHolder: RecyclerView.ViewHolder): View? {
+                return if (viewHolder is CatalogItem.ViewHolder) {
+                    viewHolder.titleDownloadButton
+                } else null
+            }
+
+            override fun onClick(
+                v: View,
+                position: Int,
+                fastAdapter: FastAdapter<CatalogItem>,
+                item: CatalogItem
+            ) {
+                val songDatabaseHelper = SongDatabaseHelper(view.context)
+                val song = songDatabaseHelper.getSong(view.context, item.songId)
+
+                song?.let {
+                    val titleDownloadButton = v as ImageButton
+
+                    when {
+                        File(song.downloadLocation).exists() -> {
+                            File(song.downloadLocation).delete()
+                            titleDownloadButton.setImageURI(song.getSongDownloadStatus().toUri())
+                        }
+                        File(song.streamDownloadLocation).exists() -> {
+                            File(song.streamDownloadLocation).delete()
+                            titleDownloadButton.setImageURI(song.getSongDownloadStatus().toUri())
+                        }
+                        else -> {
+                            addDownloadSong(item.songId) {titleDownloadButton.setImageURI(song.getSongDownloadStatus().toUri())}
+                        }
+                    }
+                }
             }
         })
 
@@ -278,7 +319,7 @@ class HomeHandler {
 
                 if (song != null) {
                     when (item) {
-                        context.getString(R.string.download) -> addDownloadSong(song.songId)
+                        context.getString(R.string.download) -> addDownloadSong(song.songId, {})
                         context.getString(R.string.playNext) -> playSongFromId(
                             id,
                             false
@@ -403,7 +444,7 @@ class HomeHandler {
             val stream =
                 de.lucaspape.monstercat.twitch.Stream(view.context.getString(R.string.twitchClientID))
 
-            stream.getStreamInfo(view.context, "monstercat") {_, _, _, _ ->
+            stream.getStreamInfo(view.context, "monstercat") { _, _, _, _ ->
                 playStream(stream)
             }
         }

@@ -83,13 +83,13 @@ data class Song(
     fun getSongDownloadStatus(): String {
         return when {
             File(downloadLocation).exists() -> {
-                "android.resource://de.lucaspape.monstercat/drawable/ic_check_green_24dp"
+                "android.resource://de.lucaspape.monstercat/drawable/ic_offline_pin_green_24dp"
             }
             File(streamDownloadLocation).exists() -> {
-                "android.resource://de.lucaspape.monstercat/drawable/ic_check_orange_24dp"
+                "android.resource://de.lucaspape.monstercat/drawable/ic_offline_pin_orange_24dp"
             }
             else -> {
-                "android.resource://de.lucaspape.monstercat/drawable/ic_empty_24dp"
+                "android.resource://de.lucaspape.monstercat/drawable/ic_file_download_24dp"
             }
         }
     }

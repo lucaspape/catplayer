@@ -14,14 +14,21 @@ import java.io.FileOutputStream
 import java.lang.ref.SoftReference
 
 //this lists contain the urls that should be downloaded
-internal val downloadList = ArrayList<String>()
+internal val downloadList = ArrayList<HashMap<String, Any?>>()
 internal val streamDownloadList = ArrayList<String>()
 
 internal val targetList = ArrayList<com.squareup.picasso.Target>()
 internal val bitmapCache = HashMap<String, SoftReference<Bitmap?>>()
 
-fun addDownloadSong(songId: String) {
-    downloadList.add(songId)
+fun addDownloadSong(songId: String, downloadFinished: () -> Unit) {
+    val downloadHashMap = HashMap<String, Any?>()
+    downloadHashMap["downloadFinished"] = object : Executable {
+        override fun run() {
+            downloadFinished()
+        }
+    }
+    downloadHashMap["songId"] = songId
+    downloadList.add(downloadHashMap)
 }
 
 fun addStreamDownloadSong(songId: String) {
@@ -43,9 +50,9 @@ fun downloadCoverIntoImageView(
 
     val cacheBitmap = bitmapCache[albumId + resolution]?.get()
 
-    if(cacheBitmap != null){
+    if (cacheBitmap != null) {
         imageView.setImageBitmap(cacheBitmap)
-    }else{
+    } else {
         val placeholder = if (!lowRes) {
             Drawable.createFromPath(context.dataDir.toString() + "/fallback.jpg")
         } else {
@@ -115,9 +122,9 @@ fun downloadCoverIntoBitmap(
 
     val cacheBitmap = bitmapCache[albumId + resolution]?.get()
 
-    if(cacheBitmap != null){
+    if (cacheBitmap != null) {
         downloadFinished(cacheBitmap)
-    }else{
+    } else {
         val url = context.getString(R.string.trackContentUrl) + "$albumId/cover"
 
         val cacheFile = File(context.cacheDir.toString() + "/$albumId.png.$resolution")
@@ -163,4 +170,8 @@ fun downloadCoverIntoBitmap(
             }
         }
     }
+}
+
+interface Executable {
+    fun run()
 }

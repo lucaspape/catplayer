@@ -73,8 +73,10 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                     //TODO add msg
                 } else {
                     try {
+                        val downloadHashMap = downloadList[downloadedSongs]
+
                         val currentDownloadSong =
-                            songDatabaseHelper.getSong(context, downloadList[downloadedSongs])
+                            songDatabaseHelper.getSong(context, downloadHashMap["songId"] as String)
                         currentDownloadSong?.let {
                             if (currentDownloadSong.isDownloadable) {
                                 if (!File(currentDownloadSong.downloadLocation).exists()) {
@@ -92,6 +94,8 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                                             false.toString()
                                         )
                                     }
+
+                                    publishProgress("downloadFinished", downloadedSongs.toString())
                                 } else {
                                     publishProgress(
                                         "alreadyDownloadedError",
@@ -129,13 +133,10 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                 "alreadyDownloadedError" -> {
                     val shownTitle = values[1]
 
-                    displayInfo(
-                        context,
-                        context.getString(
-                            R.string.alreadyDownloadedMsg,
-                            shownTitle
-                        )
-                    )
+                    println(context.getString(
+                        R.string.alreadyDownloadedMsg,
+                        shownTitle
+                    ))
                 }
                 "downloadNotAllowedError" -> {
                     val shownTitle = values[1]
@@ -168,6 +169,15 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                                 }
                             }
                         }
+                    }
+                }
+                "downloadFinished" -> {
+                    values[1]?.let {
+                        val listIndex = Integer.parseInt(it)
+
+                        val downloadHashMap = downloadList[listIndex]
+                        val downloadFinished = downloadHashMap["downloadFinished"] as Executable
+                        downloadFinished.run()
                     }
                 }
                 else -> throw Exception("Unknown type exception")

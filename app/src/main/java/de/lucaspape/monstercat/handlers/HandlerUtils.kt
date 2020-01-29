@@ -20,6 +20,7 @@ import de.lucaspape.monstercat.handlers.async.*
 import de.lucaspape.monstercat.request.AuthorizedRequest
 import de.lucaspape.monstercat.util.*
 import org.json.JSONObject
+import java.io.File
 import java.lang.ref.WeakReference
 
 /**
@@ -145,7 +146,7 @@ internal fun playPlaylistNext(context: Context, playlistId: String) {
 /**
  * Download an entire playlist
  */
-internal fun downloadPlaylist(context: Context, playlistId: String) {
+internal fun downloadPlaylist(context: Context, playlistId: String, downloadFinished:()->Unit) {
     LoadPlaylistTracksAsync(WeakReference(context), true, playlistId, {}) {
         val playlistItemDatabaseHelper =
             PlaylistItemDatabaseHelper(context, playlistId)
@@ -155,9 +156,35 @@ internal fun downloadPlaylist(context: Context, playlistId: String) {
             val songDatabaseHelper = SongDatabaseHelper(context)
             val song = songDatabaseHelper.getSong(context, playlistItem.songId)
 
-            song?.songId?.let { addDownloadSong(it) }
+            song?.songId?.let { addDownloadSong(it, downloadFinished) }
         }
     }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+}
+
+/**
+ * Deletes downloaded playlist tracks
+ */
+internal fun deleteDownloadedPlaylistTracks(context: Context, playlistId: String, deleteFinished:()-> Unit){
+    val alertDialogBuilder = AlertDialog.Builder(context)
+    alertDialogBuilder.setTitle(context.getString(R.string.deletePlaylistDownloadedTracksMsg))
+    alertDialogBuilder.setPositiveButton(context.getString(R.string.yes)) { _, _ ->
+        val playlistItemDatabaseHelper = PlaylistItemDatabaseHelper(context,playlistId)
+        val playlistItemList = playlistItemDatabaseHelper.getAllData()
+
+        val songDatabaseHelper = SongDatabaseHelper(context)
+
+        for(playlistItem in playlistItemList){
+            val song = songDatabaseHelper.getSong(context, playlistItem.songId)
+
+            song?.let {
+                File(song.downloadLocation).delete()
+            }
+        }
+
+        deleteFinished()
+    }
+    alertDialogBuilder.setNegativeButton(context.getString(R.string.no)) { _, _ ->  }
+    alertDialogBuilder.show()
 }
 
 /**
@@ -187,7 +214,7 @@ internal fun downloadAlbum(context: Context, mcID: String) {
 
             for (id in idArray) {
                 val song = databaseHelper.getSong(context, id)
-                song?.songId?.let { addDownloadSong(it) }
+                song?.songId?.let { addDownloadSong(it, {}) }
             }
         },
         Response.ErrorListener {
@@ -258,8 +285,14 @@ internal fun createPlaylist(context: Context) {
  * Delete playlist with given playlistId
  */
 internal fun deletePlaylist(context: Context, playlistId: String) {
-    val deletePlaylistAsync = DeletePlaylistAsync(WeakReference(context), playlistId)
-    deletePlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    val alertDialogBuilder = AlertDialog.Builder(context)
+    alertDialogBuilder.setTitle(context.getString(R.string.deletePlaylistMsg))
+    alertDialogBuilder.setPositiveButton(context.getString(R.string.yes)) { _, _ ->
+        val deletePlaylistAsync = DeletePlaylistAsync(WeakReference(context), playlistId)
+        deletePlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    }
+    alertDialogBuilder.setNegativeButton(context.getString(R.string.no)) { _, _ ->  }
+    alertDialogBuilder.show()
 }
 
 /**

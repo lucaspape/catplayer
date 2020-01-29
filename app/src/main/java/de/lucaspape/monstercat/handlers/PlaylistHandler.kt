@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.AsyncTask
 import android.view.View
 import android.widget.ImageButton
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -22,6 +23,7 @@ import de.lucaspape.monstercat.handlers.abstract_items.PlaylistItem
 import de.lucaspape.monstercat.handlers.async.BackgroundAsync
 import de.lucaspape.monstercat.handlers.async.LoadPlaylistAsync
 import de.lucaspape.monstercat.handlers.async.LoadPlaylistTracksAsync
+import java.io.File
 import java.lang.ref.WeakReference
 
 class PlaylistHandler {
@@ -114,6 +116,45 @@ class PlaylistHandler {
             }
         })
 
+        /**
+         * On download button click
+         */
+        fastAdapter.addEventHook(object : ClickEventHook<CatalogItem>() {
+            override fun onBind(viewHolder: RecyclerView.ViewHolder): View? {
+                return if (viewHolder is CatalogItem.ViewHolder) {
+                    viewHolder.titleDownloadButton
+                } else null
+            }
+
+            override fun onClick(
+                v: View,
+                position: Int,
+                fastAdapter: FastAdapter<CatalogItem>,
+                item: CatalogItem
+            ) {
+                val songDatabaseHelper = SongDatabaseHelper(view.context)
+                val song = songDatabaseHelper.getSong(view.context, item.songId)
+
+                song?.let {
+                    val titleDownloadButton = v as ImageButton
+
+                    when {
+                        File(song.downloadLocation).exists() -> {
+                            File(song.downloadLocation).delete()
+                            titleDownloadButton.setImageURI(song.getSongDownloadStatus().toUri())
+                        }
+                        File(song.streamDownloadLocation).exists() -> {
+                            File(song.streamDownloadLocation).delete()
+                            titleDownloadButton.setImageURI(song.getSongDownloadStatus().toUri())
+                        }
+                        else -> {
+                            addDownloadSong(item.songId) { titleDownloadButton.setImageURI(song.getSongDownloadStatus().toUri()) }
+                        }
+                    }
+                }
+            }
+        })
+
     }
 
     /**
@@ -184,6 +225,39 @@ class PlaylistHandler {
                 showContextMenu(view, playlistIdList, true, position)
             }
         })
+
+        /**
+         * On download button click
+         */
+        fastAdapter.addEventHook(object : ClickEventHook<PlaylistItem>() {
+            override fun onBind(viewHolder: RecyclerView.ViewHolder): View? {
+                return if (viewHolder is PlaylistItem.ViewHolder) {
+                    viewHolder.titleDownloadButton
+                } else null
+            }
+
+            override fun onClick(
+                v: View,
+                position: Int,
+                fastAdapter: FastAdapter<PlaylistItem>,
+                item: PlaylistItem
+            ) {
+                if (item.getDownloadStatus(view.context) == "android.resource://de.lucaspape.monstercat/drawable/ic_offline_pin_green_24dp") {
+                    val titleDownloadButton = v as ImageButton
+
+                    deleteDownloadedPlaylistTracks(
+                        view.context,
+                        item.playlistId
+                    ) { titleDownloadButton.setImageURI(item.getDownloadStatus(view.context).toUri()) }
+                } else {
+                    val titleDownloadButton = v as ImageButton
+
+                    downloadPlaylist(view.context, item.playlistId) {
+                        titleDownloadButton.setImageURI(item.getDownloadStatus(view.context).toUri())
+                    }
+                }
+            }
+        })
     }
 
     /**
@@ -213,7 +287,8 @@ class PlaylistHandler {
                     if (isPlaylist) {
                         downloadPlaylist(
                             context,
-                            id
+                            id,
+                            {}
                         )
                     } else {
                         view.let { view ->
@@ -223,7 +298,7 @@ class PlaylistHandler {
                                 songDatabaseHelper.getSong(view.context, id)
 
                             if (song != null) {
-                                addDownloadSong(song.songId)
+                                addDownloadSong(song.songId, {})
                             }
                         }
                     }
