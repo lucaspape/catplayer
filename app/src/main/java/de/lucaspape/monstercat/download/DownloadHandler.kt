@@ -11,13 +11,14 @@ import de.lucaspape.monstercat.util.Settings
 import de.lucaspape.monstercat.util.wifiConnected
 import java.io.File
 import java.io.FileOutputStream
+import java.lang.ref.SoftReference
 
 //this lists contain the urls that should be downloaded
 internal val downloadList = ArrayList<String>()
 internal val streamDownloadList = ArrayList<String>()
 
 internal val targetList = ArrayList<com.squareup.picasso.Target>()
-internal val bitmapCache = HashMap<String, Bitmap?>()
+internal val bitmapCache = HashMap<String, SoftReference<Bitmap?>>()
 
 fun addDownloadSong(songId: String) {
     downloadList.add(songId)
@@ -40,7 +41,7 @@ fun downloadCoverIntoImageView(
         settings.getSetting("secondaryResolution")
     }
 
-    val cacheBitmap = bitmapCache[albumId + resolution]
+    val cacheBitmap = bitmapCache[albumId + resolution]?.get()
 
     if(cacheBitmap != null){
         imageView.setImageBitmap(cacheBitmap)
@@ -58,7 +59,7 @@ fun downloadCoverIntoImageView(
         if (cacheFile.exists()) {
             val bitmap = BitmapFactory.decodeFile(cacheFile.absolutePath)
             imageView.setImageBitmap(bitmap)
-            bitmapCache[albumId + resolution] = bitmap
+            bitmapCache[albumId + resolution] = SoftReference(bitmap)
         } else {
             if (wifiConnected(context) == true || settings.getSetting("downloadCoversOverMobile") == "true") {
                 val picassoTarget = object : com.squareup.picasso.Target {
@@ -80,7 +81,7 @@ fun downloadCoverIntoImageView(
                             }
                         }
 
-                        bitmapCache[albumId + resolution] = bitmap
+                        bitmapCache[albumId + resolution] = SoftReference(bitmap)
                     }
                 }
 
@@ -112,7 +113,7 @@ fun downloadCoverIntoBitmap(
         settings.getSetting("secondaryResolution")
     }
 
-    val cacheBitmap = bitmapCache[albumId + resolution]
+    val cacheBitmap = bitmapCache[albumId + resolution]?.get()
 
     if(cacheBitmap != null){
         downloadFinished(cacheBitmap)
@@ -124,7 +125,7 @@ fun downloadCoverIntoBitmap(
         if (cacheFile.exists()) {
             val bitmap = BitmapFactory.decodeFile(cacheFile.absolutePath)
             downloadFinished(bitmap)
-            bitmapCache[albumId + resolution] = bitmap
+            bitmapCache[albumId + resolution] = SoftReference(bitmap)
         } else {
             if (wifiConnected(context) == true || settings.getSetting("downloadCoversOverMobile") == "true") {
                 val picassoTarget = object : com.squareup.picasso.Target {
@@ -145,7 +146,7 @@ fun downloadCoverIntoBitmap(
                                 }
                             }
 
-                            bitmapCache[albumId + resolution] = bitmap
+                            bitmapCache[albumId + resolution] = SoftReference(bitmap)
                         }
                     }
                 }
