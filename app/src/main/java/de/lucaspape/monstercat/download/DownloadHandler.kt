@@ -15,7 +15,7 @@ import java.lang.ref.SoftReference
 
 //this lists contain the urls that should be downloaded
 internal val downloadList = ArrayList<HashMap<String, Any?>>()
-internal val streamDownloadList = ArrayList<String>()
+internal val streamDownloadList = ArrayList<HashMap<String, Any?>>()
 
 internal val targetList = ArrayList<com.squareup.picasso.Target>()
 internal val bitmapCache = HashMap<String, SoftReference<Bitmap?>>()
@@ -31,8 +31,16 @@ fun addDownloadSong(songId: String, downloadFinished: () -> Unit) {
     downloadList.add(downloadHashMap)
 }
 
-fun addStreamDownloadSong(songId: String) {
-    streamDownloadList.add(songId)
+fun addStreamDownloadSong(songId: String, downloadFinished: () -> Unit) {
+    val downloadHashMap = HashMap<String, Any?>()
+    downloadHashMap["downloadFinished"] = object : Executable {
+        override fun run() {
+            downloadFinished()
+        }
+    }
+    downloadHashMap["songId"] = songId
+
+    streamDownloadList.add(downloadHashMap)
 }
 
 fun downloadCoverIntoImageView(

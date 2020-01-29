@@ -17,8 +17,6 @@ class BackgroundService : Service() {
         @JvmStatic
         var downloadTask: DownloadTask? = null
         @JvmStatic
-        var waitForDownloadTask: AsyncTask<Void, Void, String>? = null
-        @JvmStatic
         var streamInfoUpdateAsync: StreamInfoUpdateAsync? = null
         @JvmStatic
         var serviceRunning = false
@@ -40,7 +38,6 @@ class BackgroundService : Service() {
     override fun onDestroy() {
         loadContinuousSongListAsyncTask?.cancel(true)
         downloadTask?.cancel(true)
-        waitForDownloadTask?.cancel(true)
         streamInfoUpdateAsync?.cancel(true)
 
         hideDownloadNotification(this)

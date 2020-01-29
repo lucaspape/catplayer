@@ -6,7 +6,6 @@ import android.media.AudioManager
 import android.os.AsyncTask
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
-import de.lucaspape.monstercat.background.BackgroundService.Companion.waitForDownloadTask
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.background.BackgroundService.Companion.streamInfoUpdateAsync
 import de.lucaspape.monstercat.database.Song
@@ -41,42 +40,12 @@ internal fun play() {
             if (downloadStream == true) {
                 if (song.isDownloadable) {
                     if (!File(song.downloadLocation).exists() && !File(song.streamDownloadLocation).exists()) {
-                        addStreamDownloadSong(song.songId)
-                    }
-
-                    waitForDownloadTask?.cancel(true)
-
-                    waitForDownloadTask = object : AsyncTask<Void, Void, String>() {
-                        override fun doInBackground(vararg params: Void?): String? {
-                            if (!File(song.downloadLocation).exists()) {
-                                while (!File(song.streamDownloadLocation).exists()) {
-                                    Thread.sleep(100)
-                                }
-                            }
-
-                            return null
-                        }
-
-                        override fun onPostExecute(result: String?) {
+                        addStreamDownloadSong(song.songId) {
                             playSong(context, song)
-
-                            try {
-                                val nextSong = getSong(MonstercatPlayer.currentSong + 1)
-
-                                if (nextSong != null) {
-                                    if (!File(nextSong.downloadLocation).exists() && !File(nextSong.streamDownloadLocation).exists()) {
-                                        addStreamDownloadSong(nextSong.songId)
-                                    }
-                                }
-
-                            } catch (e: IndexOutOfBoundsException) {
-
-                            }
                         }
-
+                    } else {
+                        playSong(context, song)
                     }
-
-                    waitForDownloadTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
                 } else {
                     //No permission to download
 
@@ -85,6 +54,17 @@ internal fun play() {
                         context,
                         context.getString(R.string.errorDownloadNotAllowedFallbackStream)
                     )
+                }
+
+                try {
+                    val nextSong = getSong(MonstercatPlayer.currentSong + 1)
+                    if (nextSong != null) {
+                        if (!File(nextSong.downloadLocation).exists() && !File(nextSong.streamDownloadLocation).exists()) {
+                            addStreamDownloadSong(nextSong.songId) {}
+                        }
+                    }
+                } catch (e: IndexOutOfBoundsException) {
+
                 }
 
             } else {

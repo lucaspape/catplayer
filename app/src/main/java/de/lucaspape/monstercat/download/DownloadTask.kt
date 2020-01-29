@@ -26,9 +26,11 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                     println("forbidden by user")
                 } else {
                     try {
+                        val currentStreamDownloadHashMap = streamDownloadList[streamDownloadedSongs]
+
                         val currentStreamDownloadSong = songDatabaseHelper.getSong(
                             context,
-                            streamDownloadList[streamDownloadedSongs]
+                            currentStreamDownloadHashMap["songId"] as String
                         )
 
                         currentStreamDownloadSong?.let {
@@ -48,6 +50,8 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                                             false.toString()
                                         )
                                     }
+
+                                    publishProgress("streamDownloadFinished", streamDownloadedSongs.toString())
                                 } else {
                                     publishProgress(
                                         "alreadyDownloadedError",
@@ -176,6 +180,15 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                         val listIndex = Integer.parseInt(it)
 
                         val downloadHashMap = downloadList[listIndex]
+                        val downloadFinished = downloadHashMap["downloadFinished"] as Executable
+                        downloadFinished.run()
+                    }
+                }
+                "streamDownloadFinished" -> {
+                    values[1]?.let {
+                        val listIndex = Integer.parseInt(it)
+
+                        val downloadHashMap = streamDownloadList[listIndex]
                         val downloadFinished = downloadHashMap["downloadFinished"] as Executable
                         downloadFinished.run()
                     }
