@@ -14,10 +14,10 @@ import java.io.FileOutputStream
 import java.lang.ref.SoftReference
 
 //this lists contain the urls that should be downloaded
-internal val downloadList = ArrayList<HashMap<String, Any?>>()
-internal val streamDownloadList = ArrayList<HashMap<String, Any?>>()
+internal val downloadList = ArrayList<SoftReference<HashMap<String, Any?>>>()
+internal val streamDownloadList = ArrayList<SoftReference<HashMap<String, Any?>>>()
 
-internal val targetList = ArrayList<com.squareup.picasso.Target>()
+internal val targetList = ArrayList<SoftReference<com.squareup.picasso.Target>>()
 internal val bitmapCache = HashMap<String, SoftReference<Bitmap?>>()
 
 fun addDownloadSong(songId: String, downloadFinished: () -> Unit) {
@@ -28,7 +28,7 @@ fun addDownloadSong(songId: String, downloadFinished: () -> Unit) {
         }
     }
     downloadHashMap["songId"] = songId
-    downloadList.add(downloadHashMap)
+    downloadList.add(SoftReference(downloadHashMap))
 }
 
 fun addStreamDownloadSong(songId: String, downloadFinished: () -> Unit) {
@@ -40,7 +40,7 @@ fun addStreamDownloadSong(songId: String, downloadFinished: () -> Unit) {
     }
     downloadHashMap["songId"] = songId
 
-    streamDownloadList.add(downloadHashMap)
+    streamDownloadList.add(SoftReference(downloadHashMap))
 }
 
 fun downloadCoverIntoImageView(
@@ -101,7 +101,7 @@ fun downloadCoverIntoImageView(
                 }
 
                 //to prevent garbage collect
-                targetList.add(picassoTarget)
+                targetList.add(SoftReference(picassoTarget))
 
                 Picasso.with(context)
                     .load("$url?image_width=$resolution")
@@ -167,7 +167,7 @@ fun downloadCoverIntoBitmap(
                 }
 
                 //prevent garbage collect
-                targetList.add(picassoTarget)
+                targetList.add(SoftReference(picassoTarget))
 
                 Picasso.with(context)
                     .load("$url?image_width=$resolution")

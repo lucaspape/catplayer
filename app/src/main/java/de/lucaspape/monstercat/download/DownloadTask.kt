@@ -26,47 +26,53 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                     println("forbidden by user")
                 } else {
                     try {
-                        val currentStreamDownloadHashMap = streamDownloadList[streamDownloadedSongs]
+                        streamDownloadList[streamDownloadedSongs].get()
+                            ?.let { currentStreamDownloadHashMap ->
+                                val currentStreamDownloadSong = songDatabaseHelper.getSong(
+                                    context,
+                                    currentStreamDownloadHashMap["songId"] as String
+                                )
 
-                        val currentStreamDownloadSong = songDatabaseHelper.getSong(
-                            context,
-                            currentStreamDownloadHashMap["songId"] as String
-                        )
+                                currentStreamDownloadSong?.let {
+                                    if (currentStreamDownloadSong.isDownloadable) {
+                                        if (!File(currentStreamDownloadSong.streamDownloadLocation).exists()) {
+                                            downloadFile(
+                                                currentStreamDownloadSong.streamDownloadLocation,
+                                                currentStreamDownloadSong.streamUrl,
+                                                context.cacheDir.toString(),
+                                                sid
+                                            ) { max, current ->
+                                                publishProgress(
+                                                    "progressUpdate",
+                                                    currentStreamDownloadSong.shownTitle,
+                                                    max.toString(),
+                                                    current.toString(),
+                                                    false.toString()
+                                                )
+                                            }
 
-                        currentStreamDownloadSong?.let {
-                            if (currentStreamDownloadSong.isDownloadable) {
-                                if (!File(currentStreamDownloadSong.streamDownloadLocation).exists()) {
-                                    downloadFile(
-                                        currentStreamDownloadSong.streamDownloadLocation,
-                                        currentStreamDownloadSong.streamUrl,
-                                        context.cacheDir.toString(),
-                                        sid
-                                    ) { max, current ->
+                                            publishProgress(
+                                                "streamDownloadFinished",
+                                                streamDownloadedSongs.toString()
+                                            )
+                                        } else {
+                                            publishProgress(
+                                                "alreadyDownloadedError",
+                                                currentStreamDownloadSong.shownTitle
+                                            )
+                                        }
+                                    } else {
                                         publishProgress(
-                                            "progressUpdate",
-                                            currentStreamDownloadSong.shownTitle,
-                                            max.toString(),
-                                            current.toString(),
-                                            false.toString()
+                                            "downloadNotAllowedError",
+                                            currentStreamDownloadSong.shownTitle
                                         )
                                     }
 
-                                    publishProgress("streamDownloadFinished", streamDownloadedSongs.toString())
-                                } else {
-                                    publishProgress(
-                                        "alreadyDownloadedError",
-                                        currentStreamDownloadSong.shownTitle
-                                    )
+                                    streamDownloadedSongs++
                                 }
-                            } else {
-                                publishProgress(
-                                    "downloadNotAllowedError",
-                                    currentStreamDownloadSong.shownTitle
-                                )
                             }
 
-                            streamDownloadedSongs++
-                        }
+
                     } catch (e: java.lang.IndexOutOfBoundsException) {
 
                     }
@@ -77,44 +83,52 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                     //TODO add msg
                 } else {
                     try {
-                        val downloadHashMap = downloadList[downloadedSongs]
+                        downloadList[downloadedSongs].get()?.let { downloadHashMap ->
+                            val currentDownloadSong =
+                                songDatabaseHelper.getSong(
+                                    context,
+                                    downloadHashMap["songId"] as String
+                                )
+                            currentDownloadSong?.let {
+                                if (currentDownloadSong.isDownloadable) {
+                                    if (!File(currentDownloadSong.downloadLocation).exists()) {
+                                        downloadFile(
+                                            currentDownloadSong.downloadLocation,
+                                            currentDownloadSong.downloadUrl,
+                                            context.cacheDir.toString(),
+                                            sid
+                                        ) { max, current ->
+                                            publishProgress(
+                                                "progressUpdate",
+                                                currentDownloadSong.shownTitle,
+                                                max.toString(),
+                                                current.toString(),
+                                                false.toString()
+                                            )
+                                        }
 
-                        val currentDownloadSong =
-                            songDatabaseHelper.getSong(context, downloadHashMap["songId"] as String)
-                        currentDownloadSong?.let {
-                            if (currentDownloadSong.isDownloadable) {
-                                if (!File(currentDownloadSong.downloadLocation).exists()) {
-                                    downloadFile(
-                                        currentDownloadSong.downloadLocation,
-                                        currentDownloadSong.downloadUrl,
-                                        context.cacheDir.toString(),
-                                        sid
-                                    ) { max, current ->
                                         publishProgress(
-                                            "progressUpdate",
-                                            currentDownloadSong.shownTitle,
-                                            max.toString(),
-                                            current.toString(),
-                                            false.toString()
+                                            "downloadFinished",
+                                            downloadedSongs.toString()
+                                        )
+                                    } else {
+                                        publishProgress(
+                                            "alreadyDownloadedError",
+                                            currentDownloadSong.shownTitle
                                         )
                                     }
-
-                                    publishProgress("downloadFinished", downloadedSongs.toString())
                                 } else {
                                     publishProgress(
-                                        "alreadyDownloadedError",
+                                        "downloadNotAllowedError",
                                         currentDownloadSong.shownTitle
                                     )
                                 }
-                            } else {
-                                publishProgress(
-                                    "downloadNotAllowedError",
-                                    currentDownloadSong.shownTitle
-                                )
-                            }
 
-                            downloadedSongs++
+                                downloadedSongs++
+                            }
                         }
+
+
                     } catch (e: java.lang.IndexOutOfBoundsException) {
 
                     }
@@ -137,10 +151,12 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                 "alreadyDownloadedError" -> {
                     val shownTitle = values[1]
 
-                    println(context.getString(
-                        R.string.alreadyDownloadedMsg,
-                        shownTitle
-                    ))
+                    println(
+                        context.getString(
+                            R.string.alreadyDownloadedMsg,
+                            shownTitle
+                        )
+                    )
                 }
                 "downloadNotAllowedError" -> {
                     val shownTitle = values[1]
@@ -179,18 +195,22 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                     values[1]?.let {
                         val listIndex = Integer.parseInt(it)
 
-                        val downloadHashMap = downloadList[listIndex]
-                        val downloadFinished = downloadHashMap["downloadFinished"] as Executable
-                        downloadFinished.run()
+                        downloadList[listIndex].get()?.let { downloadHashMap ->
+                            val downloadFinished = downloadHashMap["downloadFinished"] as Executable
+                            downloadFinished.run()
+                        }
+
                     }
                 }
                 "streamDownloadFinished" -> {
                     values[1]?.let {
                         val listIndex = Integer.parseInt(it)
 
-                        val downloadHashMap = streamDownloadList[listIndex]
-                        val downloadFinished = downloadHashMap["downloadFinished"] as Executable
-                        downloadFinished.run()
+                        streamDownloadList[listIndex].get()?.let { downloadHashMap ->
+                            val downloadFinished = downloadHashMap["downloadFinished"] as Executable
+                            downloadFinished.run()
+                        }
+
                     }
                 }
                 else -> throw Exception("Unknown type exception")
