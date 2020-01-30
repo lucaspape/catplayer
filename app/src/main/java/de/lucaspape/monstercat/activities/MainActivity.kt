@@ -248,7 +248,7 @@ class MainActivity : AppCompatActivity() {
         val settings = Settings(this)
 
         if (settings.getSetting("darkTheme") != null) {
-            if (settings.getSetting("darkTheme")!!.toBoolean()) {
+            if (settings.getSetting("darkTheme") == "true") {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
 
                 if (fallbackBlackFile.exists() && fallbackBlackFileLow.exists()) {
