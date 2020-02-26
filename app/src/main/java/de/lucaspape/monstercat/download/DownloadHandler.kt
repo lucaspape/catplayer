@@ -4,45 +4,46 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
+import android.os.AsyncTask
 import android.widget.ImageView
 import com.squareup.picasso.Picasso
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.background.BackgroundService
 import de.lucaspape.monstercat.util.Settings
 import de.lucaspape.monstercat.util.wifiConnected
 import java.io.File
 import java.io.FileOutputStream
 import java.lang.ref.SoftReference
+import java.lang.ref.WeakReference
 
 //TODO cancel downloads
 
 //this lists contain the urls that should be downloaded
-internal val downloadList = ArrayList<SoftReference<HashMap<String, Any?>>>()
-internal val streamDownloadList = ArrayList<SoftReference<HashMap<String, Any?>>>()
+internal val downloadList = ArrayList<SoftReference<DownloadObject>>()
+internal val streamDownloadList = ArrayList<SoftReference<DownloadObject>>()
+
+internal var downloadedSongs = 0
+internal var streamDownloadedSongs = 0
 
 internal val targetList = ArrayList<SoftReference<com.squareup.picasso.Target>>()
 internal val bitmapCache = HashMap<String, SoftReference<Bitmap?>>()
 
-fun addDownloadSong(songId: String, downloadFinished: () -> Unit) {
-    val downloadHashMap = HashMap<String, Any?>()
-    downloadHashMap["downloadFinished"] = object : Executable {
-        override fun run() {
-            downloadFinished()
-        }
+fun addDownloadSong(context: Context, songId: String, downloadFinished: () -> Unit) {
+    downloadList.add(SoftReference(DownloadObject(songId, downloadFinished)))
+
+    if (BackgroundService.downloadTask?.status != AsyncTask.Status.RUNNING) {
+        BackgroundService.downloadTask = DownloadTask(WeakReference(context))
+        BackgroundService.downloadTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
-    downloadHashMap["songId"] = songId
-    downloadList.add(SoftReference(downloadHashMap))
 }
 
-fun addStreamDownloadSong(songId: String, downloadFinished: () -> Unit) {
-    val downloadHashMap = HashMap<String, Any?>()
-    downloadHashMap["downloadFinished"] = object : Executable {
-        override fun run() {
-            downloadFinished()
-        }
-    }
-    downloadHashMap["songId"] = songId
+fun addStreamDownloadSong(context: Context, songId: String, downloadFinished: () -> Unit) {
+    streamDownloadList.add(SoftReference(DownloadObject(songId, downloadFinished)))
 
-    streamDownloadList.add(SoftReference(downloadHashMap))
+    if (BackgroundService.downloadTask?.status != AsyncTask.Status.RUNNING) {
+        BackgroundService.downloadTask = DownloadTask(WeakReference(context))
+        BackgroundService.downloadTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    }
 }
 
 fun downloadCoverIntoImageView(
@@ -180,8 +181,4 @@ fun downloadCoverIntoBitmap(
             }
         }
     }
-}
-
-interface Executable {
-    fun run()
 }

@@ -156,7 +156,7 @@ internal fun downloadPlaylist(context: Context, playlistId: String, downloadFini
             val songDatabaseHelper = SongDatabaseHelper(context)
             val song = songDatabaseHelper.getSong(context, playlistItem.songId)
 
-            song?.songId?.let { addDownloadSong(it, downloadFinished) }
+            song?.songId?.let { addDownloadSong(context, it, downloadFinished) }
         }
     }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }
@@ -214,7 +214,7 @@ internal fun downloadAlbum(context: Context, mcID: String) {
 
             for (id in idArray) {
                 val song = databaseHelper.getSong(context, id)
-                song?.songId?.let { addDownloadSong(it, {}) }
+                song?.songId?.let { addDownloadSong(context, it, {}) }
             }
         },
         Response.ErrorListener {

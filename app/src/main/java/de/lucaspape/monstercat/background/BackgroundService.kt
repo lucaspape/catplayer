@@ -2,13 +2,11 @@ package de.lucaspape.monstercat.background
 
 import android.app.Service
 import android.content.Intent
-import android.os.AsyncTask
 import android.os.IBinder
 import de.lucaspape.monstercat.download.DownloadTask
 import de.lucaspape.monstercat.download.hideDownloadNotification
 import de.lucaspape.monstercat.handlers.async.BackgroundAsync
 import de.lucaspape.monstercat.music.StreamInfoUpdateAsync
-import java.lang.ref.WeakReference
 
 class BackgroundService : Service() {
     companion object {
@@ -27,9 +25,6 @@ class BackgroundService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        downloadTask = DownloadTask(WeakReference(applicationContext))
-        downloadTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-
         serviceRunning = true
 
         return START_STICKY

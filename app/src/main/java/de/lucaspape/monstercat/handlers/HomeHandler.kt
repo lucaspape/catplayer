@@ -178,7 +178,7 @@ class HomeHandler {
                             titleDownloadButton.setImageURI(song.getSongDownloadStatus().toUri())
                         }
                         else -> {
-                            addDownloadSong(item.songId) {titleDownloadButton.setImageURI(song.getSongDownloadStatus().toUri())}
+                            addDownloadSong(v.context, item.songId) {titleDownloadButton.setImageURI(song.getSongDownloadStatus().toUri())}
                         }
                     }
                 }
@@ -319,7 +319,7 @@ class HomeHandler {
 
                 if (song != null) {
                     when (item) {
-                        context.getString(R.string.download) -> addDownloadSong(song.songId, {})
+                        context.getString(R.string.download) -> addDownloadSong(context, song.songId, {})
                         context.getString(R.string.playNext) -> playSongFromId(
                             id,
                             false

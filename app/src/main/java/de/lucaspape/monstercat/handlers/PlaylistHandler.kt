@@ -148,7 +148,7 @@ class PlaylistHandler {
                             titleDownloadButton.setImageURI(song.getSongDownloadStatus().toUri())
                         }
                         else -> {
-                            addDownloadSong(item.songId) { titleDownloadButton.setImageURI(song.getSongDownloadStatus().toUri()) }
+                            addDownloadSong(v.context, item.songId) { titleDownloadButton.setImageURI(song.getSongDownloadStatus().toUri()) }
                         }
                     }
                 }
@@ -298,7 +298,7 @@ class PlaylistHandler {
                                 songDatabaseHelper.getSong(view.context, id)
 
                             if (song != null) {
-                                addDownloadSong(song.songId, {})
+                                addDownloadSong(view.context, song.songId, {})
                             }
                         }
                     }

@@ -15,22 +15,21 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
 
     override fun doInBackground(vararg p0: Void?): String? {
         weakReference.get()?.let { context ->
-            var downloadedSongs = 0
-            var streamDownloadedSongs = 0
-
             val settings = Settings(context)
             val songDatabaseHelper = SongDatabaseHelper(context)
 
-            while (true) {
+            var failedDownloads = 0
+
+            while (failedDownloads <= 10) {
                 if (wifiConnected(context) == false && settings.getSetting("downloadOverMobile") != "true") {
                     println("forbidden by user")
                 } else {
                     try {
                         streamDownloadList[streamDownloadedSongs].get()
-                            ?.let { currentStreamDownloadHashMap ->
+                            ?.let { currentDownloadObject ->
                                 val currentStreamDownloadSong = songDatabaseHelper.getSong(
                                     context,
-                                    currentStreamDownloadHashMap["songId"] as String
+                                    currentDownloadObject.songId
                                 )
 
                                 currentStreamDownloadSong?.let {
@@ -74,7 +73,8 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
 
 
                     } catch (e: java.lang.IndexOutOfBoundsException) {
-
+                        failedDownloads++
+                        hideDownloadNotification(context)
                     }
                 }
 
@@ -83,11 +83,11 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                     //TODO add msg
                 } else {
                     try {
-                        downloadList[downloadedSongs].get()?.let { downloadHashMap ->
+                        downloadList[downloadedSongs].get()?.let { currentDownloadObject ->
                             val currentDownloadSong =
                                 songDatabaseHelper.getSong(
                                     context,
-                                    downloadHashMap["songId"] as String
+                                    currentDownloadObject.songId
                                 )
                             currentDownloadSong?.let {
                                 if (currentDownloadSong.isDownloadable) {
@@ -130,13 +130,12 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
 
 
                     } catch (e: java.lang.IndexOutOfBoundsException) {
-
+                        failedDownloads++
+                        hideDownloadNotification(context)
                     }
                 }
 
-                hideDownloadNotification(context)
-
-                Thread.sleep(100)
+                Thread.sleep(10)
             }
         }
 
@@ -195,9 +194,8 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                     values[1]?.let {
                         val listIndex = Integer.parseInt(it)
 
-                        downloadList[listIndex].get()?.let { downloadHashMap ->
-                            val downloadFinished = downloadHashMap["downloadFinished"] as Executable
-                            downloadFinished.run()
+                        downloadList[listIndex].get()?.let { downloadObject ->
+                            downloadObject.downloadFinished()
                         }
 
                     }
@@ -206,9 +204,8 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                     values[1]?.let {
                         val listIndex = Integer.parseInt(it)
 
-                        streamDownloadList[listIndex].get()?.let { downloadHashMap ->
-                            val downloadFinished = downloadHashMap["downloadFinished"] as Executable
-                            downloadFinished.run()
+                        streamDownloadList[listIndex].get()?.let { downloadObject ->
+                            downloadObject.downloadFinished()
                         }
 
                     }

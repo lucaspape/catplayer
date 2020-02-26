@@ -40,7 +40,7 @@ internal fun play() {
             if (downloadStream == true) {
                 if (song.isDownloadable) {
                     if (!File(song.downloadLocation).exists() && !File(song.streamDownloadLocation).exists()) {
-                        addStreamDownloadSong(song.songId) {
+                        addStreamDownloadSong(context, song.songId) {
                             playSong(context, song)
                         }
                     } else {
@@ -60,7 +60,7 @@ internal fun play() {
                     val nextSong = getSong(MonstercatPlayer.currentSong + 1)
                     if (nextSong != null) {
                         if (!File(nextSong.downloadLocation).exists() && !File(nextSong.streamDownloadLocation).exists()) {
-                            addStreamDownloadSong(nextSong.songId) {}
+                            addStreamDownloadSong(context, nextSong.songId) {}
                         }
                     }
                 } catch (e: IndexOutOfBoundsException) {
