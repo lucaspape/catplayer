@@ -2,8 +2,10 @@ package de.lucaspape.monstercat.handlers
 
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
 import android.os.AsyncTask
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.EditText
 import com.android.volley.Response
 import com.android.volley.Request
@@ -316,4 +318,51 @@ internal fun deletePlaylistSong(
             DeletePlaylistTrackAsync(WeakReference(context), song, playlistId, songDeleteIndex)
         deletePlaylistTrackAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
+}
+
+internal fun shareAlbum(context:Context, albumMcId:String){
+    val volleyRequestQueue = Volley.newRequestQueue(context)
+
+    val albumLinksRequest = AuthorizedRequest(Request.Method.GET, context.getString(R.string.loadAlbumSongsUrl) + "/$albumMcId", sid,
+        Response.Listener { response->
+            val responseJsonObject = JSONObject(response)
+            val releaseObject = responseJsonObject.getJSONObject("release")
+            val linksArray = releaseObject.getJSONArray("links")
+
+            if(linksArray.length() > 0){
+                val titles = arrayOfNulls<String>(linksArray.length())
+                val urls = arrayOfNulls<String>(linksArray.length())
+
+                for(i in (0 until linksArray.length())){
+                    val linkObject = linksArray.getJSONObject(i)
+
+                    titles[i] = linkObject.getString("platform")
+                    urls[i] = linkObject.getString("original")
+                }
+
+                val alertDialogBuilder = AlertDialog.Builder(context)
+                alertDialogBuilder.setTitle(context.getString(R.string.pickLinkToShare))
+                alertDialogBuilder.setItems(titles) { _, i ->
+                    urls[i]?.let { url ->
+                        val sendIntent = Intent().apply{
+                            action = Intent.ACTION_SEND
+                            putExtra(Intent.EXTRA_TEXT,url)
+                            type = "text/plain"
+                        }
+
+                        val shareIntent = Intent.createChooser(sendIntent, null)
+                        context.startActivity(shareIntent)
+                    }
+
+                }
+                alertDialogBuilder.show()
+            }else{
+                displayInfo(context, context.getString(R.string.albumHasNoLinksMsg))
+            }
+        },
+        Response.ErrorListener {
+            displayInfo(context, context.getString(R.string.errorRetrieveAlbumData))
+        })
+
+    volleyRequestQueue.add(albumLinksRequest)
 }

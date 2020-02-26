@@ -301,7 +301,8 @@ class HomeHandler {
         } else {
             arrayOf(
                 view.context.getString(R.string.downloadAlbum),
-                view.context.getString(R.string.playAlbumNext)
+                view.context.getString(R.string.playAlbumNext),
+                view.context.getString(R.string.shareAlbum)
             )
         }
 
@@ -339,6 +340,7 @@ class HomeHandler {
                             context,
                             id
                         )
+                        context.getString(R.string.shareAlbum) -> shareAlbum(context, id)
                     }
                 }
             }
