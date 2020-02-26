@@ -131,7 +131,7 @@ private fun playSong(context: Context, song: Song) {
 
                 //UI stuff
                 setTitle(song.title, song.version, song.artist)
-                startTextAnimation()
+
                 setCover(context, song.title, song.version, song.artist, song.albumId) {
                     setPlayButtonImage(context)
                     startSeekBarUpdate()
@@ -197,7 +197,7 @@ fun playStream(stream: Stream) {
 
                 //UI stuff
                 setTitle(stream.title, stream.version, stream.artist)
-                startTextAnimation()
+
                 setPlayButtonImage(context)
                 startSeekBarUpdate()
 

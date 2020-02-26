@@ -13,7 +13,7 @@
         android:layout_marginTop="64dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        app:layout_constraintBottom_toTopOf="@+id/fullscreenSongCurrent1"
+        app:layout_constraintBottom_toTopOf="@+id/fullscreenTitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.492"
         app:layout_constraintStart_toStartOf="parent"
@@ -82,19 +82,20 @@
         android:contentDescription="@string/shuffle" />
 
     <TextView
-        android:id="@+id/fullscreenSongCurrent1"
+        android:id="@+id/fullscreenTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
+        android:layout_marginStart="10dp"
         android:maxLines="1"
-        app:layout_constraintBottom_toTopOf="@+id/fullscreenSeekBar"
+        app:layout_constraintBottom_toTopOf="@+id/fullscreenArtist"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
-        android:id="@+id/fullscreenSongCurrent2"
+        android:id="@+id/fullscreenArtist"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
         android:layout_marginBottom="20dp"
         android:maxLines="1"
         app:layout_constraintBottom_toTopOf="@+id/fullscreenSeekBar"

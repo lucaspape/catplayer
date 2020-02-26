@@ -54,9 +54,9 @@ fun downloadCoverIntoImageView(
 ) {
     val settings = Settings(context)
     val resolution = if (!lowRes) {
-        settings.getSetting("primaryResolution")
+        settings.getSetting("primaryCoverResolution")
     } else {
-        settings.getSetting("secondaryResolution")
+        settings.getSetting("secondaryCoverResolution")
     }
 
     val cacheBitmap = bitmapCache[albumId + resolution]?.get()
@@ -126,9 +126,9 @@ fun downloadCoverIntoBitmap(
     val settings = Settings(context)
 
     val resolution = if (!lowRes) {
-        settings.getSetting("primaryResolution")
+        settings.getSetting("primaryCoverResolution")
     } else {
-        settings.getSetting("secondaryResolution")
+        settings.getSetting("secondaryCoverResolution")
     }
 
     val cacheBitmap = bitmapCache[albumId + resolution]?.get()

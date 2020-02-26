@@ -145,7 +145,7 @@ class SettingsActivity : AppCompatActivity() {
                         settings.saveSetting("primaryCoverResolution", (progress * 256).toString())
                         settings.saveSetting(
                             "secondaryCoverResolution",
-                            (((progress) * 256) / 10).toString()
+                            (((progress) * 256) / 4).toString()
                         )
                     } else {
                         settings.saveSetting("primaryCoverResolution", (128).toString())

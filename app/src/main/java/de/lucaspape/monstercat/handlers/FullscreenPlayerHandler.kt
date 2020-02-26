@@ -8,15 +8,15 @@ import java.lang.ref.WeakReference
 
 class FullscreenPlayerHandler {
     fun setupMusicPlayer(view: View) {
-        val textView1 = view.findViewById<TextView>(R.id.fullscreenSongCurrent1)
-        val textView2 = view.findViewById<TextView>(R.id.fullscreenSongCurrent2)
+        val titleTextView = view.findViewById<TextView>(R.id.fullscreenTitle)
+        val artistTextView = view.findViewById<TextView>(R.id.fullscreenArtist)
         val coverBarImageView = view.findViewById<ImageView>(R.id.fullscreenAlbumImage)
         val playButton = view.findViewById<ImageButton>(R.id.fullScreenPlay)
         val seekBar = view.findViewById<SeekBar>(R.id.fullscreenSeekBar)
 
         //setup musicPlayer
-        fullscreenTextView1Reference = WeakReference(textView1)
-        fullscreenTextView2Reference = WeakReference(textView2)
+        fullscreenTitleReference = WeakReference(titleTextView)
+        fullscreenArtistReference = WeakReference(artistTextView)
         fullscreenSeekBarReference = WeakReference(seekBar)
         fullscreenCoverReference = WeakReference(coverBarImageView)
         fullscreenPlayButtonReference = WeakReference(playButton)

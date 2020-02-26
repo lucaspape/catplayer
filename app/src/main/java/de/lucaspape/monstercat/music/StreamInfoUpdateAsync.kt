@@ -55,7 +55,6 @@ class StreamInfoUpdateAsync(
             }
 
             setTitle(liveTitle, liveVersion, liveArtist)
-            startTextAnimation()
         }
     }
 

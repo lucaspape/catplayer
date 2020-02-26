@@ -1,6 +1,5 @@
 package de.lucaspape.monstercat.music
 
-import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
@@ -9,8 +8,6 @@ import android.media.session.PlaybackState
 import android.os.Handler
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import android.view.animation.Animation
-import android.view.animation.LinearInterpolator
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.SeekBar
@@ -24,6 +21,10 @@ import de.lucaspape.monstercat.music.MonstercatPlayer.Companion.mediaPlayer
 import de.lucaspape.monstercat.music.MonstercatPlayer.Companion.mediaSession
 import java.lang.ref.WeakReference
 import java.util.*
+
+private var title = ""
+private var version = ""
+private var artist = ""
 
 var textViewReference: WeakReference<TextView>? = null
     set(newTextView) {
@@ -84,16 +85,27 @@ var playButtonReference: WeakReference<ImageButton>? = null
         field = newPlayButton
     }
 
-var fullscreenTextView1Reference: WeakReference<TextView>? = null
-    set(newTextView1) {
-        newTextView1?.get()?.text = textViewReference?.get()?.text
-        field = newTextView1
+var fullscreenTitleReference: WeakReference<TextView>? = null
+    set(newTitleTextView) {
+        if(fullscreenTitleReference != null){
+            newTitleTextView?.get()?.text = fullscreenTitleReference?.get()?.text
+        }else{
+            val shownTitle = "$title $version"
+            newTitleTextView?.get()?.text = shownTitle
+        }
+
+        field = newTitleTextView
     }
 
-var fullscreenTextView2Reference: WeakReference<TextView>? = null
-    set(newTextView2) {
-        newTextView2?.get()?.text = textViewReference?.get()?.text
-        field = newTextView2
+var fullscreenArtistReference: WeakReference<TextView>? = null
+    set(newArtistTextView) {
+        if(fullscreenArtistReference != null){
+            newArtistTextView?.get()?.text = fullscreenArtistReference?.get()?.text
+        }else{
+            newArtistTextView?.get()?.text = artist
+        }
+
+        field = newArtistTextView
     }
 
 var fullscreenSeekBarReference: WeakReference<SeekBar>? = null
@@ -148,47 +160,33 @@ var fullscreenPlayButtonReference: WeakReference<ImageButton>? = null
         }
     }
 
-internal fun setTitle(title: String, version: String, artist: String) {
+internal fun setTitle(newTitle: String, newVersion: String, newArtist: String) {
+    title = newTitle
+    version = newVersion
+    artist = newArtist
 
-    val text = "$title $version - $artist"
+    val fullText = "$title $version - $artist"
+    val shownTitle = "$title $version"
 
-    textViewReference?.get()?.text = text
+    textViewReference?.get()?.text = fullText
 
-    fullscreenTextView1Reference?.get()?.text = text
+    fullscreenTitleReference?.get()?.text = shownTitle
 
-    fullscreenTextView2Reference?.get()?.text = text
+    fullscreenArtistReference?.get()?.text = artist
 }
 
 internal fun hideTitle() {
+    title = ""
+    version = ""
+    artist = ""
+
     val text = ""
 
     textViewReference?.get()?.text = text
 
-    fullscreenTextView1Reference?.get()?.text = text
+    fullscreenTitleReference?.get()?.text = text
 
-    fullscreenTextView2Reference?.get()?.text = text
-}
-
-internal fun startTextAnimation() {
-    val valueAnimator = ValueAnimator.ofFloat(0.0f, 1.0f)
-    valueAnimator.repeatCount = Animation.INFINITE
-    valueAnimator.interpolator = LinearInterpolator()
-    valueAnimator.duration = 9000L
-    valueAnimator.addUpdateListener { animation ->
-        val progress = animation.animatedValue as Float
-
-        var width = 0
-
-        fullscreenTextView1Reference?.get()?.width?.let { width = it }
-
-        val translationX = width * progress
-
-        fullscreenTextView1Reference?.get()?.translationX = translationX
-
-        fullscreenTextView2Reference?.get()?.translationX = translationX - width
-    }
-
-    valueAnimator.start()
+    fullscreenArtistReference?.get()?.text = text
 }
 
 private var currentSeekbarHandlerId = ""
@@ -253,9 +251,8 @@ internal fun setCover(
     albumId: String,
     callback: (bitmap: Bitmap) -> Unit
 ) {
-
     barCoverImageReference?.get()?.let {
-        downloadCoverIntoImageView(context, it, albumId, true)
+        downloadCoverIntoImageView(context, it, albumId, false)
     }
 
     fullscreenCoverReference?.get()?.let {
