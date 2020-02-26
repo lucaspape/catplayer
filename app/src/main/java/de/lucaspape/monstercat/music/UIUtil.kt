@@ -23,6 +23,7 @@ import de.lucaspape.monstercat.music.MonstercatPlayer.Companion.contextReference
 import de.lucaspape.monstercat.music.MonstercatPlayer.Companion.mediaPlayer
 import de.lucaspape.monstercat.music.MonstercatPlayer.Companion.mediaSession
 import java.lang.ref.WeakReference
+import java.util.*
 
 var textViewReference: WeakReference<TextView>? = null
     set(newTextView) {
@@ -190,9 +191,14 @@ internal fun startTextAnimation() {
     valueAnimator.start()
 }
 
+private var currentSeekbarHandlerId = ""
+
 @SuppressLint("ClickableViewAccessibility")
 internal fun startSeekBarUpdate() {
     val seekBarUpdateHandler = Handler()
+
+    val id = UUID.randomUUID().toString()
+    currentSeekbarHandlerId = id
 
     val updateSeekBar = object : Runnable {
         override fun run() {
@@ -208,7 +214,9 @@ internal fun startSeekBarUpdate() {
 
             mediaPlayer?.currentPosition?.let { setPlayerState(it) }
 
-            seekBarUpdateHandler.postDelayed(this, 50)
+            if(currentSeekbarHandlerId == id){
+                seekBarUpdateHandler.postDelayed(this, 50)
+            }
         }
     }
 
