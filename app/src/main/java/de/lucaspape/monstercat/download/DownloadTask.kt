@@ -73,65 +73,57 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
 
 
                     } catch (e: java.lang.IndexOutOfBoundsException) {
-                        failedDownloads++
-                        hideDownloadNotification(context)
-                    }
-                }
+                        try {
+                            downloadList[downloadedSongs].get()?.let { currentDownloadObject ->
+                                val currentDownloadSong =
+                                    songDatabaseHelper.getSong(
+                                        context,
+                                        currentDownloadObject.songId
+                                    )
+                                currentDownloadSong?.let {
+                                    if (currentDownloadSong.isDownloadable) {
+                                        if (!File(currentDownloadSong.downloadLocation).exists()) {
+                                            downloadFile(
+                                                currentDownloadSong.downloadLocation,
+                                                currentDownloadSong.downloadUrl,
+                                                context.cacheDir.toString(),
+                                                sid
+                                            ) { max, current ->
+                                                publishProgress(
+                                                    "progressUpdate",
+                                                    currentDownloadSong.shownTitle,
+                                                    max.toString(),
+                                                    current.toString(),
+                                                    false.toString()
+                                                )
+                                            }
 
-                if (wifiConnected(context) == false && settings.getSetting("downloadOverMobile") != "true") {
-                    println("forbidden by user")
-                    //TODO add msg
-                } else {
-                    try {
-                        downloadList[downloadedSongs].get()?.let { currentDownloadObject ->
-                            val currentDownloadSong =
-                                songDatabaseHelper.getSong(
-                                    context,
-                                    currentDownloadObject.songId
-                                )
-                            currentDownloadSong?.let {
-                                if (currentDownloadSong.isDownloadable) {
-                                    if (!File(currentDownloadSong.downloadLocation).exists()) {
-                                        downloadFile(
-                                            currentDownloadSong.downloadLocation,
-                                            currentDownloadSong.downloadUrl,
-                                            context.cacheDir.toString(),
-                                            sid
-                                        ) { max, current ->
                                             publishProgress(
-                                                "progressUpdate",
-                                                currentDownloadSong.shownTitle,
-                                                max.toString(),
-                                                current.toString(),
-                                                false.toString()
+                                                "downloadFinished",
+                                                downloadedSongs.toString()
+                                            )
+                                        } else {
+                                            publishProgress(
+                                                "alreadyDownloadedError",
+                                                currentDownloadSong.shownTitle
                                             )
                                         }
-
-                                        publishProgress(
-                                            "downloadFinished",
-                                            downloadedSongs.toString()
-                                        )
                                     } else {
                                         publishProgress(
-                                            "alreadyDownloadedError",
+                                            "downloadNotAllowedError",
                                             currentDownloadSong.shownTitle
                                         )
                                     }
-                                } else {
-                                    publishProgress(
-                                        "downloadNotAllowedError",
-                                        currentDownloadSong.shownTitle
-                                    )
+
+                                    downloadedSongs++
                                 }
-
-                                downloadedSongs++
                             }
+
+
+                        } catch (e: java.lang.IndexOutOfBoundsException) {
+                            failedDownloads++
+                            hideDownloadNotification(context)
                         }
-
-
-                    } catch (e: java.lang.IndexOutOfBoundsException) {
-                        failedDownloads++
-                        hideDownloadNotification(context)
                     }
                 }
 
