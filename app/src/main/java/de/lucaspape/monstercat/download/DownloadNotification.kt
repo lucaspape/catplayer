@@ -2,11 +2,14 @@ package de.lucaspape.monstercat.download
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.activities.MainActivity
 
 //notification var
 private const val channelID = "Download Notification"
@@ -21,11 +24,15 @@ internal fun showDownloadNotification(
 ) {
     createDownloadNotificationChannel(context)
 
+    val openActivityIntent = Intent(context, MainActivity::class.java)
+    val openActivityPendingIntent = PendingIntent.getActivity(context, 0, openActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+
     val notificationBuilder = NotificationCompat.Builder(context, channelID)
     notificationBuilder.setContentTitle(shownTitle)
-    notificationBuilder.setSmallIcon(R.drawable.ic_play_circle_filled_black_24dp)
+    notificationBuilder.setSmallIcon(R.drawable.ic_file_download_black_24dp)
     notificationBuilder.priority = NotificationCompat.PRIORITY_LOW
     notificationBuilder.setOngoing(true)
+    notificationBuilder.setContentIntent(openActivityPendingIntent)
 
     notificationBuilder.setProgress(max, progress, indeterminate)
 

@@ -6,10 +6,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.activities.MainActivity
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.MonstercatPlayer.Companion.contextReference
 import de.lucaspape.monstercat.music.MonstercatPlayer.Companion.mediaPlayer
@@ -110,14 +112,18 @@ internal fun createPlayerNotification(
             CLOSE_ACTION, closePendingIntent
         ).build()
 
+        val openActivityIntent = Intent(context, MainActivity::class.java)
+        val openActivityPendingIntent = PendingIntent.getActivity(context, 0, openActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+
         notificationBuilder
             .setShowWhen(false)
             .setStyle(notificationStyle)
-            .setSmallIcon(R.drawable.ic_play_arrow_black_24dp)
+            .setSmallIcon(R.drawable.ic_icon)
             .setLargeIcon(bitmap)
             .setColor(Color.LTGRAY)
             .setContentTitle("$title $version")
             .setContentText(artist)
+            .setContentIntent(openActivityPendingIntent)
             .addAction(prevAction)
             .addAction(playPauseAction)
             .addAction(nextAction)
