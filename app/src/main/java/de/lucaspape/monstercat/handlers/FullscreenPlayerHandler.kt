@@ -1,8 +1,12 @@
 package de.lucaspape.monstercat.handlers
 
+import android.content.Context
+import android.content.Intent
 import android.view.View
 import android.widget.*
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.activities.MainActivity
+import de.lucaspape.monstercat.activities.SettingsActivity
 import de.lucaspape.monstercat.music.*
 import java.lang.ref.WeakReference
 
@@ -90,5 +94,4 @@ class FullscreenPlayerHandler {
             }
         }
     }
-
 }

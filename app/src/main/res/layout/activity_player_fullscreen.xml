@@ -87,6 +87,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:maxLines="1"
+        android:textSize="24sp"
         app:layout_constraintBottom_toTopOf="@+id/fullscreenArtist"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -96,8 +97,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="30dp"
         android:maxLines="1"
+        android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/fullscreenSeekBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

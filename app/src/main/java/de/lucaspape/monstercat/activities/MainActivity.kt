@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity() {
         BottomNavigationView.OnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_home -> {
-                    openFragment(HomeFragment.newInstance())
+                    openFragment(HomeFragment.newInstance(""))
 
                     return@OnNavigationItemSelectedListener true
                 }
@@ -121,8 +121,17 @@ class MainActivity : AppCompatActivity() {
             HomeHandler.albumViewSelected = settings.getSetting("albumView") == true.toString()
         }
 
-        //open the home fragment
-        openFragment(HomeFragment.newInstance())
+        val intentExtras = intent.extras
+
+
+        if(intentExtras != null){
+            if(intentExtras["search"] != null){
+                //open the home fragment
+                openFragment(HomeFragment.newInstance(intentExtras["search"] as String))
+            }
+        }else{
+            openFragment(HomeFragment.newInstance(""))
+        }
 
         setContentView(R.layout.activity_main)
 

@@ -673,6 +673,12 @@ class HomeHandler {
      * Search for string TODO load more
      */
     fun searchSong(view: View, searchString: String) {
+        //search can also be performed without this view
+        val search = view.findViewById<SearchView>(R.id.homeSearch)
+        search.onActionViewExpanded()
+        search.setQuery(searchString, false)
+        search.clearFocus()
+
         searchResults = ArrayList()
 
         val contextReference = WeakReference<Context>(view.context)
