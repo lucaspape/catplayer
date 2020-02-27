@@ -82,4 +82,6 @@
     <string name="shareAlbum">Share album...</string>
     <string name="contextMenu">Context menu</string>
     <string name="twoFaCode">2FA code</string>
+    <string name="openAlbumInApp">Open album in app...</string>
+    <string name="pickApp">Pick app:</string>
 </resources>

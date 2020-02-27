@@ -280,7 +280,8 @@ class PlaylistHandler {
                 view.context.getString(R.string.download),
                 view.context.getString(R.string.playNext),
                 view.context.getString(R.string.delete),
-                view.context.getString(R.string.shareAlbum))
+                view.context.getString(R.string.shareAlbum),
+                view.context.getString(R.string.openAlbumInApp))
         }
 
         val alertDialogBuilder = AlertDialog.Builder(view.context)
@@ -355,7 +356,22 @@ class PlaylistHandler {
                                 songDatabaseHelper.getSong(view.context, id)
 
                             if (song != null) {
-                                shareAlbum(context, song.mcAlbumId)
+                                openAlbum(context, song.mcAlbumId, true)
+                            }
+                        }
+                    }
+                } else if(item == view.context.getString(R.string.openAlbumInApp)){
+                    if(isPlaylist){
+                        displayInfo(context, "Sharing playlist currently not implemented.")
+                    }else{
+                        view.let { view ->
+                            val songDatabaseHelper =
+                                SongDatabaseHelper(view.context)
+                            val song =
+                                songDatabaseHelper.getSong(view.context, id)
+
+                            if (song != null) {
+                                openAlbum(context, song.mcAlbumId, false)
                             }
                         }
                     }

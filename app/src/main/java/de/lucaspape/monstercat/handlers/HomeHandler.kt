@@ -296,13 +296,15 @@ class HomeHandler {
                 view.context.getString(R.string.download),
                 view.context.getString(R.string.playNext),
                 view.context.getString(R.string.addToPlaylist),
-                view.context.getString(R.string.shareAlbum)
+                view.context.getString(R.string.shareAlbum),
+                view.context.getString(R.string.openAlbumInApp)
             )
         } else {
             arrayOf(
                 view.context.getString(R.string.downloadAlbum),
                 view.context.getString(R.string.playAlbumNext),
-                view.context.getString(R.string.shareAlbum)
+                view.context.getString(R.string.shareAlbum),
+                view.context.getString(R.string.openAlbumInApp)
             )
         }
 
@@ -320,7 +322,7 @@ class HomeHandler {
 
                 if (song != null) {
                     when (item) {
-                        context.getString(R.string.download) -> addDownloadSong(context, song.songId, {})
+                        context.getString(R.string.download) -> addDownloadSong(context, song.songId) {}
                         context.getString(R.string.playNext) -> playSongFromId(
                             id,
                             false
@@ -329,7 +331,8 @@ class HomeHandler {
                             context,
                             song
                         )
-                        view.context.getString(R.string.shareAlbum) -> shareAlbum(context, song.mcAlbumId)
+                        context.getString(R.string.shareAlbum) -> openAlbum(context, song.mcAlbumId, true)
+                        context.getString(R.string.openAlbumInApp) -> openAlbum(context, song.mcAlbumId, false)
                     }
                 } else {
                     when (item) {
@@ -341,7 +344,8 @@ class HomeHandler {
                             context,
                             id
                         )
-                        context.getString(R.string.shareAlbum) -> shareAlbum(context, id)
+                        context.getString(R.string.shareAlbum) -> openAlbum(context, id, true)
+                        context.getString(R.string.openAlbumInApp) -> openAlbum(context, id, false)
                     }
                 }
             }

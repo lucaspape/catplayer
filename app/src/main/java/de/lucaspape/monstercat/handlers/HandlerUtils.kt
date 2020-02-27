@@ -4,25 +4,27 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.net.Uri
 import android.os.AsyncTask
 import android.util.TypedValue
 import android.view.LayoutInflater
-import android.view.View
 import android.widget.EditText
-import com.android.volley.Response
 import com.android.volley.Request
+import com.android.volley.Response
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.activities.monstercatPlayer
 import de.lucaspape.monstercat.background.BackgroundService.Companion.loadContinuousSongListAsyncTask
-import de.lucaspape.monstercat.database.*
+import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.handlers.async.*
 import de.lucaspape.monstercat.request.AuthorizedRequest
-import de.lucaspape.monstercat.util.*
+import de.lucaspape.monstercat.util.displayInfo
+import de.lucaspape.monstercat.util.parseSongToDB
+import de.lucaspape.monstercat.util.sid
 import org.json.JSONObject
 import java.io.File
 import java.lang.ref.WeakReference
@@ -230,7 +232,7 @@ internal fun downloadAlbum(context: Context, mcID: String) {
 
             for (id in idArray) {
                 val song = databaseHelper.getSong(context, id)
-                song?.songId?.let { addDownloadSong(context, it, {}) }
+                song?.songId?.let { addDownloadSong(context, it) {} }
             }
         },
         Response.ErrorListener {
@@ -354,7 +356,7 @@ internal fun deletePlaylistSong(
     }
 }
 
-internal fun shareAlbum(context:Context, albumMcId:String){
+internal fun openAlbum(context:Context, albumMcId:String, share:Boolean){
     val volleyRequestQueue = Volley.newRequestQueue(context)
 
     val albumLinksRequest = AuthorizedRequest(Request.Method.GET, context.getString(R.string.loadAlbumSongsUrl) + "/$albumMcId", sid,
@@ -375,17 +377,27 @@ internal fun shareAlbum(context:Context, albumMcId:String){
                 }
 
                 val alertDialogBuilder = AlertDialog.Builder(context)
-                alertDialogBuilder.setTitle(context.getString(R.string.pickLinkToShare))
+
+                if(share){
+                    alertDialogBuilder.setTitle(context.getString(R.string.pickLinkToShare))
+                }else{
+                    alertDialogBuilder.setTitle(context.getString(R.string.pickApp))
+                }
+
                 alertDialogBuilder.setItems(titles) { _, i ->
                     urls[i]?.let { url ->
-                        val sendIntent = Intent().apply{
-                            action = Intent.ACTION_SEND
-                            putExtra(Intent.EXTRA_TEXT,url)
-                            type = "text/plain"
-                        }
+                        if(share){
+                            val sendIntent = Intent().apply{
+                                action = Intent.ACTION_SEND
+                                putExtra(Intent.EXTRA_TEXT,url)
+                                type = "text/plain"
+                            }
 
-                        val shareIntent = Intent.createChooser(sendIntent, null)
-                        context.startActivity(shareIntent)
+                            val shareIntent = Intent.createChooser(sendIntent, null)
+                            context.startActivity(shareIntent)
+                        }else{
+                            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                        }
                     }
 
                 }
