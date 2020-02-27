@@ -42,7 +42,7 @@ class PlaylistDatabaseHelper(context: Context) :
         }
 
         val db = writableDatabase
-        
+
         db?.execSQL("DROP TABLE IF EXISTS " + Playlist.TABLE_NAME)
         onCreate(db)
     }
