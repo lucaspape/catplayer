@@ -9,15 +9,10 @@ import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.AlbumDatabaseHelper
-import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
-import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.download.downloadCoverIntoImageView
-import de.lucaspape.monstercat.handlers.*
-import de.lucaspape.monstercat.handlers.addSongToPlaylist
 import de.lucaspape.monstercat.handlers.downloadAlbum
 import de.lucaspape.monstercat.handlers.openAlbum
 import de.lucaspape.monstercat.handlers.playAlbumNext
-import de.lucaspape.monstercat.handlers.playSongFromId
 
 open class AlbumItem(
     val albumId: String
