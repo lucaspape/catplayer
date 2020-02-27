@@ -270,12 +270,18 @@ class PlaylistHandler {
         isPlaylist: Boolean,
         listViewPosition: Int
     ) {
-        val menuItems: Array<String> = arrayOf(
-            view.context.getString(R.string.download),
-            view.context.getString(R.string.playNext),
-            view.context.getString(R.string.delete),
-            view.context.getString(R.string.shareAlbum)
-        )
+        val menuItems = if(isPlaylist){
+            arrayOf(
+                view.context.getString(R.string.download),
+                view.context.getString(R.string.playNext),
+                view.context.getString(R.string.delete))
+        }else{
+            arrayOf(
+                view.context.getString(R.string.download),
+                view.context.getString(R.string.playNext),
+                view.context.getString(R.string.delete),
+                view.context.getString(R.string.shareAlbum))
+        }
 
         val alertDialogBuilder = AlertDialog.Builder(view.context)
         alertDialogBuilder.setTitle("")
