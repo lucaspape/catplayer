@@ -35,7 +35,6 @@ import java.lang.ref.WeakReference
  * Does everything for the home page
  */
 class HomeHandler {
-
     companion object {
         @JvmStatic
         var searchResults = ArrayList<CatalogItem>()

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Player for Monstercat</string>
+    <string name="app_name">Catplayer</string>
     <string name="title_home">Home</string>
     <string name="title_playlist">Playlist</string>
     <string name="title_settings">Settings</string>
