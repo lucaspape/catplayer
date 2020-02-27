@@ -1,9 +1,11 @@
 package de.lucaspape.monstercat.activities
 
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.os.Build
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
@@ -175,13 +177,13 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         resetDatabaseButton.setOnClickListener {
-            AlertDialog.Builder(this)
+            val alertDialogBuilder = AlertDialog.Builder(this)
                 .setTitle(getString(R.string.resetDatabase))
                 .setMessage(getString(R.string.resetDatabaseQuestion))
                 .setPositiveButton(android.R.string.yes) { _, _ ->
-                    AlbumDatabaseHelper(this).reCreateTable()
+                    AlbumDatabaseHelper(this).reCreateTable(this, true)
                     CatalogSongDatabaseHelper(this).reCreateTable()
-                    PlaylistDatabaseHelper(this).reCreateTable()
+                    PlaylistDatabaseHelper(this).reCreateTable(this, true)
 
                     val intent = Intent(this, MainActivity::class.java)
                     intent.addFlags(FLAG_ACTIVITY_NEW_TASK)
@@ -192,7 +194,18 @@ class SettingsActivity : AppCompatActivity() {
                     Runtime.getRuntime().exit(0)
                 }
                 .setNegativeButton(android.R.string.no, null)
-                .show()
+
+            val dialog = alertDialogBuilder.create()
+            dialog.show()
+
+            val typedValue = TypedValue()
+            theme.resolveAttribute(R.attr.colorOnSurface, typedValue, true)
+
+            val positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE)
+            positiveButton.setTextColor(typedValue.data)
+
+            val negativeButton = dialog.getButton(DialogInterface.BUTTON_NEGATIVE)
+            negativeButton.setTextColor(typedValue.data)
         }
     }
 }

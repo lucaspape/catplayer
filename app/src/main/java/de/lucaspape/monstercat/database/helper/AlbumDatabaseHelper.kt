@@ -31,7 +31,16 @@ class AlbumDatabaseHelper(context: Context) :
         db?.execSQL(Album.CREATE_TABLE)
     }
 
-    fun reCreateTable() {
+    fun reCreateTable(context: Context, reCreateItems:Boolean) {
+        if(reCreateItems){
+            val albums = getAllAlbums()
+
+            for(album in albums){
+                val albumItemDatabaseHelper = AlbumItemDatabaseHelper(context, album.albumId)
+                albumItemDatabaseHelper.reCreateTable()
+            }
+        }
+
         val db = writableDatabase
 
         db?.execSQL("DROP TABLE IF EXISTS " + Album.TABLE_NAME)
@@ -133,5 +142,33 @@ class AlbumDatabaseHelper(context: Context) :
         return albums
     }
 
+    fun getAllAlbums(): List<Album> {
+        val albums: ArrayList<Album> = ArrayList()
+
+        val selectQuery = "SELECT * FROM " + Album.TABLE_NAME + " ORDER BY " +
+                Album.COLUMN_ID + " ASC"
+
+        val db = writableDatabase
+        val cursor = db.rawQuery(selectQuery, null)
+
+        if (cursor.moveToFirst()) {
+            do {
+                val album = Album(
+                    cursor.getInt(cursor.getColumnIndex(Album.COLUMN_ID)),
+                    cursor.getString(cursor.getColumnIndex(Album.COLUMN_ALBUM_ID)),
+                    cursor.getString(cursor.getColumnIndex(Album.COLUMN_TITLE)),
+                    cursor.getString(cursor.getColumnIndex(Album.COLUMN_ARTIST)),
+                    cursor.getString(cursor.getColumnIndex(Album.COLUMN_COVER_URL)),
+                    cursor.getString(cursor.getColumnIndex(Album.COLUMN_ALBUM_MCID))
+                )
+                albums.add(album)
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        db.close()
+
+        return albums
+    }
 
 }

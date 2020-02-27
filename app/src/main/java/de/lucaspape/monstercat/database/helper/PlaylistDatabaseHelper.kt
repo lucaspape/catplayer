@@ -31,9 +31,18 @@ class PlaylistDatabaseHelper(context: Context) :
         db?.execSQL(Playlist.CREATE_TABLE)
     }
 
-    fun reCreateTable() {
-        val db = writableDatabase
+    fun reCreateTable(context: Context, reCreateItems:Boolean) {
+        if(reCreateItems){
+            val allPlaylists = getAllPlaylists()
 
+            for(playlist in allPlaylists){
+                val playlistItemDatabaseHelper = PlaylistItemDatabaseHelper(context, playlist.playlistId)
+                playlistItemDatabaseHelper.reCreateTable()
+            }
+        }
+
+        val db = writableDatabase
+        
         db?.execSQL("DROP TABLE IF EXISTS " + Playlist.TABLE_NAME)
         onCreate(db)
     }

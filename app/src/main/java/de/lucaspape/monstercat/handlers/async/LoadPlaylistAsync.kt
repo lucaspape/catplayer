@@ -65,7 +65,7 @@ class LoadPlaylistAsync(
                     val jsonObject = JSONObject(response)
                     val jsonArray = jsonObject.getJSONArray("results")
 
-                    playlistDatabaseHelper.reCreateTable()
+                    playlistDatabaseHelper.reCreateTable(context, false)
 
                     for (i in (0 until jsonArray.length())) {
                         parsePlaylistToDB(

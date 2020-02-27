@@ -564,7 +564,7 @@ class HomeHandler {
         val albumDatabaseHelper = AlbumDatabaseHelper(view.context)
 
         if (forceReload) {
-            albumDatabaseHelper.reCreateTable()
+            albumDatabaseHelper.reCreateTable(view.context, false)
         }
 
         LoadAlbumListAsync(
