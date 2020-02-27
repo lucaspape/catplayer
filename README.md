@@ -16,7 +16,7 @@ This android app aims to implement the Monstercat API.
  - Live Radio from Twitch
  - FLAC download support
 
-<img src="https://raw.githubusercontent.com/lucaspape/catplayer/master/playstore_res/screenshots/Screenshot_20191228-164712_Player_for_Monstercat.png" width="40%">  <img src="https://raw.githubusercontent.com/lucaspape/catplayer/master/playstore_res/screenshots/Screenshot_20191228-164732_Player_for_Monstercat.png" width="40%">
+<img src="https://raw.githubusercontent.com/lucaspape/catplayer/master/playstore_res/screenshots/20200227/Screenshot_20200227-163256_Catplayer.png" width="40%">  <img src="https://raw.githubusercontent.com/lucaspape/catplayer/master/playstore_res/screenshots/20200227/Screenshot_20200227-163207_Catplayer.png" width="40%">
 
 All album images seen in these screenshots are Copyright Monstercat.
 
