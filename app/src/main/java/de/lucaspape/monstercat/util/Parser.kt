@@ -30,6 +30,7 @@ fun parseSongSearchToSongList(context: Context, jsonArray: JSONArray): ArrayList
 fun parseSongToDB(jsonObject: JSONObject, context: Context): String? {
     var id = ""
     var albumId = ""
+    var albumMcId = ""
     var title = ""
     var artist = ""
     var coverUrl = ""
@@ -40,6 +41,7 @@ fun parseSongToDB(jsonObject: JSONObject, context: Context): String? {
 
     try {
         albumId = jsonObject.getJSONObject("release").getString("id")
+        albumMcId = jsonObject.getJSONObject("release").getString("catalogId")
         title = jsonObject.getString("title")
         artist = jsonObject.getString("artistsTitle")
         coverUrl = context.getString(R.string.trackContentUrl) + "$albumId/cover"
@@ -63,6 +65,7 @@ fun parseSongToDB(jsonObject: JSONObject, context: Context): String? {
         title,
         version,
         albumId,
+        albumMcId,
         artist,
         coverUrl,
         downloadable,

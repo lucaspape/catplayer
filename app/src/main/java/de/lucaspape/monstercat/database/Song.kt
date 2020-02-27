@@ -19,6 +19,7 @@ data class Song(
     val title: String,
     val version: String,
     val albumId: String,
+    val mcAlbumId: String,
     val artist: String,
     val coverUrl: String,
     val isDownloadable: Boolean,
@@ -38,6 +39,8 @@ data class Song(
         @JvmStatic
         val COLUMN_ALBUM_ID = "albumId"
         @JvmStatic
+        val COLUMN_ALBUM_MC_ID = "mcALbumId"
+        @JvmStatic
         val COLUMN_ARTIST = "artist"
         @JvmStatic
         val COLUMN_COVER_URL = "coverUrl"
@@ -55,6 +58,7 @@ data class Song(
                     COLUMN_TITLE + " TEXT," +
                     COLUMN_VERSION + " TEXT," +
                     COLUMN_ALBUM_ID + " TEXT," +
+                    COLUMN_ALBUM_MC_ID + " TEXT," +
                     COLUMN_ARTIST + " TEXT," +
                     COLUMN_COVER_URL + " TEXT," +
                     COLUMN_DOWNLOADABLE + " TEXT," +

@@ -296,7 +296,8 @@ class HomeHandler {
             arrayOf(
                 view.context.getString(R.string.download),
                 view.context.getString(R.string.playNext),
-                view.context.getString(R.string.addToPlaylist)
+                view.context.getString(R.string.addToPlaylist),
+                view.context.getString(R.string.shareAlbum)
             )
         } else {
             arrayOf(
@@ -329,6 +330,7 @@ class HomeHandler {
                             context,
                             song
                         )
+                        view.context.getString(R.string.shareAlbum) -> shareAlbum(context, song.mcAlbumId)
                     }
                 } else {
                     when (item) {
@@ -697,6 +699,7 @@ class HomeHandler {
         ) {
             searchContentsDisplayed = true
             albumContentsDisplayed = false
+            albumView = false
 
             currentCatalogViewData = searchResults
 

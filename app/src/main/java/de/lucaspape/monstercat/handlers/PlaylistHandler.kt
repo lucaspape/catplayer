@@ -23,6 +23,7 @@ import de.lucaspape.monstercat.handlers.abstract_items.PlaylistItem
 import de.lucaspape.monstercat.handlers.async.BackgroundAsync
 import de.lucaspape.monstercat.handlers.async.LoadPlaylistAsync
 import de.lucaspape.monstercat.handlers.async.LoadPlaylistTracksAsync
+import de.lucaspape.monstercat.util.displayInfo
 import java.io.File
 import java.lang.ref.WeakReference
 
@@ -272,7 +273,8 @@ class PlaylistHandler {
         val menuItems: Array<String> = arrayOf(
             view.context.getString(R.string.download),
             view.context.getString(R.string.playNext),
-            view.context.getString(R.string.delete)
+            view.context.getString(R.string.delete),
+            view.context.getString(R.string.shareAlbum)
         )
 
         val alertDialogBuilder = AlertDialog.Builder(view.context)
@@ -333,6 +335,21 @@ class PlaylistHandler {
                                         data.size
                                     )
                                 }
+                            }
+                        }
+                    }
+                } else if(item == view.context.getString(R.string.shareAlbum)){
+                    if(isPlaylist){
+                        displayInfo(context, "Sharing playlist currently not implemented.")
+                    }else{
+                        view.let { view ->
+                            val songDatabaseHelper =
+                                SongDatabaseHelper(view.context)
+                            val song =
+                                songDatabaseHelper.getSong(view.context, id)
+
+                            if (song != null) {
+                                shareAlbum(context, song.mcAlbumId)
                             }
                         }
                     }
