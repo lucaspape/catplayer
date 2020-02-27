@@ -152,7 +152,7 @@ internal fun playPlaylistNext(context: Context, playlistId: String) {
 /**
  * Download an entire playlist
  */
-internal fun downloadPlaylist(context: Context, playlistId: String, downloadFinished:()->Unit) {
+internal fun downloadPlaylist(context: Context, playlistId: String, downloadFinished: () -> Unit) {
     LoadPlaylistTracksAsync(WeakReference(context), true, playlistId, {}) {
         val playlistItemDatabaseHelper =
             PlaylistItemDatabaseHelper(context, playlistId)
@@ -170,16 +170,20 @@ internal fun downloadPlaylist(context: Context, playlistId: String, downloadFini
 /**
  * Deletes downloaded playlist tracks
  */
-internal fun deleteDownloadedPlaylistTracks(context: Context, playlistId: String, deleteFinished:()-> Unit){
+internal fun deleteDownloadedPlaylistTracks(
+    context: Context,
+    playlistId: String,
+    deleteFinished: () -> Unit
+) {
     val alertDialogBuilder = AlertDialog.Builder(context)
     alertDialogBuilder.setTitle(context.getString(R.string.deletePlaylistDownloadedTracksMsg))
     alertDialogBuilder.setPositiveButton(context.getString(R.string.yes)) { _, _ ->
-        val playlistItemDatabaseHelper = PlaylistItemDatabaseHelper(context,playlistId)
+        val playlistItemDatabaseHelper = PlaylistItemDatabaseHelper(context, playlistId)
         val playlistItemList = playlistItemDatabaseHelper.getAllData()
 
         val songDatabaseHelper = SongDatabaseHelper(context)
 
-        for(playlistItem in playlistItemList){
+        for (playlistItem in playlistItemList) {
             val song = songDatabaseHelper.getSong(context, playlistItem.songId)
 
             song?.let {
@@ -190,7 +194,7 @@ internal fun deleteDownloadedPlaylistTracks(context: Context, playlistId: String
         deleteFinished()
     }
 
-    alertDialogBuilder.setNegativeButton(context.getString(R.string.no)) { _, _ ->  }
+    alertDialogBuilder.setNegativeButton(context.getString(R.string.no)) { _, _ -> }
 
     val dialog = alertDialogBuilder.create()
     dialog.show()
@@ -318,7 +322,7 @@ internal fun deletePlaylist(context: Context, playlistId: String) {
         val deletePlaylistAsync = DeletePlaylistAsync(WeakReference(context), playlistId)
         deletePlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
-    alertDialogBuilder.setNegativeButton(context.getString(R.string.no)) { _, _ ->  }
+    alertDialogBuilder.setNegativeButton(context.getString(R.string.no)) { _, _ -> }
 
     val dialog = alertDialogBuilder.create()
     dialog.show()
@@ -356,58 +360,56 @@ internal fun deletePlaylistSong(
     }
 }
 
-internal fun openAlbum(context:Context, albumMcId:String, share:Boolean){
+internal fun openAlbum(context: Context, albumMcId: String, share: Boolean) {
     val volleyRequestQueue = Volley.newRequestQueue(context)
 
-    val albumLinksRequest = AuthorizedRequest(Request.Method.GET, context.getString(R.string.loadAlbumSongsUrl) + "/$albumMcId", sid,
-        Response.Listener { response->
+    val albumLinksRequest = AuthorizedRequest(Request.Method.GET,
+        context.getString(R.string.loadAlbumSongsUrl) + "/$albumMcId",
+        sid,
+        Response.Listener { response ->
             val responseJsonObject = JSONObject(response)
             val releaseObject = responseJsonObject.getJSONObject("release")
             val linksArray = releaseObject.getJSONArray("links")
 
-            if(linksArray.length() > 0){
-                val titles = arrayOfNulls<String>(linksArray.length()+1)
-                val urls = arrayOfNulls<String>(linksArray.length()+1)
+            val titles = arrayOfNulls<String>(linksArray.length() + 1)
+            val urls = arrayOfNulls<String>(linksArray.length() + 1)
 
-                titles[0] = "monstercat.com"
-                urls[0] = context.getString(R.string.shareReleaseUrl) + "/$albumMcId"
+            titles[0] = "monstercat.com"
+            urls[0] = context.getString(R.string.shareReleaseUrl) + "/$albumMcId"
 
-                for(i in (0 until linksArray.length())){
-                    val linkObject = linksArray.getJSONObject(i)
+            for (i in (0 until linksArray.length())) {
+                val linkObject = linksArray.getJSONObject(i)
 
-                    titles[i+1] = linkObject.getString("platform")
-                    urls[i+1] = linkObject.getString("original")
-                }
-
-                val alertDialogBuilder = AlertDialog.Builder(context)
-
-                if(share){
-                    alertDialogBuilder.setTitle(context.getString(R.string.pickLinkToShare))
-                }else{
-                    alertDialogBuilder.setTitle(context.getString(R.string.pickApp))
-                }
-
-                alertDialogBuilder.setItems(titles) { _, i ->
-                    urls[i]?.let { url ->
-                        if(share){
-                            val sendIntent = Intent().apply{
-                                action = Intent.ACTION_SEND
-                                putExtra(Intent.EXTRA_TEXT,url)
-                                type = "text/plain"
-                            }
-
-                            val shareIntent = Intent.createChooser(sendIntent, null)
-                            context.startActivity(shareIntent)
-                        }else{
-                            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-                        }
-                    }
-
-                }
-                alertDialogBuilder.show()
-            }else{
-                displayInfo(context, context.getString(R.string.albumHasNoLinksMsg))
+                titles[i + 1] = linkObject.getString("platform")
+                urls[i + 1] = linkObject.getString("original")
             }
+
+            val alertDialogBuilder = AlertDialog.Builder(context)
+
+            if (share) {
+                alertDialogBuilder.setTitle(context.getString(R.string.pickLinkToShare))
+            } else {
+                alertDialogBuilder.setTitle(context.getString(R.string.pickApp))
+            }
+
+            alertDialogBuilder.setItems(titles) { _, i ->
+                urls[i]?.let { url ->
+                    if (share) {
+                        val sendIntent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            putExtra(Intent.EXTRA_TEXT, url)
+                            type = "text/plain"
+                        }
+
+                        val shareIntent = Intent.createChooser(sendIntent, null)
+                        context.startActivity(shareIntent)
+                    } else {
+                        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                    }
+                }
+
+            }
+            alertDialogBuilder.show()
         },
         Response.ErrorListener {
             displayInfo(context, context.getString(R.string.errorRetrieveAlbumData))
