@@ -2,8 +2,10 @@ package de.lucaspape.monstercat.handlers
 
 import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.AsyncTask
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.EditText
@@ -185,8 +187,20 @@ internal fun deleteDownloadedPlaylistTracks(context: Context, playlistId: String
 
         deleteFinished()
     }
+
     alertDialogBuilder.setNegativeButton(context.getString(R.string.no)) { _, _ ->  }
-    alertDialogBuilder.show()
+
+    val dialog = alertDialogBuilder.create()
+    dialog.show()
+
+    val typedValue = TypedValue()
+    context.theme.resolveAttribute(R.attr.colorOnSurface, typedValue, true)
+
+    val positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE)
+    positiveButton.setTextColor(typedValue.data)
+
+    val negativeButton = dialog.getButton(DialogInterface.BUTTON_NEGATIVE)
+    negativeButton.setTextColor(typedValue.data)
 }
 
 /**
@@ -280,6 +294,15 @@ internal fun createPlaylist(context: Context) {
         setCancelable(true)
     }.create().run {
         show()
+
+        val typedValue = TypedValue()
+        context.theme.resolveAttribute(R.attr.colorOnSurface, typedValue, true)
+
+        val positiveButton = getButton(DialogInterface.BUTTON_POSITIVE)
+        positiveButton.setTextColor(typedValue.data)
+
+        val negativeButton = getButton(DialogInterface.BUTTON_NEGATIVE)
+        negativeButton.setTextColor(typedValue.data)
     }
 }
 
@@ -294,7 +317,18 @@ internal fun deletePlaylist(context: Context, playlistId: String) {
         deletePlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
     alertDialogBuilder.setNegativeButton(context.getString(R.string.no)) { _, _ ->  }
-    alertDialogBuilder.show()
+
+    val dialog = alertDialogBuilder.create()
+    dialog.show()
+
+    val typedValue = TypedValue()
+    context.theme.resolveAttribute(R.attr.colorOnSurface, typedValue, true)
+
+    val positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE)
+    positiveButton.setTextColor(typedValue.data)
+
+    val negativeButton = dialog.getButton(DialogInterface.BUTTON_NEGATIVE)
+    negativeButton.setTextColor(typedValue.data)
 }
 
 /**

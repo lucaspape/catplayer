@@ -8,7 +8,15 @@ import de.lucaspape.monstercat.activities.fragmentBackPressedCallback
 import de.lucaspape.monstercat.handlers.*
 import de.lucaspape.monstercat.util.Settings
 
-class HomeFragment(private val search:String) : Fragment() {
+class HomeFragment() : Fragment() {
+    private var search:String? = null
+
+    constructor(search:String):this(){
+        if(search != ""){
+            this.search = search
+        }
+    }
+
     private val homeHandler = HomeHandler()
 
     override fun onCreateView(
@@ -22,6 +30,9 @@ class HomeFragment(private val search:String) : Fragment() {
     companion object {
         fun newInstance(search: String): HomeFragment =
             HomeFragment(search)
+
+        fun newInstance(): HomeFragment =
+            HomeFragment()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -44,8 +55,8 @@ class HomeFragment(private val search:String) : Fragment() {
             }
         }
 
-        if(search != ""){
-            homeHandler.searchSong(view, search)
+        search?.let {
+            homeHandler.searchSong(view, it)
         }
     }
 }

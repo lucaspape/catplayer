@@ -3,6 +3,7 @@ package de.lucaspape.monstercat.activities
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
@@ -12,6 +13,7 @@ import android.os.AsyncTask
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
+import android.util.TypedValue
 import android.widget.*
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
@@ -51,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         BottomNavigationView.OnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_home -> {
-                    openFragment(HomeFragment.newInstance(""))
+                    openFragment(HomeFragment.newInstance())
 
                     return@OnNavigationItemSelectedListener true
                 }
@@ -130,7 +132,7 @@ class MainActivity : AppCompatActivity() {
                 openFragment(HomeFragment.newInstance(intentExtras["search"] as String))
             }
         }else{
-            openFragment(HomeFragment.newInstance(""))
+            openFragment(HomeFragment.newInstance())
         }
 
         setContentView(R.layout.activity_main)
@@ -296,6 +298,13 @@ class MainActivity : AppCompatActivity() {
                 )
             }.create().run {
                 show()
+
+                val textColorTypedValue = TypedValue()
+                context.theme.resolveAttribute(R.attr.colorOnSurface, textColorTypedValue, true)
+
+                val positiveButton = getButton(DialogInterface.BUTTON_POSITIVE)
+                positiveButton.setTextColor(textColorTypedValue.data)
+
                 // Now that we've called show(), we can get a reference to the dialog's TextView
                 // and modify it as we wish
                 findViewById<TextView>(android.R.id.message).apply {

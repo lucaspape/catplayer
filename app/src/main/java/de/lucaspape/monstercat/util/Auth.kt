@@ -2,6 +2,8 @@ package de.lucaspape.monstercat.util
 
 import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.widget.EditText
 import com.android.volley.NetworkResponse
@@ -111,7 +113,7 @@ class Auth {
         loginFailed: () -> Unit
     ) {
         val alertDialogBuilder = AlertDialog.Builder(context)
-        alertDialogBuilder.setTitle("2FA Code")
+        alertDialogBuilder.setTitle(context.getString(R.string.twoFaCode))
 
         val layoutInflater =
             context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
@@ -120,7 +122,7 @@ class Auth {
         alertDialogBuilder.setView(twoFAInputView)
         alertDialogBuilder.setCancelable(false)
 
-        alertDialogBuilder.setPositiveButton("OK") { _, _ ->
+        alertDialogBuilder.setPositiveButton(context.getString(R.string.ok)) { _, _ ->
             //post token to API
 
             val twoFAEditText = twoFAInputView.findViewById<EditText>(R.id.twoFAInput)
@@ -173,10 +175,16 @@ class Auth {
             }
 
             twoFAQueue.add(twoFaPostRequest)
-
         }
 
-        alertDialogBuilder.show()
+        val dialog = alertDialogBuilder.create()
+        dialog.show()
+
+        val typedValue = TypedValue()
+        context.theme.resolveAttribute(R.attr.colorOnSurface, typedValue, true)
+
+        val positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE)
+        positiveButton.setTextColor(typedValue.data)
     }
 
     //saves the login sid
