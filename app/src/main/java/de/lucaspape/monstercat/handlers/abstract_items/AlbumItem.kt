@@ -1,5 +1,7 @@
 package de.lucaspape.monstercat.handlers.abstract_items
 
+import android.app.AlertDialog
+import android.content.Context
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -7,11 +9,57 @@ import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.AlbumDatabaseHelper
+import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
+import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.download.downloadCoverIntoImageView
+import de.lucaspape.monstercat.handlers.*
+import de.lucaspape.monstercat.handlers.addSongToPlaylist
+import de.lucaspape.monstercat.handlers.downloadAlbum
+import de.lucaspape.monstercat.handlers.openAlbum
+import de.lucaspape.monstercat.handlers.playAlbumNext
+import de.lucaspape.monstercat.handlers.playSongFromId
 
 open class AlbumItem(
     val albumId: String
 ) : AbstractItem<AlbumItem.ViewHolder>() {
+
+    companion object {
+        @JvmStatic
+        fun showContextMenu(
+            context: Context,
+            contentList: ArrayList<String>,
+            listViewPosition: Int
+        ) {
+            val menuItems: Array<String> = arrayOf(
+                context.getString(R.string.downloadAlbum),
+                context.getString(R.string.playAlbumNext),
+                context.getString(R.string.shareAlbum),
+                context.getString(R.string.openAlbumInApp)
+            )
+
+            val alertDialogBuilder = AlertDialog.Builder(context)
+            alertDialogBuilder.setTitle("")
+            alertDialogBuilder.setItems(menuItems) { _, which ->
+                val id = contentList[listViewPosition]
+
+                when (menuItems[which]) {
+                    context.getString(R.string.downloadAlbum) -> downloadAlbum(
+                        context,
+                        id
+                    )
+                    context.getString(R.string.playAlbumNext) -> playAlbumNext(
+                        context,
+                        id
+                    )
+                    context.getString(R.string.shareAlbum) -> openAlbum(context, id, true)
+                    context.getString(R.string.openAlbumInApp) -> openAlbum(context, id, false)
+                }
+            }
+
+            alertDialogBuilder.show()
+        }
+    }
+
     override val type: Int = 100
 
     override val layoutRes: Int

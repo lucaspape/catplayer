@@ -1,6 +1,5 @@
 package de.lucaspape.monstercat.handlers
 
-import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.AsyncTask
@@ -114,7 +113,7 @@ class HomeHandler {
                 idList.add(catalogItem.songId)
             }
 
-            showContextMenu(view, idList, position)
+            CatalogItem.showContextMenu(view.context, idList, position)
 
             false
         }
@@ -141,7 +140,7 @@ class HomeHandler {
                     idList.add(catalogItem.songId)
                 }
 
-                showContextMenu(view, idList, position)
+                CatalogItem.showContextMenu(view.context, idList, position)
             }
         })
 
@@ -255,7 +254,7 @@ class HomeHandler {
                 }
             }
 
-            showContextMenu(view, albumMcIdList, position)
+            AlbumItem.showContextMenu(view.context, albumMcIdList, position)
 
             false
         }
@@ -281,77 +280,6 @@ class HomeHandler {
         }, {
             initDone = true
         }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-    }
-
-    /**
-     * Context menu
-     */
-    private fun showContextMenu(
-        view: View,
-        contentList: ArrayList<String>,
-        listViewPosition: Int
-    ) {
-        val menuItems: Array<String> = if (!albumView) {
-            arrayOf(
-                view.context.getString(R.string.download),
-                view.context.getString(R.string.playNext),
-                view.context.getString(R.string.addToPlaylist),
-                view.context.getString(R.string.shareAlbum),
-                view.context.getString(R.string.openAlbumInApp)
-            )
-        } else {
-            arrayOf(
-                view.context.getString(R.string.downloadAlbum),
-                view.context.getString(R.string.playAlbumNext),
-                view.context.getString(R.string.shareAlbum),
-                view.context.getString(R.string.openAlbumInApp)
-            )
-        }
-
-        val alertDialogBuilder = AlertDialog.Builder(view.context)
-        alertDialogBuilder.setTitle("")
-        alertDialogBuilder.setItems(menuItems) { _, which ->
-            val id = contentList[listViewPosition]
-
-            view.context.let { context ->
-                val songDatabaseHelper =
-                    SongDatabaseHelper(context)
-                val song = songDatabaseHelper.getSong(context, id)
-
-                val item = menuItems[which]
-
-                if (song != null) {
-                    when (item) {
-                        context.getString(R.string.download) -> addDownloadSong(context, song.songId) {}
-                        context.getString(R.string.playNext) -> playSongFromId(
-                            id,
-                            false
-                        )
-                        context.getString(R.string.addToPlaylist) -> addSongToPlaylist(
-                            context,
-                            song
-                        )
-                        context.getString(R.string.shareAlbum) -> openAlbum(context, song.mcAlbumId, true)
-                        context.getString(R.string.openAlbumInApp) -> openAlbum(context, song.mcAlbumId, false)
-                    }
-                } else {
-                    when (item) {
-                        context.getString(R.string.downloadAlbum) -> downloadAlbum(
-                            context,
-                            id
-                        )
-                        context.getString(R.string.playAlbumNext) -> playAlbumNext(
-                            context,
-                            id
-                        )
-                        context.getString(R.string.shareAlbum) -> openAlbum(context, id, true)
-                        context.getString(R.string.openAlbumInApp) -> openAlbum(context, id, false)
-                    }
-                }
-            }
-        }
-
-        alertDialogBuilder.create().show()
     }
 
     /**

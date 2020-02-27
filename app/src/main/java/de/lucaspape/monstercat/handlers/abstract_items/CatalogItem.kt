@@ -1,5 +1,7 @@
 package de.lucaspape.monstercat.handlers.abstract_items
 
+import android.app.AlertDialog
+import android.content.Context
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -9,12 +11,155 @@ import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
+import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.download.downloadCoverIntoImageView
-import java.io.File
+import de.lucaspape.monstercat.handlers.*
+import de.lucaspape.monstercat.handlers.addSongToPlaylist
+import de.lucaspape.monstercat.handlers.deletePlaylistSong
+import de.lucaspape.monstercat.handlers.openAlbum
+import de.lucaspape.monstercat.handlers.playSongFromId
 
 open class CatalogItem(
     val songId: String
 ) : AbstractItem<CatalogItem.ViewHolder>() {
+
+    companion object {
+        @JvmStatic
+        fun showContextMenu(
+            context: Context,
+            contentList: ArrayList<String>,
+            listViewPosition: Int
+        ) {
+            val menuItems =
+                arrayOf(
+                    context.getString(R.string.download),
+                    context.getString(R.string.playNext),
+                    context.getString(R.string.addToPlaylist),
+                    context.getString(R.string.shareAlbum),
+                    context.getString(R.string.openAlbumInApp)
+                )
+
+            val alertDialogBuilder = AlertDialog.Builder(context)
+            alertDialogBuilder.setTitle("")
+            alertDialogBuilder.setItems(menuItems) { _, which ->
+                val id = contentList[listViewPosition]
+                val songDatabaseHelper =
+                    SongDatabaseHelper(context)
+                val song = songDatabaseHelper.getSong(context, id)
+
+                song?.let {
+                    when (menuItems[which]) {
+                        context.getString(R.string.download) -> addDownloadSong(
+                            context,
+                            song.songId
+                        ) {}
+                        context.getString(R.string.playNext) -> playSongFromId(
+                            id,
+                            false
+                        )
+                        context.getString(R.string.addToPlaylist) -> addSongToPlaylist(
+                            context,
+                            song
+                        )
+                        context.getString(R.string.shareAlbum) -> openAlbum(
+                            context,
+                            song.mcAlbumId,
+                            true
+                        )
+                        context.getString(R.string.openAlbumInApp) -> openAlbum(
+                            context,
+                            song.mcAlbumId,
+                            false
+                        )
+                    }
+                }
+            }
+
+            alertDialogBuilder.create().show()
+        }
+
+        @JvmStatic
+        fun showContextMenuPlaylist(
+            context: Context,
+            data: ArrayList<String>,
+            listViewPosition: Int
+        ) {
+            val menuItems =
+                arrayOf(
+                    context.getString(R.string.download),
+                    context.getString(R.string.playNext),
+                    context.getString(R.string.delete),
+                    context.getString(R.string.shareAlbum),
+                    context.getString(R.string.openAlbumInApp)
+                )
+
+            val alertDialogBuilder = AlertDialog.Builder(context)
+            alertDialogBuilder.setTitle("")
+            alertDialogBuilder.setItems(menuItems) { _, which ->
+                val id = data[listViewPosition]
+                when (menuItems[which]) {
+                    context.getString(R.string.download) -> {
+                        val songDatabaseHelper =
+                            SongDatabaseHelper(context)
+                        val song =
+                            songDatabaseHelper.getSong(context, id)
+
+                        if (song != null) {
+                            addDownloadSong(context, song.songId) {}
+                        }
+                    }
+                    context.getString(R.string.playNext) -> {
+                        playSongFromId(
+                            id,
+                            false
+                        )
+                    }
+                    context.getString(R.string.delete) -> {
+                        val songDatabaseHelper =
+                            SongDatabaseHelper(context)
+                        val song =
+                            songDatabaseHelper.getSong(context, id)
+
+                        if (song != null) {
+                            PlaylistHandler.currentPlaylistId?.let { playlistId ->
+                                deletePlaylistSong(
+                                    context,
+                                    song,
+                                    playlistId,
+                                    listViewPosition + 1,
+                                    data.size
+                                )
+                            }
+                        }
+
+                    }
+                    context.getString(R.string.shareAlbum) -> {
+                        val songDatabaseHelper =
+                            SongDatabaseHelper(context)
+                        val song =
+                            songDatabaseHelper.getSong(context, id)
+
+                        if (song != null) {
+                            openAlbum(context, song.mcAlbumId, true)
+                        }
+                    }
+                    context.getString(R.string.openAlbumInApp) -> {
+                        val songDatabaseHelper =
+                            SongDatabaseHelper(context)
+                        val song =
+                            songDatabaseHelper.getSong(context, id)
+
+                        if (song != null) {
+                            openAlbum(context, song.mcAlbumId, false)
+                        }
+
+                    }
+                }
+            }
+
+            alertDialogBuilder.create().show()
+        }
+    }
 
     override val type: Int = 101
 

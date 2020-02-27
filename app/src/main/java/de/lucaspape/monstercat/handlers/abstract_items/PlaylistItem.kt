@@ -1,5 +1,6 @@
 package de.lucaspape.monstercat.handlers.abstract_items
 
+import android.app.AlertDialog
 import android.content.Context
 import android.view.View
 import android.widget.ImageButton
@@ -12,13 +13,54 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
+import de.lucaspape.monstercat.handlers.deletePlaylist
+import de.lucaspape.monstercat.handlers.downloadPlaylist
+import de.lucaspape.monstercat.handlers.playPlaylistNext
 import java.io.File
 
 open class PlaylistItem(
     val playlistId: String
 ) : AbstractItem<PlaylistItem.ViewHolder>() {
 
-    fun getDownloadStatus(context:Context):String{
+    companion object {
+        @JvmStatic
+        fun showContextMenu(
+            context: Context,
+            data: ArrayList<String>,
+            listViewPosition: Int
+        ) {
+            val menuItems = arrayOf(
+                context.getString(R.string.download),
+                context.getString(R.string.playNext),
+                context.getString(R.string.delete)
+            )
+
+            val alertDialogBuilder = AlertDialog.Builder(context)
+            alertDialogBuilder.setTitle("")
+            alertDialogBuilder.setItems(menuItems) { _, which ->
+                val id = data[listViewPosition]
+
+                when (menuItems[which]) {
+                    context.getString(R.string.download) -> {
+                        downloadPlaylist(
+                            context,
+                            id
+                        ) {}
+                    }
+                    context.getString(R.string.playNext) -> {
+                        playPlaylistNext(context, id)
+                    }
+                    context.getString(R.string.delete) -> {
+                        deletePlaylist(context, id)
+                    }
+                }
+            }
+
+            alertDialogBuilder.create().show()
+        }
+    }
+
+    fun getDownloadStatus(context: Context): String {
         val playlistTracks =
             PlaylistItemDatabaseHelper(context, playlistId).getAllData()
 

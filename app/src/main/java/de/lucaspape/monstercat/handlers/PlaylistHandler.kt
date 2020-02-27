@@ -1,6 +1,5 @@
 package de.lucaspape.monstercat.handlers
 
-import android.app.AlertDialog
 import android.content.Context
 import android.os.AsyncTask
 import android.view.View
@@ -23,7 +22,6 @@ import de.lucaspape.monstercat.handlers.abstract_items.PlaylistItem
 import de.lucaspape.monstercat.handlers.async.BackgroundAsync
 import de.lucaspape.monstercat.handlers.async.LoadPlaylistAsync
 import de.lucaspape.monstercat.handlers.async.LoadPlaylistTracksAsync
-import de.lucaspape.monstercat.util.displayInfo
 import java.io.File
 import java.lang.ref.WeakReference
 
@@ -87,7 +85,7 @@ class PlaylistHandler {
                 idList.add(catalogItem.songId)
             }
 
-            showContextMenu(view, idList, false, position)
+            CatalogItem.showContextMenuPlaylist(view.context, idList, position)
             false
         }
 
@@ -113,7 +111,7 @@ class PlaylistHandler {
                     idList.add(catalogItem.songId)
                 }
 
-                showContextMenu(view, idList, false, position)
+                CatalogItem.showContextMenuPlaylist(view.context, idList, position)
             }
         })
 
@@ -149,7 +147,10 @@ class PlaylistHandler {
                             titleDownloadButton.setImageURI(song.getSongDownloadStatus().toUri())
                         }
                         else -> {
-                            addDownloadSong(v.context, item.songId) { titleDownloadButton.setImageURI(song.getSongDownloadStatus().toUri()) }
+                            addDownloadSong(
+                                v.context,
+                                item.songId
+                            ) { titleDownloadButton.setImageURI(song.getSongDownloadStatus().toUri()) }
                         }
                     }
                 }
@@ -197,7 +198,7 @@ class PlaylistHandler {
                 playlistIdList.add(playlist.playlistId)
             }
 
-            showContextMenu(view, playlistIdList, true, position)
+            PlaylistItem.showContextMenu(view.context, playlistIdList, position)
             false
         }
 
@@ -223,7 +224,7 @@ class PlaylistHandler {
                     playlistIdList.add(playlist.playlistId)
                 }
 
-                showContextMenu(view, playlistIdList, true, position)
+                PlaylistItem.showContextMenu(view.context, playlistIdList, position)
             }
         })
 
@@ -259,127 +260,6 @@ class PlaylistHandler {
                 }
             }
         })
-    }
-
-    /**
-     * Context menu
-     */
-    private fun showContextMenu(
-        view: View,
-        data: ArrayList<String>,
-        isPlaylist: Boolean,
-        listViewPosition: Int
-    ) {
-        val menuItems = if(isPlaylist){
-            arrayOf(
-                view.context.getString(R.string.download),
-                view.context.getString(R.string.playNext),
-                view.context.getString(R.string.delete))
-        }else{
-            arrayOf(
-                view.context.getString(R.string.download),
-                view.context.getString(R.string.playNext),
-                view.context.getString(R.string.delete),
-                view.context.getString(R.string.shareAlbum),
-                view.context.getString(R.string.openAlbumInApp))
-        }
-
-        val alertDialogBuilder = AlertDialog.Builder(view.context)
-        alertDialogBuilder.setTitle("")
-        alertDialogBuilder.setItems(menuItems) { _, which ->
-            val id = data[listViewPosition]
-
-            view.context.let { context ->
-                val item = menuItems[which]
-
-                if (item == context.getString(R.string.download)) {
-                    if (isPlaylist) {
-                        downloadPlaylist(
-                            context,
-                            id,
-                            {}
-                        )
-                    } else {
-                        view.let { view ->
-                            val songDatabaseHelper =
-                                SongDatabaseHelper(view.context)
-                            val song =
-                                songDatabaseHelper.getSong(view.context, id)
-
-                            if (song != null) {
-                                addDownloadSong(view.context, song.songId, {})
-                            }
-                        }
-                    }
-
-                } else if (item == context.getString(R.string.playNext)) {
-                    if (isPlaylist) {
-                        playPlaylistNext(context, id)
-                    } else {
-                        playSongFromId(
-                            id,
-                            false
-                        )
-                    }
-
-                } else if (item == view.context.getString(R.string.delete)) {
-                    if (isPlaylist) {
-                        deletePlaylist(context, id)
-                    } else {
-                        view.let { view ->
-                            val songDatabaseHelper =
-                                SongDatabaseHelper(view.context)
-                            val song =
-                                songDatabaseHelper.getSong(view.context, id)
-
-                            if (song != null) {
-                                currentPlaylistId?.let { playlistId ->
-                                    deletePlaylistSong(
-                                        context,
-                                        song,
-                                        playlistId,
-                                        listViewPosition + 1,
-                                        data.size
-                                    )
-                                }
-                            }
-                        }
-                    }
-                } else if(item == view.context.getString(R.string.shareAlbum)){
-                    if(isPlaylist){
-                        displayInfo(context, "Sharing playlist currently not implemented.")
-                    }else{
-                        view.let { view ->
-                            val songDatabaseHelper =
-                                SongDatabaseHelper(view.context)
-                            val song =
-                                songDatabaseHelper.getSong(view.context, id)
-
-                            if (song != null) {
-                                openAlbum(context, song.mcAlbumId, true)
-                            }
-                        }
-                    }
-                } else if(item == view.context.getString(R.string.openAlbumInApp)){
-                    if(isPlaylist){
-                        displayInfo(context, "Sharing playlist currently not implemented.")
-                    }else{
-                        view.let { view ->
-                            val songDatabaseHelper =
-                                SongDatabaseHelper(view.context)
-                            val song =
-                                songDatabaseHelper.getSong(view.context, id)
-
-                            if (song != null) {
-                                openAlbum(context, song.mcAlbumId, false)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        alertDialogBuilder.create().show()
     }
 
     /**
