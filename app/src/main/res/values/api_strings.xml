@@ -20,6 +20,8 @@
     <string name="fallbackCoverUrl" translatable="false">https://assets.monstercat.com/artwork-fallback.jpg</string>
     <string name="fallbackCoverBlackUrl" translatable="false">https://lucaspape.de/monstercat-app/artwork-fallback-black.jpg</string>
 
+    <string name="shareReleaseUrl" translatable="false">https://www.monstercat.com/release</string>
+
     <string name="liveInfoUrl" translatable="false">https://api.lucaspape.de/monstercat/v1/liveinfo</string>
     <string name="liveCoverUrl" translatable="false">https://api.lucaspape.de/monstercat/v1/livecover</string>
 

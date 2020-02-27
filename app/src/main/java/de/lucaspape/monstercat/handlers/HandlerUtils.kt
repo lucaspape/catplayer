@@ -366,14 +366,17 @@ internal fun openAlbum(context:Context, albumMcId:String, share:Boolean){
             val linksArray = releaseObject.getJSONArray("links")
 
             if(linksArray.length() > 0){
-                val titles = arrayOfNulls<String>(linksArray.length())
-                val urls = arrayOfNulls<String>(linksArray.length())
+                val titles = arrayOfNulls<String>(linksArray.length()+1)
+                val urls = arrayOfNulls<String>(linksArray.length()+1)
+
+                titles[0] = "monstercat.com"
+                urls[0] = context.getString(R.string.shareReleaseUrl) + "/$albumMcId"
 
                 for(i in (0 until linksArray.length())){
                     val linkObject = linksArray.getJSONObject(i)
 
-                    titles[i] = linkObject.getString("platform")
-                    urls[i] = linkObject.getString("original")
+                    titles[i+1] = linkObject.getString("platform")
+                    urls[i+1] = linkObject.getString("original")
                 }
 
                 val alertDialogBuilder = AlertDialog.Builder(context)
