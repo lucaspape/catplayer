@@ -4,8 +4,17 @@ import android.content.Context
 import android.media.AudioFocusRequest
 import android.media.AudioManager
 import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.audio.AudioAttributes
+import de.lucaspape.monstercat.database.Song
+import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
+import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.MonstercatPlayer.Companion.audioFocusChangeListener
+import de.lucaspape.monstercat.music.notification.updateNotification
+import de.lucaspape.monstercat.music.setCover
+import de.lucaspape.monstercat.music.setPlayButtonImage
+import de.lucaspape.monstercat.music.startSeekBarUpdate
+import java.lang.IndexOutOfBoundsException
 
 fun getAudioAttributes(): AudioAttributes {
     return AudioAttributes.Builder()
@@ -61,4 +70,84 @@ fun abandonAudioFocus(context: Context) {
 
     @Suppress("DEPRECATION")
     audioManager.abandonAudioFocus(audioFocusChangeListener)
+}
+
+fun getStreamPlayerListener(context:Context): Player.EventListener{
+    return object: Player.EventListener{
+        @Override
+        override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
+            setPlayButtonImage(context)
+
+            setCover(
+                context,
+                StreamInfoUpdateAsync.liveTitle,
+                StreamInfoUpdateAsync.liveVersion,
+                StreamInfoUpdateAsync.liveArtist,
+                StreamInfoUpdateAsync.liveAlbumId
+            ) { bitmap ->
+                updateNotification(
+                    StreamInfoUpdateAsync.liveTitle,
+                    StreamInfoUpdateAsync.liveVersion,
+                    StreamInfoUpdateAsync.liveArtist,
+                    bitmap
+                )
+            }
+        }
+    }
+}
+
+fun getPlayerListener(context:Context, song: Song): Player.EventListener{
+    return object: Player.EventListener{
+        @Override
+        override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
+            if (playbackState == Player.STATE_ENDED) {
+                next()
+            }else{
+                setCover(context, song.title, song.version, song.artist, song.albumId) {
+                    updateNotification(
+                        song.title,
+                        song.version,
+                        song.artist,
+                        it
+                    )
+                }
+
+                setPlayButtonImage(context)
+                startSeekBarUpdate()
+            }
+        }
+    }
+}
+
+/**
+ * Returns current song from playlist
+ */
+fun getCurrentSong(): Song? {
+    try {
+        return getSong(MonstercatPlayer.currentSong)
+    } catch (e: IndexOutOfBoundsException) {
+        return if (MonstercatPlayer.loop) {
+            MonstercatPlayer.currentSong = 0
+
+            return try {
+                getSong(MonstercatPlayer.currentSong)
+            } catch (e: IndexOutOfBoundsException) {
+                null
+            }
+        } else {
+            null
+        }
+    }
+}
+
+fun getSong(index: Int): Song? {
+    val songId = MonstercatPlayer.playlist[index]
+
+    MonstercatPlayer.contextReference?.get()?.let { context ->
+        val songDatabaseHelper = SongDatabaseHelper(context)
+
+        return songDatabaseHelper.getSong(context, songId)
+    }
+
+    return null
 }

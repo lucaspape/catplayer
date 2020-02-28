@@ -18,6 +18,7 @@ import de.lucaspape.monstercat.download.downloadCoverIntoImageView
 import de.lucaspape.monstercat.music.MonstercatPlayer.Companion.contextReference
 import de.lucaspape.monstercat.music.MonstercatPlayer.Companion.mediaPlayer
 import de.lucaspape.monstercat.music.MonstercatPlayer.Companion.mediaSession
+import de.lucaspape.monstercat.util.getCurrentSong
 import java.lang.ref.WeakReference
 import java.util.*
 
