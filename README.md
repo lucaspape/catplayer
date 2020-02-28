@@ -8,10 +8,13 @@ This android app aims to implement the Monstercat API.
 
 ## Features
 
- - Play your Monstercat playlist
+ - Manage and play your playlist from monstercat.com
+ - Shuffle and repeat playback
  - Download songs (with Monstercat Gold)
+ - Stream songs early (with Monstercat Gold)
  - Browse in catalog and in album view
  - Search songs
+ - Search for artist by tapping on text in fullscreen-view
  - Dark Mode (Android 9 or higher)
  - Live Radio from Twitch
  - FLAC download support
