@@ -1,6 +1,5 @@
 package de.lucaspape.monstercat.music
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.media.MediaMetadata
@@ -21,10 +20,6 @@ import de.lucaspape.monstercat.music.MonstercatPlayer.Companion.mediaPlayer
 import de.lucaspape.monstercat.music.MonstercatPlayer.Companion.mediaSession
 import java.lang.ref.WeakReference
 import java.util.*
-
-private var title = ""
-private var version = ""
-private var artist = ""
 
 var textViewReference: WeakReference<TextView>? = null
     set(newTextView) {
@@ -90,7 +85,8 @@ var fullscreenTitleReference: WeakReference<TextView>? = null
         if(fullscreenTitleReference != null){
             newTitleTextView?.get()?.text = fullscreenTitleReference?.get()?.text
         }else{
-            val shownTitle = "$title $version"
+            val currentSong = getCurrentSong()
+            val shownTitle = "${currentSong?.title} ${currentSong?.version}"
             newTitleTextView?.get()?.text = shownTitle
         }
 
@@ -102,7 +98,8 @@ var fullscreenArtistReference: WeakReference<TextView>? = null
         if(fullscreenArtistReference != null){
             newArtistTextView?.get()?.text = fullscreenArtistReference?.get()?.text
         }else{
-            newArtistTextView?.get()?.text = artist
+            val currentSong = getCurrentSong()
+            newArtistTextView?.get()?.text = currentSong?.artist
         }
 
         field = newArtistTextView
@@ -160,11 +157,7 @@ var fullscreenPlayButtonReference: WeakReference<ImageButton>? = null
         }
     }
 
-internal fun setTitle(newTitle: String, newVersion: String, newArtist: String) {
-    title = newTitle
-    version = newVersion
-    artist = newArtist
-
+internal fun setTitle(title: String, version: String, artist: String) {
     val fullText = "$title $version - $artist"
     val shownTitle = "$title $version"
 
@@ -176,10 +169,6 @@ internal fun setTitle(newTitle: String, newVersion: String, newArtist: String) {
 }
 
 internal fun hideTitle() {
-    title = ""
-    version = ""
-    artist = ""
-
     val text = ""
 
     textViewReference?.get()?.text = text
@@ -189,58 +178,35 @@ internal fun hideTitle() {
     fullscreenArtistReference?.get()?.text = text
 }
 
-private var currentSeekbarHandlerId = ""
+private var currentProgressUpdaterId = ""
 
-@SuppressLint("ClickableViewAccessibility")
 internal fun startSeekBarUpdate() {
     val seekBarUpdateHandler = Handler()
 
     val id = UUID.randomUUID().toString()
-    currentSeekbarHandlerId = id
+    currentProgressUpdaterId = id
 
     val updateSeekBar = object : Runnable {
         override fun run() {
-            mediaPlayer?.duration?.toInt()?.let { seekBarReference?.get()?.max = it }
-            mediaPlayer?.currentPosition?.toInt()
-                ?.let { seekBarReference?.get()?.progress = it }
 
+            mediaPlayer?.duration?.toInt()?.let{ duration ->
+                seekBarReference?.get()?.max = duration
+                fullscreenSeekBarReference?.get()?.max = duration
+            }
 
-            mediaPlayer?.duration?.toInt()?.let { fullscreenSeekBarReference?.get()?.max = it }
-            mediaPlayer?.currentPosition?.toInt()
-                ?.let { fullscreenSeekBarReference?.get()?.progress = it }
+            mediaPlayer?.currentPosition?.toInt()?.let{ currentPosition ->
+                seekBarReference?.get()?.progress = currentPosition
+                fullscreenSeekBarReference?.get()?.progress = currentPosition
+                setPlayerState(currentPosition)
+            }
 
-
-            mediaPlayer?.currentPosition?.let { setPlayerState(it) }
-
-            if(currentSeekbarHandlerId == id){
+            if(currentProgressUpdaterId == id){
                 seekBarUpdateHandler.postDelayed(this, 50)
             }
         }
     }
 
     seekBarUpdateHandler.postDelayed(updateSeekBar, 0)
-
-    seekBarReference?.get()?.setOnTouchListener { _, _ -> true }
-
-    fullscreenSeekBarReference?.get()?.setOnSeekBarChangeListener(object :
-        SeekBar.OnSeekBarChangeListener {
-        override fun onProgressChanged(
-            seekBar: SeekBar,
-            progress: Int,
-            fromUser: Boolean
-        ) {
-            if (fromUser) {
-                mediaPlayer?.seekTo(progress.toLong())
-                setPlayerState(progress.toLong())
-            }
-        }
-
-        override fun onStartTrackingTouch(seekBar: SeekBar) {
-        }
-
-        override fun onStopTrackingTouch(seekBar: SeekBar) {
-        }
-    })
 }
 
 internal fun setCover(
@@ -308,7 +274,7 @@ internal fun setPlayButtonImage(context: Context) {
 /**
  * SetPlayerState
  */
-internal fun setPlayerState(progress: Long) {
+internal fun setPlayerState(progress: Int) {
     val stateBuilder = PlaybackStateCompat.Builder()
 
     val state: Int = if (mediaPlayer?.isPlaying == true) {
@@ -317,7 +283,7 @@ internal fun setPlayerState(progress: Long) {
         PlaybackState.STATE_PAUSED
     }
 
-    stateBuilder.setState(state, progress, 1.0f)
+    stateBuilder.setState(state, progress.toLong(), 1.0f)
     stateBuilder.setActions(
         PlaybackStateCompat.ACTION_PLAY +
                 PlaybackStateCompat.ACTION_PAUSE +
