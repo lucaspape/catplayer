@@ -165,7 +165,20 @@ fun resume() {
 fun next() {
     if (!MonstercatPlayer.loopSingle) {
         if (MonstercatPlayer.shuffle) {
-            MonstercatPlayer.currentSong = Random.nextInt(0, MonstercatPlayer.playlist.size + 1)
+            if(MonstercatPlayer.randomAlreadyPlayed.size <= MonstercatPlayer.playlist.size){
+                MonstercatPlayer.currentSong = Random.nextInt(0, MonstercatPlayer.playlist.size + 1)
+
+                for(songId in MonstercatPlayer.randomAlreadyPlayed){
+                    if(getCurrentSong()?.songId == songId){
+                        next()
+                        break
+                    }
+                }
+
+                MonstercatPlayer.randomAlreadyPlayed.add(getCurrentSong()?.songId)
+            }else if(MonstercatPlayer.loop){
+                MonstercatPlayer.randomAlreadyPlayed = ArrayList()
+            }
         } else {
             MonstercatPlayer.currentSong++
         }

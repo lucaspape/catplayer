@@ -21,6 +21,9 @@ class MonstercatPlayer {
             internal set
 
         @JvmStatic
+        var randomAlreadyPlayed = ArrayList<String?>()
+
+        @JvmStatic
         var currentSong = 0
             internal set
 

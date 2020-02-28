@@ -71,6 +71,8 @@ class FullscreenPlayerHandler {
             } else {
                 MonstercatPlayer.shuffle = true
                 shuffleButton.setImageResource(R.drawable.ic_shuffle_green_24dp)
+
+                MonstercatPlayer.randomAlreadyPlayed = ArrayList()
             }
         }
 
