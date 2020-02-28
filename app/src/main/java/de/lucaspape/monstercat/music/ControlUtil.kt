@@ -38,42 +38,54 @@ internal fun play() {
 
             //This downloads the stream before playing it (and it pre-downloads the next stream)
             if (downloadStream == true) {
-                if (song.isDownloadable) {
-                    if (!File(song.downloadLocation).exists() && !File(song.streamDownloadLocation).exists()) {
-                        addStreamDownloadSong(context, song.songId) {
-                            playSong(context, song)
-                        }
-                    } else {
-                        playSong(context, song)
-                    }
-                } else {
-                    //No permission to download
-
-                    playSong(context, song)
-                    displayInfo(
-                        context,
-                        context.getString(R.string.errorDownloadNotAllowedFallbackStream)
-                    )
+                preDownloadSongStream(
+                    context,
+                    song,
+                    getSong(MonstercatPlayer.currentSong + 1)
+                ) { finishedSong ->
+                    playSong(context, finishedSong)
                 }
-
-                try {
-                    val nextSong = getSong(MonstercatPlayer.currentSong + 1)
-                    if (nextSong != null) {
-                        if (!File(nextSong.downloadLocation).exists() && !File(nextSong.streamDownloadLocation).exists()) {
-                            addStreamDownloadSong(context, nextSong.songId) {}
-                        }
-                    }
-                } catch (e: IndexOutOfBoundsException) {
-
-                }
-
             } else {
                 //Stream normally
-
                 playSong(context, song)
             }
-
         }
+    }
+}
+
+private fun preDownloadSongStream(
+    context: Context,
+    song: Song,
+    nextSong: Song?,
+    currentSongFinished: (song: Song) -> Unit
+) {
+    if (song.isDownloadable) {
+        if (!File(song.downloadLocation).exists() && !File(song.streamDownloadLocation).exists()) {
+            addStreamDownloadSong(context, song.songId) {
+                currentSongFinished(song)
+            }
+        } else {
+            currentSongFinished(song)
+        }
+    } else {
+        //No permission to download
+
+        currentSongFinished(song)
+
+        displayInfo(
+            context,
+            context.getString(R.string.errorDownloadNotAllowedFallbackStream)
+        )
+    }
+
+    try {
+        if (nextSong != null) {
+            if (!File(nextSong.downloadLocation).exists() && !File(nextSong.streamDownloadLocation).exists()) {
+                addStreamDownloadSong(context, nextSong.songId) {}
+            }
+        }
+    } catch (e: IndexOutOfBoundsException) {
+
     }
 }
 
@@ -91,31 +103,13 @@ private fun playSong(context: Context, song: Song) {
     val exoPlayer = SimpleExoPlayer.Builder(context).build()
     exoPlayer.audioAttributes = getAudioAttributes()
 
-    //for play/pause button change
-    exoPlayer.addListener(object : Player.EventListener {
-        @Override
-        override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-            setCover(context, song.title, song.version, song.artist, song.albumId) {
-                updateNotification(
-                    song.title,
-                    song.version,
-                    song.artist,
-                    it
-                )
-            }
-
-            setPlayButtonImage(context)
-            startSeekBarUpdate()
-        }
-    })
+    //for play/pause button change and if song ended
+    exoPlayer.addListener(getPlayerListener(context, song))
 
     MonstercatPlayer.mediaPlayer = exoPlayer
 
     //request audio focus
     if (requestAudioFocus(context) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-        //if song ended play next
-        registerNextListener()
-
         //dont stream if not allowed
         if (wifiConnected(context) == true || settings.getSetting("streamOverMobile") == "true" || File(
                 song.getUrl()
@@ -163,27 +157,7 @@ fun playStream(stream: Stream) {
         exoPlayer.audioAttributes = getAudioAttributes()
 
         //for play/pause button change
-        exoPlayer.addListener(object : Player.EventListener {
-            @Override
-            override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-                setPlayButtonImage(context)
-
-                setCover(
-                    context,
-                    StreamInfoUpdateAsync.liveTitle,
-                    StreamInfoUpdateAsync.liveVersion,
-                    StreamInfoUpdateAsync.liveArtist,
-                    StreamInfoUpdateAsync.liveAlbumId
-                ) { bitmap ->
-                    updateNotification(
-                        StreamInfoUpdateAsync.liveTitle,
-                        StreamInfoUpdateAsync.liveVersion,
-                        StreamInfoUpdateAsync.liveArtist,
-                        bitmap
-                    )
-                }
-            }
-        })
+        exoPlayer.addListener(getStreamPlayerListener(context))
 
         MonstercatPlayer.mediaPlayer = exoPlayer
 
@@ -204,7 +178,6 @@ fun playStream(stream: Stream) {
                 streamInfoUpdateAsync = StreamInfoUpdateAsync(WeakReference(context), stream)
                 streamInfoUpdateAsync?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
             }
-
         }
     }
 }
@@ -220,8 +193,6 @@ internal fun stop() {
         setPlayButtonImage(MonstercatPlayer.contextReference?.get()!!)
 
         MonstercatPlayer.mediaPlayer?.stop()
-
-        registerNextListener()
 
         MonstercatPlayer.contextReference?.get()?.let { context ->
             abandonAudioFocus(context)
@@ -240,8 +211,6 @@ fun pause() {
             MonstercatPlayer.mediaPlayer?.playWhenReady = false
 
             setPlayButtonImage(context)
-
-            registerNextListener()
 
             abandonAudioFocus(context)
 
@@ -268,8 +237,6 @@ fun resume() {
                 }
 
                 setPlayButtonImage(context)
-
-                registerNextListener()
 
                 startPlayerService()
             }
@@ -350,17 +317,49 @@ fun getSong(index: Int): Song? {
     return null
 }
 
-private fun registerNextListener() {
-    var nextRun = false
-
-    MonstercatPlayer.mediaPlayer?.addListener(object : Player.EventListener {
+private fun getStreamPlayerListener(context:Context):Player.EventListener{
+    return object:Player.EventListener{
+        @Override
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-            if (playbackState == Player.STATE_ENDED) {
-                if (!nextRun) {
-                    nextRun = true
-                    next()
-                }
+            setPlayButtonImage(context)
+
+            setCover(
+                context,
+                StreamInfoUpdateAsync.liveTitle,
+                StreamInfoUpdateAsync.liveVersion,
+                StreamInfoUpdateAsync.liveArtist,
+                StreamInfoUpdateAsync.liveAlbumId
+            ) { bitmap ->
+                updateNotification(
+                    StreamInfoUpdateAsync.liveTitle,
+                    StreamInfoUpdateAsync.liveVersion,
+                    StreamInfoUpdateAsync.liveArtist,
+                    bitmap
+                )
             }
         }
-    })
+    }
+}
+
+private fun getPlayerListener(context:Context, song:Song):Player.EventListener{
+    return object:Player.EventListener{
+        @Override
+        override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
+            if (playbackState == Player.STATE_ENDED) {
+                next()
+            }else{
+                setCover(context, song.title, song.version, song.artist, song.albumId) {
+                    updateNotification(
+                        song.title,
+                        song.version,
+                        song.artist,
+                        it
+                    )
+                }
+
+                setPlayButtonImage(context)
+                startSeekBarUpdate()
+            }
+        }
+    }
 }
