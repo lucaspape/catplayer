@@ -251,8 +251,7 @@ private fun playSong(context: Context, song: Song) {
                     startSeekBarUpdate()
                 }
             } else {
-                //TODO msg
-                displayInfo(context, "You cannot play this song")
+                displayInfo(context, context.getString(R.string.songNotPlayableError))
             }
         }
     }

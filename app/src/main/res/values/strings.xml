@@ -85,4 +85,5 @@
     <string name="openAlbumInApp">Open album in app...</string>
     <string name="pickApp">Pick app:</string>
     <string name="skipSongsMonstercat">Skip songs from monstercat (e.g. COTW)</string>
+    <string name="songNotPlayableError">Song is not available!</string>
 </resources>
