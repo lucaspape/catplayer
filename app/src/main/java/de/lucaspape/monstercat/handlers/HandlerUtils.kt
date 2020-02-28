@@ -22,6 +22,7 @@ import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.handlers.async.*
 import de.lucaspape.monstercat.request.AuthorizedRequest
+import de.lucaspape.monstercat.util.Settings
 import de.lucaspape.monstercat.util.displayInfo
 import de.lucaspape.monstercat.util.parseSongToDB
 import de.lucaspape.monstercat.util.sid
@@ -62,12 +63,20 @@ internal fun playSongFromId(
     loadContinuousSongListAsyncTask = BackgroundAsync({
         val songDatabaseHelper = SongDatabaseHelper(context)
 
+        val skipMonstercatSongs = Settings(context).getSetting("skipMonstercatSongs")
+
         for (cSongId in continuousList) {
 
             val song = songDatabaseHelper.getSong(context, cSongId)
 
             if (song != null) {
-                monstercatPlayer.addContinuous(song.songId)
+                if(song.artist.contains("monstercat", true)){
+                    if(skipMonstercatSongs != "true"){
+                        monstercatPlayer.addContinuous(song.songId)
+                    }
+                }else{
+                    monstercatPlayer.addContinuous(song.songId)
+                }
             }
         }
     }, {})
