@@ -83,11 +83,17 @@ var playButtonReference: WeakReference<ImageButton>? = null
 
 var fullscreenTitleReference: WeakReference<TextView>? = null
     set(newTitleTextView) {
-        if(fullscreenTitleReference != null){
+        if (fullscreenTitleReference != null) {
             newTitleTextView?.get()?.text = fullscreenTitleReference?.get()?.text
-        }else{
+        } else {
             val currentSong = getCurrentSong()
-            val shownTitle = "${currentSong?.title} ${currentSong?.version}"
+
+            val shownTitle = if (currentSong == null) {
+                ""
+            } else {
+                "${currentSong.title} ${currentSong.version}"
+            }
+
             newTitleTextView?.get()?.text = shownTitle
         }
 
@@ -96,11 +102,18 @@ var fullscreenTitleReference: WeakReference<TextView>? = null
 
 var fullscreenArtistReference: WeakReference<TextView>? = null
     set(newArtistTextView) {
-        if(fullscreenArtistReference != null){
+        if (fullscreenArtistReference != null) {
             newArtistTextView?.get()?.text = fullscreenArtistReference?.get()?.text
-        }else{
+        } else {
             val currentSong = getCurrentSong()
-            newArtistTextView?.get()?.text = currentSong?.artist
+
+            val artist = if (currentSong == null) {
+                ""
+            } else {
+                currentSong?.artist
+            }
+
+            newArtistTextView?.get()?.text = artist
         }
 
         field = newArtistTextView
@@ -190,18 +203,18 @@ internal fun startSeekBarUpdate() {
     val updateSeekBar = object : Runnable {
         override fun run() {
 
-            mediaPlayer?.duration?.toInt()?.let{ duration ->
+            mediaPlayer?.duration?.toInt()?.let { duration ->
                 seekBarReference?.get()?.max = duration
                 fullscreenSeekBarReference?.get()?.max = duration
             }
 
-            mediaPlayer?.currentPosition?.toInt()?.let{ currentPosition ->
+            mediaPlayer?.currentPosition?.toInt()?.let { currentPosition ->
                 seekBarReference?.get()?.progress = currentPosition
                 fullscreenSeekBarReference?.get()?.progress = currentPosition
                 setPlayerState(currentPosition)
             }
 
-            if(currentProgressUpdaterId == id){
+            if (currentProgressUpdaterId == id) {
                 seekBarUpdateHandler.postDelayed(this, 50)
             }
         }
