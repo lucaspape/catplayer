@@ -84,4 +84,5 @@
     <string name="twoFaCode">2FA code</string>
     <string name="openAlbumInApp">Open album in app...</string>
     <string name="pickApp">Pick app:</string>
+    <string name="skipSongsMonstercat">Skip songs from monstercat (e.g. COTW)</string>
 </resources>

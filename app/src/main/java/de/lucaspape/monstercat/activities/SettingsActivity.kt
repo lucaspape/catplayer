@@ -60,6 +60,7 @@ class SettingsActivity : AppCompatActivity() {
         val coverResolutionSeekBar = findViewById<SeekBar>(R.id.coverResolutionSeekbar)
         val shownCoverResolution = findViewById<TextView>(R.id.shownCoverResolution)
 
+        val skipMonstercatSongsSwitch = findViewById<Switch>(R.id.skipMonstercatSongs)
         val resetDatabaseButton = findViewById<Button>(R.id.resetDatabaseButton)
 
         coverResolutionSeekBar.max = 2048 / 256
@@ -105,6 +106,10 @@ class SettingsActivity : AppCompatActivity() {
 
         if (settings.getSetting("downloadType") != null) {
             downloadFlacSwitch.isChecked = settings.getSetting("downloadType") == "flac"
+        }
+
+        if (settings.getSetting("skipMonstercatSongs") != null) {
+            downloadFlacSwitch.isChecked = settings.getSetting("skipMonstercatSongs")!!.toBoolean()
         }
 
         //set switch listeners
@@ -174,6 +179,10 @@ class SettingsActivity : AppCompatActivity() {
             } else {
                 settings.saveSetting("downloadType", "mp3_320")
             }
+        }
+
+        skipMonstercatSongsSwitch.setOnCheckedChangeListener { _, isChecked ->
+            settings.saveSetting("skipMonstercatSongs", isChecked.toString())
         }
 
         resetDatabaseButton.setOnClickListener {

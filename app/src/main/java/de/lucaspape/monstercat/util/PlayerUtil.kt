@@ -129,11 +129,7 @@ fun getCurrentSong(): Song? {
         return if (MonstercatPlayer.loop) {
             MonstercatPlayer.currentSong = 0
 
-            return try {
-                getSong(MonstercatPlayer.currentSong)
-            } catch (e: IndexOutOfBoundsException) {
-                null
-            }
+            getSong(MonstercatPlayer.currentSong)
         } else {
             null
         }
@@ -141,13 +137,17 @@ fun getCurrentSong(): Song? {
 }
 
 fun getSong(index: Int): Song? {
-    val songId = MonstercatPlayer.playlist[index]
+    return try{
+        val songId = MonstercatPlayer.playlist[index]
 
-    MonstercatPlayer.contextReference?.get()?.let { context ->
-        val songDatabaseHelper = SongDatabaseHelper(context)
+        MonstercatPlayer.contextReference?.get()?.let { context ->
+            val songDatabaseHelper = SongDatabaseHelper(context)
 
-        return songDatabaseHelper.getSong(context, songId)
+            return songDatabaseHelper.getSong(context, songId)
+        }
+
+        null
+    }catch(e: IndexOutOfBoundsException){
+        null
     }
-
-    return null
 }
