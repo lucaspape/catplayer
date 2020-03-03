@@ -173,7 +173,12 @@ internal fun nextSong(): String {
                 return nextSongId
             } catch (e: IndexOutOfBoundsException) {
                 return if (loop) {
-                    playlistIndex = 0
+                    playlistIndex = if (shuffle) {
+                        Random.nextInt(0, playlist.size + 1)
+                    } else {
+                        0
+                    }
+
                     playlist[playlistIndex]
                 } else {
                     ""
