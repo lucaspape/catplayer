@@ -10,6 +10,7 @@ import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addStreamDownloadSong
 import de.lucaspape.monstercat.music.notification.startPlayerService
+import de.lucaspape.monstercat.music.notification.updateNotification
 import de.lucaspape.monstercat.twitch.Stream
 import de.lucaspape.monstercat.util.*
 import java.io.File
@@ -25,9 +26,6 @@ internal fun prepareSong(context: Context, song: Song) {
         //new exoplayer
         val newExoPlayer = SimpleExoPlayer.Builder(context).build()
         newExoPlayer.audioAttributes = getAudioAttributes()
-
-        //for play/pause button change and if song ended
-        newExoPlayer.addListener(getPlayerListener(context, song))
 
         nextExoPlayer = newExoPlayer
 
@@ -80,6 +78,9 @@ private fun playSong(context: Context, song: Song) {
 
         exoPlayer?.audioComponent?.volume = 1.0f
 
+        //for play/pause button change and if song ended
+        exoPlayer?.addListener(getPlayerListener(context, song))
+
         exoPlayer?.playWhenReady = true
 
         //UI stuff
@@ -88,6 +89,12 @@ private fun playSong(context: Context, song: Song) {
         setCover(context, song.title, song.version, song.artist, song.albumId) {
             setPlayButtonImage(context)
             startSeekBarUpdate(true)
+            updateNotification(
+                song.title,
+                song.version,
+                song.artist,
+                it
+            )
         }
     }
 }
