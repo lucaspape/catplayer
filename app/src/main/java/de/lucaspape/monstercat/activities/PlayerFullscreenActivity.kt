@@ -31,7 +31,7 @@ class PlayerFullscreenActivity : AppCompatActivity() {
         }
     }
 
-    private fun search(context: Context, term:String){
+    private fun search(context: Context, term: String) {
         val intent = Intent(context, MainActivity::class.java)
         intent.putExtra("search", term)
         context.startActivity(intent)

@@ -30,24 +30,34 @@ data class Song(
     companion object {
         @JvmStatic
         val TABLE_NAME = "song"
+
         @JvmStatic
         val COLUMN_SONG_ID = "songId"
+
         @JvmStatic
         val COLUMN_TITLE = "title"
+
         @JvmStatic
         val COLUMN_VERSION = "version"
+
         @JvmStatic
         val COLUMN_ALBUM_ID = "albumId"
+
         @JvmStatic
         val COLUMN_ALBUM_MC_ID = "mcALbumId"
+
         @JvmStatic
         val COLUMN_ARTIST = "artist"
+
         @JvmStatic
         val COLUMN_COVER_URL = "coverUrl"
+
         @JvmStatic
         val COLUMN_DOWNLOADABLE = "downloadable"
+
         @JvmStatic
         val COLUMN_STREAMABLE = "streamable"
+
         @JvmStatic
         val COLUMN_INEARLYACCESS = "inEarlyAccess"
 
@@ -70,7 +80,8 @@ data class Song(
     val shownTitle = "$title $version"
 
     val downloadLocation: String =
-        context.getExternalFilesDir(null).toString() + "/" + artist + title + version + "." + Settings(
+        context.getExternalFilesDir(null)
+            .toString() + "/" + artist + title + version + "." + Settings(
             context
         ).getSetting("downloadType")
 

@@ -16,6 +16,7 @@ class PlaylistItemDatabaseHelper(context: Context, var playlistId: String) :
     companion object {
         @JvmStatic
         private val DATABASE_VERSION = 3 * PlaylistDatabaseHelper.DATABASE_VERSION
+
         @JvmStatic
         private val DATABASE_NAME = "playlist_items_db"
     }

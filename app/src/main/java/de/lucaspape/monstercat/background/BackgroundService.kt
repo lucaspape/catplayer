@@ -12,10 +12,13 @@ class BackgroundService : Service() {
     companion object {
         @JvmStatic
         var loadContinuousSongListAsyncTask: BackgroundAsync? = null
+
         @JvmStatic
         var downloadTask: DownloadTask? = null
+
         @JvmStatic
         var streamInfoUpdateAsync: StreamInfoUpdateAsync? = null
+
         @JvmStatic
         var serviceRunning = false
     }

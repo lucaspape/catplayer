@@ -81,7 +81,7 @@ class Settings(private val context: Context) {
                 saveSetting("downloadCoversOverMobile", defaultDownloadCoversMobile)
             }
 
-            if(getSetting("crossfadeTime") == null){
+            if (getSetting("crossfadeTime") == null) {
                 saveSetting("crossfadeTime", defaultCrossfadeTime)
             }
         }

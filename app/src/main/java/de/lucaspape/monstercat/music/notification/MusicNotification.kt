@@ -109,7 +109,12 @@ internal fun createPlayerNotification(
         ).build()
 
         val openActivityIntent = Intent(context, MainActivity::class.java)
-        val openActivityPendingIntent = PendingIntent.getActivity(context, 0, openActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val openActivityPendingIntent = PendingIntent.getActivity(
+            context,
+            0,
+            openActivityIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
 
         notificationBuilder
             .setShowWhen(false)
@@ -192,7 +197,8 @@ fun updateNotification(
     bitmap: Bitmap
 ) {
     val notificationManager =
-        contextReference?.get()?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager?
+        contextReference?.get()
+            ?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager?
     notificationManager?.notify(
         musicNotificationID,
         createPlayerNotification(

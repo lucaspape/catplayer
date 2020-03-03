@@ -2,7 +2,6 @@ package de.lucaspape.monstercat.music
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.media.AudioManager
 import android.media.MediaMetadata
 import android.media.session.PlaybackState
 import android.os.Handler
@@ -187,7 +186,7 @@ internal fun hideTitle() {
 
 private var currentProgressUpdaterId = ""
 
-internal fun startSeekBarUpdate(enableCrossfade:Boolean) {
+internal fun startSeekBarUpdate(enableCrossfade: Boolean) {
     val seekBarUpdateHandler = Handler()
 
     contextReference?.get()?.let { context ->

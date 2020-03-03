@@ -72,11 +72,11 @@ internal fun playSongFromId(
             val song = songDatabaseHelper.getSong(context, cSongId)
 
             if (song != null) {
-                if(song.artist.contains("monstercat", true)){
-                    if(skipMonstercatSongs != "true"){
+                if (song.artist.contains("monstercat", true)) {
+                    if (skipMonstercatSongs != "true") {
                         songQueue.add(song.songId)
                     }
-                }else{
+                } else {
                     songQueue.add(song.songId)
                 }
             }

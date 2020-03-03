@@ -18,8 +18,8 @@ import java.lang.ref.WeakReference
 
 private var preparedNext = ""
 
-internal fun prepareSong(context: Context, song:Song){
-    if(preparedNext != song.songId){
+internal fun prepareSong(context: Context, song: Song) {
+    if (preparedNext != song.songId) {
         val settings = Settings(context)
 
         //new exoplayer
@@ -47,7 +47,7 @@ internal fun prepareSong(context: Context, song:Song){
     }
 }
 
-internal fun prepareNextSong(context: Context){
+internal fun prepareNextSong(context: Context) {
     val nextSongId = try {
         playlist[playlistIndex + 1]
     } catch (e: IndexOutOfBoundsException) {
@@ -58,7 +58,7 @@ internal fun prepareNextSong(context: Context){
         }
     }
 
-    if(preparedNext != nextSongId){
+    if (preparedNext != nextSongId) {
         val songDatabaseHelper = SongDatabaseHelper(context)
         val nextSong = songDatabaseHelper.getSong(context, nextSongId)
 
@@ -126,7 +126,8 @@ fun playStream(stream: Stream) {
                 setPlayButtonImage(context)
                 startSeekBarUpdate(false)
 
-                BackgroundService.streamInfoUpdateAsync = StreamInfoUpdateAsync(WeakReference(context), stream)
+                BackgroundService.streamInfoUpdateAsync =
+                    StreamInfoUpdateAsync(WeakReference(context), stream)
                 BackgroundService.streamInfoUpdateAsync?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
             }
         }

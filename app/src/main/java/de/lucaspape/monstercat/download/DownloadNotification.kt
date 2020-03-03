@@ -25,7 +25,8 @@ internal fun showDownloadNotification(
     createDownloadNotificationChannel(context)
 
     val openActivityIntent = Intent(context, MainActivity::class.java)
-    val openActivityPendingIntent = PendingIntent.getActivity(context, 0, openActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+    val openActivityPendingIntent =
+        PendingIntent.getActivity(context, 0, openActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
     val notificationBuilder = NotificationCompat.Builder(context, channelID)
     notificationBuilder.setContentTitle(shownTitle)

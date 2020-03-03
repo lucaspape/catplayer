@@ -11,6 +11,7 @@ data class PlaylistItem(val playlistId: String, val id: Long, val songId: String
     companion object {
         @JvmStatic
         val COLUMN_ID = "id"
+
         @JvmStatic
         val COLUMN_SONG_ID = "song_id"
     }

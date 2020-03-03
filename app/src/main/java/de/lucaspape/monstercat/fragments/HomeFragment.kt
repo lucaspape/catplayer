@@ -9,10 +9,10 @@ import de.lucaspape.monstercat.handlers.*
 import de.lucaspape.monstercat.util.Settings
 
 class HomeFragment() : Fragment() {
-    private var search:String? = null
+    private var search: String? = null
 
-    constructor(search:String):this(){
-        if(search != ""){
+    constructor(search: String) : this() {
+        if (search != "") {
             this.search = search
         }
     }

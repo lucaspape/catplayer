@@ -18,6 +18,7 @@ class AlbumDatabaseHelper(context: Context) :
     companion object {
         @JvmStatic
         val DATABASE_VERSION = 5 * SongDatabaseHelper.DATABASE_VERSION
+
         @JvmStatic
         private val DATABASE_NAME = "albums_db"
     }
@@ -31,11 +32,11 @@ class AlbumDatabaseHelper(context: Context) :
         db?.execSQL(Album.CREATE_TABLE)
     }
 
-    fun reCreateTable(context: Context, reCreateItems:Boolean) {
-        if(reCreateItems){
+    fun reCreateTable(context: Context, reCreateItems: Boolean) {
+        if (reCreateItems) {
             val albums = getAllAlbums()
 
-            for(album in albums){
+            for (album in albums) {
                 val albumItemDatabaseHelper = AlbumItemDatabaseHelper(context, album.albumId)
                 albumItemDatabaseHelper.reCreateTable()
             }
@@ -142,7 +143,7 @@ class AlbumDatabaseHelper(context: Context) :
         return albums
     }
 
-    fun getAllAlbums(): List<Album> {
+    private fun getAllAlbums(): List<Album> {
         val albums: ArrayList<Album> = ArrayList()
 
         val selectQuery = "SELECT * FROM " + Album.TABLE_NAME + " ORDER BY " +

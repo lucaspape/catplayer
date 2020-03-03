@@ -1,6 +1,5 @@
 package de.lucaspape.monstercat.handlers
 
-import android.content.Context
 import android.os.AsyncTask
 import android.view.View
 import android.widget.ImageButton
@@ -23,6 +22,7 @@ import de.lucaspape.monstercat.handlers.async.LoadPlaylistAsync
 import de.lucaspape.monstercat.handlers.async.LoadPlaylistTracksAsync
 import de.lucaspape.monstercat.music.clearQueue
 import java.io.File
+import java.lang.IndexOutOfBoundsException
 import java.lang.ref.WeakReference
 
 class PlaylistHandler {
@@ -68,7 +68,11 @@ class PlaylistHandler {
             val nextSongIdsList = ArrayList<String>()
 
             for (i in (position + 1 until data.size)) {
-                nextSongIdsList.add(data[i].songId)
+                try {
+                    nextSongIdsList.add(data[i].songId)
+                } catch (e: IndexOutOfBoundsException) {
+
+                }
             }
 
             playSongFromId(view.context, songId, true, nextSongIdsList)
@@ -150,7 +154,11 @@ class PlaylistHandler {
                             addDownloadSong(
                                 v.context,
                                 item.songId
-                            ) { titleDownloadButton.setImageURI(song.getSongDownloadStatus().toUri()) }
+                            ) {
+                                titleDownloadButton.setImageURI(
+                                    song.getSongDownloadStatus().toUri()
+                                )
+                            }
                         }
                     }
                 }
@@ -250,12 +258,18 @@ class PlaylistHandler {
                     deleteDownloadedPlaylistTracks(
                         view.context,
                         item.playlistId
-                    ) { titleDownloadButton.setImageURI(item.getDownloadStatus(view.context).toUri()) }
+                    ) {
+                        titleDownloadButton.setImageURI(
+                            item.getDownloadStatus(view.context).toUri()
+                        )
+                    }
                 } else {
                     val titleDownloadButton = v as ImageButton
 
                     downloadPlaylist(view.context, item.playlistId) {
-                        titleDownloadButton.setImageURI(item.getDownloadStatus(view.context).toUri())
+                        titleDownloadButton.setImageURI(
+                            item.getDownloadStatus(view.context).toUri()
+                        )
                     }
                 }
             }
@@ -286,7 +300,7 @@ class PlaylistHandler {
      * Load playlists
      */
     fun loadPlaylist(view: View, forceReload: Boolean) {
-        val contextReference = WeakReference<Context>(view.context)
+        val contextReference = WeakReference(view.context)
 
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
@@ -328,7 +342,7 @@ class PlaylistHandler {
         forceReload: Boolean,
         playlistId: String
     ) {
-        val contextReference = WeakReference<Context>(view.context)
+        val contextReference = WeakReference(view.context)
 
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)

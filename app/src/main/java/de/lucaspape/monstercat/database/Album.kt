@@ -11,16 +11,22 @@ data class Album(
     companion object {
         @JvmStatic
         val TABLE_NAME = "album"
+
         @JvmStatic
         val COLUMN_ID = "id"
+
         @JvmStatic
         val COLUMN_ALBUM_ID = "albumId"
+
         @JvmStatic
         val COLUMN_TITLE = "title"
+
         @JvmStatic
         val COLUMN_ARTIST = "artist"
+
         @JvmStatic
         val COLUMN_COVER_URL = "coverUrl"
+
         @JvmStatic
         val COLUMN_ALBUM_MCID = "albumMCID"
 

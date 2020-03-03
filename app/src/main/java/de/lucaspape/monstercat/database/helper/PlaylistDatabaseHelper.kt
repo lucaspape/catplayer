@@ -18,6 +18,7 @@ class PlaylistDatabaseHelper(context: Context) :
     companion object {
         @JvmStatic
         val DATABASE_VERSION = 2 * SongDatabaseHelper.DATABASE_VERSION
+
         @JvmStatic
         private val DATABASE_NAME = "playlists_db"
     }
@@ -31,12 +32,13 @@ class PlaylistDatabaseHelper(context: Context) :
         db?.execSQL(Playlist.CREATE_TABLE)
     }
 
-    fun reCreateTable(context: Context, reCreateItems:Boolean) {
-        if(reCreateItems){
+    fun reCreateTable(context: Context, reCreateItems: Boolean) {
+        if (reCreateItems) {
             val allPlaylists = getAllPlaylists()
 
-            for(playlist in allPlaylists){
-                val playlistItemDatabaseHelper = PlaylistItemDatabaseHelper(context, playlist.playlistId)
+            for (playlist in allPlaylists) {
+                val playlistItemDatabaseHelper =
+                    PlaylistItemDatabaseHelper(context, playlist.playlistId)
                 playlistItemDatabaseHelper.reCreateTable()
             }
         }

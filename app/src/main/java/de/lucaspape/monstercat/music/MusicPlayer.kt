@@ -181,26 +181,25 @@ internal fun nextSong(): String {
             }
         }
     }
-
 }
 
 internal fun previousSong(): String {
-    return try{
+    return try {
         playlistIndex--
         playlist[playlistIndex]
-    }catch(e: IndexOutOfBoundsException){
+    } catch (e: IndexOutOfBoundsException) {
         ""
     }
 }
 
 fun getCurrentSong(): Song? {
     contextReference?.get()?.let { context ->
-        return try{
+        return try {
             val currentSongId = playlist[playlistIndex]
             val songDatabaseHelper = SongDatabaseHelper(context)
 
             songDatabaseHelper.getSong(context, currentSongId)
-        }catch(e: IndexOutOfBoundsException){
+        } catch (e: IndexOutOfBoundsException) {
             null
         }
     }

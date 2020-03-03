@@ -26,14 +26,18 @@ class Stream(private val clientId: String) {
     var version = ""
     var albumId = ""
 
-    fun getStreamInfo(context: Context, channel: String, finished: (title: String, version:String, artist:String, albumId:String) -> Unit) {
+    fun getStreamInfo(
+        context: Context,
+        channel: String,
+        finished: (title: String, version: String, artist: String, albumId: String) -> Unit
+    ) {
         getAccessToken(context, channel, finished)
     }
 
     private fun getAccessToken(
         context: Context,
         channel: String,
-        finished: (title: String, version:String, artist:String, albumId:String) -> Unit
+        finished: (title: String, version: String, artist: String, albumId: String) -> Unit
     ) {
         val accessTokenRequest = TwitchRequest(Request.Method.GET,
             context.getString(R.string.twitchApiUrl) + "channels/$channel/access_token", clientId,
@@ -53,7 +57,7 @@ class Stream(private val clientId: String) {
         context: Context,
         channel: String,
         accessToken: JSONObject,
-        finished: (title: String, version:String, artist:String, albumId:String) -> Unit
+        finished: (title: String, version: String, artist: String, albumId: String) -> Unit
     ) {
         val player = "twitchweb"
         val token = accessToken.getString("token")
@@ -83,7 +87,7 @@ class Stream(private val clientId: String) {
     fun updateInfo(
         context: Context,
         volleyQueue: RequestQueue,
-        finished: (title: String, version:String, artist:String, albumId:String) -> Unit
+        finished: (title: String, version: String, artist: String, albumId: String) -> Unit
     ) {
         val artistTitleRequest =
             StringRequest(Request.Method.GET,

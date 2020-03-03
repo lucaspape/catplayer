@@ -69,8 +69,8 @@ fun abandonAudioFocus(context: Context) {
     audioManager.abandonAudioFocus(audioFocusChangeListener)
 }
 
-fun getStreamPlayerListener(context:Context): Player.EventListener{
-    return object: Player.EventListener{
+fun getStreamPlayerListener(context: Context): Player.EventListener {
+    return object : Player.EventListener {
         @Override
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
             setPlayButtonImage(context)
@@ -93,15 +93,15 @@ fun getStreamPlayerListener(context:Context): Player.EventListener{
     }
 }
 
-fun getPlayerListener(context:Context, song: Song): Player.EventListener{
-    return object: Player.EventListener{
+fun getPlayerListener(context: Context, song: Song): Player.EventListener {
+    return object : Player.EventListener {
         @Override
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
             exoPlayer?.duration?.let { duration ->
                 exoPlayer?.currentPosition?.let { currentPosition ->
-                    val timeLeft = duration-currentPosition
+                    val timeLeft = duration - currentPosition
 
-                    if(timeLeft < crossfade){
+                    if (timeLeft < crossfade) {
                         nextExoPlayer?.playWhenReady = playWhenReady
                     }
                 }
@@ -109,7 +109,7 @@ fun getPlayerListener(context:Context, song: Song): Player.EventListener{
 
             if (playbackState == Player.STATE_ENDED) {
                 next()
-            }else{
+            } else {
                 setCover(context, song.title, song.version, song.artist, song.albumId) {
                     updateNotification(
                         song.title,

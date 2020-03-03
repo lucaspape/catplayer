@@ -9,12 +9,16 @@ data class Playlist(
     companion object {
         @JvmStatic
         val TABLE_NAME = "playlist"
+
         @JvmStatic
         val COLUMN_ID = "id"
+
         @JvmStatic
         val COLUMN_PLAYLIST_ID = "playlistId"
+
         @JvmStatic
         val COLUMN_NAME = "name"
+
         @JvmStatic
         val COLUMN_TRACK_COUNT = "trackCount"
 

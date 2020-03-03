@@ -1,6 +1,5 @@
 package de.lucaspape.monstercat.handlers
 
-import android.content.Context
 import android.content.Intent
 import android.os.AsyncTask
 import android.view.View
@@ -90,7 +89,11 @@ class HomeHandler {
             val nextSongIdsList = ArrayList<String>()
 
             for (i in (position + 1 until currentCatalogViewData.size)) {
-                nextSongIdsList.add(currentCatalogViewData[i].songId)
+                try {
+                    nextSongIdsList.add(currentCatalogViewData[i].songId)
+                } catch (e: IndexOutOfBoundsException) {
+
+                }
             }
 
             playSongFromId(
@@ -176,7 +179,14 @@ class HomeHandler {
                             titleDownloadButton.setImageURI(song.getSongDownloadStatus().toUri())
                         }
                         else -> {
-                            addDownloadSong(v.context, item.songId) {titleDownloadButton.setImageURI(song.getSongDownloadStatus().toUri())}
+                            addDownloadSong(
+                                v.context,
+                                item.songId
+                            ) {
+                                titleDownloadButton.setImageURI(
+                                    song.getSongDownloadStatus().toUri()
+                                )
+                            }
                         }
                     }
                 }
@@ -195,7 +205,6 @@ class HomeHandler {
                     footerAdapter.add(ProgressItem())
 
                     loadSongList(view, itemAdapter)
-
                 }
             }
         })
@@ -412,7 +421,6 @@ class HomeHandler {
 
                 return false
             }
-
         })
     }
 
@@ -488,7 +496,7 @@ class HomeHandler {
         initDone = false
         currentAlbumViewData = ArrayList()
 
-        val contextReference = WeakReference<Context>(view.context)
+        val contextReference = WeakReference(view.context)
 
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
@@ -558,7 +566,7 @@ class HomeHandler {
      * Load single album
      */
     private fun loadAlbum(view: View, albumId: String, mcId: String, forceReload: Boolean) {
-        val contextReference = WeakReference<Context>(view.context)
+        val contextReference = WeakReference(view.context)
 
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
@@ -616,7 +624,7 @@ class HomeHandler {
 
         searchResults = ArrayList()
 
-        val contextReference = WeakReference<Context>(view.context)
+        val contextReference = WeakReference(view.context)
 
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
