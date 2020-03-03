@@ -206,6 +206,20 @@ internal fun startSeekBarUpdate() {
                 setPlayerState(currentPosition)
             }
 
+            exoPlayer?.duration?.let { duration ->
+                exoPlayer?.currentPosition?.let { currentPosition ->
+                    val timeLeft = duration-currentPosition
+
+                    if(timeLeft < crossfade && exoPlayer?.isPlaying == true){
+                        nextExoPlayer?.playWhenReady = true
+                    }else if(timeLeft < duration/2 && exoPlayer?.isPlaying == true){
+                        contextReference?.get()?.let { context ->
+                            prepareNextSong(context)
+                        }
+                    }
+                }
+            }
+
             if (currentProgressUpdaterId == id) {
                 seekBarUpdateHandler.postDelayed(this, 50)
             }

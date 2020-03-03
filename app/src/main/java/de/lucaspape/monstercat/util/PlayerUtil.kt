@@ -97,6 +97,16 @@ fun getPlayerListener(context:Context, song: Song): Player.EventListener{
     return object: Player.EventListener{
         @Override
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
+            exoPlayer?.duration?.let { duration ->
+                exoPlayer?.currentPosition?.let { currentPosition ->
+                    val timeLeft = duration-currentPosition
+
+                    if(timeLeft < crossfade){
+                        nextExoPlayer?.playWhenReady = playWhenReady
+                    }
+                }
+            }
+
             if (playbackState == Player.STATE_ENDED) {
                 next()
             }else{

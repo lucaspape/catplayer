@@ -16,24 +16,21 @@ import java.io.File
 import java.lang.IndexOutOfBoundsException
 import java.lang.ref.WeakReference
 
-internal fun playSong(context: Context, song: Song) {
-    BackgroundService.streamInfoUpdateAsync?.cancel(true)
+private var preparedNext = ""
 
-    val settings = Settings(context)
+internal fun prepareSong(context: Context, song:Song){
+    if(preparedNext != song.songId){
+        val settings = Settings(context)
 
-    exoPlayer?.release()
-    exoPlayer?.stop()
+        //new exoplayer
+        val newExoPlayer = SimpleExoPlayer.Builder(context).build()
+        newExoPlayer.audioAttributes = getAudioAttributes()
 
-    //new exoplayer
-    val newExoPlayer = SimpleExoPlayer.Builder(context).build()
-    newExoPlayer.audioAttributes = getAudioAttributes()
+        //for play/pause button change and if song ended
+        newExoPlayer.addListener(getPlayerListener(context, song))
 
-    //for play/pause button change and if song ended
-    newExoPlayer.addListener(getPlayerListener(context, song))
+        nextExoPlayer = newExoPlayer
 
-    exoPlayer = newExoPlayer
-
-    if (requestAudioFocus(context) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
         if (wifiConnected(context) == true || settings.getSetting("streamOverMobile") == "true" || File(
                 song.getUrl()
             ).exists()
@@ -41,20 +38,54 @@ internal fun playSong(context: Context, song: Song) {
             val mediaSource = song.getMediaSource()
 
             if (mediaSource != null) {
-                exoPlayer?.prepare(mediaSource)
-
-                exoPlayer?.playWhenReady = true
-
-                //UI stuff
-                setTitle(song.title, song.version, song.artist)
-
-                setCover(context, song.title, song.version, song.artist, song.albumId) {
-                    setPlayButtonImage(context)
-                    startSeekBarUpdate()
-                }
+                nextExoPlayer?.prepare(mediaSource)
+                preparedNext = song.songId
             } else {
                 displayInfo(context, context.getString(R.string.songNotPlayableError))
             }
+        }
+    }
+}
+
+internal fun prepareNextSong(context: Context){
+    val nextSongId = try {
+        playlist[playlistIndex + 1]
+    } catch (e: IndexOutOfBoundsException) {
+        try {
+            songQueue[0]
+        } catch (e: IndexOutOfBoundsException) {
+            ""
+        }
+    }
+
+    if(preparedNext != nextSongId){
+        val songDatabaseHelper = SongDatabaseHelper(context)
+        val nextSong = songDatabaseHelper.getSong(context, nextSongId)
+
+        nextSong?.let {
+            prepareSong(context, it)
+            preparedNext = nextSongId
+        }
+    }
+}
+
+private fun playSong(context: Context, song: Song) {
+    BackgroundService.streamInfoUpdateAsync?.cancel(true)
+
+    if (requestAudioFocus(context) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+        exoPlayer?.release()
+        exoPlayer?.stop()
+
+        exoPlayer = nextExoPlayer
+
+        exoPlayer?.playWhenReady = true
+
+        //UI stuff
+        setTitle(song.title, song.version, song.artist)
+
+        setCover(context, song.title, song.version, song.artist, song.albumId) {
+            setPlayButtonImage(context)
+            startSeekBarUpdate()
         }
     }
 }
@@ -126,6 +157,8 @@ internal fun playNext() {
                 val nextSong = songDatabaseHelper.getSong(context, nextSongId)
 
                 preDownloadSongStream(context, song, nextSong) { song ->
+                    prepareSong(context, song)
+
                     playSong(
                         context,
                         song
@@ -133,6 +166,7 @@ internal fun playNext() {
                 }
 
             } else {
+                prepareSong(context, song)
                 playSong(context, song)
             }
         }
@@ -165,12 +199,14 @@ internal fun playPrevious() {
                 val nextSong = songDatabaseHelper.getSong(context, nextSongId)
 
                 preDownloadSongStream(context, song, nextSong) { song ->
+                    prepareSong(context, song)
                     playSong(
                         context,
                         song
                     )
                 }
             } else {
+                prepareSong(context, song)
                 playSong(context, song)
             }
         }

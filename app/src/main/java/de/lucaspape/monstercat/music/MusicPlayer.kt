@@ -23,7 +23,11 @@ internal var contextReference: WeakReference<Context>? = null
 var exoPlayer: ExoPlayer? = null
     internal set
 
+var nextExoPlayer: ExoPlayer? = null
+    internal set
+
 var songQueue = ArrayList<String>()
+    internal set
 
 internal var playlist = ArrayList<String>()
 internal var playlistIndex = 0
@@ -31,6 +35,7 @@ internal var playlistIndex = 0
 var loop = false
 var loopSingle = false
 var shuffle = false
+var crossfade = 5000
 
 var mediaSession: MediaSessionCompat? = null
     internal set
