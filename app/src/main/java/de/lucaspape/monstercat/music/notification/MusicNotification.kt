@@ -13,6 +13,7 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.activities.MainActivity
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.contextReference
+import java.lang.IllegalArgumentException
 
 internal const val PLAY_PAUSE_ACTION = "de.lucaspape.monstercat.playpause"
 internal const val NEXT_ACTION = "de.lucaspape.monstercat.next"
@@ -28,6 +29,11 @@ private var lastButtonPress: Long = 0
 private var playerServiceIntent: Intent? = null
 
 private var serviceRunning = false
+
+private var prevReceiver:BroadcastReceiver? = null
+private var playPauseReceiver:BroadcastReceiver? = null
+private var nextReceiver:BroadcastReceiver? = null
+private var closeReceiver:BroadcastReceiver? = null
 
 internal fun createPlayerNotification(
     title: String,
@@ -63,23 +69,37 @@ internal fun createPlayerNotification(
         val closePendingIntent =
             PendingIntent.getBroadcast(context, 0, closeIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
+        try {
+            context.unregisterReceiver(prevReceiver)
+            context.unregisterReceiver(playPauseReceiver)
+            context.unregisterReceiver(nextReceiver)
+            context.unregisterReceiver(closeReceiver)
+        }catch (e: IllegalArgumentException){
+
+        }
+
+        prevReceiver = NotificationIntentReceiver()
+        playPauseReceiver = NotificationIntentReceiver()
+        nextReceiver = NotificationIntentReceiver()
+        closeReceiver = NotificationIntentReceiver()
+
         context.registerReceiver(
-            NotificationIntentReceiver(), IntentFilter(
+            prevReceiver, IntentFilter(
                 PREV_ACTION
             )
         )
         context.registerReceiver(
-            NotificationIntentReceiver(), IntentFilter(
+            playPauseReceiver, IntentFilter(
                 PLAY_PAUSE_ACTION
             )
         )
         context.registerReceiver(
-            NotificationIntentReceiver(), IntentFilter(
+            nextReceiver, IntentFilter(
                 NEXT_ACTION
             )
         )
         context.registerReceiver(
-            NotificationIntentReceiver(), IntentFilter(
+            closeReceiver, IntentFilter(
                 CLOSE_ACTION
             )
         )

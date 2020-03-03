@@ -158,8 +158,8 @@ internal fun nextSong(): String {
         } catch (e: IndexOutOfBoundsException) {
             try {
                 //grab song from queue
-                val queueIndex = if (shuffle) {
-                    Random.nextInt(0, songQueue.size + 1)
+                val queueIndex = if (shuffle && songQueue.size>0) {
+                    Random.nextInt(0, songQueue.size)
                 } else {
                     0
                 }
@@ -173,13 +173,31 @@ internal fun nextSong(): String {
                 return nextSongId
             } catch (e: IndexOutOfBoundsException) {
                 return if (loop) {
-                    playlistIndex = if (shuffle) {
-                        Random.nextInt(0, playlist.size + 1)
-                    } else {
-                        0
+                    clearQueue()
+
+                    for(songId in playlist){
+                        songQueue.add(songId)
                     }
 
-                    playlist[playlistIndex]
+                    playlist = ArrayList()
+
+                    return try{
+                        val queueIndex = if (shuffle) {
+                            Random.nextInt(0, songQueue.size)
+                        } else {
+                            0
+                        }
+
+                        val nextSongId: String = songQueue[queueIndex]
+                        songQueue.removeAt(queueIndex)
+
+                        playlist.add(nextSongId)
+                        playlistIndex = playlist.indexOf(nextSongId)
+
+                        nextSongId
+                    }catch(e: java.lang.IndexOutOfBoundsException){
+                        ""
+                    }
                 } else {
                     ""
                 }
