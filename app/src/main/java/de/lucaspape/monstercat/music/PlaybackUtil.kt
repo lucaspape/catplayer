@@ -46,12 +46,22 @@ internal fun prepareSong(context: Context, song: Song) {
 }
 
 internal fun prepareNextSong(context: Context) {
-    val nextSongId = try {
-        playlist[playlistIndex + 1]
-    } catch (e: IndexOutOfBoundsException) {
-        try {
-            songQueue[0]
+    val nextSongId:String
+
+    if(!loopSingle){
+        nextSongId = try {
+            playlist[playlistIndex + 1]
         } catch (e: IndexOutOfBoundsException) {
+            try {
+                songQueue[0]
+            } catch (e: IndexOutOfBoundsException) {
+                ""
+            }
+        }
+    }else{
+        nextSongId = try {
+            playlist[playlistIndex]
+        }catch (e: IndexOutOfBoundsException){
             ""
         }
     }
@@ -65,6 +75,7 @@ internal fun prepareNextSong(context: Context) {
             preparedNext = nextSongId
         }
     }
+
 }
 
 private fun playSong(context: Context, song: Song) {
