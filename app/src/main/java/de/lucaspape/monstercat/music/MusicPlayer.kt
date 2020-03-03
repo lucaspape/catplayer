@@ -185,16 +185,24 @@ internal fun nextSong(): String {
 }
 
 internal fun previousSong(): String {
-    playlistIndex--
-    return playlist[playlistIndex]
+    return try{
+        playlistIndex--
+        playlist[playlistIndex]
+    }catch(e: IndexOutOfBoundsException){
+        ""
+    }
 }
 
 fun getCurrentSong(): Song? {
     contextReference?.get()?.let { context ->
-        val currentSongId = playlist[playlistIndex]
-        val songDatabaseHelper = SongDatabaseHelper(context)
+        return try{
+            val currentSongId = playlist[playlistIndex]
+            val songDatabaseHelper = SongDatabaseHelper(context)
 
-        return songDatabaseHelper.getSong(context, currentSongId)
+            songDatabaseHelper.getSong(context, currentSongId)
+        }catch(e: IndexOutOfBoundsException){
+            null
+        }
     }
 
     return null

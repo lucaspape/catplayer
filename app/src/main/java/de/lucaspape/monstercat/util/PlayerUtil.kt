@@ -120,7 +120,7 @@ fun getPlayerListener(context:Context, song: Song): Player.EventListener{
                 }
 
                 setPlayButtonImage(context)
-                startSeekBarUpdate()
+                startSeekBarUpdate(true)
             }
         }
     }

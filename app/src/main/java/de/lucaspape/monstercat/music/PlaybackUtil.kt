@@ -87,7 +87,7 @@ private fun playSong(context: Context, song: Song) {
 
         setCover(context, song.title, song.version, song.artist, song.albumId) {
             setPlayButtonImage(context)
-            startSeekBarUpdate()
+            startSeekBarUpdate(true)
         }
     }
 }
@@ -124,7 +124,7 @@ fun playStream(stream: Stream) {
                 setTitle(stream.title, stream.version, stream.artist)
 
                 setPlayButtonImage(context)
-                startSeekBarUpdate()
+                startSeekBarUpdate(false)
 
                 BackgroundService.streamInfoUpdateAsync = StreamInfoUpdateAsync(WeakReference(context), stream)
                 BackgroundService.streamInfoUpdateAsync?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)

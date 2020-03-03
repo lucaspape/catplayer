@@ -187,7 +187,7 @@ internal fun hideTitle() {
 
 private var currentProgressUpdaterId = ""
 
-internal fun startSeekBarUpdate() {
+internal fun startSeekBarUpdate(enableCrossfade:Boolean) {
     val seekBarUpdateHandler = Handler()
 
     contextReference?.get()?.let { context ->
@@ -212,7 +212,7 @@ internal fun startSeekBarUpdate() {
                     exoPlayer?.currentPosition?.let { currentPosition ->
                         val timeLeft = duration - currentPosition
 
-                        if (timeLeft < crossfade && exoPlayer?.isPlaying == true) {
+                        if (timeLeft < crossfade && exoPlayer?.isPlaying == true && enableCrossfade) {
                             if (timeLeft >= 1) {
                                 val nextVolume: Float = (crossfade.toFloat() - timeLeft) / crossfade
                                 nextExoPlayer?.audioComponent?.volume = nextVolume
