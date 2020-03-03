@@ -17,6 +17,7 @@
 
         <ImageButton
             android:id="@+id/newPlaylistButton"
+            android:contentDescription="@string/createPlaylist"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_gravity="start"

@@ -33,6 +33,7 @@
             tools:layout_editor_absoluteX="316dp" />
 
         <ImageButton
+            android:contentDescription="@string/monstercatLivestream"
             android:layout_marginStart="20dp"
             android:id="@+id/liveButton"
             android:layout_width="50dp"
