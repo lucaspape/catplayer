@@ -6,10 +6,8 @@ import android.media.AudioManager
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.audio.AudioAttributes
-import de.lucaspape.monstercat.activities.musicPlayer
 import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.music.*
-import de.lucaspape.monstercat.music.MusicPlayer.Companion.audioFocusChangeListener
 import de.lucaspape.monstercat.music.notification.updateNotification
 import de.lucaspape.monstercat.music.setCover
 import de.lucaspape.monstercat.music.setPlayButtonImage
@@ -100,7 +98,7 @@ fun getPlayerListener(context:Context, song: Song): Player.EventListener{
         @Override
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
             if (playbackState == Player.STATE_ENDED) {
-                musicPlayer.next()
+                next()
             }else{
                 setCover(context, song.title, song.version, song.artist, song.albumId) {
                     updateNotification(

@@ -13,7 +13,6 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.activities.musicPlayer
 import de.lucaspape.monstercat.background.BackgroundService.Companion.loadContinuousSongListAsyncTask
 import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
@@ -21,7 +20,8 @@ import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.handlers.async.*
-import de.lucaspape.monstercat.music.MusicPlayer
+import de.lucaspape.monstercat.music.playNext
+import de.lucaspape.monstercat.music.songQueue
 import de.lucaspape.monstercat.request.AuthorizedRequest
 import de.lucaspape.monstercat.util.Settings
 import de.lucaspape.monstercat.util.displayInfo
@@ -36,10 +36,10 @@ import java.lang.ref.WeakReference
  */
 internal fun playSongFromId(songId: String, playNow: Boolean) {
     if (playNow) {
-        MusicPlayer.songQueue.add(songId)
-        musicPlayer.playNow()
+        songQueue.add(songId)
+        playNext()
     } else {
-        MusicPlayer.songQueue.add(0, songId)
+        songQueue.add(0, songId)
     }
 }
 
@@ -74,10 +74,10 @@ internal fun playSongFromId(
             if (song != null) {
                 if(song.artist.contains("monstercat", true)){
                     if(skipMonstercatSongs != "true"){
-                        MusicPlayer.songQueue.add(song.songId)
+                        songQueue.add(song.songId)
                     }
                 }else{
-                    MusicPlayer.songQueue.add(song.songId)
+                    songQueue.add(song.songId)
                 }
             }
         }
@@ -109,13 +109,13 @@ internal fun playAlbumNext(context: Context, mcID: String) {
                 }
             }
 
-            MusicPlayer.songQueue.add(idArray[0])
+            songQueue.add(idArray[0])
 
             loadContinuousSongListAsyncTask?.cancel(true)
 
             loadContinuousSongListAsyncTask = BackgroundAsync({
                 for (i in (1 until idArray.size)) {
-                    MusicPlayer.songQueue.add(idArray[i])
+                    songQueue.add(idArray[i])
                 }
             }, {})
 
@@ -140,7 +140,7 @@ internal fun playPlaylistNext(context: Context, playlistId: String) {
             context,
             playlistItemList[0].songId
         )?.songId?.let { songId ->
-            MusicPlayer.songQueue.add(songId)
+            songQueue.add(songId)
         }
 
         loadContinuousSongListAsyncTask?.cancel(true)
@@ -151,7 +151,7 @@ internal fun playPlaylistNext(context: Context, playlistId: String) {
                     context,
                     playlistItemList[i].songId
                 )?.songId?.let { songId ->
-                    MusicPlayer.songQueue.add(songId)
+                    songQueue.add(songId)
                 }
             }
         }, {})

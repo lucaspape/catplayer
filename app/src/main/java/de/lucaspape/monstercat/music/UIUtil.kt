@@ -13,10 +13,8 @@ import android.widget.SeekBar
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.activities.musicPlayer
 import de.lucaspape.monstercat.download.downloadCoverIntoBitmap
 import de.lucaspape.monstercat.download.downloadCoverIntoImageView
-import de.lucaspape.monstercat.music.MusicPlayer.Companion.contextReference
 import java.lang.ref.WeakReference
 import java.util.*
 
@@ -32,7 +30,7 @@ var seekBarReference: WeakReference<SeekBar>? = null
         newSeekBar?.get()?.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 if (fromUser)
-                    MusicPlayer.exoPlayer?.seekTo(progress.toLong())
+                    exoPlayer?.seekTo(progress.toLong())
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar) {
@@ -57,7 +55,7 @@ var musicBarReference: WeakReference<androidx.appcompat.widget.Toolbar>? = null
 var playButtonReference: WeakReference<ImageButton>? = null
     set(newPlayButton) {
         contextReference?.get()?.let { context ->
-            if (MusicPlayer.exoPlayer?.isPlaying == true) {
+            if (exoPlayer?.isPlaying == true) {
                 newPlayButton?.get()?.setImageDrawable(
                     ContextCompat.getDrawable(
                         context,
@@ -84,7 +82,7 @@ var fullscreenTitleReference: WeakReference<TextView>? = null
         if (fullscreenTitleReference != null) {
             newTitleTextView?.get()?.text = fullscreenTitleReference?.get()?.text
         } else {
-            val currentSong = musicPlayer.getCurrentSong()
+            val currentSong = getCurrentSong()
 
             val shownTitle = if (currentSong == null) {
                 ""
@@ -103,7 +101,7 @@ var fullscreenArtistReference: WeakReference<TextView>? = null
         if (fullscreenArtistReference != null) {
             newArtistTextView?.get()?.text = fullscreenArtistReference?.get()?.text
         } else {
-            val currentSong = musicPlayer.getCurrentSong()
+            val currentSong = getCurrentSong()
 
             val artist = currentSong?.artist ?: ""
 
@@ -120,7 +118,7 @@ var fullscreenSeekBarReference: WeakReference<SeekBar>? = null
         newSeekBar?.get()?.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 if (fromUser)
-                    MusicPlayer.exoPlayer?.seekTo(progress.toLong())
+                    exoPlayer?.seekTo(progress.toLong())
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar) {
@@ -143,7 +141,7 @@ var fullscreenCoverReference: WeakReference<ImageView>? = null
 var fullscreenPlayButtonReference: WeakReference<ImageButton>? = null
     set(newPlayButton) {
         contextReference?.get()?.let { context ->
-            if (MusicPlayer.exoPlayer?.isPlaying == true) {
+            if (exoPlayer?.isPlaying == true) {
                 newPlayButton?.get()?.setImageDrawable(
                     ContextCompat.getDrawable(
                         context,
@@ -197,12 +195,12 @@ internal fun startSeekBarUpdate() {
     val updateSeekBar = object : Runnable {
         override fun run() {
 
-            MusicPlayer.exoPlayer?.duration?.toInt()?.let { duration ->
+            exoPlayer?.duration?.toInt()?.let { duration ->
                 seekBarReference?.get()?.max = duration
                 fullscreenSeekBarReference?.get()?.max = duration
             }
 
-            MusicPlayer.exoPlayer?.currentPosition?.toInt()?.let { currentPosition ->
+            exoPlayer?.currentPosition?.toInt()?.let { currentPosition ->
                 seekBarReference?.get()?.progress = currentPosition
                 fullscreenSeekBarReference?.get()?.progress = currentPosition
                 setPlayerState(currentPosition)
@@ -234,7 +232,7 @@ internal fun setCover(
     }
 
     downloadCoverIntoBitmap(context, { bitmap ->
-        MusicPlayer.exoPlayer?.duration?.let {
+        exoPlayer?.duration?.let {
             setSongMetadata(
                 title,
                 version,
@@ -248,7 +246,7 @@ internal fun setCover(
 }
 
 internal fun setPlayButtonImage(context: Context) {
-    if (MusicPlayer.exoPlayer?.isPlaying == true) {
+    if (exoPlayer?.isPlaying == true) {
         playButtonReference?.get()?.setImageDrawable(
             ContextCompat.getDrawable(
                 context,
@@ -285,7 +283,7 @@ internal fun setPlayButtonImage(context: Context) {
 internal fun setPlayerState(progress: Int) {
     val stateBuilder = PlaybackStateCompat.Builder()
 
-    val state: Int = if (MusicPlayer.exoPlayer?.isPlaying == true) {
+    val state: Int = if (exoPlayer?.isPlaying == true) {
         PlaybackState.STATE_PLAYING
     } else {
         PlaybackState.STATE_PAUSED
@@ -303,7 +301,7 @@ internal fun setPlayerState(progress: Int) {
                 PlaybackStateCompat.ACTION_FAST_FORWARD +
                 PlaybackStateCompat.ACTION_REWIND
     )
-    MusicPlayer.mediaSession?.setPlaybackState(stateBuilder.build())
+    mediaSession?.setPlaybackState(stateBuilder.build())
 }
 
 /**
@@ -322,5 +320,5 @@ internal fun setSongMetadata(
     mediaMetadata.putLong(MediaMetadata.METADATA_KEY_DURATION, duration)
     mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, cover)
     mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ART, cover)
-    MusicPlayer.mediaSession?.setMetadata(mediaMetadata.build())
+    mediaSession?.setMetadata(mediaMetadata.build())
 }

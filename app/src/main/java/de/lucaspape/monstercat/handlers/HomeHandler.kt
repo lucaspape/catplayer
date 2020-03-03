@@ -15,7 +15,6 @@ import com.mikepenz.fastadapter.listeners.ClickEventHook
 import com.mikepenz.fastadapter.scroll.EndlessRecyclerOnScrollListener
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.activities.SettingsActivity
-import de.lucaspape.monstercat.activities.musicPlayer
 import de.lucaspape.monstercat.database.helper.AlbumDatabaseHelper
 import de.lucaspape.monstercat.database.helper.AlbumItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.CatalogSongDatabaseHelper
@@ -25,7 +24,8 @@ import de.lucaspape.monstercat.handlers.abstract_items.AlbumItem
 import de.lucaspape.monstercat.handlers.abstract_items.CatalogItem
 import de.lucaspape.monstercat.handlers.abstract_items.ProgressItem
 import de.lucaspape.monstercat.handlers.async.*
-import de.lucaspape.monstercat.music.*
+import de.lucaspape.monstercat.music.clearQueue
+import de.lucaspape.monstercat.music.playStream
 import de.lucaspape.monstercat.util.*
 import java.io.File
 import java.lang.ref.WeakReference
@@ -83,7 +83,7 @@ class HomeHandler {
          * On song click
          */
         fastAdapter.onClickListener = { _, _, _, position ->
-            musicPlayer.clearQueue()
+            clearQueue()
 
             val catalogItem = currentCatalogViewData[position]
 
@@ -380,7 +380,7 @@ class HomeHandler {
                 de.lucaspape.monstercat.twitch.Stream(view.context.getString(R.string.twitchClientID))
 
             stream.getStreamInfo(view.context, "monstercat") { _, _, _, _ ->
-                musicPlayer.playStream(stream)
+                playStream(stream)
             }
         }
 

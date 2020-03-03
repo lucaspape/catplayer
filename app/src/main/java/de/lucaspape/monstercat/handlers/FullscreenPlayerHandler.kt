@@ -3,7 +3,6 @@ package de.lucaspape.monstercat.handlers
 import android.view.View
 import android.widget.*
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.activities.musicPlayer
 import de.lucaspape.monstercat.music.*
 import java.lang.ref.WeakReference
 
@@ -31,17 +30,17 @@ class FullscreenPlayerHandler {
         val shuffleButton = view.findViewById<ImageButton>(R.id.fullscreenShuffle)
         val loopButton = view.findViewById<ImageButton>(R.id.fullscreenLoop)
 
-        if (MusicPlayer.shuffle) {
+        if (shuffle) {
             shuffleButton.setImageResource(R.drawable.ic_shuffle_green_24dp)
         } else {
             shuffleButton.setImageResource(R.drawable.ic_shuffle_24dp)
         }
 
         when {
-            MusicPlayer.loop -> {
+            loop -> {
                 loopButton.setImageResource(R.drawable.ic_repeat_green_24dp)
             }
-            MusicPlayer.loopSingle -> {
+            loopSingle -> {
                 loopButton.setImageResource(R.drawable.ic_repeat_one_green_24dp)
             }
             else -> {
@@ -50,42 +49,42 @@ class FullscreenPlayerHandler {
         }
 
         playButton.setOnClickListener {
-            musicPlayer.toggleMusic()
+            toggleMusic()
         }
 
         nextButton.setOnClickListener {
-            musicPlayer.next()
+            next()
         }
 
         backButton.setOnClickListener {
-            musicPlayer.previous()
+            previous()
         }
 
         shuffleButton.setOnClickListener {
-            if (MusicPlayer.shuffle) {
-                MusicPlayer.shuffle = false
+            if (shuffle) {
+                shuffle = false
                 shuffleButton.setImageResource(R.drawable.ic_shuffle_24dp)
             } else {
-                MusicPlayer.shuffle = true
+                shuffle = true
                 shuffleButton.setImageResource(R.drawable.ic_shuffle_green_24dp)
             }
         }
 
         loopButton.setOnClickListener {
             when {
-                MusicPlayer.loop -> {
-                    MusicPlayer.loop = false
+                loop -> {
+                    loop = false
 
-                    MusicPlayer.loopSingle = true
+                    loopSingle = true
 
                     loopButton.setImageResource(R.drawable.ic_repeat_one_green_24dp)
                 }
-                MusicPlayer.loopSingle -> {
-                    MusicPlayer.loopSingle = false
+                loopSingle -> {
+                    loopSingle = false
                     loopButton.setImageResource(R.drawable.ic_repeat_24dp)
                 }
                 else -> {
-                    MusicPlayer.loop = true
+                    loop = true
                     loopButton.setImageResource(R.drawable.ic_repeat_green_24dp)
                 }
             }

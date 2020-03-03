@@ -12,7 +12,6 @@ import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.adapters.ItemAdapter
 import com.mikepenz.fastadapter.listeners.ClickEventHook
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.activities.musicPlayer
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
@@ -22,6 +21,7 @@ import de.lucaspape.monstercat.handlers.abstract_items.PlaylistItem
 import de.lucaspape.monstercat.handlers.async.BackgroundAsync
 import de.lucaspape.monstercat.handlers.async.LoadPlaylistAsync
 import de.lucaspape.monstercat.handlers.async.LoadPlaylistTracksAsync
+import de.lucaspape.monstercat.music.clearQueue
 import java.io.File
 import java.lang.ref.WeakReference
 
@@ -61,7 +61,7 @@ class PlaylistHandler {
          * On song click
          */
         fastAdapter.onClickListener = { _, _, _, position ->
-            musicPlayer.clearQueue()
+            clearQueue()
 
             val songId = data[position].songId
 

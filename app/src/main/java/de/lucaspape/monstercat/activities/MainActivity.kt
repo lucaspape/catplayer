@@ -35,13 +35,11 @@ import java.io.File
 import java.io.FileOutputStream
 import java.lang.ref.WeakReference
 
-val noisyReceiver = MusicPlayer.Companion.NoisyReceiver()
+val noisyReceiver = NoisyReceiver()
 var backgroundServiceIntent: Intent? = null
 
 //callback function for back pressed, TODO this is not great
 var fragmentBackPressedCallback: () -> Unit = {}
-
-val musicPlayer = MusicPlayer()
 
 /**
  * Main activity
@@ -88,9 +86,9 @@ class MainActivity : AppCompatActivity() {
         //adjust theme
         changeTheme()
 
-        MusicPlayer.contextReference = WeakReference(this)
+        contextReference = WeakReference(this)
         //create the MusicPlayer.kt mediasession
-        musicPlayer.createMediaSession()
+        createMediaSession()
 
         val settings = Settings(this)
 
@@ -145,9 +143,9 @@ class MainActivity : AppCompatActivity() {
         registerButtonListeners()
 
         //update notification after restart of activity (screen orientation change etc)
-        if (MusicPlayer.exoPlayer?.isPlaying == true) {
+        if (exoPlayer?.isPlaying == true) {
             if (streamInfoUpdateAsync?.status != AsyncTask.Status.RUNNING) {
-                val currentSong = musicPlayer.getCurrentSong()
+                val currentSong = getCurrentSong()
 
                 currentSong?.let { song ->
                     setCover(this, song.title, song.version, song.artist, song.albumId) { bitmap ->
@@ -342,7 +340,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun registerButtonListeners() {
         findViewById<ImageButton>(R.id.playButton).setOnClickListener {
-            musicPlayer.toggleMusic()
+            toggleMusic()
         }
 
         findViewById<androidx.appcompat.widget.Toolbar>(R.id.musicBar).setOnClickListener {

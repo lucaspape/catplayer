@@ -11,10 +11,8 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.activities.MainActivity
-import de.lucaspape.monstercat.activities.musicPlayer
-import de.lucaspape.monstercat.music.MusicPlayer
-import de.lucaspape.monstercat.music.MusicPlayer.Companion.contextReference
-import de.lucaspape.monstercat.music.MusicPlayer.Companion.mediaSession
+import de.lucaspape.monstercat.music.*
+import de.lucaspape.monstercat.music.contextReference
 
 internal const val PLAY_PAUSE_ACTION = "de.lucaspape.monstercat.playpause"
 internal const val NEXT_ACTION = "de.lucaspape.monstercat.next"
@@ -91,7 +89,7 @@ internal fun createPlayerNotification(
             PREV_ACTION, prevPendingIntent
         ).build()
 
-        val playPauseIcon: Int = if (MusicPlayer.exoPlayer?.isPlaying == true) {
+        val playPauseIcon: Int = if (exoPlayer?.isPlaying == true) {
             R.drawable.ic_pause_black_24dp
         } else {
             R.drawable.ic_play_arrow_black_24dp
@@ -138,10 +136,10 @@ class NotificationIntentReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         if (System.currentTimeMillis() - lastButtonPress > 300) {
             when (intent?.action) {
-                PREV_ACTION -> musicPlayer.previous()
-                PLAY_PAUSE_ACTION -> musicPlayer.toggleMusic()
-                NEXT_ACTION -> musicPlayer.next()
-                CLOSE_ACTION -> musicPlayer.stop()
+                PREV_ACTION -> previous()
+                PLAY_PAUSE_ACTION -> toggleMusic()
+                NEXT_ACTION -> next()
+                CLOSE_ACTION -> stop()
             }
 
             lastButtonPress = System.currentTimeMillis()
