@@ -12,7 +12,7 @@ import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.adapters.ItemAdapter
 import com.mikepenz.fastadapter.listeners.ClickEventHook
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.activities.monstercatPlayer
+import de.lucaspape.monstercat.activities.musicPlayer
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
@@ -61,7 +61,7 @@ class PlaylistHandler {
          * On song click
          */
         fastAdapter.onClickListener = { _, _, _, position ->
-            monstercatPlayer.clearContinuous()
+            musicPlayer.clearQueue()
 
             val songId = data[position].songId
 

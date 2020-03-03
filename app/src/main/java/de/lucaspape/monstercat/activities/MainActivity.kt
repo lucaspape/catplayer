@@ -29,20 +29,19 @@ import de.lucaspape.monstercat.fragments.PlaylistFragment
 import de.lucaspape.monstercat.handlers.HomeHandler
 import de.lucaspape.monstercat.handlers.async.BackgroundAsync
 import de.lucaspape.monstercat.music.*
-import de.lucaspape.monstercat.music.MonstercatPlayer.Companion.mediaPlayer
 import de.lucaspape.monstercat.music.notification.updateNotification
 import de.lucaspape.monstercat.util.*
 import java.io.File
 import java.io.FileOutputStream
 import java.lang.ref.WeakReference
 
-val noisyReceiver = MonstercatPlayer.Companion.NoisyReceiver()
+val noisyReceiver = MusicPlayer.Companion.NoisyReceiver()
 var backgroundServiceIntent: Intent? = null
 
 //callback function for back pressed, TODO this is not great
 var fragmentBackPressedCallback: () -> Unit = {}
 
-val monstercatPlayer = MonstercatPlayer()
+val musicPlayer = MusicPlayer()
 
 /**
  * Main activity
@@ -89,9 +88,9 @@ class MainActivity : AppCompatActivity() {
         //adjust theme
         changeTheme()
 
-        MonstercatPlayer.contextReference = WeakReference(this)
+        MusicPlayer.contextReference = WeakReference(this)
         //create the MusicPlayer.kt mediasession
-        monstercatPlayer.createMediaSession()
+        musicPlayer.createMediaSession()
 
         val settings = Settings(this)
 
@@ -146,9 +145,9 @@ class MainActivity : AppCompatActivity() {
         registerButtonListeners()
 
         //update notification after restart of activity (screen orientation change etc)
-        if (mediaPlayer?.isPlaying == true) {
+        if (MusicPlayer.exoPlayer?.isPlaying == true) {
             if (streamInfoUpdateAsync?.status != AsyncTask.Status.RUNNING) {
-                val currentSong = getCurrentSong()
+                val currentSong = musicPlayer.getCurrentSong()
 
                 currentSong?.let { song ->
                     setCover(this, song.title, song.version, song.artist, song.albumId) { bitmap ->
@@ -343,7 +342,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun registerButtonListeners() {
         findViewById<ImageButton>(R.id.playButton).setOnClickListener {
-            toggleMusic()
+            musicPlayer.toggleMusic()
         }
 
         findViewById<androidx.appcompat.widget.Toolbar>(R.id.musicBar).setOnClickListener {

@@ -15,7 +15,7 @@ import com.mikepenz.fastadapter.listeners.ClickEventHook
 import com.mikepenz.fastadapter.scroll.EndlessRecyclerOnScrollListener
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.activities.SettingsActivity
-import de.lucaspape.monstercat.activities.monstercatPlayer
+import de.lucaspape.monstercat.activities.musicPlayer
 import de.lucaspape.monstercat.database.helper.AlbumDatabaseHelper
 import de.lucaspape.monstercat.database.helper.AlbumItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.CatalogSongDatabaseHelper
@@ -83,7 +83,7 @@ class HomeHandler {
          * On song click
          */
         fastAdapter.onClickListener = { _, _, _, position ->
-            monstercatPlayer.clearContinuous()
+            musicPlayer.clearQueue()
 
             val catalogItem = currentCatalogViewData[position]
 
@@ -380,7 +380,7 @@ class HomeHandler {
                 de.lucaspape.monstercat.twitch.Stream(view.context.getString(R.string.twitchClientID))
 
             stream.getStreamInfo(view.context, "monstercat") { _, _, _, _ ->
-                playStream(stream)
+                musicPlayer.playStream(stream)
             }
         }
 

@@ -1,39 +1,39 @@
 package de.lucaspape.monstercat.music
 
 import android.support.v4.media.session.MediaSessionCompat
-import de.lucaspape.monstercat.music.MonstercatPlayer.Companion.mediaPlayer
+import de.lucaspape.monstercat.activities.musicPlayer
 
 class MediaSessionCallback : MediaSessionCompat.Callback() {
     override fun onPause() {
-        pause()
+        musicPlayer.pause()
     }
 
     override fun onPlay() {
-        mediaPlayer?.playWhenReady = true
+        MusicPlayer.exoPlayer?.playWhenReady = true
     }
 
     override fun onSkipToNext() {
-        next()
+        musicPlayer.next()
     }
 
     override fun onSkipToPrevious() {
-        previous()
+        musicPlayer.previous()
     }
 
     override fun onStop() {
-        stop()
+        musicPlayer.stop()
     }
 
     override fun onSeekTo(pos: Long) {
-        mediaPlayer?.seekTo(pos)
+        MusicPlayer.exoPlayer?.seekTo(pos)
     }
 
     override fun onFastForward() {
-        mediaPlayer?.seekTo(mediaPlayer!!.duration)
+        MusicPlayer.exoPlayer?.seekTo(MusicPlayer.exoPlayer!!.duration)
     }
 
     override fun onRewind() {
         super.onRewind()
-        mediaPlayer?.seekTo(0)
+        MusicPlayer.exoPlayer?.seekTo(0)
     }
 }

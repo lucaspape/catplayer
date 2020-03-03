@@ -1,12 +1,9 @@
 package de.lucaspape.monstercat.handlers
 
-import android.content.Context
-import android.content.Intent
 import android.view.View
 import android.widget.*
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.activities.MainActivity
-import de.lucaspape.monstercat.activities.SettingsActivity
+import de.lucaspape.monstercat.activities.musicPlayer
 import de.lucaspape.monstercat.music.*
 import java.lang.ref.WeakReference
 
@@ -34,17 +31,17 @@ class FullscreenPlayerHandler {
         val shuffleButton = view.findViewById<ImageButton>(R.id.fullscreenShuffle)
         val loopButton = view.findViewById<ImageButton>(R.id.fullscreenLoop)
 
-        if (MonstercatPlayer.shuffle) {
+        if (MusicPlayer.shuffle) {
             shuffleButton.setImageResource(R.drawable.ic_shuffle_green_24dp)
         } else {
             shuffleButton.setImageResource(R.drawable.ic_shuffle_24dp)
         }
 
         when {
-            MonstercatPlayer.loop -> {
+            MusicPlayer.loop -> {
                 loopButton.setImageResource(R.drawable.ic_repeat_green_24dp)
             }
-            MonstercatPlayer.loopSingle -> {
+            MusicPlayer.loopSingle -> {
                 loopButton.setImageResource(R.drawable.ic_repeat_one_green_24dp)
             }
             else -> {
@@ -53,44 +50,42 @@ class FullscreenPlayerHandler {
         }
 
         playButton.setOnClickListener {
-            toggleMusic()
+            musicPlayer.toggleMusic()
         }
 
         nextButton.setOnClickListener {
-            next()
+            musicPlayer.next()
         }
 
         backButton.setOnClickListener {
-            previous()
+            musicPlayer.previous()
         }
 
         shuffleButton.setOnClickListener {
-            if (MonstercatPlayer.shuffle) {
-                MonstercatPlayer.shuffle = false
+            if (MusicPlayer.shuffle) {
+                MusicPlayer.shuffle = false
                 shuffleButton.setImageResource(R.drawable.ic_shuffle_24dp)
             } else {
-                MonstercatPlayer.shuffle = true
+                MusicPlayer.shuffle = true
                 shuffleButton.setImageResource(R.drawable.ic_shuffle_green_24dp)
-
-                MonstercatPlayer.randomAlreadyPlayed = ArrayList()
             }
         }
 
         loopButton.setOnClickListener {
             when {
-                MonstercatPlayer.loop -> {
-                    MonstercatPlayer.loop = false
+                MusicPlayer.loop -> {
+                    MusicPlayer.loop = false
 
-                    MonstercatPlayer.loopSingle = true
+                    MusicPlayer.loopSingle = true
 
                     loopButton.setImageResource(R.drawable.ic_repeat_one_green_24dp)
                 }
-                MonstercatPlayer.loopSingle -> {
-                    MonstercatPlayer.loopSingle = false
+                MusicPlayer.loopSingle -> {
+                    MusicPlayer.loopSingle = false
                     loopButton.setImageResource(R.drawable.ic_repeat_24dp)
                 }
                 else -> {
-                    MonstercatPlayer.loop = true
+                    MusicPlayer.loop = true
                     loopButton.setImageResource(R.drawable.ic_repeat_green_24dp)
                 }
             }
