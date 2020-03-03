@@ -78,6 +78,8 @@ private fun playSong(context: Context, song: Song) {
 
         exoPlayer = nextExoPlayer
 
+        exoPlayer?.audioComponent?.volume = 1.0f
+
         exoPlayer?.playWhenReady = true
 
         //UI stuff

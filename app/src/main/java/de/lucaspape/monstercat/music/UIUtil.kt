@@ -2,6 +2,7 @@ package de.lucaspape.monstercat.music
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.media.AudioManager
 import android.media.MediaMetadata
 import android.media.session.PlaybackState
 import android.os.Handler
@@ -189,44 +190,49 @@ private var currentProgressUpdaterId = ""
 internal fun startSeekBarUpdate() {
     val seekBarUpdateHandler = Handler()
 
-    val id = UUID.randomUUID().toString()
-    currentProgressUpdaterId = id
+    contextReference?.get()?.let { context->
+        val id = UUID.randomUUID().toString()
+        currentProgressUpdaterId = id
 
-    val updateSeekBar = object : Runnable {
-        override fun run() {
+        val updateSeekBar = object : Runnable {
+            override fun run() {
 
-            exoPlayer?.duration?.toInt()?.let { duration ->
-                seekBarReference?.get()?.max = duration
-                fullscreenSeekBarReference?.get()?.max = duration
-            }
+                exoPlayer?.duration?.toInt()?.let { duration ->
+                    seekBarReference?.get()?.max = duration
+                    fullscreenSeekBarReference?.get()?.max = duration
+                }
 
-            exoPlayer?.currentPosition?.toInt()?.let { currentPosition ->
-                seekBarReference?.get()?.progress = currentPosition
-                fullscreenSeekBarReference?.get()?.progress = currentPosition
-                setPlayerState(currentPosition)
-            }
+                exoPlayer?.currentPosition?.toInt()?.let { currentPosition ->
+                    seekBarReference?.get()?.progress = currentPosition
+                    fullscreenSeekBarReference?.get()?.progress = currentPosition
+                    setPlayerState(currentPosition)
+                }
 
-            exoPlayer?.duration?.let { duration ->
-                exoPlayer?.currentPosition?.let { currentPosition ->
-                    val timeLeft = duration-currentPosition
+                exoPlayer?.duration?.let { duration ->
+                    exoPlayer?.currentPosition?.let { currentPosition ->
+                        val timeLeft = duration-currentPosition
 
-                    if(timeLeft < crossfade && exoPlayer?.isPlaying == true){
-                        nextExoPlayer?.playWhenReady = true
-                    }else if(timeLeft < duration/2 && exoPlayer?.isPlaying == true){
-                        contextReference?.get()?.let { context ->
+                        if(timeLeft < crossfade && exoPlayer?.isPlaying == true){
+                            if(timeLeft >= 1){
+                                val volume:Float = (crossfade.toFloat()-timeLeft) / crossfade
+                                nextExoPlayer?.audioComponent?.volume = volume
+                            }
+
+                            nextExoPlayer?.playWhenReady = true
+                        }else if(timeLeft < duration/2 && exoPlayer?.isPlaying == true){
                             prepareNextSong(context)
                         }
                     }
                 }
-            }
 
-            if (currentProgressUpdaterId == id) {
-                seekBarUpdateHandler.postDelayed(this, 50)
+                if (currentProgressUpdaterId == id) {
+                    seekBarUpdateHandler.postDelayed(this, 50)
+                }
             }
         }
-    }
 
-    seekBarUpdateHandler.postDelayed(updateSeekBar, 0)
+        seekBarUpdateHandler.postDelayed(updateSeekBar, 0)
+    }
 }
 
 internal fun setCover(
