@@ -46,36 +46,37 @@ internal fun prepareSong(context: Context, song: Song) {
 }
 
 internal fun prepareNextSong(context: Context) {
-    val nextSongId:String
+    if(!shuffle){
+        val nextSongId:String
 
-    if(!loopSingle){
-        nextSongId = try {
-            playlist[playlistIndex + 1]
-        } catch (e: IndexOutOfBoundsException) {
-            try {
-                songQueue[0]
+        if(!loopSingle){
+            nextSongId = try {
+                playlist[playlistIndex + 1]
             } catch (e: IndexOutOfBoundsException) {
+                try {
+                    songQueue[0]
+                } catch (e: IndexOutOfBoundsException) {
+                    ""
+                }
+            }
+        }else{
+            nextSongId = try {
+                playlist[playlistIndex]
+            }catch (e: IndexOutOfBoundsException){
                 ""
             }
         }
-    }else{
-        nextSongId = try {
-            playlist[playlistIndex]
-        }catch (e: IndexOutOfBoundsException){
-            ""
+
+        if (preparedNext != nextSongId) {
+            val songDatabaseHelper = SongDatabaseHelper(context)
+            val nextSong = songDatabaseHelper.getSong(context, nextSongId)
+
+            nextSong?.let {
+                prepareSong(context, it)
+                preparedNext = nextSongId
+            }
         }
     }
-
-    if (preparedNext != nextSongId) {
-        val songDatabaseHelper = SongDatabaseHelper(context)
-        val nextSong = songDatabaseHelper.getSong(context, nextSongId)
-
-        nextSong?.let {
-            prepareSong(context, it)
-            preparedNext = nextSongId
-        }
-    }
-
 }
 
 private fun playSong(context: Context, song: Song) {
