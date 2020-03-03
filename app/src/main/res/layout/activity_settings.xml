@@ -175,7 +175,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/coverResolutionText" />
 
             <Switch
-                android:id="@+id/skipMonstercatSongs"
+                android:id="@+id/skipMonstercatSongsSwitch"
                 android:layout_width="0dp"
                 android:layout_height="50dp"
                 android:layout_marginLeft="10dp"
@@ -186,6 +186,37 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/coverResolutionSeekbar" />
 
+            <TextView
+                android:id="@+id/crossfadeText"
+                android:layout_width="0dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="10dp"
+                android:textColor="?attr/colorOnSurface"
+                android:text="Crossfade"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/skipMonstercatSongsSwitch" />
+
+            <TextView
+                android:id="@+id/shownCrossfadeTime"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_margin="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/crossfadeText" />
+
+            <SeekBar
+                android:id="@+id/crossfadeTimeSeekbar"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/shownCoverResolution"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/crossfadeText" />
+
             <Button
                 android:layout_width="200dp"
                 android:layout_height="50dp"
@@ -195,7 +226,7 @@
                 android:id="@+id/resetDatabaseButton"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/skipMonstercatSongs"/>
+                app:layout_constraintTop_toBottomOf="@+id/crossfadeTimeSeekbar"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -47,7 +47,7 @@ class Settings(private val context: Context) {
         val defaultStreamOverMobile = false.toString()
         val defaultDownloadOverMobile = false.toString()
         val defaultDownloadCoversMobile = false.toString()
-        val defaultMaximumLoad = 50.toString()
+        val defaultCrossfadeTime = 0.toString()
 
         if (overwrite) {
             saveSetting("downloadType", defaultDownloadType)
@@ -58,7 +58,7 @@ class Settings(private val context: Context) {
             saveSetting("streamOverMobile", defaultStreamOverMobile)
             saveSetting("downloadOverMobile", defaultDownloadOverMobile)
             saveSetting("downloadCoversOverMobile", defaultDownloadCoversMobile)
-            saveSetting("maximumLoad", defaultMaximumLoad)
+            saveSetting("crossfadeTime", defaultCrossfadeTime)
         } else {
             if (getSetting("downloadType") == null) {
                 saveSetting("downloadType", defaultDownloadType)
@@ -81,8 +81,8 @@ class Settings(private val context: Context) {
                 saveSetting("downloadCoversOverMobile", defaultDownloadCoversMobile)
             }
 
-            if (getSetting("maximumLoad") == null) {
-                saveSetting("maximumLoad", defaultMaximumLoad)
+            if(getSetting("crossfadeTime") == null){
+                saveSetting("crossfadeTime", defaultCrossfadeTime)
             }
         }
     }

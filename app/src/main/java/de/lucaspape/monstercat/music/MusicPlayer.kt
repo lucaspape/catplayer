@@ -35,7 +35,7 @@ internal var playlistIndex = 0
 var loop = false
 var loopSingle = false
 var shuffle = false
-var crossfade = 5000
+var crossfade = 12000
 
 var mediaSession: MediaSessionCompat? = null
     internal set

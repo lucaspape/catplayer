@@ -190,7 +190,7 @@ private var currentProgressUpdaterId = ""
 internal fun startSeekBarUpdate() {
     val seekBarUpdateHandler = Handler()
 
-    contextReference?.get()?.let { context->
+    contextReference?.get()?.let { context ->
         val id = UUID.randomUUID().toString()
         currentProgressUpdaterId = id
 
@@ -210,16 +210,19 @@ internal fun startSeekBarUpdate() {
 
                 exoPlayer?.duration?.let { duration ->
                     exoPlayer?.currentPosition?.let { currentPosition ->
-                        val timeLeft = duration-currentPosition
+                        val timeLeft = duration - currentPosition
 
-                        if(timeLeft < crossfade && exoPlayer?.isPlaying == true){
-                            if(timeLeft >= 1){
-                                val volume:Float = (crossfade.toFloat()-timeLeft) / crossfade
-                                nextExoPlayer?.audioComponent?.volume = volume
+                        if (timeLeft < crossfade && exoPlayer?.isPlaying == true) {
+                            if (timeLeft >= 1) {
+                                val nextVolume: Float = (crossfade.toFloat() - timeLeft) / crossfade
+                                nextExoPlayer?.audioComponent?.volume = nextVolume
+
+                                val currentVolume = 1 - nextVolume
+                                exoPlayer?.audioComponent?.volume = currentVolume
                             }
 
                             nextExoPlayer?.playWhenReady = true
-                        }else if(timeLeft < duration/2 && exoPlayer?.isPlaying == true){
+                        } else if (timeLeft < duration / 2 && exoPlayer?.isPlaying == true) {
                             prepareNextSong(context)
                         }
                     }

@@ -86,11 +86,15 @@ class MainActivity : AppCompatActivity() {
         //adjust theme
         changeTheme()
 
+        val settings = Settings(this)
+
         contextReference = WeakReference(this)
         //create the MusicPlayer.kt mediasession
         createMediaSession()
 
-        val settings = Settings(this)
+        settings.getSetting("crossfadeTime")?.let {
+            crossfade = Integer.parseInt(it)
+        }
 
         if (!loggedIn) {
             Auth().loadLogin(this, {
@@ -123,12 +127,12 @@ class MainActivity : AppCompatActivity() {
         val intentExtras = intent.extras
 
 
-        if(intentExtras != null){
-            if(intentExtras["search"] != null){
+        if (intentExtras != null) {
+            if (intentExtras["search"] != null) {
                 //open the home fragment
                 openFragment(HomeFragment.newInstance(intentExtras["search"] as String))
             }
-        }else{
+        } else {
             openFragment(HomeFragment.newInstance())
         }
 

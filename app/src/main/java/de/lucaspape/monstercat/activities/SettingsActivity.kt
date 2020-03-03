@@ -15,6 +15,7 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.AlbumDatabaseHelper
 import de.lucaspape.monstercat.database.helper.CatalogSongDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
+import de.lucaspape.monstercat.music.crossfade
 import de.lucaspape.monstercat.util.Auth
 import de.lucaspape.monstercat.util.Settings
 import de.lucaspape.monstercat.util.displayInfo
@@ -60,10 +61,15 @@ class SettingsActivity : AppCompatActivity() {
         val coverResolutionSeekBar = findViewById<SeekBar>(R.id.coverResolutionSeekbar)
         val shownCoverResolution = findViewById<TextView>(R.id.shownCoverResolution)
 
-        val skipMonstercatSongsSwitch = findViewById<Switch>(R.id.skipMonstercatSongs)
-        val resetDatabaseButton = findViewById<Button>(R.id.resetDatabaseButton)
-
         coverResolutionSeekBar.max = 2048 / 256
+
+        val crossfadeTimeSeekBar = findViewById<SeekBar>(R.id.crossfadeTimeSeekbar)
+        val shownCrossfadeTime = findViewById<TextView>(R.id.shownCrossfadeTime)
+
+        crossfadeTimeSeekBar.max = 20000 / 1000
+
+        val skipMonstercatSongsSwitch = findViewById<Switch>(R.id.skipMonstercatSongsSwitch)
+        val resetDatabaseButton = findViewById<Button>(R.id.resetDatabaseButton)
 
         if (settings.getSetting("streamOverMobile") != null) {
             streamMobileSwitch.isChecked = settings.getSetting("streamOverMobile")!!.toBoolean()
@@ -109,7 +115,18 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         if (settings.getSetting("skipMonstercatSongs") != null) {
-            downloadFlacSwitch.isChecked = settings.getSetting("skipMonstercatSongs")!!.toBoolean()
+            skipMonstercatSongsSwitch.isChecked =
+                settings.getSetting("skipMonstercatSongs")!!.toBoolean()
+        }
+
+        if (settings.getSetting("crossfadeTime") != null) {
+            crossfadeTimeSeekBar.progress =
+                Integer.parseInt(settings.getSetting("crossfadeTime")!!) / 1000
+            shownCrossfadeTime.text =
+                (Integer.parseInt(settings.getSetting("crossfadeTime")!!) / 1000).toString()
+            settings.getSetting("crossfadeTime")?.let {
+                crossfade = Integer.parseInt(it)
+            }
         }
 
         //set switch listeners
@@ -161,6 +178,29 @@ class SettingsActivity : AppCompatActivity() {
 
                     settings.getSetting("primaryCoverResolution")
                         ?.let { shownCoverResolution.text = it }
+                }
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+
+            }
+        })
+
+        crossfadeTimeSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (fromUser) {
+                    settings.saveSetting("crossfadeTime", (progress * 1000).toString())
+
+                    settings.getSetting("crossfadeTime")
+                        ?.let { shownCrossfadeTime.text = (Integer.parseInt(it) / 1000).toString() }
+
+                    settings.getSetting("crossfadeTime")?.let {
+                        crossfade = Integer.parseInt(it)
+                    }
                 }
             }
 
