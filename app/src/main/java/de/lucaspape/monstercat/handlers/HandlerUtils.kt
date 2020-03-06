@@ -21,6 +21,7 @@ import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.handlers.async.*
 import de.lucaspape.monstercat.music.playNext
+import de.lucaspape.monstercat.music.prioritySongQueue
 import de.lucaspape.monstercat.music.songQueue
 import de.lucaspape.monstercat.request.AuthorizedRequest
 import de.lucaspape.monstercat.util.Settings
@@ -34,12 +35,21 @@ import java.lang.ref.WeakReference
 /**
  * Play a song from ID
  */
-internal fun playSongFromId(songId: String, playNow: Boolean) {
+internal fun playSongFromId(songId: String, playNow: Boolean, priority:Boolean) {
     if (playNow) {
-        songQueue.add(songId)
-        playNext()
+        if(priority){
+            prioritySongQueue.add(songId)
+            playNext()
+        }else{
+            songQueue.add(songId)
+            playNext()
+        }
     } else {
-        songQueue.add(0, songId)
+        if(priority){
+            prioritySongQueue.add(0, songId)
+        }else{
+            songQueue.add(0, songId)
+        }
     }
 }
 
@@ -52,7 +62,7 @@ internal fun playSongFromId(
     playNow: Boolean,
     nextSongIds: ArrayList<String>
 ) {
-    playSongFromId(songId, playNow)
+    playSongFromId(songId, playNow, false)
 
     val continuousList = ArrayList<String>()
 

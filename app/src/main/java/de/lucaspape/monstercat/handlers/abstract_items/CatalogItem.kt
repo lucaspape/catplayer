@@ -55,7 +55,8 @@ open class CatalogItem(
                         ) {}
                         context.getString(R.string.playNext) -> playSongFromId(
                             id,
-                            false
+                            false,
+                            priority = true
                         )
                         context.getString(R.string.addToPlaylist) -> addSongToPlaylist(
                             context,
@@ -111,7 +112,8 @@ open class CatalogItem(
                     context.getString(R.string.playNext) -> {
                         playSongFromId(
                             id,
-                            false
+                            false,
+                            priority = true
                         )
                     }
                     context.getString(R.string.delete) -> {

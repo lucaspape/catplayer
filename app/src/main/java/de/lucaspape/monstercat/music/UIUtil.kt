@@ -211,7 +211,7 @@ internal fun startSeekBarUpdate(enableCrossfade: Boolean) {
                     exoPlayer?.currentPosition?.let { currentPosition ->
                         val timeLeft = duration - currentPosition
 
-                        if (timeLeft < crossfade && exoPlayer?.isPlaying == true && enableCrossfade && !shuffle) {
+                        if (timeLeft < crossfade && exoPlayer?.isPlaying == true && enableCrossfade) {
                             if (timeLeft >= 1) {
                                 val nextVolume: Float = (crossfade.toFloat() - timeLeft) / crossfade
                                 nextExoPlayer?.audioComponent?.volume = nextVolume
