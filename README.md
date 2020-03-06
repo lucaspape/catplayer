@@ -18,6 +18,7 @@ This android app aims to implement the Monstercat API.
  - Dark Mode (Android 9 or higher)
  - Live Radio from Twitch
  - FLAC download support
+ - Crossfade
 
 <img src="https://raw.githubusercontent.com/lucaspape/catplayer/master/playstore_res/screenshots/20200227/Screenshot_20200227-163256_Catplayer.png" width="40%">  <img src="https://raw.githubusercontent.com/lucaspape/catplayer/master/playstore_res/screenshots/20200227/Screenshot_20200227-163207_Catplayer.png" width="40%">
 
@@ -31,7 +32,6 @@ This custom API is open source and available [here](https://github.com/lucaspape
 ## Todo
 
  - Retain position of list
- - Restore last played song and position after app restart
  - Favorites
  - More song info
  - Browse by artist
