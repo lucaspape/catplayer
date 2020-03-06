@@ -146,15 +146,7 @@ internal fun playNext() {
             val downloadStream = settings.getSetting("downloadStream")?.toBoolean()
 
             if (downloadStream == true) {
-                val nextSongId = try {
-                    playlist[playlistIndex + 1]
-                } catch (e: IndexOutOfBoundsException) {
-                    try {
-                        songQueue[0]
-                    } catch (e: IndexOutOfBoundsException) {
-                        ""
-                    }
-                }
+                val nextSongId = nextSong()
 
                 val nextSong = songDatabaseHelper.getSong(context, nextSongId)
 
@@ -188,15 +180,7 @@ internal fun playPrevious() {
             val downloadStream = settings.getSetting("downloadStream")?.toBoolean()
 
             if (downloadStream == true) {
-                val nextSongId = try {
-                    playlist[playlistIndex + 1]
-                } catch (e: IndexOutOfBoundsException) {
-                    try {
-                        songQueue[0]
-                    } catch (e: IndexOutOfBoundsException) {
-                        ""
-                    }
-                }
+                val nextSongId = previousSong()
 
                 val nextSong = songDatabaseHelper.getSong(context, nextSongId)
 
