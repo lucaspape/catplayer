@@ -88,10 +88,6 @@ class MainActivity : AppCompatActivity() {
 
         val settings = Settings(this)
 
-        contextReference = WeakReference(this)
-        //create the MusicPlayer.kt mediasession
-        createMediaSession()
-
         settings.getSetting("crossfadeTime")?.let {
             crossfade = Integer.parseInt(it)
         }
@@ -138,11 +134,18 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
+        contextReference = WeakReference(this)
+
+        setupMusicPlayer()
+
+        restoreMusicPlayerState()
+
+        //create the MusicPlayer.kt mediasession
+        createMediaSession()
+
         findViewById<BottomNavigationView>(R.id.nav_view).setOnNavigationItemSelectedListener(
             onNavigationItemSelectedListener
         )
-
-        setupMusicPlayer()
 
         registerButtonListeners()
 
@@ -193,6 +196,8 @@ class MainActivity : AppCompatActivity() {
         hideDownloadNotification(this)
 
         fragmentBackPressedCallback = {}
+
+        saveMusicPlayerState()
 
         super.onDestroy()
     }

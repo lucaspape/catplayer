@@ -175,16 +175,13 @@ class NotificationIntentReceiver : BroadcastReceiver() {
 /**
  * Show notification
  */
-internal fun startPlayerService(
+internal fun startPlayerService(songId:String?
 ) {
     if (!serviceRunning) {
         playerServiceIntent =
             Intent(contextReference!!.get()!!, PlayerService::class.java)
 
-        playerServiceIntent?.putExtra("title", "")
-        playerServiceIntent?.putExtra("version", "")
-        playerServiceIntent?.putExtra("artist", "")
-        playerServiceIntent?.putExtra("coverLocation", "")
+        playerServiceIntent?.putExtra("songId", songId)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             contextReference?.get()?.startForegroundService(

@@ -7,7 +7,10 @@ import android.media.AudioManager
 import android.os.IBinder
 import de.lucaspape.monstercat.activities.noisyReceiver
 import de.lucaspape.monstercat.background.BackgroundService
+import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
+import de.lucaspape.monstercat.music.contextReference
 import de.lucaspape.monstercat.music.exoPlayer
+import de.lucaspape.monstercat.music.setCover
 import java.lang.IllegalArgumentException
 
 class PlayerService : Service() {
@@ -19,21 +22,28 @@ class PlayerService : Service() {
         //register receiver which checks if headphones unplugged
         registerReceiver(noisyReceiver, IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY))
 
-        val title = intent!!.getStringExtra("title")!!
-        val version = intent.getStringExtra("version")!!
-        val artist = intent.getStringExtra("artist")!!
+        val songId = intent!!.getStringExtra("songId")!!
 
-        createNotificationChannel()
+        contextReference?.get()?.let { context ->
+            createNotificationChannel()
 
-        startForeground(
-            musicNotificationID,
-            createPlayerNotification(
-                title,
-                version,
-                artist,
-                null
-            )
-        )
+            SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
+                setCover(context, song.title, song.version, song.artist, song.albumId) {
+                    val notification = createPlayerNotification(
+                        song.title,
+                        song.version,
+                        song.artist,
+                        it
+                    )
+
+                    startForeground(
+                        musicNotificationID,
+                        notification
+                    )
+                }
+            }
+
+        }
 
         return START_NOT_STICKY
     }

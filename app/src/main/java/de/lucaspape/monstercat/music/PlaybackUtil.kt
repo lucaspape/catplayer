@@ -91,13 +91,38 @@ private fun playSong(context: Context, song: Song) {
     }
 }
 
+internal fun loadSong(context: Context, song: Song, progress:Long) {
+    BackgroundService.streamInfoUpdateAsync?.cancel(true)
+
+    if (requestAudioFocus(context) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+        exoPlayer?.release()
+        exoPlayer?.stop()
+
+        exoPlayer = nextExoPlayer
+
+        exoPlayer?.audioComponent?.volume = 1.0f
+
+        //for play/pause button change and if song ended
+        exoPlayer?.addListener(getPlayerListener(context, song))
+
+        exoPlayer?.seekTo(progress)
+
+        //UI stuff
+        setTitle(song.title, song.version, song.artist)
+
+        setCover(context, song.title, song.version, song.artist, song.albumId) {
+            setPlayButtonImage(context)
+        }
+    }
+}
+
 fun playStream(stream: Stream) {
     contextReference?.get()?.let { context ->
         BackgroundService.streamInfoUpdateAsync?.cancel(true)
 
         val settings = Settings(context)
 
-        startPlayerService()
+        startPlayerService("")
 
         exoPlayer?.release()
         exoPlayer?.stop()
@@ -136,12 +161,12 @@ fun playStream(stream: Stream) {
 internal fun playNext() {
     contextReference?.get()?.let { context ->
         BackgroundService.streamInfoUpdateAsync?.cancel(true)
-        startPlayerService()
 
         val songDatabaseHelper = SongDatabaseHelper(context)
-        val song = songDatabaseHelper.getSong(context, nextSong())
 
-        song?.let {
+        songDatabaseHelper.getSong(context, nextSong())?.let { song ->
+            startPlayerService(song.songId)
+
             val settings = Settings(context)
             val downloadStream = settings.getSetting("downloadStream")?.toBoolean()
 
@@ -170,12 +195,13 @@ internal fun playNext() {
 internal fun playPrevious() {
     contextReference?.get()?.let { context ->
         BackgroundService.streamInfoUpdateAsync?.cancel(true)
-        startPlayerService()
 
         val songDatabaseHelper = SongDatabaseHelper(context)
         val song = songDatabaseHelper.getSong(context, previousSong())
 
         song?.let {
+            startPlayerService(song.songId)
+
             val settings = Settings(context)
             val downloadStream = settings.getSetting("downloadStream")?.toBoolean()
 

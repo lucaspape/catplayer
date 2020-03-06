@@ -8,13 +8,14 @@ import android.media.AudioManager
 import android.media.session.MediaSession
 import android.support.v4.media.session.MediaSessionCompat
 import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.SimpleExoPlayer
 import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.music.notification.startPlayerService
 import de.lucaspape.monstercat.music.notification.stopPlayerService
+import de.lucaspape.monstercat.music.notification.updateNotification
 import de.lucaspape.monstercat.util.abandonAudioFocus
 import de.lucaspape.monstercat.util.requestAudioFocus
+import java.io.*
 import java.lang.ref.WeakReference
 import kotlin.random.Random
 
@@ -45,6 +46,8 @@ var mediaSession: MediaSessionCompat? = null
     internal set
 
 private var sessionCreated = false
+internal var restored = false
+    private set
 
 val audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener {
     pause()
@@ -58,15 +61,85 @@ class NoisyReceiver : BroadcastReceiver() {
     }
 }
 
+fun restoreMusicPlayerState() {
+    if (!restored) {
+        contextReference?.get()?.let { context ->
+            try {
+                val objectInputStream =
+                    ObjectInputStream(FileInputStream(File(context.cacheDir.toString() + "/player_state.obj")))
+
+                try {
+                    val playerSaveState = objectInputStream.readObject() as PlayerSaveState
+
+                    loop = playerSaveState.loop
+                    loopSingle = playerSaveState.loopSingle
+                    shuffle = playerSaveState.shuffle
+                    crossfade = playerSaveState.crossfade
+                    playlist = playerSaveState.playlist
+                    playlistIndex = playerSaveState.playlistIndex
+                    nextRandom = playerSaveState.nextRandom
+                    songQueue = playerSaveState.songQueue
+                    prioritySongQueue = playerSaveState.prioritySongQueue
+
+                    val song = getCurrentSong()
+
+                    song?.let {
+                        prepareSong(context, song)
+
+                        playerSaveState.progress?.let { progress->
+                            loadSong(context, song, progress)
+
+                            seekBarReference?.get()?.progress = progress.toInt()
+                        }
+
+                        playerSaveState.duration?.let { duration->
+                            seekBarReference?.get()?.max = duration.toInt()
+                        }
+
+                    }
+                } catch (e: TypeCastException) {
+                    File((context.cacheDir.toString() + "/player_state.obj")).delete()
+                }
+            } catch (e: FileNotFoundException) {
+
+            }
+        }
+
+        restored = true
+    }
+}
+
+fun saveMusicPlayerState() {
+    contextReference?.get()?.let { context ->
+        val objectOutputStream =
+            ObjectOutputStream(FileOutputStream(File(context.cacheDir.toString() + "/player_state.obj")))
+
+        val playerSaveState = PlayerSaveState(
+            loop,
+            loopSingle,
+            shuffle,
+            crossfade,
+            playlist,
+            playlistIndex,
+            nextRandom,
+            songQueue,
+            prioritySongQueue,
+            exoPlayer?.currentPosition,
+            exoPlayer?.duration
+        )
+
+        objectOutputStream.writeObject(playerSaveState)
+        objectOutputStream.flush()
+        objectOutputStream.close()
+    }
+}
+
 /**
  * Create mediaSession and listen for callbacks (pause, play buttons on headphones etc.)
  */
 fun createMediaSession() {
     contextReference?.get()?.let {
         if (!sessionCreated) {
-            exoPlayer = SimpleExoPlayer.Builder(it).build()
-
-
             mediaSession = MediaSessionCompat.fromMediaSession(
                 it,
                 MediaSession(it, "de.lucaspape.monstercat.music")
@@ -114,11 +187,27 @@ private fun resume() {
                     NoisyReceiver(),
                     intentFilter
                 )
+
+                setPlayButtonImage(context)
+
+                getCurrentSong()?.let { song ->
+                    startPlayerService(song.songId)
+
+                    //UI stuff
+                    setTitle(song.title, song.version, song.artist)
+
+                    setCover(context, song.title, song.version, song.artist, song.albumId) {
+                        setPlayButtonImage(context)
+                        startSeekBarUpdate(true)
+                        updateNotification(
+                            song.title,
+                            song.version,
+                            song.artist,
+                            it
+                        )
+                    }
+                }
             }
-
-            setPlayButtonImage(context)
-
-            startPlayerService()
         }
     }
 }
@@ -179,7 +268,7 @@ internal fun nextSong(): String {
 
                     //grab song from queue, if shuffle queueIndex is random
                     val queueIndex = if (shuffle && songQueue.size > 0) {
-                        if(nextRandom == -1 ){
+                        if (nextRandom == -1) {
                             nextRandom = Random.nextInt(0, songQueue.size)
                         }
 
@@ -196,7 +285,7 @@ internal fun nextSong(): String {
 
                     playlistIndex = playlist.indexOf(songId)
 
-                    if(songQueue.size > 0){
+                    if (songQueue.size > 0) {
                         nextRandom = Random.nextInt(0, songQueue.size)
                     }
 
@@ -271,7 +360,7 @@ fun getNextSong(): String {
 
                     //grab song from queue, if shuffle queueIndex is random TODO
                     val queueIndex = if (shuffle && songQueue.size > 0) {
-                        if(nextRandom == -1 ){
+                        if (nextRandom == -1) {
                             nextRandom = Random.nextInt(0, songQueue.size)
                         }
 
