@@ -28,8 +28,20 @@ class PlayerService : Service() {
             createNotificationChannel()
 
             SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
+                var notification = createPlayerNotification(
+                    song.title,
+                    song.version,
+                    song.artist,
+                    null
+                )
+
+                startForeground(
+                    musicNotificationID,
+                    notification
+                )
+
                 setCover(context, song.title, song.version, song.artist, song.albumId) {
-                    val notification = createPlayerNotification(
+                    notification = createPlayerNotification(
                         song.title,
                         song.version,
                         song.artist,
@@ -44,6 +56,8 @@ class PlayerService : Service() {
             }
 
         }
+
+
 
         return START_NOT_STICKY
     }

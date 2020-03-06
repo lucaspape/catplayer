@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="emailSetting" translatable="false">email</string>
+    <string name="passwordSetting" translatable="false">password</string>
+    <string name="streamOverMobileSetting" translatable="false">streamOverMobile</string>
+    <string name="downloadCoversOverMobileSetting" translatable="false">downloadCoversOverMobile</string>
+    <string name="downloadOverMobileSetting" translatable="false">downloadOverMobileSetting</string>
+    <string name="disableAudioFocusSetting" translatable="false">disableAudioFocus</string>
+    <string name="primaryCoverResolutionSetting" translatable="false">primaryCoverResolution</string>
+    <string name="secondaryCoverResolutionSetting" translatable="false">secondaryCoverResolution</string>
+    <string name="darkThemeSetting" translatable="false">darkTheme</string>
+    <string name="downloadTypeSetting" translatable="false">downloadType</string>
+    <string name="skipMonstercatSongsSetting" translatable="false">skipMonstercatSongs</string>
+    <string name="crossfadeTimeSetting" translatable="false">crossfadeTime</string>
+    <string name="downloadStreamSetting" translatable="false">downloadStream</string>
+    <string name="albumViewSelectedSetting" translatable="false">albumViewSelected</string>
+    <string name="albumViewSetting" translatable="false">albumView</string>
+    <string name="privacyPolicySetting" translatable="false">privacypolicy</string>
+</resources>

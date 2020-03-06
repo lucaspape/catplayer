@@ -39,8 +39,10 @@ class HomeFragment() : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val settings = Settings(view.context)
-        if (settings.getSetting("albumViewSelected") != null) {
-            HomeHandler.albumViewSelected = settings.getSetting("albumViewSelected")!!.toBoolean()
+        if (settings.getSetting(view.context.getString(R.string.albumViewSelectedSetting)) != null) {
+            HomeHandler.albumViewSelected =
+                settings.getSetting(view.context.getString(R.string.albumViewSelectedSetting))!!
+                    .toBoolean()
         }
 
         homeHandler.setupSpinner(view)

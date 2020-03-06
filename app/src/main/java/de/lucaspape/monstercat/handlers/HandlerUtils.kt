@@ -20,7 +20,7 @@ import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.handlers.async.*
-import de.lucaspape.monstercat.music.playNext
+import de.lucaspape.monstercat.music.next
 import de.lucaspape.monstercat.music.prioritySongQueue
 import de.lucaspape.monstercat.music.songQueue
 import de.lucaspape.monstercat.request.AuthorizedRequest
@@ -39,10 +39,10 @@ internal fun playSongFromId(songId: String, playNow: Boolean, priority:Boolean) 
     if (playNow) {
         if(priority){
             prioritySongQueue.add(songId)
-            playNext()
+            next()
         }else{
             songQueue.add(songId)
-            playNext()
+            next()
         }
     } else {
         if(priority){
@@ -75,7 +75,7 @@ internal fun playSongFromId(
     loadContinuousSongListAsyncTask = BackgroundAsync({
         val songDatabaseHelper = SongDatabaseHelper(context)
 
-        val skipMonstercatSongs = Settings(context).getSetting("skipMonstercatSongs")
+        val skipMonstercatSongs = Settings(context).getSetting(context.getString(R.string.skipMonstercatSongsSetting))
 
         for (cSongId in continuousList) {
 

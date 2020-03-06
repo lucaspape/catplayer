@@ -29,8 +29,8 @@ class PlaylistFragment : Fragment() {
 
         val settings = Settings(view.context)
 
-        val username = settings.getSetting("email")
-        val password = settings.getSetting("password")
+        val username = settings.getSetting(view.context.getString(R.string.emailSetting))
+        val password = settings.getSetting(view.context.getString(R.string.passwordSetting))
 
         if (username == null || password == null) {
             displayInfo(

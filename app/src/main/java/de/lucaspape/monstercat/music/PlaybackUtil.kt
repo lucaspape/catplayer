@@ -29,7 +29,7 @@ internal fun prepareSong(context: Context, song: Song) {
 
         nextExoPlayer = newExoPlayer
 
-        if (wifiConnected(context) == true || settings.getSetting("streamOverMobile") == "true" || File(
+        if (wifiConnected(context) == true || settings.getSetting(context.getString(R.string.streamOverMobileSetting)) == "true" || File(
                 song.getUrl()
             ).exists()
         ) {
@@ -59,7 +59,7 @@ internal fun prepareNextSong(context: Context) {
     }
 }
 
-private fun playSong(context: Context, song: Song) {
+internal fun playSong(context: Context, song: Song) {
     BackgroundService.streamInfoUpdateAsync?.cancel(true)
 
     if (requestAudioFocus(context) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
@@ -139,7 +139,7 @@ fun playStream(stream: Stream) {
         //request audio focus
         if (requestAudioFocus(context) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             //only play stream if allowed
-            if (wifiConnected(context) == true || settings.getSetting("streamOverMobile") == "true") {
+            if (wifiConnected(context) == true || settings.getSetting(context.getString(R.string.streamOverMobileSetting)) == "true") {
                 exoPlayer?.prepare(stream.getMediaSource(context))
 
                 exoPlayer?.playWhenReady = true
@@ -158,77 +158,10 @@ fun playStream(stream: Stream) {
     }
 }
 
-internal fun playNext() {
-    contextReference?.get()?.let { context ->
-        BackgroundService.streamInfoUpdateAsync?.cancel(true)
-
-        val songDatabaseHelper = SongDatabaseHelper(context)
-
-        songDatabaseHelper.getSong(context, nextSong())?.let { song ->
-            startPlayerService(song.songId)
-
-            val settings = Settings(context)
-            val downloadStream = settings.getSetting("downloadStream")?.toBoolean()
-
-            if (downloadStream == true) {
-                val nextSongId = nextSong()
-
-                val nextSong = songDatabaseHelper.getSong(context, nextSongId)
-
-                preDownloadSongStream(context, song, nextSong) { song ->
-                    prepareSong(context, song)
-
-                    playSong(
-                        context,
-                        song
-                    )
-                }
-
-            } else {
-                prepareSong(context, song)
-                playSong(context, song)
-            }
-        }
-    }
-}
-
-internal fun playPrevious() {
-    contextReference?.get()?.let { context ->
-        BackgroundService.streamInfoUpdateAsync?.cancel(true)
-
-        val songDatabaseHelper = SongDatabaseHelper(context)
-        val song = songDatabaseHelper.getSong(context, previousSong())
-
-        song?.let {
-            startPlayerService(song.songId)
-
-            val settings = Settings(context)
-            val downloadStream = settings.getSetting("downloadStream")?.toBoolean()
-
-            if (downloadStream == true) {
-                val nextSongId = previousSong()
-
-                val nextSong = songDatabaseHelper.getSong(context, nextSongId)
-
-                preDownloadSongStream(context, song, nextSong) { song ->
-                    prepareSong(context, song)
-                    playSong(
-                        context,
-                        song
-                    )
-                }
-            } else {
-                prepareSong(context, song)
-                playSong(context, song)
-            }
-        }
-    }
-}
-
 /**
  * Pre-downloads stream before playback
  */
-private fun preDownloadSongStream(
+internal fun preDownloadSongStream(
     context: Context,
     song: Song,
     nextSong: Song?,

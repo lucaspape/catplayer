@@ -6,6 +6,7 @@ import android.media.AudioManager
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.audio.AudioAttributes
+import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.notification.updateNotification
@@ -23,8 +24,8 @@ fun getAudioAttributes(): AudioAttributes {
 fun requestAudioFocus(context: Context): Int {
     val settings = Settings(context)
 
-    val disableAudioFocus = if (settings.getSetting("disableAudioFocus") != null) {
-        settings.getSetting("disableAudioFocus")!!.toBoolean()
+    val disableAudioFocus = if (settings.getSetting(context.getString(R.string.disableAudioFocusSetting)) != null) {
+        settings.getSetting(context.getString(R.string.disableAudioFocusSetting))!!.toBoolean()
     } else {
         false
     }

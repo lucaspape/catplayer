@@ -8,14 +8,15 @@ import android.media.AudioManager
 import android.media.session.MediaSession
 import android.support.v4.media.session.MediaSessionCompat
 import com.google.android.exoplayer2.ExoPlayer
+import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.music.notification.startPlayerService
 import de.lucaspape.monstercat.music.notification.stopPlayerService
 import de.lucaspape.monstercat.music.notification.updateNotification
+import de.lucaspape.monstercat.util.Settings
 import de.lucaspape.monstercat.util.abandonAudioFocus
 import de.lucaspape.monstercat.util.requestAudioFocus
-import java.io.*
 import java.lang.ref.WeakReference
 import kotlin.random.Random
 
@@ -46,8 +47,6 @@ var mediaSession: MediaSessionCompat? = null
     internal set
 
 private var sessionCreated = false
-internal var restored = false
-    private set
 
 val audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener {
     pause()
@@ -58,79 +57,6 @@ class NoisyReceiver : BroadcastReceiver() {
         if (intent?.action == AudioManager.ACTION_AUDIO_BECOMING_NOISY) {
             pause()
         }
-    }
-}
-
-fun restoreMusicPlayerState() {
-    if (!restored) {
-        contextReference?.get()?.let { context ->
-            try {
-                val objectInputStream =
-                    ObjectInputStream(FileInputStream(File(context.cacheDir.toString() + "/player_state.obj")))
-
-                try {
-                    val playerSaveState = objectInputStream.readObject() as PlayerSaveState
-
-                    loop = playerSaveState.loop
-                    loopSingle = playerSaveState.loopSingle
-                    shuffle = playerSaveState.shuffle
-                    crossfade = playerSaveState.crossfade
-                    playlist = playerSaveState.playlist
-                    playlistIndex = playerSaveState.playlistIndex
-                    nextRandom = playerSaveState.nextRandom
-                    songQueue = playerSaveState.songQueue
-                    prioritySongQueue = playerSaveState.prioritySongQueue
-
-                    val song = getCurrentSong()
-
-                    song?.let {
-                        prepareSong(context, song)
-
-                        playerSaveState.progress?.let { progress->
-                            loadSong(context, song, progress)
-
-                            seekBarReference?.get()?.progress = progress.toInt()
-                        }
-
-                        playerSaveState.duration?.let { duration->
-                            seekBarReference?.get()?.max = duration.toInt()
-                        }
-
-                    }
-                } catch (e: TypeCastException) {
-                    File((context.cacheDir.toString() + "/player_state.obj")).delete()
-                }
-            } catch (e: FileNotFoundException) {
-
-            }
-        }
-
-        restored = true
-    }
-}
-
-fun saveMusicPlayerState() {
-    contextReference?.get()?.let { context ->
-        val objectOutputStream =
-            ObjectOutputStream(FileOutputStream(File(context.cacheDir.toString() + "/player_state.obj")))
-
-        val playerSaveState = PlayerSaveState(
-            loop,
-            loopSingle,
-            shuffle,
-            crossfade,
-            playlist,
-            playlistIndex,
-            nextRandom,
-            songQueue,
-            prioritySongQueue,
-            exoPlayer?.currentPosition,
-            exoPlayer?.duration
-        )
-
-        objectOutputStream.writeObject(playerSaveState)
-        objectOutputStream.flush()
-        objectOutputStream.close()
     }
 }
 
@@ -159,11 +85,39 @@ fun createMediaSession() {
  */
 
 fun next() {
-    playNext()
+    contextReference?.get()?.let { context ->
+        SongDatabaseHelper(context).getSong(context, nextSong())?.let { song ->
+            if (Settings(context).getSetting(context.getString(R.string.downloadStreamSetting))?.toBoolean() == true) {
+                SongDatabaseHelper(context).getSong(context, getNextSong())?.let { nextSong ->
+                    preDownloadSongStream(context, song, nextSong) { song ->
+                        prepareSong(context, song)
+                        playSong(context, song)
+                    }
+                }
+
+            } else {
+                prepareSong(context, song)
+                playSong(context, song)
+            }
+        }
+    }
 }
 
 fun previous() {
-    playPrevious()
+    contextReference?.get()?.let { context ->
+        SongDatabaseHelper(context).getSong(context, previousSong())?.let { prevSong ->
+            if (Settings(context).getSetting(context.getString(R.string.downloadStreamSetting))?.toBoolean() == true) {
+                preDownloadSongStream(context, prevSong, null) { song ->
+                    prepareSong(context, song)
+                    playSong(context, song)
+                }
+
+            } else {
+                prepareSong(context, prevSong)
+                playSong(context, prevSong)
+            }
+        }
+    }
 }
 
 fun pause() {
@@ -240,7 +194,7 @@ internal fun stop() {
 /**
  * Returns next song and makes changes to vars
  */
-internal fun nextSong(): String {
+private fun nextSong(): String {
     if (loopSingle) {
         //loop single
         return try {
@@ -326,7 +280,7 @@ internal fun nextSong(): String {
     }
 }
 
-internal fun previousSong(): String {
+private fun previousSong(): String {
     return try {
         playlistIndex--
         playlist[playlistIndex]
@@ -358,7 +312,7 @@ fun getNextSong(): String {
                 try {
                     //next song is not in already in playlist
 
-                    //grab song from queue, if shuffle queueIndex is random TODO
+                    //grab song from queue, if shuffle queueIndex is random
                     val queueIndex = if (shuffle && songQueue.size > 0) {
                         if (nextRandom == -1) {
                             nextRandom = Random.nextInt(0, songQueue.size)

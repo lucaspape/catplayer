@@ -337,7 +337,7 @@ class HomeHandler {
         }
 
         val settings = Settings(view.context)
-        settings.saveSetting("albumViewSelected", albumViewSelected.toString())
+        settings.saveSetting(view.context.getString(R.string.albumViewSelectedSetting), albumViewSelected.toString())
 
         viewSelector.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -358,15 +358,15 @@ class HomeHandler {
                 id: Long
             ) {
                 when {
-                    viewSelector.getItemAtPosition(position) == "Catalog View" -> {
+                    viewSelector.getItemAtPosition(position) == view.context.getString(R.string.catalogView) -> {
                         albumView = false
                         albumViewSelected = false
-                        settings.saveSetting("albumViewSelected", albumViewSelected.toString())
+                        settings.saveSetting(view.context.getString(R.string.albumViewSelectedSetting), albumViewSelected.toString())
                     }
-                    viewSelector.getItemAtPosition(position) == "Album View" -> {
+                    viewSelector.getItemAtPosition(position) == view.context.getString(R.string.albumView) -> {
                         albumView = true
                         albumViewSelected = true
-                        settings.saveSetting("albumViewSelected", albumViewSelected.toString())
+                        settings.saveSetting(view.context.getString(R.string.albumViewSelectedSetting), albumViewSelected.toString())
                     }
                 }
 

@@ -1,6 +1,7 @@
 package de.lucaspape.monstercat.util
 
 import android.content.Context
+import de.lucaspape.monstercat.R
 
 private const val version = "1.3"
 
@@ -48,42 +49,49 @@ class Settings(private val context: Context) {
         val defaultDownloadOverMobile = false.toString()
         val defaultDownloadCoversMobile = false.toString()
         val defaultCrossfadeTime = 0.toString()
-
-        if (overwrite) {
-            saveSetting("downloadType", defaultDownloadType)
-
-            saveSetting("primaryCoverResolution", defaultPrimaryCoverResolution)
-            saveSetting("secondaryCoverResolution", defaultSecondaryCoverResolution)
-
-            saveSetting("streamOverMobile", defaultStreamOverMobile)
-            saveSetting("downloadOverMobile", defaultDownloadOverMobile)
-            saveSetting("downloadCoversOverMobile", defaultDownloadCoversMobile)
-            saveSetting("crossfadeTime", defaultCrossfadeTime)
-        } else {
-            if (getSetting("downloadType") == null) {
-                saveSetting("downloadType", defaultDownloadType)
-            }
-
-            if (getSetting("primaryCoverResolution") == null || getSetting("secondaryCoverResolution") == null) {
-                saveSetting("primaryCoverResolution", defaultPrimaryCoverResolution)
-                saveSetting("secondaryCoverResolution", defaultSecondaryCoverResolution)
-            }
-
-            if (getSetting("streamOverMobile") == null) {
-                saveSetting("streamOverMobile", defaultStreamOverMobile)
-            }
-
-            if (getSetting("downloadOverMobile") == null) {
-                saveSetting("downloadOverMobile", defaultDownloadOverMobile)
-            }
-
-            if (getSetting("downloadCoversOverMobile") == null) {
-                saveSetting("downloadCoversOverMobile", defaultDownloadCoversMobile)
-            }
-
-            if (getSetting("crossfadeTime") == null) {
-                saveSetting("crossfadeTime", defaultCrossfadeTime)
-            }
+        
+        if (getSetting(context.getString(R.string.downloadTypeSetting)) == null || overwrite) {
+            saveSetting(context.getString(R.string.downloadTypeSetting), defaultDownloadType)
         }
+
+        if (getSetting(context.getString(R.string.primaryCoverResolutionSetting)) == null || getSetting(
+                context.getString(R.string.secondaryCoverResolutionSetting)
+            ) == null || overwrite
+        ) {
+            saveSetting(
+                context.getString(R.string.primaryCoverResolutionSetting),
+                defaultPrimaryCoverResolution
+            )
+            saveSetting(
+                context.getString(R.string.secondaryCoverResolutionSetting),
+                defaultSecondaryCoverResolution
+            )
+        }
+
+        if (getSetting(context.getString(R.string.streamOverMobileSetting)) == null || overwrite) {
+            saveSetting(
+                context.getString(R.string.streamOverMobileSetting),
+                defaultStreamOverMobile
+            )
+        }
+
+        if (getSetting(context.getString(R.string.downloadOverMobileSetting)) == null || overwrite) {
+            saveSetting(
+                context.getString(R.string.downloadOverMobileSetting),
+                defaultDownloadOverMobile
+            )
+        }
+
+        if (getSetting(context.getString(R.string.downloadCoversOverMobileSetting)) == null || overwrite) {
+            saveSetting(
+                context.getString(R.string.downloadCoversOverMobileSetting),
+                defaultDownloadCoversMobile
+            )
+        }
+
+        if (getSetting(context.getString(R.string.crossfadeTimeSetting)) == null || overwrite) {
+            saveSetting(context.getString(R.string.crossfadeTimeSetting), defaultCrossfadeTime)
+        }
+
     }
 }

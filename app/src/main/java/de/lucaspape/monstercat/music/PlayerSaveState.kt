@@ -1,6 +1,6 @@
 package de.lucaspape.monstercat.music
 
-import java.io.Serializable
+import java.io.*
 
 data class PlayerSaveState(
     val loop: Boolean,
@@ -17,5 +17,84 @@ data class PlayerSaveState(
 ):Serializable{
     companion object {
         private const val serialVersionUID = 158352511676231
+
+        @JvmStatic
+        internal var restored = false
+            private set
+
+        @JvmStatic
+        fun restoreMusicPlayerState() {
+            if (!restored) {
+                contextReference?.get()?.let { context ->
+                    try {
+                        val objectInputStream =
+                            ObjectInputStream(FileInputStream(File(context.cacheDir.toString() + "/player_state.obj")))
+
+                        try {
+                            val playerSaveState = objectInputStream.readObject() as PlayerSaveState
+
+                            loop = playerSaveState.loop
+                            loopSingle = playerSaveState.loopSingle
+                            shuffle = playerSaveState.shuffle
+                            crossfade = playerSaveState.crossfade
+                            playlist = playerSaveState.playlist
+                            playlistIndex = playerSaveState.playlistIndex
+                            nextRandom = playerSaveState.nextRandom
+                            songQueue = playerSaveState.songQueue
+                            prioritySongQueue = playerSaveState.prioritySongQueue
+
+                            val song = getCurrentSong()
+
+                            song?.let {
+                                prepareSong(context, song)
+
+                                playerSaveState.progress?.let { progress ->
+                                    loadSong(context, song, progress)
+
+                                    seekBarReference?.get()?.progress = progress.toInt()
+                                }
+
+                                playerSaveState.duration?.let { duration ->
+                                    seekBarReference?.get()?.max = duration.toInt()
+                                }
+
+                            }
+                        } catch (e: TypeCastException) {
+                            File((context.cacheDir.toString() + "/player_state.obj")).delete()
+                        }
+                    } catch (e: FileNotFoundException) {
+
+                    }
+                }
+
+                restored = true
+            }
+        }
+
+        @JvmStatic
+        fun saveMusicPlayerState() {
+            contextReference?.get()?.let { context ->
+                val objectOutputStream =
+                    ObjectOutputStream(FileOutputStream(File(context.cacheDir.toString() + "/player_state.obj")))
+
+                val playerSaveState = PlayerSaveState(
+                    loop,
+                    loopSingle,
+                    shuffle,
+                    crossfade,
+                    playlist,
+                    playlistIndex,
+                    nextRandom,
+                    songQueue,
+                    prioritySongQueue,
+                    exoPlayer?.currentPosition,
+                    exoPlayer?.duration
+                )
+
+                objectOutputStream.writeObject(playerSaveState)
+                objectOutputStream.flush()
+                objectOutputStream.close()
+            }
+        }
     }
 }

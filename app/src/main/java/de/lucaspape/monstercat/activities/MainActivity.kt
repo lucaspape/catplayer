@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity() {
 
         val settings = Settings(this)
 
-        settings.getSetting("crossfadeTime")?.let {
+        settings.getSetting(getString(R.string.crossfadeTimeSetting))?.let {
             crossfade = Integer.parseInt(it)
         }
 
@@ -99,8 +99,8 @@ class MainActivity : AppCompatActivity() {
             }, {
                 //login failed, retrieve new SID
 
-                val sUsername = settings.getSetting("email")
-                val sPassword = settings.getSetting("password")
+                val sUsername = settings.getSetting(getString(R.string.emailSetting))
+                val sPassword = settings.getSetting(getString(R.string.passwordSetting))
 
                 sUsername?.let { username ->
                     sPassword?.let { password ->
@@ -116,8 +116,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         //set the correct view
-        if (settings.getSetting("albumViewSelected") != null) {
-            HomeHandler.albumViewSelected = settings.getSetting("albumView") == true.toString()
+        if (settings.getSetting(getString(R.string.albumViewSelectedSetting)) != null) {
+            HomeHandler.albumViewSelected =
+                settings.getSetting(getString(R.string.albumView)) == true.toString()
         }
 
         val intentExtras = intent.extras
@@ -138,7 +139,7 @@ class MainActivity : AppCompatActivity() {
 
         setupMusicPlayer()
 
-        restoreMusicPlayerState()
+        PlayerSaveState.restoreMusicPlayerState()
 
         //create the MusicPlayer.kt mediasession
         createMediaSession()
@@ -197,7 +198,7 @@ class MainActivity : AppCompatActivity() {
 
         fragmentBackPressedCallback = {}
 
-        saveMusicPlayerState()
+        PlayerSaveState.saveMusicPlayerState()
 
         super.onDestroy()
     }
@@ -264,8 +265,8 @@ class MainActivity : AppCompatActivity() {
 
         val settings = Settings(this)
 
-        if (settings.getSetting("darkTheme") != null) {
-            if (settings.getSetting("darkTheme") == "true") {
+        if (settings.getSetting(getString(R.string.darkThemeSetting)) != null) {
+            if (settings.getSetting(getString(R.string.darkThemeSetting)) == "true") {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
 
                 if (fallbackBlackFile.exists() && fallbackBlackFileLow.exists()) {
@@ -282,9 +283,9 @@ class MainActivity : AppCompatActivity() {
             }
         } else {
             if (resources.configuration.uiMode.and(Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) {
-                settings.saveSetting("darkTheme", true.toString())
+                settings.saveSetting(getString(R.string.darkThemeSetting), true.toString())
             } else {
-                settings.saveSetting("darkTheme", false.toString())
+                settings.saveSetting(getString(R.string.darkThemeSetting), false.toString())
             }
 
             changeTheme()
@@ -295,7 +296,7 @@ class MainActivity : AppCompatActivity() {
         val settings = Settings(this)
 
         //for new privacy policy change version number
-        if (settings.getSetting("privacypolicy") != "1.0") {
+        if (settings.getSetting(getString(R.string.privacyPolicySetting)) != "1.0") {
             AlertDialog.Builder(this).apply {
                 setTitle(getString(R.string.privacyPolicy))
                 setPositiveButton(getString(R.string.ok), null)
@@ -319,7 +320,7 @@ class MainActivity : AppCompatActivity() {
                     movementMethod = LinkMovementMethod.getInstance()
                 }
             }
-            settings.saveSetting("privacypolicy", "1.0")
+            settings.saveSetting(getString(R.string.privacyPolicySetting), "1.0")
         }
     }
 

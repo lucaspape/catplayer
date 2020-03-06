@@ -38,8 +38,8 @@ class SettingsActivity : AppCompatActivity() {
 
             val username = usernameInput.text.toString()
             val password = passwordInput.text.toString()
-            settings.saveSetting("email", username)
-            settings.saveSetting("password", password)
+            settings.saveSetting(getString(R.string.emailSetting), username)
+            settings.saveSetting(getString(R.string.passwordSetting), password)
 
             Auth().login(this, username, password, {
                 displayInfo(this, getString(R.string.loginSuccessfulMsg))
@@ -71,33 +71,33 @@ class SettingsActivity : AppCompatActivity() {
         val skipMonstercatSongsSwitch = findViewById<Switch>(R.id.skipMonstercatSongsSwitch)
         val resetDatabaseButton = findViewById<Button>(R.id.resetDatabaseButton)
 
-        if (settings.getSetting("streamOverMobile") != null) {
-            streamMobileSwitch.isChecked = settings.getSetting("streamOverMobile")!!.toBoolean()
+        if (settings.getSetting(getString(R.string.streamOverMobileSetting)) != null) {
+            streamMobileSwitch.isChecked = settings.getSetting(getString(R.string.streamOverMobileSetting))!!.toBoolean()
         }
 
-        if (settings.getSetting("downloadOverMobile") != null) {
-            downloadMobileSwitch.isChecked = settings.getSetting("downloadOverMobile")!!.toBoolean()
+        if (settings.getSetting(getString(R.string.downloadOverMobileSetting)) != null) {
+            downloadMobileSwitch.isChecked = settings.getSetting(getString(R.string.downloadOverMobileSetting))!!.toBoolean()
         }
 
-        if (settings.getSetting("downloadCoversOverMobile") != null) {
+        if (settings.getSetting(getString(R.string.downloadCoversOverMobileSetting)) != null) {
             downloadCoversMobileSwitch.isChecked =
-                settings.getSetting("downloadCoversOverMobile")!!.toBoolean()
+                settings.getSetting(getString(R.string.downloadCoversOverMobileSetting))!!.toBoolean()
         }
 
-        if (settings.getSetting("disableAudioFocus") != null) {
+        if (settings.getSetting(getString(R.string.disableAudioFocusSetting)) != null) {
             disableAudioFocusSwitch.isChecked =
-                settings.getSetting("disableAudioFocus")!!.toBoolean()
+                settings.getSetting(getString(R.string.disableAudioFocusSetting))!!.toBoolean()
         }
 
-        if (settings.getSetting("downloadStream") != null) {
+        if (settings.getSetting(getString(R.string.downloadStreamSetting)) != null) {
             downloadStreamSwitch.isChecked =
-                settings.getSetting("downloadStream")!!.toBoolean()
+                settings.getSetting(getString(R.string.downloadStreamSetting))!!.toBoolean()
         }
 
-        if (settings.getSetting("primaryCoverResolution") != null) {
+        if (settings.getSetting(getString(R.string.primaryCoverResolutionSetting)) != null) {
             coverResolutionSeekBar.progress =
-                Integer.parseInt(settings.getSetting("primaryCoverResolution")!!) / 256
-            shownCoverResolution.text = settings.getSetting("primaryCoverResolution")!!
+                Integer.parseInt(settings.getSetting(getString(R.string.primaryCoverResolutionSetting))!!) / 256
+            shownCoverResolution.text = settings.getSetting(getString(R.string.primaryCoverResolutionSetting))!!
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -106,53 +106,53 @@ class SettingsActivity : AppCompatActivity() {
             darkThemeSwitch.visibility = View.GONE
         }
 
-        if (settings.getSetting("darkTheme") != null) {
-            darkThemeSwitch.isChecked = settings.getSetting("darkTheme")!!.toBoolean()
+        if (settings.getSetting(getString(R.string.darkThemeSetting)) != null) {
+            darkThemeSwitch.isChecked = settings.getSetting(getString(R.string.darkThemeSetting))!!.toBoolean()
         }
 
-        if (settings.getSetting("downloadType") != null) {
-            downloadFlacSwitch.isChecked = settings.getSetting("downloadType") == "flac"
+        if (settings.getSetting(getString(R.string.downloadTypeSetting)) != null) {
+            downloadFlacSwitch.isChecked = settings.getSetting(getString(R.string.downloadTypeSetting)) == "flac"
         }
 
-        if (settings.getSetting("skipMonstercatSongs") != null) {
+        if (settings.getSetting(getString(R.string.skipMonstercatSongsSetting)) != null) {
             skipMonstercatSongsSwitch.isChecked =
-                settings.getSetting("skipMonstercatSongs")!!.toBoolean()
+                settings.getSetting(getString(R.string.skipMonstercatSongsSetting))!!.toBoolean()
         }
 
-        if (settings.getSetting("crossfadeTime") != null) {
+        if (settings.getSetting(getString(R.string.crossfadeTimeSetting)) != null) {
             crossfadeTimeSeekBar.progress =
-                Integer.parseInt(settings.getSetting("crossfadeTime")!!) / 1000
+                Integer.parseInt(settings.getSetting(getString(R.string.crossfadeTimeSetting))!!) / 1000
             shownCrossfadeTime.text =
-                (Integer.parseInt(settings.getSetting("crossfadeTime")!!) / 1000).toString()
-            settings.getSetting("crossfadeTime")?.let {
+                (Integer.parseInt(settings.getSetting(getString(R.string.crossfadeTimeSetting))!!) / 1000).toString()
+            settings.getSetting(getString(R.string.crossfadeTimeSetting))?.let {
                 crossfade = Integer.parseInt(it)
             }
         }
 
         //set switch listeners
         streamMobileSwitch.setOnCheckedChangeListener { _, isChecked ->
-            settings.saveSetting("streamOverMobile", isChecked.toString())
+            settings.saveSetting(getString(R.string.streamOverMobileSetting), isChecked.toString())
         }
 
         downloadMobileSwitch.setOnCheckedChangeListener { _, isChecked ->
-            settings.saveSetting("downloadOverMobile", isChecked.toString())
+            settings.saveSetting(getString(R.string.downloadOverMobileSetting), isChecked.toString())
         }
 
         downloadCoversMobileSwitch.setOnCheckedChangeListener { _, isChecked ->
-            settings.saveSetting("downloadCoversOverMobile", isChecked.toString())
+            settings.saveSetting(getString(R.string.downloadCoversOverMobileSetting), isChecked.toString())
         }
 
         disableAudioFocusSwitch.setOnCheckedChangeListener { _, isChecked ->
-            settings.saveSetting("disableAudioFocus", isChecked.toString())
+            settings.saveSetting(getString(R.string.disableAudioFocusSetting), isChecked.toString())
         }
 
         downloadStreamSwitch.setOnCheckedChangeListener { _, isChecked ->
-            settings.saveSetting("downloadStream", isChecked.toString())
+            settings.saveSetting(getString(R.string.downloadStreamSetting), isChecked.toString())
         }
 
 
         darkThemeSwitch.setOnCheckedChangeListener { _, isChecked ->
-            settings.saveSetting("darkTheme", isChecked.toString())
+            settings.saveSetting(getString(R.string.darkThemeSetting), isChecked.toString())
 
             if (isChecked) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
@@ -166,17 +166,17 @@ class SettingsActivity : AppCompatActivity() {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
                     if (progress != 0) {
-                        settings.saveSetting("primaryCoverResolution", (progress * 256).toString())
+                        settings.saveSetting(getString(R.string.primaryCoverResolutionSetting), (progress * 256).toString())
                         settings.saveSetting(
-                            "secondaryCoverResolution",
+                            getString(R.string.secondaryCoverResolutionSetting),
                             (((progress) * 256) / 4).toString()
                         )
                     } else {
-                        settings.saveSetting("primaryCoverResolution", (128).toString())
-                        settings.saveSetting("secondaryCoverResolution", (64).toString())
+                        settings.saveSetting(getString(R.string.primaryCoverResolutionSetting), (128).toString())
+                        settings.saveSetting(getString(R.string.secondaryCoverResolutionSetting), (64).toString())
                     }
 
-                    settings.getSetting("primaryCoverResolution")
+                    settings.getSetting(getString(R.string.primaryCoverResolutionSetting))
                         ?.let { shownCoverResolution.text = it }
                 }
             }
@@ -193,12 +193,12 @@ class SettingsActivity : AppCompatActivity() {
         crossfadeTimeSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    settings.saveSetting("crossfadeTime", (progress * 1000).toString())
+                    settings.saveSetting(getString(R.string.crossfadeTimeSetting), (progress * 1000).toString())
 
-                    settings.getSetting("crossfadeTime")
+                    settings.getSetting(getString(R.string.crossfadeTimeSetting))
                         ?.let { shownCrossfadeTime.text = (Integer.parseInt(it) / 1000).toString() }
 
-                    settings.getSetting("crossfadeTime")?.let {
+                    settings.getSetting(getString(R.string.crossfadeTimeSetting))?.let {
                         crossfade = Integer.parseInt(it)
                     }
                 }
@@ -215,14 +215,14 @@ class SettingsActivity : AppCompatActivity() {
 
         downloadFlacSwitch.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                settings.saveSetting("downloadType", "flac")
+                settings.saveSetting(getString(R.string.downloadTypeSetting), "flac")
             } else {
-                settings.saveSetting("downloadType", "mp3_320")
+                settings.saveSetting(getString(R.string.downloadTypeSetting), "mp3_320")
             }
         }
 
         skipMonstercatSongsSwitch.setOnCheckedChangeListener { _, isChecked ->
-            settings.saveSetting("skipMonstercatSongs", isChecked.toString())
+            settings.saveSetting(getString(R.string.skipMonstercatSongsSetting), isChecked.toString())
         }
 
         resetDatabaseButton.setOnClickListener {
