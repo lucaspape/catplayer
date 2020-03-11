@@ -1,5 +1,6 @@
 package de.lucaspape.monstercat.music
 
+import android.content.Context
 import java.io.*
 
 data class PlayerSaveState(
@@ -10,11 +11,11 @@ data class PlayerSaveState(
     val playlist: ArrayList<String>,
     val playlistIndex: Int,
     val nextRandom: Int,
-    val songQueue:ArrayList<String>,
-    val prioritySongQueue:ArrayList<String>,
-    val progress:Long?,
-    val duration:Long?
-):Serializable{
+    val songQueue: ArrayList<String>,
+    val prioritySongQueue: ArrayList<String>,
+    val progress: Long?,
+    val duration: Long?
+) : Serializable {
     companion object {
         private const val serialVersionUID = 158352511676231
 
@@ -23,9 +24,9 @@ data class PlayerSaveState(
             private set
 
         @JvmStatic
-        fun restoreMusicPlayerState() {
+        fun restoreMusicPlayerState(context: Context) {
             if (!restored) {
-                contextReference?.get()?.let { context ->
+                try {
                     try {
                         val objectInputStream =
                             ObjectInputStream(FileInputStream(File(context.cacheDir.toString() + "/player_state.obj")))
@@ -62,9 +63,11 @@ data class PlayerSaveState(
                         } catch (e: TypeCastException) {
                             File((context.cacheDir.toString() + "/player_state.obj")).delete()
                         }
-                    } catch (e: FileNotFoundException) {
+                    }catch (e: EOFException){
 
                     }
+                } catch (e: FileNotFoundException) {
+
                 }
 
                 restored = true
@@ -72,29 +75,27 @@ data class PlayerSaveState(
         }
 
         @JvmStatic
-        fun saveMusicPlayerState() {
-            contextReference?.get()?.let { context ->
-                val objectOutputStream =
-                    ObjectOutputStream(FileOutputStream(File(context.cacheDir.toString() + "/player_state.obj")))
+        fun saveMusicPlayerState(context: Context) {
+            val objectOutputStream =
+                ObjectOutputStream(FileOutputStream(File(context.cacheDir.toString() + "/player_state.obj")))
 
-                val playerSaveState = PlayerSaveState(
-                    loop,
-                    loopSingle,
-                    shuffle,
-                    crossfade,
-                    playlist,
-                    playlistIndex,
-                    nextRandom,
-                    songQueue,
-                    prioritySongQueue,
-                    exoPlayer?.currentPosition,
-                    exoPlayer?.duration
-                )
+            val playerSaveState = PlayerSaveState(
+                loop,
+                loopSingle,
+                shuffle,
+                crossfade,
+                playlist,
+                playlistIndex,
+                nextRandom,
+                songQueue,
+                prioritySongQueue,
+                exoPlayer?.currentPosition,
+                exoPlayer?.duration
+            )
 
-                objectOutputStream.writeObject(playerSaveState)
-                objectOutputStream.flush()
-                objectOutputStream.close()
-            }
+            objectOutputStream.writeObject(playerSaveState)
+            objectOutputStream.flush()
+            objectOutputStream.close()
         }
     }
 }

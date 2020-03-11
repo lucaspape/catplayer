@@ -254,8 +254,7 @@ private fun nextSong(): String {
                             songQueue.add(songId)
                         }
 
-                        //empty playlist
-                        playlist = ArrayList()
+                        clearPlaylist()
 
                         return try {
                             val songId = songQueue[0]
@@ -365,4 +364,9 @@ fun getCurrentSong(): Song? {
 fun clearQueue() {
     nextRandom = -1
     songQueue = ArrayList()
+}
+
+fun clearPlaylist(){
+    playlistIndex = 0
+    playlist = ArrayList()
 }

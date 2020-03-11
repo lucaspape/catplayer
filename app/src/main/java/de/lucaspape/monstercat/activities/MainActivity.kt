@@ -139,7 +139,7 @@ class MainActivity : AppCompatActivity() {
 
         setupMusicPlayer()
 
-        PlayerSaveState.restoreMusicPlayerState()
+        PlayerSaveState.restoreMusicPlayerState(this)
 
         //create the MusicPlayer.kt mediasession
         createMediaSession()
@@ -198,7 +198,7 @@ class MainActivity : AppCompatActivity() {
 
         fragmentBackPressedCallback = {}
 
-        PlayerSaveState.saveMusicPlayerState()
+        PlayerSaveState.saveMusicPlayerState(this)
 
         super.onDestroy()
     }
