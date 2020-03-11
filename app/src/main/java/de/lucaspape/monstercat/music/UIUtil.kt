@@ -14,7 +14,6 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.download.downloadCoverIntoBitmap
-import de.lucaspape.monstercat.download.downloadCoverIntoImageView
 import java.lang.ref.WeakReference
 import java.util.*
 
@@ -246,11 +245,15 @@ internal fun setCover(
     callback: (bitmap: Bitmap) -> Unit
 ) {
     barCoverImageReference?.get()?.let {
-        downloadCoverIntoImageView(context, it, albumId, false)
+        downloadCoverIntoBitmap(context, {bitmap ->
+            it.setImageBitmap(bitmap)
+        }, albumId, false)
     }
 
     fullscreenCoverReference?.get()?.let {
-        downloadCoverIntoImageView(context, it, albumId, false)
+        downloadCoverIntoBitmap(context, {bitmap ->
+            it.setImageBitmap(bitmap)
+        }, albumId, false)
     }
 
     downloadCoverIntoBitmap(context, { bitmap ->

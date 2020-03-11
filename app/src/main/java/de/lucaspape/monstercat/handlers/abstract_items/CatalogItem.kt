@@ -2,6 +2,8 @@ package de.lucaspape.monstercat.handlers.abstract_items
 
 import android.app.AlertDialog
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -12,7 +14,7 @@ import com.mikepenz.fastadapter.items.AbstractItem
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadSong
-import de.lucaspape.monstercat.download.downloadCoverIntoImageView
+import de.lucaspape.monstercat.download.downloadCoverIntoAbstractItem
 import de.lucaspape.monstercat.handlers.*
 import de.lucaspape.monstercat.handlers.addSongToPlaylist
 import de.lucaspape.monstercat.handlers.deletePlaylistSong
@@ -21,7 +23,7 @@ import de.lucaspape.monstercat.handlers.playSongFromId
 
 open class CatalogItem(
     val songId: String
-) : AbstractItem<CatalogItem.ViewHolder>() {
+) : AbstractItem<CatalogItem.ViewHolder>(){
 
     companion object {
         @JvmStatic
@@ -174,7 +176,7 @@ open class CatalogItem(
         )
     }
 
-    class ViewHolder(view: View) : FastAdapter.ViewHolder<CatalogItem>(view) {
+    class ViewHolder(view: View) : FastAdapter.ViewHolder<CatalogItem>(view), ViewHolderInterface {
         private val titleTextView: TextView = view.findViewById(R.id.title)
         private val artistTextView: TextView = view.findViewById(R.id.artist)
         val titleMenuButton: ImageButton = view.findViewById(R.id.titleMenuButton)
@@ -183,17 +185,22 @@ open class CatalogItem(
             view.findViewById(R.id.titleDownloadButton)
         private val context = view.context
 
+        private var albumId = ""
+
         override fun bindView(item: CatalogItem, payloads: MutableList<Any>) {
             val songDatabaseHelper = SongDatabaseHelper(context)
             val song = songDatabaseHelper.getSong(context, item.songId)
 
             song?.let {
+                albumId = song.albumId
+
                 val shownTitle = "${song.title} ${song.version}"
 
                 titleTextView.text = shownTitle
                 artistTextView.text = song.artist
 
-                downloadCoverIntoImageView(context, coverImageView, song.albumId, true)
+                //downloadCoverIntoImageView(context, coverImageView, song.albumId, true)
+                downloadCoverIntoAbstractItem(context, this, song.albumId, true)
 
                 titleDownloadButton.setImageURI(song.getSongDownloadStatus().toUri())
             }
@@ -204,6 +211,18 @@ open class CatalogItem(
             artistTextView.text = null
             coverImageView.setImageURI(null)
             titleDownloadButton.setImageURI(null)
+        }
+
+        override fun setCoverBitmap(albumId: String, bitmap: Bitmap?) {
+            if(albumId == this.albumId){
+                coverImageView.setImageBitmap(bitmap)
+            }
+        }
+
+        override fun setCoverDrawable(albumId: String, drawable: Drawable?) {
+            if(albumId == this.albumId){
+                coverImageView.setImageDrawable(drawable)
+            }
         }
     }
 }

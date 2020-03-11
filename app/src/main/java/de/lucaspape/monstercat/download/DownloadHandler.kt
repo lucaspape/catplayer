@@ -6,9 +6,11 @@ import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
 import android.os.AsyncTask
 import android.widget.ImageView
+import com.mikepenz.fastadapter.items.AbstractItem
 import com.squareup.picasso.Picasso
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.background.BackgroundService
+import de.lucaspape.monstercat.handlers.abstract_items.ViewHolderInterface
 import de.lucaspape.monstercat.util.Settings
 import de.lucaspape.monstercat.util.wifiConnected
 import java.io.File
@@ -46,9 +48,9 @@ fun addStreamDownloadSong(context: Context, songId: String, downloadFinished: ()
     }
 }
 
-fun downloadCoverIntoImageView(
+fun downloadCoverIntoAbstractItem(
     context: Context,
-    imageView: ImageView,
+    viewHolder: ViewHolderInterface,
     albumId: String,
     lowRes: Boolean
 ) {
@@ -62,7 +64,7 @@ fun downloadCoverIntoImageView(
     val cacheBitmap = bitmapCache[albumId + resolution]?.get()
 
     if (cacheBitmap != null) {
-        imageView.setImageBitmap(cacheBitmap)
+        viewHolder.setCoverBitmap(albumId, cacheBitmap)
     } else {
         val placeholder = if (!lowRes) {
             Drawable.createFromPath(context.dataDir.toString() + "/fallback.jpg")
@@ -76,21 +78,21 @@ fun downloadCoverIntoImageView(
 
         if (cacheFile.exists()) {
             val bitmap = BitmapFactory.decodeFile(cacheFile.absolutePath)
-            imageView.setImageBitmap(bitmap)
+            viewHolder.setCoverBitmap(albumId, bitmap)
             bitmapCache[albumId + resolution] = SoftReference(bitmap)
         } else {
             if (wifiConnected(context) == true || settings.getSetting(context.getString(R.string.downloadCoversOverMobileSetting)) == "true") {
                 val picassoTarget = object : com.squareup.picasso.Target {
                     override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
-                        imageView.setImageDrawable(placeHolderDrawable)
+                        viewHolder.setCoverDrawable(albumId, placeHolderDrawable)
                     }
 
                     override fun onBitmapFailed(errorDrawable: Drawable?) {
-                        imageView.setImageDrawable(errorDrawable)
+                        viewHolder.setCoverDrawable(albumId, errorDrawable)
                     }
 
                     override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                        imageView.setImageBitmap(bitmap)
+                        viewHolder.setCoverBitmap(albumId, bitmap)
 
                         //possible that it changed by this time
                         if (!cacheFile.exists()) {
@@ -111,7 +113,7 @@ fun downloadCoverIntoImageView(
                     .placeholder(placeholder)
                     .into(picassoTarget)
             } else {
-                imageView.setImageDrawable(placeholder)
+                viewHolder.setCoverDrawable(albumId, placeholder)
             }
         }
     }

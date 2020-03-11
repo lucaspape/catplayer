@@ -2,6 +2,8 @@ package de.lucaspape.monstercat.handlers.abstract_items
 
 import android.app.AlertDialog
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -9,7 +11,7 @@ import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.AlbumDatabaseHelper
-import de.lucaspape.monstercat.download.downloadCoverIntoImageView
+import de.lucaspape.monstercat.download.downloadCoverIntoAbstractItem
 import de.lucaspape.monstercat.handlers.downloadAlbum
 import de.lucaspape.monstercat.handlers.openAlbum
 import de.lucaspape.monstercat.handlers.playAlbumNext
@@ -66,11 +68,13 @@ open class AlbumItem(
         )
     }
 
-    class ViewHolder(view: View) : FastAdapter.ViewHolder<AlbumItem>(view) {
+    class ViewHolder(view: View) : FastAdapter.ViewHolder<AlbumItem>(view), ViewHolderInterface {
         private val titleTextView: TextView = view.findViewById(R.id.albumTitle)
         private val artistTextView: TextView = view.findViewById(R.id.albumArtist)
         private val coverImageView: ImageView = view.findViewById(R.id.cover)
         private val context = view.context
+
+        private var albumId = ""
 
         override fun bindView(item: AlbumItem, payloads: MutableList<Any>) {
             val albumDatabaseHelper = AlbumDatabaseHelper(context)
@@ -78,17 +82,31 @@ open class AlbumItem(
             val album = albumDatabaseHelper.getAlbum(item.albumId)
 
             album?.let {
+                albumId = album.albumId
+
                 titleTextView.text = album.title
                 artistTextView.text = album.artist
             }
 
-            downloadCoverIntoImageView(context, coverImageView, item.albumId, false)
+            downloadCoverIntoAbstractItem(context, this, item.albumId, false)
         }
 
         override fun unbindView(item: AlbumItem) {
             titleTextView.text = null
             artistTextView.text = null
             coverImageView.setImageURI(null)
+        }
+
+        override fun setCoverBitmap(albumId: String, bitmap: Bitmap?) {
+            if(albumId == this.albumId){
+                coverImageView.setImageBitmap(bitmap)
+            }
+        }
+
+        override fun setCoverDrawable(albumId: String, drawable: Drawable?) {
+            if(albumId == this.albumId){
+                coverImageView.setImageDrawable(drawable)
+            }
         }
     }
 }

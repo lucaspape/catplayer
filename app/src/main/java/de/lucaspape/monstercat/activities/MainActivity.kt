@@ -198,9 +198,13 @@ class MainActivity : AppCompatActivity() {
 
         fragmentBackPressedCallback = {}
 
-        PlayerSaveState.saveMusicPlayerState(this)
-
         super.onDestroy()
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        PlayerSaveState.saveMusicPlayerState(this)
     }
 
     private fun downloadFallbackCoverImages() {
