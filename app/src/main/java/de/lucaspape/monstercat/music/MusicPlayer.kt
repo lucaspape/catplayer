@@ -43,6 +43,8 @@ var loopSingle = false
 var shuffle = false
 var crossfade = 12000
 
+var listenerEnabled = false
+
 var mediaSession: MediaSessionCompat? = null
     internal set
 
@@ -91,13 +93,23 @@ fun next() {
                 SongDatabaseHelper(context).getSong(context, getNextSong())?.let { nextSong ->
                     preDownloadSongStream(context, song, nextSong) { song ->
                         prepareSong(context, song)
-                        playSong(context, song)
+                        playSong(context, song,
+                            showNotification = true,
+                            requestAudioFocus = true,
+                            playWhenReady = true,
+                            progress = null
+                        )
                     }
                 }
 
             } else {
                 prepareSong(context, song)
-                playSong(context, song)
+                playSong(context, song,
+                    showNotification = true,
+                    requestAudioFocus = true,
+                    playWhenReady = true,
+                    progress = null
+                )
             }
         }
     }
@@ -109,12 +121,22 @@ fun previous() {
             if (Settings(context).getSetting(context.getString(R.string.downloadStreamSetting))?.toBoolean() == true) {
                 preDownloadSongStream(context, prevSong, null) { song ->
                     prepareSong(context, song)
-                    playSong(context, song)
+                    playSong(context, song,
+                        showNotification = true,
+                        requestAudioFocus = true,
+                        playWhenReady = true,
+                        progress = null
+                    )
                 }
 
             } else {
                 prepareSong(context, prevSong)
-                playSong(context, prevSong)
+                playSong(context, prevSong,
+                    showNotification = true,
+                    requestAudioFocus = true,
+                    playWhenReady = true,
+                    progress = null
+                )
             }
         }
     }
@@ -134,6 +156,8 @@ private fun resume() {
     contextReference?.get()?.let { context ->
         if (exoPlayer?.isPlaying == false) {
             if (requestAudioFocus(context) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                listenerEnabled = true
+
                 exoPlayer?.playWhenReady = true
 
                 val intentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
@@ -182,6 +206,8 @@ internal fun stop() {
         setPlayButtonImage(contextReference?.get()!!)
 
         exoPlayer?.stop()
+
+        listenerEnabled = false
 
         contextReference?.get()?.let { context ->
             abandonAudioFocus(context)
@@ -256,7 +282,7 @@ private fun nextSong(): String {
 
                         clearPlaylist()
 
-                        return try {
+                        try {
                             val songId = songQueue[0]
 
                             //add to playlist, remove from queue
@@ -265,9 +291,9 @@ private fun nextSong(): String {
 
                             playlistIndex = playlist.indexOf(songId)
 
-                            songId
+                             return songId
                         } catch (e: IndexOutOfBoundsException) {
-                            ""
+                            return ""
                         }
                     } else {
                         //queue finished, no loop

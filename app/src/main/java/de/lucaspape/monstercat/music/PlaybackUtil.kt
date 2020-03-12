@@ -17,27 +17,23 @@ import java.io.File
 import java.lang.IndexOutOfBoundsException
 import java.lang.ref.WeakReference
 
-private var preparedNext = ""
+private var preparedSong = ""
 
 internal fun prepareSong(context: Context, song: Song) {
-    if (preparedNext != song.songId) {
-        val settings = Settings(context)
-
+    if (preparedSong != song.songId) {
         //new exoplayer
         val newExoPlayer = SimpleExoPlayer.Builder(context).build()
         newExoPlayer.audioAttributes = getAudioAttributes()
 
         nextExoPlayer = newExoPlayer
 
-        if (wifiConnected(context) == true || settings.getSetting(context.getString(R.string.streamOverMobileSetting)) == "true" || File(
-                song.getUrl()
-            ).exists()
+        if (song.playbackAllowed(context)
         ) {
             val mediaSource = song.getMediaSource()
 
             if (mediaSource != null) {
                 nextExoPlayer?.prepare(mediaSource)
-                preparedNext = song.songId
+                preparedSong = song.songId
             } else {
                 displayInfo(context, context.getString(R.string.songNotPlayableError))
             }
@@ -46,23 +42,21 @@ internal fun prepareSong(context: Context, song: Song) {
 }
 
 internal fun prepareNextSong(context: Context) {
-    val nextSongId = getNextSong()
-
-    if (preparedNext != nextSongId) {
-        val songDatabaseHelper = SongDatabaseHelper(context)
-        val nextSong = songDatabaseHelper.getSong(context, nextSongId)
-
-        nextSong?.let {
-            prepareSong(context, it)
-            preparedNext = nextSongId
-        }
+    SongDatabaseHelper(context).getSong(context, getNextSong())?.let { song->
+        prepareSong(context, song)
     }
 }
 
-internal fun playSong(context: Context, song: Song) {
+internal fun playSong(context: Context, song: Song, showNotification:Boolean, requestAudioFocus:Boolean, playWhenReady:Boolean, progress:Long?) {
     BackgroundService.streamInfoUpdateAsync?.cancel(true)
 
-    if (requestAudioFocus(context) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+    val audioFocus = if(requestAudioFocus){
+        requestAudioFocus(context)
+    }else{
+        null
+    }
+
+    if (audioFocus == AudioManager.AUDIOFOCUS_REQUEST_GRANTED || !requestAudioFocus) {
         exoPlayer?.release()
         exoPlayer?.stop()
 
@@ -70,10 +64,18 @@ internal fun playSong(context: Context, song: Song) {
 
         exoPlayer?.audioComponent?.volume = 1.0f
 
+        if(progress != null){
+            exoPlayer?.seekTo(progress)
+        }
+
         //for play/pause button change and if song ended
         exoPlayer?.addListener(getPlayerListener(context, song))
 
-        exoPlayer?.playWhenReady = true
+        exoPlayer?.playWhenReady = playWhenReady
+
+        if(playWhenReady){
+            listenerEnabled = true
+        }
 
         //UI stuff
         setTitle(song.title, song.version, song.artist)
@@ -81,37 +83,15 @@ internal fun playSong(context: Context, song: Song) {
         setCover(context, song.title, song.version, song.artist, song.albumId) {
             setPlayButtonImage(context)
             startSeekBarUpdate(true)
-            updateNotification(
-                song.title,
-                song.version,
-                song.artist,
-                it
-            )
-        }
-    }
-}
 
-internal fun loadSong(context: Context, song: Song, progress:Long) {
-    BackgroundService.streamInfoUpdateAsync?.cancel(true)
-
-    if (requestAudioFocus(context) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-        exoPlayer?.release()
-        exoPlayer?.stop()
-
-        exoPlayer = nextExoPlayer
-
-        exoPlayer?.audioComponent?.volume = 1.0f
-
-        //for play/pause button change and if song ended
-        exoPlayer?.addListener(getPlayerListener(context, song))
-
-        exoPlayer?.seekTo(progress)
-
-        //UI stuff
-        setTitle(song.title, song.version, song.artist)
-
-        setCover(context, song.title, song.version, song.artist, song.albumId) {
-            setPlayButtonImage(context)
+            if(showNotification){
+                updateNotification(
+                    song.title,
+                    song.version,
+                    song.artist,
+                    it
+                )
+            }
         }
     }
 }

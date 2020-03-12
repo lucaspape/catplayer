@@ -50,7 +50,12 @@ data class PlayerSaveState(
                                 prepareSong(context, song)
 
                                 playerSaveState.progress?.let { progress ->
-                                    loadSong(context, song, progress)
+                                    playSong(context, song,
+                                        showNotification = false,
+                                        requestAudioFocus = false,
+                                        playWhenReady = false,
+                                        progress = progress
+                                    )
 
                                     seekBarReference?.get()?.progress = progress.toInt()
                                 }

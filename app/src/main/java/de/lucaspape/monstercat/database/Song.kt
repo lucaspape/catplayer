@@ -11,6 +11,7 @@ import com.google.android.exoplayer2.util.Util
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.util.Settings
 import de.lucaspape.monstercat.util.sid
+import de.lucaspape.monstercat.util.wifiConnected
 import java.io.File
 
 data class Song(
@@ -139,6 +140,12 @@ data class Song(
                 null
             }
         }
+    }
+
+    fun playbackAllowed(context: Context):Boolean{
+        return wifiConnected(context) == true || Settings(context).getSetting(context.getString(R.string.streamOverMobileSetting)) == "true" || File(
+                getUrl()
+            ).exists()
     }
 
     private fun fileToMediaSource(fileLocation: String): ProgressiveMediaSource {
