@@ -75,7 +75,7 @@ internal fun playSongFromId(
     loadContinuousSongListAsyncTask = BackgroundAsync({
         val songDatabaseHelper = SongDatabaseHelper(context)
 
-        val skipMonstercatSongs = Settings(context).getSetting(context.getString(R.string.skipMonstercatSongsSetting))
+        val skipMonstercatSongs = Settings(context).getBoolean(context.getString(R.string.skipMonstercatSongsSetting))
 
         for (cSongId in continuousList) {
 
@@ -83,7 +83,7 @@ internal fun playSongFromId(
 
             if (song != null) {
                 if (song.artist.contains("monstercat", true)) {
-                    if (skipMonstercatSongs != "true") {
+                    if (skipMonstercatSongs != true) {
                         songQueue.add(song.songId)
                     }
                 } else {

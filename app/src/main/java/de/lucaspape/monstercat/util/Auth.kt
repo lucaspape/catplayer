@@ -191,7 +191,7 @@ class Auth {
     private fun saveLogin(context: Context) {
         val settings = Settings(context)
         sid?.let {
-            settings.saveSetting("sid", it)
+            settings.setString("sid", it)
         }
     }
 
@@ -199,7 +199,7 @@ class Auth {
     fun loadLogin(context: Context, loginSuccess: () -> Unit, loginFailed: () -> Unit) {
         val settings = Settings(context)
 
-        val sSid = settings.getSetting("sid")
+        val sSid = settings.getString("sid")
 
         if (sSid != null) {
             sid = sSid

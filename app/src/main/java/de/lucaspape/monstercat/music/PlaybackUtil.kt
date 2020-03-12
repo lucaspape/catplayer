@@ -119,7 +119,7 @@ fun playStream(stream: Stream) {
         //request audio focus
         if (requestAudioFocus(context) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             //only play stream if allowed
-            if (wifiConnected(context) == true || settings.getSetting(context.getString(R.string.streamOverMobileSetting)) == "true") {
+            if (wifiConnected(context) == true || settings.getBoolean(context.getString(R.string.streamOverMobileSetting)) == true) {
                 exoPlayer?.prepare(stream.getMediaSource(context))
 
                 exoPlayer?.playWhenReady = true

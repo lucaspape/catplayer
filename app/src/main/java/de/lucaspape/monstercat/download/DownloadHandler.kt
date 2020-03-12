@@ -56,9 +56,9 @@ fun downloadCoverIntoAbstractItem(
 ) {
     val settings = Settings(context)
     val resolution = if (!lowRes) {
-        settings.getSetting(context.getString(R.string.primaryCoverResolutionSetting))
+        settings.getInt(context.getString(R.string.primaryCoverResolutionSetting))
     } else {
-        settings.getSetting(context.getString(R.string.secondaryCoverResolutionSetting))
+        settings.getInt(context.getString(R.string.secondaryCoverResolutionSetting))
     }
 
     val cacheBitmap = bitmapCache[albumId + resolution]?.get()
@@ -81,7 +81,7 @@ fun downloadCoverIntoAbstractItem(
             viewHolder.setCoverBitmap(albumId, bitmap)
             bitmapCache[albumId + resolution] = SoftReference(bitmap)
         } else {
-            if (wifiConnected(context) == true || settings.getSetting(context.getString(R.string.downloadCoversOverMobileSetting)) == "true") {
+            if (wifiConnected(context) == true || settings.getBoolean(context.getString(R.string.downloadCoversOverMobileSetting)) == true) {
                 val picassoTarget = object : com.squareup.picasso.Target {
                     override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
                         viewHolder.setCoverDrawable(albumId, placeHolderDrawable)
@@ -128,9 +128,9 @@ fun downloadCoverIntoBitmap(
     val settings = Settings(context)
 
     val resolution = if (!lowRes) {
-        settings.getSetting(context.getString(R.string.primaryCoverResolutionSetting))
+        settings.getInt(context.getString(R.string.primaryCoverResolutionSetting))
     } else {
-        settings.getSetting(context.getString(R.string.secondaryCoverResolutionSetting))
+        settings.getInt(context.getString(R.string.secondaryCoverResolutionSetting))
     }
 
     val cacheBitmap = bitmapCache[albumId + resolution]?.get()
@@ -147,7 +147,7 @@ fun downloadCoverIntoBitmap(
             downloadFinished(bitmap)
             bitmapCache[albumId + resolution] = SoftReference(bitmap)
         } else {
-            if (wifiConnected(context) == true || settings.getSetting(context.getString(R.string.downloadCoversOverMobileSetting)) == "true") {
+            if (wifiConnected(context) == true || settings.getBoolean(context.getString(R.string.downloadCoversOverMobileSetting)) == true) {
                 val picassoTarget = object : com.squareup.picasso.Target {
                     override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
                     }

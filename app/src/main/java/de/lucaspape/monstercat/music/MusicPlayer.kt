@@ -89,7 +89,7 @@ fun createMediaSession() {
 fun next() {
     contextReference?.get()?.let { context ->
         SongDatabaseHelper(context).getSong(context, nextSong())?.let { song ->
-            if (Settings(context).getSetting(context.getString(R.string.downloadStreamSetting))?.toBoolean() == true) {
+            if (Settings(context).getBoolean(context.getString(R.string.downloadStreamSetting)) == true) {
                 SongDatabaseHelper(context).getSong(context, getNextSong())?.let { nextSong ->
                     preDownloadSongStream(context, song, nextSong) { song ->
                         prepareSong(context, song)
@@ -118,7 +118,7 @@ fun next() {
 fun previous() {
     contextReference?.get()?.let { context ->
         SongDatabaseHelper(context).getSong(context, previousSong())?.let { prevSong ->
-            if (Settings(context).getSetting(context.getString(R.string.downloadStreamSetting))?.toBoolean() == true) {
+            if (Settings(context).getBoolean(context.getString(R.string.downloadStreamSetting)) == true) {
                 preDownloadSongStream(context, prevSong, null) { song ->
                     prepareSong(context, song)
                     playSong(context, song,

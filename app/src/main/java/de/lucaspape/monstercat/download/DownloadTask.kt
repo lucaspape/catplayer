@@ -21,7 +21,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
             var failedDownloads = 0
 
             while (failedDownloads <= 10) {
-                if (wifiConnected(context) == false && settings.getSetting("downloadOverMobile") != "true") {
+                if (wifiConnected(context) == false && settings.getBoolean("downloadOverMobile") != true) {
                     println("forbidden by user")
                 } else {
                     try {

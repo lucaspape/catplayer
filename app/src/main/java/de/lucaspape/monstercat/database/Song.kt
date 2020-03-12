@@ -84,12 +84,12 @@ data class Song(
         context.getExternalFilesDir(null)
             .toString() + "/" + artist + title + version + "." + Settings(
             context
-        ).getSetting("downloadType")
+        ).getString("downloadType")
 
     val downloadUrl =
         context.getString(R.string.trackContentUrl) + albumId + "/track-download/" + songId + "?format=" + Settings(
             context
-        ).getSetting("downloadType")
+        ).getString("downloadType")
 
     val streamUrl: String =
         context.getString(R.string.trackContentUrl) + albumId + "/track-stream/" + songId
@@ -143,7 +143,7 @@ data class Song(
     }
 
     fun playbackAllowed(context: Context):Boolean{
-        return wifiConnected(context) == true || Settings(context).getSetting(context.getString(R.string.streamOverMobileSetting)) == "true" || File(
+        return wifiConnected(context) == true || Settings(context).getBoolean(context.getString(R.string.streamOverMobileSetting)) == true || File(
                 getUrl()
             ).exists()
     }

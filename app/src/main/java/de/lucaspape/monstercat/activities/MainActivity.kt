@@ -46,6 +46,14 @@ var fragmentBackPressedCallback: () -> Unit = {}
  */
 class MainActivity : AppCompatActivity() {
 
+    private val fallbackFile = File("$dataDir/fallback.jpg")
+    private val fallbackFileLow = File("$dataDir/fallback_low.jpg")
+
+    private val fallbackBlackFile = File("$dataDir/fallback_black.jpg")
+    private val fallbackBlackFileLow = File("$dataDir/fallback_black_low.jpg")
+    private val fallbackWhiteFile = File("$dataDir/fallback_white.jpg")
+    private val fallbackWhiteFileLow = File("$dataDir/fallback_white_low.jpg")
+
     private val onNavigationItemSelectedListener =
         BottomNavigationView.OnNavigationItemSelectedListener { item ->
             when (item.itemId) {
@@ -88,8 +96,8 @@ class MainActivity : AppCompatActivity() {
 
         val settings = Settings(this)
 
-        settings.getSetting(getString(R.string.crossfadeTimeSetting))?.let {
-            crossfade = Integer.parseInt(it)
+        settings.getInt(getString(R.string.crossfadeTimeSetting))?.let {
+            crossfade = it
         }
 
         if (!loggedIn) {
@@ -99,8 +107,8 @@ class MainActivity : AppCompatActivity() {
             }, {
                 //login failed, retrieve new SID
 
-                val sUsername = settings.getSetting(getString(R.string.emailSetting))
-                val sPassword = settings.getSetting(getString(R.string.passwordSetting))
+                val sUsername = settings.getString(getString(R.string.emailSetting))
+                val sPassword = settings.getString(getString(R.string.passwordSetting))
 
                 sUsername?.let { username ->
                     sPassword?.let { password ->
@@ -116,13 +124,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         //set the correct view
-        if (settings.getSetting(getString(R.string.albumViewSelectedSetting)) != null) {
-            HomeHandler.albumViewSelected =
-                settings.getSetting(getString(R.string.albumView)) == true.toString()
+        settings.getBoolean(getString(R.string.albumViewSelectedSetting))?.let {
+            HomeHandler.albumViewSelected = it
         }
 
         val intentExtras = intent.extras
-
 
         if (intentExtras != null) {
             if (intentExtras["search"] != null) {
@@ -208,11 +214,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun downloadFallbackCoverImages() {
-        val fallbackBlackFile = File("$dataDir/fallback_black.jpg")
-        val fallbackBlackFileLow = File("$dataDir/fallback_black_low.jpg")
-        val fallbackWhiteFile = File("$dataDir/fallback_white.jpg")
-        val fallbackWhiteFileLow = File("$dataDir/fallback_white_low.jpg")
-
         if (!fallbackBlackFile.exists() || !fallbackBlackFileLow.exists()) {
             BackgroundAsync({
                 downloadFile(
@@ -259,25 +260,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun changeTheme() {
-        val fallbackFile = File("$dataDir/fallback.jpg")
-        val fallbackFileLow = File("$dataDir/fallback_low.jpg")
-
-        val fallbackBlackFile = File("$dataDir/fallback_black.jpg")
-        val fallbackBlackFileLow = File("$dataDir/fallback_black_low.jpg")
-        val fallbackWhiteFile = File("$dataDir/fallback_white.jpg")
-        val fallbackWhiteFileLow = File("$dataDir/fallback_white_low.jpg")
-
         val settings = Settings(this)
 
-        if (settings.getSetting(getString(R.string.darkThemeSetting)) != null) {
-            if (settings.getSetting(getString(R.string.darkThemeSetting)) == "true") {
+        val darkMode = settings.getBoolean(getString(R.string.darkThemeSetting))
+
+        if(darkMode != null){
+            if(darkMode){
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
 
                 if (fallbackBlackFile.exists() && fallbackBlackFileLow.exists()) {
                     fallbackBlackFile.copyTo(fallbackFile, true)
                     fallbackBlackFileLow.copyTo(fallbackFileLow, true)
                 }
-            } else {
+            }else{
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
                 if (fallbackWhiteFile.exists() && fallbackWhiteFileLow.exists()) {
@@ -285,11 +280,11 @@ class MainActivity : AppCompatActivity() {
                     fallbackWhiteFileLow.copyTo(fallbackFileLow, true)
                 }
             }
-        } else {
+        }else{
             if (resources.configuration.uiMode.and(Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) {
-                settings.saveSetting(getString(R.string.darkThemeSetting), true.toString())
+                settings.setBoolean(getString(R.string.darkThemeSetting), true)
             } else {
-                settings.saveSetting(getString(R.string.darkThemeSetting), false.toString())
+                settings.setBoolean(getString(R.string.darkThemeSetting), false)
             }
 
             changeTheme()
@@ -300,7 +295,7 @@ class MainActivity : AppCompatActivity() {
         val settings = Settings(this)
 
         //for new privacy policy change version number
-        if (settings.getSetting(getString(R.string.privacyPolicySetting)) != "1.0") {
+        if (settings.getString(getString(R.string.privacyPolicySetting)) != "1.0") {
             AlertDialog.Builder(this).apply {
                 setTitle(getString(R.string.privacyPolicy))
                 setPositiveButton(getString(R.string.ok), null)
@@ -324,7 +319,7 @@ class MainActivity : AppCompatActivity() {
                     movementMethod = LinkMovementMethod.getInstance()
                 }
             }
-            settings.saveSetting(getString(R.string.privacyPolicySetting), "1.0")
+            settings.setString(getString(R.string.privacyPolicySetting), "1.0")
         }
     }
 
