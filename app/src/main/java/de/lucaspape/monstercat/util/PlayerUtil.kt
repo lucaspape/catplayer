@@ -89,6 +89,7 @@ fun getStreamPlayerListener(context: Context): Player.EventListener {
 }
 
 fun getPlayerListener(context: Context, song: Song): Player.EventListener {
+
     return object : Player.EventListener {
         @Override
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {

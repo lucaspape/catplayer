@@ -46,13 +46,13 @@ var fragmentBackPressedCallback: () -> Unit = {}
  */
 class MainActivity : AppCompatActivity() {
 
-    private val fallbackFile = File("$dataDir/fallback.jpg")
-    private val fallbackFileLow = File("$dataDir/fallback_low.jpg")
+    private var fallbackFile = File("")
+    private var fallbackFileLow = File("")
 
-    private val fallbackBlackFile = File("$dataDir/fallback_black.jpg")
-    private val fallbackBlackFileLow = File("$dataDir/fallback_black_low.jpg")
-    private val fallbackWhiteFile = File("$dataDir/fallback_white.jpg")
-    private val fallbackWhiteFileLow = File("$dataDir/fallback_white_low.jpg")
+    private var fallbackBlackFile = File("")
+    private var fallbackBlackFileLow = File("")
+    private var fallbackWhiteFile = File("")
+    private var fallbackWhiteFileLow = File("")
 
     private val onNavigationItemSelectedListener =
         BottomNavigationView.OnNavigationItemSelectedListener { item ->
@@ -80,6 +80,14 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        fallbackFile = File("$dataDir/fallback.jpg")
+        fallbackFileLow = File("$dataDir/fallback_low.jpg")
+
+        fallbackBlackFile = File("$dataDir/fallback_black.jpg")
+        fallbackBlackFileLow = File("$dataDir/fallback_black_low.jpg")
+        fallbackWhiteFile = File("$dataDir/fallback_white.jpg")
+        fallbackWhiteFileLow = File("$dataDir/fallback_white_low.jpg")
 
         //check for internet
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET)
