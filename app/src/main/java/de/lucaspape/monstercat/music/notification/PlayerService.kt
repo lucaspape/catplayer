@@ -28,9 +28,19 @@ class PlayerService : Service() {
         var artist = ""
         var version = ""
 
-        contextReference?.get()?.let { context ->
-            createNotificationChannel()
+        createNotificationChannel()
 
+        startForeground(
+            musicNotificationID,
+            createPlayerNotification(
+                title,
+                version,
+                artist,
+                null
+            )
+        )
+
+        contextReference?.get()?.let { context ->
             SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
                 title = song.title
                 artist = song.artist
@@ -49,16 +59,6 @@ class PlayerService : Service() {
                 }
             }
         }
-
-        startForeground(
-            musicNotificationID,
-            createPlayerNotification(
-                title,
-                version,
-                artist,
-                null
-            )
-        )
 
         return START_NOT_STICKY
     }

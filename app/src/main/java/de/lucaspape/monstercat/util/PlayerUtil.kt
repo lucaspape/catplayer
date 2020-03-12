@@ -9,6 +9,7 @@ import com.google.android.exoplayer2.audio.AudioAttributes
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.music.*
+import de.lucaspape.monstercat.music.notification.startPlayerService
 import de.lucaspape.monstercat.music.notification.updateNotification
 import de.lucaspape.monstercat.music.setCover
 import de.lucaspape.monstercat.music.setPlayButtonImage
@@ -94,6 +95,8 @@ fun getPlayerListener(context: Context, song: Song): Player.EventListener {
         @Override
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
             if(listenerEnabled){
+                startPlayerService(song.songId)
+                
                 exoPlayer?.duration?.let { duration ->
                     exoPlayer?.currentPosition?.let { currentPosition ->
                         val timeLeft = duration - currentPosition
