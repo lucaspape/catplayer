@@ -24,40 +24,41 @@ class PlayerService : Service() {
 
         val songId = intent!!.getStringExtra("songId")!!
 
+        var title = ""
+        var artist = ""
+        var version = ""
+
         contextReference?.get()?.let { context ->
             createNotificationChannel()
 
             SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
-                var notification = createPlayerNotification(
-                    song.title,
-                    song.version,
-                    song.artist,
-                    null
-                )
-
-                startForeground(
-                    musicNotificationID,
-                    notification
-                )
+                title = song.title
+                artist = song.artist
+                version = song.version
 
                 setCover(context, song.title, song.version, song.artist, song.albumId) {
-                    notification = createPlayerNotification(
-                        song.title,
-                        song.version,
-                        song.artist,
-                        it
-                    )
-
                     startForeground(
                         musicNotificationID,
-                        notification
+                        createPlayerNotification(
+                            song.title,
+                            song.version,
+                            song.artist,
+                            it
+                        )
                     )
                 }
             }
-
         }
 
-
+        startForeground(
+            musicNotificationID,
+            createPlayerNotification(
+                title,
+                version,
+                artist,
+                null
+            )
+        )
 
         return START_NOT_STICKY
     }

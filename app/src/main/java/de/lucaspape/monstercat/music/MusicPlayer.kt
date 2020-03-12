@@ -333,7 +333,7 @@ fun getNextSong(): String {
             prioritySongQueue.size > 0 -> {
                 return prioritySongQueue[0]
             }
-            playlist.size >= playlistIndex + 1 -> {
+            playlist.size > playlistIndex + 1 -> {
                 return playlist[playlistIndex + 1]
             }
             else -> {
