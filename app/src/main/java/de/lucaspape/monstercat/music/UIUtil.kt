@@ -194,7 +194,6 @@ internal fun startSeekBarUpdate(enableCrossfade: Boolean) {
 
         val updateSeekBar = object : Runnable {
             override fun run() {
-
                 exoPlayer?.duration?.toInt()?.let { duration ->
                     seekBarReference?.get()?.max = duration
                     fullscreenSeekBarReference?.get()?.max = duration

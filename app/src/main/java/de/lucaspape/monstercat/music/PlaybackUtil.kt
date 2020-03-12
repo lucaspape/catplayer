@@ -60,6 +60,10 @@ internal fun playSong(context: Context, song: Song, showNotification:Boolean, re
         exoPlayer?.release()
         exoPlayer?.stop()
 
+        if(preparedSong != song.songId){
+            prepareSong(context, song)
+        }
+
         exoPlayer = nextExoPlayer
 
         exoPlayer?.audioComponent?.volume = 1.0f

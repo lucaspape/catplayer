@@ -44,11 +44,7 @@ data class PlayerSaveState(
                             songQueue = playerSaveState.songQueue
                             prioritySongQueue = playerSaveState.prioritySongQueue
 
-                            val song = getCurrentSong()
-
-                            song?.let {
-                                prepareSong(context, song)
-
+                            getCurrentSong()?.let {song ->
                                 playerSaveState.progress?.let { progress ->
                                     playSong(context, song,
                                         showNotification = false,

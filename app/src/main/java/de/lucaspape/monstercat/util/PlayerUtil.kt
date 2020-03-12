@@ -96,7 +96,7 @@ fun getPlayerListener(context: Context, song: Song): Player.EventListener {
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
             if(listenerEnabled){
                 startPlayerService(song.songId)
-                
+
                 exoPlayer?.duration?.let { duration ->
                     exoPlayer?.currentPosition?.let { currentPosition ->
                         val timeLeft = duration - currentPosition

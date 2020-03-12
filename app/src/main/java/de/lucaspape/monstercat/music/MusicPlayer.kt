@@ -92,7 +92,6 @@ fun next() {
             if (Settings(context).getBoolean(context.getString(R.string.downloadStreamSetting)) == true) {
                 SongDatabaseHelper(context).getSong(context, getNextSong())?.let { nextSong ->
                     preDownloadSongStream(context, song, nextSong) { song ->
-                        prepareSong(context, song)
                         playSong(
                             context, song,
                             showNotification = true,
@@ -102,9 +101,7 @@ fun next() {
                         )
                     }
                 }
-
             } else {
-                prepareSong(context, song)
                 playSong(
                     context, song,
                     showNotification = true,
@@ -122,7 +119,6 @@ fun previous() {
         SongDatabaseHelper(context).getSong(context, previousSong())?.let { prevSong ->
             if (Settings(context).getBoolean(context.getString(R.string.downloadStreamSetting)) == true) {
                 preDownloadSongStream(context, prevSong, null) { song ->
-                    prepareSong(context, song)
                     playSong(
                         context, song,
                         showNotification = true,
@@ -133,7 +129,6 @@ fun previous() {
                 }
 
             } else {
-                prepareSong(context, prevSong)
                 playSong(
                     context, prevSong,
                     showNotification = true,
@@ -274,7 +269,6 @@ private fun nextSong(): String {
                     return songId
                 } catch (e: IndexOutOfBoundsException) {
                     //queue is empty, if loop add every song from playlist back to queue and start again
-                    loop = false
                     if (loop) {
                         clearQueue()
 
@@ -354,7 +348,6 @@ fun getNextSong(): String {
                     return songQueue[queueIndex]
                 } catch (e: IndexOutOfBoundsException) {
                     //queue is empty, if loop add every song from playlist back to queue and start again
-                    loop = false
                     return if (loop) {
                         try {
                             playlist[0]
