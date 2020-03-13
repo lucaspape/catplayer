@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.mikepenz.fastadapter.FastAdapter
+import com.mikepenz.fastadapter.GenericItem
 import com.mikepenz.fastadapter.adapters.ItemAdapter
 import com.mikepenz.fastadapter.listeners.ClickEventHook
 import com.mikepenz.fastadapter.scroll.EndlessRecyclerOnScrollListener
@@ -68,7 +69,9 @@ class HomeHandler {
             LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
 
         val itemAdapter = ItemAdapter<CatalogItem>()
-        val fastAdapter = FastAdapter.with(itemAdapter)
+        val footerAdapter = ItemAdapter<ProgressItem>()
+
+        val fastAdapter:FastAdapter<GenericItem> = FastAdapter.with(listOf(itemAdapter, footerAdapter))
 
         recyclerView.adapter = fastAdapter
 
@@ -196,7 +199,6 @@ class HomeHandler {
         /**
          * On scroll down (load next)
          */
-        val footerAdapter = ItemAdapter<ProgressItem>()
         recyclerView.addOnScrollListener(object :
             EndlessRecyclerOnScrollListener(footerAdapter) {
             override fun onLoadMore(currentPage: Int) {
@@ -226,7 +228,9 @@ class HomeHandler {
             LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
 
         val itemAdapter = ItemAdapter<AlbumItem>()
-        val fastAdapter = FastAdapter.with(itemAdapter)
+        val footerAdapter = ItemAdapter<ProgressItem>()
+
+        val fastAdapter:FastAdapter<GenericItem> = FastAdapter.with(listOf(itemAdapter, footerAdapter))
 
         recyclerView.adapter = fastAdapter
 
@@ -271,7 +275,6 @@ class HomeHandler {
         /**
          * On scroll down (load more)
          */
-        val footerAdapter = ItemAdapter<ProgressItem>()
         recyclerView.addOnScrollListener(object :
             EndlessRecyclerOnScrollListener(footerAdapter) {
             override fun onLoadMore(currentPage: Int) {
