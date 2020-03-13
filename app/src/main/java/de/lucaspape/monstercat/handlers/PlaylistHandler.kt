@@ -68,21 +68,24 @@ class PlaylistHandler {
         fastAdapter.onClickListener = { _, _, _, position ->
             val itemIndex = position+itemIndexOffset
 
-            clearQueue()
+            if(itemIndex >= 0){
+                clearQueue()
 
-            val songId = data[itemIndex].songId
+                val songId = data[itemIndex].songId
 
-            val nextSongIdsList = ArrayList<String>()
+                val nextSongIdsList = ArrayList<String>()
 
-            for (i in (itemIndex + 1 until data.size)) {
-                try {
-                    nextSongIdsList.add(data[i].songId)
-                } catch (e: IndexOutOfBoundsException) {
+                for (i in (itemIndex + 1 until data.size)) {
+                    try {
+                        nextSongIdsList.add(data[i].songId)
+                    } catch (e: IndexOutOfBoundsException) {
 
+                    }
                 }
+
+                playSongFromId(view.context, songId, true, nextSongIdsList)
             }
 
-            playSongFromId(view.context, songId, true, nextSongIdsList)
             false
         }
 
@@ -92,13 +95,16 @@ class PlaylistHandler {
         fastAdapter.onLongClickListener = { _, _, _, position ->
             val itemIndex = position+itemIndexOffset
 
-            val idList = ArrayList<String>()
+            if(itemIndex >= 0){
+                val idList = ArrayList<String>()
 
-            for (catalogItem in data) {
-                idList.add(catalogItem.songId)
+                for (catalogItem in data) {
+                    idList.add(catalogItem.songId)
+                }
+
+                CatalogItem.showContextMenuPlaylist(view.context, idList, itemIndex)
             }
 
-            CatalogItem.showContextMenuPlaylist(view.context, idList, itemIndex)
             false
         }
 
@@ -120,13 +126,15 @@ class PlaylistHandler {
             ) {
                 val itemIndex = position+itemIndexOffset
 
-                val idList = ArrayList<String>()
+                if(itemIndex >= 0){
+                    val idList = ArrayList<String>()
 
-                for (catalogItem in data) {
-                    idList.add(catalogItem.songId)
+                    for (catalogItem in data) {
+                        idList.add(catalogItem.songId)
+                    }
+
+                    CatalogItem.showContextMenuPlaylist(view.context, idList, itemIndex)
                 }
-
-                CatalogItem.showContextMenuPlaylist(view.context, idList, itemIndex)
             }
         })
 
@@ -209,8 +217,11 @@ class PlaylistHandler {
         fastAdapter.onClickListener = { _, _, _, position ->
             val itemIndex = position + itemIndexOffset
 
-            currentPlaylistId = data[itemIndex].playlistId
-            loadPlaylistTracks(view, false, currentPlaylistId!!)
+            if(itemIndex >= 0){
+                currentPlaylistId = data[itemIndex].playlistId
+                loadPlaylistTracks(view, false, currentPlaylistId!!)
+            }
+
             false
         }
 
@@ -220,13 +231,16 @@ class PlaylistHandler {
         fastAdapter.onLongClickListener = { _, _, _, position ->
             val itemIndex = position + itemIndexOffset
 
-            val playlistIdList = ArrayList<String>()
+            if(itemIndex >= 0){
+                val playlistIdList = ArrayList<String>()
 
-            for (playlist in data) {
-                playlistIdList.add(playlist.playlistId)
+                for (playlist in data) {
+                    playlistIdList.add(playlist.playlistId)
+                }
+
+                PlaylistItem.showContextMenu(view.context, playlistIdList, itemIndex)
             }
 
-            PlaylistItem.showContextMenu(view.context, playlistIdList, itemIndex)
             false
         }
 
@@ -248,13 +262,15 @@ class PlaylistHandler {
             ) {
                 val itemIndex = position + itemIndexOffset
 
-                val playlistIdList = ArrayList<String>()
+                if(itemIndex >= 0){
+                    val playlistIdList = ArrayList<String>()
 
-                for (playlist in data) {
-                    playlistIdList.add(playlist.playlistId)
+                    for (playlist in data) {
+                        playlistIdList.add(playlist.playlistId)
+                    }
+
+                    PlaylistItem.showContextMenu(view.context, playlistIdList, itemIndex)
                 }
-
-                PlaylistItem.showContextMenu(view.context, playlistIdList, itemIndex)
             }
         })
 

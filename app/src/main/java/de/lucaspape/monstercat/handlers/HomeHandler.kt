@@ -96,26 +96,28 @@ class HomeHandler {
         fastAdapter.onClickListener = { _, _, _, position ->
             val itemIndex = position + itemIndexOffset
 
-            clearQueue()
+            if(itemIndex >= 0){
+                clearQueue()
 
-            val catalogItem = currentCatalogViewData[itemIndex]
+                val catalogItem = currentCatalogViewData[itemIndex]
 
-            val nextSongIdsList = ArrayList<String>()
+                val nextSongIdsList = ArrayList<String>()
 
-            for (i in (itemIndex + 1 until currentCatalogViewData.size)) {
-                try {
-                    nextSongIdsList.add(currentCatalogViewData[i].songId)
-                } catch (e: IndexOutOfBoundsException) {
+                for (i in (itemIndex + 1 until currentCatalogViewData.size)) {
+                    try {
+                        nextSongIdsList.add(currentCatalogViewData[i].songId)
+                    } catch (e: IndexOutOfBoundsException) {
 
+                    }
                 }
-            }
 
-            playSongFromId(
-                view.context,
-                catalogItem.songId,
-                true,
-                nextSongIdsList
-            )
+                playSongFromId(
+                    view.context,
+                    catalogItem.songId,
+                    true,
+                    nextSongIdsList
+                )
+            }
 
             false
         }
@@ -126,13 +128,15 @@ class HomeHandler {
         fastAdapter.onLongClickListener = { _, _, _, position ->
             val itemIndex = position + itemIndexOffset
 
-            val idList = ArrayList<String>()
+            if(itemIndex >= 0){
+                val idList = ArrayList<String>()
 
-            for (catalogItem in currentCatalogViewData) {
-                idList.add(catalogItem.songId)
+                for (catalogItem in currentCatalogViewData) {
+                    idList.add(catalogItem.songId)
+                }
+
+                CatalogItem.showContextMenu(view.context, idList, itemIndex)
             }
-
-            CatalogItem.showContextMenu(view.context, idList, itemIndex)
 
             false
         }
@@ -155,13 +159,15 @@ class HomeHandler {
             ) {
                 val itemIndex = position + itemIndexOffset
 
-                val idList = ArrayList<String>()
+                if(itemIndex >= 0){
+                    val idList = ArrayList<String>()
 
-                for (catalogItem in currentCatalogViewData) {
-                    idList.add(catalogItem.songId)
+                    for (catalogItem in currentCatalogViewData) {
+                        idList.add(catalogItem.songId)
+                    }
+
+                    CatalogItem.showContextMenu(view.context, idList, itemIndex)
                 }
-
-                CatalogItem.showContextMenu(view.context, idList, itemIndex)
             }
         })
 
