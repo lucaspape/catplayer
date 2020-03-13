@@ -31,7 +31,7 @@ open class PlaylistItem(
         ) {
             val menuItems = arrayOf(
                 context.getString(R.string.download),
-                context.getString(R.string.playNext),
+                context.getString(R.string.addToQueue),
                 context.getString(R.string.delete)
             )
 
@@ -47,7 +47,7 @@ open class PlaylistItem(
                             id
                         ) {}
                     }
-                    context.getString(R.string.playNext) -> {
+                    context.getString(R.string.addToQueue) -> {
                         playPlaylistNext(context, id)
                     }
                     context.getString(R.string.delete) -> {

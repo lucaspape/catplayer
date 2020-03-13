@@ -388,3 +388,10 @@ fun clearPlaylist() {
     playlistIndex = 0
     playlist = ArrayList()
 }
+
+/**
+ * Dont play from playlist, play from queue
+ */
+fun skipPreviousInPlaylist(){
+    playlistIndex = playlist.size
+}

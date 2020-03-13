@@ -11,10 +11,11 @@ import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.AlbumDatabaseHelper
-import de.lucaspape.monstercat.download.downloadCoverIntoAbstractItem
+import de.lucaspape.monstercat.download.downloadCoverIntoImageReceiver
 import de.lucaspape.monstercat.handlers.downloadAlbum
 import de.lucaspape.monstercat.handlers.openAlbum
 import de.lucaspape.monstercat.handlers.playAlbumNext
+import de.lucaspape.monstercat.util.ImageReceiverInterface
 
 open class AlbumItem(
     val albumId: String
@@ -29,7 +30,7 @@ open class AlbumItem(
         ) {
             val menuItems: Array<String> = arrayOf(
                 context.getString(R.string.downloadAlbum),
-                context.getString(R.string.playAlbumNext),
+                context.getString(R.string.addAlbumToQueue),
                 context.getString(R.string.shareAlbum),
                 context.getString(R.string.openAlbumInApp)
             )
@@ -44,7 +45,7 @@ open class AlbumItem(
                         context,
                         id
                     )
-                    context.getString(R.string.playAlbumNext) -> playAlbumNext(
+                    context.getString(R.string.addAlbumToQueue) -> playAlbumNext(
                         context,
                         id
                     )
@@ -68,7 +69,7 @@ open class AlbumItem(
         )
     }
 
-    class ViewHolder(view: View) : FastAdapter.ViewHolder<AlbumItem>(view), ViewHolderInterface {
+    class ViewHolder(view: View) : FastAdapter.ViewHolder<AlbumItem>(view), ImageReceiverInterface {
         private val titleTextView: TextView = view.findViewById(R.id.albumTitle)
         private val artistTextView: TextView = view.findViewById(R.id.albumArtist)
         private val coverImageView: ImageView = view.findViewById(R.id.cover)
@@ -88,7 +89,7 @@ open class AlbumItem(
                 artistTextView.text = album.artist
             }
 
-            downloadCoverIntoAbstractItem(context, this, item.albumId, false)
+            downloadCoverIntoImageReceiver(context, this, item.albumId, false)
         }
 
         override fun unbindView(item: AlbumItem) {
@@ -97,13 +98,13 @@ open class AlbumItem(
             coverImageView.setImageURI(null)
         }
 
-        override fun setCoverBitmap(albumId: String, bitmap: Bitmap?) {
+        override fun setBitmap(albumId: String, bitmap: Bitmap?) {
             if(albumId == this.albumId){
                 coverImageView.setImageBitmap(bitmap)
             }
         }
 
-        override fun setCoverDrawable(albumId: String, drawable: Drawable?) {
+        override fun setDrawable(albumId: String, drawable: Drawable?) {
             if(albumId == this.albumId){
                 coverImageView.setImageDrawable(drawable)
             }

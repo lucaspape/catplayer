@@ -14,12 +14,13 @@ import com.mikepenz.fastadapter.items.AbstractItem
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadSong
-import de.lucaspape.monstercat.download.downloadCoverIntoAbstractItem
+import de.lucaspape.monstercat.download.downloadCoverIntoImageReceiver
 import de.lucaspape.monstercat.handlers.*
 import de.lucaspape.monstercat.handlers.addSongToPlaylist
 import de.lucaspape.monstercat.handlers.deletePlaylistSong
 import de.lucaspape.monstercat.handlers.openAlbum
 import de.lucaspape.monstercat.handlers.playSongFromId
+import de.lucaspape.monstercat.util.ImageReceiverInterface
 
 open class CatalogItem(
     val songId: String
@@ -35,7 +36,7 @@ open class CatalogItem(
             val menuItems =
                 arrayOf(
                     context.getString(R.string.download),
-                    context.getString(R.string.playNext),
+                    context.getString(R.string.addToQueue),
                     context.getString(R.string.addToPlaylist),
                     context.getString(R.string.shareAlbum),
                     context.getString(R.string.openAlbumInApp)
@@ -55,7 +56,7 @@ open class CatalogItem(
                             context,
                             song.songId
                         ) {}
-                        context.getString(R.string.playNext) -> playSongFromId(
+                        context.getString(R.string.addToQueue) -> playSongFromId(
                             id,
                             false,
                             priority = true
@@ -90,7 +91,7 @@ open class CatalogItem(
             val menuItems =
                 arrayOf(
                     context.getString(R.string.download),
-                    context.getString(R.string.playNext),
+                    context.getString(R.string.addToQueue),
                     context.getString(R.string.delete),
                     context.getString(R.string.shareAlbum),
                     context.getString(R.string.openAlbumInApp)
@@ -111,7 +112,7 @@ open class CatalogItem(
                             addDownloadSong(context, song.songId) {}
                         }
                     }
-                    context.getString(R.string.playNext) -> {
+                    context.getString(R.string.addToQueue) -> {
                         playSongFromId(
                             id,
                             false,
@@ -176,7 +177,7 @@ open class CatalogItem(
         )
     }
 
-    class ViewHolder(view: View) : FastAdapter.ViewHolder<CatalogItem>(view), ViewHolderInterface {
+    class ViewHolder(view: View) : FastAdapter.ViewHolder<CatalogItem>(view), ImageReceiverInterface {
         private val titleTextView: TextView = view.findViewById(R.id.title)
         private val artistTextView: TextView = view.findViewById(R.id.artist)
         val titleMenuButton: ImageButton = view.findViewById(R.id.titleMenuButton)
@@ -200,7 +201,7 @@ open class CatalogItem(
                 artistTextView.text = song.artist
 
                 //downloadCoverIntoImageView(context, coverImageView, song.albumId, true)
-                downloadCoverIntoAbstractItem(context, this, song.albumId, true)
+                downloadCoverIntoImageReceiver(context, this, song.albumId, true)
 
                 titleDownloadButton.setImageURI(song.getSongDownloadStatus().toUri())
             }
@@ -213,13 +214,13 @@ open class CatalogItem(
             titleDownloadButton.setImageURI(null)
         }
 
-        override fun setCoverBitmap(albumId: String, bitmap: Bitmap?) {
+        override fun setBitmap(albumId: String, bitmap: Bitmap?) {
             if(albumId == this.albumId){
                 coverImageView.setImageBitmap(bitmap)
             }
         }
 
-        override fun setCoverDrawable(albumId: String, drawable: Drawable?) {
+        override fun setDrawable(albumId: String, drawable: Drawable?) {
             if(albumId == this.albumId){
                 coverImageView.setImageDrawable(drawable)
             }

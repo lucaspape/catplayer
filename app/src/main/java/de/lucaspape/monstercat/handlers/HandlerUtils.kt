@@ -22,6 +22,7 @@ import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.handlers.async.*
 import de.lucaspape.monstercat.music.next
 import de.lucaspape.monstercat.music.prioritySongQueue
+import de.lucaspape.monstercat.music.skipPreviousInPlaylist
 import de.lucaspape.monstercat.music.songQueue
 import de.lucaspape.monstercat.request.AuthorizedRequest
 import de.lucaspape.monstercat.util.Settings
@@ -39,16 +40,18 @@ internal fun playSongFromId(songId: String, playNow: Boolean, priority:Boolean) 
     if (playNow) {
         if(priority){
             prioritySongQueue.add(songId)
+            skipPreviousInPlaylist()
             next()
         }else{
             songQueue.add(songId)
+            skipPreviousInPlaylist()
             next()
         }
     } else {
         if(priority){
-            prioritySongQueue.add(0, songId)
+            prioritySongQueue.add(songId)
         }else{
-            songQueue.add(0, songId)
+            songQueue.add(songId)
         }
     }
 }

@@ -2,6 +2,7 @@ package de.lucaspape.monstercat.music
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.media.MediaMetadata
 import android.media.session.PlaybackState
 import android.os.Handler
@@ -13,7 +14,8 @@ import android.widget.SeekBar
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.download.downloadCoverIntoBitmap
+import de.lucaspape.monstercat.download.downloadCoverIntoImageReceiver
+import de.lucaspape.monstercat.util.ImageReceiverInterface
 import java.lang.ref.WeakReference
 import java.util.*
 
@@ -240,33 +242,38 @@ internal fun setCover(
     title: String,
     version: String,
     artist: String,
-    albumId: String,
+    rAlbumId: String,
     callback: (bitmap: Bitmap) -> Unit
 ) {
-    barCoverImageReference?.get()?.let {
-        downloadCoverIntoBitmap(context, {bitmap ->
-            it.setImageBitmap(bitmap)
-        }, albumId, false)
-    }
+    downloadCoverIntoImageReceiver(context, object:ImageReceiverInterface{
+        override fun setBitmap(albumId: String, bitmap: Bitmap?) {
+            if(albumId == rAlbumId){
+                barCoverImageReference?.get()?.setImageBitmap(bitmap)
+                fullscreenCoverReference?.get()?.setImageBitmap(bitmap)
 
-    fullscreenCoverReference?.get()?.let {
-        downloadCoverIntoBitmap(context, {bitmap ->
-            it.setImageBitmap(bitmap)
-        }, albumId, false)
-    }
+                bitmap?.let {
+                    exoPlayer?.duration?.let {
+                        setSongMetadata(
+                            title,
+                            version,
+                            artist,
+                            bitmap,
+                            it
+                        )
+                    }
 
-    downloadCoverIntoBitmap(context, { bitmap ->
-        exoPlayer?.duration?.let {
-            setSongMetadata(
-                title,
-                version,
-                artist,
-                bitmap,
-                it
-            )
+                    callback(bitmap)
+                }
+            }
         }
-        callback(bitmap)
-    }, albumId, false)
+
+        override fun setDrawable(albumId: String, drawable: Drawable?) {
+            if(albumId == rAlbumId){
+                barCoverImageReference?.get()?.setImageDrawable(drawable)
+                fullscreenCoverReference?.get()?.setImageDrawable(drawable)
+            }
+        }
+    }, rAlbumId, false)
 }
 
 internal fun setPlayButtonImage(context: Context) {
