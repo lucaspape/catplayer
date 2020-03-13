@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.mikepenz.fastadapter.FastAdapter
+import com.mikepenz.fastadapter.GenericItem
 import com.mikepenz.fastadapter.adapters.ItemAdapter
 import com.mikepenz.fastadapter.listeners.ClickEventHook
 import de.lucaspape.monstercat.R
@@ -16,6 +17,7 @@ import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.handlers.abstract_items.CatalogItem
+import de.lucaspape.monstercat.handlers.abstract_items.HeaderTextItem
 import de.lucaspape.monstercat.handlers.abstract_items.PlaylistItem
 import de.lucaspape.monstercat.handlers.async.BackgroundAsync
 import de.lucaspape.monstercat.handlers.async.LoadPlaylistAsync
@@ -31,25 +33,28 @@ class PlaylistHandler {
         var currentPlaylistId: String? = null
     }
 
-    private var currentPlaylistContentData = ArrayList<CatalogItem>()
-    private var currentPlaylistsData = ArrayList<PlaylistItem>()
-
     //private var currentListViewData = ArrayList<HashMap<String, Any?>>()
     private var listViewDataIsPlaylistView = true
 
     /**
      * List for playlist content
      */
-    private fun updateCatalogRecyclerView(view: View, data: ArrayList<CatalogItem>) {
+    private fun updateCatalogRecyclerView(view: View, playlistName:String, data: ArrayList<CatalogItem>) {
         val playlistList = view.findViewById<RecyclerView>(R.id.playlistView)
 
         playlistList.layoutManager =
             LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
 
         val itemAdapter = ItemAdapter<CatalogItem>()
-        val fastAdapter = FastAdapter.with(itemAdapter)
+        val headerAdapter = ItemAdapter<HeaderTextItem>()
+
+        val fastAdapter:FastAdapter<GenericItem> = FastAdapter.with(listOf(headerAdapter, itemAdapter))
 
         playlistList.adapter = fastAdapter
+
+        headerAdapter.add(HeaderTextItem(playlistName))
+
+        val itemIndexOffset = -1
 
         for (catalogItem in data) {
             itemAdapter.add(
@@ -61,13 +66,15 @@ class PlaylistHandler {
          * On song click
          */
         fastAdapter.onClickListener = { _, _, _, position ->
+            val itemIndex = position+itemIndexOffset
+
             clearQueue()
 
-            val songId = data[position].songId
+            val songId = data[itemIndex].songId
 
             val nextSongIdsList = ArrayList<String>()
 
-            for (i in (position + 1 until data.size)) {
+            for (i in (itemIndex + 1 until data.size)) {
                 try {
                     nextSongIdsList.add(data[i].songId)
                 } catch (e: IndexOutOfBoundsException) {
@@ -83,13 +90,15 @@ class PlaylistHandler {
          * On song long click
          */
         fastAdapter.onLongClickListener = { _, _, _, position ->
+            val itemIndex = position+itemIndexOffset
+
             val idList = ArrayList<String>()
 
             for (catalogItem in data) {
                 idList.add(catalogItem.songId)
             }
 
-            CatalogItem.showContextMenuPlaylist(view.context, idList, position)
+            CatalogItem.showContextMenuPlaylist(view.context, idList, itemIndex)
             false
         }
 
@@ -109,13 +118,15 @@ class PlaylistHandler {
                 fastAdapter: FastAdapter<CatalogItem>,
                 item: CatalogItem
             ) {
+                val itemIndex = position+itemIndexOffset
+
                 val idList = ArrayList<String>()
 
                 for (catalogItem in data) {
                     idList.add(catalogItem.songId)
                 }
 
-                CatalogItem.showContextMenuPlaylist(view.context, idList, position)
+                CatalogItem.showContextMenuPlaylist(view.context, idList, itemIndex)
             }
         })
 
@@ -177,7 +188,12 @@ class PlaylistHandler {
             LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
 
         val itemAdapter = ItemAdapter<PlaylistItem>()
-        val fastAdapter = FastAdapter.with(itemAdapter)
+        val headerAdapter = ItemAdapter<HeaderTextItem>()
+        val fastAdapter:FastAdapter<GenericItem> = FastAdapter.with(listOf(headerAdapter, itemAdapter))
+
+        headerAdapter.add(HeaderTextItem(view.context.getString(R.string.yourPlaylists)))
+
+        val itemIndexOffset = -1
 
         playlistList.adapter = fastAdapter
 
@@ -191,7 +207,9 @@ class PlaylistHandler {
          * On playlist click
          */
         fastAdapter.onClickListener = { _, _, _, position ->
-            currentPlaylistId = data[position].playlistId
+            val itemIndex = position + itemIndexOffset
+
+            currentPlaylistId = data[itemIndex].playlistId
             loadPlaylistTracks(view, false, currentPlaylistId!!)
             false
         }
@@ -200,13 +218,15 @@ class PlaylistHandler {
          * On playlist long click
          */
         fastAdapter.onLongClickListener = { _, _, _, position ->
+            val itemIndex = position + itemIndexOffset
+
             val playlistIdList = ArrayList<String>()
 
             for (playlist in data) {
                 playlistIdList.add(playlist.playlistId)
             }
 
-            PlaylistItem.showContextMenu(view.context, playlistIdList, position)
+            PlaylistItem.showContextMenu(view.context, playlistIdList, itemIndex)
             false
         }
 
@@ -226,13 +246,15 @@ class PlaylistHandler {
                 fastAdapter: FastAdapter<PlaylistItem>,
                 item: PlaylistItem
             ) {
+                val itemIndex = position + itemIndexOffset
+
                 val playlistIdList = ArrayList<String>()
 
                 for (playlist in data) {
                     playlistIdList.add(playlist.playlistId)
                 }
 
-                PlaylistItem.showContextMenu(view.context, playlistIdList, position)
+                PlaylistItem.showContextMenu(view.context, playlistIdList, itemIndex)
             }
         })
 
@@ -305,7 +327,7 @@ class PlaylistHandler {
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
 
-        currentPlaylistsData = ArrayList()
+        val playlistsData = ArrayList<PlaylistItem>()
 
         LoadPlaylistAsync(
             contextReference,
@@ -320,13 +342,13 @@ class PlaylistHandler {
                 val playlists = playlistDatabaseHelper.getAllPlaylists()
 
                 for (playlist in playlists) {
-                    currentPlaylistsData.add(PlaylistItem(playlist.playlistId))
+                    playlistsData.add(PlaylistItem(playlist.playlistId))
                 }
 
             }, {
                 listViewDataIsPlaylistView = true
 
-                updatePlaylistRecyclerView(view, currentPlaylistsData)
+                updatePlaylistRecyclerView(view, playlistsData)
 
                 swipeRefreshLayout.isRefreshing = false
 
@@ -347,7 +369,9 @@ class PlaylistHandler {
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
 
-        currentPlaylistContentData = ArrayList()
+        var playlistName = ""
+
+        val playlistData = ArrayList<CatalogItem>()
 
         LoadPlaylistTracksAsync(
             contextReference,
@@ -363,16 +387,20 @@ class PlaylistHandler {
                         playlistId
                     )
 
+                PlaylistDatabaseHelper(view.context).getPlaylist(playlistId)?.playlistName?.let {
+                    playlistName = it
+                }
+
                 val playlistItems = playlistItemDatabaseHelper.getAllData()
 
                 for (i in (playlistItems.size - 1 downTo 0)) {
-                    currentPlaylistContentData.add(CatalogItem(playlistItems[i].songId))
+                    playlistData.add(CatalogItem(playlistItems[i].songId))
                 }
 
             }, {
                 listViewDataIsPlaylistView = false
 
-                updateCatalogRecyclerView(view, currentPlaylistContentData)
+                updateCatalogRecyclerView(view, playlistName, playlistData)
 
                 swipeRefreshLayout.isRefreshing = false
             }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)

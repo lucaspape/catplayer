@@ -22,6 +22,7 @@ import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.handlers.abstract_items.AlbumItem
 import de.lucaspape.monstercat.handlers.abstract_items.CatalogItem
+import de.lucaspape.monstercat.handlers.abstract_items.HeaderTextItem
 import de.lucaspape.monstercat.handlers.abstract_items.ProgressItem
 import de.lucaspape.monstercat.handlers.async.*
 import de.lucaspape.monstercat.music.clearQueue
@@ -62,16 +63,24 @@ class HomeHandler {
     /**
      * Setup catalog view
      */
-    private fun updateCatalogRecyclerView(view: View) {
+    private fun updateCatalogRecyclerView(view: View, headerText:String?) {
         val recyclerView = view.findViewById<RecyclerView>(R.id.musiclistview)
 
         recyclerView.layoutManager =
             LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
 
         val itemAdapter = ItemAdapter<CatalogItem>()
+        val headerAdapter = ItemAdapter<HeaderTextItem>()
         val footerAdapter = ItemAdapter<ProgressItem>()
 
-        val fastAdapter:FastAdapter<GenericItem> = FastAdapter.with(listOf(itemAdapter, footerAdapter))
+        val fastAdapter:FastAdapter<GenericItem> = FastAdapter.with(listOf(headerAdapter, itemAdapter, footerAdapter))
+
+        var itemIndexOffset = 0
+
+        if(headerText != null){
+            headerAdapter.add(HeaderTextItem(headerText))
+            itemIndexOffset = -1
+        }
 
         recyclerView.adapter = fastAdapter
 
@@ -85,13 +94,15 @@ class HomeHandler {
          * On song click
          */
         fastAdapter.onClickListener = { _, _, _, position ->
+            val itemIndex = position + itemIndexOffset
+
             clearQueue()
 
-            val catalogItem = currentCatalogViewData[position]
+            val catalogItem = currentCatalogViewData[itemIndex]
 
             val nextSongIdsList = ArrayList<String>()
 
-            for (i in (position + 1 until currentCatalogViewData.size)) {
+            for (i in (itemIndex + 1 until currentCatalogViewData.size)) {
                 try {
                     nextSongIdsList.add(currentCatalogViewData[i].songId)
                 } catch (e: IndexOutOfBoundsException) {
@@ -113,13 +124,15 @@ class HomeHandler {
          * On song long click
          */
         fastAdapter.onLongClickListener = { _, _, _, position ->
+            val itemIndex = position + itemIndexOffset
+
             val idList = ArrayList<String>()
 
             for (catalogItem in currentCatalogViewData) {
                 idList.add(catalogItem.songId)
             }
 
-            CatalogItem.showContextMenu(view.context, idList, position)
+            CatalogItem.showContextMenu(view.context, idList, itemIndex)
 
             false
         }
@@ -140,13 +153,15 @@ class HomeHandler {
                 fastAdapter: FastAdapter<CatalogItem>,
                 item: CatalogItem
             ) {
+                val itemIndex = position + itemIndexOffset
+
                 val idList = ArrayList<String>()
 
                 for (catalogItem in currentCatalogViewData) {
                     idList.add(catalogItem.songId)
                 }
 
-                CatalogItem.showContextMenu(view.context, idList, position)
+                CatalogItem.showContextMenu(view.context, idList, itemIndex)
             }
         })
 
@@ -350,7 +365,7 @@ class HomeHandler {
                     updateAlbumRecyclerView(view)
                 } else {
                     viewSelector.setSelection(0)
-                    updateCatalogRecyclerView(view)
+                    updateCatalogRecyclerView(view, null)
                 }
             }
 
@@ -455,7 +470,7 @@ class HomeHandler {
                 }
 
             }, {
-                updateCatalogRecyclerView(view)
+                updateCatalogRecyclerView(view, null)
 
                 swipeRefreshLayout.isRefreshing = false
                 searchContentsDisplayed = false
@@ -574,6 +589,8 @@ class HomeHandler {
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
 
+        var albumName = ""
+
         LoadAlbumAsync(
             contextReference,
             forceReload,
@@ -583,6 +600,9 @@ class HomeHandler {
             }
         ) {
             BackgroundAsync({
+                AlbumDatabaseHelper(view.context).getAlbum(albumId)?.let {
+                    albumName = "${it.artist} - ${it.title}"
+                }
                 val albumItemDatabaseHelper =
                     AlbumItemDatabaseHelper(contextReference.get()!!, albumId)
                 val albumItemList = albumItemDatabaseHelper.getAllData()
@@ -599,7 +619,7 @@ class HomeHandler {
             }, {
                 albumView = false
 
-                updateCatalogRecyclerView(view)
+                updateCatalogRecyclerView(view, albumName)
 
                 swipeRefreshLayout.isRefreshing = false
 
@@ -645,7 +665,7 @@ class HomeHandler {
 
             currentCatalogViewData = searchResults
 
-            updateCatalogRecyclerView(view)
+            updateCatalogRecyclerView(view, null)
 
             swipeRefreshLayout.isRefreshing = false
         }.executeOnExecutor(
