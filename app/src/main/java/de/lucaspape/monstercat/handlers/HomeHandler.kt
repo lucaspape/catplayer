@@ -472,11 +472,14 @@ class HomeHandler {
 
             val positionIndex = layoutManager.findFirstVisibleItemPosition()
             val startView = recyclerView.getChildAt(0)
-            val topView = startView.top - recyclerView.paddingTop
 
-            val settings = Settings(context)
-            settings.setInt("$savePrefix-positionIndex", positionIndex)
-            settings.setInt("$savePrefix-topView", topView)
+            startView?.let {
+                val topView = it.top - recyclerView.paddingTop
+
+                val settings = Settings(context)
+                settings.setInt("$savePrefix-positionIndex", positionIndex)
+                settings.setInt("$savePrefix-topView", topView)
+            }
         }
     }
 
