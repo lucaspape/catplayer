@@ -529,13 +529,14 @@ class HomeHandler {
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
 
-        if (currentCatalogViewData.size < 50 || forceReload) {
+        if (currentCatalogViewData.size < 50 || forceReload || albumContentsDisplayed) {
             val catalogSongDatabaseHelper =
                 CatalogSongDatabaseHelper(view.context)
 
+            resetRecyclerViewPosition(view.context, "catalogView")
+            currentCatalogViewData = ArrayList()
+
             if (forceReload) {
-                resetRecyclerViewPosition(view.context, "catalogView")
-                currentCatalogViewData = ArrayList()
                 catalogSongDatabaseHelper.reCreateTable()
             }
 
