@@ -411,8 +411,10 @@ class HomeHandler {
                 }
 
                 if (albumView) {
+                    saveRecyclerViewPosition(view.context, "catalogView", recyclerView)
                     initAlbumListLoad(view, false)
                 } else {
+                    saveRecyclerViewPosition(view.context, "albumView", recyclerView)
                     initSongListLoad(view, false)
                 }
             }
@@ -505,11 +507,13 @@ class HomeHandler {
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
 
-        if(currentCatalogViewData.size < 50){
+        if(currentCatalogViewData.size < 50 || forceReload){
             val catalogSongDatabaseHelper =
                 CatalogSongDatabaseHelper(view.context)
 
             if (forceReload) {
+                resetRecyclerViewPosition(view.context, "catalogView")
+                currentCatalogViewData = ArrayList()
                 catalogSongDatabaseHelper.reCreateTable()
             }
 
@@ -577,12 +581,14 @@ class HomeHandler {
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
 
-        if(currentAlbumViewData.size < 50){
+        if(currentAlbumViewData.size < 50 || forceReload){
             val contextReference = WeakReference(view.context)
 
             val albumDatabaseHelper = AlbumDatabaseHelper(view.context)
 
             if (forceReload) {
+                currentCatalogViewData = ArrayList()
+                resetRecyclerViewPosition(view.context, "albumView")
                 albumDatabaseHelper.reCreateTable(view.context, false)
             }
 
