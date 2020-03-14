@@ -23,7 +23,8 @@ internal fun prepareSong(context: Context, song: Song) {
     if (preparedSong != song.songId) {
         //new exoplayer
         val newExoPlayer = SimpleExoPlayer.Builder(context).build()
-        newExoPlayer.audioAttributes = getAudioAttributes()
+        newExoPlayer.audioAttributes =
+            getAudioAttributes()
 
         nextExoPlayer = newExoPlayer
 
@@ -42,17 +43,24 @@ internal fun prepareSong(context: Context, song: Song) {
 }
 
 internal fun prepareNextSong(context: Context) {
-    SongDatabaseHelper(context).getSong(context, getNextSong())?.let { song->
+    SongDatabaseHelper(context).getSong(context, getNextSong())?.let { song ->
         prepareSong(context, song)
     }
 }
 
-internal fun playSong(context: Context, song: Song, showNotification:Boolean, requestAudioFocus:Boolean, playWhenReady:Boolean, progress:Long?) {
+internal fun playSong(
+    context: Context,
+    song: Song,
+    showNotification: Boolean,
+    requestAudioFocus: Boolean,
+    playWhenReady: Boolean,
+    progress: Long?
+) {
     BackgroundService.streamInfoUpdateAsync?.cancel(true)
 
-    val audioFocus = if(requestAudioFocus){
+    val audioFocus = if (requestAudioFocus) {
         requestAudioFocus(context)
-    }else{
+    } else {
         null
     }
 
@@ -60,7 +68,7 @@ internal fun playSong(context: Context, song: Song, showNotification:Boolean, re
         exoPlayer?.release()
         exoPlayer?.stop()
 
-        if(preparedSong != song.songId){
+        if (preparedSong != song.songId) {
             prepareSong(context, song)
         }
 
@@ -70,16 +78,21 @@ internal fun playSong(context: Context, song: Song, showNotification:Boolean, re
 
         exoPlayer?.audioComponent?.volume = 1.0f
 
-        if(progress != null){
+        if (progress != null) {
             exoPlayer?.seekTo(progress)
         }
 
         //for play/pause button change and if song ended
-        exoPlayer?.addListener(getPlayerListener(context, song))
+        exoPlayer?.addListener(
+            getPlayerListener(
+                context,
+                song
+            )
+        )
 
         exoPlayer?.playWhenReady = playWhenReady
 
-        if(playWhenReady){
+        if (playWhenReady) {
             listenerEnabled = true
         }
 
@@ -90,7 +103,7 @@ internal fun playSong(context: Context, song: Song, showNotification:Boolean, re
             setPlayButtonImage(context)
             startSeekBarUpdate(true)
 
-            if(showNotification){
+            if (showNotification) {
                 updateNotification(
                     song.title,
                     song.version,
@@ -115,10 +128,15 @@ fun playStream(stream: Stream) {
 
         //new exoplayer
         val newExoPlayer = SimpleExoPlayer.Builder(context).build()
-        newExoPlayer.audioAttributes = getAudioAttributes()
+        newExoPlayer.audioAttributes =
+            getAudioAttributes()
 
         //for play/pause button change and if song ended
-        newExoPlayer.addListener(getStreamPlayerListener(context))
+        newExoPlayer.addListener(
+            getStreamPlayerListener(
+                context
+            )
+        )
 
         exoPlayer = newExoPlayer
 

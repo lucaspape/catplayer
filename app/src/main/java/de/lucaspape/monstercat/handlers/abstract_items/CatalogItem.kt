@@ -20,7 +20,7 @@ import de.lucaspape.monstercat.handlers.addSongToPlaylist
 import de.lucaspape.monstercat.handlers.deletePlaylistSong
 import de.lucaspape.monstercat.handlers.openAlbum
 import de.lucaspape.monstercat.handlers.playSongFromId
-import de.lucaspape.monstercat.util.ImageReceiverInterface
+import de.lucaspape.monstercat.download.ImageReceiverInterface
 
 open class CatalogItem(
     val songId: String
@@ -177,7 +177,8 @@ open class CatalogItem(
         )
     }
 
-    class ViewHolder(view: View) : FastAdapter.ViewHolder<CatalogItem>(view), ImageReceiverInterface {
+    class ViewHolder(view: View) : FastAdapter.ViewHolder<CatalogItem>(view),
+        ImageReceiverInterface {
         private val titleTextView: TextView = view.findViewById(R.id.title)
         private val artistTextView: TextView = view.findViewById(R.id.artist)
         val titleMenuButton: ImageButton = view.findViewById(R.id.titleMenuButton)

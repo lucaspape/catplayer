@@ -105,14 +105,21 @@ class MainActivity : AppCompatActivity() {
 
         val settings = Settings(this)
 
-        if(settings.getString("app-version") != packageManager.getPackageInfo(packageName, 0).versionName){
+        if (settings.getString("app-version") != packageManager.getPackageInfo(
+                packageName,
+                0
+            ).versionName
+        ) {
             try {
                 File("$cacheDir/player_state.obj").delete()
-            }catch (e: FileNotFoundException){
+            } catch (e: FileNotFoundException) {
 
             }
 
-            settings.setString("app-version", packageManager.getPackageInfo(packageName, 0).versionName)
+            settings.setString(
+                "app-version",
+                packageManager.getPackageInfo(packageName, 0).versionName
+            )
         }
 
         settings.getInt(getString(R.string.crossfadeTimeSetting))?.let {
@@ -285,15 +292,15 @@ class MainActivity : AppCompatActivity() {
 
         val darkMode = settings.getBoolean(getString(R.string.darkThemeSetting))
 
-        if(darkMode != null){
-            if(darkMode){
+        if (darkMode != null) {
+            if (darkMode) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
 
                 if (fallbackBlackFile.exists() && fallbackBlackFileLow.exists()) {
                     fallbackBlackFile.copyTo(fallbackFile, true)
                     fallbackBlackFileLow.copyTo(fallbackFileLow, true)
                 }
-            }else{
+            } else {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
                 if (fallbackWhiteFile.exists() && fallbackWhiteFileLow.exists()) {
@@ -301,7 +308,7 @@ class MainActivity : AppCompatActivity() {
                     fallbackWhiteFileLow.copyTo(fallbackFileLow, true)
                 }
             }
-        }else{
+        } else {
             if (resources.configuration.uiMode.and(Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) {
                 settings.setBoolean(getString(R.string.darkThemeSetting), true)
             } else {

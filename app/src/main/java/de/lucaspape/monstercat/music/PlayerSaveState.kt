@@ -44,9 +44,10 @@ data class PlayerSaveState(
                             songQueue = playerSaveState.songQueue
                             prioritySongQueue = playerSaveState.prioritySongQueue
 
-                            getCurrentSong()?.let {song ->
+                            getCurrentSong()?.let { song ->
                                 playerSaveState.progress?.let { progress ->
-                                    playSong(context, song,
+                                    playSong(
+                                        context, song,
                                         showNotification = false,
                                         requestAudioFocus = false,
                                         playWhenReady = false,
@@ -64,7 +65,7 @@ data class PlayerSaveState(
                         } catch (e: TypeCastException) {
                             File((context.cacheDir.toString() + "/player_state.obj")).delete()
                         }
-                    }catch (e: EOFException){
+                    } catch (e: EOFException) {
 
                     }
                 } catch (e: FileNotFoundException) {

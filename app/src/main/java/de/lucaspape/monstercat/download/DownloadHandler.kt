@@ -8,7 +8,6 @@ import android.os.AsyncTask
 import com.squareup.picasso.Picasso
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.background.BackgroundService
-import de.lucaspape.monstercat.util.ImageReceiverInterface
 import de.lucaspape.monstercat.util.Settings
 import de.lucaspape.monstercat.util.wifiConnected
 import java.io.File

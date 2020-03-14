@@ -15,8 +15,6 @@ import de.lucaspape.monstercat.music.notification.startPlayerService
 import de.lucaspape.monstercat.music.notification.stopPlayerService
 import de.lucaspape.monstercat.music.notification.updateNotification
 import de.lucaspape.monstercat.util.Settings
-import de.lucaspape.monstercat.util.abandonAudioFocus
-import de.lucaspape.monstercat.util.requestAudioFocus
 import java.lang.ref.WeakReference
 import kotlin.random.Random
 
@@ -392,6 +390,6 @@ fun clearPlaylist() {
 /**
  * Dont play from playlist, play from queue
  */
-fun skipPreviousInPlaylist(){
+fun skipPreviousInPlaylist() {
     playlistIndex = playlist.size
 }

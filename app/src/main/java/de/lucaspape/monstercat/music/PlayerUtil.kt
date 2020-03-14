@@ -1,4 +1,4 @@
-package de.lucaspape.monstercat.util
+package de.lucaspape.monstercat.music
 
 import android.content.Context
 import android.media.AudioFocusRequest
@@ -8,12 +8,9 @@ import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.audio.AudioAttributes
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.Song
-import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.notification.startPlayerService
 import de.lucaspape.monstercat.music.notification.updateNotification
-import de.lucaspape.monstercat.music.setCover
-import de.lucaspape.monstercat.music.setPlayButtonImage
-import de.lucaspape.monstercat.music.startSeekBarUpdate
+import de.lucaspape.monstercat.util.Settings
 
 fun getAudioAttributes(): AudioAttributes {
     return AudioAttributes.Builder()
@@ -94,7 +91,7 @@ fun getPlayerListener(context: Context, song: Song): Player.EventListener {
     return object : Player.EventListener {
         @Override
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-            if(listenerEnabled){
+            if (listenerEnabled) {
                 startPlayerService(song.songId)
 
                 exoPlayer?.duration?.let { duration ->

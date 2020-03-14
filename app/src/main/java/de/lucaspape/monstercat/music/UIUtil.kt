@@ -15,7 +15,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.download.downloadCoverIntoImageReceiver
-import de.lucaspape.monstercat.util.ImageReceiverInterface
+import de.lucaspape.monstercat.download.ImageReceiverInterface
 import java.lang.ref.WeakReference
 import java.util.*
 
@@ -245,9 +245,10 @@ internal fun setCover(
     rAlbumId: String,
     callback: (bitmap: Bitmap) -> Unit
 ) {
-    downloadCoverIntoImageReceiver(context, object:ImageReceiverInterface{
+    downloadCoverIntoImageReceiver(context, object :
+        ImageReceiverInterface {
         override fun setBitmap(albumId: String, bitmap: Bitmap?) {
-            if(albumId == rAlbumId){
+            if (albumId == rAlbumId) {
                 barCoverImageReference?.get()?.setImageBitmap(bitmap)
                 fullscreenCoverReference?.get()?.setImageBitmap(bitmap)
 
@@ -268,7 +269,7 @@ internal fun setCover(
         }
 
         override fun setDrawable(albumId: String, drawable: Drawable?) {
-            if(albumId == rAlbumId){
+            if (albumId == rAlbumId) {
                 barCoverImageReference?.get()?.setImageDrawable(drawable)
                 fullscreenCoverReference?.get()?.setImageDrawable(drawable)
             }

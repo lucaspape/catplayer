@@ -44,11 +44,11 @@ class HomeFragment() : Fragment() {
             HomeHandler.albumViewSelected = it
         }
 
-        if(HomeHandler.currentAlbumViewData.size == 0){
+        if (HomeHandler.currentAlbumViewData.size == 0) {
             homeHandler.resetRecyclerViewPosition(view.context, "albumView")
         }
 
-        if(HomeHandler.currentCatalogViewData.size == 0){
+        if (HomeHandler.currentCatalogViewData.size == 0) {
             homeHandler.resetRecyclerViewPosition(view.context, "catalogView")
         }
 

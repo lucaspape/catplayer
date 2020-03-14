@@ -15,7 +15,7 @@ import de.lucaspape.monstercat.download.downloadCoverIntoImageReceiver
 import de.lucaspape.monstercat.handlers.downloadAlbum
 import de.lucaspape.monstercat.handlers.openAlbum
 import de.lucaspape.monstercat.handlers.playAlbumNext
-import de.lucaspape.monstercat.util.ImageReceiverInterface
+import de.lucaspape.monstercat.download.ImageReceiverInterface
 
 open class AlbumItem(
     val albumId: String
@@ -69,7 +69,8 @@ open class AlbumItem(
         )
     }
 
-    class ViewHolder(view: View) : FastAdapter.ViewHolder<AlbumItem>(view), ImageReceiverInterface {
+    class ViewHolder(view: View) : FastAdapter.ViewHolder<AlbumItem>(view),
+        ImageReceiverInterface {
         private val titleTextView: TextView = view.findViewById(R.id.albumTitle)
         private val artistTextView: TextView = view.findViewById(R.id.albumArtist)
         private val coverImageView: ImageView = view.findViewById(R.id.cover)
