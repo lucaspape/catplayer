@@ -94,8 +94,7 @@ class MainActivity : AppCompatActivity() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET)
             != PackageManager.PERMISSION_GRANTED
         ) {
-            displayInfo(this, "No access to internet!")
-            println("Internet permission not granted!")
+            displayInfo(this, getString(R.string.noInternetAccessError))
         }
 
         downloadFallbackCoverImages()
@@ -105,7 +104,7 @@ class MainActivity : AppCompatActivity() {
 
         val settings = Settings(this)
 
-        if (settings.getString("app-version") != packageManager.getPackageInfo(
+        if (settings.getString(getString(R.string.appVersionSetting)) != packageManager.getPackageInfo(
                 packageName,
                 0
             ).versionName
@@ -117,7 +116,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             settings.setString(
-                "app-version",
+                getString(R.string.appVersionSetting),
                 packageManager.getPackageInfo(packageName, 0).versionName
             )
         }

@@ -16,4 +16,5 @@
     <string name="albumViewSelectedSetting" translatable="false">albumViewSelected</string>
     <string name="albumViewSetting" translatable="false">albumView</string>
     <string name="privacyPolicySetting" translatable="false">privacypolicy</string>
+    <string name="appVersionSetting" translatable="false">app-version</string>
 </resources>

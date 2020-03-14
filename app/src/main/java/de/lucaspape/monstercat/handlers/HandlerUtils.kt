@@ -25,10 +25,7 @@ import de.lucaspape.monstercat.music.prioritySongQueue
 import de.lucaspape.monstercat.music.skipPreviousInPlaylist
 import de.lucaspape.monstercat.music.songQueue
 import de.lucaspape.monstercat.request.AuthorizedRequest
-import de.lucaspape.monstercat.util.Settings
-import de.lucaspape.monstercat.util.displayInfo
-import de.lucaspape.monstercat.util.parseSongToDB
-import de.lucaspape.monstercat.util.sid
+import de.lucaspape.monstercat.util.*
 import org.json.JSONObject
 import java.io.File
 import java.lang.ref.WeakReference
@@ -279,7 +276,7 @@ internal fun addSongToPlaylist(context: Context, song: Song) {
             PlaylistDatabaseHelper(context)
         val playlistList = playlistDatabaseHelper.getAllPlaylists()
 
-        if(playlistList.size>0){
+        if(playlistList.isNotEmpty()){
             val playlistNames = arrayOfNulls<String>(playlistList.size)
             val playlistIds = arrayOfNulls<String>(playlistList.size)
 
@@ -309,7 +306,7 @@ internal fun addSongToPlaylist(context: Context, song: Song) {
  * Create a new playlist, will ask for name with alertDialog
  */
 internal fun createPlaylist(context: Context) {
-    if(sid != ""){
+    if(loggedIn){
         val layoutInflater =
             context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
