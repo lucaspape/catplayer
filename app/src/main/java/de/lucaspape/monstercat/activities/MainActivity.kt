@@ -54,8 +54,6 @@ class MainActivity : AppCompatActivity() {
     private var fallbackWhiteFile = File("")
     private var fallbackWhiteFileLow = File("")
 
-    private var fragmentOpen = ""
-
     private val onNavigationItemSelectedListener =
         BottomNavigationView.OnNavigationItemSelectedListener { item ->
             when (item.itemId) {
@@ -209,12 +207,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        super.onDestroy()
+        
         //if app closed
         hideDownloadNotification(this)
 
         fragmentBackPressedCallback = {}
 
-        super.onDestroy()
+        PlayerSaveState.saveMusicPlayerState(this)
     }
 
     override fun onPause() {
