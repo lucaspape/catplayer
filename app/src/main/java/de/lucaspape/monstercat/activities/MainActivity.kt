@@ -32,6 +32,7 @@ import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.notification.updateNotification
 import de.lucaspape.monstercat.util.*
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.lang.ref.WeakReference
 
@@ -103,6 +104,16 @@ class MainActivity : AppCompatActivity() {
         changeTheme()
 
         val settings = Settings(this)
+
+        if(settings.getString("app-version") != packageManager.getPackageInfo(packageName, 0).versionName){
+            try {
+                File("$cacheDir/player_state.obj").delete()
+            }catch (e: FileNotFoundException){
+
+            }
+
+            settings.setString("app-version", packageManager.getPackageInfo(packageName, 0).versionName)
+        }
 
         settings.getInt(getString(R.string.crossfadeTimeSetting))?.let {
             crossfade = it
@@ -208,7 +219,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        
+
         //if app closed
         hideDownloadNotification(this)
 
