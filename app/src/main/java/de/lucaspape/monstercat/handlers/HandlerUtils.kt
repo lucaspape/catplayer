@@ -279,60 +279,68 @@ internal fun addSongToPlaylist(context: Context, song: Song) {
             PlaylistDatabaseHelper(context)
         val playlistList = playlistDatabaseHelper.getAllPlaylists()
 
-        val playlistNames = arrayOfNulls<String>(playlistList.size)
-        val playlistIds = arrayOfNulls<String>(playlistList.size)
+        if(playlistList.size>0){
+            val playlistNames = arrayOfNulls<String>(playlistList.size)
+            val playlistIds = arrayOfNulls<String>(playlistList.size)
 
-        for (i in playlistList.indices) {
-            playlistNames[i] = playlistList[i].playlistName
-            playlistIds[i] = playlistList[i].playlistId
-        }
-
-        val alertDialogBuilder = AlertDialog.Builder(context)
-        alertDialogBuilder.setTitle(context.getString(R.string.pickPlaylistMsg))
-        alertDialogBuilder.setItems(playlistNames) { _, i ->
-            playlistIds[i]?.let { playlistId ->
-                val addToPlaylistAsync =
-                    AddToPlaylistAsync(WeakReference(context), playlistId, song)
-                addToPlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+            for (i in playlistList.indices) {
+                playlistNames[i] = playlistList[i].playlistName
+                playlistIds[i] = playlistList[i].playlistId
             }
 
+            val alertDialogBuilder = AlertDialog.Builder(context)
+            alertDialogBuilder.setTitle(context.getString(R.string.pickPlaylistMsg))
+            alertDialogBuilder.setItems(playlistNames) { _, i ->
+                playlistIds[i]?.let { playlistId ->
+                    val addToPlaylistAsync =
+                        AddToPlaylistAsync(WeakReference(context), playlistId, song)
+                    addToPlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                }
+
+            }
+            alertDialogBuilder.show()
+        }else{
+            displayInfo(context, context.getString(R.string.noPlaylistFound))
         }
-        alertDialogBuilder.show()
     }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }
 
 /**
- * Create a new playlist, will ask for name with alertDialog TODO check if logged in
+ * Create a new playlist, will ask for name with alertDialog
  */
 internal fun createPlaylist(context: Context) {
-    val layoutInflater =
-        context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+    if(sid != ""){
+        val layoutInflater =
+            context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
-    val playlistNameInputLayout = layoutInflater.inflate(R.layout.playlistname_input_layout, null)
+        val playlistNameInputLayout = layoutInflater.inflate(R.layout.playlistname_input_layout, null)
 
-    AlertDialog.Builder(context).apply {
-        setTitle(context.getString(R.string.createPlaylist))
-        setPositiveButton(context.getString(R.string.ok)) { _, _ ->
-            val playlistNameEditText =
-                playlistNameInputLayout.findViewById<EditText>(R.id.playlistNameInput)
-            val playlistName = playlistNameEditText.text.toString()
+        AlertDialog.Builder(context).apply {
+            setTitle(context.getString(R.string.createPlaylist))
+            setPositiveButton(context.getString(R.string.ok)) { _, _ ->
+                val playlistNameEditText =
+                    playlistNameInputLayout.findViewById<EditText>(R.id.playlistNameInput)
+                val playlistName = playlistNameEditText.text.toString()
 
-            val createPlaylistAsync = CreatePlaylistAsync(WeakReference(context), playlistName)
-            createPlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                val createPlaylistAsync = CreatePlaylistAsync(WeakReference(context), playlistName)
+                createPlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+            }
+            setView(playlistNameInputLayout)
+            setCancelable(true)
+        }.create().run {
+            show()
+
+            val typedValue = TypedValue()
+            context.theme.resolveAttribute(R.attr.colorOnSurface, typedValue, true)
+
+            val positiveButton = getButton(DialogInterface.BUTTON_POSITIVE)
+            positiveButton.setTextColor(typedValue.data)
+
+            val negativeButton = getButton(DialogInterface.BUTTON_NEGATIVE)
+            negativeButton.setTextColor(typedValue.data)
         }
-        setView(playlistNameInputLayout)
-        setCancelable(true)
-    }.create().run {
-        show()
-
-        val typedValue = TypedValue()
-        context.theme.resolveAttribute(R.attr.colorOnSurface, typedValue, true)
-
-        val positiveButton = getButton(DialogInterface.BUTTON_POSITIVE)
-        positiveButton.setTextColor(typedValue.data)
-
-        val negativeButton = getButton(DialogInterface.BUTTON_NEGATIVE)
-        negativeButton.setTextColor(typedValue.data)
+    }else{
+        displayInfo(context, context.getString(R.string.errorNotLoggedIn))
     }
 }
 

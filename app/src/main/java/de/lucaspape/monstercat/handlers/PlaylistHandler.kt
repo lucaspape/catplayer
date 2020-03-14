@@ -33,8 +33,7 @@ class PlaylistHandler {
         var currentPlaylistId: String? = null
     }
 
-    //private var currentListViewData = ArrayList<HashMap<String, Any?>>()
-    private var listViewDataIsPlaylistView = true
+    private var playlistDisplayed = false
 
     /**
      * List for playlist content
@@ -321,10 +320,10 @@ class PlaylistHandler {
         //refresh
         val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
         swipeRefreshLayout.setOnRefreshListener {
-            if (listViewDataIsPlaylistView) {
-                loadPlaylist(view, forceReload = true)
-            } else {
+            if (playlistDisplayed) {
                 loadPlaylistTracks(view, true, currentPlaylistId!!)
+            } else {
+                loadPlaylist(view, forceReload = true)
             }
         }
 
@@ -362,7 +361,7 @@ class PlaylistHandler {
                 }
 
             }, {
-                listViewDataIsPlaylistView = true
+                playlistDisplayed = false
 
                 updatePlaylistRecyclerView(view, playlistsData)
 
@@ -414,7 +413,7 @@ class PlaylistHandler {
                 }
 
             }, {
-                listViewDataIsPlaylistView = false
+                playlistDisplayed = true
 
                 updateCatalogRecyclerView(view, playlistName, playlistData)
 
