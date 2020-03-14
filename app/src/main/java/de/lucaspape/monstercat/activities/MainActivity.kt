@@ -54,6 +54,8 @@ class MainActivity : AppCompatActivity() {
     private var fallbackWhiteFile = File("")
     private var fallbackWhiteFileLow = File("")
 
+    private var fragmentOpen = ""
+
     private val onNavigationItemSelectedListener =
         BottomNavigationView.OnNavigationItemSelectedListener { item ->
             when (item.itemId) {

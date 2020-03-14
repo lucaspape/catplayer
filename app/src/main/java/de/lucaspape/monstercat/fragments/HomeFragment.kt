@@ -44,6 +44,14 @@ class HomeFragment() : Fragment() {
             HomeHandler.albumViewSelected = it
         }
 
+        if(HomeHandler.currentAlbumViewData.size == 0){
+            homeHandler.resetRecyclerViewPosition(view.context, "albumView")
+        }
+
+        if(HomeHandler.currentCatalogViewData.size == 0){
+            homeHandler.resetRecyclerViewPosition(view.context, "catalogView")
+        }
+
         homeHandler.setupSpinner(view)
         homeHandler.registerListeners(view)
 
@@ -58,6 +66,14 @@ class HomeFragment() : Fragment() {
 
         search?.let {
             homeHandler.searchSong(view, it)
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        context?.let {
+            homeHandler.onPause(it)
         }
     }
 }
