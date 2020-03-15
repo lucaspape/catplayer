@@ -10,16 +10,16 @@
         android:id="@+id/fullscreenAlbumImage"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="64dp"
         android:layout_marginLeft="10dp"
+        android:layout_marginTop="64dp"
         android:layout_marginRight="10dp"
+        android:contentDescription="@string/fullscreenAlbumImage"
         app:layout_constraintBottom_toTopOf="@+id/fullscreenTitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.492"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_music_video_black_24dp"
-        android:contentDescription="@string/fullscreenAlbumImage" />
+        app:srcCompat="@drawable/ic_music_video_black_24dp" />
 
     <ImageButton
         android:id="@+id/fullScreenPlay"
@@ -27,11 +27,11 @@
         android:layout_height="50dp"
         android:layout_marginBottom="20dp"
         android:background="@null"
+        android:contentDescription="@string/fullscreenPlayPause"
         android:src="@drawable/ic_play_arrow_24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:contentDescription="@string/fullscreenPlayPause" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <ImageButton
         android:id="@+id/fullscreenLoop"
@@ -39,11 +39,11 @@
         android:layout_height="50dp"
         android:layout_marginBottom="20dp"
         android:background="@null"
+        android:contentDescription="@string/loop"
         android:src="@drawable/ic_repeat_24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/fullscreenNext"
-        android:contentDescription="@string/loop" />
+        app:layout_constraintStart_toEndOf="@+id/fullscreenNext" />
 
     <ImageButton
         android:id="@+id/fullscreenNext"
@@ -51,11 +51,11 @@
         android:layout_height="50dp"
         android:layout_marginBottom="20dp"
         android:background="@null"
+        android:contentDescription="@string/fullscreenNext"
         android:src="@drawable/ic_skip_next_24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/fullscreenLoop"
-        app:layout_constraintStart_toEndOf="@+id/fullScreenPlay"
-        android:contentDescription="@string/fullscreenNext" />
+        app:layout_constraintStart_toEndOf="@+id/fullScreenPlay" />
 
     <ImageButton
         android:id="@+id/fullscreenPrev"
@@ -63,11 +63,11 @@
         android:layout_height="50dp"
         android:layout_marginBottom="20dp"
         android:background="@null"
+        android:contentDescription="@string/fullscreenPrevButton"
         android:src="@drawable/ic_skip_previous_24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/fullScreenPlay"
-        app:layout_constraintStart_toEndOf="@id/fullscreenShuffle"
-        android:contentDescription="@string/fullscreenPrevButton" />
+        app:layout_constraintStart_toEndOf="@id/fullscreenShuffle" />
 
     <ImageButton
         android:id="@+id/fullscreenShuffle"
@@ -75,11 +75,11 @@
         android:layout_height="50dp"
         android:layout_marginBottom="20dp"
         android:background="@null"
+        android:contentDescription="@string/shuffle"
         android:src="@drawable/ic_shuffle_24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/fullscreenPrev"
-        app:layout_constraintStart_toStartOf="parent"
-        android:contentDescription="@string/shuffle" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/fullscreenTitle"
@@ -98,21 +98,21 @@
         android:id="@+id/fullscreenArtist"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textColor="?attr/colorOnSurface"
         android:layout_marginStart="10dp"
         android:layout_marginBottom="20dp"
         android:maxLines="1"
+        android:textColor="?attr/colorOnSurface"
         android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/fullscreenSeekBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <SeekBar
-        android:contentDescription="@string/songProgress"
         android:id="@+id/fullscreenSeekBar"
         android:layout_width="0dp"
         android:layout_height="20dp"
         android:layout_marginBottom="20dp"
+        android:contentDescription="@string/songProgress"
         app:layout_constraintBottom_toTopOf="@+id/fullScreenPlay"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

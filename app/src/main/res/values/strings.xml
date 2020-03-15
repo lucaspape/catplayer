@@ -94,4 +94,7 @@
     <string name="yourPlaylists">Your playlists</string>
     <string name="noPlaylistFound">No playlist found</string>
     <string name="noInternetAccessError">No access to internet!</string>
+    <string name="playlistView">Playlist View</string>
+    <string name="contentView">Content View</string>
+    <string name="playlistName">Playlist Name</string>
 </resources>

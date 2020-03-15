@@ -10,9 +10,11 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
             <Button
                 android:id="@+id/add_account"
                 android:layout_width="wrap_content"
@@ -21,8 +23,8 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 android:backgroundTint="?attr/colorButtonNormal"
-                android:textColor="?attr/colorOnSurface"
                 android:text="@string/addaccount"
+                android:textColor="?attr/colorOnSurface"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/passwordInput" />
@@ -131,6 +133,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/audioFocusSwitch" />
+
             <Switch
                 android:id="@+id/downloadFlacSwitch"
                 android:layout_width="0dp"
@@ -150,8 +153,8 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="10dp"
-                android:textColor="?attr/colorOnSurface"
                 android:text="@string/coverResolution"
+                android:textColor="?attr/colorOnSurface"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/downloadFlacSwitch" />
 
@@ -194,8 +197,8 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="10dp"
-                android:textColor="?attr/colorOnSurface"
                 android:text="@string/crossfade"
+                android:textColor="?attr/colorOnSurface"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/skipMonstercatSongsSwitch" />
 
@@ -220,15 +223,15 @@
                 app:layout_constraintTop_toBottomOf="@+id/crossfadeText" />
 
             <Button
+                android:id="@+id/resetDatabaseButton"
                 android:layout_width="200dp"
                 android:layout_height="50dp"
                 android:backgroundTint="?attr/colorButtonNormal"
-                android:textColor="?attr/colorOnSurface"
                 android:text="@string/resetDatabase"
-                android:id="@+id/resetDatabaseButton"
+                android:textColor="?attr/colorOnSurface"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/crossfadeTimeSeekbar"/>
+                app:layout_constraintTop_toBottomOf="@+id/crossfadeTimeSeekbar" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
