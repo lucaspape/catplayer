@@ -707,7 +707,7 @@ class HomeHandler {
         }
 
         AlbumDatabaseHelper(view.context).getAlbum(albumId)?.let {
-            albumName = "${it.artist} - ${it.title}"
+            albumName = it.title
         }
 
         if (albumContentViewData[albumId] == null || forceReload) {
