@@ -26,7 +26,6 @@ import de.lucaspape.monstercat.background.BackgroundService.Companion.streamInfo
 import de.lucaspape.monstercat.download.hideDownloadNotification
 import de.lucaspape.monstercat.fragments.HomeFragment
 import de.lucaspape.monstercat.fragments.PlaylistFragment
-import de.lucaspape.monstercat.handlers.HomeHandler
 import de.lucaspape.monstercat.handlers.async.BackgroundAsync
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.notification.updateNotification
@@ -146,11 +145,6 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             })
-        }
-
-        //set the correct view
-        settings.getBoolean(getString(R.string.albumViewSelectedSetting))?.let {
-            HomeHandler.albumViewSelected = it
         }
 
         val intentExtras = intent.extras

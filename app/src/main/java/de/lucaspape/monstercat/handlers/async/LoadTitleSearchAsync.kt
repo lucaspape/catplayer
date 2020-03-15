@@ -21,11 +21,13 @@ class LoadTitleSearchAsync(
     private val contextReference: WeakReference<Context>,
     private val searchString: String,
     private val skip: Int,
-    private val requestFinished: () -> Unit
+    private val requestFinished: (searchResults: ArrayList<CatalogItem>) -> Unit
 ) : AsyncTask<Void, Void, String>() {
 
+    var searchResults = ArrayList<CatalogItem>()
+
     override fun onPostExecute(result: String?) {
-        requestFinished()
+        requestFinished(searchResults)
     }
 
     override fun doInBackground(vararg params: Void?): String? {
@@ -49,14 +51,9 @@ class LoadTitleSearchAsync(
                     val songList =
                         parseSongSearchToSongList(context, jsonArray)
 
-                    val catalogItemList = ArrayList<CatalogItem>()
-
                     for (song in songList) {
-                        catalogItemList.add(CatalogItem(song.songId))
+                        searchResults.add(CatalogItem(song.songId))
                     }
-
-                    //display list
-                    HomeHandler.searchResults = catalogItemList
 
                 },
                 Response.ErrorListener { error ->
