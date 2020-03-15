@@ -2,6 +2,7 @@ package de.lucaspape.monstercat.handlers.abstract_items
 
 import android.app.AlertDialog
 import android.content.Context
+import android.os.AsyncTask
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -13,6 +14,7 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
+import de.lucaspape.monstercat.handlers.async.BackgroundAsync
 import de.lucaspape.monstercat.handlers.deletePlaylist
 import de.lucaspape.monstercat.handlers.downloadPlaylist
 import de.lucaspape.monstercat.handlers.playPlaylistNext
@@ -121,7 +123,13 @@ open class PlaylistItem(
                 titleTextView.text = playlist.playlistName
                 coverImageView.setImageURI("".toUri())
 
-                titleDownloadButton.setImageURI(item.getDownloadStatus(context).toUri())
+                var downloadStatus = "android.resource://de.lucaspape.monstercat/drawable/ic_file_download_24dp".toUri()
+
+                BackgroundAsync({
+                    downloadStatus = item.getDownloadStatus(context).toUri()
+                }, {
+                    titleDownloadButton.setImageURI(downloadStatus)
+                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
             }
         }
 
