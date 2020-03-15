@@ -706,6 +706,10 @@ class HomeHandler {
             }
         }
 
+        AlbumDatabaseHelper(view.context).getAlbum(albumId)?.let {
+            albumName = "${it.artist} - ${it.title}"
+        }
+
         if (albumContentViewData[albumId] == null || forceReload) {
             LoadAlbumAsync(
                 contextReference,
@@ -716,9 +720,6 @@ class HomeHandler {
                 }
             ) {
                 BackgroundAsync({
-                    AlbumDatabaseHelper(view.context).getAlbum(albumId)?.let {
-                        albumName = "${it.artist} - ${it.title}"
-                    }
                     val albumItemDatabaseHelper =
                         AlbumItemDatabaseHelper(contextReference.get()!!, albumId)
                     val albumItemList = albumItemDatabaseHelper.getAllData()
