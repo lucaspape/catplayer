@@ -45,6 +45,67 @@ fun addStreamDownloadSong(context: Context, songId: String, downloadFinished: ()
     }
 }
 
+fun downloadArtistImageIntoImageReceiver(
+    context: Context,
+    imageReceiver: ImageReceiverInterface,
+    artistId: String
+) {
+    val cacheBitmap = bitmapCache[artistId]?.get()
+
+    val settings = Settings(context)
+
+    if (cacheBitmap != null) {
+        imageReceiver.setBitmap(artistId, cacheBitmap)
+    } else {
+        //TODO placeholder
+
+        val url = context.getString(R.string.artistContentUrl) + "$artistId/image"
+
+        val cacheFile = File(context.cacheDir.toString() + "/$artistId.png")
+
+        if (cacheFile.exists()) {
+            val bitmap = BitmapFactory.decodeFile(cacheFile.absolutePath)
+            imageReceiver.setBitmap(artistId, bitmap)
+            bitmapCache[artistId] = SoftReference(bitmap)
+        } else {
+            if (wifiConnected(context) == true || settings.getBoolean(context.getString(R.string.downloadCoversOverMobileSetting)) == true) {
+                val picassoTarget = object : com.squareup.picasso.Target {
+                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
+                        imageReceiver.setDrawable(artistId, placeHolderDrawable)
+                    }
+
+                    override fun onBitmapFailed(errorDrawable: Drawable?) {
+                        imageReceiver.setDrawable(artistId, errorDrawable)
+                    }
+
+                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                        imageReceiver.setBitmap(artistId, bitmap)
+
+                        //possible that it changed by this time
+                        if (!cacheFile.exists()) {
+                            FileOutputStream(cacheFile).use { out ->
+                                bitmap?.compress(Bitmap.CompressFormat.PNG, 100, out)
+                            }
+                        }
+
+                        bitmapCache[artistId] = SoftReference(bitmap)
+                    }
+                }
+
+                //to prevent garbage collect
+                targetList.add(SoftReference(picassoTarget))
+
+                Picasso.with(context)
+                    .load("$url?image_width=256")
+                    .placeholder(null)
+                    .into(picassoTarget)
+            } else {
+                imageReceiver.setDrawable(artistId, null)
+            }
+        }
+    }
+}
+
 fun downloadCoverIntoImageReceiver(
     context: Context,
     imageReceiver: ImageReceiverInterface,

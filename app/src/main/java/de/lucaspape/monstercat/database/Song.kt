@@ -22,6 +22,7 @@ data class Song(
     val albumId: String,
     val mcAlbumId: String,
     val artist: String,
+    val artistId: String,
     val coverUrl: String,
     val isDownloadable: Boolean,
     val isStreamable: Boolean,
@@ -51,6 +52,9 @@ data class Song(
         val COLUMN_ARTIST = "artist"
 
         @JvmStatic
+        val COLUMN_ARTIST_ID = "artistId"
+
+        @JvmStatic
         val COLUMN_COVER_URL = "coverUrl"
 
         @JvmStatic
@@ -71,6 +75,7 @@ data class Song(
                     COLUMN_ALBUM_ID + " TEXT," +
                     COLUMN_ALBUM_MC_ID + " TEXT," +
                     COLUMN_ARTIST + " TEXT," +
+                    COLUMN_ARTIST_ID + " TEXT," +
                     COLUMN_COVER_URL + " TEXT," +
                     COLUMN_DOWNLOADABLE + " TEXT," +
                     COLUMN_STREAMABLE + " TEXT," +
@@ -110,7 +115,7 @@ data class Song(
         }
     }
 
-    fun getUrl(): String {
+    private fun getUrl(): String {
         return if (File(downloadLocation).exists() && File(streamDownloadLocation).exists()) {
             File(streamDownloadLocation).delete()
 

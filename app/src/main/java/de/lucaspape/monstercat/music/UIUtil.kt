@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.download.downloadCoverIntoImageReceiver
 import de.lucaspape.monstercat.download.ImageReceiverInterface
+import de.lucaspape.monstercat.download.downloadArtistImageIntoImageReceiver
 import java.lang.ref.WeakReference
 import java.util.*
 
@@ -164,6 +165,13 @@ var fullscreenPlayButtonReference: WeakReference<ImageButton>? = null
         }
     }
 
+var fullscreenArtistImageViewReference: WeakReference<ImageView>? = null
+    set(newImageView){
+        newImageView?.get()?.setImageDrawable(fullscreenArtistImageViewReference?.get()?.drawable)
+
+        field = newImageView
+    }
+
 internal fun setTitle(title: String, version: String, artist: String) {
     val fullText = "$title $version - $artist"
     val shownTitle = "$title $version"
@@ -242,13 +250,14 @@ internal fun setCover(
     title: String,
     version: String,
     artist: String,
-    rAlbumId: String,
+    artistId: String,
+    albumId: String,
     callback: (bitmap: Bitmap) -> Unit
 ) {
     downloadCoverIntoImageReceiver(context, object :
         ImageReceiverInterface {
-        override fun setBitmap(albumId: String, bitmap: Bitmap?) {
-            if (albumId == rAlbumId) {
+        override fun setBitmap(id: String, bitmap: Bitmap?) {
+            if (id == albumId) {
                 barCoverImageReference?.get()?.setImageBitmap(bitmap)
                 fullscreenCoverReference?.get()?.setImageBitmap(bitmap)
 
@@ -268,13 +277,27 @@ internal fun setCover(
             }
         }
 
-        override fun setDrawable(albumId: String, drawable: Drawable?) {
-            if (albumId == rAlbumId) {
+        override fun setDrawable(id: String, drawable: Drawable?) {
+            if (id == albumId) {
                 barCoverImageReference?.get()?.setImageDrawable(drawable)
                 fullscreenCoverReference?.get()?.setImageDrawable(drawable)
             }
         }
-    }, rAlbumId, false)
+    }, albumId, false)
+
+    downloadArtistImageIntoImageReceiver(context, object: ImageReceiverInterface{
+        override fun setBitmap(id: String, bitmap: Bitmap?) {
+            if(id == artistId){
+                fullscreenArtistImageViewReference?.get()?.setImageBitmap(bitmap)
+            }
+        }
+
+        override fun setDrawable(id: String, drawable: Drawable?) {
+            if(id == artistId){
+                fullscreenArtistImageViewReference?.get()?.setImageDrawable(drawable)
+            }
+        }
+    }, artistId)
 }
 
 internal fun setPlayButtonImage(context: Context) {

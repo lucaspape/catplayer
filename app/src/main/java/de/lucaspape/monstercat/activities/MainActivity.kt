@@ -181,7 +181,14 @@ class MainActivity : AppCompatActivity() {
                 val currentSong = getCurrentSong()
 
                 currentSong?.let { song ->
-                    setCover(this, song.title, song.version, song.artist, song.albumId) { bitmap ->
+                    setCover(
+                        this,
+                        song.title,
+                        song.version,
+                        song.artist,
+                        song.artistId,
+                        song.albumId
+                    ) { bitmap ->
                         updateNotification(
                             song.title,
                             song.version,
@@ -191,11 +198,13 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             } else {
+                //TODO artistId
                 setCover(
                     this,
                     StreamInfoUpdateAsync.liveTitle,
                     StreamInfoUpdateAsync.liveVersion,
                     StreamInfoUpdateAsync.liveArtist,
+                    "",
                     StreamInfoUpdateAsync.liveAlbumId
                 ) { bitmap ->
                     updateNotification(

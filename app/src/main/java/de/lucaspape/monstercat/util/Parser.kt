@@ -6,6 +6,7 @@ import de.lucaspape.monstercat.database.*
 import de.lucaspape.monstercat.database.helper.*
 import org.json.JSONArray
 import org.json.JSONObject
+import java.lang.IndexOutOfBoundsException
 import java.lang.reflect.InvocationTargetException
 
 fun parseSongSearchToSongList(context: Context, jsonArray: JSONArray): ArrayList<Song> {
@@ -33,6 +34,7 @@ fun parseSongToDB(jsonObject: JSONObject, context: Context): String? {
     var albumMcId = ""
     var title = ""
     var artist = ""
+    var artistId = ""
     var coverUrl = ""
     var version = ""
     var downloadable = false
@@ -44,6 +46,13 @@ fun parseSongToDB(jsonObject: JSONObject, context: Context): String? {
         albumMcId = jsonObject.getJSONObject("release").getString("catalogId")
         title = jsonObject.getString("title")
         artist = jsonObject.getString("artistsTitle")
+
+        try {
+            artistId = jsonObject.getJSONArray("artists").getJSONObject(0).getString("id")
+        }catch (e: IndexOutOfBoundsException){
+
+        }
+
         coverUrl = context.getString(R.string.trackContentUrl) + "$albumId/cover"
         version = jsonObject.getString("version")
         id = jsonObject.getString("id")
@@ -67,6 +76,7 @@ fun parseSongToDB(jsonObject: JSONObject, context: Context): String? {
         albumId,
         albumMcId,
         artist,
+        artistId,
         coverUrl,
         downloadable,
         streamable,

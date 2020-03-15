@@ -68,11 +68,13 @@ fun getStreamPlayerListener(context: Context): Player.EventListener {
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
             setPlayButtonImage(context)
 
+            //TODO artistid
             setCover(
                 context,
                 StreamInfoUpdateAsync.liveTitle,
                 StreamInfoUpdateAsync.liveVersion,
                 StreamInfoUpdateAsync.liveArtist,
+                "",
                 StreamInfoUpdateAsync.liveAlbumId
             ) { bitmap ->
                 updateNotification(
@@ -107,7 +109,7 @@ fun getPlayerListener(context: Context, song: Song): Player.EventListener {
                 if (playbackState == Player.STATE_ENDED) {
                     next()
                 } else {
-                    setCover(context, song.title, song.version, song.artist, song.albumId) {
+                    setCover(context, song.title, song.version, song.artist, song.artistId, song.albumId) {
                         updateNotification(
                             song.title,
                             song.version,

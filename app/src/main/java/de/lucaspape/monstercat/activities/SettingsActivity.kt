@@ -233,7 +233,7 @@ class SettingsActivity : AppCompatActivity() {
 
                     try {
                         File("$cacheDir/player_state.obj").delete()
-                    }catch (e: FileNotFoundException){
+                    } catch (e: FileNotFoundException) {
 
                     }
 

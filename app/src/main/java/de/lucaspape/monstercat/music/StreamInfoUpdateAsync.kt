@@ -50,7 +50,8 @@ class StreamInfoUpdateAsync(
 
     override fun onProgressUpdate(vararg values: Void) {
         contextReference.get()?.let { context ->
-            setCover(context, liveTitle, liveVersion, liveArtist, liveAlbumId) { bitmap ->
+            //TODO artistId
+            setCover(context, liveTitle, liveVersion, liveArtist, "", liveAlbumId) { bitmap ->
                 updateNotification(liveTitle, liveVersion, liveArtist, bitmap)
             }
 

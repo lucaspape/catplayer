@@ -171,7 +171,7 @@ private fun resume() {
                     //UI stuff
                     setTitle(song.title, song.version, song.artist)
 
-                    setCover(context, song.title, song.version, song.artist, song.albumId) {
+                    setCover(context, song.title, song.version, song.artist, song.artistId, song.albumId) {
                         setPlayButtonImage(context)
                         startSeekBarUpdate(true)
                         updateNotification(

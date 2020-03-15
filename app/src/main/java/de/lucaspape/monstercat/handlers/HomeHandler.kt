@@ -780,7 +780,6 @@ class HomeHandler {
                         searchSong(view, searchString, true)
                     },
                     {
-
                         if (Settings(view.context).getBoolean(view.context.getString(R.string.albumViewSelectedSetting)) == true) {
                             initAlbumListLoad(view, false)
                         } else {

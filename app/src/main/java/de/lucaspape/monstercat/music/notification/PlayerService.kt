@@ -46,7 +46,7 @@ class PlayerService : Service() {
                 artist = song.artist
                 version = song.version
 
-                setCover(context, song.title, song.version, song.artist, song.albumId) {
+                setCover(context, song.title, song.version, song.artist, song.artistId, song.albumId) {
                     startForeground(
                         musicNotificationID,
                         createPlayerNotification(

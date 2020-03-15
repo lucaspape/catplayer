@@ -69,8 +69,7 @@ open class AlbumItem(
         )
     }
 
-    class ViewHolder(view: View) : FastAdapter.ViewHolder<AlbumItem>(view),
-        ImageReceiverInterface {
+    class ViewHolder(view: View) : FastAdapter.ViewHolder<AlbumItem>(view) {
         private val titleTextView: TextView = view.findViewById(R.id.albumTitle)
         private val artistTextView: TextView = view.findViewById(R.id.albumArtist)
         private val coverImageView: ImageView = view.findViewById(R.id.cover)
@@ -90,25 +89,25 @@ open class AlbumItem(
                 artistTextView.text = album.artist
             }
 
-            downloadCoverIntoImageReceiver(context, this, item.albumId, false)
+            downloadCoverIntoImageReceiver(context, object : ImageReceiverInterface {
+                override fun setBitmap(id: String, bitmap: Bitmap?) {
+                    if (id == albumId) {
+                        coverImageView.setImageBitmap(bitmap)
+                    }
+                }
+
+                override fun setDrawable(id: String, drawable: Drawable?) {
+                    if (id == albumId) {
+                        coverImageView.setImageDrawable(drawable)
+                    }
+                }
+            }, item.albumId, false)
         }
 
         override fun unbindView(item: AlbumItem) {
             titleTextView.text = null
             artistTextView.text = null
             coverImageView.setImageURI(null)
-        }
-
-        override fun setBitmap(albumId: String, bitmap: Bitmap?) {
-            if(albumId == this.albumId){
-                coverImageView.setImageBitmap(bitmap)
-            }
-        }
-
-        override fun setDrawable(albumId: String, drawable: Drawable?) {
-            if(albumId == this.albumId){
-                coverImageView.setImageDrawable(drawable)
-            }
         }
     }
 }
