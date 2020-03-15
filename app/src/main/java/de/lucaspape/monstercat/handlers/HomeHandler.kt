@@ -294,7 +294,7 @@ class HomeHandler {
          * On item click
          */
         fastAdapter.onClickListener = { _, _, _, position ->
-            if(position < currentAlbumViewData.size){
+            if (position < currentAlbumViewData.size) {
                 saveRecyclerViewPosition(view.context, "albumView")
 
                 val albumItem = currentAlbumViewData[position]
@@ -312,7 +312,7 @@ class HomeHandler {
          * On item long click
          */
         fastAdapter.onLongClickListener = { _, _, _, position ->
-            if(position < currentAlbumViewData.size){
+            if (position < currentAlbumViewData.size) {
                 val albumMcIdList = ArrayList<String>()
 
                 for (albumItem in currentAlbumViewData) {
@@ -420,8 +420,8 @@ class HomeHandler {
                             false
                         )
 
-                        resetRecyclerViewPosition(view.context,"catalogView")
-                        resetRecyclerViewPosition(view.context,"albumView")
+                        resetRecyclerViewPosition(view.context, "catalogView")
+                        resetRecyclerViewPosition(view.context, "albumView")
 
                         initSongListLoad(view, false)
                     }
@@ -433,8 +433,8 @@ class HomeHandler {
                             true
                         )
 
-                        resetRecyclerViewPosition(view.context,"catalogView")
-                        resetRecyclerViewPosition(view.context,"albumView")
+                        resetRecyclerViewPosition(view.context, "catalogView")
+                        resetRecyclerViewPosition(view.context, "albumView")
 
                         initAlbumListLoad(view, false)
                     }
@@ -549,7 +549,11 @@ class HomeHandler {
     /**
      * Loads next 50 songs
      */
-    private fun loadSongList(view: View, itemAdapter: ItemAdapter<CatalogItem>, footerAdapter: ItemAdapter<ProgressItem>) {
+    private fun loadSongList(
+        view: View,
+        itemAdapter: ItemAdapter<CatalogItem>,
+        footerAdapter: ItemAdapter<ProgressItem>
+    ) {
         if (initDone) {
             LoadSongListAsync(WeakReference(view.context), false, catalogViewData.size, {}, {
                 val catalogSongDatabaseHelper =
@@ -636,7 +640,11 @@ class HomeHandler {
     /**
      * Loads next 50 albums
      */
-    private fun loadAlbumList(view: View, itemAdapter: ItemAdapter<AlbumItem>, footerAdapter: ItemAdapter<ProgressItem>) {
+    private fun loadAlbumList(
+        view: View,
+        itemAdapter: ItemAdapter<AlbumItem>,
+        footerAdapter: ItemAdapter<ProgressItem>
+    ) {
         if (initDone) {
             LoadAlbumListAsync(WeakReference(view.context),
                 false, albumViewData.size, {}, {
@@ -801,12 +809,17 @@ class HomeHandler {
         }
     }
 
-    private fun searchMore(view: View, searchString: String, itemAdapter: ItemAdapter<CatalogItem>, footerAdapter: ItemAdapter<ProgressItem>){
+    private fun searchMore(
+        view: View,
+        searchString: String,
+        itemAdapter: ItemAdapter<CatalogItem>,
+        footerAdapter: ItemAdapter<ProgressItem>
+    ) {
         val contextReference = WeakReference(view.context)
 
         var skip = searchResultsData[searchString]?.size
 
-        if(skip == null){
+        if (skip == null) {
             skip = 0
         }
 
@@ -815,7 +828,7 @@ class HomeHandler {
             searchString,
             skip
         ) { searchResults ->
-            for(result in searchResults){
+            for (result in searchResults) {
                 itemAdapter.add(result)
                 searchResultsData[searchString]?.add(result)
             }

@@ -19,6 +19,8 @@ import de.lucaspape.monstercat.music.crossfade
 import de.lucaspape.monstercat.util.Auth
 import de.lucaspape.monstercat.util.Settings
 import de.lucaspape.monstercat.util.displayInfo
+import java.io.File
+import java.io.FileNotFoundException
 
 /**
  * SettingsActivity
@@ -228,6 +230,12 @@ class SettingsActivity : AppCompatActivity() {
                     AlbumDatabaseHelper(this).reCreateTable(this, true)
                     CatalogSongDatabaseHelper(this).reCreateTable()
                     PlaylistDatabaseHelper(this).reCreateTable(this, true)
+
+                    try {
+                        File("$cacheDir/player_state.obj").delete()
+                    }catch (e: FileNotFoundException){
+
+                    }
 
                     val intent = Intent(this, MainActivity::class.java)
                     intent.addFlags(FLAG_ACTIVITY_NEW_TASK)
