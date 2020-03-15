@@ -12,6 +12,7 @@ import de.lucaspape.monstercat.util.Settings
 import de.lucaspape.monstercat.util.wifiConnected
 import java.io.File
 import java.io.FileOutputStream
+import java.lang.Exception
 import java.lang.ref.SoftReference
 import java.lang.ref.WeakReference
 
@@ -74,7 +75,7 @@ fun downloadArtistImageIntoImageReceiver(
                         imageReceiver.setDrawable(artistId, placeHolderDrawable)
                     }
 
-                    override fun onBitmapFailed(errorDrawable: Drawable?) {
+                    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
                         imageReceiver.setDrawable(artistId, errorDrawable)
                     }
 
@@ -95,9 +96,8 @@ fun downloadArtistImageIntoImageReceiver(
                 //to prevent garbage collect
                 targetList.add(SoftReference(picassoTarget))
 
-                Picasso.with(context)
+                Picasso.get()
                     .load("$url?image_width=256")
-                    .placeholder(null)
                     .into(picassoTarget)
             } else {
                 imageReceiver.setDrawable(artistId, null)
@@ -145,7 +145,7 @@ fun downloadCoverIntoImageReceiver(
                         imageReceiver.setDrawable(albumId, placeHolderDrawable)
                     }
 
-                    override fun onBitmapFailed(errorDrawable: Drawable?) {
+                    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
                         imageReceiver.setDrawable(albumId, errorDrawable)
                     }
 
@@ -166,10 +166,16 @@ fun downloadCoverIntoImageReceiver(
                 //to prevent garbage collect
                 targetList.add(SoftReference(picassoTarget))
 
-                Picasso.with(context)
-                    .load("$url?image_width=$resolution")
-                    .placeholder(placeholder)
-                    .into(picassoTarget)
+                if (placeholder != null) {
+                    Picasso.get()
+                        .load("$url?image_width=$resolution")
+                        .placeholder(placeholder)
+                        .into(picassoTarget)
+                } else {
+                    Picasso.get()
+                        .load("$url?image_width=$resolution")
+                        .into(picassoTarget)
+                }
             } else {
                 imageReceiver.setDrawable(albumId, placeholder)
             }

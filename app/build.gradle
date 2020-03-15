@@ -38,7 +38,7 @@ dependencies {
     implementation 'androidx.media:media:1.1.0'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.0.0'
 
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
@@ -52,5 +52,5 @@ dependencies {
 
     implementation "com.mikepenz:fastadapter:4.1.0"
     implementation "com.mikepenz:fastadapter-extensions-scroll:4.1.0"
-    implementation 'com.squareup.picasso:picasso:2.5.2'
+    implementation 'com.squareup.picasso:picasso:2.71828'
 }

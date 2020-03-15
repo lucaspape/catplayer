@@ -177,8 +177,7 @@ open class CatalogItem(
         )
     }
 
-    class ViewHolder(view: View) : FastAdapter.ViewHolder<CatalogItem>(view),
-        ImageReceiverInterface {
+    class ViewHolder(view: View) : FastAdapter.ViewHolder<CatalogItem>(view) {
         private val titleTextView: TextView = view.findViewById(R.id.title)
         private val artistTextView: TextView = view.findViewById(R.id.artist)
         val titleMenuButton: ImageButton = view.findViewById(R.id.titleMenuButton)
@@ -201,13 +200,25 @@ open class CatalogItem(
                 titleTextView.text = shownTitle
                 artistTextView.text = song.artist
 
-                downloadCoverIntoImageReceiver(context, this, song.albumId, true)
+                downloadCoverIntoImageReceiver(context, object : ImageReceiverInterface {
+                    override fun setBitmap(id: String, bitmap: Bitmap?) {
+                        if (id == albumId) {
+                            coverImageView.setImageBitmap(bitmap)
+                        }
+                    }
+
+                    override fun setDrawable(id: String, drawable: Drawable?) {
+                        if (id == albumId) {
+                            coverImageView.setImageDrawable(drawable)
+                        }
+                    }
+                }, song.albumId, true)
 
                 var downloadStatus =
                     "android.resource://de.lucaspape.monstercat/drawable/ic_file_download_24dp".toUri()
 
                 titleDownloadButton.setImageURI(downloadStatus)
-                
+
                 BackgroundAsync({
                     downloadStatus = song.getSongDownloadStatus().toUri()
                 }, {
@@ -221,18 +232,6 @@ open class CatalogItem(
             artistTextView.text = null
             coverImageView.setImageURI(null)
             titleDownloadButton.setImageURI(null)
-        }
-
-        override fun setBitmap(albumId: String, bitmap: Bitmap?) {
-            if (albumId == this.albumId) {
-                coverImageView.setImageBitmap(bitmap)
-            }
-        }
-
-        override fun setDrawable(albumId: String, drawable: Drawable?) {
-            if (albumId == this.albumId) {
-                coverImageView.setImageDrawable(drawable)
-            }
         }
     }
 }
