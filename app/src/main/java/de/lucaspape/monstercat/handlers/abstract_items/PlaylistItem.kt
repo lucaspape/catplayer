@@ -124,6 +124,8 @@ open class PlaylistItem(
                 coverImageView.setImageURI("".toUri())
 
                 var downloadStatus = "android.resource://de.lucaspape.monstercat/drawable/ic_file_download_24dp".toUri()
+                
+                titleDownloadButton.setImageURI(downloadStatus)
 
                 BackgroundAsync({
                     downloadStatus = item.getDownloadStatus(context).toUri()

@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import android.os.AsyncTask
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -20,6 +21,7 @@ import de.lucaspape.monstercat.handlers.deletePlaylistSong
 import de.lucaspape.monstercat.handlers.openAlbum
 import de.lucaspape.monstercat.handlers.playSongFromId
 import de.lucaspape.monstercat.download.ImageReceiverInterface
+import de.lucaspape.monstercat.handlers.async.BackgroundAsync
 
 open class CatalogItem(
     val songId: String
@@ -199,10 +201,18 @@ open class CatalogItem(
                 titleTextView.text = shownTitle
                 artistTextView.text = song.artist
 
-                //downloadCoverIntoImageView(context, coverImageView, song.albumId, true)
                 downloadCoverIntoImageReceiver(context, this, song.albumId, true)
 
-                titleDownloadButton.setImageURI(song.getSongDownloadStatus().toUri())
+                var downloadStatus =
+                    "android.resource://de.lucaspape.monstercat/drawable/ic_file_download_24dp".toUri()
+
+                titleDownloadButton.setImageURI(downloadStatus)
+                
+                BackgroundAsync({
+                    downloadStatus = song.getSongDownloadStatus().toUri()
+                }, {
+                    titleDownloadButton.setImageURI(downloadStatus)
+                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
             }
         }
 
