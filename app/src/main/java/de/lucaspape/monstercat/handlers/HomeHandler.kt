@@ -108,7 +108,7 @@ class HomeHandler {
         fastAdapter.onClickListener = { _, _, _, position ->
             val itemIndex = position + itemIndexOffset
 
-            if (itemIndex >= 0) {
+            if (itemIndex >= 0 && itemIndex < currentCatalogViewData.size) {
                 clearQueue()
 
                 val catalogItem = currentCatalogViewData[itemIndex]
@@ -140,7 +140,7 @@ class HomeHandler {
         fastAdapter.onLongClickListener = { _, _, _, position ->
             val itemIndex = position + itemIndexOffset
 
-            if (itemIndex >= 0) {
+            if (itemIndex >= 0 && itemIndex < currentCatalogViewData.size) {
                 val idList = ArrayList<String>()
 
                 for (catalogItem in currentCatalogViewData) {
@@ -171,7 +171,7 @@ class HomeHandler {
             ) {
                 val itemIndex = position + itemIndexOffset
 
-                if (itemIndex >= 0) {
+                if (itemIndex >= 0 && itemIndex < currentCatalogViewData.size) {
                     val idList = ArrayList<String>()
 
                     for (catalogItem in currentCatalogViewData) {
@@ -294,12 +294,15 @@ class HomeHandler {
          * On item click
          */
         fastAdapter.onClickListener = { _, _, _, position ->
-            saveRecyclerViewPosition(view.context, "albumView")
+            if(position < currentAlbumViewData.size){
+                saveRecyclerViewPosition(view.context, "albumView")
 
-            val albumItem = currentAlbumViewData[position]
+                val albumItem = currentAlbumViewData[position]
 
-            albumDatabaseHelper.getAlbum(albumItem.albumId)?.mcID?.let { mcID ->
-                loadAlbum(view, albumItem.albumId, mcID, false)
+                albumDatabaseHelper.getAlbum(albumItem.albumId)?.mcID?.let { mcID ->
+                    loadAlbum(view, albumItem.albumId, mcID, false)
+                }
+
             }
 
             false
@@ -309,15 +312,17 @@ class HomeHandler {
          * On item long click
          */
         fastAdapter.onLongClickListener = { _, _, _, position ->
-            val albumMcIdList = ArrayList<String>()
+            if(position < currentAlbumViewData.size){
+                val albumMcIdList = ArrayList<String>()
 
-            for (albumItem in currentAlbumViewData) {
-                albumDatabaseHelper.getAlbum(albumItem.albumId)?.mcID?.let { mcID ->
-                    albumMcIdList.add(mcID)
+                for (albumItem in currentAlbumViewData) {
+                    albumDatabaseHelper.getAlbum(albumItem.albumId)?.mcID?.let { mcID ->
+                        albumMcIdList.add(mcID)
+                    }
                 }
-            }
 
-            AlbumItem.showContextMenu(view.context, albumMcIdList, position)
+                AlbumItem.showContextMenu(view.context, albumMcIdList, position)
+            }
 
             false
         }
@@ -500,7 +505,7 @@ class HomeHandler {
                     footerAdapter.clear()
                     footerAdapter.add(ProgressItem())
 
-                    loadSongList(view, itemAdapter)
+                    loadSongList(view, itemAdapter, footerAdapter)
                 }, { _, _ ->
                     initSongListLoad(view, true)
                 }, {
@@ -544,7 +549,7 @@ class HomeHandler {
     /**
      * Loads next 50 songs
      */
-    private fun loadSongList(view: View, itemAdapter: ItemAdapter<CatalogItem>) {
+    private fun loadSongList(view: View, itemAdapter: ItemAdapter<CatalogItem>, footerAdapter: ItemAdapter<ProgressItem>) {
         if (initDone) {
             LoadSongListAsync(WeakReference(view.context), false, catalogViewData.size, {}, {
                 val catalogSongDatabaseHelper =
@@ -561,6 +566,8 @@ class HomeHandler {
                     )
 
                     catalogViewData.add(catalogItem)
+
+                    footerAdapter.clear()
                 }
             }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         }
@@ -580,7 +587,7 @@ class HomeHandler {
                 footerAdapter.clear()
                 footerAdapter.add(ProgressItem())
 
-                loadAlbumList(view, itemAdapter)
+                loadAlbumList(view, itemAdapter, footerAdapter)
             }, {
                 initAlbumListLoad(view, true)
             }, {
@@ -629,7 +636,7 @@ class HomeHandler {
     /**
      * Loads next 50 albums
      */
-    private fun loadAlbumList(view: View, itemAdapter: ItemAdapter<AlbumItem>) {
+    private fun loadAlbumList(view: View, itemAdapter: ItemAdapter<AlbumItem>, footerAdapter: ItemAdapter<ProgressItem>) {
         if (initDone) {
             LoadAlbumListAsync(WeakReference(view.context),
                 false, albumViewData.size, {}, {
@@ -646,6 +653,8 @@ class HomeHandler {
                         )
 
                         albumViewData.add(albumItem)
+
+                        footerAdapter.clear()
                     }
 
                 }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
@@ -728,7 +737,7 @@ class HomeHandler {
     }
 
     /**
-     * Search for string TODO load more
+     * Search for string
      */
     fun searchSong(view: View, searchString: String, forceReload: Boolean) {
         //search can also be performed without this view
@@ -757,7 +766,7 @@ class HomeHandler {
                         footerAdapter.clear()
                         footerAdapter.add(ProgressItem())
 
-                        searchMore(view, searchString, itemAdapter)
+                        searchMore(view, searchString, itemAdapter, footerAdapter)
                     },
                     { _, _ ->
                         searchSong(view, searchString, true)
@@ -792,7 +801,7 @@ class HomeHandler {
         }
     }
 
-    private fun searchMore(view: View, searchString: String, itemAdapter: ItemAdapter<CatalogItem>){
+    private fun searchMore(view: View, searchString: String, itemAdapter: ItemAdapter<CatalogItem>, footerAdapter: ItemAdapter<ProgressItem>){
         val contextReference = WeakReference(view.context)
 
         var skip = searchResultsData[searchString]?.size
@@ -810,6 +819,8 @@ class HomeHandler {
                 itemAdapter.add(result)
                 searchResultsData[searchString]?.add(result)
             }
+
+            footerAdapter.clear()
         }.executeOnExecutor(
             AsyncTask.THREAD_POOL_EXECUTOR
         )
