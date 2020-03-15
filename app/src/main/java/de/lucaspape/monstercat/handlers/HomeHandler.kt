@@ -472,7 +472,7 @@ class HomeHandler {
 
             override fun onQueryTextSubmit(query: String?): Boolean {
                 query?.let {
-                    searchSong(view, it, true)
+                    searchSong(view, it, false)
                 }
 
                 return false
@@ -753,8 +753,15 @@ class HomeHandler {
                     null,
                     false,
                     it,
-                    { _, _ -> },
-                    { _, _ -> },
+                    { itemAdapter, footerAdapter ->
+                        footerAdapter.clear()
+                        footerAdapter.add(ProgressItem())
+
+                        searchMore(view, searchString, itemAdapter)
+                    },
+                    { _, _ ->
+                        searchSong(view, searchString, true)
+                    },
                     {
 
                         if (Settings(view.context).getBoolean(view.context.getString(R.string.albumViewSelectedSetting)) == true) {
@@ -783,6 +790,29 @@ class HomeHandler {
         } else {
             displayData()
         }
+    }
+
+    private fun searchMore(view: View, searchString: String, itemAdapter: ItemAdapter<CatalogItem>){
+        val contextReference = WeakReference(view.context)
+
+        var skip = searchResultsData[searchString]?.size
+
+        if(skip == null){
+            skip = 0
+        }
+
+        LoadTitleSearchAsync(
+            contextReference,
+            searchString,
+            skip
+        ) { searchResults ->
+            for(result in searchResults){
+                itemAdapter.add(result)
+                searchResultsData[searchString]?.add(result)
+            }
+        }.executeOnExecutor(
+            AsyncTask.THREAD_POOL_EXECUTOR
+        )
     }
 
     private fun saveRecyclerViewPosition(

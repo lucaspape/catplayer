@@ -40,7 +40,7 @@ class HomeFragment() : Fragment() {
         homeHandler.registerListeners(view)
 
         search?.let {
-            homeHandler.searchSong(view, it, true)
+            homeHandler.searchSong(view, it, false)
         }
     }
 
