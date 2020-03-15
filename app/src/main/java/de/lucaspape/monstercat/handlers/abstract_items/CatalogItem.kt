@@ -15,7 +15,6 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.download.downloadCoverIntoImageReceiver
-import de.lucaspape.monstercat.handlers.*
 import de.lucaspape.monstercat.handlers.addSongToPlaylist
 import de.lucaspape.monstercat.handlers.deletePlaylistSong
 import de.lucaspape.monstercat.handlers.openAlbum
@@ -24,7 +23,7 @@ import de.lucaspape.monstercat.download.ImageReceiverInterface
 
 open class CatalogItem(
     val songId: String
-) : AbstractItem<CatalogItem.ViewHolder>(){
+) : AbstractItem<CatalogItem.ViewHolder>() {
 
     companion object {
         @JvmStatic
@@ -86,7 +85,8 @@ open class CatalogItem(
         fun showContextMenuPlaylist(
             context: Context,
             data: ArrayList<String>,
-            listViewPosition: Int
+            listViewPosition: Int,
+            playlistId: String
         ) {
             val menuItems =
                 arrayOf(
@@ -126,15 +126,13 @@ open class CatalogItem(
                             songDatabaseHelper.getSong(context, id)
 
                         if (song != null) {
-                            PlaylistHandler.currentPlaylistId?.let { playlistId ->
-                                deletePlaylistSong(
-                                    context,
-                                    song,
-                                    playlistId,
-                                    listViewPosition + 1,
-                                    data.size
-                                )
-                            }
+                            deletePlaylistSong(
+                                context,
+                                song,
+                                playlistId,
+                                listViewPosition + 1,
+                                data.size
+                            )
                         }
 
                     }
@@ -216,13 +214,13 @@ open class CatalogItem(
         }
 
         override fun setBitmap(albumId: String, bitmap: Bitmap?) {
-            if(albumId == this.albumId){
+            if (albumId == this.albumId) {
                 coverImageView.setImageBitmap(bitmap)
             }
         }
 
         override fun setDrawable(albumId: String, drawable: Drawable?) {
-            if(albumId == this.albumId){
+            if (albumId == this.albumId) {
                 coverImageView.setImageDrawable(drawable)
             }
         }

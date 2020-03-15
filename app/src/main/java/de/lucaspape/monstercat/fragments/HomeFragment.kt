@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.activities.fragmentBackPressedCallback
 import de.lucaspape.monstercat.handlers.*
 
 class HomeFragment() : Fragment() {
