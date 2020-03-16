@@ -20,7 +20,7 @@ This android app aims to implement the Monstercat API.
  - FLAC download support
  - Crossfade
 
-<img src="https://github.com/lucaspape/catplayer/raw/master/playstore_res/screenshots/20200315/Screenshot_20200315-154702_Catplayer.png" width="40%">  <img src="https://github.com/lucaspape/catplayer/raw/master/playstore_res/screenshots/20200315/Screenshot_20200315-154547_Catplayer.png" width="40%">
+<img src="https://github.com/lucaspape/catplayer/raw/master/playstore_res/screenshots/20200316/Screenshot_20200316-154827_Catplayer.png" width="40%">  <img src="https://github.com/lucaspape/catplayer/raw/master/playstore_res/screenshots/20200316/Screenshot_20200316-154918_Catplayer.png" width="40%">
 
 All album images seen in these screenshots are Copyright Monstercat.
 
