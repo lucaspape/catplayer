@@ -147,7 +147,7 @@ class HomeHandler {
                     idList.add(catalogItem.songId)
                 }
 
-                CatalogItem.showContextMenu(view.context, idList, itemIndex)
+                CatalogItem.showContextMenu(view, idList, itemIndex)
             }
 
             false
@@ -178,7 +178,7 @@ class HomeHandler {
                         idList.add(catalogItem.songId)
                     }
 
-                    CatalogItem.showContextMenu(view.context, idList, itemIndex)
+                    CatalogItem.showContextMenu(view, idList, itemIndex)
                 }
             }
         })
@@ -317,7 +317,7 @@ class HomeHandler {
                     }
                 }
 
-                AlbumItem.showContextMenu(view.context, albumMcIdList, position)
+                AlbumItem.showContextMenu(view, albumMcIdList, position)
             }
 
             false

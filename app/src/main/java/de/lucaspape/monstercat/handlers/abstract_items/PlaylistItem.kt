@@ -29,10 +29,12 @@ open class PlaylistItem(
     companion object {
         @JvmStatic
         fun showContextMenu(
-            context: Context,
+            view: View,
             data: ArrayList<String>,
             listViewPosition: Int
         ) {
+            val context = view.context
+
             val menuItems = arrayOf(
                 context.getString(R.string.download),
                 context.getString(R.string.addToQueue),
@@ -55,7 +57,7 @@ open class PlaylistItem(
                         playPlaylistNext(context, id)
                     }
                     context.getString(R.string.delete) -> {
-                        deletePlaylist(context, id)
+                        deletePlaylist(view, id)
                     }
                 }
             }

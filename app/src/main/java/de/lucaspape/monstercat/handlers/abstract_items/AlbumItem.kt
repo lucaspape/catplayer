@@ -1,7 +1,6 @@
 package de.lucaspape.monstercat.handlers.abstract_items
 
 import android.app.AlertDialog
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.view.View
@@ -24,10 +23,12 @@ open class AlbumItem(
     companion object {
         @JvmStatic
         fun showContextMenu(
-            context: Context,
+            view: View,
             contentList: ArrayList<String>,
             listViewPosition: Int
         ) {
+            val context = view.context
+
             val menuItems: Array<String> = arrayOf(
                 context.getString(R.string.downloadAlbum),
                 context.getString(R.string.addAlbumToQueue),
@@ -49,8 +50,8 @@ open class AlbumItem(
                         context,
                         id
                     )
-                    context.getString(R.string.shareAlbum) -> openAlbum(context, id, true)
-                    context.getString(R.string.openAlbumInApp) -> openAlbum(context, id, false)
+                    context.getString(R.string.shareAlbum) -> openAlbum(view, id, true)
+                    context.getString(R.string.openAlbumInApp) -> openAlbum(view, id, false)
                 }
             }
 

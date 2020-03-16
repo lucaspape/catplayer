@@ -109,7 +109,7 @@ class PlaylistHandler {
                     idList.add(catalogItem.songId)
                 }
 
-                CatalogItem.showContextMenuPlaylist(view.context, idList, itemIndex, playlistId)
+                CatalogItem.showContextMenuPlaylist(view, idList, itemIndex, playlistId)
             }
 
             false
@@ -140,7 +140,7 @@ class PlaylistHandler {
                         idList.add(catalogItem.songId)
                     }
 
-                    CatalogItem.showContextMenuPlaylist(view.context, idList, itemIndex, playlistId)
+                    CatalogItem.showContextMenuPlaylist(view, idList, itemIndex, playlistId)
                 }
             }
         })
@@ -249,7 +249,7 @@ class PlaylistHandler {
                     playlistIdList.add(playlist.playlistId)
                 }
 
-                PlaylistItem.showContextMenu(view.context, playlistIdList, itemIndex)
+                PlaylistItem.showContextMenu(view, playlistIdList, itemIndex)
             }
 
             false
@@ -280,7 +280,7 @@ class PlaylistHandler {
                         playlistIdList.add(playlist.playlistId)
                     }
 
-                    PlaylistItem.showContextMenu(view.context, playlistIdList, itemIndex)
+                    PlaylistItem.showContextMenu(view, playlistIdList, itemIndex)
                 }
             }
         })
@@ -336,7 +336,7 @@ class PlaylistHandler {
     fun registerListeners(view: View) {
         //create new playlist button
         view.findViewById<ImageButton>(R.id.newPlaylistButton).setOnClickListener {
-            createPlaylist(view.context)
+            createPlaylist(view)
         }
     }
 

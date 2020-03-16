@@ -31,10 +31,12 @@ open class CatalogItem(
     companion object {
         @JvmStatic
         fun showContextMenu(
-            context: Context,
+            view: View,
             contentList: ArrayList<String>,
             listViewPosition: Int
         ) {
+            val context = view.context
+
             val menuItems =
                 arrayOf(
                     context.getString(R.string.download),
@@ -64,16 +66,16 @@ open class CatalogItem(
                             priority = true
                         )
                         context.getString(R.string.addToPlaylist) -> addSongToPlaylist(
-                            context,
+                            view,
                             song.songId
                         )
                         context.getString(R.string.shareAlbum) -> openAlbum(
-                            context,
+                            view,
                             song.mcAlbumId,
                             true
                         )
                         context.getString(R.string.openAlbumInApp) -> openAlbum(
-                            context,
+                            view,
                             song.mcAlbumId,
                             false
                         )
@@ -86,11 +88,13 @@ open class CatalogItem(
 
         @JvmStatic
         fun showContextMenuPlaylist(
-            context: Context,
+            view: View,
             data: ArrayList<String>,
             listViewPosition: Int,
             playlistId: String
         ) {
+            val context = view.context
+
             val menuItems =
                 arrayOf(
                     context.getString(R.string.download),
@@ -124,7 +128,7 @@ open class CatalogItem(
                     }
                     context.getString(R.string.delete) -> {
                         deletePlaylistSong(
-                            context,
+                            view,
                             id,
                             playlistId,
                             listViewPosition + 1,
@@ -138,7 +142,7 @@ open class CatalogItem(
                             songDatabaseHelper.getSong(context, id)
 
                         if (song != null) {
-                            openAlbum(context, song.mcAlbumId, true)
+                            openAlbum(view, song.mcAlbumId, true)
                         }
                     }
                     context.getString(R.string.openAlbumInApp) -> {
@@ -148,7 +152,7 @@ open class CatalogItem(
                             songDatabaseHelper.getSong(context, id)
 
                         if (song != null) {
-                            openAlbum(context, song.mcAlbumId, false)
+                            openAlbum(view, song.mcAlbumId, false)
                         }
 
                     }

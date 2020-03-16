@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.AsyncTask
 import android.util.TypedValue
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.EditText
 import com.android.volley.Request
 import com.android.volley.Response
@@ -271,10 +272,10 @@ internal fun downloadAlbum(context: Context, mcID: String) {
 /**
  * Add single song to playlist, will ask for playlist with alertDialog TODO check if logged in
  */
-internal fun addSongToPlaylist(context: Context, songId: String) {
-    LoadPlaylistAsync(WeakReference(context), true, displayLoading = {}, finishedCallback = { _, _ ->
+internal fun addSongToPlaylist(view: View, songId: String) {
+    LoadPlaylistAsync(WeakReference(view.context), true, displayLoading = {}, finishedCallback = { _, _ ->
         val playlistDatabaseHelper =
-            PlaylistDatabaseHelper(context)
+            PlaylistDatabaseHelper(view.context)
         val playlistList = playlistDatabaseHelper.getAllPlaylists()
 
         if (playlistList.isNotEmpty()) {
@@ -286,43 +287,49 @@ internal fun addSongToPlaylist(context: Context, songId: String) {
                 playlistIds[i] = playlistList[i].playlistId
             }
 
-            val alertDialogBuilder = AlertDialog.Builder(context)
-            alertDialogBuilder.setTitle(context.getString(R.string.pickPlaylistMsg))
+            val alertDialogBuilder = AlertDialog.Builder(view.context)
+            alertDialogBuilder.setTitle(view.context.getString(R.string.pickPlaylistMsg))
             alertDialogBuilder.setItems(playlistNames) { _, i ->
                 playlistIds[i]?.let { playlistId ->
-                    val addToPlaylistAsync =
-                        AddToPlaylistAsync(
-                            WeakReference(context),
-                            playlistId,
-                            songId,
-                            finishedCallback = { _, _ ->
-                                displayInfo(
-                                    context,
-                                    context.getString(R.string.songAddedToPlaylistMsg)
-                                )
-                            },
-                            errorCallback = { _, _ ->
-                                displayInfo(
-                                    context,
-                                    context.getString(R.string.errorUpdatePlaylist)
-                                )
-                            })
-                    addToPlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                    addSongToPlaylist(view, playlistId, songId)
                 }
 
             }
             alertDialogBuilder.show()
         } else {
-            displayInfo(context, context.getString(R.string.noPlaylistFound))
+            displayInfo(view.context, view.context.getString(R.string.noPlaylistFound))
         }
-    }, errorCallback = { _, _ ->}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    }, errorCallback = { _, _ ->
+        displaySnackbar(view,view.context.getString(R.string.errorRetrievePlaylist), view.context.getString(R.string.retry)) {
+            addSongToPlaylist(view, songId)
+        }
+    }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+}
+
+private fun addSongToPlaylist(view: View, playlistId: String, songId: String){
+    val addToPlaylistAsync = AddToPlaylistAsync(
+        WeakReference(view.context),
+        playlistId,
+        songId,
+        finishedCallback =  { _,_ ->
+            displaySnackbar(view, view.context.getString(R.string.songAddedToPlaylistMsg), null) {}
+        },
+        errorCallback = { _, _ ->
+            displaySnackbar(view,view.context.getString(R.string.errorRetrievePlaylist), view.context.getString(R.string.retry)) {
+                addSongToPlaylist(view, playlistId, songId)
+            }
+        })
+
+    addToPlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }
 
 /**
  * Create a new playlist, will ask for name with alertDialog
  */
-internal fun createPlaylist(context: Context) {
+internal fun createPlaylist(view: View) {
     if (loggedIn) {
+        val context = view.context
+
         val layoutInflater =
             context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
@@ -336,9 +343,8 @@ internal fun createPlaylist(context: Context) {
                     playlistNameInputLayout.findViewById<EditText>(R.id.playlistNameInput)
                 val playlistName = playlistNameEditText.text.toString()
 
-                val createPlaylistAsync = CreatePlaylistAsync(WeakReference(context), playlistName, finishedCallback = {},
-                    errorCallback = {})
-                createPlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                createPlaylist(view, playlistName)
+
             }
             setView(playlistNameInputLayout)
             setCancelable(true)
@@ -355,22 +361,35 @@ internal fun createPlaylist(context: Context) {
             negativeButton.setTextColor(typedValue.data)
         }
     } else {
-        displayInfo(context, context.getString(R.string.errorNotLoggedIn))
+        displaySnackbar(view, view.context.getString(R.string.errorNotLoggedIn),null) {}
     }
+}
+
+private fun createPlaylist(view: View, playlistName:String){
+    val createPlaylistAsync = CreatePlaylistAsync(WeakReference(view.context), playlistName, finishedCallback = {
+        displaySnackbar(view, "Created playlist $playlistName", null) {}
+    },
+        errorCallback = {
+            displaySnackbar(view, "Could not create playlist", view.context.getString(R.string.retry)) {
+                createPlaylist(view, playlistName)
+            }
+        })
+    createPlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }
 
 /**
  * Delete playlist with given playlistId
  */
-internal fun deletePlaylist(context: Context, playlistId: String) {
+internal fun deletePlaylist(view: View, playlistId: String) {
+    val context = view.context
     val alertDialogBuilder = AlertDialog.Builder(context)
     alertDialogBuilder.setTitle(context.getString(R.string.deletePlaylistMsg))
     alertDialogBuilder.setPositiveButton(context.getString(R.string.yes)) { _, _ ->
-        val deletePlaylistAsync = DeletePlaylistAsync(WeakReference(context), playlistId, finishedCallback = {},
-            errorCallback = {})
-        deletePlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        deletePlaylist(view, playlistId, true)
     }
-    alertDialogBuilder.setNegativeButton(context.getString(R.string.no)) { _, _ -> }
+    alertDialogBuilder.setNegativeButton(context.getString(R.string.no)) { _, _ ->
+        deletePlaylist(view, playlistId, false)
+    }
 
     val dialog = alertDialogBuilder.create()
     dialog.show()
@@ -385,11 +404,25 @@ internal fun deletePlaylist(context: Context, playlistId: String) {
     negativeButton.setTextColor(typedValue.data)
 }
 
+private fun deletePlaylist(view: View, playlistId: String, force:Boolean){
+    if(!force){
+        val deletePlaylistAsync = DeletePlaylistAsync(WeakReference(view.context), playlistId, finishedCallback = {
+            displaySnackbar(view, "Playlist deleted!", null) {}
+        },
+            errorCallback = {
+                displaySnackbar(view, "Could not delete playlist!", view.context.getString(R.string.retry)) {
+                    deletePlaylist(view, playlistId, true)
+                }
+            })
+        deletePlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    }
+}
+
 /**
  * Delete one song from playlist, index required because double songs can exist in one playlist
  */
 internal fun deletePlaylistSong(
-    context: Context,
+    view: View,
     songId: String,
     playlistId: String,
     index: Int,
@@ -403,13 +436,20 @@ internal fun deletePlaylistSong(
         val songDeleteIndex = playlistMax - index
 
         val deletePlaylistTrackAsync =
-            DeletePlaylistTrackAsync(WeakReference(context), songId, playlistId, songDeleteIndex, finishedCallback = {_,_,_ ->},
-                errorCallback = { _, _, _->})
+            DeletePlaylistTrackAsync(WeakReference(view.context), songId, playlistId, songDeleteIndex, finishedCallback = {_,_,_ ->
+                displaySnackbar(view, "Removed track from playlist!", null) {}
+            },
+                errorCallback = { _, _, _->
+                    displaySnackbar(view, "Could not remove track from playlist!", view.context.getString(R.string.retry)) {
+                        deletePlaylistSong(view, songId, playlistId, index, playlistMax)
+                    }
+                })
         deletePlaylistTrackAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 }
 
-internal fun openAlbum(context: Context, albumMcId: String, share: Boolean) {
+internal fun openAlbum(view: View, albumMcId: String, share: Boolean) {
+    val context = view.context
     val volleyRequestQueue = Volley.newRequestQueue(context)
 
     val albumLinksRequest = AuthorizedRequest(Request.Method.GET,
@@ -461,7 +501,9 @@ internal fun openAlbum(context: Context, albumMcId: String, share: Boolean) {
             alertDialogBuilder.show()
         },
         Response.ErrorListener {
-            displayInfo(context, context.getString(R.string.errorRetrieveAlbumData))
+            displaySnackbar(view, context.getString(R.string.errorRetrieveAlbumData), context.getString(R.string.retry)) {
+                openAlbum(view, albumMcId, share)
+            }
         })
 
     volleyRequestQueue.add(albumLinksRequest)

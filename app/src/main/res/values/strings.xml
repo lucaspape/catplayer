@@ -97,4 +97,5 @@
     <string name="playlistView">Playlist View</string>
     <string name="contentView">Content View</string>
     <string name="playlistName">Playlist Name</string>
+    <string name="retry">Retry</string>
 </resources>
