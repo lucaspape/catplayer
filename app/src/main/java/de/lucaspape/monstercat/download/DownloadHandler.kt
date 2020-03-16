@@ -20,7 +20,6 @@ import java.lang.ref.WeakReference
 
 //this lists contain the urls that should be downloaded
 internal val downloadList = ArrayList<SoftReference<DownloadObject>>()
-internal val streamDownloadList = ArrayList<SoftReference<DownloadObject>>()
 
 internal var downloadedSongs = 0
 internal var streamDownloadedSongs = 0
@@ -30,15 +29,6 @@ internal val bitmapCache = HashMap<String, SoftReference<Bitmap?>>()
 
 fun addDownloadSong(context: Context, songId: String, downloadFinished: () -> Unit) {
     downloadList.add(SoftReference(DownloadObject(songId, downloadFinished)))
-
-    if (BackgroundService.downloadTask?.status != AsyncTask.Status.RUNNING) {
-        BackgroundService.downloadTask = DownloadTask(WeakReference(context))
-        BackgroundService.downloadTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-    }
-}
-
-fun addStreamDownloadSong(context: Context, songId: String, downloadFinished: () -> Unit) {
-    streamDownloadList.add(SoftReference(DownloadObject(songId, downloadFinished)))
 
     if (BackgroundService.downloadTask?.status != AsyncTask.Status.RUNNING) {
         BackgroundService.downloadTask = DownloadTask(WeakReference(context))

@@ -9,6 +9,8 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.activities.downloadDrawable
+import de.lucaspape.monstercat.activities.offlineDrawable
 import de.lucaspape.monstercat.util.Settings
 import de.lucaspape.monstercat.util.sid
 import de.lucaspape.monstercat.util.wifiConnected
@@ -99,49 +101,32 @@ data class Song(
     val streamUrl: String =
         context.getString(R.string.trackContentUrl) + albumId + "/track-stream/" + songId
 
-    val streamDownloadLocation: String = "$downloadLocation.stream"
-
     fun getSongDownloadStatus(): String {
         return when {
             File(downloadLocation).exists() -> {
-                "android.resource://de.lucaspape.monstercat/drawable/ic_offline_pin_green_24dp"
-            }
-            File(streamDownloadLocation).exists() -> {
-                "android.resource://de.lucaspape.monstercat/drawable/ic_offline_pin_orange_24dp"
+                offlineDrawable
             }
             else -> {
-                "android.resource://de.lucaspape.monstercat/drawable/ic_file_download_24dp"
+                downloadDrawable
             }
         }
     }
 
     private fun getUrl(): String {
-        return if (File(downloadLocation).exists() && File(streamDownloadLocation).exists()) {
-            File(streamDownloadLocation).delete()
-
+        return if(File(downloadLocation).exists()){
             downloadLocation
-        } else if (File(downloadLocation).exists()) {
-            downloadLocation
-        } else if (File(streamDownloadLocation).exists()) {
-            streamDownloadLocation
-        } else {
+        }else{
             streamUrl
         }
     }
 
     fun getMediaSource(): MediaSource? {
-        return if (File(downloadLocation).exists() && File(streamDownloadLocation).exists()) {
-            File(streamDownloadLocation).delete()
-
+        return if(File(downloadLocation).exists()){
             fileToMediaSource(downloadLocation)
-        } else if (File(downloadLocation).exists()) {
-            fileToMediaSource(downloadLocation)
-        } else if (File(streamDownloadLocation).exists()) {
-            fileToMediaSource(streamDownloadLocation)
-        } else {
-            if (isStreamable) {
+        }else{
+            if(isStreamable){
                 urlToMediaSource(streamUrl)
-            } else {
+            }else{
                 null
             }
         }

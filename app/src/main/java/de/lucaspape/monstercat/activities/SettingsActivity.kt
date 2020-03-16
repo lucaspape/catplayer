@@ -56,7 +56,6 @@ class SettingsActivity : AppCompatActivity() {
         val downloadCoversMobileSwitch = findViewById<Switch>(R.id.downloadCoversMobileSwitch)
         val darkThemeSwitch = findViewById<Switch>(R.id.darkThemeSwitch)
         val disableAudioFocusSwitch = findViewById<Switch>(R.id.audioFocusSwitch)
-        val downloadStreamSwitch = findViewById<Switch>(R.id.streamDownloadSwitch)
 
         val downloadFlacSwitch = findViewById<Switch>(R.id.downloadFlacSwitch)
 
@@ -88,10 +87,6 @@ class SettingsActivity : AppCompatActivity() {
 
         settings.getBoolean(getString(R.string.disableAudioFocusSetting))?.let {
             disableAudioFocusSwitch.isChecked = it
-        }
-
-        settings.getBoolean(getString(R.string.downloadStreamSetting))?.let {
-            downloadStreamSwitch.isChecked = it
         }
 
         settings.getInt(getString(R.string.primaryCoverResolutionSetting))?.let {
@@ -140,11 +135,6 @@ class SettingsActivity : AppCompatActivity() {
         disableAudioFocusSwitch.setOnCheckedChangeListener { _, isChecked ->
             settings.setBoolean(getString(R.string.disableAudioFocusSetting), isChecked)
         }
-
-        downloadStreamSwitch.setOnCheckedChangeListener { _, isChecked ->
-            settings.setBoolean(getString(R.string.downloadStreamSetting), isChecked)
-        }
-
 
         darkThemeSwitch.setOnCheckedChangeListener { _, isChecked ->
             settings.setBoolean(getString(R.string.darkThemeSetting), isChecked)

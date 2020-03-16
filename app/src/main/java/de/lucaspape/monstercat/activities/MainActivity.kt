@@ -41,6 +41,9 @@ var backgroundServiceIntent: Intent? = null
 //callback function for back pressed, TODO this is not great
 var fragmentBackPressedCallback: () -> Unit = {}
 
+var offlineDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_offline_pin_24dp"
+var downloadDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_file_download_24dp"
+
 /**
  * Main activity
  */
@@ -302,6 +305,9 @@ class MainActivity : AppCompatActivity() {
                     fallbackBlackFile.copyTo(fallbackFile, true)
                     fallbackBlackFileLow.copyTo(fallbackFileLow, true)
                 }
+
+                offlineDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_offline_pin_white_24dp"
+                downloadDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_file_download_white_24dp"
             } else {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
@@ -309,6 +315,9 @@ class MainActivity : AppCompatActivity() {
                     fallbackWhiteFile.copyTo(fallbackFile, true)
                     fallbackWhiteFileLow.copyTo(fallbackFileLow, true)
                 }
+
+                offlineDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_offline_pin_black_24dp"
+                downloadDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_file_download_black_24dp"
             }
         } else {
             if (resources.configuration.uiMode.and(Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) {
@@ -369,9 +378,9 @@ class MainActivity : AppCompatActivity() {
         val seekBar = findViewById<SeekBar>(R.id.seekBar)
 
         textViewReference = WeakReference(textView)
+        musicBarReference = WeakReference(musicToolBar)
         seekBarReference = WeakReference(seekBar)
         barCoverImageReference = WeakReference(coverBarImageView)
-        musicBarReference = WeakReference(musicToolBar)
         playButtonReference = WeakReference(playButton)
 
         seekBar.setOnTouchListener { _, _ -> true }

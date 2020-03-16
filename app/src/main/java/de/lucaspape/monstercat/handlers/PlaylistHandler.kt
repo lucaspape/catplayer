@@ -165,10 +165,6 @@ class PlaylistHandler {
                             File(song.downloadLocation).delete()
                             titleDownloadButton.setImageURI(song.getSongDownloadStatus().toUri())
                         }
-                        File(song.streamDownloadLocation).exists() -> {
-                            File(song.streamDownloadLocation).delete()
-                            titleDownloadButton.setImageURI(song.getSongDownloadStatus().toUri())
-                        }
                         else -> {
                             addDownloadSong(
                                 v.context,

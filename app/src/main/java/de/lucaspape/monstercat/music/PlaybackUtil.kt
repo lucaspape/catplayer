@@ -8,13 +8,10 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.background.BackgroundService
 import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
-import de.lucaspape.monstercat.download.addStreamDownloadSong
 import de.lucaspape.monstercat.music.notification.startPlayerService
 import de.lucaspape.monstercat.music.notification.updateNotification
 import de.lucaspape.monstercat.twitch.Stream
 import de.lucaspape.monstercat.util.*
-import java.io.File
-import java.lang.IndexOutOfBoundsException
 import java.lang.ref.WeakReference
 
 private var preparedSong = ""
@@ -159,44 +156,5 @@ fun playStream(stream: Stream) {
                 BackgroundService.streamInfoUpdateAsync?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
             }
         }
-    }
-}
-
-/**
- * Pre-downloads stream before playback
- */
-internal fun preDownloadSongStream(
-    context: Context,
-    song: Song,
-    nextSong: Song?,
-    currentSongFinished: (song: Song) -> Unit
-) {
-    if (song.isDownloadable) {
-        if (!File(song.downloadLocation).exists() && !File(song.streamDownloadLocation).exists()) {
-            addStreamDownloadSong(context, song.songId) {
-                currentSongFinished(song)
-            }
-        } else {
-            currentSongFinished(song)
-        }
-    } else {
-        //No permission to download
-
-        currentSongFinished(song)
-
-        displayInfo(
-            context,
-            context.getString(R.string.errorDownloadNotAllowedFallbackStream)
-        )
-    }
-
-    try {
-        if (nextSong != null) {
-            if (!File(nextSong.downloadLocation).exists() && !File(nextSong.streamDownloadLocation).exists()) {
-                addStreamDownloadSong(context, nextSong.songId) {}
-            }
-        }
-    } catch (e: IndexOutOfBoundsException) {
-
     }
 }

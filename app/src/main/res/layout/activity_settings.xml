@@ -123,18 +123,6 @@
                 app:layout_constraintTop_toBottomOf="@+id/darkThemeSwitch" />
 
             <Switch
-                android:id="@+id/streamDownloadSwitch"
-                android:layout_width="0dp"
-                android:layout_height="50dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginRight="10dp"
-                android:text="@string/downloadStream"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/audioFocusSwitch" />
-
-            <Switch
                 android:id="@+id/downloadFlacSwitch"
                 android:layout_width="0dp"
                 android:layout_height="50dp"
@@ -144,7 +132,7 @@
                 android:text="@string/downloadFlacInsteadMp3"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/streamDownloadSwitch" />
+                app:layout_constraintTop_toBottomOf="@+id/audioFocusSwitch" />
 
             <TextView
                 android:id="@+id/coverResolutionText"

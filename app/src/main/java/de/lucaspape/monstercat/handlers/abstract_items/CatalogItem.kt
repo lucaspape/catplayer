@@ -13,6 +13,7 @@ import androidx.core.net.toUri
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.activities.downloadDrawable
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.download.downloadCoverIntoImageReceiver
@@ -215,7 +216,7 @@ open class CatalogItem(
                 }, song.albumId, true)
 
                 var downloadStatus =
-                    "android.resource://de.lucaspape.monstercat/drawable/ic_file_download_24dp".toUri()
+                    downloadDrawable.toUri()
 
                 titleDownloadButton.setImageURI(downloadStatus)
 

@@ -8,13 +8,11 @@ import android.media.AudioManager
 import android.media.session.MediaSession
 import android.support.v4.media.session.MediaSessionCompat
 import com.google.android.exoplayer2.ExoPlayer
-import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.music.notification.startPlayerService
 import de.lucaspape.monstercat.music.notification.stopPlayerService
 import de.lucaspape.monstercat.music.notification.updateNotification
-import de.lucaspape.monstercat.util.Settings
 import java.lang.ref.WeakReference
 import kotlin.random.Random
 
@@ -87,27 +85,13 @@ fun createMediaSession() {
 fun next() {
     contextReference?.get()?.let { context ->
         SongDatabaseHelper(context).getSong(context, nextSong())?.let { song ->
-            if (Settings(context).getBoolean(context.getString(R.string.downloadStreamSetting)) == true) {
-                SongDatabaseHelper(context).getSong(context, getNextSong())?.let { nextSong ->
-                    preDownloadSongStream(context, song, nextSong) { song ->
-                        playSong(
-                            context, song,
-                            showNotification = true,
-                            requestAudioFocus = true,
-                            playWhenReady = true,
-                            progress = null
-                        )
-                    }
-                }
-            } else {
-                playSong(
-                    context, song,
-                    showNotification = true,
-                    requestAudioFocus = true,
-                    playWhenReady = true,
-                    progress = null
-                )
-            }
+            playSong(
+                context, song,
+                showNotification = true,
+                requestAudioFocus = true,
+                playWhenReady = true,
+                progress = null
+            )
         }
     }
 }
@@ -115,26 +99,13 @@ fun next() {
 fun previous() {
     contextReference?.get()?.let { context ->
         SongDatabaseHelper(context).getSong(context, previousSong())?.let { prevSong ->
-            if (Settings(context).getBoolean(context.getString(R.string.downloadStreamSetting)) == true) {
-                preDownloadSongStream(context, prevSong, null) { song ->
-                    playSong(
-                        context, song,
-                        showNotification = true,
-                        requestAudioFocus = true,
-                        playWhenReady = true,
-                        progress = null
-                    )
-                }
-
-            } else {
-                playSong(
-                    context, prevSong,
-                    showNotification = true,
-                    requestAudioFocus = true,
-                    playWhenReady = true,
-                    progress = null
-                )
-            }
+            playSong(
+                context, prevSong,
+                showNotification = true,
+                requestAudioFocus = true,
+                playWhenReady = true,
+                progress = null
+            )
         }
     }
 }
@@ -171,7 +142,14 @@ private fun resume() {
                     //UI stuff
                     setTitle(song.title, song.version, song.artist)
 
-                    setCover(context, song.title, song.version, song.artist, song.artistId, song.albumId) {
+                    setCover(
+                        context,
+                        song.title,
+                        song.version,
+                        song.artist,
+                        song.artistId,
+                        song.albumId
+                    ) {
                         setPlayButtonImage(context)
                         startSeekBarUpdate(true)
                         updateNotification(

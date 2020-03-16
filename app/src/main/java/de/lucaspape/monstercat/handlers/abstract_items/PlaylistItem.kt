@@ -11,6 +11,8 @@ import androidx.core.net.toUri
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.activities.downloadDrawable
+import de.lucaspape.monstercat.activities.offlineDrawable
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
@@ -67,7 +69,6 @@ open class PlaylistItem(
             PlaylistItemDatabaseHelper(context, playlistId).getAllData()
 
         var downloaded = true
-        var streamDownloaded = true
 
         for (track in playlistTracks) {
             val song = SongDatabaseHelper(context).getSong(context, track.songId)
@@ -76,21 +77,15 @@ open class PlaylistItem(
                 if (!File(song.downloadLocation).exists()) {
                     downloaded = false
                 }
-                if (!File(song.streamDownloadLocation).exists()) {
-                    streamDownloaded = false
-                }
             }
         }
 
         return when {
             downloaded -> {
-                "android.resource://de.lucaspape.monstercat/drawable/ic_offline_pin_green_24dp"
-            }
-            streamDownloaded -> {
-                "android.resource://de.lucaspape.monstercat/drawable/ic_offline_pin_orange_24dp"
+                offlineDrawable
             }
             else -> {
-                "android.resource://de.lucaspape.monstercat/drawable/ic_file_download_24dp"
+                downloadDrawable
             }
         }
     }
@@ -123,7 +118,7 @@ open class PlaylistItem(
                 titleTextView.text = playlist.playlistName
                 coverImageView.setImageURI("".toUri())
 
-                var downloadStatus = "android.resource://de.lucaspape.monstercat/drawable/ic_file_download_24dp".toUri()
+                var downloadStatus = downloadDrawable.toUri()
 
                 titleDownloadButton.setImageURI(downloadStatus)
 
