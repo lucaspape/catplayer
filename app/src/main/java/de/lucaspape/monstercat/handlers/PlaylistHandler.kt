@@ -19,9 +19,9 @@ import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.handlers.abstract_items.CatalogItem
 import de.lucaspape.monstercat.handlers.abstract_items.HeaderTextItem
 import de.lucaspape.monstercat.handlers.abstract_items.PlaylistItem
-import de.lucaspape.monstercat.handlers.async.BackgroundAsync
-import de.lucaspape.monstercat.handlers.async.LoadPlaylistAsync
-import de.lucaspape.monstercat.handlers.async.LoadPlaylistTracksAsync
+import de.lucaspape.monstercat.request.async.BackgroundAsync
+import de.lucaspape.monstercat.request.async.LoadPlaylistAsync
+import de.lucaspape.monstercat.request.async.LoadPlaylistTracksAsync
 import de.lucaspape.monstercat.music.clearQueue
 import java.io.File
 import java.lang.IndexOutOfBoundsException

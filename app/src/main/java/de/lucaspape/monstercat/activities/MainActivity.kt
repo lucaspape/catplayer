@@ -26,7 +26,7 @@ import de.lucaspape.monstercat.background.BackgroundService.Companion.streamInfo
 import de.lucaspape.monstercat.download.hideDownloadNotification
 import de.lucaspape.monstercat.fragments.HomeFragment
 import de.lucaspape.monstercat.fragments.PlaylistFragment
-import de.lucaspape.monstercat.handlers.async.BackgroundAsync
+import de.lucaspape.monstercat.request.async.BackgroundAsync
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.notification.updateNotification
 import de.lucaspape.monstercat.util.*

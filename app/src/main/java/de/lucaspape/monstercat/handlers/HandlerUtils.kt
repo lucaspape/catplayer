@@ -19,7 +19,7 @@ import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadSong
-import de.lucaspape.monstercat.handlers.async.*
+import de.lucaspape.monstercat.request.async.*
 import de.lucaspape.monstercat.music.next
 import de.lucaspape.monstercat.music.prioritySongQueue
 import de.lucaspape.monstercat.music.skipPreviousInPlaylist

@@ -26,7 +26,7 @@ import de.lucaspape.monstercat.handlers.abstract_items.AlbumItem
 import de.lucaspape.monstercat.handlers.abstract_items.CatalogItem
 import de.lucaspape.monstercat.handlers.abstract_items.HeaderTextItem
 import de.lucaspape.monstercat.handlers.abstract_items.ProgressItem
-import de.lucaspape.monstercat.handlers.async.*
+import de.lucaspape.monstercat.request.async.*
 import de.lucaspape.monstercat.music.clearQueue
 import de.lucaspape.monstercat.music.playStream
 import de.lucaspape.monstercat.util.*

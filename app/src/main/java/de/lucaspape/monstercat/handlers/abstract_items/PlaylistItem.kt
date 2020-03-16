@@ -16,7 +16,7 @@ import de.lucaspape.monstercat.activities.offlineDrawable
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
-import de.lucaspape.monstercat.handlers.async.BackgroundAsync
+import de.lucaspape.monstercat.request.async.BackgroundAsync
 import de.lucaspape.monstercat.handlers.deletePlaylist
 import de.lucaspape.monstercat.handlers.downloadPlaylist
 import de.lucaspape.monstercat.handlers.playPlaylistNext

@@ -5,7 +5,7 @@ import android.content.Intent
 import android.os.IBinder
 import de.lucaspape.monstercat.download.DownloadTask
 import de.lucaspape.monstercat.download.hideDownloadNotification
-import de.lucaspape.monstercat.handlers.async.BackgroundAsync
+import de.lucaspape.monstercat.request.async.BackgroundAsync
 import de.lucaspape.monstercat.music.StreamInfoUpdateAsync
 
 class BackgroundService : Service() {

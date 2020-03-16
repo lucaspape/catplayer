@@ -22,7 +22,7 @@ import de.lucaspape.monstercat.handlers.deletePlaylistSong
 import de.lucaspape.monstercat.handlers.openAlbum
 import de.lucaspape.monstercat.handlers.playSongFromId
 import de.lucaspape.monstercat.download.ImageReceiverInterface
-import de.lucaspape.monstercat.handlers.async.BackgroundAsync
+import de.lucaspape.monstercat.request.async.BackgroundAsync
 
 open class CatalogItem(
     val songId: String
