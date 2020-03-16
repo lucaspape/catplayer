@@ -5,8 +5,7 @@
     style="@style/Widget.MaterialComponents.CardView"
     android:layout_width="match_parent"
     android:layout_height="80dp"
-    android:layout_margin="4dp"
-    android:descendantFocusability="blocksDescendants">
+    android:layout_margin="4dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
