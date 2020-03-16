@@ -539,7 +539,7 @@ class HomeHandler {
             }, errorCallback = { _, _, _ ->
                 displaySnackbar(
                     view,
-                    "Could not load song list",
+                    view.context.getString(R.string.errorLoadingSongList),
                     view.context.getString(R.string.retry)
                 ) {
                     initSongListLoad(view, forceReload)
@@ -585,7 +585,7 @@ class HomeHandler {
                 errorCallback = { _, _, _ ->
                     displaySnackbar(
                         view,
-                        "Could not load song list",
+                        view.context.getString(R.string.errorLoadingSongList),
                         view.context.getString(R.string.retry)
                     ) {
                         loadSongList(view, itemAdapter, footerAdapter)
@@ -651,7 +651,7 @@ class HomeHandler {
                 }, errorCallback = { _, _, _ ->
                     displaySnackbar(
                         view,
-                        "Could not load album list",
+                        view.context.getString(R.string.errorLoadingAlbumList),
                         view.context.getString(R.string.retry)
                     ) {
                         initAlbumListLoad(view, forceReload)
@@ -693,7 +693,7 @@ class HomeHandler {
                 }, errorCallback = { _, _, _ ->
                     displaySnackbar(
                         view,
-                        "Could not load album list",
+                        view.context.getString(R.string.errorLoadingAlbumList),
                         view.context.getString(R.string.retry)
                     ) {
                         loadAlbumList(view, itemAdapter, footerAdapter)
@@ -773,7 +773,7 @@ class HomeHandler {
                 }, errorCallback = { _, _, _, _ ->
                     displaySnackbar(
                         view,
-                        "Could not load album",
+                        view.context.getString(R.string.errorLoadingAlbum),
                         view.context.getString(R.string.retry)
                     ) {
                         loadAlbum(view, albumId, mcId, forceReload)
@@ -846,7 +846,7 @@ class HomeHandler {
                     Unit
                     displaySnackbar(
                         view,
-                        "Error searching",
+                        view.context.getString(R.string.errorLoadingSearch),
                         view.context.getString(R.string.retry)
                     ) { searchSong(view, searchString, forceReload) }
                 }).executeOnExecutor(
@@ -885,7 +885,7 @@ class HomeHandler {
             }, errorCallback = { _, _ ->
                 displaySnackbar(
                     view,
-                    "Error searching",
+                    view.context.getString(R.string.errorLoadingSearch),
                     view.context.getString(R.string.retry)
                 ) { searchMore(view, searchString, itemAdapter, footerAdapter) }
             }).executeOnExecutor(

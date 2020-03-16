@@ -49,7 +49,7 @@ open class PlaylistItem(
                 when (menuItems[which]) {
                     context.getString(R.string.download) -> {
                         downloadPlaylist(
-                            context,
+                            view,
                             id
                         ) {}
                     }

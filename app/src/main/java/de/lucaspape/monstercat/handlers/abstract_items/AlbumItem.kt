@@ -47,7 +47,7 @@ open class AlbumItem(
                         id
                     )
                     context.getString(R.string.addAlbumToQueue) -> playAlbumNext(
-                        context,
+                        view,
                         id
                     )
                     context.getString(R.string.shareAlbum) -> openAlbum(view, id, true)

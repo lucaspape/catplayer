@@ -100,7 +100,8 @@ internal fun playSongFromId(
 /**
  * Play an entire album after the current song
  */
-internal fun playAlbumNext(context: Context, mcID: String) {
+internal fun playAlbumNext(view: View, mcID: String) {
+    val context = view.context
     val requestUrl =
         context.getString(R.string.loadAlbumSongsUrl) + "/" + mcID
 
@@ -133,14 +134,20 @@ internal fun playAlbumNext(context: Context, mcID: String) {
             loadContinuousSongListAsyncTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         },
         Response.ErrorListener {
-            displayInfo(context, context.getString(R.string.errorRetrieveAlbumData))
+            displaySnackbar(
+                view,
+                context.getString(R.string.errorRetrieveAlbumData),
+                view.context.getString(R.string.retry)
+            ) {
+                playAlbumNext(view, mcID)
+            }
         })
 
     albumRequestQueue.add(albumRequest)
 }
 
 internal fun playPlaylistNext(context: Context, playlistId: String) {
-    LoadPlaylistTracksAsync(WeakReference(context), true, playlistId, {}, { _,_,_->
+    LoadPlaylistTracksAsync(WeakReference(context), true, playlistId, {}, { _, _, _ ->
         val playlistItemDatabaseHelper =
             PlaylistItemDatabaseHelper(context, playlistId)
         val playlistItemList = playlistItemDatabaseHelper.getAllData().reversed()
@@ -168,26 +175,34 @@ internal fun playPlaylistNext(context: Context, playlistId: String) {
         }, {})
 
         loadContinuousSongListAsyncTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-    }, {_,_,_ ->  }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    }, { _, _, _ -> }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }
 
 /**
  * Download an entire playlist
  */
-internal fun downloadPlaylist(context: Context, playlistId: String, downloadFinished: () -> Unit) {
-    LoadPlaylistTracksAsync(WeakReference(context), true, playlistId, displayLoading = {},
-        finishedCallback = { _, _, _->
+internal fun downloadPlaylist(view: View, playlistId: String, downloadFinished: () -> Unit) {
+    LoadPlaylistTracksAsync(WeakReference(view.context), true, playlistId, displayLoading = {},
+        finishedCallback = { _, _, _ ->
             val playlistItemDatabaseHelper =
-                PlaylistItemDatabaseHelper(context, playlistId)
+                PlaylistItemDatabaseHelper(view.context, playlistId)
             val playlistItemList = playlistItemDatabaseHelper.getAllData()
 
             for (playlistItem in playlistItemList) {
-                val songDatabaseHelper = SongDatabaseHelper(context)
-                val song = songDatabaseHelper.getSong(context, playlistItem.songId)
+                val songDatabaseHelper = SongDatabaseHelper(view.context)
+                val song = songDatabaseHelper.getSong(view.context, playlistItem.songId)
 
-                song?.songId?.let { addDownloadSong(context, it, downloadFinished) }
+                song?.songId?.let { addDownloadSong(view.context, it, downloadFinished) }
             }
-        }, errorCallback = { _, _, _->}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        }, errorCallback = { _, _, _ ->
+            displaySnackbar(
+                view,
+                view.context.getString(R.string.errorRetrievePlaylist),
+                view.context.getString(R.string.retry)
+            ) {
+                downloadPlaylist(view, playlistId, downloadFinished)
+            }
+        }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }
 
 /**
@@ -273,49 +288,62 @@ internal fun downloadAlbum(context: Context, mcID: String) {
  * Add single song to playlist, will ask for playlist with alertDialog TODO check if logged in
  */
 internal fun addSongToPlaylist(view: View, songId: String) {
-    LoadPlaylistAsync(WeakReference(view.context), true, displayLoading = {}, finishedCallback = { _, _ ->
-        val playlistDatabaseHelper =
-            PlaylistDatabaseHelper(view.context)
-        val playlistList = playlistDatabaseHelper.getAllPlaylists()
+    LoadPlaylistAsync(
+        WeakReference(view.context),
+        true,
+        displayLoading = {},
+        finishedCallback = { _, _ ->
+            val playlistDatabaseHelper =
+                PlaylistDatabaseHelper(view.context)
+            val playlistList = playlistDatabaseHelper.getAllPlaylists()
 
-        if (playlistList.isNotEmpty()) {
-            val playlistNames = arrayOfNulls<String>(playlistList.size)
-            val playlistIds = arrayOfNulls<String>(playlistList.size)
+            if (playlistList.isNotEmpty()) {
+                val playlistNames = arrayOfNulls<String>(playlistList.size)
+                val playlistIds = arrayOfNulls<String>(playlistList.size)
 
-            for (i in playlistList.indices) {
-                playlistNames[i] = playlistList[i].playlistName
-                playlistIds[i] = playlistList[i].playlistId
-            }
-
-            val alertDialogBuilder = AlertDialog.Builder(view.context)
-            alertDialogBuilder.setTitle(view.context.getString(R.string.pickPlaylistMsg))
-            alertDialogBuilder.setItems(playlistNames) { _, i ->
-                playlistIds[i]?.let { playlistId ->
-                    addSongToPlaylist(view, playlistId, songId)
+                for (i in playlistList.indices) {
+                    playlistNames[i] = playlistList[i].playlistName
+                    playlistIds[i] = playlistList[i].playlistId
                 }
 
+                val alertDialogBuilder = AlertDialog.Builder(view.context)
+                alertDialogBuilder.setTitle(view.context.getString(R.string.pickPlaylistMsg))
+                alertDialogBuilder.setItems(playlistNames) { _, i ->
+                    playlistIds[i]?.let { playlistId ->
+                        addSongToPlaylist(view, playlistId, songId)
+                    }
+
+                }
+                alertDialogBuilder.show()
+            } else {
+                displayInfo(view.context, view.context.getString(R.string.noPlaylistFound))
             }
-            alertDialogBuilder.show()
-        } else {
-            displayInfo(view.context, view.context.getString(R.string.noPlaylistFound))
-        }
-    }, errorCallback = { _, _ ->
-        displaySnackbar(view,view.context.getString(R.string.errorRetrievePlaylist), view.context.getString(R.string.retry)) {
-            addSongToPlaylist(view, songId)
-        }
-    }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        },
+        errorCallback = { _, _ ->
+            displaySnackbar(
+                view,
+                view.context.getString(R.string.errorRetrievePlaylist),
+                view.context.getString(R.string.retry)
+            ) {
+                addSongToPlaylist(view, songId)
+            }
+        }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }
 
-private fun addSongToPlaylist(view: View, playlistId: String, songId: String){
+private fun addSongToPlaylist(view: View, playlistId: String, songId: String) {
     val addToPlaylistAsync = AddToPlaylistAsync(
         WeakReference(view.context),
         playlistId,
         songId,
-        finishedCallback =  { _,_ ->
+        finishedCallback = { _, _ ->
             displaySnackbar(view, view.context.getString(R.string.songAddedToPlaylistMsg), null) {}
         },
         errorCallback = { _, _ ->
-            displaySnackbar(view,view.context.getString(R.string.errorRetrievePlaylist), view.context.getString(R.string.retry)) {
+            displaySnackbar(
+                view,
+                view.context.getString(R.string.errorRetrievePlaylist),
+                view.context.getString(R.string.retry)
+            ) {
                 addSongToPlaylist(view, playlistId, songId)
             }
         })
@@ -361,19 +389,24 @@ internal fun createPlaylist(view: View) {
             negativeButton.setTextColor(typedValue.data)
         }
     } else {
-        displaySnackbar(view, view.context.getString(R.string.errorNotLoggedIn),null) {}
+        displaySnackbar(view, view.context.getString(R.string.errorNotLoggedIn), null) {}
     }
 }
 
-private fun createPlaylist(view: View, playlistName:String){
-    val createPlaylistAsync = CreatePlaylistAsync(WeakReference(view.context), playlistName, finishedCallback = {
-        displaySnackbar(view, "Created playlist $playlistName", null) {}
-    },
-        errorCallback = {
-            displaySnackbar(view, "Could not create playlist", view.context.getString(R.string.retry)) {
-                createPlaylist(view, playlistName)
-            }
-        })
+private fun createPlaylist(view: View, playlistName: String) {
+    val createPlaylistAsync =
+        CreatePlaylistAsync(WeakReference(view.context), playlistName, finishedCallback = {
+            displaySnackbar(view, view.context.getString(R.string.playlistCreatedMsg), null) {}
+        },
+            errorCallback = {
+                displaySnackbar(
+                    view,
+                    view.context.getString(R.string.errorCreatingPlaylist),
+                    view.context.getString(R.string.retry)
+                ) {
+                    createPlaylist(view, playlistName)
+                }
+            })
     createPlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }
 
@@ -404,16 +437,21 @@ internal fun deletePlaylist(view: View, playlistId: String) {
     negativeButton.setTextColor(typedValue.data)
 }
 
-private fun deletePlaylist(view: View, playlistId: String, force:Boolean){
-    if(!force){
-        val deletePlaylistAsync = DeletePlaylistAsync(WeakReference(view.context), playlistId, finishedCallback = {
-            displaySnackbar(view, "Playlist deleted!", null) {}
-        },
-            errorCallback = {
-                displaySnackbar(view, "Could not delete playlist!", view.context.getString(R.string.retry)) {
-                    deletePlaylist(view, playlistId, true)
-                }
-            })
+private fun deletePlaylist(view: View, playlistId: String, force: Boolean) {
+    if (!force) {
+        val deletePlaylistAsync =
+            DeletePlaylistAsync(WeakReference(view.context), playlistId, finishedCallback = {
+                displaySnackbar(view, view.context.getString(R.string.playlistDeletedMsg), null) {}
+            },
+                errorCallback = {
+                    displaySnackbar(
+                        view,
+                        view.context.getString(R.string.errorDeletingPlaylist),
+                        view.context.getString(R.string.retry)
+                    ) {
+                        deletePlaylist(view, playlistId, true)
+                    }
+                })
         deletePlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 }
@@ -436,11 +474,23 @@ internal fun deletePlaylistSong(
         val songDeleteIndex = playlistMax - index
 
         val deletePlaylistTrackAsync =
-            DeletePlaylistTrackAsync(WeakReference(view.context), songId, playlistId, songDeleteIndex, finishedCallback = {_,_,_ ->
-                displaySnackbar(view, "Removed track from playlist!", null) {}
-            },
-                errorCallback = { _, _, _->
-                    displaySnackbar(view, "Could not remove track from playlist!", view.context.getString(R.string.retry)) {
+            DeletePlaylistTrackAsync(WeakReference(view.context),
+                songId,
+                playlistId,
+                songDeleteIndex,
+                finishedCallback = { _, _, _ ->
+                    displaySnackbar(
+                        view,
+                        view.context.getString(R.string.removedSongFromPlaylistMsg),
+                        null
+                    ) {}
+                },
+                errorCallback = { _, _, _ ->
+                    displaySnackbar(
+                        view,
+                        view.context.getString(R.string.errorRemovingSongFromPlaylist),
+                        view.context.getString(R.string.retry)
+                    ) {
                         deletePlaylistSong(view, songId, playlistId, index, playlistMax)
                     }
                 })
@@ -501,7 +551,11 @@ internal fun openAlbum(view: View, albumMcId: String, share: Boolean) {
             alertDialogBuilder.show()
         },
         Response.ErrorListener {
-            displaySnackbar(view, context.getString(R.string.errorRetrieveAlbumData), context.getString(R.string.retry)) {
+            displaySnackbar(
+                view,
+                context.getString(R.string.errorRetrieveAlbumData),
+                context.getString(R.string.retry)
+            ) {
                 openAlbum(view, albumMcId, share)
             }
         })
