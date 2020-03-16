@@ -438,7 +438,7 @@ internal fun deletePlaylist(view: View, playlistId: String) {
 }
 
 private fun deletePlaylist(view: View, playlistId: String, force: Boolean) {
-    if (!force) {
+    if (force) {
         val deletePlaylistAsync =
             DeletePlaylistAsync(WeakReference(view.context), playlistId, finishedCallback = {
                 displaySnackbar(view, view.context.getString(R.string.playlistDeletedMsg), null) {}
