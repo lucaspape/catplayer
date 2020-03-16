@@ -22,11 +22,16 @@ class LoadPlaylistTracksAsync(
     private val forceReload: Boolean,
     private val playlistId: String,
     private val displayLoading: () -> Unit,
-    private val requestFinished: () -> Unit
-) : AsyncTask<Void, Void, String>() {
+    private val finishedCallback: (forceReload: Boolean, playlistId: String, displayLoading: () -> Unit) -> Unit,
+    private val errorCallback: (forceReload: Boolean, playlistId: String, displayLoading: () -> Unit) -> Unit
+) : AsyncTask<Void, Void, Boolean>() {
 
-    override fun onPostExecute(result: String?) {
-        requestFinished()
+    override fun onPostExecute(result: Boolean) {
+        if (result) {
+            finishedCallback(forceReload, playlistId, displayLoading)
+        } else {
+            errorCallback(forceReload, playlistId, displayLoading)
+        }
     }
 
     override fun onPreExecute() {
@@ -39,7 +44,7 @@ class LoadPlaylistTracksAsync(
             val playlistItems = playlistItemDatabaseHelper.getAllData()
 
             if (!forceReload && playlistItems.isNotEmpty()) {
-                requestFinished()
+                finishedCallback(forceReload, playlistId, displayLoading)
                 cancel(true)
             } else {
                 displayLoading()
@@ -47,8 +52,9 @@ class LoadPlaylistTracksAsync(
         }
     }
 
-    override fun doInBackground(vararg param: Void?): String? {
+    override fun doInBackground(vararg param: Void?): Boolean {
         contextReference.get()?.let { context ->
+            var success = true
             val syncObject = Object()
 
             val playlistItemDatabaseHelper =
@@ -76,7 +82,9 @@ class LoadPlaylistTracksAsync(
                         }
                     }
                 },
-                Response.ErrorListener { })
+                Response.ErrorListener {
+                    success = false
+                })
 
 
             trackCountRequestQueue.addRequestFinishedListener<Any> {
@@ -129,7 +137,9 @@ class LoadPlaylistTracksAsync(
                                 tempList[i * 50 + k] = jsonArray.getJSONObject(k)
                             }
                         },
-                        Response.ErrorListener { })
+                        Response.ErrorListener {
+                            success = false
+                        })
 
                     totalRequestsCount++
                     requests.add(playlistTrackRequest)
@@ -142,11 +152,13 @@ class LoadPlaylistTracksAsync(
 
             synchronized(syncObject) {
                 syncObject.wait()
+
+                return success
             }
 
         }
 
-        return null
+        return false
     }
 
 }

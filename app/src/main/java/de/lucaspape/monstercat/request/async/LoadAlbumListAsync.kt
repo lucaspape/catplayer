@@ -21,11 +21,16 @@ class LoadAlbumListAsync(
     private val forceReload: Boolean,
     private val skip: Int,
     private val displayLoading: () -> Unit,
-    private val requestFinished: () -> Unit
-) : AsyncTask<Void, Void, String>() {
+    private val finishedCallback: (forceReload:Boolean, skip:Int, displayLoading:() -> Unit) -> Unit,
+    private val errorCallback: (forceReload:Boolean, skip:Int, displayLoading:() -> Unit) -> Unit
+) : AsyncTask<Void, Void, Boolean>() {
 
-    override fun onPostExecute(result: String?) {
-        requestFinished()
+    override fun onPostExecute(result: Boolean) {
+        if(result){
+            finishedCallback(forceReload, skip, displayLoading)
+        }else{
+            errorCallback(forceReload, skip, displayLoading)
+        }
     }
 
     override fun onPreExecute() {
@@ -35,7 +40,7 @@ class LoadAlbumListAsync(
             val albumList = albumDatabaseHelper.getAlbums(skip.toLong(), 50)
 
             if (!forceReload && albumList.isNotEmpty()) {
-                requestFinished()
+                finishedCallback(forceReload, skip, displayLoading)
                 cancel(true)
             } else {
                 displayLoading()
@@ -43,10 +48,11 @@ class LoadAlbumListAsync(
         }
     }
 
-    override fun doInBackground(vararg param: Void?): String? {
-        val syncObject = Object()
-
+    override fun doInBackground(vararg param: Void?): Boolean {
         contextReference.get()?.let { context ->
+            var success = true
+            val syncObject = Object()
+
             val requestQueue = Volley.newRequestQueue(context)
 
             requestQueue.addRequestFinishedListener<Any?> {
@@ -68,18 +74,22 @@ class LoadAlbumListAsync(
                     }
 
                 },
-                Response.ErrorListener { }
+                Response.ErrorListener {
+                    success = false
+                }
             )
 
             requestQueue.add(albumsRequest)
 
+            synchronized(syncObject) {
+                syncObject.wait()
+
+                return success
+            }
+
         }
 
-        synchronized(syncObject) {
-            syncObject.wait()
-        }
-
-        return null
+        return false
     }
 
 }

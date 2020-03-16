@@ -65,7 +65,7 @@ open class CatalogItem(
                         )
                         context.getString(R.string.addToPlaylist) -> addSongToPlaylist(
                             context,
-                            song
+                            song.songId
                         )
                         context.getString(R.string.shareAlbum) -> openAlbum(
                             context,
@@ -123,21 +123,13 @@ open class CatalogItem(
                         )
                     }
                     context.getString(R.string.delete) -> {
-                        val songDatabaseHelper =
-                            SongDatabaseHelper(context)
-                        val song =
-                            songDatabaseHelper.getSong(context, id)
-
-                        if (song != null) {
-                            deletePlaylistSong(
-                                context,
-                                song,
-                                playlistId,
-                                listViewPosition + 1,
-                                data.size
-                            )
-                        }
-
+                        deletePlaylistSong(
+                            context,
+                            id,
+                            playlistId,
+                            listViewPosition + 1,
+                            data.size
+                        )
                     }
                     context.getString(R.string.shareAlbum) -> {
                         val songDatabaseHelper =

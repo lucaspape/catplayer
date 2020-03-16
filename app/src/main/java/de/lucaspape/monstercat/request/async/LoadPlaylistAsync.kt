@@ -20,11 +20,16 @@ class LoadPlaylistAsync(
     private val contextReference: WeakReference<Context>,
     private val forceReload: Boolean,
     private val displayLoading: () -> Unit,
-    private val requestFinished: () -> Unit
-) : AsyncTask<Void, Void, String>() {
+    private val finishedCallback: (forceReload:Boolean, displayLoading:() -> Unit) -> Unit,
+    private val errorCallback: (forceReload:Boolean, displayLoading:() -> Unit) -> Unit
+) : AsyncTask<Void, Void, Boolean>() {
 
-    override fun onPostExecute(result: String?) {
-        requestFinished()
+    override fun onPostExecute(result: Boolean) {
+        if(result){
+            finishedCallback(forceReload, displayLoading)
+        }else{
+            errorCallback(forceReload, displayLoading)
+        }
     }
 
     override fun onPreExecute() {
@@ -34,7 +39,7 @@ class LoadPlaylistAsync(
             val playlists = playlistDatabaseHelper.getAllPlaylists()
 
             if (!forceReload && playlists.isNotEmpty()) {
-                requestFinished()
+                finishedCallback(forceReload, displayLoading)
                 cancel(true)
             } else {
                 displayLoading()
@@ -42,7 +47,7 @@ class LoadPlaylistAsync(
         }
     }
 
-    override fun doInBackground(vararg param: Void?): String? {
+    override fun doInBackground(vararg param: Void?): Boolean {
         contextReference.get()?.let { context ->
             val playlistDatabaseHelper =
                 PlaylistDatabaseHelper(context)
@@ -51,6 +56,7 @@ class LoadPlaylistAsync(
 
             val playlistUrl = context.getString(R.string.playlistsUrl)
 
+            var success = true
             val syncObject = Object()
 
             playlistRequestQueue.addRequestFinishedListener<Any> {
@@ -75,17 +81,20 @@ class LoadPlaylistAsync(
                     }
 
                 },
-                Response.ErrorListener { })
+                Response.ErrorListener {
+                    success = false
+                })
 
             playlistRequestQueue.add(playlistRequest)
 
             synchronized(syncObject) {
                 syncObject.wait()
+
+                return success
             }
         }
 
-        return null
-
+        return false
     }
 
 }

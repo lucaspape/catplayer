@@ -22,11 +22,16 @@ class LoadAlbumAsync(
     private val albumId: String,
     private val mcId: String,
     private val displayLoading: () -> Unit,
-    private val requestFinished: () -> Unit
-) : AsyncTask<Void, Void, String>() {
+    private val finishedCallback: (forceReload:Boolean, albumId:String, mcId:String, displayLoading:() -> Unit) -> Unit,
+    private val errorCallback: (forceReload:Boolean, albumId:String, mcId:String, displayLoading:() -> Unit) -> Unit
+) : AsyncTask<Void, Void, Boolean>() {
 
-    override fun onPostExecute(result: String?) {
-        requestFinished()
+    override fun onPostExecute(result: Boolean) {
+        if(result){
+            finishedCallback(forceReload, albumId, mcId, displayLoading)
+        }else{
+            errorCallback(forceReload, albumId, mcId, displayLoading)
+        }
     }
 
     override fun onPreExecute() {
@@ -36,7 +41,7 @@ class LoadAlbumAsync(
             val albumItems = albumItemDatabaseHelper.getAllData()
 
             if (!forceReload && albumItems.isNotEmpty()) {
-                requestFinished()
+                finishedCallback(forceReload, albumId, mcId, displayLoading)
                 cancel(true)
             } else {
                 displayLoading()
@@ -45,7 +50,7 @@ class LoadAlbumAsync(
         }
     }
 
-    override fun doInBackground(vararg param: Void?): String? {
+    override fun doInBackground(vararg param: Void?): Boolean {
         contextReference.get()?.let { context ->
             val requestQueue = Volley.newRequestQueue(context)
 
@@ -54,6 +59,7 @@ class LoadAlbumAsync(
 
             displayLoading()
 
+            var success = true
             val syncObject = Object()
 
             requestQueue.addRequestFinishedListener<Any> {
@@ -82,17 +88,21 @@ class LoadAlbumAsync(
                         )
                     }
 
-                }, Response.ErrorListener { }
+                }, Response.ErrorListener {
+                    success = false
+                }
             )
 
             requestQueue.add(listRequest)
             synchronized(syncObject) {
                 syncObject.wait()
+
+                return success
             }
 
         }
 
-        return null
+        return false
     }
 
 }

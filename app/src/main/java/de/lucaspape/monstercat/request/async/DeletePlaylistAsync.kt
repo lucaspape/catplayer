@@ -13,27 +13,52 @@ import java.lang.ref.WeakReference
 
 class DeletePlaylistAsync(
     private val contextReference: WeakReference<Context>,
-    private val playlistId: String
-) : AsyncTask<Void, Void, String>() {
-    override fun doInBackground(vararg params: Void?): String? {
+    private val playlistId: String,
+    private val finishedCallback: (playlistId: String) -> Unit,
+    private val errorCallback: (playlistId: String) -> Unit
+) : AsyncTask<Void, Void, Boolean>() {
+
+    override fun onPostExecute(result: Boolean) {
+        if (result) {
+            finishedCallback(playlistId)
+        } else {
+            errorCallback(playlistId)
+        }
+    }
+
+    override fun doInBackground(vararg params: Void?): Boolean {
         contextReference.get()?.let { context ->
             val deletePlaylistVolleyQueue = Volley.newRequestQueue(context)
 
             val deletePlaylistUrl = context.getString(R.string.playlistUrl) + playlistId
 
+            var success = true
+            val syncObject = Object()
+
+            deletePlaylistVolleyQueue.addRequestFinishedListener<Any?> {
+                synchronized(syncObject) {
+                    syncObject.notify()
+                }
+            }
+
             val deletePlaylistRequest = AuthorizedRequest(
                 Request.Method.DELETE, deletePlaylistUrl, sid,
                 Response.Listener {
-                    displayInfo(context, context.getString(R.string.playlistDeletedMsg))
                 },
                 Response.ErrorListener {
-                    displayInfo(context, context.getString(R.string.errorDeletingPlaylist))
+                    success = false
                 })
 
             deletePlaylistVolleyQueue.add(deletePlaylistRequest)
+
+            synchronized(syncObject) {
+                syncObject.wait()
+
+                return success
+            }
         }
 
-        return null
+        return false
     }
 
 }

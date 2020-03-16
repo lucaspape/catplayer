@@ -525,7 +525,7 @@ class HomeHandler {
 
             LoadSongListAsync(WeakReference(view.context), forceReload, 0, {
                 swipeRefreshLayout.isRefreshing = true
-            }, {
+            }, { _,_ ,_->
                 BackgroundAsync({
                     val songIdList = catalogSongDatabaseHelper.getSongs(0, 50)
 
@@ -536,7 +536,7 @@ class HomeHandler {
                 }, {
                     displayData()
                 }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-            }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+            }, {_, _, _ ->}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         } else {
             displayData()
         }
@@ -551,7 +551,7 @@ class HomeHandler {
         footerAdapter: ItemAdapter<ProgressItem>
     ) {
         if (initDone) {
-            LoadSongListAsync(WeakReference(view.context), false, catalogViewData.size, {}, {
+            LoadSongListAsync(WeakReference(view.context), false, catalogViewData.size, {}, { _,_,_ ->
                 val catalogSongDatabaseHelper =
                     CatalogSongDatabaseHelper(view.context)
 
@@ -569,7 +569,7 @@ class HomeHandler {
 
                     footerAdapter.clear()
                 }
-            }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+            }, { _,_,_ ->}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         }
     }
 
@@ -616,7 +616,7 @@ class HomeHandler {
                 0, {
                     swipeRefreshLayout.isRefreshing = true
                 }
-            ) {
+            , { _,_,_->
                 BackgroundAsync({
                     val albumList = albumDatabaseHelper.getAlbums(0, 50)
 
@@ -627,7 +627,7 @@ class HomeHandler {
                     displayData()
                 }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 
-            }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+            }, {_,_,_->}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         } else {
             displayData()
         }
@@ -643,7 +643,7 @@ class HomeHandler {
     ) {
         if (initDone) {
             LoadAlbumListAsync(WeakReference(view.context),
-                false, albumViewData.size, {}, {
+                false, albumViewData.size, {}, { _,_,_ ->
                     val albumDatabaseHelper =
                         AlbumDatabaseHelper(view.context)
                     val albumList =
@@ -661,7 +661,7 @@ class HomeHandler {
                         footerAdapter.clear()
                     }
 
-                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                }, {_,_,_ ->}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         }
     }
 
@@ -714,7 +714,7 @@ class HomeHandler {
                 mcId, {
                     swipeRefreshLayout.isRefreshing = true
                 }
-            ) {
+            , { _,_,_,_->
                 BackgroundAsync({
                     val albumItemDatabaseHelper =
                         AlbumItemDatabaseHelper(contextReference.get()!!, albumId)
@@ -733,7 +733,7 @@ class HomeHandler {
                     displayData()
                 }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 
-            }.executeOnExecutor(
+            }, {_,_,_,_->}).executeOnExecutor(
                 AsyncTask.THREAD_POOL_EXECUTOR
             )
         } else {
@@ -793,11 +793,11 @@ class HomeHandler {
                 contextReference,
                 searchString,
                 0
-            ) { searchResults ->
+            , { _,_,searchResults ->
                 searchResultsData[searchString] = searchResults
 
                 displayData()
-            }.executeOnExecutor(
+            }, {_,_ -> Unit}).executeOnExecutor(
                 AsyncTask.THREAD_POOL_EXECUTOR
             )
         } else {
@@ -823,14 +823,14 @@ class HomeHandler {
             contextReference,
             searchString,
             skip
-        ) { searchResults ->
+        , { _,_, searchResults ->
             for (result in searchResults) {
                 itemAdapter.add(result)
                 searchResultsData[searchString]?.add(result)
             }
 
             footerAdapter.clear()
-        }.executeOnExecutor(
+        }, {_,_ ->}).executeOnExecutor(
             AsyncTask.THREAD_POOL_EXECUTOR
         )
     }

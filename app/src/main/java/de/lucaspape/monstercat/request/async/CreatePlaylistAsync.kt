@@ -14,9 +14,20 @@ import java.lang.ref.WeakReference
 
 class CreatePlaylistAsync(
     private val contextReference: WeakReference<Context>,
-    private val playlistName: String
-) : AsyncTask<Void, Void, String>() {
-    override fun doInBackground(vararg params: Void?): String? {
+    private val playlistName: String,
+    private val finishedCallback: (playlistName: String) -> Unit,
+    private val errorCallback: (playlistName: String) -> Unit
+) : AsyncTask<Void, Void, Boolean>() {
+
+    override fun onPostExecute(result: Boolean) {
+        if (result) {
+            finishedCallback(playlistName)
+        } else {
+            errorCallback(playlistName)
+        }
+    }
+
+    override fun doInBackground(vararg params: Void?): Boolean {
         contextReference.get()?.let { context ->
             val playlistPostUrl = context.getString(R.string.newPlaylistUrl)
 
@@ -28,13 +39,21 @@ class CreatePlaylistAsync(
 
             val newPlaylistVolleyQueue = Volley.newRequestQueue(context)
 
+            var success = true
+            val syncObject = Object()
+
+            newPlaylistVolleyQueue.addRequestFinishedListener<Any?> {
+                synchronized(syncObject) {
+                    syncObject.notify()
+                }
+            }
+
             val newPlaylistRequest = object : JsonObjectRequest(
                 Method.POST, playlistPostUrl, postObject,
                 Response.Listener {
-                    displayInfo(context, context.getString(R.string.playlistCreatedMsg))
                 },
                 Response.ErrorListener {
-                    displayInfo(context, context.getString(R.string.errorCreatingPlaylist))
+                    success = false
                 }
             ) {
                 override fun getHeaders(): Map<String, String> {
@@ -49,9 +68,15 @@ class CreatePlaylistAsync(
             }
 
             newPlaylistVolleyQueue.add(newPlaylistRequest)
+
+            synchronized(syncObject) {
+                syncObject.wait()
+
+                return success
+            }
         }
 
-        return null
+        return false
     }
 
 }

@@ -20,19 +20,24 @@ class LoadTitleSearchAsync(
     private val contextReference: WeakReference<Context>,
     private val searchString: String,
     private val skip: Int,
-    private val requestFinished: (searchResults: ArrayList<CatalogItem>) -> Unit
-) : AsyncTask<Void, Void, String>() {
+    private val finishedCallback: (searchString: String, skip: Int, searchResults: ArrayList<CatalogItem>) -> Unit,
+    private val errorCallback: (searchString: String, skip: Int) -> Unit
+) : AsyncTask<Void, Void, Boolean>() {
 
     var searchResults = ArrayList<CatalogItem>()
 
-    override fun onPostExecute(result: String?) {
-        requestFinished(searchResults)
+    override fun onPostExecute(result: Boolean) {
+        if (result) {
+            finishedCallback(searchString, skip, searchResults)
+        } else {
+            errorCallback(searchString, skip)
+        }
     }
 
-    override fun doInBackground(vararg params: Void?): String? {
-        val syncObject = Object()
-
+    override fun doInBackground(vararg params: Void?): Boolean {
         contextReference.get()?.let { context ->
+            var success = true
+            val syncObject = Object()
             val searchQueue = Volley.newRequestQueue(context)
 
             searchQueue.addRequestFinishedListener<Any?> {
@@ -56,17 +61,19 @@ class LoadTitleSearchAsync(
 
                 },
                 Response.ErrorListener { error ->
-                    println(error)
+                    success = false
                 })
 
             searchQueue.add(searchRequest)
+
+            synchronized(syncObject) {
+                syncObject.wait()
+
+                return success
+            }
         }
 
-        synchronized(syncObject) {
-            syncObject.wait()
-        }
-
-        return null
+        return false
     }
 
 }

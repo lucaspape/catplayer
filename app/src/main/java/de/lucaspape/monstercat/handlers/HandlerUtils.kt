@@ -14,7 +14,6 @@ import com.android.volley.Response
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.background.BackgroundService.Companion.loadContinuousSongListAsyncTask
-import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
@@ -33,21 +32,21 @@ import java.lang.ref.WeakReference
 /**
  * Play a song from ID
  */
-internal fun playSongFromId(songId: String, playNow: Boolean, priority:Boolean) {
+internal fun playSongFromId(songId: String, playNow: Boolean, priority: Boolean) {
     if (playNow) {
-        if(priority){
+        if (priority) {
             prioritySongQueue.add(songId)
             skipPreviousInPlaylist()
             next()
-        }else{
+        } else {
             songQueue.add(songId)
             skipPreviousInPlaylist()
             next()
         }
     } else {
-        if(priority){
+        if (priority) {
             prioritySongQueue.add(songId)
-        }else{
+        } else {
             songQueue.add(songId)
         }
     }
@@ -75,7 +74,8 @@ internal fun playSongFromId(
     loadContinuousSongListAsyncTask = BackgroundAsync({
         val songDatabaseHelper = SongDatabaseHelper(context)
 
-        val skipMonstercatSongs = Settings(context).getBoolean(context.getString(R.string.skipMonstercatSongsSetting))
+        val skipMonstercatSongs =
+            Settings(context).getBoolean(context.getString(R.string.skipMonstercatSongsSetting))
 
         for (cSongId in continuousList) {
 
@@ -139,7 +139,7 @@ internal fun playAlbumNext(context: Context, mcID: String) {
 }
 
 internal fun playPlaylistNext(context: Context, playlistId: String) {
-    LoadPlaylistTracksAsync(WeakReference(context), true, playlistId, {}) {
+    LoadPlaylistTracksAsync(WeakReference(context), true, playlistId, {}, { _,_,_->
         val playlistItemDatabaseHelper =
             PlaylistItemDatabaseHelper(context, playlistId)
         val playlistItemList = playlistItemDatabaseHelper.getAllData().reversed()
@@ -167,14 +167,14 @@ internal fun playPlaylistNext(context: Context, playlistId: String) {
         }, {})
 
         loadContinuousSongListAsyncTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-    }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    }, {_,_,_ ->  }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }
 
 /**
  * Download an entire playlist
  */
 internal fun downloadPlaylist(context: Context, playlistId: String, downloadFinished: () -> Unit) {
-    LoadPlaylistTracksAsync(WeakReference(context), true, playlistId, {}) {
+    LoadPlaylistTracksAsync(WeakReference(context), true, playlistId, {}, { _,_,_->
         val playlistItemDatabaseHelper =
             PlaylistItemDatabaseHelper(context, playlistId)
         val playlistItemList = playlistItemDatabaseHelper.getAllData()
@@ -185,7 +185,7 @@ internal fun downloadPlaylist(context: Context, playlistId: String, downloadFini
 
             song?.songId?.let { addDownloadSong(context, it, downloadFinished) }
         }
-    }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    }, {_,_,_->}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }
 
 /**
@@ -270,13 +270,13 @@ internal fun downloadAlbum(context: Context, mcID: String) {
 /**
  * Add single song to playlist, will ask for playlist with alertDialog TODO check if logged in
  */
-internal fun addSongToPlaylist(context: Context, song: Song) {
-    LoadPlaylistAsync(WeakReference(context), true, {}) {
+internal fun addSongToPlaylist(context: Context, songId: String) {
+    LoadPlaylistAsync(WeakReference(context), true, {}, { _,_ ->
         val playlistDatabaseHelper =
             PlaylistDatabaseHelper(context)
         val playlistList = playlistDatabaseHelper.getAllPlaylists()
 
-        if(playlistList.isNotEmpty()){
+        if (playlistList.isNotEmpty()) {
             val playlistNames = arrayOfNulls<String>(playlistList.size)
             val playlistIds = arrayOfNulls<String>(playlistList.size)
 
@@ -290,27 +290,43 @@ internal fun addSongToPlaylist(context: Context, song: Song) {
             alertDialogBuilder.setItems(playlistNames) { _, i ->
                 playlistIds[i]?.let { playlistId ->
                     val addToPlaylistAsync =
-                        AddToPlaylistAsync(WeakReference(context), playlistId, song)
+                        AddToPlaylistAsync(
+                            WeakReference(context),
+                            playlistId,
+                            songId,
+                            finishedCallback = { _, _ ->
+                                displayInfo(
+                                    context,
+                                    context.getString(R.string.songAddedToPlaylistMsg)
+                                )
+                            },
+                            errorCallback = { _, _ ->
+                                displayInfo(
+                                    context,
+                                    context.getString(R.string.errorUpdatePlaylist)
+                                )
+                            })
                     addToPlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
                 }
 
             }
             alertDialogBuilder.show()
-        }else{
+        } else {
             displayInfo(context, context.getString(R.string.noPlaylistFound))
         }
-    }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    }, {_,_ ->}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }
 
 /**
  * Create a new playlist, will ask for name with alertDialog
  */
 internal fun createPlaylist(context: Context) {
-    if(loggedIn){
+    if (loggedIn) {
         val layoutInflater =
             context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
-        val playlistNameInputLayout = layoutInflater.inflate(R.layout.playlistname_input_layout, null)
+        val playlistNameInputLayout =
+            layoutInflater.inflate(R.layout.playlistname_input_layout, null)
 
         AlertDialog.Builder(context).apply {
             setTitle(context.getString(R.string.createPlaylist))
@@ -319,7 +335,7 @@ internal fun createPlaylist(context: Context) {
                     playlistNameInputLayout.findViewById<EditText>(R.id.playlistNameInput)
                 val playlistName = playlistNameEditText.text.toString()
 
-                val createPlaylistAsync = CreatePlaylistAsync(WeakReference(context), playlistName)
+                val createPlaylistAsync = CreatePlaylistAsync(WeakReference(context), playlistName, {}, {})
                 createPlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
             }
             setView(playlistNameInputLayout)
@@ -336,7 +352,7 @@ internal fun createPlaylist(context: Context) {
             val negativeButton = getButton(DialogInterface.BUTTON_NEGATIVE)
             negativeButton.setTextColor(typedValue.data)
         }
-    }else{
+    } else {
         displayInfo(context, context.getString(R.string.errorNotLoggedIn))
     }
 }
@@ -348,7 +364,7 @@ internal fun deletePlaylist(context: Context, playlistId: String) {
     val alertDialogBuilder = AlertDialog.Builder(context)
     alertDialogBuilder.setTitle(context.getString(R.string.deletePlaylistMsg))
     alertDialogBuilder.setPositiveButton(context.getString(R.string.yes)) { _, _ ->
-        val deletePlaylistAsync = DeletePlaylistAsync(WeakReference(context), playlistId)
+        val deletePlaylistAsync = DeletePlaylistAsync(WeakReference(context), playlistId, {}, {})
         deletePlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
     alertDialogBuilder.setNegativeButton(context.getString(R.string.no)) { _, _ -> }
@@ -371,7 +387,7 @@ internal fun deletePlaylist(context: Context, playlistId: String) {
  */
 internal fun deletePlaylistSong(
     context: Context,
-    song: Song,
+    songId: String,
     playlistId: String,
     index: Int,
     playlistMax: Int
@@ -384,7 +400,7 @@ internal fun deletePlaylistSong(
         val songDeleteIndex = playlistMax - index
 
         val deletePlaylistTrackAsync =
-            DeletePlaylistTrackAsync(WeakReference(context), song, playlistId, songDeleteIndex)
+            DeletePlaylistTrackAsync(WeakReference(context), songId, playlistId, songDeleteIndex, {_,_,_ ->}, {_,_,_->})
         deletePlaylistTrackAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 }
