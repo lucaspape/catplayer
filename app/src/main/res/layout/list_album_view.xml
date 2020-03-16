@@ -13,9 +13,10 @@
 
         <ImageView
             android:id="@+id/cover"
-            android:layout_width="350dp"
-            android:layout_height="350dp"
-            android:layout_marginTop="10dp"
+            android:layout_margin="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
             android:contentDescription="@string/coverImage"
             android:scaleType="fitCenter"
             app:layout_constraintEnd_toEndOf="parent"
@@ -24,11 +25,11 @@
 
         <TextView
             android:id="@+id/albumTitle"
-            android:layout_width="300dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:textColor="?attr/colorOnSurface"
-            android:textSize="18sp"
+            android:textSize="22sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@id/albumArtist"
             app:layout_constraintStart_toStartOf="@id/cover"
@@ -36,11 +37,11 @@
 
         <TextView
             android:id="@+id/albumArtist"
-            android:layout_width="300dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:textColor="?attr/colorOnSurface"
-            android:textSize="14sp"
+            android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@id/cover"
             app:layout_constraintTop_toBottomOf="@+id/albumTitle" />
