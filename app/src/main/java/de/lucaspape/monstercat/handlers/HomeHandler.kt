@@ -537,6 +537,8 @@ class HomeHandler {
                     displayData()
                 }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
             }, errorCallback = { _, _, _ ->
+                swipeRefreshLayout.isRefreshing = false
+
                 displaySnackbar(
                     view,
                     view.context.getString(R.string.errorLoadingSongList),
@@ -583,6 +585,8 @@ class HomeHandler {
                     }
                 },
                 errorCallback = { _, _, _ ->
+                    footerAdapter.clear()
+
                     displaySnackbar(
                         view,
                         view.context.getString(R.string.errorLoadingSongList),
@@ -649,6 +653,8 @@ class HomeHandler {
                     }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 
                 }, errorCallback = { _, _, _ ->
+                    swipeRefreshLayout.isRefreshing = false
+
                     displaySnackbar(
                         view,
                         view.context.getString(R.string.errorLoadingAlbumList),
@@ -691,6 +697,8 @@ class HomeHandler {
                     }
 
                 }, errorCallback = { _, _, _ ->
+                    footerAdapter.clear()
+
                     displaySnackbar(
                         view,
                         view.context.getString(R.string.errorLoadingAlbumList),
@@ -771,6 +779,8 @@ class HomeHandler {
                     }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 
                 }, errorCallback = { _, _, _, _ ->
+                    swipeRefreshLayout.isRefreshing = false
+
                     displaySnackbar(
                         view,
                         view.context.getString(R.string.errorLoadingAlbum),
@@ -843,7 +853,8 @@ class HomeHandler {
 
                     displayData()
                 }, errorCallback = { _, _ ->
-                    Unit
+                    swipeRefreshLayout.isRefreshing = false
+
                     displaySnackbar(
                         view,
                         view.context.getString(R.string.errorLoadingSearch),
@@ -883,6 +894,8 @@ class HomeHandler {
 
                 footerAdapter.clear()
             }, errorCallback = { _, _ ->
+                footerAdapter.clear()
+
                 displaySnackbar(
                     view,
                     view.context.getString(R.string.errorLoadingSearch),
