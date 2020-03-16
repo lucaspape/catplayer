@@ -60,6 +60,7 @@ class PlaylistDatabaseHelper(context: Context) :
 
         val id = db.insert(Playlist.TABLE_NAME, null, values)
         db.close()
+
         return id
     }
 

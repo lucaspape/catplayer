@@ -67,6 +67,7 @@ class AlbumDatabaseHelper(context: Context) :
 
         val id = db.insert(Album.TABLE_NAME, null, values)
         db.close()
+
         return id
     }
 
