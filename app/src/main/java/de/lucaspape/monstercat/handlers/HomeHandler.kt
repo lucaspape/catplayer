@@ -523,9 +523,9 @@ class HomeHandler {
                 catalogSongDatabaseHelper.reCreateTable()
             }
 
-            LoadSongListAsync(WeakReference(view.context), forceReload, 0, {
+            LoadSongListAsync(WeakReference(view.context), forceReload, 0, displayLoading = {
                 swipeRefreshLayout.isRefreshing = true
-            }, { _, _, _ ->
+            }, finishedCallback = { _, _, _ ->
                 BackgroundAsync({
                     val songIdList = catalogSongDatabaseHelper.getSongs(0, 50)
 
@@ -536,7 +536,15 @@ class HomeHandler {
                 }, {
                     displayData()
                 }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-            }, { _, _, _ -> }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+            }, errorCallback = { _, _, _ ->
+                displaySnackbar(
+                    view,
+                    "Could not load song list",
+                    view.context.getString(R.string.retry)
+                ) {
+                    initSongListLoad(view, forceReload)
+                }
+            }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         } else {
             displayData()
         }
@@ -574,7 +582,15 @@ class HomeHandler {
                         footerAdapter.clear()
                     }
                 },
-                errorCallback = { _, _, _ -> }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                errorCallback = { _, _, _ ->
+                    displaySnackbar(
+                        view,
+                        "Could not load song list",
+                        view.context.getString(R.string.retry)
+                    ) {
+                        loadSongList(view, itemAdapter, footerAdapter)
+                    }
+                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         }
     }
 
@@ -632,7 +648,15 @@ class HomeHandler {
                         displayData()
                     }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 
-                }, errorCallback = { _, _, _ -> }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                }, errorCallback = { _, _, _ ->
+                    displaySnackbar(
+                        view,
+                        "Could not load album list",
+                        view.context.getString(R.string.retry)
+                    ) {
+                        initAlbumListLoad(view, forceReload)
+                    }
+                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         } else {
             displayData()
         }
@@ -666,7 +690,15 @@ class HomeHandler {
                         footerAdapter.clear()
                     }
 
-                }, errorCallback = { _, _, _ -> }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                }, errorCallback = { _, _, _ ->
+                    displaySnackbar(
+                        view,
+                        "Could not load album list",
+                        view.context.getString(R.string.retry)
+                    ) {
+                        loadAlbumList(view, itemAdapter, footerAdapter)
+                    }
+                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         }
     }
 
@@ -738,7 +770,15 @@ class HomeHandler {
                         displayData()
                     }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 
-                }, errorCallback = { _, _, _, _ -> }).executeOnExecutor(
+                }, errorCallback = { _, _, _, _ ->
+                    displaySnackbar(
+                        view,
+                        "Could not load album",
+                        view.context.getString(R.string.retry)
+                    ) {
+                        loadAlbum(view, albumId, mcId, forceReload)
+                    }
+                }).executeOnExecutor(
                 AsyncTask.THREAD_POOL_EXECUTOR
             )
         } else {
@@ -802,7 +842,14 @@ class HomeHandler {
                     searchResultsData[searchString] = searchResults
 
                     displayData()
-                }, errorCallback = { _, _ -> Unit }).executeOnExecutor(
+                }, errorCallback = { _, _ ->
+                    Unit
+                    displaySnackbar(
+                        view,
+                        "Error searching",
+                        view.context.getString(R.string.retry)
+                    ) { searchSong(view, searchString, forceReload) }
+                }).executeOnExecutor(
                 AsyncTask.THREAD_POOL_EXECUTOR
             )
         } else {
@@ -835,7 +882,13 @@ class HomeHandler {
                 }
 
                 footerAdapter.clear()
-            }, errorCallback = { _, _ -> }).executeOnExecutor(
+            }, errorCallback = { _, _ ->
+                displaySnackbar(
+                    view,
+                    "Error searching",
+                    view.context.getString(R.string.retry)
+                ) { searchMore(view, searchString, itemAdapter, footerAdapter) }
+            }).executeOnExecutor(
             AsyncTask.THREAD_POOL_EXECUTOR
         )
     }

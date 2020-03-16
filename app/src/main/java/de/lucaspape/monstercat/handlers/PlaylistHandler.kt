@@ -12,6 +12,7 @@ import com.mikepenz.fastadapter.GenericItem
 import com.mikepenz.fastadapter.adapters.ItemAdapter
 import com.mikepenz.fastadapter.listeners.ClickEventHook
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.activities.offlineDrawable
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
@@ -23,6 +24,7 @@ import de.lucaspape.monstercat.request.async.BackgroundAsync
 import de.lucaspape.monstercat.request.async.LoadPlaylistAsync
 import de.lucaspape.monstercat.request.async.LoadPlaylistTracksAsync
 import de.lucaspape.monstercat.music.clearQueue
+import de.lucaspape.monstercat.util.displaySnackbar
 import java.io.File
 import java.lang.IndexOutOfBoundsException
 import java.lang.ref.WeakReference
@@ -301,7 +303,7 @@ class PlaylistHandler {
                 fastAdapter: FastAdapter<PlaylistItem>,
                 item: PlaylistItem
             ) {
-                if (item.getDownloadStatus(view.context) == "android.resource://de.lucaspape.monstercat/drawable/ic_offline_pin_green_24dp") {
+                if (item.getDownloadStatus(view.context) == offlineDrawable) {
                     val titleDownloadButton = v as ImageButton
 
                     deleteDownloadedPlaylistTracks(
@@ -378,7 +380,9 @@ class PlaylistHandler {
                         displayData()
 
                     }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-                }, errorCallback = { _, _ -> }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                }, errorCallback = { _, _ ->
+                    displaySnackbar(view, "Could not load playlists", view.context.getString(R.string.retry)) {loadPlaylist(view, forceReload)}
+                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         } else {
             displayData()
         }
@@ -441,7 +445,11 @@ class PlaylistHandler {
                         displayData()
                     }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 
-                }, errorCallback = { _, _, _ -> }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                }, errorCallback = { _, _, _ ->
+                    displaySnackbar(view, "Could not load playlist tracks", view.context.getString(R.string.retry)) {
+                        loadPlaylistTracks(view, forceReload, playlistId)
+                    }
+                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         } else {
             displayData()
         }
