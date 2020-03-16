@@ -382,7 +382,11 @@ class PlaylistHandler {
                     }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
                 }, errorCallback = { _, _ ->
                     swipeRefreshLayout.isRefreshing = false
-                    displaySnackbar(view, view.context.getString(R.string.errorLoadingPlaylists), view.context.getString(R.string.retry)) {loadPlaylist(view, forceReload)}
+                    displaySnackbar(
+                        view,
+                        view.context.getString(R.string.errorLoadingPlaylists),
+                        view.context.getString(R.string.retry)
+                    ) { loadPlaylist(view, forceReload) }
                 }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         } else {
             displayData()
@@ -448,7 +452,11 @@ class PlaylistHandler {
 
                 }, errorCallback = { _, _, _ ->
                     swipeRefreshLayout.isRefreshing = false
-                    displaySnackbar(view, view.context.getString(R.string.errorLoadingPlaylistTracks), view.context.getString(R.string.retry)) {
+                    displaySnackbar(
+                        view,
+                        view.context.getString(R.string.errorLoadingPlaylistTracks),
+                        view.context.getString(R.string.retry)
+                    ) {
                         loadPlaylistTracks(view, forceReload, playlistId)
                     }
                 }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
