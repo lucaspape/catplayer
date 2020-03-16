@@ -174,18 +174,19 @@ internal fun playPlaylistNext(context: Context, playlistId: String) {
  * Download an entire playlist
  */
 internal fun downloadPlaylist(context: Context, playlistId: String, downloadFinished: () -> Unit) {
-    LoadPlaylistTracksAsync(WeakReference(context), true, playlistId, {}, { _,_,_->
-        val playlistItemDatabaseHelper =
-            PlaylistItemDatabaseHelper(context, playlistId)
-        val playlistItemList = playlistItemDatabaseHelper.getAllData()
+    LoadPlaylistTracksAsync(WeakReference(context), true, playlistId, displayLoading = {},
+        finishedCallback = { _, _, _->
+            val playlistItemDatabaseHelper =
+                PlaylistItemDatabaseHelper(context, playlistId)
+            val playlistItemList = playlistItemDatabaseHelper.getAllData()
 
-        for (playlistItem in playlistItemList) {
-            val songDatabaseHelper = SongDatabaseHelper(context)
-            val song = songDatabaseHelper.getSong(context, playlistItem.songId)
+            for (playlistItem in playlistItemList) {
+                val songDatabaseHelper = SongDatabaseHelper(context)
+                val song = songDatabaseHelper.getSong(context, playlistItem.songId)
 
-            song?.songId?.let { addDownloadSong(context, it, downloadFinished) }
-        }
-    }, {_,_,_->}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                song?.songId?.let { addDownloadSong(context, it, downloadFinished) }
+            }
+        }, errorCallback = { _, _, _->}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }
 
 /**
@@ -271,7 +272,7 @@ internal fun downloadAlbum(context: Context, mcID: String) {
  * Add single song to playlist, will ask for playlist with alertDialog TODO check if logged in
  */
 internal fun addSongToPlaylist(context: Context, songId: String) {
-    LoadPlaylistAsync(WeakReference(context), true, {}, { _,_ ->
+    LoadPlaylistAsync(WeakReference(context), true, displayLoading = {}, finishedCallback = { _, _ ->
         val playlistDatabaseHelper =
             PlaylistDatabaseHelper(context)
         val playlistList = playlistDatabaseHelper.getAllPlaylists()
@@ -314,7 +315,7 @@ internal fun addSongToPlaylist(context: Context, songId: String) {
         } else {
             displayInfo(context, context.getString(R.string.noPlaylistFound))
         }
-    }, {_,_ ->}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    }, errorCallback = { _, _ ->}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }
 
 /**
@@ -335,7 +336,8 @@ internal fun createPlaylist(context: Context) {
                     playlistNameInputLayout.findViewById<EditText>(R.id.playlistNameInput)
                 val playlistName = playlistNameEditText.text.toString()
 
-                val createPlaylistAsync = CreatePlaylistAsync(WeakReference(context), playlistName, {}, {})
+                val createPlaylistAsync = CreatePlaylistAsync(WeakReference(context), playlistName, finishedCallback = {},
+                    errorCallback = {})
                 createPlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
             }
             setView(playlistNameInputLayout)
@@ -364,7 +366,8 @@ internal fun deletePlaylist(context: Context, playlistId: String) {
     val alertDialogBuilder = AlertDialog.Builder(context)
     alertDialogBuilder.setTitle(context.getString(R.string.deletePlaylistMsg))
     alertDialogBuilder.setPositiveButton(context.getString(R.string.yes)) { _, _ ->
-        val deletePlaylistAsync = DeletePlaylistAsync(WeakReference(context), playlistId, {}, {})
+        val deletePlaylistAsync = DeletePlaylistAsync(WeakReference(context), playlistId, finishedCallback = {},
+            errorCallback = {})
         deletePlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
     alertDialogBuilder.setNegativeButton(context.getString(R.string.no)) { _, _ -> }
@@ -400,7 +403,8 @@ internal fun deletePlaylistSong(
         val songDeleteIndex = playlistMax - index
 
         val deletePlaylistTrackAsync =
-            DeletePlaylistTrackAsync(WeakReference(context), songId, playlistId, songDeleteIndex, {_,_,_ ->}, {_,_,_->})
+            DeletePlaylistTrackAsync(WeakReference(context), songId, playlistId, songDeleteIndex, finishedCallback = {_,_,_ ->},
+                errorCallback = { _, _, _->})
         deletePlaylistTrackAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 }

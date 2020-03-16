@@ -525,7 +525,7 @@ class HomeHandler {
 
             LoadSongListAsync(WeakReference(view.context), forceReload, 0, {
                 swipeRefreshLayout.isRefreshing = true
-            }, { _,_ ,_->
+            }, { _, _, _ ->
                 BackgroundAsync({
                     val songIdList = catalogSongDatabaseHelper.getSongs(0, 50)
 
@@ -536,7 +536,7 @@ class HomeHandler {
                 }, {
                     displayData()
                 }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-            }, {_, _, _ ->}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+            }, { _, _, _ -> }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         } else {
             displayData()
         }
@@ -551,25 +551,30 @@ class HomeHandler {
         footerAdapter: ItemAdapter<ProgressItem>
     ) {
         if (initDone) {
-            LoadSongListAsync(WeakReference(view.context), false, catalogViewData.size, {}, { _,_,_ ->
-                val catalogSongDatabaseHelper =
-                    CatalogSongDatabaseHelper(view.context)
+            LoadSongListAsync(WeakReference(view.context),
+                false,
+                catalogViewData.size,
+                displayLoading = {},
+                finishedCallback = { _, _, _ ->
+                    val catalogSongDatabaseHelper =
+                        CatalogSongDatabaseHelper(view.context)
 
-                val songList =
-                    catalogSongDatabaseHelper.getSongs(catalogViewData.size.toLong(), 50)
+                    val songList =
+                        catalogSongDatabaseHelper.getSongs(catalogViewData.size.toLong(), 50)
 
-                for (i in (songList.size - 1 downTo 0)) {
-                    val catalogItem = CatalogItem(songList[i].songId)
+                    for (i in (songList.size - 1 downTo 0)) {
+                        val catalogItem = CatalogItem(songList[i].songId)
 
-                    itemAdapter.add(
-                        catalogItem
-                    )
+                        itemAdapter.add(
+                            catalogItem
+                        )
 
-                    catalogViewData.add(catalogItem)
+                        catalogViewData.add(catalogItem)
 
-                    footerAdapter.clear()
-                }
-            }, { _,_,_ ->}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                        footerAdapter.clear()
+                    }
+                },
+                errorCallback = { _, _, _ -> }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         }
     }
 
@@ -613,21 +618,21 @@ class HomeHandler {
             LoadAlbumListAsync(
                 contextReference,
                 forceReload,
-                0, {
+                0, displayLoading = {
                     swipeRefreshLayout.isRefreshing = true
                 }
-            , { _,_,_->
-                BackgroundAsync({
-                    val albumList = albumDatabaseHelper.getAlbums(0, 50)
+                , finishedCallback = { _, _, _ ->
+                    BackgroundAsync({
+                        val albumList = albumDatabaseHelper.getAlbums(0, 50)
 
-                    for (i in (albumList.size - 1 downTo 0)) {
-                        albumViewData.add(AlbumItem(albumList[i].albumId))
-                    }
-                }, {
-                    displayData()
-                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                        for (i in (albumList.size - 1 downTo 0)) {
+                            albumViewData.add(AlbumItem(albumList[i].albumId))
+                        }
+                    }, {
+                        displayData()
+                    }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 
-            }, {_,_,_->}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                }, errorCallback = { _, _, _ -> }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         } else {
             displayData()
         }
@@ -643,7 +648,7 @@ class HomeHandler {
     ) {
         if (initDone) {
             LoadAlbumListAsync(WeakReference(view.context),
-                false, albumViewData.size, {}, { _,_,_ ->
+                false, albumViewData.size, displayLoading = {}, finishedCallback = { _, _, _ ->
                     val albumDatabaseHelper =
                         AlbumDatabaseHelper(view.context)
                     val albumList =
@@ -661,7 +666,7 @@ class HomeHandler {
                         footerAdapter.clear()
                     }
 
-                }, {_,_,_ ->}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                }, errorCallback = { _, _, _ -> }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         }
     }
 
@@ -711,29 +716,29 @@ class HomeHandler {
                 contextReference,
                 forceReload,
                 albumId,
-                mcId, {
+                mcId, displayLoading = {
                     swipeRefreshLayout.isRefreshing = true
                 }
-            , { _,_,_,_->
-                BackgroundAsync({
-                    val albumItemDatabaseHelper =
-                        AlbumItemDatabaseHelper(contextReference.get()!!, albumId)
-                    val albumItemList = albumItemDatabaseHelper.getAllData()
+                , finishedCallback = { _, _, _, _ ->
+                    BackgroundAsync({
+                        val albumItemDatabaseHelper =
+                            AlbumItemDatabaseHelper(contextReference.get()!!, albumId)
+                        val albumItemList = albumItemDatabaseHelper.getAllData()
 
-                    val dbSongs = ArrayList<CatalogItem>()
+                        val dbSongs = ArrayList<CatalogItem>()
 
-                    for (albumItem in albumItemList) {
-                        dbSongs.add(
-                            CatalogItem(albumItem.songId)
-                        )
-                    }
+                        for (albumItem in albumItemList) {
+                            dbSongs.add(
+                                CatalogItem(albumItem.songId)
+                            )
+                        }
 
-                    albumContentViewData[albumId] = dbSongs
-                }, {
-                    displayData()
-                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                        albumContentViewData[albumId] = dbSongs
+                    }, {
+                        displayData()
+                    }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 
-            }, {_,_,_,_->}).executeOnExecutor(
+                }, errorCallback = { _, _, _, _ -> }).executeOnExecutor(
                 AsyncTask.THREAD_POOL_EXECUTOR
             )
         } else {
@@ -793,11 +798,11 @@ class HomeHandler {
                 contextReference,
                 searchString,
                 0
-            , { _,_,searchResults ->
-                searchResultsData[searchString] = searchResults
+                , finishedCallback = { _, _, searchResults ->
+                    searchResultsData[searchString] = searchResults
 
-                displayData()
-            }, {_,_ -> Unit}).executeOnExecutor(
+                    displayData()
+                }, errorCallback = { _, _ -> Unit }).executeOnExecutor(
                 AsyncTask.THREAD_POOL_EXECUTOR
             )
         } else {
@@ -823,14 +828,14 @@ class HomeHandler {
             contextReference,
             searchString,
             skip
-        , { _,_, searchResults ->
-            for (result in searchResults) {
-                itemAdapter.add(result)
-                searchResultsData[searchString]?.add(result)
-            }
+            , finishedCallback = { _, _, searchResults ->
+                for (result in searchResults) {
+                    itemAdapter.add(result)
+                    searchResultsData[searchString]?.add(result)
+                }
 
-            footerAdapter.clear()
-        }, {_,_ ->}).executeOnExecutor(
+                footerAdapter.clear()
+            }, errorCallback = { _, _ -> }).executeOnExecutor(
             AsyncTask.THREAD_POOL_EXECUTOR
         )
     }

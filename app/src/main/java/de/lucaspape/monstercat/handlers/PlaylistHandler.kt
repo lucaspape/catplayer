@@ -360,10 +360,10 @@ class PlaylistHandler {
 
             LoadPlaylistAsync(
                 contextReference,
-                forceReload, {
+                forceReload, displayLoading = {
                     swipeRefreshLayout.isRefreshing = true
                 }
-                , { _, _ ->
+                , finishedCallback = { _, _ ->
                     BackgroundAsync({
 
                         val playlistDatabaseHelper =
@@ -378,7 +378,7 @@ class PlaylistHandler {
                         displayData()
 
                     }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-                }, { _, _ -> }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                }, errorCallback = { _, _ -> }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         } else {
             displayData()
         }
@@ -419,10 +419,10 @@ class PlaylistHandler {
             LoadPlaylistTracksAsync(
                 contextReference,
                 forceReload,
-                playlistId, {
+                playlistId, displayLoading = {
                     swipeRefreshLayout.isRefreshing = true
                 }
-                , { _, _, _ ->
+                , finishedCallback = { _, _, _ ->
                     BackgroundAsync({
                         val playlistItemDatabaseHelper =
                             PlaylistItemDatabaseHelper(
@@ -441,7 +441,7 @@ class PlaylistHandler {
                         displayData()
                     }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 
-                }, { _, _, _ -> }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                }, errorCallback = { _, _, _ -> }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         } else {
             displayData()
         }
