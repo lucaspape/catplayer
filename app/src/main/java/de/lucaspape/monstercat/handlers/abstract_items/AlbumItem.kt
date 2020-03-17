@@ -9,6 +9,10 @@ import android.widget.TextView
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.activities.addToQueueDrawable
+import de.lucaspape.monstercat.activities.downloadDrawable
+import de.lucaspape.monstercat.activities.openInAppDrawable
+import de.lucaspape.monstercat.activities.shareDrawable
 import de.lucaspape.monstercat.database.helper.AlbumDatabaseHelper
 import de.lucaspape.monstercat.download.downloadCoverIntoImageReceiver
 import de.lucaspape.monstercat.handlers.downloadAlbum
@@ -31,10 +35,10 @@ open class AlbumItem(
             val context = view.context
 
             val itemList = arrayListOf(
-                AlertListItem(context.getString(R.string.downloadAlbum), ""),
-                AlertListItem(context.getString(R.string.addAlbumToQueue), ""),
-                AlertListItem(context.getString(R.string.shareAlbum), ""),
-                AlertListItem(context.getString(R.string.openAlbumInApp), "")
+                AlertListItem(context.getString(R.string.downloadAlbum), downloadDrawable),
+                AlertListItem(context.getString(R.string.addAlbumToQueue), addToQueueDrawable),
+                AlertListItem(context.getString(R.string.shareAlbum), shareDrawable),
+                AlertListItem(context.getString(R.string.openAlbumInApp), openInAppDrawable)
             )
 
             displayAlertDialogList(context, "", itemList) { _, item ->

@@ -12,7 +12,7 @@ import androidx.core.net.toUri
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.activities.downloadDrawable
+import de.lucaspape.monstercat.activities.*
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.download.downloadCoverIntoImageReceiver
@@ -38,11 +38,11 @@ open class CatalogItem(
             val context = view.context
 
             val itemList = arrayListOf(
-                AlertListItem(context.getString(R.string.download), ""),
-                AlertListItem(context.getString(R.string.addToQueue), ""),
-                AlertListItem(context.getString(R.string.addToPlaylist), ""),
-                AlertListItem(context.getString(R.string.shareAlbum), ""),
-                AlertListItem(context.getString(R.string.openAlbumInApp), "")
+                AlertListItem(context.getString(R.string.download), downloadDrawable),
+                AlertListItem(context.getString(R.string.addToQueue), addToQueueDrawable),
+                AlertListItem(context.getString(R.string.addToPlaylist), addToPlaylistDrawable),
+                AlertListItem(context.getString(R.string.shareAlbum), shareDrawable),
+                AlertListItem(context.getString(R.string.openAlbumInApp), openInAppDrawable)
             )
 
             displayAlertDialogList(context, "", itemList) { _, item ->
@@ -91,11 +91,11 @@ open class CatalogItem(
             val context = view.context
 
             val itemList = arrayListOf(
-                AlertListItem(context.getString(R.string.download), ""),
-                AlertListItem(context.getString(R.string.addToQueue), ""),
-                AlertListItem(context.getString(R.string.delete), ""),
-                AlertListItem(context.getString(R.string.shareAlbum), ""),
-                AlertListItem(context.getString(R.string.openAlbumInApp), "")
+                AlertListItem(context.getString(R.string.download), downloadDrawable),
+                AlertListItem(context.getString(R.string.addToQueue), addToQueueDrawable),
+                AlertListItem(context.getString(R.string.delete), deleteDrawable),
+                AlertListItem(context.getString(R.string.shareAlbum), shareDrawable),
+                AlertListItem(context.getString(R.string.openAlbumInApp), openInAppDrawable)
             )
 
             displayAlertDialogList(context, "", itemList) { _, item ->
