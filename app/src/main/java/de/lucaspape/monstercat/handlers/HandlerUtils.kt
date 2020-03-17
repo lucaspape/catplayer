@@ -1,6 +1,5 @@
 package de.lucaspape.monstercat.handlers
 
-import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -228,7 +227,7 @@ internal fun deleteDownloadedPlaylistTracks(
     playlistId: String,
     deleteFinished: () -> Unit
 ) {
-    val alertDialogBuilder = AlertDialog.Builder(context)
+    val alertDialogBuilder = MaterialAlertDialogBuilder(context)
     alertDialogBuilder.setTitle(context.getString(R.string.deletePlaylistDownloadedTracksMsg))
     alertDialogBuilder.setPositiveButton(context.getString(R.string.yes)) { _, _ ->
         val playlistItemDatabaseHelper = PlaylistItemDatabaseHelper(context, playlistId)
@@ -424,7 +423,7 @@ private fun createPlaylist(view: View, playlistName: String) {
  */
 internal fun deletePlaylist(view: View, playlistId: String) {
     val context = view.context
-    val alertDialogBuilder = AlertDialog.Builder(context)
+    val alertDialogBuilder = MaterialAlertDialogBuilder(context)
     alertDialogBuilder.setTitle(context.getString(R.string.deletePlaylistMsg))
     alertDialogBuilder.setPositiveButton(context.getString(R.string.yes)) { _, _ ->
         deletePlaylist(view, playlistId, true)
