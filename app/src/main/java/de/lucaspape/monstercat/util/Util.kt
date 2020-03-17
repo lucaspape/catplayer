@@ -155,7 +155,7 @@ fun displayAlertDialogList(
         val index = position + indexOffset
 
         if (index >= 0) {
-            onItemClick(position, listItems[index])
+            onItemClick(index, listItems[index])
             dialog.hide()
         }
 
