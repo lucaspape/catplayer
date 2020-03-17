@@ -50,7 +50,7 @@ open class AlbumItem(
                 ) { _, item ->
                     when (item.itemText) {
                         context.getString(R.string.downloadAlbum) -> downloadAlbum(
-                            context,
+                            view,
                             id
                         )
                         context.getString(R.string.addAlbumToQueue) -> playAlbumNext(

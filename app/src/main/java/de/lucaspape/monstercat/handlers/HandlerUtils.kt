@@ -13,6 +13,7 @@ import android.widget.EditText
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.Volley
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.background.BackgroundService.Companion.loadContinuousSongListAsyncTask
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
@@ -99,11 +100,12 @@ internal fun playSongFromId(
     loadContinuousSongListAsyncTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }
 
-/**
- * Play an entire album after the current song
- */
-internal fun playAlbumNext(view: View, mcID: String) {
-    val context = view.context
+private fun loadAlbumTracks(
+    context: Context,
+    mcID: String,
+    finishedCallback: (trackIds: ArrayList<String>) -> Unit,
+    errorCallback: () -> Unit
+) {
     val requestUrl =
         context.getString(R.string.loadAlbumSongsUrl) + "/" + mcID
 
@@ -123,29 +125,40 @@ internal fun playAlbumNext(view: View, mcID: String) {
                 }
             }
 
-            songQueue.add(idArray[0])
-
-            loadContinuousSongListAsyncTask?.cancel(true)
-
-            loadContinuousSongListAsyncTask = BackgroundAsync({
-                for (i in (1 until idArray.size)) {
-                    songQueue.add(idArray[i])
-                }
-            }, {})
-
-            loadContinuousSongListAsyncTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+            finishedCallback(idArray)
         },
         Response.ErrorListener {
-            displaySnackbar(
-                view,
-                context.getString(R.string.errorRetrieveAlbumData),
-                view.context.getString(R.string.retry)
-            ) {
-                playAlbumNext(view, mcID)
-            }
+            errorCallback()
         })
 
     albumRequestQueue.add(albumRequest)
+}
+
+/**
+ * Play an entire album after the current song
+ */
+internal fun playAlbumNext(view: View, mcID: String) {
+    loadAlbumTracks(view.context, mcID, finishedCallback = { idArray ->
+        prioritySongQueue.add(idArray[0])
+
+        loadContinuousSongListAsyncTask?.cancel(true)
+
+        loadContinuousSongListAsyncTask = BackgroundAsync({
+            for (i in (1 until idArray.size)) {
+                prioritySongQueue.add(idArray[i])
+            }
+        }, {})
+
+        loadContinuousSongListAsyncTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    }, errorCallback = {
+        displaySnackbar(
+            view,
+            view.context.getString(R.string.errorRetrieveAlbumData),
+            view.context.getString(R.string.retry)
+        ) {
+            playAlbumNext(view, mcID)
+        }
+    })
 }
 
 internal fun playPlaylistNext(context: Context, playlistId: String) {
@@ -160,7 +173,7 @@ internal fun playPlaylistNext(context: Context, playlistId: String) {
             context,
             playlistItemList[0].songId
         )?.songId?.let { songId ->
-            songQueue.add(songId)
+            prioritySongQueue.add(songId)
         }
 
         loadContinuousSongListAsyncTask?.cancel(true)
@@ -171,7 +184,7 @@ internal fun playPlaylistNext(context: Context, playlistId: String) {
                     context,
                     playlistItemList[i].songId
                 )?.songId?.let { songId ->
-                    songQueue.add(songId)
+                    prioritySongQueue.add(songId)
                 }
             }
         }, {})
@@ -252,38 +265,23 @@ internal fun deleteDownloadedPlaylistTracks(
 /**
  * Download an entire album
  */
-internal fun downloadAlbum(context: Context, mcID: String) {
-    val requestUrl =
-        context.getString(R.string.loadAlbumSongsUrl) + "/" + mcID
+internal fun downloadAlbum(view: View, mcID: String) {
+    loadAlbumTracks(view.context, mcID, finishedCallback = { idArray ->
+        val databaseHelper = SongDatabaseHelper(view.context)
 
-    val albumRequestQueue = Volley.newRequestQueue(context)
-
-    val albumRequest = AuthorizedRequest(Request.Method.GET, requestUrl,
-        sid,
-        Response.Listener { response ->
-            val jsonObject = JSONObject(response)
-            val jsonArray = jsonObject.getJSONArray("tracks")
-
-            val idArray = ArrayList<String>()
-
-            for (i in (0 until jsonArray.length())) {
-                parseSongToDB(jsonArray.getJSONObject(i), context)?.let { id ->
-                    idArray.add(id)
-                }
-            }
-
-            val databaseHelper = SongDatabaseHelper(context)
-
-            for (id in idArray) {
-                val song = databaseHelper.getSong(context, id)
-                song?.songId?.let { addDownloadSong(context, it) {} }
-            }
-        },
-        Response.ErrorListener {
-            displayInfo(context, context.getString(R.string.errorRetrieveAlbumData))
-        })
-
-    albumRequestQueue.add(albumRequest)
+        for (id in idArray) {
+            val song = databaseHelper.getSong(view.context, id)
+            song?.songId?.let { addDownloadSong(view.context, it) {} }
+        }
+    }, errorCallback = {
+        displaySnackbar(
+            view,
+            view.context.getString(R.string.errorRetrieveAlbumData),
+            view.context.getString(R.string.retry)
+        ) {
+            downloadAlbum(view, mcID)
+        }
+    })
 }
 
 /**
@@ -369,13 +367,13 @@ internal fun createPlaylist(view: View) {
     if (loggedIn) {
         val context = view.context
 
-        val layoutInflater =
-            context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        MaterialAlertDialogBuilder(context).apply {
+            val layoutInflater =
+                context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
-        val playlistNameInputLayout =
-            layoutInflater.inflate(R.layout.playlistname_input_layout, null)
+            val playlistNameInputLayout =
+                layoutInflater.inflate(R.layout.playlistname_input_layout, null)
 
-        AlertDialog.Builder(context).apply {
             setTitle(context.getString(R.string.createPlaylist))
             setPositiveButton(context.getString(R.string.ok)) { _, _ ->
                 val playlistNameEditText =
