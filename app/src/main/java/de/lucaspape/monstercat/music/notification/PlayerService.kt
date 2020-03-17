@@ -5,11 +5,11 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.media.AudioManager
 import android.os.IBinder
-import de.lucaspape.monstercat.activities.noisyReceiver
+import de.lucaspape.monstercat.ui.activities.noisyReceiver
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.music.contextReference
 import de.lucaspape.monstercat.music.exoPlayer
-import de.lucaspape.monstercat.music.setCover
+import de.lucaspape.monstercat.music.util.setCover
 import de.lucaspape.monstercat.music.streamInfoUpdateAsync
 import java.lang.IllegalArgumentException
 
@@ -46,7 +46,14 @@ class PlayerService : Service() {
                 artist = song.artist
                 version = song.version
 
-                setCover(context, song.title, song.version, song.artist, song.artistId, song.albumId) {
+                setCover(
+                    context,
+                    song.title,
+                    song.version,
+                    song.artist,
+                    song.artistId,
+                    song.albumId
+                ) {
                     startForeground(
                         musicNotificationID,
                         createPlayerNotification(

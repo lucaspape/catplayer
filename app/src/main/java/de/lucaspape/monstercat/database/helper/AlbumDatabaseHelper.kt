@@ -6,7 +6,7 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
-import de.lucaspape.monstercat.database.Album
+import de.lucaspape.monstercat.database.objects.Album
 import java.lang.IndexOutOfBoundsException
 
 class AlbumDatabaseHelper(context: Context) :
@@ -71,7 +71,7 @@ class AlbumDatabaseHelper(context: Context) :
         return id
     }
 
-    fun getAlbumFromMcId(mcID: String):Album?{
+    fun getAlbumFromMcId(mcID: String): Album?{
         val db = readableDatabase
         val cursor: Cursor
 

@@ -7,9 +7,7 @@ import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
-import de.lucaspape.monstercat.util.displayInfo
 import de.lucaspape.monstercat.util.sid
 import org.json.JSONObject
 import java.lang.ref.WeakReference

@@ -6,7 +6,7 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
-import de.lucaspape.monstercat.database.Song
+import de.lucaspape.monstercat.database.objects.Song
 import java.lang.IndexOutOfBoundsException
 import java.lang.ref.WeakReference
 
@@ -126,9 +126,12 @@ class SongDatabaseHelper(context: Context) :
                         cursor.getString(cursor.getColumnIndex(Song.COLUMN_ARTIST)),
                         cursor.getString(cursor.getColumnIndex(Song.COLUMN_ARTIST_ID)),
                         cursor.getString(cursor.getColumnIndex(Song.COLUMN_COVER_URL)),
-                        cursor.getString(cursor.getColumnIndex(Song.COLUMN_DOWNLOADABLE))!!.toBoolean(),
-                        cursor.getString(cursor.getColumnIndex(Song.COLUMN_STREAMABLE))!!.toBoolean(),
-                        cursor.getString(cursor.getColumnIndex(Song.COLUMN_INEARLYACCESS))!!.toBoolean()
+                        cursor.getString(cursor.getColumnIndex(Song.COLUMN_DOWNLOADABLE))!!
+                            .toBoolean(),
+                        cursor.getString(cursor.getColumnIndex(Song.COLUMN_STREAMABLE))!!
+                            .toBoolean(),
+                        cursor.getString(cursor.getColumnIndex(Song.COLUMN_INEARLYACCESS))!!
+                            .toBoolean()
                     )
 
                     cursor.close()

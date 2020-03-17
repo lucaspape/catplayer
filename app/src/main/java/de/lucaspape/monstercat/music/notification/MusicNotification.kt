@@ -10,7 +10,7 @@ import android.graphics.Color
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.activities.MainActivity
+import de.lucaspape.monstercat.ui.activities.MainActivity
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.contextReference
 import java.lang.IllegalArgumentException

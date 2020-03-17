@@ -9,7 +9,7 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.activities.MainActivity
+import de.lucaspape.monstercat.ui.activities.MainActivity
 
 private const val downloadNotificationID = 2
 

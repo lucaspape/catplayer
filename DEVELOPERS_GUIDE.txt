@@ -24,7 +24,7 @@ using the parameters "email" and "password" inside the JSON body.
 The API server will return a cookie inside the header called "sid".
 Please look into "java/de.lucaspape.monstercat.auth/Auth.kt"
 
-All content data is retrieved using ASYNC tasks. These can be found in "java/de.lucaspape.monstercat.handlers/async“.
+All content data is retrieved using ASYNC tasks. These can be found in "java/de.lucaspape.monstercat.ui.handlers/async“.
 These ASYNC tasks are started by the classes HomeHandler and PlaylistHandler (in the same package).
 
 The UI is mainly controlled by the HomeFragment and PlaylistFragment (both of them create a new object of their Handler classes).

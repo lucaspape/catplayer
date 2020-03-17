@@ -5,7 +5,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
-import de.lucaspape.monstercat.database.AlbumItem
+import de.lucaspape.monstercat.database.objects.AlbumItem
 
 class AlbumItemDatabaseHelper(context: Context, var albumId: String) :
     SQLiteOpenHelper(
@@ -34,11 +34,21 @@ class AlbumItemDatabaseHelper(context: Context, var albumId: String) :
     }
 
     override fun onOpen(db: SQLiteDatabase?) {
-        db?.execSQL(AlbumItem(albumId, 0, "").CREATE_TABLE)
+        db?.execSQL(
+            AlbumItem(
+                albumId,
+                0,
+                ""
+            ).CREATE_TABLE)
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
-        db?.execSQL(AlbumItem(albumId, 0, "").CREATE_TABLE)
+        db?.execSQL(
+            AlbumItem(
+                albumId,
+                0,
+                ""
+            ).CREATE_TABLE)
     }
 
     fun reCreateTable() {
@@ -61,7 +71,12 @@ class AlbumItemDatabaseHelper(context: Context, var albumId: String) :
 
         values.put(AlbumItem.COLUMN_SONG_ID, songId)
 
-        val id = db.insert(AlbumItem(albumId, 0, "").TABLE_NAME, null, values)
+        val id = db.insert(
+            AlbumItem(
+                albumId,
+                0,
+                ""
+            ).TABLE_NAME, null, values)
         db.close()
         return id
     }
@@ -71,7 +86,11 @@ class AlbumItemDatabaseHelper(context: Context, var albumId: String) :
 
         try {
             val cursor = db.query(
-                AlbumItem(albumId, 0, "").TABLE_NAME, arrayOf(
+                AlbumItem(
+                    albumId,
+                    0,
+                    ""
+                ).TABLE_NAME, arrayOf(
                     AlbumItem.COLUMN_ID,
                     AlbumItem.COLUMN_SONG_ID
                 ),
@@ -82,11 +101,12 @@ class AlbumItemDatabaseHelper(context: Context, var albumId: String) :
             cursor?.moveToFirst()
 
             return try {
-                val albumItem = AlbumItem(
-                    albumId,
-                    cursor.getLong(cursor.getColumnIndex(AlbumItem.COLUMN_ID)),
-                    cursor.getString(cursor.getColumnIndex(AlbumItem.COLUMN_SONG_ID))
-                )
+                val albumItem =
+                    AlbumItem(
+                        albumId,
+                        cursor.getLong(cursor.getColumnIndex(AlbumItem.COLUMN_ID)),
+                        cursor.getString(cursor.getColumnIndex(AlbumItem.COLUMN_SONG_ID))
+                    )
 
                 cursor.close()
 
@@ -116,11 +136,12 @@ class AlbumItemDatabaseHelper(context: Context, var albumId: String) :
 
         if (cursor.moveToFirst()) {
             do {
-                val newAlbumItem = AlbumItem(
-                    albumId,
-                    cursor.getLong(cursor.getColumnIndex(AlbumItem.COLUMN_ID)),
-                    cursor.getString(cursor.getColumnIndex(AlbumItem.COLUMN_SONG_ID))
-                )
+                val newAlbumItem =
+                    AlbumItem(
+                        albumId,
+                        cursor.getLong(cursor.getColumnIndex(AlbumItem.COLUMN_ID)),
+                        cursor.getString(cursor.getColumnIndex(AlbumItem.COLUMN_SONG_ID))
+                    )
 
                 albumItems.add(newAlbumItem)
             } while (cursor.moveToNext())

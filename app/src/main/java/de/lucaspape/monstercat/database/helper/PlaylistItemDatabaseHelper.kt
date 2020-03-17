@@ -4,7 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import de.lucaspape.monstercat.database.PlaylistItem
+import de.lucaspape.monstercat.database.objects.PlaylistItem
 
 class PlaylistItemDatabaseHelper(context: Context, var playlistId: String) :
     SQLiteOpenHelper(
@@ -33,11 +33,21 @@ class PlaylistItemDatabaseHelper(context: Context, var playlistId: String) :
     }
 
     override fun onOpen(db: SQLiteDatabase?) {
-        db?.execSQL(PlaylistItem(playlistId, 0, "").CREATE_TABLE)
+        db?.execSQL(
+            PlaylistItem(
+                playlistId,
+                0,
+                ""
+            ).CREATE_TABLE)
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
-        db?.execSQL(PlaylistItem(playlistId, 0, "").CREATE_TABLE)
+        db?.execSQL(
+            PlaylistItem(
+                playlistId,
+                0,
+                ""
+            ).CREATE_TABLE)
     }
 
     fun reCreateTable() {
@@ -60,7 +70,12 @@ class PlaylistItemDatabaseHelper(context: Context, var playlistId: String) :
 
         values.put(PlaylistItem.COLUMN_SONG_ID, songId)
 
-        val id = db.insert(PlaylistItem(playlistId, 0, "").TABLE_NAME, null, values)
+        val id = db.insert(
+            PlaylistItem(
+                playlistId,
+                0,
+                ""
+            ).TABLE_NAME, null, values)
         db.close()
         return id
     }
@@ -80,11 +95,12 @@ class PlaylistItemDatabaseHelper(context: Context, var playlistId: String) :
 
         if (cursor.moveToFirst()) {
             do {
-                val newPlaylistItem = PlaylistItem(
-                    playlistId,
-                    cursor.getLong(cursor.getColumnIndex(PlaylistItem.COLUMN_ID)),
-                    cursor.getString(cursor.getColumnIndex(PlaylistItem.COLUMN_SONG_ID))
-                )
+                val newPlaylistItem =
+                    PlaylistItem(
+                        playlistId,
+                        cursor.getLong(cursor.getColumnIndex(PlaylistItem.COLUMN_ID)),
+                        cursor.getString(cursor.getColumnIndex(PlaylistItem.COLUMN_SONG_ID))
+                    )
 
                 playlistItems.add(newPlaylistItem)
             } while (cursor.moveToNext())

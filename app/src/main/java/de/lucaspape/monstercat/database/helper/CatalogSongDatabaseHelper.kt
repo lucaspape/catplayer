@@ -6,7 +6,7 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
-import de.lucaspape.monstercat.database.CatalogSong
+import de.lucaspape.monstercat.database.objects.CatalogSong
 import java.lang.IndexOutOfBoundsException
 
 class CatalogSongDatabaseHelper(context: Context) :
@@ -70,10 +70,11 @@ class CatalogSongDatabaseHelper(context: Context) :
             cursor.moveToFirst()
 
             return try {
-                val catalogSongs = CatalogSong(
-                    cursor.getInt(cursor.getColumnIndex(CatalogSong.COLUMN_ID)),
-                    cursor.getString(cursor.getColumnIndex(CatalogSong.COLUMN_SONG_ID))
-                )
+                val catalogSongs =
+                    CatalogSong(
+                        cursor.getInt(cursor.getColumnIndex(CatalogSong.COLUMN_ID)),
+                        cursor.getString(cursor.getColumnIndex(CatalogSong.COLUMN_SONG_ID))
+                    )
 
                 cursor.close()
 
@@ -98,10 +99,11 @@ class CatalogSongDatabaseHelper(context: Context) :
 
         if (cursor.moveToFirst()) {
             do {
-                val catalogSong = CatalogSong(
-                    cursor.getInt(cursor.getColumnIndex(CatalogSong.COLUMN_ID)),
-                    cursor.getString(cursor.getColumnIndex(CatalogSong.COLUMN_SONG_ID))
-                )
+                val catalogSong =
+                    CatalogSong(
+                        cursor.getInt(cursor.getColumnIndex(CatalogSong.COLUMN_ID)),
+                        cursor.getString(cursor.getColumnIndex(CatalogSong.COLUMN_SONG_ID))
+                    )
 
                 catalogSongs.add(catalogSong)
             } while (cursor.moveToNext())

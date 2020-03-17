@@ -8,11 +8,13 @@ import android.media.AudioManager
 import android.media.session.MediaSession
 import android.support.v4.media.session.MediaSessionCompat
 import com.google.android.exoplayer2.ExoPlayer
-import de.lucaspape.monstercat.database.Song
+import de.lucaspape.monstercat.database.objects.Song
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.music.notification.startPlayerService
 import de.lucaspape.monstercat.music.notification.stopPlayerService
 import de.lucaspape.monstercat.music.notification.updateNotification
+import de.lucaspape.monstercat.music.util.*
+import de.lucaspape.monstercat.music.util.playSong
 import java.lang.ref.WeakReference
 import kotlin.random.Random
 
@@ -46,7 +48,7 @@ var mediaSession: MediaSessionCompat? = null
 
 private var sessionCreated = false
 
-var streamInfoUpdateAsync:StreamInfoUpdateAsync? = null
+var streamInfoUpdateAsync: StreamInfoUpdateAsync? = null
 
 val audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener {
     pause()
@@ -142,7 +144,11 @@ private fun resume() {
                     startPlayerService(song.songId)
 
                     //UI stuff
-                    setTitle(song.title, song.version, song.artist)
+                    setTitle(
+                        song.title,
+                        song.version,
+                        song.artist
+                    )
 
                     setCover(
                         context,
@@ -152,8 +158,12 @@ private fun resume() {
                         song.artistId,
                         song.albumId
                     ) {
-                        setPlayButtonImage(context)
-                        startSeekBarUpdate(true)
+                        setPlayButtonImage(
+                            context
+                        )
+                        startSeekBarUpdate(
+                            true
+                        )
                         updateNotification(
                             song.title,
                             song.version,
