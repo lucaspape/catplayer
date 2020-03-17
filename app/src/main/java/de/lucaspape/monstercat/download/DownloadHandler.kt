@@ -36,71 +36,12 @@ fun addDownloadSong(context: Context, songId: String, downloadFinished: () -> Un
     }
 }
 
-fun downloadArtistImageIntoImageReceiver(
+private fun downloadImageUrlIntoImageReceiver(
     context: Context,
     imageReceiver: ImageReceiverInterface,
-    artistId: String
-) {
-    val cacheBitmap = bitmapCache[artistId]?.get()
-
-    val settings = Settings(context)
-
-    if (cacheBitmap != null) {
-        imageReceiver.setBitmap(artistId, cacheBitmap)
-    } else {
-        //TODO placeholder
-
-        val url = context.getString(R.string.artistContentUrl) + "$artistId/image"
-
-        val cacheFile = File(context.cacheDir.toString() + "/$artistId.png")
-
-        if (cacheFile.exists()) {
-            val bitmap = BitmapFactory.decodeFile(cacheFile.absolutePath)
-            imageReceiver.setBitmap(artistId, bitmap)
-            bitmapCache[artistId] = SoftReference(bitmap)
-        } else {
-            if (wifiConnected(context) == true || settings.getBoolean(context.getString(R.string.downloadCoversOverMobileSetting)) == true) {
-                val picassoTarget = object : com.squareup.picasso.Target {
-                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
-                        imageReceiver.setDrawable(artistId, placeHolderDrawable)
-                    }
-
-                    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                        imageReceiver.setDrawable(artistId, errorDrawable)
-                    }
-
-                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                        imageReceiver.setBitmap(artistId, bitmap)
-
-                        //possible that it changed by this time
-                        if (!cacheFile.exists()) {
-                            FileOutputStream(cacheFile).use { out ->
-                                bitmap?.compress(Bitmap.CompressFormat.PNG, 100, out)
-                            }
-                        }
-
-                        bitmapCache[artistId] = SoftReference(bitmap)
-                    }
-                }
-
-                //to prevent garbage collect
-                targetList.add(SoftReference(picassoTarget))
-
-                Picasso.get()
-                    .load("$url?image_width=256")
-                    .into(picassoTarget)
-            } else {
-                imageReceiver.setDrawable(artistId, null)
-            }
-        }
-    }
-}
-
-fun downloadCoverIntoImageReceiver(
-    context: Context,
-    imageReceiver: ImageReceiverInterface,
-    albumId: String,
-    lowRes: Boolean
+    lowRes: Boolean,
+    imageId: String,
+    url: String
 ) {
     val settings = Settings(context)
     val resolution = if (!lowRes) {
@@ -109,10 +50,10 @@ fun downloadCoverIntoImageReceiver(
         settings.getInt(context.getString(R.string.secondaryCoverResolutionSetting))
     }
 
-    val cacheBitmap = bitmapCache[albumId + resolution]?.get()
+    val cacheBitmap = bitmapCache[imageId + resolution]?.get()
 
     if (cacheBitmap != null) {
-        imageReceiver.setBitmap(albumId, cacheBitmap)
+        imageReceiver.setBitmap(imageId, cacheBitmap)
     } else {
         val placeholder = if (!lowRes) {
             Drawable.createFromPath(context.dataDir.toString() + "/fallback.jpg")
@@ -120,27 +61,25 @@ fun downloadCoverIntoImageReceiver(
             Drawable.createFromPath(context.dataDir.toString() + "/fallback_low.jpg")
         }
 
-        val url = context.getString(R.string.trackContentUrl) + "$albumId/cover"
-
-        val cacheFile = File(context.cacheDir.toString() + "/$albumId.png.$resolution")
+        val cacheFile = File(context.cacheDir.toString() + "/$imageId-$resolution.png")
 
         if (cacheFile.exists()) {
             val bitmap = BitmapFactory.decodeFile(cacheFile.absolutePath)
-            imageReceiver.setBitmap(albumId, bitmap)
-            bitmapCache[albumId + resolution] = SoftReference(bitmap)
+            imageReceiver.setBitmap(imageId, bitmap)
+            bitmapCache[imageId + resolution] = SoftReference(bitmap)
         } else {
             if (wifiConnected(context) == true || settings.getBoolean(context.getString(R.string.downloadCoversOverMobileSetting)) == true) {
                 val picassoTarget = object : com.squareup.picasso.Target {
                     override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
-                        imageReceiver.setDrawable(albumId, placeHolderDrawable)
+                        imageReceiver.setDrawable(imageId, placeHolderDrawable)
                     }
 
                     override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                        imageReceiver.setDrawable(albumId, errorDrawable)
+                        imageReceiver.setDrawable(imageId, errorDrawable)
                     }
 
                     override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                        imageReceiver.setBitmap(albumId, bitmap)
+                        imageReceiver.setBitmap(imageId, bitmap)
 
                         //possible that it changed by this time
                         if (!cacheFile.exists()) {
@@ -149,7 +88,7 @@ fun downloadCoverIntoImageReceiver(
                             }
                         }
 
-                        bitmapCache[albumId + resolution] = SoftReference(bitmap)
+                        bitmapCache[imageId + resolution] = SoftReference(bitmap)
                     }
                 }
 
@@ -168,8 +107,37 @@ fun downloadCoverIntoImageReceiver(
                         .into(picassoTarget)
                 }
             } else {
-                imageReceiver.setDrawable(albumId, placeholder)
+                imageReceiver.setDrawable(imageId, placeholder)
             }
         }
     }
+}
+
+fun downloadArtistImageIntoImageReceiver(
+    context: Context,
+    imageReceiver: ImageReceiverInterface,
+    artistId: String
+) {
+    downloadImageUrlIntoImageReceiver(
+        context,
+        imageReceiver,
+        true,
+        artistId,
+        context.getString(R.string.artistContentUrl) + "$artistId/image"
+    )
+}
+
+fun downloadCoverIntoImageReceiver(
+    context: Context,
+    imageReceiver: ImageReceiverInterface,
+    albumId: String,
+    lowRes: Boolean
+) {
+    downloadImageUrlIntoImageReceiver(
+        context,
+        imageReceiver,
+        lowRes,
+        albumId,
+        context.getString(R.string.trackContentUrl) + "$albumId/cover"
+    )
 }
