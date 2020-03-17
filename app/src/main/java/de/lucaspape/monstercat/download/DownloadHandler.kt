@@ -22,7 +22,6 @@ import java.lang.ref.WeakReference
 internal val downloadList = ArrayList<SoftReference<DownloadObject>>()
 
 internal var downloadedSongs = 0
-internal var streamDownloadedSongs = 0
 
 internal val targetList = ArrayList<SoftReference<com.squareup.picasso.Target>>()
 internal val bitmapCache = HashMap<String, SoftReference<Bitmap?>>()

@@ -20,8 +20,6 @@ internal const val NEXT_ACTION = "de.lucaspape.monstercat.next"
 internal const val PREV_ACTION = "de.lucaspape.monstercat.prev"
 internal const val CLOSE_ACTION = "de.lucaspape.monstercat.close"
 
-//notification var
-internal const val musicChannelID = "Music Notification"
 internal const val musicNotificationID = 1
 
 private var lastButtonPress: Long = 0
@@ -30,10 +28,10 @@ private var playerServiceIntent: Intent? = null
 
 private var serviceRunning = false
 
-private var prevReceiver:BroadcastReceiver? = null
-private var playPauseReceiver:BroadcastReceiver? = null
-private var nextReceiver:BroadcastReceiver? = null
-private var closeReceiver:BroadcastReceiver? = null
+private var prevReceiver: BroadcastReceiver? = null
+private var playPauseReceiver: BroadcastReceiver? = null
+private var nextReceiver: BroadcastReceiver? = null
+private var closeReceiver: BroadcastReceiver? = null
 
 internal fun createPlayerNotification(
     title: String,
@@ -44,7 +42,7 @@ internal fun createPlayerNotification(
     contextReference?.get()?.let { context ->
         val notificationBuilder = NotificationCompat.Builder(
             context,
-            musicChannelID
+            context.getString(R.string.musicNotificationChannelId)
         )
 
         val notificationStyle = androidx.media.app.NotificationCompat.MediaStyle()
@@ -74,7 +72,7 @@ internal fun createPlayerNotification(
             context.unregisterReceiver(playPauseReceiver)
             context.unregisterReceiver(nextReceiver)
             context.unregisterReceiver(closeReceiver)
-        }catch (e: IllegalArgumentException){
+        } catch (e: IllegalArgumentException) {
 
         }
 
@@ -175,7 +173,8 @@ class NotificationIntentReceiver : BroadcastReceiver() {
 /**
  * Show notification
  */
-internal fun startPlayerService(songId:String?
+internal fun startPlayerService(
+    songId: String?
 ) {
     if (!serviceRunning) {
         playerServiceIntent =
@@ -230,11 +229,15 @@ fun updateNotification(
 internal fun createNotificationChannel() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         contextReference?.get()?.let { context ->
-            val channelName = "Music Notification"
-            val channelDescription = "Handy dandy description"
+            val channelName = context.getString(R.string.musicNotificationChannelId)
+            val channelDescription = context.getString(R.string.musicNotificationDescription)
             val importance = NotificationManager.IMPORTANCE_LOW
 
-            val notificationChannel = NotificationChannel(musicChannelID, channelName, importance)
+            val notificationChannel = NotificationChannel(
+                context.getString(R.string.musicNotificationChannelId),
+                channelName,
+                importance
+            )
 
             notificationChannel.description = channelDescription
 

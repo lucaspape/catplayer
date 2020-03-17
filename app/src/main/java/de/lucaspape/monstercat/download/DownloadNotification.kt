@@ -11,8 +11,6 @@ import androidx.core.app.NotificationManagerCompat
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.activities.MainActivity
 
-//notification var
-private const val channelID = "Download Notification"
 private const val downloadNotificationID = 2
 
 internal fun showDownloadNotification(
@@ -28,7 +26,10 @@ internal fun showDownloadNotification(
     val openActivityPendingIntent =
         PendingIntent.getActivity(context, 0, openActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
-    val notificationBuilder = NotificationCompat.Builder(context, channelID)
+    val notificationBuilder = NotificationCompat.Builder(
+        context,
+        context.getString(R.string.downloadNotificationChannelId)
+    )
     notificationBuilder.setContentTitle(shownTitle)
     notificationBuilder.setSmallIcon(R.drawable.ic_file_download_black_24dp)
     notificationBuilder.priority = NotificationCompat.PRIORITY_LOW
@@ -49,11 +50,15 @@ fun hideDownloadNotification(context: Context) {
 
 private fun createDownloadNotificationChannel(context: Context) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        val channelName = "Download Notification"
-        val channelDescription = "Handy dandy description"
+        val channelName = context.getString(R.string.downloadNotificationChannelId)
+        val channelDescription = context.getString(R.string.downloadNotificationDescription)
         val importance = NotificationManager.IMPORTANCE_LOW
 
-        val notificationChannel = NotificationChannel(channelID, channelName, importance)
+        val notificationChannel = NotificationChannel(
+            context.getString(R.string.downloadNotificationChannelId),
+            channelName,
+            importance
+        )
 
         notificationChannel.description = channelDescription
 
