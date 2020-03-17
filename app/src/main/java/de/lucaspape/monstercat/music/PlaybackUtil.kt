@@ -5,7 +5,6 @@ import android.media.AudioManager
 import android.os.AsyncTask
 import com.google.android.exoplayer2.SimpleExoPlayer
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.background.BackgroundService
 import de.lucaspape.monstercat.database.Song
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.music.notification.startPlayerService
@@ -53,7 +52,7 @@ internal fun playSong(
     playWhenReady: Boolean,
     progress: Long?
 ) {
-    BackgroundService.streamInfoUpdateAsync?.cancel(true)
+    streamInfoUpdateAsync?.cancel(true)
 
     val audioFocus = if (requestAudioFocus) {
         requestAudioFocus(context)
@@ -114,7 +113,7 @@ internal fun playSong(
 
 fun playStream(stream: Stream) {
     contextReference?.get()?.let { context ->
-        BackgroundService.streamInfoUpdateAsync?.cancel(true)
+        streamInfoUpdateAsync?.cancel(true)
 
         val settings = Settings(context)
 
@@ -151,9 +150,9 @@ fun playStream(stream: Stream) {
                 setPlayButtonImage(context)
                 startSeekBarUpdate(false)
 
-                BackgroundService.streamInfoUpdateAsync =
+                streamInfoUpdateAsync =
                     StreamInfoUpdateAsync(WeakReference(context), stream)
-                BackgroundService.streamInfoUpdateAsync?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                streamInfoUpdateAsync?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
             }
         }
     }

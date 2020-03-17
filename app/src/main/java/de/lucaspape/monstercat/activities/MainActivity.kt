@@ -20,9 +20,8 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import de.lucaspape.monstercat.background.BackgroundService
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.background.BackgroundService.Companion.streamInfoUpdateAsync
+import de.lucaspape.monstercat.download.DownloadService
 import de.lucaspape.monstercat.download.hideDownloadNotification
 import de.lucaspape.monstercat.fragments.HomeFragment
 import de.lucaspape.monstercat.fragments.PlaylistFragment
@@ -36,7 +35,7 @@ import java.io.FileOutputStream
 import java.lang.ref.WeakReference
 
 val noisyReceiver = NoisyReceiver()
-var backgroundServiceIntent: Intent? = null
+var downloadServiceIntent: Intent? = null
 
 //callback function for back pressed, TODO this is not great
 var fragmentBackPressedCallback: () -> Unit = {}
@@ -225,9 +224,9 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        if (!BackgroundService.serviceRunning || backgroundServiceIntent == null) {
-            backgroundServiceIntent = Intent(this, BackgroundService::class.java)
-            startService(backgroundServiceIntent)
+        if (DownloadService.downloadTask?.status != AsyncTask.Status.RUNNING) {
+            downloadServiceIntent = Intent(this, DownloadService::class.java)
+            startService(downloadServiceIntent)
         }
 
         //show privacy policy

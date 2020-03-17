@@ -7,7 +7,7 @@ import android.graphics.drawable.Drawable
 import android.os.AsyncTask
 import com.squareup.picasso.Picasso
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.background.BackgroundService
+import de.lucaspape.monstercat.download.DownloadService.Companion.downloadTask
 import de.lucaspape.monstercat.util.Settings
 import de.lucaspape.monstercat.util.wifiConnected
 import java.io.File
@@ -29,9 +29,9 @@ internal val bitmapCache = HashMap<String, SoftReference<Bitmap?>>()
 fun addDownloadSong(context: Context, songId: String, downloadFinished: () -> Unit) {
     downloadList.add(SoftReference(DownloadObject(songId, downloadFinished)))
 
-    if (BackgroundService.downloadTask?.status != AsyncTask.Status.RUNNING) {
-        BackgroundService.downloadTask = DownloadTask(WeakReference(context))
-        BackgroundService.downloadTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    if (downloadTask?.status != AsyncTask.Status.RUNNING) {
+        downloadTask = DownloadTask(WeakReference(context))
+        downloadTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 }
 

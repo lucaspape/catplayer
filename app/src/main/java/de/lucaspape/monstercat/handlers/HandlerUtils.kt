@@ -14,7 +14,6 @@ import com.android.volley.Response
 import com.android.volley.toolbox.Volley
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.background.BackgroundService.Companion.loadContinuousSongListAsyncTask
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
@@ -72,31 +71,24 @@ internal fun playSongFromId(
         continuousList.add(nextSongId)
     }
 
-    loadContinuousSongListAsyncTask?.cancel(true)
+    val songDatabaseHelper = SongDatabaseHelper(context)
 
-    loadContinuousSongListAsyncTask = BackgroundAsync({
-        val songDatabaseHelper = SongDatabaseHelper(context)
+    val skipMonstercatSongs =
+        Settings(context).getBoolean(context.getString(R.string.skipMonstercatSongsSetting))
 
-        val skipMonstercatSongs =
-            Settings(context).getBoolean(context.getString(R.string.skipMonstercatSongsSetting))
+    for (cSongId in continuousList) {
+        val song = songDatabaseHelper.getSong(context, cSongId)
 
-        for (cSongId in continuousList) {
-
-            val song = songDatabaseHelper.getSong(context, cSongId)
-
-            if (song != null) {
-                if (song.artist.contains("monstercat", true)) {
-                    if (skipMonstercatSongs != true) {
-                        songQueue.add(song.songId)
-                    }
-                } else {
+        if (song != null) {
+            if (song.artist.contains("monstercat", true)) {
+                if (skipMonstercatSongs != true) {
                     songQueue.add(song.songId)
                 }
+            } else {
+                songQueue.add(song.songId)
             }
         }
-    }, {})
-
-    loadContinuousSongListAsyncTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    }
 }
 
 private fun loadAlbumTracks(
@@ -140,15 +132,9 @@ internal fun playAlbumNext(view: View, mcID: String) {
     loadAlbumTracks(view.context, mcID, finishedCallback = { idArray ->
         prioritySongQueue.add(idArray[0])
 
-        loadContinuousSongListAsyncTask?.cancel(true)
-
-        loadContinuousSongListAsyncTask = BackgroundAsync({
-            for (i in (1 until idArray.size)) {
-                prioritySongQueue.add(idArray[i])
-            }
-        }, {})
-
-        loadContinuousSongListAsyncTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        for (i in (1 until idArray.size)) {
+            prioritySongQueue.add(idArray[i])
+        }
     }, errorCallback = {
         displaySnackbar(
             view,
@@ -161,23 +147,21 @@ internal fun playAlbumNext(view: View, mcID: String) {
 }
 
 internal fun playPlaylistNext(context: Context, playlistId: String) {
-    LoadPlaylistTracksAsync(WeakReference(context), true, playlistId, {}, { _, _, _ ->
-        val playlistItemDatabaseHelper =
-            PlaylistItemDatabaseHelper(context, playlistId)
-        val playlistItemList = playlistItemDatabaseHelper.getAllData().reversed()
+    LoadPlaylistTracksAsync(WeakReference(context), true, playlistId, displayLoading = {},
+        finishedCallback = { _, _, _ ->
+            val playlistItemDatabaseHelper =
+                PlaylistItemDatabaseHelper(context, playlistId)
+            val playlistItemList = playlistItemDatabaseHelper.getAllData().reversed()
 
-        val songDatabaseHelper = SongDatabaseHelper(context)
+            val songDatabaseHelper = SongDatabaseHelper(context)
 
-        songDatabaseHelper.getSong(
-            context,
-            playlistItemList[0].songId
-        )?.songId?.let { songId ->
-            prioritySongQueue.add(songId)
-        }
+            songDatabaseHelper.getSong(
+                context,
+                playlistItemList[0].songId
+            )?.songId?.let { songId ->
+                prioritySongQueue.add(songId)
+            }
 
-        loadContinuousSongListAsyncTask?.cancel(true)
-
-        loadContinuousSongListAsyncTask = BackgroundAsync({
             for (i in (1 until playlistItemList.size)) {
                 songDatabaseHelper.getSong(
                     context,
@@ -186,10 +170,7 @@ internal fun playPlaylistNext(context: Context, playlistId: String) {
                     prioritySongQueue.add(songId)
                 }
             }
-        }, {})
-
-        loadContinuousSongListAsyncTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-    }, { _, _, _ -> }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        }, errorCallback = { _, _, _ -> }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }
 
 /**

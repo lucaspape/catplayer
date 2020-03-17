@@ -46,6 +46,8 @@ var mediaSession: MediaSessionCompat? = null
 
 private var sessionCreated = false
 
+var streamInfoUpdateAsync:StreamInfoUpdateAsync? = null
+
 val audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener {
     pause()
 }

@@ -6,11 +6,11 @@ import android.content.IntentFilter
 import android.media.AudioManager
 import android.os.IBinder
 import de.lucaspape.monstercat.activities.noisyReceiver
-import de.lucaspape.monstercat.background.BackgroundService
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.music.contextReference
 import de.lucaspape.monstercat.music.exoPlayer
 import de.lucaspape.monstercat.music.setCover
+import de.lucaspape.monstercat.music.streamInfoUpdateAsync
 import java.lang.IllegalArgumentException
 
 class PlayerService : Service() {
@@ -68,7 +68,7 @@ class PlayerService : Service() {
 
         exoPlayer?.release()
         exoPlayer?.stop()
-        BackgroundService.streamInfoUpdateAsync?.cancel(true)
+        streamInfoUpdateAsync?.cancel(true)
 
         try {
             unregisterReceiver(noisyReceiver)
