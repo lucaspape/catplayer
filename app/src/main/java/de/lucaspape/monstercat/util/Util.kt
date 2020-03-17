@@ -1,21 +1,23 @@
 package de.lucaspape.monstercat.util
 
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.GenericItem
 import com.mikepenz.fastadapter.adapters.ItemAdapter
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.handlers.abstract_items.AlertListItem
-import de.lucaspape.monstercat.handlers.abstract_items.HeaderTextItem
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -108,14 +110,18 @@ fun displaySnackbar(
 }
 
 fun displayAlertDialogList(context: Context, title:String, listItems:ArrayList<AlertListItem>, onItemClick:(position:Int, item:AlertListItem) -> Unit){
-    val alertDialogBuilder = AlertDialog.Builder(context)
+    val alertDialogBuilder = MaterialAlertDialogBuilder(context, R.style.DialogSlideAnim)
     alertDialogBuilder.setTitle(title)
 
     val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-    val alertListLayout = layoutInflater.inflate(R.layout.alert_list_layout, null, false)
+    val alertListLayout = layoutInflater.inflate(R.layout.alert_list, null, false)
 
     alertDialogBuilder.setView(alertListLayout)
     val dialog = alertDialogBuilder.create()
+
+    dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+    dialog.window?.setGravity(Gravity.BOTTOM)
+
     dialog.show()
 
     val recyclerView = alertListLayout.findViewById<RecyclerView>(R.id.alertDialogList)
