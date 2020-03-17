@@ -81,7 +81,7 @@ var playButtonReference: WeakReference<ImageButton>? = null
 
 var fullscreenTitleReference: WeakReference<TextView>? = null
     set(newTitleTextView) {
-        if (fullscreenTitleReference != null) {
+        if (fullscreenTitleReference?.get() != null) {
             newTitleTextView?.get()?.text = fullscreenTitleReference?.get()?.text
         } else {
             val currentSong = getCurrentSong()
@@ -100,7 +100,7 @@ var fullscreenTitleReference: WeakReference<TextView>? = null
 
 var fullscreenArtistReference: WeakReference<TextView>? = null
     set(newArtistTextView) {
-        if (fullscreenArtistReference != null) {
+        if (fullscreenArtistReference?.get() != null) {
             newArtistTextView?.get()?.text = fullscreenArtistReference?.get()?.text
         } else {
             val currentSong = getCurrentSong()
