@@ -318,13 +318,14 @@ internal fun addSongToPlaylist(view: View, songId: String) {
 
                 displayAlertDialogList(
                     view.context,
-                    view.context.getString(R.string.pickPlaylistMsg),
+                    HeaderTextItem(view.context.getString(R.string.pickPlaylistMsg)),
                     alertListItems
                 ) { position, _ ->
                     playlistIds[position]?.let { playlistId ->
                         addSongToPlaylist(view, playlistId, songId)
                     }
                 }
+
             } else {
                 displayInfo(view.context, view.context.getString(R.string.noPlaylistFound))
             }
@@ -543,7 +544,7 @@ internal fun openAlbum(view: View, albumMcId: String, share: Boolean) {
                 context.getString(R.string.pickApp)
             }
 
-            displayAlertDialogList(context, title, itemArray) { position, _ ->
+            displayAlertDialogList(context, HeaderTextItem(title), itemArray) { position, _ ->
                 urlArray[position].let { url ->
                     if (share) {
                         val sendIntent = Intent().apply {

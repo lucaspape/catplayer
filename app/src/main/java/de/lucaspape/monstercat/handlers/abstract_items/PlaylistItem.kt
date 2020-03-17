@@ -1,7 +1,8 @@
 package de.lucaspape.monstercat.handlers.abstract_items
 
-import android.app.AlertDialog
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.os.AsyncTask
 import android.view.View
 import android.widget.ImageButton
@@ -18,6 +19,8 @@ import de.lucaspape.monstercat.activities.offlineDrawable
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
+import de.lucaspape.monstercat.download.ImageReceiverInterface
+import de.lucaspape.monstercat.download.downloadCoverIntoImageReceiver
 import de.lucaspape.monstercat.request.async.BackgroundAsync
 import de.lucaspape.monstercat.handlers.deletePlaylist
 import de.lucaspape.monstercat.handlers.downloadPlaylist
@@ -44,21 +47,27 @@ open class PlaylistItem(
                 AlertListItem(context.getString(R.string.delete), deleteDrawable)
             )
 
-            displayAlertDialogList(context, "", itemList) { _, item ->
-                val id = data[listViewPosition]
+            val id = data[listViewPosition]
 
-                when (item.itemText) {
-                    context.getString(R.string.download) -> {
-                        downloadPlaylist(
-                            view,
-                            id
-                        ) {}
-                    }
-                    context.getString(R.string.addToQueue) -> {
-                        playPlaylistNext(context, id)
-                    }
-                    context.getString(R.string.delete) -> {
-                        deletePlaylist(view, id)
+            PlaylistDatabaseHelper(context).getPlaylist(id)?.let { playlist ->
+                displayAlertDialogList(
+                    context,
+                    AlertListHeaderItem(playlist.playlistName, ""),
+                    itemList
+                ) { _, item ->
+                    when (item.itemText) {
+                        context.getString(R.string.download) -> {
+                            downloadPlaylist(
+                                view,
+                                id
+                            ) {}
+                        }
+                        context.getString(R.string.addToQueue) -> {
+                            playPlaylistNext(context, id)
+                        }
+                        context.getString(R.string.delete) -> {
+                            deletePlaylist(view, id)
+                        }
                     }
                 }
             }
@@ -117,7 +126,20 @@ open class PlaylistItem(
 
             playlist?.let {
                 titleTextView.text = playlist.playlistName
-                coverImageView.setImageURI("".toUri())
+
+                downloadCoverIntoImageReceiver(context, object: ImageReceiverInterface{
+                    override fun setBitmap(id: String, bitmap: Bitmap?) {
+                        if(id == ""){
+                            coverImageView.setImageBitmap(bitmap)
+                        }
+                    }
+
+                    override fun setDrawable(id: String, drawable: Drawable?) {
+                        if(id == ""){
+                            coverImageView.setImageDrawable(drawable)
+                        }
+                    }
+                }, "", true)
 
                 var downloadStatus = downloadDrawable.toUri()
 

@@ -159,6 +159,7 @@ fun downloadCoverIntoImageReceiver(
                 if (placeholder != null) {
                     Picasso.get()
                         .load("$url?image_width=$resolution")
+                        .error(placeholder)
                         .placeholder(placeholder)
                         .into(picassoTarget)
                 } else {

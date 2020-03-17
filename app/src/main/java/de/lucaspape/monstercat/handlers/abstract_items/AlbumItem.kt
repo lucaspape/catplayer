@@ -1,6 +1,5 @@
 package de.lucaspape.monstercat.handlers.abstract_items
 
-import android.app.AlertDialog
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.view.View
@@ -41,20 +40,26 @@ open class AlbumItem(
                 AlertListItem(context.getString(R.string.openAlbumInApp), openInAppDrawable)
             )
 
-            displayAlertDialogList(context, "", itemList) { _, item ->
-                val id = contentList[listViewPosition]
+            val id = contentList[listViewPosition]
 
-                when (item.itemText) {
-                    context.getString(R.string.downloadAlbum) -> downloadAlbum(
-                        context,
-                        id
-                    )
-                    context.getString(R.string.addAlbumToQueue) -> playAlbumNext(
-                        view,
-                        id
-                    )
-                    context.getString(R.string.shareAlbum) -> openAlbum(view, id, true)
-                    context.getString(R.string.openAlbumInApp) -> openAlbum(view, id, false)
+            AlbumDatabaseHelper(context).getAlbumFromMcId(id)?.let { album ->
+                displayAlertDialogList(
+                    context,
+                    AlertListHeaderItem(album.title, album.albumId),
+                    itemList
+                ) { _, item ->
+                    when (item.itemText) {
+                        context.getString(R.string.downloadAlbum) -> downloadAlbum(
+                            context,
+                            id
+                        )
+                        context.getString(R.string.addAlbumToQueue) -> playAlbumNext(
+                            view,
+                            id
+                        )
+                        context.getString(R.string.shareAlbum) -> openAlbum(view, id, true)
+                        context.getString(R.string.openAlbumInApp) -> openAlbum(view, id, false)
+                    }
                 }
             }
         }

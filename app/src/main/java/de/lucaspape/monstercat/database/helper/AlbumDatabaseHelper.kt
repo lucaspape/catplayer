@@ -71,6 +71,50 @@ class AlbumDatabaseHelper(context: Context) :
         return id
     }
 
+    fun getAlbumFromMcId(mcID: String):Album?{
+        val db = readableDatabase
+        val cursor: Cursor
+
+        try {
+            cursor = db.query(
+                Album.TABLE_NAME, arrayOf(
+                    Album.COLUMN_ID,
+                    Album.COLUMN_ALBUM_ID,
+                    Album.COLUMN_TITLE,
+                    Album.COLUMN_ARTIST,
+                    Album.COLUMN_COVER_URL,
+                    Album.COLUMN_ALBUM_MCID
+                ),
+                Album.COLUMN_ALBUM_MCID + "=?",
+                arrayOf(mcID), null, null, null, null
+            )
+
+            cursor?.moveToFirst()
+
+            try {
+                val album = Album(
+                    cursor.getInt(cursor.getColumnIndex(Album.COLUMN_ID)),
+                    cursor.getString(cursor.getColumnIndex(Album.COLUMN_ALBUM_ID)),
+                    cursor.getString(cursor.getColumnIndex(Album.COLUMN_TITLE)),
+                    cursor.getString(cursor.getColumnIndex(Album.COLUMN_ARTIST)),
+                    cursor.getString(cursor.getColumnIndex(Album.COLUMN_COVER_URL)),
+                    cursor.getString(cursor.getColumnIndex(Album.COLUMN_ALBUM_MCID))
+                )
+
+                cursor.close()
+
+                return album
+            } catch (e: IndexOutOfBoundsException) {
+                cursor.close()
+                db.close()
+                return null
+            }
+
+        } catch (e: SQLiteException) {
+            return null
+        }
+    }
+
     fun getAlbum(albumId: String): Album? {
         val db = readableDatabase
         val cursor: Cursor

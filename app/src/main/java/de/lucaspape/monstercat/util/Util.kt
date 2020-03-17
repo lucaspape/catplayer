@@ -105,18 +105,23 @@ fun displaySnackbar(
     buttonText?.let {
         snackbar.setAction(buttonText, buttonListener)
     }
-    
+
     snackbar.show()
 }
 
-fun displayAlertDialogList(context: Context, title:String, listItems:ArrayList<AlertListItem>, onItemClick:(position:Int, item:AlertListItem) -> Unit){
+fun displayAlertDialogList(
+    context: Context,
+    headerItem: GenericItem?,
+    listItems: ArrayList<AlertListItem>,
+    onItemClick: (position: Int, item: AlertListItem) -> Unit
+) {
     val alertDialogBuilder = MaterialAlertDialogBuilder(context, R.style.DialogSlideAnim)
-    alertDialogBuilder.setTitle(title)
 
     val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
     val alertListLayout = layoutInflater.inflate(R.layout.alert_list, null, false)
 
     alertDialogBuilder.setView(alertListLayout)
+    alertDialogBuilder.setCancelable(true)
     val dialog = alertDialogBuilder.create()
 
     dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -128,19 +133,32 @@ fun displayAlertDialogList(context: Context, title:String, listItems:ArrayList<A
     recyclerView.layoutManager =
         LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
 
+    val headerAdapter = ItemAdapter<GenericItem>()
     val itemAdapter = ItemAdapter<AlertListItem>()
     val fastAdapter: FastAdapter<GenericItem> =
-        FastAdapter.with(listOf(itemAdapter))
+        FastAdapter.with(listOf(headerAdapter, itemAdapter))
 
-    for(listItem in listItems){
+    var indexOffset = 0
+
+    headerItem?.let {
+        headerAdapter.add(headerItem)
+        indexOffset = -1
+    }
+
+    for (listItem in listItems) {
         itemAdapter.add(listItem)
     }
 
     recyclerView.adapter = fastAdapter
 
     fastAdapter.onClickListener = { _, _, _, position ->
-        onItemClick(position, listItems[position])
-        dialog.hide()
+        val index = position + indexOffset
+
+        if (index >= 0) {
+            onItemClick(position, listItems[index])
+            dialog.hide()
+        }
+
         false
     }
 }
