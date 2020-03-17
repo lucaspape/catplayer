@@ -20,6 +20,7 @@ import de.lucaspape.monstercat.request.async.BackgroundAsync
 import de.lucaspape.monstercat.handlers.deletePlaylist
 import de.lucaspape.monstercat.handlers.downloadPlaylist
 import de.lucaspape.monstercat.handlers.playPlaylistNext
+import de.lucaspape.monstercat.util.displayAlertDialogList
 import java.io.File
 
 open class PlaylistItem(
@@ -35,18 +36,16 @@ open class PlaylistItem(
         ) {
             val context = view.context
 
-            val menuItems = arrayOf(
-                context.getString(R.string.download),
-                context.getString(R.string.addToQueue),
-                context.getString(R.string.delete)
+            val itemList = arrayListOf(
+                AlertListItem(context.getString(R.string.download), ""),
+                AlertListItem(context.getString(R.string.addToQueue), ""),
+                AlertListItem(context.getString(R.string.delete), "")
             )
 
-            val alertDialogBuilder = AlertDialog.Builder(context)
-            alertDialogBuilder.setTitle("")
-            alertDialogBuilder.setItems(menuItems) { _, which ->
+            displayAlertDialogList(context, "", itemList) { _, item ->
                 val id = data[listViewPosition]
 
-                when (menuItems[which]) {
+                when (item.itemText) {
                     context.getString(R.string.download) -> {
                         downloadPlaylist(
                             view,
@@ -61,8 +60,6 @@ open class PlaylistItem(
                     }
                 }
             }
-
-            alertDialogBuilder.create().show()
         }
     }
 

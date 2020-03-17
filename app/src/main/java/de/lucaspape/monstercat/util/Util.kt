@@ -3,15 +3,26 @@ package de.lucaspape.monstercat.util
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
+import com.mikepenz.fastadapter.FastAdapter
+import com.mikepenz.fastadapter.GenericItem
+import com.mikepenz.fastadapter.adapters.ItemAdapter
+import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.handlers.abstract_items.AlertListItem
+import de.lucaspape.monstercat.handlers.abstract_items.HeaderTextItem
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.lang.Exception
 import java.net.URL
 import java.util.*
+import kotlin.collections.ArrayList
 
 fun wifiConnected(context: Context): Boolean? {
     val connectivityManager =
@@ -94,4 +105,36 @@ fun displaySnackbar(
     }
     
     snackbar.show()
+}
+
+fun displayAlertDialogList(context: Context, title:String, listItems:ArrayList<AlertListItem>, onItemClick:(position:Int, item:AlertListItem) -> Unit){
+    val alertDialogBuilder = AlertDialog.Builder(context)
+    alertDialogBuilder.setTitle(title)
+
+    val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+    val alertListLayout = layoutInflater.inflate(R.layout.alert_list_layout, null, false)
+
+    alertDialogBuilder.setView(alertListLayout)
+    val dialog = alertDialogBuilder.create()
+    dialog.show()
+
+    val recyclerView = alertListLayout.findViewById<RecyclerView>(R.id.alertDialogList)
+    recyclerView.layoutManager =
+        LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+
+    val itemAdapter = ItemAdapter<AlertListItem>()
+    val fastAdapter: FastAdapter<GenericItem> =
+        FastAdapter.with(listOf(itemAdapter))
+
+    for(listItem in listItems){
+        itemAdapter.add(listItem)
+    }
+
+    recyclerView.adapter = fastAdapter
+
+    fastAdapter.onClickListener = { _, _, _, position ->
+        onItemClick(position, listItems[position])
+        dialog.hide()
+        false
+    }
 }

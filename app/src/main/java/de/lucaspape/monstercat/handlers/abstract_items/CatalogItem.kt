@@ -1,7 +1,6 @@
 package de.lucaspape.monstercat.handlers.abstract_items
 
 import android.app.AlertDialog
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.AsyncTask
@@ -23,6 +22,7 @@ import de.lucaspape.monstercat.handlers.openAlbum
 import de.lucaspape.monstercat.handlers.playSongFromId
 import de.lucaspape.monstercat.download.ImageReceiverInterface
 import de.lucaspape.monstercat.request.async.BackgroundAsync
+import de.lucaspape.monstercat.util.displayAlertDialogList
 
 open class CatalogItem(
     val songId: String
@@ -37,25 +37,22 @@ open class CatalogItem(
         ) {
             val context = view.context
 
-            val menuItems =
-                arrayOf(
-                    context.getString(R.string.download),
-                    context.getString(R.string.addToQueue),
-                    context.getString(R.string.addToPlaylist),
-                    context.getString(R.string.shareAlbum),
-                    context.getString(R.string.openAlbumInApp)
-                )
+            val itemList = arrayListOf(
+                AlertListItem(context.getString(R.string.download), ""),
+                AlertListItem(context.getString(R.string.addToQueue), ""),
+                AlertListItem(context.getString(R.string.addToPlaylist), ""),
+                AlertListItem(context.getString(R.string.shareAlbum), ""),
+                AlertListItem(context.getString(R.string.openAlbumInApp), "")
+            )
 
-            val alertDialogBuilder = AlertDialog.Builder(context)
-            alertDialogBuilder.setTitle("")
-            alertDialogBuilder.setItems(menuItems) { _, which ->
+            displayAlertDialogList(context, "", itemList) { _, item ->
                 val id = contentList[listViewPosition]
                 val songDatabaseHelper =
                     SongDatabaseHelper(context)
                 val song = songDatabaseHelper.getSong(context, id)
 
                 song?.let {
-                    when (menuItems[which]) {
+                    when (item.itemText) {
                         context.getString(R.string.download) -> addDownloadSong(
                             context,
                             song.songId
@@ -82,8 +79,6 @@ open class CatalogItem(
                     }
                 }
             }
-
-            alertDialogBuilder.create().show()
         }
 
         @JvmStatic
@@ -95,20 +90,17 @@ open class CatalogItem(
         ) {
             val context = view.context
 
-            val menuItems =
-                arrayOf(
-                    context.getString(R.string.download),
-                    context.getString(R.string.addToQueue),
-                    context.getString(R.string.delete),
-                    context.getString(R.string.shareAlbum),
-                    context.getString(R.string.openAlbumInApp)
-                )
+            val itemList = arrayListOf(
+                AlertListItem(context.getString(R.string.download), ""),
+                AlertListItem(context.getString(R.string.addToQueue), ""),
+                AlertListItem(context.getString(R.string.delete), ""),
+                AlertListItem(context.getString(R.string.shareAlbum), ""),
+                AlertListItem(context.getString(R.string.openAlbumInApp), "")
+            )
 
-            val alertDialogBuilder = AlertDialog.Builder(context)
-            alertDialogBuilder.setTitle("")
-            alertDialogBuilder.setItems(menuItems) { _, which ->
+            displayAlertDialogList(context, "", itemList) { _, item ->
                 val id = data[listViewPosition]
-                when (menuItems[which]) {
+                when (item.itemText) {
                     context.getString(R.string.download) -> {
                         val songDatabaseHelper =
                             SongDatabaseHelper(context)
@@ -158,8 +150,6 @@ open class CatalogItem(
                     }
                 }
             }
-
-            alertDialogBuilder.create().show()
         }
     }
 

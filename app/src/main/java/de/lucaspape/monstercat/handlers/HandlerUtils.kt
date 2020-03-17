@@ -19,6 +19,8 @@ import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadSong
+import de.lucaspape.monstercat.handlers.abstract_items.AlertListItem
+import de.lucaspape.monstercat.handlers.abstract_items.HeaderTextItem
 import de.lucaspape.monstercat.request.async.*
 import de.lucaspape.monstercat.music.next
 import de.lucaspape.monstercat.music.prioritySongQueue
@@ -306,15 +308,23 @@ internal fun addSongToPlaylist(view: View, songId: String) {
                     playlistIds[i] = playlistList[i].playlistId
                 }
 
-                val alertDialogBuilder = AlertDialog.Builder(view.context)
-                alertDialogBuilder.setTitle(view.context.getString(R.string.pickPlaylistMsg))
-                alertDialogBuilder.setItems(playlistNames) { _, i ->
-                    playlistIds[i]?.let { playlistId ->
+                val alertListItems = ArrayList<AlertListItem>()
+
+                for (name in playlistNames) {
+                    name?.let {
+                        alertListItems.add(AlertListItem(name, ""))
+                    }
+                }
+
+                displayAlertDialogList(
+                    view.context,
+                    view.context.getString(R.string.pickPlaylistMsg),
+                    alertListItems
+                ) { position, _ ->
+                    playlistIds[position]?.let { playlistId ->
                         addSongToPlaylist(view, playlistId, songId)
                     }
-
                 }
-                alertDialogBuilder.show()
             } else {
                 displayInfo(view.context, view.context.getString(R.string.noPlaylistFound))
             }
@@ -514,29 +524,27 @@ internal fun openAlbum(view: View, albumMcId: String, share: Boolean) {
             val releaseObject = responseJsonObject.getJSONObject("release")
             val linksArray = releaseObject.getJSONArray("links")
 
-            val titles = arrayOfNulls<String>(linksArray.length() + 1)
-            val urls = arrayOfNulls<String>(linksArray.length() + 1)
+            val itemArray = ArrayList<AlertListItem>()
+            val urlArray = ArrayList<String>()
 
-            titles[0] = "monstercat.com"
-            urls[0] = context.getString(R.string.shareReleaseUrl) + "/$albumMcId"
+            itemArray.add(AlertListItem("monstercat.com", ""))
+            urlArray.add(context.getString(R.string.shareReleaseUrl) + "/$albumMcId")
 
             for (i in (0 until linksArray.length())) {
                 val linkObject = linksArray.getJSONObject(i)
 
-                titles[i + 1] = linkObject.getString("platform")
-                urls[i + 1] = linkObject.getString("original")
+                itemArray.add(AlertListItem(linkObject.getString("platform"), ""))
+                urlArray.add(linkObject.getString("original"))
             }
 
-            val alertDialogBuilder = AlertDialog.Builder(context)
-
-            if (share) {
-                alertDialogBuilder.setTitle(context.getString(R.string.pickLinkToShare))
+            val title = if (share) {
+                context.getString(R.string.pickLinkToShare)
             } else {
-                alertDialogBuilder.setTitle(context.getString(R.string.pickApp))
+                context.getString(R.string.pickApp)
             }
 
-            alertDialogBuilder.setItems(titles) { _, i ->
-                urls[i]?.let { url ->
+            displayAlertDialogList(context, title, itemArray) { position, _ ->
+                urlArray[position].let { url ->
                     if (share) {
                         val sendIntent = Intent().apply {
                             action = Intent.ACTION_SEND
@@ -550,9 +558,7 @@ internal fun openAlbum(view: View, albumMcId: String, share: Boolean) {
                         context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
                     }
                 }
-
             }
-            alertDialogBuilder.show()
         },
         Response.ErrorListener {
             displaySnackbar(

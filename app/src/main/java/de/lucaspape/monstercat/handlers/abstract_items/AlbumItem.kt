@@ -15,6 +15,7 @@ import de.lucaspape.monstercat.handlers.downloadAlbum
 import de.lucaspape.monstercat.handlers.openAlbum
 import de.lucaspape.monstercat.handlers.playAlbumNext
 import de.lucaspape.monstercat.download.ImageReceiverInterface
+import de.lucaspape.monstercat.util.displayAlertDialogList
 
 open class AlbumItem(
     val albumId: String
@@ -29,19 +30,17 @@ open class AlbumItem(
         ) {
             val context = view.context
 
-            val menuItems: Array<String> = arrayOf(
-                context.getString(R.string.downloadAlbum),
-                context.getString(R.string.addAlbumToQueue),
-                context.getString(R.string.shareAlbum),
-                context.getString(R.string.openAlbumInApp)
+            val itemList = arrayListOf(
+                AlertListItem(context.getString(R.string.downloadAlbum), ""),
+                AlertListItem(context.getString(R.string.addAlbumToQueue), ""),
+                AlertListItem(context.getString(R.string.shareAlbum), ""),
+                AlertListItem(context.getString(R.string.openAlbumInApp), "")
             )
 
-            val alertDialogBuilder = AlertDialog.Builder(context)
-            alertDialogBuilder.setTitle("")
-            alertDialogBuilder.setItems(menuItems) { _, which ->
+            displayAlertDialogList(context, "", itemList) { _, item ->
                 val id = contentList[listViewPosition]
 
-                when (menuItems[which]) {
+                when (item.itemText) {
                     context.getString(R.string.downloadAlbum) -> downloadAlbum(
                         context,
                         id
@@ -54,8 +53,6 @@ open class AlbumItem(
                     context.getString(R.string.openAlbumInApp) -> openAlbum(view, id, false)
                 }
             }
-
-            alertDialogBuilder.show()
         }
     }
 
