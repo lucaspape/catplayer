@@ -18,8 +18,8 @@ import de.lucaspape.monstercat.download.downloadCoverIntoImageReceiver
 import de.lucaspape.monstercat.ui.handlers.addSongToPlaylist
 import de.lucaspape.monstercat.ui.handlers.deletePlaylistSong
 import de.lucaspape.monstercat.ui.handlers.openAlbum
-import de.lucaspape.monstercat.ui.handlers.playSongFromId
 import de.lucaspape.monstercat.download.ImageReceiverInterface
+import de.lucaspape.monstercat.music.prioritySongQueue
 import de.lucaspape.monstercat.util.BackgroundAsync
 import de.lucaspape.monstercat.util.displayAlertDialogList
 
@@ -57,11 +57,7 @@ open class CatalogItem(
                             context,
                             song.songId
                         ) {}
-                        context.getString(R.string.addToQueue) -> playSongFromId(
-                            id,
-                            false,
-                            priority = true
-                        )
+                        context.getString(R.string.addToQueue) -> prioritySongQueue.add(id)
                         context.getString(R.string.addToPlaylist) -> addSongToPlaylist(
                             view,
                             song.songId
@@ -112,11 +108,7 @@ open class CatalogItem(
                             addDownloadSong(context, song.songId) {}
                         }
                         context.getString(R.string.addToQueue) -> {
-                            playSongFromId(
-                                id,
-                                false,
-                                priority = true
-                            )
+                            prioritySongQueue.add(id)
                         }
                         context.getString(R.string.delete) -> {
                             deletePlaylistSong(

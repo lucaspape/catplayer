@@ -17,17 +17,20 @@ import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadSong
+import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.ui.abstract_items.CatalogItem
 import de.lucaspape.monstercat.ui.abstract_items.HeaderTextItem
 import de.lucaspape.monstercat.ui.abstract_items.PlaylistItem
 import de.lucaspape.monstercat.util.BackgroundAsync
 import de.lucaspape.monstercat.request.async.LoadPlaylistAsync
 import de.lucaspape.monstercat.request.async.LoadPlaylistTracksAsync
-import de.lucaspape.monstercat.music.clearQueue
 import de.lucaspape.monstercat.util.displaySnackbar
 import java.io.File
 import java.lang.IndexOutOfBoundsException
 import java.lang.ref.WeakReference
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class PlaylistHandler {
     companion object {
@@ -78,21 +81,31 @@ class PlaylistHandler {
             val itemIndex = position + itemIndexOffset
 
             if (itemIndex >= 0) {
+                HomeHandler.addSongsTaskId = ""
+
+                clearPlaylist()
                 clearQueue()
 
-                val songId = data[itemIndex].songId
+                songQueue.add(data[itemIndex].songId)
+                skipPreviousInPlaylist()
+                next()
 
-                val nextSongIdsList = ArrayList<String>()
+                BackgroundAsync({
+                    val id = UUID.randomUUID().toString()
+                    HomeHandler.addSongsTaskId = id
 
-                for (i in (itemIndex + 1 until data.size)) {
-                    try {
-                        nextSongIdsList.add(data[i].songId)
-                    } catch (e: IndexOutOfBoundsException) {
+                    for (i in (itemIndex + 1 until data.size)) {
+                        try {
+                            if (HomeHandler.addSongsTaskId == id) {
+                                songQueue.add(data[i].songId)
+                            } else {
+                                break
+                            }
+                        } catch (e: IndexOutOfBoundsException) {
 
+                        }
                     }
-                }
-
-                playSongFromId(view.context, songId, true, nextSongIdsList)
+                }, {}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
             }
 
             false

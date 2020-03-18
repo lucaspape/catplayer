@@ -22,17 +22,20 @@ import de.lucaspape.monstercat.database.helper.AlbumItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.CatalogSongDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadSong
+import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.ui.abstract_items.AlbumItem
 import de.lucaspape.monstercat.ui.abstract_items.CatalogItem
 import de.lucaspape.monstercat.ui.abstract_items.HeaderTextItem
 import de.lucaspape.monstercat.ui.abstract_items.ProgressItem
 import de.lucaspape.monstercat.request.async.*
-import de.lucaspape.monstercat.music.clearQueue
-import de.lucaspape.monstercat.music.songQueue
 import de.lucaspape.monstercat.music.util.playStream
 import de.lucaspape.monstercat.util.*
 import java.io.File
+import java.lang.IndexOutOfBoundsException
 import java.lang.ref.WeakReference
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 /**
  * Does everything for the home page
@@ -41,6 +44,9 @@ class HomeHandler {
     companion object {
         @JvmStatic
         private var viewDataCache = HashMap<String, WeakReference<ArrayList<*>>>()
+
+        @JvmStatic
+        var addSongsTaskId = ""
     }
 
     private var initDone = false
@@ -104,42 +110,99 @@ class HomeHandler {
             val itemIndex = position + itemIndexOffset
 
             if (itemIndex >= 0 && itemIndex < catalogViewData.size) {
+                val fistItem = catalogViewData[itemIndex]
+
+                addSongsTaskId = ""
+
+                clearPlaylist()
                 clearQueue()
 
-                val catalogItem = catalogViewData[itemIndex]
+                songQueue.add(fistItem.songId)
+                skipPreviousInPlaylist()
+                next()
 
-                val catalogSongDatabaseHelper = CatalogSongDatabaseHelper(view.context)
-
-                val songDatabaseHelper = SongDatabaseHelper(view.context)
                 val skipMonstercatSongs =
                     Settings(view.context).getBoolean(view.context.getString(R.string.skipMonstercatSongsSetting))
 
-                BackgroundAsync({
-                    catalogSongDatabaseHelper.getIndexFromSongId(catalogItem.songId)?.toLong()
-                        ?.let { skip ->
-                            val nextSongs = catalogSongDatabaseHelper.getSongs(skip)
+                val songDatabaseHelper = SongDatabaseHelper(view.context)
 
-                            nextSongs.reverse()
+                if (albumId == null) {
+                    //add next songs from database
+                    val catalogSongDatabaseHelper = CatalogSongDatabaseHelper(view.context)
 
-                            for (catalogSong in nextSongs) {
-                                if (skipMonstercatSongs == true) {
-                                    val song =
-                                        songDatabaseHelper.getSong(view.context, catalogSong.songId)
-                                    if (!song?.artist.equals("monstercat", true)) {
-                                        songQueue.add(catalogSong.songId)
+                    BackgroundAsync({
+                        val id = UUID.randomUUID().toString()
+                        addSongsTaskId = id
+
+                        catalogSongDatabaseHelper.getIndexFromSongId(fistItem.songId)?.toLong()
+                            ?.let { skip ->
+                                val nextSongs = catalogSongDatabaseHelper.getSongs(skip)
+
+                                nextSongs.reverse()
+
+                                for (catalogSong in nextSongs) {
+
+                                    if (skipMonstercatSongs == true) {
+                                        val song =
+                                            songDatabaseHelper.getSong(
+                                                view.context,
+                                                catalogSong.songId
+                                            )
+                                        if (!song?.artist.equals("monstercat", true)) {
+                                            if (id == addSongsTaskId) {
+                                                songQueue.add(catalogSong.songId)
+                                            } else {
+                                                break
+                                            }
+                                        }
+                                    } else {
+                                        if (id == addSongsTaskId) {
+                                            songQueue.add(catalogSong.songId)
+                                        } else {
+                                            break
+                                        }
                                     }
-                                } else {
-                                    songQueue.add(catalogSong.songId)
+
                                 }
                             }
-                        }
-                }, {}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                    }, {}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                } else {
+                    //add visible next songs
+                    BackgroundAsync({
+                        val id = UUID.randomUUID().toString()
+                        addSongsTaskId = id
 
-                playSongFromId(
-                    catalogItem.songId,
-                    playNow = true,
-                    priority = true
-                )
+                        for (i in (itemIndex + 1 until catalogViewData.size)) {
+                            try {
+                                if (skipMonstercatSongs == true) {
+                                    val song =
+                                        songDatabaseHelper.getSong(
+                                            view.context,
+                                            catalogViewData[i].songId
+                                        )
+
+                                    if (!song?.artist.equals("monstercat", true)) {
+                                        if (id == addSongsTaskId) {
+                                            songQueue.add(catalogViewData[i].songId)
+                                        } else {
+                                            break
+                                        }
+                                    }
+                                } else {
+                                    if (id == addSongsTaskId) {
+                                        songQueue.add(catalogViewData[i].songId)
+                                    } else {
+                                        break
+                                    }
+                                }
+
+                            } catch (e: IndexOutOfBoundsException) {
+
+                            }
+
+                        }
+                    }, {}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                }
             }
 
             false

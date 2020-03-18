@@ -21,75 +21,12 @@ import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.ui.abstract_items.AlertListItem
 import de.lucaspape.monstercat.ui.abstract_items.HeaderTextItem
 import de.lucaspape.monstercat.request.async.*
-import de.lucaspape.monstercat.music.next
 import de.lucaspape.monstercat.music.prioritySongQueue
-import de.lucaspape.monstercat.music.skipPreviousInPlaylist
-import de.lucaspape.monstercat.music.songQueue
 import de.lucaspape.monstercat.request.AuthorizedRequest
 import de.lucaspape.monstercat.util.*
 import org.json.JSONObject
 import java.io.File
 import java.lang.ref.WeakReference
-
-/**
- * Play a song from ID
- */
-internal fun playSongFromId(songId: String, playNow: Boolean, priority: Boolean) {
-    if (playNow) {
-        if (priority) {
-            prioritySongQueue.add(songId)
-            skipPreviousInPlaylist()
-            next()
-        } else {
-            songQueue.add(songId)
-            skipPreviousInPlaylist()
-            next()
-        }
-    } else {
-        if (priority) {
-            prioritySongQueue.add(songId)
-        } else {
-            songQueue.add(songId)
-        }
-    }
-}
-
-/**
- * Play a song from ID with next songs (-> songs which are listed under the current song in listView)
- */
-internal fun playSongFromId(
-    context: Context,
-    songId: String,
-    playNow: Boolean,
-    nextSongIds: ArrayList<String>
-) {
-    playSongFromId(songId, playNow, false)
-
-    val continuousList = ArrayList<String>()
-
-    for (nextSongId in (nextSongIds)) {
-        continuousList.add(nextSongId)
-    }
-
-    val songDatabaseHelper = SongDatabaseHelper(context)
-
-    val skipMonstercatSongs =
-        Settings(context).getBoolean(context.getString(R.string.skipMonstercatSongsSetting))
-
-    for (cSongId in continuousList) {
-        val song = songDatabaseHelper.getSong(context, cSongId)
-
-        if (song != null) {
-            if (song.artist.contains("monstercat", true)) {
-                if (skipMonstercatSongs != true) {
-                    songQueue.add(song.songId)
-                }
-            } else {
-                songQueue.add(song.songId)
-            }
-        }
-    }
-}
 
 private fun loadAlbumTracks(
     context: Context,

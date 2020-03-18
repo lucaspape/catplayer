@@ -208,6 +208,7 @@ private fun nextSong(): String {
             prioritySongQueue.size > 0 -> {
                 val songId = prioritySongQueue[0]
                 prioritySongQueue.removeAt(0)
+                playlist.add(playlistIndex, songId)
                 return songId
             }
             playlist.size > playlistIndex + 1 -> {
