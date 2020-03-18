@@ -71,7 +71,6 @@ class LoadSongListAsync(
                     val jsonArray = json.getJSONArray("results")
 
                     for (i in (0 until jsonArray.length())) {
-
                         parseCatalogSongToDB(
                             jsonArray.getJSONObject(i),
                             context

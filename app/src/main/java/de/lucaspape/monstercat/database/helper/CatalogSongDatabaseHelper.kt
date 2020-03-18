@@ -92,7 +92,7 @@ class CatalogSongDatabaseHelper(context: Context) :
         val catalogSongs: ArrayList<CatalogSong> = ArrayList()
 
         val selectQuery = "SELECT * FROM " + CatalogSong.TABLE_NAME + " ORDER BY " +
-                CatalogSong.COLUMN_ID + " ASC LIMIT $skip,$limit"
+                CatalogSong.COLUMN_ID + " ASC LIMIT ${skip-1},$limit"
 
         val db = writableDatabase
         val cursor = db.rawQuery(selectQuery, null)
