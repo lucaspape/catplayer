@@ -8,7 +8,6 @@ import android.media.AudioManager
 import android.media.session.MediaSession
 import android.support.v4.media.session.MediaSessionCompat
 import com.google.android.exoplayer2.ExoPlayer
-import de.lucaspape.monstercat.database.objects.Song
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.music.notification.startPlayerService
 import de.lucaspape.monstercat.music.notification.stopPlayerService
@@ -88,29 +87,25 @@ fun createMediaSession() {
 
 fun next() {
     contextReference?.get()?.let { context ->
-        SongDatabaseHelper(context).getSong(context, nextSong())?.let { song ->
-            playSong(
-                context, song,
-                showNotification = true,
-                requestAudioFocus = true,
-                playWhenReady = true,
-                progress = null
-            )
-        }
+        playSong(
+            context, nextSong(),
+            showNotification = true,
+            requestAudioFocus = true,
+            playWhenReady = true,
+            progress = null
+        )
     }
 }
 
 fun previous() {
     contextReference?.get()?.let { context ->
-        SongDatabaseHelper(context).getSong(context, previousSong())?.let { prevSong ->
-            playSong(
-                context, prevSong,
-                showNotification = true,
-                requestAudioFocus = true,
-                playWhenReady = true,
-                progress = null
-            )
-        }
+        playSong(
+            context, previousSong(),
+            showNotification = true,
+            requestAudioFocus = true,
+            playWhenReady = true,
+            progress = null
+        )
     }
 }
 
@@ -140,17 +135,12 @@ private fun resume() {
 
                 setPlayButtonImage(context)
 
-                getCurrentSong()?.let { song ->
-                    startPlayerService(song.songId)
-
-                    //UI stuff
-                    title = "${song.title} ${song.version}"
-                    artist = song.artist
+                getCurrentSong()?.let { songId ->
+                    startPlayerService(songId)
 
                     setCover(
                         context,
-                        song.albumId,
-                        song.artistId
+                        songId
                     ) {
                         setPlayButtonImage(
                             context
@@ -159,12 +149,14 @@ private fun resume() {
                             context,
                             true
                         )
-                        updateNotification(
-                            song.title,
-                            song.version,
-                            song.artist,
-                            it
-                        )
+
+                        updateNotification(context, songId, it)
+                    }
+
+                    SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
+                        //UI stuff
+                        title = "${song.title} ${song.version}"
+                        artist = song.artist
                     }
                 }
             }
@@ -348,13 +340,10 @@ fun getNextSong(): String {
     }
 }
 
-fun getCurrentSong(): Song? {
+fun getCurrentSong(): String? {
     contextReference?.get()?.let { context ->
         return try {
-            val currentSongId = playlist[playlistIndex]
-            val songDatabaseHelper = SongDatabaseHelper(context)
-
-            songDatabaseHelper.getSong(context, currentSongId)
+            return playlist[playlistIndex]
         } catch (e: IndexOutOfBoundsException) {
             null
         }

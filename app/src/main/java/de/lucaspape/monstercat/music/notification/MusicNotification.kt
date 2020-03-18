@@ -10,6 +10,7 @@ import android.graphics.Color
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.ui.activities.MainActivity
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.contextReference
@@ -204,6 +205,12 @@ fun stopPlayerService() {
     }
 
     serviceRunning = false
+}
+
+fun updateNotification(context: Context, songId: String, bitmap: Bitmap){
+    SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
+        updateNotification(song.title, song.version, song.artist, bitmap)
+    }
 }
 
 fun updateNotification(

@@ -7,7 +7,6 @@ import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.audio.AudioAttributes
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.database.objects.Song
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.notification.startPlayerService
 import de.lucaspape.monstercat.music.notification.updateNotification
@@ -86,13 +85,12 @@ fun getStreamPlayerListener(context: Context): Player.EventListener {
     }
 }
 
-fun getPlayerListener(context: Context, song: Song): Player.EventListener {
-
+fun getPlayerListener(context: Context, songId: String): Player.EventListener {
     return object : Player.EventListener {
         @Override
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
             if (listenerEnabled) {
-                startPlayerService(song.songId)
+                startPlayerService(songId)
 
                 exoPlayer?.duration?.let { duration ->
                     exoPlayer?.currentPosition?.let { currentPosition ->
@@ -109,15 +107,9 @@ fun getPlayerListener(context: Context, song: Song): Player.EventListener {
                 } else {
                     setCover(
                         context,
-                        song.albumId,
-                        song.artistId
+                        songId
                     ) {
-                        updateNotification(
-                            song.title,
-                            song.version,
-                            song.artist,
-                            it
-                        )
+                        updateNotification(context, songId, it)
                     }
 
                     setPlayButtonImage(context)

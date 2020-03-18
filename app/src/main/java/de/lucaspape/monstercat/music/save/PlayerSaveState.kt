@@ -52,10 +52,10 @@ data class PlayerSaveState(
                                 prioritySongQueue = playerSaveState.prioritySongQueue
 
                                 getCurrentSong()
-                                    ?.let { song ->
+                                    ?.let { songId ->
                                         playerSaveState.progress?.let { progress ->
                                             playSong(
-                                                context, song,
+                                                context, songId,
                                                 showNotification = false,
                                                 requestAudioFocus = false,
                                                 playWhenReady = false,

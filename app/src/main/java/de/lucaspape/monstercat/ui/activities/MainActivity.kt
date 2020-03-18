@@ -190,16 +190,14 @@ class MainActivity : AppCompatActivity() {
             if (streamInfoUpdateAsync?.status != AsyncTask.Status.RUNNING) {
                 val currentSong = getCurrentSong()
 
-                currentSong?.let { song ->
+                currentSong?.let { songId ->
                     setCover(
                         this,
-                        song.albumId,
-                        song.artistId
+                        songId
                     ) { bitmap ->
                         updateNotification(
-                            song.title,
-                            song.version,
-                            song.artist,
+                            this,
+                            songId,
                             bitmap
                         )
                     }

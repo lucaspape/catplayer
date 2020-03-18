@@ -6,7 +6,6 @@ import android.os.AsyncTask
 import android.os.Handler
 import com.google.android.exoplayer2.SimpleExoPlayer
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.database.objects.Song
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.contextReference
@@ -19,8 +18,8 @@ import java.util.*
 
 private var preparedSong = ""
 
-internal fun prepareSong(context: Context, song: Song) {
-    if (preparedSong != song.songId) {
+internal fun prepareSong(context: Context, songId: String) {
+    if (preparedSong != songId) {
         //new exoplayer
         val newExoPlayer = SimpleExoPlayer.Builder(context).build()
         newExoPlayer.audioAttributes =
@@ -28,32 +27,25 @@ internal fun prepareSong(context: Context, song: Song) {
 
         nextExoPlayer = newExoPlayer
 
-        if (song.playbackAllowed(context)
-        ) {
-            val mediaSource = song.getMediaSource()
+        SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
+            if (song.playbackAllowed(context)
+            ) {
+                val mediaSource = song.getMediaSource()
 
-            if (mediaSource != null) {
-                nextExoPlayer?.prepare(mediaSource)
-                preparedSong = song.songId
-            } else {
-                displayInfo(context, context.getString(R.string.songNotPlayableError))
+                if (mediaSource != null) {
+                    nextExoPlayer?.prepare(mediaSource)
+                    preparedSong = song.songId
+                } else {
+                    displayInfo(context, context.getString(R.string.songNotPlayableError))
+                }
             }
         }
     }
 }
 
-internal fun prepareNextSong(context: Context) {
-    SongDatabaseHelper(context).getSong(
-        context,
-        getNextSong()
-    )?.let { song ->
-        prepareSong(context, song)
-    }
-}
-
 internal fun playSong(
     context: Context,
-    song: Song,
+    songId:String,
     showNotification: Boolean,
     requestAudioFocus: Boolean,
     playWhenReady: Boolean,
@@ -71,8 +63,8 @@ internal fun playSong(
         exoPlayer?.release()
         exoPlayer?.stop()
 
-        if (preparedSong != song.songId) {
-            prepareSong(context, song)
+        if (preparedSong != songId) {
+            prepareSong(context, songId)
         }
 
         exoPlayer =
@@ -90,7 +82,7 @@ internal fun playSong(
         exoPlayer?.addListener(
             getPlayerListener(
                 context,
-                song
+                songId
             )
         )
 
@@ -100,25 +92,27 @@ internal fun playSong(
             listenerEnabled = true
         }
 
-        //UI stuff
-        title = "${song.title} ${song.version}"
-        artist = song.artist
+        SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
+            //UI stuff
+            title = "${song.title} ${song.version}"
+            artist = song.artist
 
-        setCover(
-            context,
-            song.albumId,
-            song.artistId
-        ) {
-            setPlayButtonImage(context)
-            runSeekBarUpdate(context, true)
+            setCover(
+                context,
+                song.albumId,
+                song.artistId
+            ) {
+                setPlayButtonImage(context)
+                runSeekBarUpdate(context, true)
 
-            if (showNotification) {
-                updateNotification(
-                    song.title,
-                    song.version,
-                    song.artist,
-                    it
-                )
+                if (showNotification) {
+                    updateNotification(
+                        song.title,
+                        song.version,
+                        song.artist,
+                        it
+                    )
+                }
             }
         }
     }
@@ -208,9 +202,7 @@ internal fun runSeekBarUpdate(context: Context, crossFade: Boolean) {
 
                     nextExoPlayer?.playWhenReady = true
                 } else if (timeLeft < duration / 2 && exoPlayer?.isPlaying == true) {
-                    prepareNextSong(
-                        context
-                    )
+                    prepareSong(context, getNextSong())
                 }
             }
 

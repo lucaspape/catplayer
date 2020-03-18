@@ -14,6 +14,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.downloadCoverIntoImageReceiver
 import de.lucaspape.monstercat.download.ImageReceiverInterface
 import de.lucaspape.monstercat.download.downloadArtistImageIntoImageReceiver
@@ -85,15 +86,15 @@ var fullscreenTitleReference: WeakReference<TextView>? = null
         if (fullscreenTitleReference?.get() != null) {
             newTitleTextView?.get()?.text = fullscreenTitleReference?.get()?.text
         } else {
-            val currentSong = getCurrentSong()
+            getCurrentSong()?.let { songId ->
+                contextReference?.get()?.let { context ->
+                    SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
+                        val shownTitle = "${song.title} ${song.version}"
 
-            val shownTitle = if (currentSong == null) {
-                ""
-            } else {
-                "${currentSong.title} ${currentSong.version}"
+                        newTitleTextView?.get()?.text = shownTitle
+                    }
+                }
             }
-
-            newTitleTextView?.get()?.text = shownTitle
         }
 
         field = newTitleTextView
@@ -104,11 +105,15 @@ var fullscreenArtistReference: WeakReference<TextView>? = null
         if (fullscreenArtistReference?.get() != null) {
             newArtistTextView?.get()?.text = fullscreenArtistReference?.get()?.text
         } else {
-            val currentSong = getCurrentSong()
+            getCurrentSong()?.let { songId ->
+                contextReference?.get()?.let { context ->
+                    SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
+                        val artist = song.artist
 
-            val artist = currentSong?.artist ?: ""
-
-            newArtistTextView?.get()?.text = artist
+                        newArtistTextView?.get()?.text = artist
+                    }
+                }
+            }
         }
 
         field = newArtistTextView
@@ -240,6 +245,12 @@ var artistDrawable: Drawable? = null
         field = newDrawable
     }
 
+internal fun setCover(context: Context, songId: String, callback: (bitmap: Bitmap) -> Unit) {
+    SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
+        setCover(context, song.albumId, song.artistId, callback)
+    }
+}
+
 internal fun setCover(
     context: Context,
     albumId: String,
@@ -319,7 +330,7 @@ internal fun setPlayButtonImage(context: Context) {
 /**
  * SetPlayerState
  */
-internal fun setPlayerState(progress:Long) {
+internal fun setPlayerState(progress: Long) {
     val stateBuilder = PlaybackStateCompat.Builder()
 
     val state: Int = if (exoPlayer?.isPlaying == true) {
