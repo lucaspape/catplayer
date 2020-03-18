@@ -39,10 +39,7 @@ import java.lang.ref.WeakReference
 class HomeHandler {
     companion object {
         @JvmStatic
-        private var catalogViewDataCache = WeakReference<ArrayList<CatalogItem>>(ArrayList())
-
-        @JvmStatic
-        private var albumViewDataCache = WeakReference<ArrayList<AlbumItem>>(ArrayList())
+        private var viewDataCache = HashMap<String, WeakReference<ArrayList<*>>>()
     }
 
     private var initDone = false
@@ -61,6 +58,7 @@ class HomeHandler {
         albumMcId: String?,
         restoreScrollPosition: Boolean,
         catalogViewData: ArrayList<CatalogItem>,
+        cacheId:String,
         loadMoreListener: (itemAdapter: ItemAdapter<CatalogItem>, footerAdapter: ItemAdapter<ProgressItem>, currentPage: Int, callback: (newList: ArrayList<CatalogItem>) -> Unit) -> Unit,
         refreshListener: (albumId: String?, albumMcId: String?) -> Unit,
         backPressedCallback: () -> Unit
@@ -96,7 +94,7 @@ class HomeHandler {
             restoreRecyclerViewPosition(view.context, "catalogView")
         }
 
-        catalogViewDataCache = WeakReference(catalogViewData)
+        viewDataCache[cacheId] = WeakReference(catalogViewData as ArrayList<*>)
 
         /**
          * On song click
@@ -232,7 +230,7 @@ class HomeHandler {
                         catalogViewData.add(catalogItem)
                     }
 
-                    catalogViewDataCache = WeakReference(catalogViewData)
+                    viewDataCache[cacheId] = WeakReference(catalogViewData as ArrayList<*>)
                 }
             }
         })
@@ -261,6 +259,7 @@ class HomeHandler {
     private fun updateAlbumRecyclerView(
         view: View,
         albumViewData: ArrayList<AlbumItem>,
+        cacheId: String,
         loadMoreListener: (itemAdapter: ItemAdapter<AlbumItem>, footerAdapter: ItemAdapter<ProgressItem>, currentPage: Int, callback: (newList: ArrayList<AlbumItem>) -> Unit) -> Unit,
         refreshListener: () -> Unit,
         backPressedCallback: () -> Unit
@@ -286,7 +285,7 @@ class HomeHandler {
 
         restoreRecyclerViewPosition(view.context, "albumView")
 
-        albumViewDataCache = WeakReference(albumViewData)
+        viewDataCache[cacheId] = WeakReference(albumViewData as ArrayList<*>)
 
         val albumDatabaseHelper = AlbumDatabaseHelper(view.context)
 
@@ -338,7 +337,7 @@ class HomeHandler {
                         albumViewData.add(albumItem)
                     }
 
-                    albumViewDataCache = WeakReference(albumViewData)
+                    viewDataCache[cacheId] = WeakReference(albumViewData as ArrayList<*>)
                 }
             }
         })
@@ -507,7 +506,7 @@ class HomeHandler {
                 null,
                 null,
                 true,
-                catalogViewData, { itemAdapter, footerAdapter, currentPage, callback ->
+                catalogViewData, "catalogView", { itemAdapter, footerAdapter, currentPage, callback ->
                     footerAdapter.clear()
                     footerAdapter.add(ProgressItem())
 
@@ -521,7 +520,7 @@ class HomeHandler {
             swipeRefreshLayout.isRefreshing = false
         }
 
-        var isEmpty = catalogViewDataCache.get()?.isEmpty()
+        var isEmpty = viewDataCache["catalogView"]?.get()?.isEmpty()
 
         if(isEmpty == null){
             isEmpty = true
@@ -566,7 +565,9 @@ class HomeHandler {
                 }
             }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         } else {
-            catalogViewDataCache.get()?.let { finished(it) }
+            viewDataCache["catalogView"]?.get()?.let {
+                finished(it as ArrayList<CatalogItem>)
+            }
         }
     }
 
@@ -635,6 +636,7 @@ class HomeHandler {
             updateAlbumRecyclerView(
                 view,
                 albumViewData,
+                "albumView",
                 { itemAdapter, footerAdapter, currentPage, callback ->
                     footerAdapter.clear()
                     footerAdapter.add(ProgressItem())
@@ -651,7 +653,7 @@ class HomeHandler {
             swipeRefreshLayout.isRefreshing = false
         }
 
-        var isEmpty = albumViewDataCache.get()?.isEmpty()
+        var isEmpty = viewDataCache["albumView"]?.get()?.isEmpty()
 
         if(isEmpty == null){
             isEmpty = true
@@ -701,8 +703,8 @@ class HomeHandler {
                     }
                 }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         } else {
-            albumViewDataCache.get()?.let {
-                finished(it)
+            viewDataCache["albumView"]?.get()?.let {
+                finished(it as ArrayList<AlbumItem>)
             }
         }
     }
@@ -797,6 +799,7 @@ class HomeHandler {
                         mcId,
                         false,
                         catalogViewData,
+                        "singleAlbum-$albumId",
                         { _, _, _, _ -> },
                         { albumId, albumMcId ->
                             albumId?.let {
@@ -857,6 +860,7 @@ class HomeHandler {
                     null,
                     false,
                     searchResults,
+                    "search-$searchString",
                     { itemAdapter, footerAdapter, currentPage, callback ->
                         footerAdapter.clear()
                         footerAdapter.add(ProgressItem())
