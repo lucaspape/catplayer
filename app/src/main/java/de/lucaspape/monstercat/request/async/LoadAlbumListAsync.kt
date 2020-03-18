@@ -21,14 +21,14 @@ class LoadAlbumListAsync(
     private val forceReload: Boolean,
     private val skip: Int,
     private val displayLoading: () -> Unit,
-    private val finishedCallback: (forceReload:Boolean, skip:Int, displayLoading:() -> Unit) -> Unit,
-    private val errorCallback: (forceReload:Boolean, skip:Int, displayLoading:() -> Unit) -> Unit
+    private val finishedCallback: (forceReload: Boolean, skip: Int, displayLoading: () -> Unit) -> Unit,
+    private val errorCallback: (forceReload: Boolean, skip: Int, displayLoading: () -> Unit) -> Unit
 ) : AsyncTask<Void, Void, Boolean>() {
 
     override fun onPostExecute(result: Boolean) {
-        if(result){
+        if (result) {
             finishedCallback(forceReload, skip, displayLoading)
-        }else{
+        } else {
             errorCallback(forceReload, skip, displayLoading)
         }
     }
@@ -69,7 +69,7 @@ class LoadAlbumListAsync(
                     val json = JSONObject(response)
                     val jsonArray = json.getJSONArray("results")
 
-                    for (i in (jsonArray.length() - 1 downTo 0)) {
+                    for (i in (0 until jsonArray.length())) {
                         parseAlbumToDB(jsonArray.getJSONObject(i), context)
                     }
 

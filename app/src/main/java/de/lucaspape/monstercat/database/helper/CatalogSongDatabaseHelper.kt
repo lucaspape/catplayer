@@ -18,7 +18,7 @@ class CatalogSongDatabaseHelper(context: Context) :
 
     companion object {
         @JvmStatic
-        private val DATABASE_VERSION = 5 * SongDatabaseHelper.DATABASE_VERSION
+        private val DATABASE_VERSION = 6 * SongDatabaseHelper.DATABASE_VERSION
 
         @JvmStatic
         private val DATABASE_NAME = "catalog_songs_db"
@@ -111,6 +111,8 @@ class CatalogSongDatabaseHelper(context: Context) :
 
         cursor.close()
         db.close()
+
+        catalogSongs.reverse()
 
         return catalogSongs
     }

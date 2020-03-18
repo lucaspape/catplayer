@@ -17,7 +17,7 @@ class AlbumDatabaseHelper(context: Context) :
     ) {
     companion object {
         @JvmStatic
-        val DATABASE_VERSION = 5 * SongDatabaseHelper.DATABASE_VERSION
+        val DATABASE_VERSION = 6 * SongDatabaseHelper.DATABASE_VERSION
 
         @JvmStatic
         private val DATABASE_NAME = "albums_db"
@@ -71,7 +71,7 @@ class AlbumDatabaseHelper(context: Context) :
         return id
     }
 
-    fun getAlbumFromMcId(mcID: String): Album?{
+    fun getAlbumFromMcId(mcID: String): Album? {
         val db = readableDatabase
         val cursor: Cursor
 
@@ -184,6 +184,8 @@ class AlbumDatabaseHelper(context: Context) :
 
         cursor.close()
         db.close()
+
+        albums.reverse()
 
         return albums
     }
