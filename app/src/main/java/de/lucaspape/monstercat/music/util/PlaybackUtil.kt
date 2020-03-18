@@ -191,6 +191,7 @@ internal fun runSeekBarUpdate(context: Context, crossFade: Boolean) {
 
             exoPlayer?.currentPosition?.toInt()?.let {
                 currentPosition = it
+                setPlayerState(it.toLong())
             }
 
             if (crossFade) {

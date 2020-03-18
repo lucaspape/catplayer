@@ -198,8 +198,6 @@ var currentPosition = 0
         fullscreenSeekBarReference?.get()?.progress = newInt
 
         field = newInt
-
-        setPlayerState()
     }
 
 var duration = 0
@@ -321,7 +319,7 @@ internal fun setPlayButtonImage(context: Context) {
 /**
  * SetPlayerState
  */
-private fun setPlayerState() {
+internal fun setPlayerState(progress:Long) {
     val stateBuilder = PlaybackStateCompat.Builder()
 
     val state: Int = if (exoPlayer?.isPlaying == true) {
@@ -330,7 +328,7 @@ private fun setPlayerState() {
         PlaybackState.STATE_PAUSED
     }
 
-    stateBuilder.setState(state, currentPosition.toLong(), 1.0f)
+    stateBuilder.setState(state, progress, 1.0f)
     stateBuilder.setActions(
         PlaybackStateCompat.ACTION_PLAY +
                 PlaybackStateCompat.ACTION_PAUSE +

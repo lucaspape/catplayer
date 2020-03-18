@@ -15,10 +15,10 @@ import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.contextReference
 import java.lang.IllegalArgumentException
 
-internal const val PLAY_PAUSE_ACTION = "de.lucaspape.monstercat.playpause"
-internal const val NEXT_ACTION = "de.lucaspape.monstercat.next"
-internal const val PREV_ACTION = "de.lucaspape.monstercat.prev"
-internal const val CLOSE_ACTION = "de.lucaspape.monstercat.close"
+private const val PLAY_PAUSE_ACTION = "de.lucaspape.monstercat.playpause"
+private const val NEXT_ACTION = "de.lucaspape.monstercat.next"
+private const val PREV_ACTION = "de.lucaspape.monstercat.prev"
+private const val CLOSE_ACTION = "de.lucaspape.monstercat.close"
 
 internal const val musicNotificationID = 1
 
