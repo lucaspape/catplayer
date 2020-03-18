@@ -37,20 +37,6 @@ import java.lang.ref.WeakReference
  * Does everything for the home page
  */
 class HomeHandler {
-    companion object {
-        @JvmStatic
-        var catalogViewData = ArrayList<CatalogItem>()
-
-        @JvmStatic
-        var albumViewData = ArrayList<AlbumItem>()
-
-        @JvmStatic
-        var albumContentViewData = HashMap<String, ArrayList<CatalogItem>>()
-
-        @JvmStatic
-        var searchResultsData = HashMap<String, ArrayList<CatalogItem>>()
-    }
-
     private var initDone = false
 
     private var recyclerView: RecyclerView? = null
@@ -66,8 +52,8 @@ class HomeHandler {
         albumId: String?,
         albumMcId: String?,
         restoreScrollPosition: Boolean,
-        currentCatalogViewData: ArrayList<CatalogItem>,
-        loadMoreListener: (itemAdapter: ItemAdapter<CatalogItem>, footerAdapter: ItemAdapter<ProgressItem>) -> Unit,
+        catalogViewData: ArrayList<CatalogItem>,
+        loadMoreListener: (itemAdapter: ItemAdapter<CatalogItem>, footerAdapter: ItemAdapter<ProgressItem>, currentPage: Int, callback: (newList: ArrayList<CatalogItem>) -> Unit) -> Unit,
         refreshListener: (albumId: String?, albumMcId: String?) -> Unit,
         backPressedCallback: () -> Unit
     ) {
@@ -92,7 +78,7 @@ class HomeHandler {
 
         recyclerView?.adapter = fastAdapter
 
-        for (catalogItem in currentCatalogViewData) {
+        for (catalogItem in catalogViewData) {
             itemAdapter.add(
                 catalogItem
             )
@@ -108,16 +94,16 @@ class HomeHandler {
         fastAdapter.onClickListener = { _, _, _, position ->
             val itemIndex = position + itemIndexOffset
 
-            if (itemIndex >= 0 && itemIndex < currentCatalogViewData.size) {
+            if (itemIndex >= 0 && itemIndex < catalogViewData.size) {
                 clearQueue()
 
-                val catalogItem = currentCatalogViewData[itemIndex]
+                val catalogItem = catalogViewData[itemIndex]
 
                 val nextSongIdsList = ArrayList<String>()
 
-                for (i in (itemIndex + 1 until currentCatalogViewData.size)) {
+                for (i in (itemIndex + 1 until catalogViewData.size)) {
                     try {
-                        nextSongIdsList.add(currentCatalogViewData[i].songId)
+                        nextSongIdsList.add(catalogViewData[i].songId)
                     } catch (e: IndexOutOfBoundsException) {
 
                     }
@@ -140,10 +126,10 @@ class HomeHandler {
         fastAdapter.onLongClickListener = { _, _, _, position ->
             val itemIndex = position + itemIndexOffset
 
-            if (itemIndex >= 0 && itemIndex < currentCatalogViewData.size) {
+            if (itemIndex >= 0 && itemIndex < catalogViewData.size) {
                 val idList = ArrayList<String>()
 
-                for (catalogItem in currentCatalogViewData) {
+                for (catalogItem in catalogViewData) {
                     idList.add(catalogItem.songId)
                 }
 
@@ -171,10 +157,10 @@ class HomeHandler {
             ) {
                 val itemIndex = position + itemIndexOffset
 
-                if (itemIndex >= 0 && itemIndex < currentCatalogViewData.size) {
+                if (itemIndex >= 0 && itemIndex < catalogViewData.size) {
                     val idList = ArrayList<String>()
 
-                    for (catalogItem in currentCatalogViewData) {
+                    for (catalogItem in catalogViewData) {
                         idList.add(catalogItem.songId)
                     }
 
@@ -231,7 +217,11 @@ class HomeHandler {
         recyclerView?.addOnScrollListener(object :
             EndlessRecyclerOnScrollListener(footerAdapter) {
             override fun onLoadMore(currentPage: Int) {
-                loadMoreListener(itemAdapter, footerAdapter)
+                loadMoreListener(itemAdapter, footerAdapter, currentPage) {
+                    for (catalogItem in it) {
+                        catalogViewData.add(catalogItem)
+                    }
+                }
             }
         })
 
@@ -258,8 +248,8 @@ class HomeHandler {
      */
     private fun updateAlbumRecyclerView(
         view: View,
-        currentAlbumViewData: ArrayList<AlbumItem>,
-        loadMoreListener: (itemAdapter: ItemAdapter<AlbumItem>, footerAdapter: ItemAdapter<ProgressItem>) -> Unit,
+        albumViewData: ArrayList<AlbumItem>,
+        loadMoreListener: (itemAdapter: ItemAdapter<AlbumItem>, footerAdapter: ItemAdapter<ProgressItem>, currentPage: Int, callback: (newList: ArrayList<AlbumItem>) -> Unit) -> Unit,
         refreshListener: () -> Unit,
         backPressedCallback: () -> Unit
     ) {
@@ -276,7 +266,7 @@ class HomeHandler {
 
         recyclerView?.adapter = fastAdapter
 
-        for (albumItem in currentAlbumViewData) {
+        for (albumItem in albumViewData) {
             itemAdapter.add(
                 albumItem
             )
@@ -290,10 +280,10 @@ class HomeHandler {
          * On item click
          */
         fastAdapter.onClickListener = { _, _, _, position ->
-            if (position < currentAlbumViewData.size) {
+            if (position < albumViewData.size) {
                 saveRecyclerViewPosition(view.context, "albumView")
 
-                val albumItem = currentAlbumViewData[position]
+                val albumItem = albumViewData[position]
 
                 albumDatabaseHelper.getAlbum(albumItem.albumId)?.mcID?.let { mcID ->
                     loadAlbum(view, albumItem.albumId, mcID, false)
@@ -308,10 +298,10 @@ class HomeHandler {
          * On item long click
          */
         fastAdapter.onLongClickListener = { _, _, _, position ->
-            if (position < currentAlbumViewData.size) {
+            if (position < albumViewData.size) {
                 val albumMcIdList = ArrayList<String>()
 
-                for (albumItem in currentAlbumViewData) {
+                for (albumItem in albumViewData) {
                     albumDatabaseHelper.getAlbum(albumItem.albumId)?.mcID?.let { mcID ->
                         albumMcIdList.add(mcID)
                     }
@@ -329,7 +319,11 @@ class HomeHandler {
         recyclerView?.addOnScrollListener(object :
             EndlessRecyclerOnScrollListener(footerAdapter) {
             override fun onLoadMore(currentPage: Int) {
-                loadMoreListener(itemAdapter, footerAdapter)
+                loadMoreListener(itemAdapter, footerAdapter, currentPage) {
+                    for (albumItem in it) {
+                        albumViewData.add(albumItem)
+                    }
+                }
             }
         })
 
@@ -487,69 +481,64 @@ class HomeHandler {
     fun initSongListLoad(view: View, forceReload: Boolean) {
         initDone = false
 
+        val catalogViewData = ArrayList<CatalogItem>()
+
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
 
-        val displayData: () -> Unit = {
-            updateCatalogRecyclerView(
-                view,
-                null,
-                null,
-                null,
-                true,
-                catalogViewData, { itemAdapter, footerAdapter ->
-                    footerAdapter.clear()
-                    footerAdapter.add(ProgressItem())
-
-                    loadSongList(view, itemAdapter, footerAdapter)
-                }, { _, _ ->
-                    initSongListLoad(view, true)
-                }, {
-                    initSongListLoad(view, false)
-                })
-
-            swipeRefreshLayout.isRefreshing = false
-        }
-
-        if (catalogViewData.size < 50 || forceReload) {
+        if (forceReload) {
             resetRecyclerViewPosition(view.context, "catalogView")
-
-            val catalogSongDatabaseHelper =
-                CatalogSongDatabaseHelper(view.context)
-
-            catalogViewData = ArrayList()
-
-            if (forceReload) {
-                catalogSongDatabaseHelper.reCreateTable()
-            }
-
-            LoadSongListAsync(WeakReference(view.context), forceReload, 0, displayLoading = {
-                swipeRefreshLayout.isRefreshing = true
-            }, finishedCallback = { _, _, _ ->
-                BackgroundAsync({
-                    val songIdList = catalogSongDatabaseHelper.getSongs(0, 50)
-
-                    for (i in (songIdList.size - 1 downTo 0)) {
-                        catalogViewData.add(CatalogItem(songIdList[i].songId))
-                    }
-
-                }, {
-                    displayData()
-                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-            }, errorCallback = { _, _, _ ->
-                swipeRefreshLayout.isRefreshing = false
-
-                displaySnackbar(
-                    view,
-                    view.context.getString(R.string.errorLoadingSongList),
-                    view.context.getString(R.string.retry)
-                ) {
-                    initSongListLoad(view, forceReload)
-                }
-            }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-        } else {
-            displayData()
         }
+
+        val catalogSongDatabaseHelper =
+            CatalogSongDatabaseHelper(view.context)
+
+        if (forceReload) {
+            catalogSongDatabaseHelper.reCreateTable()
+        }
+
+        LoadSongListAsync(WeakReference(view.context), forceReload, 0, displayLoading = {
+            swipeRefreshLayout.isRefreshing = true
+        }, finishedCallback = { _, _, _ ->
+            BackgroundAsync({
+                val songIdList = catalogSongDatabaseHelper.getSongs(0, 50)
+
+                for (i in (songIdList.size - 1 downTo 0)) {
+                    catalogViewData.add(CatalogItem(songIdList[i].songId))
+                }
+
+            }, {
+                updateCatalogRecyclerView(
+                    view,
+                    null,
+                    null,
+                    null,
+                    true,
+                    catalogViewData, { itemAdapter, footerAdapter, currentPage, callback ->
+                        footerAdapter.clear()
+                        footerAdapter.add(ProgressItem())
+
+                        loadSongList(view, itemAdapter, footerAdapter, currentPage, callback)
+                    }, { _, _ ->
+                        initSongListLoad(view, true)
+                    }, {
+                        initSongListLoad(view, false)
+                    })
+
+                swipeRefreshLayout.isRefreshing = false
+            }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        }, errorCallback = { _, _, _ ->
+            swipeRefreshLayout.isRefreshing = false
+
+            displaySnackbar(
+                view,
+                view.context.getString(R.string.errorLoadingSongList),
+                view.context.getString(R.string.retry)
+            ) {
+                initSongListLoad(view, forceReload)
+            }
+        }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+
     }
 
     /**
@@ -558,19 +547,23 @@ class HomeHandler {
     private fun loadSongList(
         view: View,
         itemAdapter: ItemAdapter<CatalogItem>,
-        footerAdapter: ItemAdapter<ProgressItem>
+        footerAdapter: ItemAdapter<ProgressItem>,
+        currentPage: Int,
+        callback: (list: ArrayList<CatalogItem>) -> Unit
     ) {
         if (initDone) {
             LoadSongListAsync(WeakReference(view.context),
                 false,
-                catalogViewData.size,
+                (currentPage * 50),
                 displayLoading = {},
                 finishedCallback = { _, _, _ ->
                     val catalogSongDatabaseHelper =
                         CatalogSongDatabaseHelper(view.context)
 
                     val songList =
-                        catalogSongDatabaseHelper.getSongs(catalogViewData.size.toLong(), 50)
+                        catalogSongDatabaseHelper.getSongs((currentPage * 50).toLong(), 50)
+
+                    val list = ArrayList<CatalogItem>()
 
                     for (i in (songList.size - 1 downTo 0)) {
                         val catalogItem = CatalogItem(songList[i].songId)
@@ -579,10 +572,12 @@ class HomeHandler {
                             catalogItem
                         )
 
-                        catalogViewData.add(catalogItem)
-
-                        footerAdapter.clear()
+                        list.add(catalogItem)
                     }
+
+                    footerAdapter.clear()
+
+                    callback(list)
                 },
                 errorCallback = { _, _, _ ->
                     footerAdapter.clear()
@@ -592,7 +587,7 @@ class HomeHandler {
                         view.context.getString(R.string.errorLoadingSongList),
                         view.context.getString(R.string.retry)
                     ) {
-                        loadSongList(view, itemAdapter, footerAdapter)
+                        loadSongList(view, itemAdapter, footerAdapter, currentPage, callback)
                     }
                 }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         }
@@ -603,69 +598,67 @@ class HomeHandler {
      */
     fun initAlbumListLoad(view: View, forceReload: Boolean) {
         initDone = false
+        val albumViewData = ArrayList<AlbumItem>()
 
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
 
-        val displayData: () -> Unit = {
-            updateAlbumRecyclerView(view, albumViewData, { itemAdapter, footerAdapter ->
-                footerAdapter.clear()
-                footerAdapter.add(ProgressItem())
-
-                loadAlbumList(view, itemAdapter, footerAdapter)
-            }, {
-                initAlbumListLoad(view, true)
-            }, {
-                initAlbumListLoad(view, false)
-            })
-
-            swipeRefreshLayout.isRefreshing = false
-        }
-
-        if (albumViewData.size < 50 || forceReload) {
+        if (forceReload) {
             resetRecyclerViewPosition(view.context, "albumView")
-
-            val contextReference = WeakReference(view.context)
-
-            val albumDatabaseHelper = AlbumDatabaseHelper(view.context)
-
-            albumViewData = ArrayList()
-
-            if (forceReload) {
-                albumDatabaseHelper.reCreateTable(view.context, false)
-            }
-
-            LoadAlbumListAsync(
-                contextReference,
-                forceReload,
-                0, displayLoading = {
-                    swipeRefreshLayout.isRefreshing = true
-                }
-                , finishedCallback = { _, _, _ ->
-                    BackgroundAsync({
-                        val albumList = albumDatabaseHelper.getAlbums(0, 50)
-
-                        for (i in (albumList.size - 1 downTo 0)) {
-                            albumViewData.add(AlbumItem(albumList[i].albumId))
-                        }
-                    }, {
-                        displayData()
-                    }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-
-                }, errorCallback = { _, _, _ ->
-                    swipeRefreshLayout.isRefreshing = false
-
-                    displaySnackbar(
-                        view,
-                        view.context.getString(R.string.errorLoadingAlbumList),
-                        view.context.getString(R.string.retry)
-                    ) {
-                        initAlbumListLoad(view, forceReload)
-                    }
-                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-        } else {
-            displayData()
         }
+
+        val contextReference = WeakReference(view.context)
+
+        val albumDatabaseHelper = AlbumDatabaseHelper(view.context)
+
+        if (forceReload) {
+            albumDatabaseHelper.reCreateTable(view.context, false)
+        }
+
+        LoadAlbumListAsync(
+            contextReference,
+            forceReload,
+            0, displayLoading = {
+                swipeRefreshLayout.isRefreshing = true
+            }
+            , finishedCallback = { _, _, _ ->
+                BackgroundAsync({
+                    val albumList = albumDatabaseHelper.getAlbums(0, 50)
+
+                    for (i in (albumList.size - 1 downTo 0)) {
+                        albumViewData.add(AlbumItem(albumList[i].albumId))
+                    }
+                }, {
+                    updateAlbumRecyclerView(
+                        view,
+                        albumViewData,
+                        { itemAdapter, footerAdapter, currentPage, callback ->
+                            footerAdapter.clear()
+                            footerAdapter.add(ProgressItem())
+
+                            loadAlbumList(view, itemAdapter, footerAdapter, currentPage, callback)
+                        },
+                        {
+                            initAlbumListLoad(view, true)
+                        },
+                        {
+                            initAlbumListLoad(view, false)
+                        })
+
+                    swipeRefreshLayout.isRefreshing = false
+                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+
+            }, errorCallback = { _, _, _ ->
+                swipeRefreshLayout.isRefreshing = false
+
+                displaySnackbar(
+                    view,
+                    view.context.getString(R.string.errorLoadingAlbumList),
+                    view.context.getString(R.string.retry)
+                ) {
+                    initAlbumListLoad(view, forceReload)
+                }
+            }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
     }
 
     /**
@@ -674,15 +667,19 @@ class HomeHandler {
     private fun loadAlbumList(
         view: View,
         itemAdapter: ItemAdapter<AlbumItem>,
-        footerAdapter: ItemAdapter<ProgressItem>
+        footerAdapter: ItemAdapter<ProgressItem>,
+        currentPage: Int,
+        callback: (newList: ArrayList<AlbumItem>) -> Unit
     ) {
         if (initDone) {
             LoadAlbumListAsync(WeakReference(view.context),
-                false, albumViewData.size, displayLoading = {}, finishedCallback = { _, _, _ ->
+                false, (currentPage * 50), displayLoading = {}, finishedCallback = { _, _, _ ->
                     val albumDatabaseHelper =
                         AlbumDatabaseHelper(view.context)
                     val albumList =
-                        albumDatabaseHelper.getAlbums(albumViewData.size.toLong(), 50)
+                        albumDatabaseHelper.getAlbums((currentPage * 50).toLong(), 50)
+
+                    val albumItemList = ArrayList<AlbumItem>()
 
                     for (album in albumList) {
                         val albumItem = AlbumItem(album.albumId)
@@ -691,10 +688,12 @@ class HomeHandler {
                             albumItem
                         )
 
-                        albumViewData.add(albumItem)
-
-                        footerAdapter.clear()
+                        albumItemList.add(albumItem)
                     }
+
+                    footerAdapter.clear()
+
+                    callback(albumItemList)
 
                 }, errorCallback = { _, _, _ ->
                     footerAdapter.clear()
@@ -704,7 +703,7 @@ class HomeHandler {
                         view.context.getString(R.string.errorLoadingAlbumList),
                         view.context.getString(R.string.retry)
                     ) {
-                        loadAlbumList(view, itemAdapter, footerAdapter)
+                        loadAlbumList(view, itemAdapter, footerAdapter, currentPage, callback)
                     }
                 }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         }
@@ -720,80 +719,67 @@ class HomeHandler {
             view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
 
         var albumName = ""
-
-        val displayData: () -> Unit = {
-            albumContentViewData[albumId]?.let {
-                updateCatalogRecyclerView(
-                    view,
-                    albumName,
-                    albumId,
-                    mcId,
-                    false,
-                    it,
-                    { _, _ -> },
-                    { albumId, albumMcId ->
-                        albumId?.let {
-                            albumMcId?.let {
-                                loadAlbum(view, albumId, albumMcId, true)
-                            }
-                        }
-                    },
-                    {
-                        initAlbumListLoad(view, false)
-                    }
-                )
-
-                swipeRefreshLayout.isRefreshing = false
-            }
-        }
+        val catalogViewData = ArrayList<CatalogItem>()
 
         AlbumDatabaseHelper(view.context).getAlbum(albumId)?.let {
             albumName = it.title
         }
 
-        if (albumContentViewData[albumId] == null || forceReload) {
-            LoadAlbumAsync(
-                contextReference,
-                forceReload,
-                albumId,
-                mcId, displayLoading = {
-                    swipeRefreshLayout.isRefreshing = true
-                }
-                , finishedCallback = { _, _, _, _ ->
-                    BackgroundAsync({
-                        val albumItemDatabaseHelper =
-                            AlbumItemDatabaseHelper(contextReference.get()!!, albumId)
-                        val albumItemList = albumItemDatabaseHelper.getAllData()
+        LoadAlbumAsync(
+            contextReference,
+            forceReload,
+            albumId,
+            mcId, displayLoading = {
+                swipeRefreshLayout.isRefreshing = true
+            }
+            , finishedCallback = { _, _, _, _ ->
+                BackgroundAsync({
+                    val albumItemDatabaseHelper =
+                        AlbumItemDatabaseHelper(contextReference.get()!!, albumId)
+                    val albumItemList = albumItemDatabaseHelper.getAllData()
 
-                        val dbSongs = ArrayList<CatalogItem>()
-
-                        for (albumItem in albumItemList) {
-                            dbSongs.add(
-                                CatalogItem(albumItem.songId)
-                            )
-                        }
-
-                        albumContentViewData[albumId] = dbSongs
-                    }, {
-                        displayData()
-                    }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-
-                }, errorCallback = { _, _, _, _ ->
-                    swipeRefreshLayout.isRefreshing = false
-
-                    displaySnackbar(
-                        view,
-                        view.context.getString(R.string.errorLoadingAlbum),
-                        view.context.getString(R.string.retry)
-                    ) {
-                        loadAlbum(view, albumId, mcId, forceReload)
+                    for (albumItem in albumItemList) {
+                        catalogViewData.add(
+                            CatalogItem(albumItem.songId)
+                        )
                     }
-                }).executeOnExecutor(
-                AsyncTask.THREAD_POOL_EXECUTOR
-            )
-        } else {
-            displayData()
-        }
+                }, {
+                    updateCatalogRecyclerView(
+                        view,
+                        albumName,
+                        albumId,
+                        mcId,
+                        false,
+                        catalogViewData,
+                        { _, _, _, _ -> },
+                        { albumId, albumMcId ->
+                            albumId?.let {
+                                albumMcId?.let {
+                                    loadAlbum(view, albumId, albumMcId, true)
+                                }
+                            }
+                        },
+                        {
+                            initAlbumListLoad(view, false)
+                        }
+                    )
+
+                    swipeRefreshLayout.isRefreshing = false
+                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+
+            }, errorCallback = { _, _, _, _ ->
+                swipeRefreshLayout.isRefreshing = false
+
+                displaySnackbar(
+                    view,
+                    view.context.getString(R.string.errorLoadingAlbum),
+                    view.context.getString(R.string.retry)
+                ) {
+                    loadAlbum(view, albumId, mcId, forceReload)
+                }
+            }).executeOnExecutor(
+            AsyncTask.THREAD_POOL_EXECUTOR
+        )
     }
 
     /**
@@ -813,20 +799,30 @@ class HomeHandler {
 
         swipeRefreshLayout.isRefreshing = true
 
-        val displayData: () -> Unit = {
-            searchResultsData[searchString]?.let {
+        LoadTitleSearchAsync(
+            contextReference,
+            searchString,
+            0
+            , finishedCallback = { _, _, searchResults ->
                 updateCatalogRecyclerView(
                     view,
                     null,
                     null,
                     null,
                     false,
-                    it,
-                    { itemAdapter, footerAdapter ->
+                    searchResults,
+                    { itemAdapter, footerAdapter, currentPage, callback ->
                         footerAdapter.clear()
                         footerAdapter.add(ProgressItem())
 
-                        searchMore(view, searchString, itemAdapter, footerAdapter)
+                        searchMore(
+                            view,
+                            searchString,
+                            itemAdapter,
+                            footerAdapter,
+                            currentPage,
+                            callback
+                        )
                     },
                     { _, _ ->
                         searchSong(view, searchString, true)
@@ -838,49 +834,33 @@ class HomeHandler {
                             initSongListLoad(view, false)
                         }
                     })
-            }
 
-            swipeRefreshLayout.isRefreshing = false
-        }
+                swipeRefreshLayout.isRefreshing = false
+            }, errorCallback = { _, _ ->
+                swipeRefreshLayout.isRefreshing = false
 
-        if (searchResultsData[searchString] == null || forceReload) {
-            LoadTitleSearchAsync(
-                contextReference,
-                searchString,
-                0
-                , finishedCallback = { _, _, searchResults ->
-                    searchResultsData[searchString] = searchResults
+                displaySnackbar(
+                    view,
+                    view.context.getString(R.string.errorLoadingSearch),
+                    view.context.getString(R.string.retry)
+                ) { searchSong(view, searchString, forceReload) }
+            }).executeOnExecutor(
+            AsyncTask.THREAD_POOL_EXECUTOR
+        )
 
-                    displayData()
-                }, errorCallback = { _, _ ->
-                    swipeRefreshLayout.isRefreshing = false
-
-                    displaySnackbar(
-                        view,
-                        view.context.getString(R.string.errorLoadingSearch),
-                        view.context.getString(R.string.retry)
-                    ) { searchSong(view, searchString, forceReload) }
-                }).executeOnExecutor(
-                AsyncTask.THREAD_POOL_EXECUTOR
-            )
-        } else {
-            displayData()
-        }
     }
 
     private fun searchMore(
         view: View,
         searchString: String,
         itemAdapter: ItemAdapter<CatalogItem>,
-        footerAdapter: ItemAdapter<ProgressItem>
+        footerAdapter: ItemAdapter<ProgressItem>,
+        currentPage: Int,
+        callback: (newList: ArrayList<CatalogItem>) -> Unit
     ) {
         val contextReference = WeakReference(view.context)
 
-        var skip = searchResultsData[searchString]?.size
-
-        if (skip == null) {
-            skip = 0
-        }
+        val skip = currentPage * 50
 
         LoadTitleSearchAsync(
             contextReference,
@@ -889,8 +869,9 @@ class HomeHandler {
             , finishedCallback = { _, _, searchResults ->
                 for (result in searchResults) {
                     itemAdapter.add(result)
-                    searchResultsData[searchString]?.add(result)
                 }
+
+                callback(searchResults)
 
                 footerAdapter.clear()
             }, errorCallback = { _, _ ->
@@ -900,7 +881,16 @@ class HomeHandler {
                     view,
                     view.context.getString(R.string.errorLoadingSearch),
                     view.context.getString(R.string.retry)
-                ) { searchMore(view, searchString, itemAdapter, footerAdapter) }
+                ) {
+                    searchMore(
+                        view,
+                        searchString,
+                        itemAdapter,
+                        footerAdapter,
+                        currentPage,
+                        callback
+                    )
+                }
             }).executeOnExecutor(
             AsyncTask.THREAD_POOL_EXECUTOR
         )
