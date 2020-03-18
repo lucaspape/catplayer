@@ -48,11 +48,8 @@ class PlayerService : Service() {
 
                 setCover(
                     context,
-                    song.title,
-                    song.version,
-                    song.artist,
-                    song.artistId,
-                    song.albumId
+                    song.albumId,
+                    song.artistId
                 ) {
                     startForeground(
                         musicNotificationID,

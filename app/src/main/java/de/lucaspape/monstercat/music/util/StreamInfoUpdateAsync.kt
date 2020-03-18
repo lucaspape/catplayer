@@ -53,11 +53,8 @@ class StreamInfoUpdateAsync(
             //TODO artistId
             setCover(
                 context,
-                liveTitle,
-                liveVersion,
-                liveArtist,
-                "",
-                liveAlbumId
+                liveAlbumId,
+                ""
             ) { bitmap ->
                 updateNotification(
                     liveTitle,
@@ -67,11 +64,8 @@ class StreamInfoUpdateAsync(
                 )
             }
 
-            setTitle(
-                liveTitle,
-                liveVersion,
-                liveArtist
-            )
+            title = "$liveTitle $liveVersion"
+            artist = liveArtist
         }
     }
 

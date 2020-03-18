@@ -144,24 +144,19 @@ private fun resume() {
                     startPlayerService(song.songId)
 
                     //UI stuff
-                    setTitle(
-                        song.title,
-                        song.version,
-                        song.artist
-                    )
+                    title = "${song.title} ${song.version}"
+                    artist = song.artist
 
                     setCover(
                         context,
-                        song.title,
-                        song.version,
-                        song.artist,
-                        song.artistId,
-                        song.albumId
+                        song.albumId,
+                        song.artistId
                     ) {
                         setPlayButtonImage(
                             context
                         )
-                        startSeekBarUpdate(
+                        runSeekBarUpdate(
+                            context,
                             true
                         )
                         updateNotification(
@@ -188,7 +183,8 @@ fun toggleMusic() {
 internal fun stop() {
     if (exoPlayer?.isPlaying == true) {
 
-        hideTitle()
+        title = ""
+        artist = ""
 
         setPlayButtonImage(contextReference?.get()!!)
 

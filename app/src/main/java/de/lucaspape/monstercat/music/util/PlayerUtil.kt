@@ -72,11 +72,8 @@ fun getStreamPlayerListener(context: Context): Player.EventListener {
             //TODO artistid
             setCover(
                 context,
-                StreamInfoUpdateAsync.liveTitle,
-                StreamInfoUpdateAsync.liveVersion,
-                StreamInfoUpdateAsync.liveArtist,
-                "",
-                StreamInfoUpdateAsync.liveAlbumId
+                StreamInfoUpdateAsync.liveAlbumId,
+                ""
             ) { bitmap ->
                 updateNotification(
                     StreamInfoUpdateAsync.liveTitle,
@@ -112,11 +109,8 @@ fun getPlayerListener(context: Context, song: Song): Player.EventListener {
                 } else {
                     setCover(
                         context,
-                        song.title,
-                        song.version,
-                        song.artist,
-                        song.artistId,
-                        song.albumId
+                        song.albumId,
+                        song.artistId
                     ) {
                         updateNotification(
                             song.title,
@@ -127,7 +121,7 @@ fun getPlayerListener(context: Context, song: Song): Player.EventListener {
                     }
 
                     setPlayButtonImage(context)
-                    startSeekBarUpdate(true)
+                    runSeekBarUpdate(context, true)
                 }
             }
         }

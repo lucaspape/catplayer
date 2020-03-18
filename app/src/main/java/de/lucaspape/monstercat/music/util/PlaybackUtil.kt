@@ -3,6 +3,7 @@ package de.lucaspape.monstercat.music.util
 import android.content.Context
 import android.media.AudioManager
 import android.os.AsyncTask
+import android.os.Handler
 import com.google.android.exoplayer2.SimpleExoPlayer
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.objects.Song
@@ -14,6 +15,7 @@ import de.lucaspape.monstercat.music.notification.updateNotification
 import de.lucaspape.monstercat.twitch.Stream
 import de.lucaspape.monstercat.util.*
 import java.lang.ref.WeakReference
+import java.util.*
 
 private var preparedSong = ""
 
@@ -41,7 +43,8 @@ internal fun prepareSong(context: Context, song: Song) {
 }
 
 internal fun prepareNextSong(context: Context) {
-    SongDatabaseHelper(context).getSong(context,
+    SongDatabaseHelper(context).getSong(
+        context,
         getNextSong()
     )?.let { song ->
         prepareSong(context, song)
@@ -98,22 +101,16 @@ internal fun playSong(
         }
 
         //UI stuff
-        setTitle(
-            song.title,
-            song.version,
-            song.artist
-        )
+        title = "${song.title} ${song.version}"
+        artist = song.artist
 
         setCover(
             context,
-            song.title,
-            song.version,
-            song.artist,
-            song.artistId,
-            song.albumId
+            song.albumId,
+            song.artistId
         ) {
             setPlayButtonImage(context)
-            startSeekBarUpdate(true)
+            runSeekBarUpdate(context, true)
 
             if (showNotification) {
                 updateNotification(
@@ -161,14 +158,10 @@ fun playStream(stream: Stream) {
                 exoPlayer?.playWhenReady = true
 
                 //UI stuff
-                setTitle(
-                    stream.title,
-                    stream.version,
-                    stream.artist
-                )
+                title = "${stream.title}, ${stream.version}"
 
                 setPlayButtonImage(context)
-                startSeekBarUpdate(false)
+                runSeekBarUpdate(context, false)
 
                 streamInfoUpdateAsync =
                     StreamInfoUpdateAsync(
@@ -179,4 +172,52 @@ fun playStream(stream: Stream) {
             }
         }
     }
+}
+
+private var seekBarUpdateHandler = Handler()
+private var currentSeekBarUpdateHandlerId = ""
+
+internal fun runSeekBarUpdate(context: Context, crossFade: Boolean) {
+    val id = UUID.randomUUID().toString()
+    currentSeekBarUpdateHandlerId = id
+
+    seekBarUpdateHandler = Handler()
+
+    val updateSeekBar = object : Runnable {
+        override fun run() {
+            exoPlayer?.duration?.toInt()?.let {
+                duration = it
+            }
+
+            exoPlayer?.currentPosition?.toInt()?.let {
+                currentPosition = it
+            }
+
+            if (crossFade) {
+                val timeLeft = duration - currentPosition
+
+                if (timeLeft < crossfade && exoPlayer?.isPlaying == true) {
+                    if (timeLeft >= 1) {
+                        val nextVolume: Float = (crossfade.toFloat() - timeLeft) / crossfade
+                        nextExoPlayer?.audioComponent?.volume = nextVolume
+
+                        val currentVolume = 1 - nextVolume
+                        exoPlayer?.audioComponent?.volume = currentVolume
+                    }
+
+                    nextExoPlayer?.playWhenReady = true
+                } else if (timeLeft < duration / 2 && exoPlayer?.isPlaying == true) {
+                    prepareNextSong(
+                        context
+                    )
+                }
+            }
+
+            if (id == currentSeekBarUpdateHandlerId) {
+                seekBarUpdateHandler.postDelayed(this, 0)
+            }
+        }
+    }
+
+    seekBarUpdateHandler.postDelayed(updateSeekBar, 0)
 }

@@ -193,11 +193,8 @@ class MainActivity : AppCompatActivity() {
                 currentSong?.let { song ->
                     setCover(
                         this,
-                        song.title,
-                        song.version,
-                        song.artist,
-                        song.artistId,
-                        song.albumId
+                        song.albumId,
+                        song.artistId
                     ) { bitmap ->
                         updateNotification(
                             song.title,
@@ -211,11 +208,8 @@ class MainActivity : AppCompatActivity() {
                 //TODO artistId
                 setCover(
                     this,
-                    StreamInfoUpdateAsync.liveTitle,
-                    StreamInfoUpdateAsync.liveVersion,
-                    StreamInfoUpdateAsync.liveArtist,
-                    "",
-                    StreamInfoUpdateAsync.liveAlbumId
+                    StreamInfoUpdateAsync.liveAlbumId,
+                    ""
                 ) { bitmap ->
                     updateNotification(
                         StreamInfoUpdateAsync.liveTitle,
