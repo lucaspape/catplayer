@@ -108,9 +108,13 @@ data class PlayerSaveState(
                     exoPlayer?.duration
                 )
 
-            objectOutputStream.writeObject(playerSaveState)
-            objectOutputStream.flush()
-            objectOutputStream.close()
+            try {
+                objectOutputStream.writeObject(playerSaveState)
+                objectOutputStream.flush()
+                objectOutputStream.close()
+            }catch (e: ConcurrentModificationException){
+
+            }
         }
     }
 }
