@@ -207,10 +207,10 @@ internal fun runSeekBarUpdate(context: Context, crossFade: Boolean) {
             }
 
             if (id == currentSeekBarUpdateHandlerId) {
-                seekBarUpdateHandler.postDelayed(this, 0)
+                seekBarUpdateHandler.postDelayed(this, 100)
             }
         }
     }
 
-    seekBarUpdateHandler.postDelayed(updateSeekBar, 0)
+    seekBarUpdateHandler.postDelayed(updateSeekBar, 100)
 }
