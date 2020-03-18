@@ -21,7 +21,7 @@ import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.ImageReceiverInterface
 import de.lucaspape.monstercat.download.downloadCoverIntoImageReceiver
-import de.lucaspape.monstercat.request.async.BackgroundAsync
+import de.lucaspape.monstercat.util.BackgroundAsync
 import de.lucaspape.monstercat.ui.handlers.deletePlaylist
 import de.lucaspape.monstercat.ui.handlers.downloadPlaylist
 import de.lucaspape.monstercat.ui.handlers.playPlaylistNext

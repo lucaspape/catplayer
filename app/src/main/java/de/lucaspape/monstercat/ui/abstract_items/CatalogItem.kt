@@ -20,7 +20,7 @@ import de.lucaspape.monstercat.ui.handlers.deletePlaylistSong
 import de.lucaspape.monstercat.ui.handlers.openAlbum
 import de.lucaspape.monstercat.ui.handlers.playSongFromId
 import de.lucaspape.monstercat.download.ImageReceiverInterface
-import de.lucaspape.monstercat.request.async.BackgroundAsync
+import de.lucaspape.monstercat.util.BackgroundAsync
 import de.lucaspape.monstercat.util.displayAlertDialogList
 
 open class CatalogItem(

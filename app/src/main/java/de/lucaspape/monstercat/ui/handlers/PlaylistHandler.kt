@@ -20,7 +20,7 @@ import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.ui.abstract_items.CatalogItem
 import de.lucaspape.monstercat.ui.abstract_items.HeaderTextItem
 import de.lucaspape.monstercat.ui.abstract_items.PlaylistItem
-import de.lucaspape.monstercat.request.async.BackgroundAsync
+import de.lucaspape.monstercat.util.BackgroundAsync
 import de.lucaspape.monstercat.request.async.LoadPlaylistAsync
 import de.lucaspape.monstercat.request.async.LoadPlaylistTracksAsync
 import de.lucaspape.monstercat.music.clearQueue

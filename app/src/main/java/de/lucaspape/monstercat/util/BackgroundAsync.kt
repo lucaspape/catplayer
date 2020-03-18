@@ -1,4 +1,4 @@
-package de.lucaspape.monstercat.request.async
+package de.lucaspape.monstercat.util
 
 import android.os.AsyncTask
 
