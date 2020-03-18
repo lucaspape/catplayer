@@ -37,6 +37,14 @@ import java.lang.ref.WeakReference
  * Does everything for the home page
  */
 class HomeHandler {
+    companion object {
+        @JvmStatic
+        private var catalogViewDataCache = WeakReference<ArrayList<CatalogItem>>(ArrayList())
+
+        @JvmStatic
+        private var albumViewDataCache = WeakReference<ArrayList<AlbumItem>>(ArrayList())
+    }
+
     private var initDone = false
 
     private var recyclerView: RecyclerView? = null
@@ -87,6 +95,8 @@ class HomeHandler {
         if (restoreScrollPosition) {
             restoreRecyclerViewPosition(view.context, "catalogView")
         }
+
+        catalogViewDataCache = WeakReference(catalogViewData)
 
         /**
          * On song click
@@ -221,6 +231,8 @@ class HomeHandler {
                     for (catalogItem in it) {
                         catalogViewData.add(catalogItem)
                     }
+
+                    catalogViewDataCache = WeakReference(catalogViewData)
                 }
             }
         })
@@ -274,6 +286,8 @@ class HomeHandler {
 
         restoreRecyclerViewPosition(view.context, "albumView")
 
+        albumViewDataCache = WeakReference(albumViewData)
+
         val albumDatabaseHelper = AlbumDatabaseHelper(view.context)
 
         /**
@@ -323,6 +337,8 @@ class HomeHandler {
                     for (albumItem in it) {
                         albumViewData.add(albumItem)
                     }
+
+                    albumViewDataCache = WeakReference(albumViewData)
                 }
             }
         })
@@ -481,64 +497,77 @@ class HomeHandler {
     fun initSongListLoad(view: View, forceReload: Boolean) {
         initDone = false
 
-        val catalogViewData = ArrayList<CatalogItem>()
-
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
 
-        if (forceReload) {
-            resetRecyclerViewPosition(view.context, "catalogView")
-        }
-
-        val catalogSongDatabaseHelper =
-            CatalogSongDatabaseHelper(view.context)
-
-        if (forceReload) {
-            catalogSongDatabaseHelper.reCreateTable()
-        }
-
-        LoadSongListAsync(WeakReference(view.context), forceReload, 0, displayLoading = {
-            swipeRefreshLayout.isRefreshing = true
-        }, finishedCallback = { _, _, _ ->
-            BackgroundAsync({
-                val songIdList = catalogSongDatabaseHelper.getSongs(0, 50)
-
-                for (i in (songIdList.size - 1 downTo 0)) {
-                    catalogViewData.add(CatalogItem(songIdList[i].songId))
-                }
-
-            }, {
-                updateCatalogRecyclerView(
-                    view,
-                    null,
-                    null,
-                    null,
-                    true,
-                    catalogViewData, { itemAdapter, footerAdapter, currentPage, callback ->
-                        footerAdapter.clear()
-                        footerAdapter.add(ProgressItem())
-
-                        loadSongList(view, itemAdapter, footerAdapter, currentPage, callback)
-                    }, { _, _ ->
-                        initSongListLoad(view, true)
-                    }, {
-                        initSongListLoad(view, false)
-                    })
-
-                swipeRefreshLayout.isRefreshing = false
-            }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-        }, errorCallback = { _, _, _ ->
-            swipeRefreshLayout.isRefreshing = false
-
-            displaySnackbar(
+        val finished: (catalogViewData: ArrayList<CatalogItem>) -> Unit = { catalogViewData ->
+            updateCatalogRecyclerView(
                 view,
-                view.context.getString(R.string.errorLoadingSongList),
-                view.context.getString(R.string.retry)
-            ) {
-                initSongListLoad(view, forceReload)
-            }
-        }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                null,
+                null,
+                null,
+                true,
+                catalogViewData, { itemAdapter, footerAdapter, currentPage, callback ->
+                    footerAdapter.clear()
+                    footerAdapter.add(ProgressItem())
 
+                    loadSongList(view, itemAdapter, footerAdapter, currentPage, callback)
+                }, { _, _ ->
+                    initSongListLoad(view, true)
+                }, {
+                    initSongListLoad(view, false)
+                })
+
+            swipeRefreshLayout.isRefreshing = false
+        }
+
+        var isEmpty = catalogViewDataCache.get()?.isEmpty()
+
+        if(isEmpty == null){
+            isEmpty = true
+        }
+
+        if (isEmpty || forceReload) {
+            val catalogViewData = ArrayList<CatalogItem>()
+
+            if (forceReload) {
+                resetRecyclerViewPosition(view.context, "catalogView")
+            }
+
+            val catalogSongDatabaseHelper =
+                CatalogSongDatabaseHelper(view.context)
+
+            if (forceReload) {
+                catalogSongDatabaseHelper.reCreateTable()
+            }
+
+            LoadSongListAsync(WeakReference(view.context), forceReload, 0, displayLoading = {
+                swipeRefreshLayout.isRefreshing = true
+            }, finishedCallback = { _, _, _ ->
+                BackgroundAsync({
+                    val songIdList = catalogSongDatabaseHelper.getSongs(0, 50)
+
+                    for (i in (songIdList.size - 1 downTo 0)) {
+                        catalogViewData.add(CatalogItem(songIdList[i].songId))
+                    }
+
+                }, {
+                    finished(catalogViewData)
+                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+            }, errorCallback = { _, _, _ ->
+                swipeRefreshLayout.isRefreshing = false
+
+                displaySnackbar(
+                    view,
+                    view.context.getString(R.string.errorLoadingSongList),
+                    view.context.getString(R.string.retry)
+                ) {
+                    initSongListLoad(view, forceReload)
+                }
+            }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        } else {
+            catalogViewDataCache.get()?.let { finished(it) }
+        }
     }
 
     /**
@@ -598,67 +627,84 @@ class HomeHandler {
      */
     fun initAlbumListLoad(view: View, forceReload: Boolean) {
         initDone = false
-        val albumViewData = ArrayList<AlbumItem>()
 
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
 
-        if (forceReload) {
-            resetRecyclerViewPosition(view.context, "albumView")
+        val finished: (albumViewData: ArrayList<AlbumItem>) -> Unit = { albumViewData ->
+            updateAlbumRecyclerView(
+                view,
+                albumViewData,
+                { itemAdapter, footerAdapter, currentPage, callback ->
+                    footerAdapter.clear()
+                    footerAdapter.add(ProgressItem())
+
+                    loadAlbumList(view, itemAdapter, footerAdapter, currentPage, callback)
+                },
+                {
+                    initAlbumListLoad(view, true)
+                },
+                {
+                    initAlbumListLoad(view, false)
+                })
+
+            swipeRefreshLayout.isRefreshing = false
         }
 
-        val contextReference = WeakReference(view.context)
+        var isEmpty = albumViewDataCache.get()?.isEmpty()
 
-        val albumDatabaseHelper = AlbumDatabaseHelper(view.context)
-
-        if (forceReload) {
-            albumDatabaseHelper.reCreateTable(view.context, false)
+        if(isEmpty == null){
+            isEmpty = true
         }
 
-        LoadAlbumListAsync(
-            contextReference,
-            forceReload,
-            0, displayLoading = {
-                swipeRefreshLayout.isRefreshing = true
+        if (isEmpty || forceReload) {
+            val albumViewData = ArrayList<AlbumItem>()
+
+            if (forceReload) {
+                resetRecyclerViewPosition(view.context, "albumView")
             }
-            , finishedCallback = { _, _, _ ->
-                BackgroundAsync({
-                    val albumList = albumDatabaseHelper.getAlbums(0, 50)
 
-                    for (i in (albumList.size - 1 downTo 0)) {
-                        albumViewData.add(AlbumItem(albumList[i].albumId))
-                    }
-                }, {
-                    updateAlbumRecyclerView(
-                        view,
-                        albumViewData,
-                        { itemAdapter, footerAdapter, currentPage, callback ->
-                            footerAdapter.clear()
-                            footerAdapter.add(ProgressItem())
+            val contextReference = WeakReference(view.context)
 
-                            loadAlbumList(view, itemAdapter, footerAdapter, currentPage, callback)
-                        },
-                        {
-                            initAlbumListLoad(view, true)
-                        },
-                        {
-                            initAlbumListLoad(view, false)
-                        })
+            val albumDatabaseHelper = AlbumDatabaseHelper(view.context)
 
-                    swipeRefreshLayout.isRefreshing = false
-                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+            if (forceReload) {
+                albumDatabaseHelper.reCreateTable(view.context, false)
+            }
 
-            }, errorCallback = { _, _, _ ->
-                swipeRefreshLayout.isRefreshing = false
-
-                displaySnackbar(
-                    view,
-                    view.context.getString(R.string.errorLoadingAlbumList),
-                    view.context.getString(R.string.retry)
-                ) {
-                    initAlbumListLoad(view, forceReload)
+            LoadAlbumListAsync(
+                contextReference,
+                forceReload,
+                0, displayLoading = {
+                    swipeRefreshLayout.isRefreshing = true
                 }
-            }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                , finishedCallback = { _, _, _ ->
+                    BackgroundAsync({
+                        val albumList = albumDatabaseHelper.getAlbums(0, 50)
+
+                        for (i in (albumList.size - 1 downTo 0)) {
+                            albumViewData.add(AlbumItem(albumList[i].albumId))
+                        }
+                    }, {
+                        finished(albumViewData)
+                    }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+
+                }, errorCallback = { _, _, _ ->
+                    swipeRefreshLayout.isRefreshing = false
+
+                    displaySnackbar(
+                        view,
+                        view.context.getString(R.string.errorLoadingAlbumList),
+                        view.context.getString(R.string.retry)
+                    ) {
+                        initAlbumListLoad(view, forceReload)
+                    }
+                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        } else {
+            albumViewDataCache.get()?.let {
+                finished(it)
+            }
+        }
     }
 
     /**
