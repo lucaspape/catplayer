@@ -88,6 +88,39 @@ class CatalogSongDatabaseHelper(context: Context) :
         }
     }
 
+    fun getIndexFromSongId(songId: String):Int?{
+        return getCatalogSong(songId)?.id
+    }
+
+    fun getSongs(skip: Long): ArrayList<CatalogSong>{
+        val catalogSongs: ArrayList<CatalogSong> = ArrayList()
+
+        val selectQuery = "SELECT * FROM " + CatalogSong.TABLE_NAME + " ORDER BY " +
+                CatalogSong.COLUMN_ID + " ASC LIMIT $skip,-1"
+
+        val db = writableDatabase
+        val cursor = db.rawQuery(selectQuery, null)
+
+        if (cursor.moveToFirst()) {
+            do {
+                val catalogSong =
+                    CatalogSong(
+                        cursor.getInt(cursor.getColumnIndex(CatalogSong.COLUMN_ID)),
+                        cursor.getString(cursor.getColumnIndex(CatalogSong.COLUMN_SONG_ID))
+                    )
+
+                catalogSongs.add(catalogSong)
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        db.close()
+
+        catalogSongs.reverse()
+
+        return catalogSongs
+    }
+
     fun getSongs(skip: Long, limit: Long): List<CatalogSong> {
         val catalogSongs: ArrayList<CatalogSong> = ArrayList()
 

@@ -28,6 +28,7 @@ import de.lucaspape.monstercat.ui.abstract_items.HeaderTextItem
 import de.lucaspape.monstercat.ui.abstract_items.ProgressItem
 import de.lucaspape.monstercat.request.async.*
 import de.lucaspape.monstercat.music.clearQueue
+import de.lucaspape.monstercat.music.songQueue
 import de.lucaspape.monstercat.music.util.playStream
 import de.lucaspape.monstercat.util.*
 import java.io.File
@@ -58,7 +59,7 @@ class HomeHandler {
         albumMcId: String?,
         restoreScrollPosition: Boolean,
         catalogViewData: ArrayList<CatalogItem>,
-        cacheId:String,
+        cacheId: String,
         loadMoreListener: (itemAdapter: ItemAdapter<CatalogItem>, footerAdapter: ItemAdapter<ProgressItem>, currentPage: Int, callback: (newList: ArrayList<CatalogItem>) -> Unit) -> Unit,
         refreshListener: (albumId: String?, albumMcId: String?) -> Unit,
         backPressedCallback: () -> Unit
@@ -107,21 +108,37 @@ class HomeHandler {
 
                 val catalogItem = catalogViewData[itemIndex]
 
-                val nextSongIdsList = ArrayList<String>()
+                val catalogSongDatabaseHelper = CatalogSongDatabaseHelper(view.context)
 
-                for (i in (itemIndex + 1 until catalogViewData.size)) {
-                    try {
-                        nextSongIdsList.add(catalogViewData[i].songId)
-                    } catch (e: IndexOutOfBoundsException) {
+                val songDatabaseHelper = SongDatabaseHelper(view.context)
+                val skipMonstercatSongs =
+                    Settings(view.context).getBoolean(view.context.getString(R.string.skipMonstercatSongsSetting))
 
-                    }
-                }
+                BackgroundAsync({
+                    catalogSongDatabaseHelper.getIndexFromSongId(catalogItem.songId)?.toLong()
+                        ?.let { skip ->
+                            val nextSongs = catalogSongDatabaseHelper.getSongs(skip)
+
+                            nextSongs.reverse()
+
+                            for (catalogSong in nextSongs) {
+                                if (skipMonstercatSongs == true) {
+                                    val song =
+                                        songDatabaseHelper.getSong(view.context, catalogSong.songId)
+                                    if (!song?.artist.equals("monstercat", true)) {
+                                        songQueue.add(catalogSong.songId)
+                                    }
+                                } else {
+                                    songQueue.add(catalogSong.songId)
+                                }
+                            }
+                        }
+                }, {}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 
                 playSongFromId(
-                    view.context,
                     catalogItem.songId,
-                    true,
-                    nextSongIdsList
+                    playNow = true,
+                    priority = true
                 )
             }
 
@@ -506,14 +523,18 @@ class HomeHandler {
                 null,
                 null,
                 true,
-                catalogViewData, "catalogView", { itemAdapter, footerAdapter, currentPage, callback ->
+                catalogViewData,
+                "catalogView",
+                { itemAdapter, footerAdapter, currentPage, callback ->
                     footerAdapter.clear()
                     footerAdapter.add(ProgressItem())
 
                     loadSongList(view, itemAdapter, footerAdapter, currentPage, callback)
-                }, { _, _ ->
+                },
+                { _, _ ->
                     initSongListLoad(view, true)
-                }, {
+                },
+                {
                     initSongListLoad(view, false)
                 })
 
@@ -522,7 +543,7 @@ class HomeHandler {
 
         var isEmpty = viewDataCache["catalogView"]?.get()?.isEmpty()
 
-        if(isEmpty == null){
+        if (isEmpty == null) {
             isEmpty = true
         }
 
@@ -655,7 +676,7 @@ class HomeHandler {
 
         var isEmpty = viewDataCache["albumView"]?.get()?.isEmpty()
 
-        if(isEmpty == null){
+        if (isEmpty == null) {
             isEmpty = true
         }
 

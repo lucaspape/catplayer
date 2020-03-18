@@ -86,15 +86,7 @@ var fullscreenTitleReference: WeakReference<TextView>? = null
         if (fullscreenTitleReference?.get() != null) {
             newTitleTextView?.get()?.text = fullscreenTitleReference?.get()?.text
         } else {
-            getCurrentSong()?.let { songId ->
-                contextReference?.get()?.let { context ->
-                    SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
-                        val shownTitle = "${song.title} ${song.version}"
-
-                        newTitleTextView?.get()?.text = shownTitle
-                    }
-                }
-            }
+            newTitleTextView?.get()?.text = title
         }
 
         field = newTitleTextView
@@ -105,15 +97,7 @@ var fullscreenArtistReference: WeakReference<TextView>? = null
         if (fullscreenArtistReference?.get() != null) {
             newArtistTextView?.get()?.text = fullscreenArtistReference?.get()?.text
         } else {
-            getCurrentSong()?.let { songId ->
-                contextReference?.get()?.let { context ->
-                    SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
-                        val artist = song.artist
-
-                        newArtistTextView?.get()?.text = artist
-                    }
-                }
-            }
+            newArtistTextView?.get()?.text = artist
         }
 
         field = newArtistTextView
