@@ -163,7 +163,7 @@ class AlbumDatabaseHelper(context: Context) :
         val albums: ArrayList<Album> = ArrayList()
 
         val selectQuery = "SELECT * FROM " + Album.TABLE_NAME + " ORDER BY " +
-                Album.COLUMN_ID + " ASC LIMIT ${skip-1},$limit"
+                Album.COLUMN_ID + " ASC LIMIT $skip,$limit"
 
         val db = writableDatabase
         val cursor = db.rawQuery(selectQuery, null)
@@ -184,8 +184,6 @@ class AlbumDatabaseHelper(context: Context) :
 
         cursor.close()
         db.close()
-
-        albums.reverse()
 
         return albums
     }

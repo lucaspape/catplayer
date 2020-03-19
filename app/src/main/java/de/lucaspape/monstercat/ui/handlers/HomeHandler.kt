@@ -628,10 +628,10 @@ class HomeHandler {
                 swipeRefreshLayout.isRefreshing = true
             }, finishedCallback = { _, _, _ ->
                 BackgroundAsync({
-                    val songIdList = catalogSongDatabaseHelper.getSongs(0, 50)
+                    val itemList = catalogSongDatabaseHelper.getSongs(0, 50)
 
-                    for (i in (songIdList.size - 1 downTo 0)) {
-                        catalogViewData.add(CatalogItem(songIdList[i].songId))
+                    for (item in itemList) {
+                        catalogViewData.add(CatalogItem(item.songId))
                     }
 
                 }, {
@@ -674,13 +674,13 @@ class HomeHandler {
                     val catalogSongDatabaseHelper =
                         CatalogSongDatabaseHelper(view.context)
 
-                    val songList =
+                    val itemList =
                         catalogSongDatabaseHelper.getSongs((currentPage * 50).toLong(), 50)
 
                     val list = ArrayList<CatalogItem>()
 
-                    for (i in (songList.size - 1 downTo 0)) {
-                        val catalogItem = CatalogItem(songList[i].songId)
+                    for (item in itemList) {
+                        val catalogItem = CatalogItem(item.songId)
 
                         itemAdapter.add(
                             catalogItem
@@ -768,8 +768,8 @@ class HomeHandler {
                     BackgroundAsync({
                         val albumList = albumDatabaseHelper.getAlbums(0, 50)
 
-                        for (i in (albumList.size - 1 downTo 0)) {
-                            albumViewData.add(AlbumItem(albumList[i].albumId))
+                        for (album in albumList) {
+                            albumViewData.add(AlbumItem(album.albumId))
                         }
                     }, {
                         finished(albumViewData)
