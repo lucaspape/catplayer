@@ -88,11 +88,11 @@ class CatalogSongDatabaseHelper(context: Context) :
         }
     }
 
-    fun getIndexFromSongId(songId: String):Int?{
+    fun getIndexFromSongId(songId: String): Int? {
         return getCatalogSong(songId)?.id
     }
 
-    fun getSongs(skip: Long): ArrayList<CatalogSong>{
+    fun getSongs(skip: Long): ArrayList<CatalogSong> {
         val catalogSongs: ArrayList<CatalogSong> = ArrayList()
 
         val selectQuery = "SELECT * FROM " + CatalogSong.TABLE_NAME + " ORDER BY " +
