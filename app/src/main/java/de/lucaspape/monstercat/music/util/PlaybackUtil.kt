@@ -147,22 +147,20 @@ fun playStream(stream: Stream) {
         if (requestAudioFocus(context) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             //only play stream if allowed
             if (wifiConnected(context) == true || settings.getBoolean(context.getString(R.string.streamOverMobileSetting)) == true) {
-                exoPlayer?.prepare(stream.getMediaSource(context))
-
-                exoPlayer?.playWhenReady = true
-
-                //UI stuff
-                title = "${stream.title}, ${stream.version}"
-
-                setPlayButtonImage(context)
-                runSeekBarUpdate(context, false)
-
                 streamInfoUpdateAsync =
                     StreamInfoUpdateAsync(
-                        WeakReference(context),
-                        stream
+                        WeakReference(context)
                     )
                 streamInfoUpdateAsync?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+
+                stream.getMediaSource(context) { mediaSource ->
+                    exoPlayer?.prepare(mediaSource)
+
+                    exoPlayer?.playWhenReady = true
+
+                    setPlayButtonImage(context)
+                    runSeekBarUpdate(context, false)
+                }
             }
         }
     }

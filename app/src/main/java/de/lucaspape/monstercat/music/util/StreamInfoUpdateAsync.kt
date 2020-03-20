@@ -2,14 +2,18 @@ package de.lucaspape.monstercat.music.util
 
 import android.content.Context
 import android.os.AsyncTask
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.music.notification.updateNotification
-import de.lucaspape.monstercat.twitch.Stream
+import org.json.JSONException
+import org.json.JSONObject
 import java.lang.ref.WeakReference
 
 class StreamInfoUpdateAsync(
-    private val contextReference: WeakReference<Context>,
-    private val stream: Stream
+    private val contextReference: WeakReference<Context>
 ) : AsyncTask<Void, Void, String>() {
     companion object {
         @JvmStatic
@@ -26,10 +30,8 @@ class StreamInfoUpdateAsync(
         liveAlbumId = ""
 
         contextReference.get()?.let { context ->
-            val volleyQueue = Volley.newRequestQueue(context)
-
             while (true) {
-                stream.updateInfo(context, volleyQueue) { title, version, artist, albumId ->
+                updateInfo(context) { title, version, artist, albumId ->
                     if (liveTitle != title || liveVersion != version || liveArtist != artist || liveAlbumId != albumId) {
                         liveTitle = title
                         liveVersion = version
@@ -67,6 +69,38 @@ class StreamInfoUpdateAsync(
             title = "$liveTitle $liveVersion"
             artist = liveArtist
         }
+    }
+
+    fun updateInfo(
+        context: Context,
+        callback: (title: String, version: String, artist: String, albumId: String) -> Unit
+    ) {
+        val volleyQueue = Volley.newRequestQueue(context)
+
+        val artistTitleRequest =
+            StringRequest(
+                Request.Method.GET,
+                context.getString(R.string.liveInfoUrl),
+                Response.Listener { artistTitleResponse ->
+                    try {
+                        val jsonObject = JSONObject(artistTitleResponse)
+
+                        val title = jsonObject.getString("title")
+                        val version = jsonObject.getString("version")
+                        val artist = jsonObject.getString("artist")
+                        val albumId = jsonObject.getString("releaseId")
+
+                        callback(title, version, artist, albumId)
+                    } catch (e: JSONException) {
+
+                    }
+
+                },
+                Response.ErrorListener { error ->
+                    println(error)
+                })
+
+        volleyQueue.add(artistTitleRequest)
     }
 
 }

@@ -29,6 +29,7 @@ import de.lucaspape.monstercat.ui.abstract_items.HeaderTextItem
 import de.lucaspape.monstercat.ui.abstract_items.ProgressItem
 import de.lucaspape.monstercat.request.async.*
 import de.lucaspape.monstercat.music.util.playStream
+import de.lucaspape.monstercat.twitch.Stream
 import de.lucaspape.monstercat.util.*
 import java.io.File
 import java.lang.IndexOutOfBoundsException
@@ -534,12 +535,7 @@ class HomeHandler {
 
         //livestream button
         view.findViewById<ImageButton>(R.id.liveButton).setOnClickListener {
-            val stream =
-                de.lucaspape.monstercat.twitch.Stream(view.context.getString(R.string.twitchClientID))
-
-            stream.getStreamInfo(view.context, "monstercat") { _, _, _, _ ->
-                playStream(stream)
-            }
+            playStream(Stream(view.context.getString(R.string.twitchClientID), "monstercat"))
         }
 
         //search
