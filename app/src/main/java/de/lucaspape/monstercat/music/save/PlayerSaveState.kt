@@ -51,25 +51,23 @@ data class PlayerSaveState(
                                 songQueue = playerSaveState.songQueue
                                 prioritySongQueue = playerSaveState.prioritySongQueue
 
-                                getCurrentSong()
-                                    ?.let { songId ->
-                                        playerSaveState.progress?.let { progress ->
-                                            playSong(
-                                                context, songId,
-                                                showNotification = false,
-                                                requestAudioFocus = false,
-                                                playWhenReady = false,
-                                                progress = progress
-                                            )
+                                val songId = getCurrentSong()
 
-                                            seekBarReference?.get()?.progress = progress.toInt()
-                                        }
+                                playerSaveState.progress?.let { progress ->
+                                    playSong(
+                                        context, songId,
+                                        showNotification = false,
+                                        requestAudioFocus = false,
+                                        playWhenReady = false,
+                                        progress = progress
+                                    )
 
-                                        playerSaveState.duration?.let { duration ->
-                                            seekBarReference?.get()?.max = duration.toInt()
-                                        }
+                                    seekBarReference?.get()?.progress = progress.toInt()
+                                }
 
-                                    }
+                                playerSaveState.duration?.let { duration ->
+                                    seekBarReference?.get()?.max = duration.toInt()
+                                }
                             }catch (e: ClassNotFoundException){
                                 File((context.cacheDir.toString() + "/player_state.obj")).delete()
                             }

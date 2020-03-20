@@ -195,6 +195,8 @@ var duration = 0
         fullscreenSeekBarReference?.get()?.max = newInt
 
         field = newInt
+
+        setSongMetadata()
     }
 
 var coverBitmap: Bitmap? = null

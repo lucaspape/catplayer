@@ -60,7 +60,7 @@ class LoadTitleSearchAsync(
                     }
 
                 },
-                Response.ErrorListener { error ->
+                Response.ErrorListener { _ ->
                     success = false
                 })
 
