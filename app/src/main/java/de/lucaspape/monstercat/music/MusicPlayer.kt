@@ -135,29 +135,29 @@ private fun resume() {
 
                 setPlayButtonImage(context)
 
-                getCurrentSong()?.let { songId ->
-                    startPlayerService(songId)
+                val songId = getCurrentSong()
 
-                    setCover(
+                startPlayerService(songId)
+
+                setCover(
+                    context,
+                    songId
+                ) {
+                    setPlayButtonImage(
+                        context
+                    )
+                    runSeekBarUpdate(
                         context,
-                        songId
-                    ) {
-                        setPlayButtonImage(
-                            context
-                        )
-                        runSeekBarUpdate(
-                            context,
-                            true
-                        )
+                        true
+                    )
 
-                        updateNotification(context, songId, it)
-                    }
+                    updateNotification(context, songId, it)
+                }
 
-                    SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
-                        //UI stuff
-                        title = "${song.title} ${song.version}"
-                        artist = song.artist
-                    }
+                SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
+                    //UI stuff
+                    title = "${song.title} ${song.version}"
+                    artist = song.artist
                 }
             }
         }
@@ -196,93 +196,74 @@ internal fun stop() {
  * Returns next song and makes changes to vars
  */
 private fun nextSong(): String {
-    if (loopSingle) {
+    if (loopSingle && playlist.size >= playlistIndex) {
         //loop single
-        return try {
-            playlist[playlistIndex]
-        } catch (e: IndexOutOfBoundsException) {
-            ""
+        return playlist[playlistIndex]
+    } else if (prioritySongQueue.size > 0) {
+        //get from priority list
+        val songId = prioritySongQueue[0]
+        prioritySongQueue.removeAt(0)
+        playlist.add(songId)
+        return songId
+    } else if (playlist.size > playlistIndex + 1) {
+        //get from playlist
+        val songId = playlist[playlistIndex + 1]
+        playlistIndex++
+        return songId
+    } else if (songQueue.size > 0) {
+        //get from queue
+
+        val queueIndex = if (shuffle && songQueue.size > 0) {
+            if (nextRandom == -1) {
+                nextRandom = Random.nextInt(0, songQueue.size)
+            }
+
+            nextRandom
+        } else {
+            0
         }
+
+        val songId = songQueue[queueIndex]
+        songQueue.removeAt(queueIndex)
+        playlist.add(songId)
+
+        skipPreviousInPlaylist()
+
+        //prepare nextRandom
+        if (songQueue.size > 0) {
+            nextRandom = Random.nextInt(0, songQueue.size)
+        }
+
+        return songId
+    } else if (loop && playlist.size > 0) {
+        //if loop go back to beginning of playlist
+
+        clearQueue()
+
+        for (songId in playlist) {
+            songQueue.add(songId)
+        }
+
+        clearPlaylist()
+
+        val songId = songQueue[0]
+        songQueue.removeAt(0)
+        playlist.add(songId)
+
+        playlistIndex = 0
+
+        return songId
     } else {
-        when {
-            prioritySongQueue.size > 0 -> {
-                val songId = prioritySongQueue[0]
-                prioritySongQueue.removeAt(0)
-                playlist.add(playlistIndex, songId)
-                return songId
-            }
-            playlist.size > playlistIndex + 1 -> {
-                val songId = playlist[playlistIndex + 1]
-                playlistIndex++
-                return songId
-            }
-            else -> {
-                try {
-                    //next song is not in already in playlist
-
-                    //grab song from queue, if shuffle queueIndex is random
-                    val queueIndex = if (shuffle && songQueue.size > 0) {
-                        if (nextRandom == -1) {
-                            nextRandom = Random.nextInt(0, songQueue.size)
-                        }
-
-                        nextRandom
-                    } else {
-                        0
-                    }
-
-                    val songId = songQueue[queueIndex]
-
-                    //add to playlist, remove from queue
-                    songQueue.removeAt(queueIndex)
-                    playlist.add(songId)
-
-                    playlistIndex = playlist.indexOf(songId)
-
-                    if (songQueue.size > 0) {
-                        nextRandom = Random.nextInt(0, songQueue.size)
-                    }
-
-                    return songId
-                } catch (e: IndexOutOfBoundsException) {
-                    //queue is empty, if loop add every song from playlist back to queue and start again
-                    if (loop) {
-                        clearQueue()
-
-                        //add every song from playlist to queue
-                        for (songId in playlist) {
-                            songQueue.add(songId)
-                        }
-
-                        clearPlaylist()
-
-                        return try {
-                            val songId = songQueue[0]
-
-                            //add to playlist, remove from queue
-                            songQueue.removeAt(0)
-                            playlist.add(songId)
-
-                            playlistIndex = playlist.indexOf(songId)
-
-                            songId
-                        } catch (e: IndexOutOfBoundsException) {
-                            ""
-                        }
-                    } else {
-                        //queue finished, no loop
-                        return ""
-                    }
-                }
-            }
-        }
+        return ""
     }
+
 }
 
 private fun previousSong(): String {
     return try {
+        val songId = playlist[playlistIndex - 1]
         playlistIndex--
-        playlist[playlistIndex]
+        songId
     } catch (e: IndexOutOfBoundsException) {
         ""
     }
@@ -292,65 +273,43 @@ private fun previousSong(): String {
  * Return next song without making changes to vars, only for prediction
  */
 fun getNextSong(): String {
-    if (loopSingle) {
+    if (loopSingle && playlist.size >= playlistIndex) {
         //loop single
-        return try {
-            playlist[playlistIndex]
-        } catch (e: IndexOutOfBoundsException) {
-            ""
+        return playlist[playlistIndex]
+    } else if (prioritySongQueue.size > 0) {
+        //get from priority list
+        return prioritySongQueue[0]
+    } else if (playlist.size > playlistIndex + 1) {
+        //get from playlist
+        return playlist[playlistIndex + 1]
+    } else if (songQueue.size > 0) {
+        //get from queue
+
+        val queueIndex = if (shuffle && songQueue.size > 0) {
+            if (nextRandom == -1) {
+                nextRandom = Random.nextInt(0, songQueue.size)
+            }
+
+            nextRandom
+        } else {
+            0
         }
+
+        return songQueue[queueIndex]
+    } else if (loop && playlist.size > 0) {
+        //if loop go back to beginning of playlist
+        return playlist[0]
     } else {
-        when {
-            prioritySongQueue.size > 0 -> {
-                return prioritySongQueue[0]
-            }
-            playlist.size > playlistIndex + 1 -> {
-                return playlist[playlistIndex + 1]
-            }
-            else -> {
-                try {
-                    //next song is not in already in playlist
-
-                    //grab song from queue, if shuffle queueIndex is random
-                    val queueIndex = if (shuffle && songQueue.size > 0) {
-                        if (nextRandom == -1) {
-                            nextRandom = Random.nextInt(0, songQueue.size)
-                        }
-
-                        nextRandom
-                    } else {
-                        0
-                    }
-
-                    return songQueue[queueIndex]
-                } catch (e: IndexOutOfBoundsException) {
-                    //queue is empty, if loop add every song from playlist back to queue and start again
-                    return if (loop) {
-                        try {
-                            playlist[0]
-                        } catch (e: IndexOutOfBoundsException) {
-                            ""
-                        }
-                    } else {
-                        //queue finished, no loop
-                        ""
-                    }
-                }
-            }
-        }
+        return ""
     }
 }
 
-fun getCurrentSong(): String? {
-    contextReference?.get()?.let { context ->
-        return try {
-            return playlist[playlistIndex]
-        } catch (e: IndexOutOfBoundsException) {
-            null
-        }
+fun getCurrentSong(): String {
+    return if (playlist.size > playlistIndex) {
+        playlist[playlistIndex]
+    } else {
+        ""
     }
-
-    return null
 }
 
 fun clearQueue() {
