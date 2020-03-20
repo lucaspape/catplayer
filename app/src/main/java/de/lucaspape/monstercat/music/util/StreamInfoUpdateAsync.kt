@@ -3,12 +3,13 @@ package de.lucaspape.monstercat.music.util
 import android.content.Context
 import android.os.AsyncTask
 import com.android.volley.Request
-import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.music.notification.updateNotification
+import de.lucaspape.monstercat.util.parseSongToDB
 import org.json.JSONException
 import org.json.JSONObject
 import java.lang.ref.WeakReference
@@ -18,42 +19,25 @@ class StreamInfoUpdateAsync(
 ) : AsyncTask<Void, Void, String>() {
     companion object {
         @JvmStatic
-        var liveTitle = ""
-        var liveVersion = ""
-        var liveArtist = ""
-        var liveArtistId = ""
-        var liveAlbumId = ""
+        var liveSongId = ""
     }
 
     override fun doInBackground(vararg params: Void): String? {
-        liveTitle = ""
-        liveVersion = ""
-        liveArtist = ""
-        liveArtistId = ""
-        liveAlbumId = ""
-
         contextReference.get()?.let { context ->
+
             val artistTitleRequest =
                 StringRequest(
                     Request.Method.GET,
                     context.getString(R.string.liveInfoUrl),
                     Response.Listener { artistTitleResponse ->
                         try {
-                            val jsonObject = JSONObject(artistTitleResponse)
+                            val jsonObject = JSONObject(artistTitleResponse).getJSONObject("track")
 
-                            val title = jsonObject.getString("title")
-                            val version = jsonObject.getString("version")
-                            val artist = jsonObject.getString("artist")
-                            val artistId = jsonObject.getString("artistId")
-                            val albumId = jsonObject.getString("releaseId")
+                            val songId = parseSongToDB(jsonObject, context)
+                            
+                            if (songId != liveSongId && songId != null) {
+                                liveSongId = songId
 
-                            if (liveTitle != title || liveVersion != version || liveArtist != artist || liveAlbumId != albumId || liveArtistId != artistId) {
-                                liveTitle = title
-                                liveVersion = version
-                                liveArtist = artist
-                                liveAlbumId = albumId
-
-                                //update cover
                                 publishProgress()
                             }
                         } catch (e: JSONException) {
@@ -81,19 +65,21 @@ class StreamInfoUpdateAsync(
         contextReference.get()?.let { context ->
             setCover(
                 context,
-                liveAlbumId,
-                liveArtistId
+                liveSongId
             ) { bitmap ->
                 updateNotification(
-                    liveTitle,
-                    liveVersion,
-                    liveArtist,
+                    context,
+                    liveSongId,
                     bitmap
                 )
             }
 
-            title = "$liveTitle $liveVersion"
-            artist = liveArtist
+            val songDatabaseHelper = SongDatabaseHelper(context)
+
+            songDatabaseHelper.getSong(context, liveSongId)?.let { song ->
+                title = "${song.title} ${song.version}"
+                artist = song.artist
+            }
         }
     }
 }

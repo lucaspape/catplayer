@@ -204,13 +204,11 @@ class MainActivity : AppCompatActivity() {
             } else {
                 setCover(
                     this,
-                    StreamInfoUpdateAsync.liveAlbumId,
-                    StreamInfoUpdateAsync.liveArtistId
+                    StreamInfoUpdateAsync.liveSongId
                 ) { bitmap ->
                     updateNotification(
-                        StreamInfoUpdateAsync.liveTitle,
-                        StreamInfoUpdateAsync.liveVersion,
-                        StreamInfoUpdateAsync.liveArtist,
+                        this,
+                        StreamInfoUpdateAsync.liveSongId,
                         bitmap
                     )
                 }
