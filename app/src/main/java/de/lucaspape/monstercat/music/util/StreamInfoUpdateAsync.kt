@@ -20,6 +20,7 @@ class StreamInfoUpdateAsync(
         var liveTitle = ""
         var liveVersion = ""
         var liveArtist = ""
+        var liveArtistId = ""
         var liveAlbumId = ""
     }
 
@@ -27,12 +28,13 @@ class StreamInfoUpdateAsync(
         liveTitle = ""
         liveVersion = ""
         liveArtist = ""
+        liveArtistId = ""
         liveAlbumId = ""
 
         contextReference.get()?.let { context ->
             while (true) {
-                updateInfo(context) { title, version, artist, albumId ->
-                    if (liveTitle != title || liveVersion != version || liveArtist != artist || liveAlbumId != albumId) {
+                updateInfo(context) { title, version, artist, artistId, albumId ->
+                    if (liveTitle != title || liveVersion != version || liveArtist != artist || liveAlbumId != albumId || liveArtistId != artistId) {
                         liveTitle = title
                         liveVersion = version
                         liveArtist = artist
@@ -52,11 +54,10 @@ class StreamInfoUpdateAsync(
 
     override fun onProgressUpdate(vararg values: Void) {
         contextReference.get()?.let { context ->
-            //TODO artistId
             setCover(
                 context,
                 liveAlbumId,
-                ""
+                liveArtistId
             ) { bitmap ->
                 updateNotification(
                     liveTitle,
@@ -71,9 +72,9 @@ class StreamInfoUpdateAsync(
         }
     }
 
-    fun updateInfo(
+    private fun updateInfo(
         context: Context,
-        callback: (title: String, version: String, artist: String, albumId: String) -> Unit
+        callback: (title: String, version: String, artist: String, artistId: String, albumId: String) -> Unit
     ) {
         val volleyQueue = Volley.newRequestQueue(context)
 
@@ -88,9 +89,10 @@ class StreamInfoUpdateAsync(
                         val title = jsonObject.getString("title")
                         val version = jsonObject.getString("version")
                         val artist = jsonObject.getString("artist")
+                        val artistId = jsonObject.getString("artistId")
                         val albumId = jsonObject.getString("releaseId")
 
-                        callback(title, version, artist, albumId)
+                        callback(title, version, artist, artistId, albumId)
                     } catch (e: JSONException) {
 
                     }

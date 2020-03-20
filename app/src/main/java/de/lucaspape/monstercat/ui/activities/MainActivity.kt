@@ -202,11 +202,10 @@ class MainActivity : AppCompatActivity() {
                 }
 
             } else {
-                //TODO artistId
                 setCover(
                     this,
                     StreamInfoUpdateAsync.liveAlbumId,
-                    ""
+                    StreamInfoUpdateAsync.liveArtistId
                 ) { bitmap ->
                     updateNotification(
                         StreamInfoUpdateAsync.liveTitle,
