@@ -2,6 +2,7 @@ package de.lucaspape.monstercat.ui.abstract_items
 
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import android.view.HapticFeedbackConstants
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -31,34 +32,34 @@ open class AlbumItem(
             contentList: ArrayList<String>,
             listViewPosition: Int
         ) {
-            val context = view.context
+            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
 
             val itemList = arrayListOf(
-                AlertListItem(context.getString(R.string.downloadAlbum), downloadDrawable),
-                AlertListItem(context.getString(R.string.addAlbumToQueue), addToQueueDrawable),
-                AlertListItem(context.getString(R.string.shareAlbum), shareDrawable),
-                AlertListItem(context.getString(R.string.openAlbumInApp), openInAppDrawable)
+                AlertListItem(view.context.getString(R.string.downloadAlbum), downloadDrawable),
+                AlertListItem(view.context.getString(R.string.addAlbumToQueue), addToQueueDrawable),
+                AlertListItem(view.context.getString(R.string.shareAlbum), shareDrawable),
+                AlertListItem(view.context.getString(R.string.openAlbumInApp), openInAppDrawable)
             )
 
             val id = contentList[listViewPosition]
 
-            AlbumDatabaseHelper(context).getAlbumFromMcId(id)?.let { album ->
+            AlbumDatabaseHelper(view.context).getAlbumFromMcId(id)?.let { album ->
                 displayAlertDialogList(
-                    context,
+                    view.context,
                     AlertListHeaderItem(album.title, album.albumId),
                     itemList
                 ) { _, item ->
                     when (item.itemText) {
-                        context.getString(R.string.downloadAlbum) -> downloadAlbum(
+                        view.context.getString(R.string.downloadAlbum) -> downloadAlbum(
                             view,
                             id
                         )
-                        context.getString(R.string.addAlbumToQueue) -> playAlbumNext(
+                        view.context.getString(R.string.addAlbumToQueue) -> playAlbumNext(
                             view,
                             id
                         )
-                        context.getString(R.string.shareAlbum) -> openAlbum(view, id, true)
-                        context.getString(R.string.openAlbumInApp) -> openAlbum(view, id, false)
+                        view.context.getString(R.string.shareAlbum) -> openAlbum(view, id, true)
+                        view.context.getString(R.string.openAlbumInApp) -> openAlbum(view, id, false)
                     }
                 }
             }

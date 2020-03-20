@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.AsyncTask
+import android.view.HapticFeedbackConstants
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -39,33 +40,33 @@ open class PlaylistItem(
             data: ArrayList<String>,
             listViewPosition: Int
         ) {
-            val context = view.context
+            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
 
             val itemList = arrayListOf(
-                AlertListItem(context.getString(R.string.download), downloadDrawable),
-                AlertListItem(context.getString(R.string.addToQueue), addToQueueDrawable),
-                AlertListItem(context.getString(R.string.delete), deleteDrawable)
+                AlertListItem(view.context.getString(R.string.download), downloadDrawable),
+                AlertListItem(view.context.getString(R.string.addToQueue), addToQueueDrawable),
+                AlertListItem(view.context.getString(R.string.delete), deleteDrawable)
             )
 
             val id = data[listViewPosition]
 
-            PlaylistDatabaseHelper(context).getPlaylist(id)?.let { playlist ->
+            PlaylistDatabaseHelper(view.context).getPlaylist(id)?.let { playlist ->
                 displayAlertDialogList(
-                    context,
+                    view.context,
                     AlertListHeaderItem(playlist.playlistName, ""),
                     itemList
                 ) { _, item ->
                     when (item.itemText) {
-                        context.getString(R.string.download) -> {
+                        view.context.getString(R.string.download) -> {
                             downloadPlaylist(
                                 view,
                                 id
                             ) {}
                         }
-                        context.getString(R.string.addToQueue) -> {
-                            playPlaylistNext(context, id)
+                        view.context.getString(R.string.addToQueue) -> {
+                            playPlaylistNext(view.context, id)
                         }
-                        context.getString(R.string.delete) -> {
+                        view.context.getString(R.string.delete) -> {
                             deletePlaylist(view, id)
                         }
                     }
@@ -127,15 +128,15 @@ open class PlaylistItem(
             playlist?.let {
                 titleTextView.text = playlist.playlistName
 
-                downloadCoverIntoImageReceiver(context, object: ImageReceiverInterface{
+                downloadCoverIntoImageReceiver(context, object : ImageReceiverInterface {
                     override fun setBitmap(id: String, bitmap: Bitmap?) {
-                        if(id == ""){
+                        if (id == "") {
                             coverImageView.setImageBitmap(bitmap)
                         }
                     }
 
                     override fun setDrawable(id: String, drawable: Drawable?) {
-                        if(id == ""){
+                        if (id == "") {
                             coverImageView.setImageDrawable(drawable)
                         }
                     }

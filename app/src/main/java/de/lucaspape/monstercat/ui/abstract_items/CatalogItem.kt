@@ -3,6 +3,7 @@ package de.lucaspape.monstercat.ui.abstract_items
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.AsyncTask
+import android.view.HapticFeedbackConstants
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -34,40 +35,43 @@ open class CatalogItem(
             contentList: ArrayList<String>,
             listViewPosition: Int
         ) {
-            val context = view.context
+            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
 
             val itemList = arrayListOf(
-                AlertListItem(context.getString(R.string.download), downloadDrawable),
-                AlertListItem(context.getString(R.string.addToQueue), addToQueueDrawable),
-                AlertListItem(context.getString(R.string.addToPlaylist), addToPlaylistDrawable),
-                AlertListItem(context.getString(R.string.shareAlbum), shareDrawable),
-                AlertListItem(context.getString(R.string.openAlbumInApp), openInAppDrawable)
+                AlertListItem(view.context.getString(R.string.download), downloadDrawable),
+                AlertListItem(view.context.getString(R.string.addToQueue), addToQueueDrawable),
+                AlertListItem(
+                    view.context.getString(R.string.addToPlaylist),
+                    addToPlaylistDrawable
+                ),
+                AlertListItem(view.context.getString(R.string.shareAlbum), shareDrawable),
+                AlertListItem(view.context.getString(R.string.openAlbumInApp), openInAppDrawable)
             )
 
             val id = contentList[listViewPosition]
 
-            SongDatabaseHelper(context).getSong(context, id)?.let { song ->
+            SongDatabaseHelper(view.context).getSong(view.context, id)?.let { song ->
                 displayAlertDialogList(
-                    context,
+                    view.context,
                     AlertListHeaderItem(song.shownTitle, song.albumId),
                     itemList
                 ) { _, item ->
                     when (item.itemText) {
-                        context.getString(R.string.download) -> addDownloadSong(
-                            context,
+                        view.context.getString(R.string.download) -> addDownloadSong(
+                            view.context,
                             song.songId
                         ) {}
-                        context.getString(R.string.addToQueue) -> prioritySongQueue.add(id)
-                        context.getString(R.string.addToPlaylist) -> addSongToPlaylist(
+                        view.context.getString(R.string.addToQueue) -> prioritySongQueue.add(id)
+                        view.context.getString(R.string.addToPlaylist) -> addSongToPlaylist(
                             view,
                             song.songId
                         )
-                        context.getString(R.string.shareAlbum) -> openAlbum(
+                        view.context.getString(R.string.shareAlbum) -> openAlbum(
                             view,
                             song.mcAlbumId,
                             true
                         )
-                        context.getString(R.string.openAlbumInApp) -> openAlbum(
+                        view.context.getString(R.string.openAlbumInApp) -> openAlbum(
                             view,
                             song.mcAlbumId,
                             false
@@ -84,33 +88,33 @@ open class CatalogItem(
             listViewPosition: Int,
             playlistId: String
         ) {
-            val context = view.context
+            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
 
             val itemList = arrayListOf(
-                AlertListItem(context.getString(R.string.download), downloadDrawable),
-                AlertListItem(context.getString(R.string.addToQueue), addToQueueDrawable),
-                AlertListItem(context.getString(R.string.delete), deleteDrawable),
-                AlertListItem(context.getString(R.string.shareAlbum), shareDrawable),
-                AlertListItem(context.getString(R.string.openAlbumInApp), openInAppDrawable)
+                AlertListItem(view.context.getString(R.string.download), downloadDrawable),
+                AlertListItem(view.context.getString(R.string.addToQueue), addToQueueDrawable),
+                AlertListItem(view.context.getString(R.string.delete), deleteDrawable),
+                AlertListItem(view.context.getString(R.string.shareAlbum), shareDrawable),
+                AlertListItem(view.context.getString(R.string.openAlbumInApp), openInAppDrawable)
             )
 
             val id = data[listViewPosition]
 
-            SongDatabaseHelper(context).getSong(context, id)?.let { song ->
+            SongDatabaseHelper(view.context).getSong(view.context, id)?.let { song ->
                 displayAlertDialogList(
-                    context,
+                    view.context,
                     AlertListHeaderItem(song.shownTitle, song.albumId),
                     itemList
                 ) { _, item ->
 
                     when (item.itemText) {
-                        context.getString(R.string.download) -> {
-                            addDownloadSong(context, song.songId) {}
+                        view.context.getString(R.string.download) -> {
+                            addDownloadSong(view.context, song.songId) {}
                         }
-                        context.getString(R.string.addToQueue) -> {
+                        view.context.getString(R.string.addToQueue) -> {
                             prioritySongQueue.add(id)
                         }
-                        context.getString(R.string.delete) -> {
+                        view.context.getString(R.string.delete) -> {
                             deletePlaylistSong(
                                 view,
                                 id,
@@ -119,12 +123,12 @@ open class CatalogItem(
                                 data.size
                             )
                         }
-                        context.getString(R.string.shareAlbum) -> {
+                        view.context.getString(R.string.shareAlbum) -> {
 
                             openAlbum(view, song.mcAlbumId, true)
 
                         }
-                        context.getString(R.string.openAlbumInApp) -> {
+                        view.context.getString(R.string.openAlbumInApp) -> {
 
                             openAlbum(view, song.mcAlbumId, false)
                         }
