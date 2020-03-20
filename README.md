@@ -6,6 +6,9 @@ https://pixabay.com/illustrations/black-panther-figure-3704552/ - Black Panther 
 
 This android app aims to implement the Monstercat API.
 
+## Download
+<a href='https://play.google.com/store/apps/details?id=de.lucaspape.monstercat&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/></a>
+
 ## Features
 
  - Manage and play your playlist from monstercat.com
@@ -54,4 +57,5 @@ Please also read the developers guide ([DEVELOPERS_GUIDE.txt](https://github.com
 Disclamer: this is not an official app from monstercat.com!
 I am not responsible in any way for the content displayed in this app!
 Monstercat is a trademark from Monstercat inc.
+Google Play and the Google Play logo are trademarks of Google LLC.
 
