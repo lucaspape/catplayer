@@ -355,7 +355,7 @@ class MainActivity : AppCompatActivity() {
         val settings = Settings(this)
 
         //for new privacy policy change version number
-        if (settings.getString(getString(R.string.privacyPolicySetting)) != "1.0") {
+        if (settings.getString(getString(R.string.privacyPolicySetting)) != "1.1") {
             MaterialAlertDialogBuilder(this).apply {
                 setTitle(getString(R.string.privacyPolicy))
                 setPositiveButton(getString(R.string.ok), null)
