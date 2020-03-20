@@ -68,7 +68,7 @@ open class AlbumItem(
     override val type: Int = 100
 
     override val layoutRes: Int
-        get() = R.layout.list_album_view
+        get() = R.layout.list_album
 
     override fun getViewHolder(v: View): ViewHolder {
         return ViewHolder(
