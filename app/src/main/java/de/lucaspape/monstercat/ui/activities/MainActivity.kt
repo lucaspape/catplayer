@@ -379,7 +379,7 @@ class MainActivity : AppCompatActivity() {
                     movementMethod = LinkMovementMethod.getInstance()
                 }
             }
-            settings.setString(getString(R.string.privacyPolicySetting), "1.0")
+            settings.setString(getString(R.string.privacyPolicySetting), "1.1")
         }
     }
 
