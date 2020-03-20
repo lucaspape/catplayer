@@ -159,7 +159,12 @@ fun playStream(stream: Stream) {
                     exoPlayer?.playWhenReady = true
 
                     setPlayButtonImage(context)
-                    runSeekBarUpdate(context, false)
+
+                    currentSeekBarUpdateHandlerId = ""
+                    
+                    duration = 0
+                    currentPosition = 0
+                    setPlayerState(0.toLong())
                 }
             }
         }
