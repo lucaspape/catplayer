@@ -198,7 +198,11 @@ internal fun stop() {
 private fun nextSong(): String {
     if (loopSingle && playlist.size >= playlistIndex) {
         //loop single
-        return playlist[playlistIndex]
+        return try{
+            playlist[playlistIndex]
+        }catch (e: java.lang.IndexOutOfBoundsException){
+            ""
+        }
     } else if (prioritySongQueue.size > 0) {
         //get from priority list
         val songId = prioritySongQueue[0]
@@ -275,7 +279,11 @@ private fun previousSong(): String {
 fun getNextSong(): String {
     if (loopSingle && playlist.size >= playlistIndex) {
         //loop single
-        return playlist[playlistIndex]
+        return try{
+            playlist[playlistIndex]
+        }catch (e: java.lang.IndexOutOfBoundsException){
+            ""
+        }
     } else if (prioritySongQueue.size > 0) {
         //get from priority list
         return prioritySongQueue[0]
