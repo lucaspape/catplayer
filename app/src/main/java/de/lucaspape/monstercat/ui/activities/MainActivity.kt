@@ -187,31 +187,17 @@ class MainActivity : AppCompatActivity() {
 
         //update notification after restart of activity (screen orientation change etc)
         if (exoPlayer?.isPlaying == true) {
-            if (streamInfoUpdateAsync?.status != AsyncTask.Status.RUNNING) {
-                val currentSong = getCurrentSong()
+            val currentSong = getCurrentSong()
 
-                setCover(
+            setCover(
+                this,
+                currentSong
+            ) { bitmap ->
+                updateNotification(
                     this,
-                    currentSong
-                ) { bitmap ->
-                    updateNotification(
-                        this,
-                        currentSong,
-                        bitmap
-                    )
-                }
-
-            } else {
-                setCover(
-                    this,
-                    StreamInfoUpdateAsync.liveSongId
-                ) { bitmap ->
-                    updateNotification(
-                        this,
-                        StreamInfoUpdateAsync.liveSongId,
-                        bitmap
-                    )
-                }
+                    currentSong,
+                    bitmap
+                )
             }
         }
 

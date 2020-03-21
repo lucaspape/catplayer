@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.media.AudioManager
 import android.media.session.MediaSession
+import android.os.AsyncTask
 import android.support.v4.media.session.MediaSessionCompat
 import com.google.android.exoplayer2.ExoPlayer
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
@@ -198,9 +199,9 @@ internal fun stop() {
 private fun nextSong(): String {
     if (loopSingle && playlist.size >= playlistIndex) {
         //loop single
-        return try{
+        return try {
             playlist[playlistIndex]
-        }catch (e: java.lang.IndexOutOfBoundsException){
+        } catch (e: java.lang.IndexOutOfBoundsException) {
             ""
         }
     } else if (prioritySongQueue.size > 0) {
@@ -279,9 +280,9 @@ private fun previousSong(): String {
 fun getNextSong(): String {
     if (loopSingle && playlist.size >= playlistIndex) {
         //loop single
-        return try{
+        return try {
             playlist[playlistIndex]
-        }catch (e: java.lang.IndexOutOfBoundsException){
+        } catch (e: java.lang.IndexOutOfBoundsException) {
             ""
         }
     } else if (prioritySongQueue.size > 0) {
@@ -313,10 +314,16 @@ fun getNextSong(): String {
 }
 
 fun getCurrentSong(): String {
-    return if (playlist.size > playlistIndex) {
-        playlist[playlistIndex]
-    } else {
-        ""
+    return when {
+        streamInfoUpdateAsync?.status == AsyncTask.Status.RUNNING -> {
+            StreamInfoUpdateAsync.liveSongId
+        }
+        playlist.size > playlistIndex -> {
+            playlist[playlistIndex]
+        }
+        else -> {
+            ""
+        }
     }
 }
 
