@@ -147,11 +147,14 @@ private fun resume() {
                     setPlayButtonImage(
                         context
                     )
-                    runSeekBarUpdate(
-                        context,
-                        true
-                    )
 
+                    if(streamInfoUpdateAsync?.status != AsyncTask.Status.RUNNING){
+                        runSeekBarUpdate(
+                            context,
+                            true
+                        )
+                    }
+                    
                     updateNotification(context, songId, it)
                 }
 
