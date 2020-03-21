@@ -321,7 +321,7 @@ fun getCurrentSongId(): String {
         streamInfoUpdateAsync?.status == AsyncTask.Status.RUNNING -> {
             StreamInfoUpdateAsync.liveSongId
         }
-        playlist.size > playlistIndex -> {
+        playlist.size > playlistIndex && playlistIndex>=0-> {
             playlist[playlistIndex]
         }
         else -> {
