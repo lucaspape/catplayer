@@ -114,7 +114,7 @@ fun pause() {
     contextReference?.get()?.let { context ->
         exoPlayer?.playWhenReady = false
 
-        setPlayButtonImage(context)
+        playing = false
 
         abandonAudioFocus(context)
     }
@@ -134,7 +134,7 @@ private fun resume() {
                     intentFilter
                 )
 
-                setPlayButtonImage(context)
+                playing = true
 
                 val songId = getCurrentSongId()
 
@@ -144,17 +144,17 @@ private fun resume() {
                     context,
                     songId
                 ) {
-                    setPlayButtonImage(
-                        context
-                    )
-
+                    exoPlayer?.isPlaying?.let { isPlaying ->
+                        playing = isPlaying
+                    }
+                    
                     if(streamInfoUpdateAsync?.status != AsyncTask.Status.RUNNING){
                         runSeekBarUpdate(
                             context,
                             true
                         )
                     }
-                    
+
                     updateNotification(context, songId, it)
                 }
 
@@ -182,7 +182,7 @@ internal fun stop() {
         title = ""
         artist = ""
 
-        setPlayButtonImage(contextReference?.get()!!)
+        playing = false
 
         exoPlayer?.stop()
 

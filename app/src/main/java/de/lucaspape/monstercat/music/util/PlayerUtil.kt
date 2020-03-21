@@ -66,7 +66,9 @@ fun getStreamPlayerListener(context: Context): Player.EventListener {
     return object : Player.EventListener {
         @Override
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-            setPlayButtonImage(context)
+            exoPlayer?.isPlaying?.let { isPlaying ->
+                playing = isPlaying
+            }
 
             setCover(
                 context,
@@ -109,7 +111,10 @@ fun getPlayerListener(context: Context, songId: String): Player.EventListener {
                         updateNotification(context, songId, it)
                     }
 
-                    setPlayButtonImage(context)
+                    exoPlayer?.isPlaying?.let { isPlaying ->
+                        playing = isPlaying
+                    }
+
                     runSeekBarUpdate(context, true)
                 }
             }

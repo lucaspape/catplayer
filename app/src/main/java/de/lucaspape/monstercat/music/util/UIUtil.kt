@@ -231,6 +231,43 @@ var artistDrawable: Drawable? = null
         field = newDrawable
     }
 
+var playing = false
+    set(newBoolean){
+        contextReference?.get()?.let { context ->
+            if (newBoolean) {
+                playButtonReference?.get()?.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        context,
+                        R.drawable.ic_pause_24dp
+                    )
+                )
+
+                fullscreenPlayButtonReference?.get()?.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        context,
+                        R.drawable.ic_pause_24dp
+                    )
+                )
+
+            } else {
+                playButtonReference?.get()?.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        context,
+                        R.drawable.ic_play_arrow_24dp
+                    )
+                )
+                fullscreenPlayButtonReference?.get()?.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        context,
+                        R.drawable.ic_play_arrow_24dp
+                    )
+                )
+            }
+        }
+
+        field = newBoolean
+    }
+
 internal fun setCover(context: Context, songId: String, callback: (bitmap: Bitmap) -> Unit) {
     SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
         setCover(context, song.albumId, song.artistId, callback)
@@ -283,38 +320,6 @@ internal fun setCover(
             }
         }
     }, artistId)
-}
-
-internal fun setPlayButtonImage(context: Context) {
-    if (exoPlayer?.isPlaying == true) {
-        playButtonReference?.get()?.setImageDrawable(
-            ContextCompat.getDrawable(
-                context,
-                R.drawable.ic_pause_24dp
-            )
-        )
-
-        fullscreenPlayButtonReference?.get()?.setImageDrawable(
-            ContextCompat.getDrawable(
-                context,
-                R.drawable.ic_pause_24dp
-            )
-        )
-
-    } else {
-        playButtonReference?.get()?.setImageDrawable(
-            ContextCompat.getDrawable(
-                context,
-                R.drawable.ic_play_arrow_24dp
-            )
-        )
-        fullscreenPlayButtonReference?.get()?.setImageDrawable(
-            ContextCompat.getDrawable(
-                context,
-                R.drawable.ic_play_arrow_24dp
-            )
-        )
-    }
 }
 
 /**
