@@ -187,7 +187,7 @@ class MainActivity : AppCompatActivity() {
 
         //update notification after restart of activity (screen orientation change etc)
         if (exoPlayer?.isPlaying == true) {
-            val currentSong = getCurrentSong()
+            val currentSong = getCurrentSongId()
 
             setCover(
                 this,

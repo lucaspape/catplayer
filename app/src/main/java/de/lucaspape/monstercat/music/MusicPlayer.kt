@@ -136,7 +136,7 @@ private fun resume() {
 
                 setPlayButtonImage(context)
 
-                val songId = getCurrentSong()
+                val songId = getCurrentSongId()
 
                 startPlayerService(songId)
 
@@ -313,7 +313,7 @@ fun getNextSong(): String {
     }
 }
 
-fun getCurrentSong(): String {
+fun getCurrentSongId(): String {
     return when {
         streamInfoUpdateAsync?.status == AsyncTask.Status.RUNNING -> {
             StreamInfoUpdateAsync.liveSongId
@@ -325,6 +325,14 @@ fun getCurrentSong(): String {
             ""
         }
     }
+}
+
+fun getCurrentAlbumId(context: Context): String {
+    SongDatabaseHelper(context).getSong(context, getCurrentSongId())?.let { song ->
+        return song.albumId
+    }
+
+    return ""
 }
 
 fun clearQueue() {
@@ -341,5 +349,5 @@ fun clearPlaylist() {
  * Dont play from playlist, play from queue
  */
 fun skipPreviousInPlaylist() {
-    playlistIndex = playlist.size
+    playlistIndex = playlist.size - 1
 }

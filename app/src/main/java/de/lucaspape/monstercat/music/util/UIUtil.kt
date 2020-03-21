@@ -247,20 +247,24 @@ internal fun setCover(
         ImageReceiverInterface {
         override fun setBitmap(id: String, bitmap: Bitmap?) {
             if (id == albumId) {
-                coverBitmap = bitmap
+                if(getCurrentAlbumId(context) == id){
+                    coverBitmap = bitmap
 
-                bitmap?.let {
-                    callback(it)
+                    bitmap?.let {
+                        callback(it)
+                    }
                 }
             }
         }
 
         override fun setDrawable(id: String, drawable: Drawable?) {
             if (id == albumId) {
-                coverDrawable = drawable
+                if(getCurrentAlbumId(context) == id){
+                    coverDrawable = drawable
 
-                drawable?.toBitmap()?.let {
-                    callback(it)
+                    drawable?.toBitmap()?.let {
+                        callback(it)
+                    }
                 }
             }
         }

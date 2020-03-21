@@ -1,6 +1,7 @@
 package de.lucaspape.monstercat.music.save
 
 import android.content.Context
+import android.os.AsyncTask
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.nextRandom
 import de.lucaspape.monstercat.music.playlist
@@ -51,7 +52,7 @@ data class PlayerSaveState(
                                 songQueue = playerSaveState.songQueue
                                 prioritySongQueue = playerSaveState.prioritySongQueue
 
-                                val songId = getCurrentSong()
+                                val songId = getCurrentSongId()
 
                                 playerSaveState.progress?.let { progress ->
                                     playSong(
@@ -88,30 +89,32 @@ data class PlayerSaveState(
 
         @JvmStatic
         fun saveMusicPlayerState(context: Context) {
-            val objectOutputStream =
-                ObjectOutputStream(FileOutputStream(File(context.cacheDir.toString() + "/player_state.obj")))
+            if(streamInfoUpdateAsync?.status != AsyncTask.Status.RUNNING){
+                val objectOutputStream =
+                    ObjectOutputStream(FileOutputStream(File(context.cacheDir.toString() + "/player_state.obj")))
 
-            val playerSaveState =
-                PlayerSaveState(
-                    loop,
-                    loopSingle,
-                    shuffle,
-                    crossfade,
-                    playlist,
-                    playlistIndex,
-                    nextRandom,
-                    songQueue,
-                    prioritySongQueue,
-                    exoPlayer?.currentPosition,
-                    exoPlayer?.duration
-                )
+                val playerSaveState =
+                    PlayerSaveState(
+                        loop,
+                        loopSingle,
+                        shuffle,
+                        crossfade,
+                        playlist,
+                        playlistIndex,
+                        nextRandom,
+                        songQueue,
+                        prioritySongQueue,
+                        exoPlayer?.currentPosition,
+                        exoPlayer?.duration
+                    )
 
-            try {
-                objectOutputStream.writeObject(playerSaveState)
-                objectOutputStream.flush()
-                objectOutputStream.close()
-            }catch (e: ConcurrentModificationException){
+                try {
+                    objectOutputStream.writeObject(playerSaveState)
+                    objectOutputStream.flush()
+                    objectOutputStream.close()
+                }catch (e: ConcurrentModificationException){
 
+                }
             }
         }
     }
