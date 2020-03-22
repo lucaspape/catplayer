@@ -51,6 +51,9 @@ var openInAppDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_
 var addToPlaylistDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_playlist_add_24"
 var deleteDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_delete_outline_24"
 
+var playButtonDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_play_arrow_24dp"
+var pauseButtonDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_pause_24dp"
+
 /**
  * Main activity
  */
@@ -217,6 +220,9 @@ class MainActivity : AppCompatActivity() {
         fragmentBackPressedCallback = {}
 
         PlayerSaveState.saveMusicPlayerState(this)
+
+        currentSong = ""
+        preparedSong = ""
     }
 
     override fun onPause() {
@@ -299,6 +305,11 @@ class MainActivity : AppCompatActivity() {
                     "android.resource://de.lucaspape.monstercat/drawable/ic_playlist_add_white_24"
                 deleteDrawable =
                     "android.resource://de.lucaspape.monstercat/drawable/ic_delete_outline_white_24"
+
+                playButtonDrawable =
+                    "android.resource://de.lucaspape.monstercat/drawable/ic_play_arrow_white_24dp"
+                pauseButtonDrawable =
+                    "android.resource://de.lucaspape.monstercat/drawable/ic_pause_white_24dp"
             } else {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
@@ -321,6 +332,10 @@ class MainActivity : AppCompatActivity() {
                     "android.resource://de.lucaspape.monstercat/drawable/ic_playlist_add_black_24"
                 deleteDrawable =
                     "android.resource://de.lucaspape.monstercat/drawable/ic_delete_outline_black_24"
+                playButtonDrawable =
+                    "android.resource://de.lucaspape.monstercat/drawable/ic_play_arrow_black_24dp"
+                pauseButtonDrawable =
+                    "android.resource://de.lucaspape.monstercat/drawable/ic_pause_black_24dp"
             }
         } else {
             if (resources.configuration.uiMode.and(Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) {

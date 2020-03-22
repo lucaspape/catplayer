@@ -7,11 +7,11 @@ import android.media.AudioManager
 import android.os.IBinder
 import de.lucaspape.monstercat.ui.activities.noisyReceiver
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
+import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.contextReference
-import de.lucaspape.monstercat.music.exoPlayer
 import de.lucaspape.monstercat.music.util.setCover
-import de.lucaspape.monstercat.music.streamInfoUpdateAsync
 import java.lang.IllegalArgumentException
+import java.lang.ref.WeakReference
 
 class PlayerService : Service() {
     override fun onBind(intent: Intent?): IBinder? {
@@ -19,6 +19,11 @@ class PlayerService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        contextReference = WeakReference(applicationContext)
+
+        //make sure session is started
+        createMediaSession()
+
         //register receiver which checks if headphones unplugged
         registerReceiver(noisyReceiver, IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY))
 
@@ -40,29 +45,28 @@ class PlayerService : Service() {
             )
         )
 
-        contextReference?.get()?.let { context ->
-            SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
-                title = song.title
-                artist = song.artist
-                version = song.version
+        SongDatabaseHelper(this).getSong(this, songId)?.let { song ->
+            title = song.title
+            artist = song.artist
+            version = song.version
 
-                setCover(
-                    context,
-                    song.albumId,
-                    song.artistId
-                ) {
-                    startForeground(
-                        musicNotificationID,
-                        createPlayerNotification(
-                            song.title,
-                            song.version,
-                            song.artist,
-                            it
-                        )
+            setCover(
+                this,
+                song.albumId,
+                song.artistId
+            ) {
+                startForeground(
+                    musicNotificationID,
+                    createPlayerNotification(
+                        song.title,
+                        song.version,
+                        song.artist,
+                        it
                     )
-                }
+                )
             }
         }
+
 
         return START_NOT_STICKY
     }
@@ -79,6 +83,8 @@ class PlayerService : Service() {
         } catch (e: IllegalArgumentException) {
 
         }
+
+        serviceRunning = false
 
         super.onDestroy()
     }

@@ -27,7 +27,7 @@ private var lastButtonPress: Long = 0
 
 private var playerServiceIntent: Intent? = null
 
-private var serviceRunning = false
+internal var serviceRunning = false
 
 private var prevReceiver: BroadcastReceiver? = null
 private var playPauseReceiver: BroadcastReceiver? = null
@@ -207,7 +207,7 @@ fun stopPlayerService() {
     serviceRunning = false
 }
 
-fun updateNotification(context: Context, songId: String, bitmap: Bitmap){
+fun updateNotification(context: Context, songId: String, bitmap: Bitmap) {
     SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
         updateNotification(song.title, song.version, song.artist, bitmap)
     }

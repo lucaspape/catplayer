@@ -16,7 +16,8 @@ import de.lucaspape.monstercat.util.*
 import java.lang.ref.WeakReference
 import java.util.*
 
-private var preparedSong = ""
+var currentSong = ""
+var preparedSong = ""
 
 internal fun prepareSong(context: Context, songId: String) {
     if (preparedSong != songId) {
@@ -60,33 +61,37 @@ internal fun playSong(
     }
 
     if (audioFocus == AudioManager.AUDIOFOCUS_REQUEST_GRANTED || !requestAudioFocus) {
-        exoPlayer?.release()
-        exoPlayer?.stop()
+        if(currentSong != songId){
+            exoPlayer?.release()
+            exoPlayer?.stop()
 
-        if (preparedSong != songId) {
-            prepareSong(context, songId)
+            if (preparedSong != songId) {
+                prepareSong(context, songId)
+            }
+
+            exoPlayer =
+                nextExoPlayer
+
+            preparedSong = ""
+
+            exoPlayer?.audioComponent?.volume = 1.0f
+
+            //for play/pause button change and if song ended
+            exoPlayer?.addListener(
+                getPlayerListener(
+                    context,
+                    songId
+                )
+            )
         }
-
-        exoPlayer =
-            nextExoPlayer
-
-        preparedSong = ""
-
-        exoPlayer?.audioComponent?.volume = 1.0f
 
         if (progress != null) {
             exoPlayer?.seekTo(progress)
         }
 
-        //for play/pause button change and if song ended
-        exoPlayer?.addListener(
-            getPlayerListener(
-                context,
-                songId
-            )
-        )
-
         exoPlayer?.playWhenReady = playWhenReady
+
+        currentSong = songId
 
         if (playWhenReady) {
             listenerEnabled = true

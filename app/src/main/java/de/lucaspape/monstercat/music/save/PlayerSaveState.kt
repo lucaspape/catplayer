@@ -6,8 +6,9 @@ import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.nextRandom
 import de.lucaspape.monstercat.music.playlist
 import de.lucaspape.monstercat.music.playlistIndex
+import de.lucaspape.monstercat.music.util.currentPosition
+import de.lucaspape.monstercat.music.util.duration
 import de.lucaspape.monstercat.music.util.playSong
-import de.lucaspape.monstercat.music.util.seekBarReference
 import java.io.*
 
 data class PlayerSaveState(
@@ -28,19 +29,19 @@ data class PlayerSaveState(
 
         @JvmStatic
         internal var restored = false
-            private set
 
         @JvmStatic
-        fun restoreMusicPlayerState(context: Context) {
-            if (!restored) {
+        fun restoreMusicPlayerState(context: Context, force: Boolean) {
+            if (!restored || force) {
                 try {
                     try {
                         val objectInputStream =
                             ObjectInputStream(FileInputStream(File(context.cacheDir.toString() + "/player_state.obj")))
 
                         try {
-                            try{
-                                val playerSaveState = objectInputStream.readObject() as PlayerSaveState
+                            try {
+                                val playerSaveState =
+                                    objectInputStream.readObject() as PlayerSaveState
 
                                 loop = playerSaveState.loop
                                 loopSingle = playerSaveState.loopSingle
@@ -52,9 +53,11 @@ data class PlayerSaveState(
                                 songQueue = playerSaveState.songQueue
                                 prioritySongQueue = playerSaveState.prioritySongQueue
 
-                                val songId = getCurrentSongId()
-
                                 playerSaveState.progress?.let { progress ->
+                                    currentPosition = progress.toInt()
+
+                                    val songId = getCurrentSongId()
+
                                     playSong(
                                         context, songId,
                                         showNotification = false,
@@ -62,14 +65,12 @@ data class PlayerSaveState(
                                         playWhenReady = false,
                                         progress = progress
                                     )
-
-                                    seekBarReference?.get()?.progress = progress.toInt()
                                 }
 
-                                playerSaveState.duration?.let { duration ->
-                                    seekBarReference?.get()?.max = duration.toInt()
+                                playerSaveState.duration?.let { sDuration ->
+                                    duration = sDuration.toInt()
                                 }
-                            }catch (e: ClassNotFoundException){
+                            } catch (e: ClassNotFoundException) {
                                 File((context.cacheDir.toString() + "/player_state.obj")).delete()
                             }
 
@@ -89,7 +90,7 @@ data class PlayerSaveState(
 
         @JvmStatic
         fun saveMusicPlayerState(context: Context) {
-            if(streamInfoUpdateAsync?.status != AsyncTask.Status.RUNNING){
+            if (streamInfoUpdateAsync?.status != AsyncTask.Status.RUNNING) {
                 val objectOutputStream =
                     ObjectOutputStream(FileOutputStream(File(context.cacheDir.toString() + "/player_state.obj")))
 
@@ -112,7 +113,7 @@ data class PlayerSaveState(
                     objectOutputStream.writeObject(playerSaveState)
                     objectOutputStream.flush()
                     objectOutputStream.close()
-                }catch (e: ConcurrentModificationException){
+                } catch (e: ConcurrentModificationException) {
 
                 }
             }

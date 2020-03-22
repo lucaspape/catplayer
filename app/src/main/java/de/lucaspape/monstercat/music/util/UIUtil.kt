@@ -11,26 +11,29 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
-import de.lucaspape.monstercat.R
+import androidx.core.net.toUri
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.downloadCoverIntoImageReceiver
 import de.lucaspape.monstercat.download.ImageReceiverInterface
 import de.lucaspape.monstercat.download.downloadArtistImageIntoImageReceiver
 import de.lucaspape.monstercat.music.*
-import de.lucaspape.monstercat.music.contextReference
+import de.lucaspape.monstercat.ui.activities.pauseButtonDrawable
+import de.lucaspape.monstercat.ui.activities.playButtonDrawable
 import java.lang.ref.WeakReference
 
 var textViewReference: WeakReference<TextView>? = null
     set(newTextView) {
-        newTextView?.get()?.text = textViewReference?.get()?.text
+        val titleWithArtist = "$title - $artist"
+        newTextView?.get()?.text = titleWithArtist
+
         field = newTextView
     }
 
 var seekBarReference: WeakReference<SeekBar>? = null
     set(newSeekBar) {
-        seekBarReference?.get()?.progress?.let { newSeekBar?.get()?.progress = it }
+        newSeekBar?.get()?.progress = currentPosition
+
         newSeekBar?.get()?.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 if (fromUser)
@@ -58,54 +61,30 @@ var musicBarReference: WeakReference<androidx.appcompat.widget.Toolbar>? = null
 
 var playButtonReference: WeakReference<ImageButton>? = null
     set(newPlayButton) {
-        contextReference?.get()?.let { context ->
-            if (exoPlayer?.isPlaying == true) {
-                newPlayButton?.get()?.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        context,
-                        R.drawable.ic_pause_24dp
-                    )
-                )
-
-            } else {
-                newPlayButton?.get()?.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        context,
-                        R.drawable.ic_play_arrow_24dp
-                    )
-                )
-
-            }
-        }
-
         field = newPlayButton
+
+        exoPlayer?.isPlaying?.let { isPlaying ->
+            playing = isPlaying
+        }
     }
 
 var fullscreenTitleReference: WeakReference<TextView>? = null
     set(newTitleTextView) {
-        if (fullscreenTitleReference?.get() != null) {
-            newTitleTextView?.get()?.text = fullscreenTitleReference?.get()?.text
-        } else {
-            newTitleTextView?.get()?.text = title
-        }
+        newTitleTextView?.get()?.text = title
 
         field = newTitleTextView
     }
 
 var fullscreenArtistReference: WeakReference<TextView>? = null
     set(newArtistTextView) {
-        if (fullscreenArtistReference?.get() != null) {
-            newArtistTextView?.get()?.text = fullscreenArtistReference?.get()?.text
-        } else {
-            newArtistTextView?.get()?.text = artist
-        }
+        newArtistTextView?.get()?.text = artist
 
         field = newArtistTextView
     }
 
 var fullscreenSeekBarReference: WeakReference<SeekBar>? = null
     set(newSeekBar) {
-        seekBarReference?.get()?.progress?.let { newSeekBar?.get()?.progress = it }
+        newSeekBar?.get()?.progress = currentPosition
 
         newSeekBar?.get()?.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
@@ -132,26 +111,9 @@ var fullscreenCoverReference: WeakReference<ImageView>? = null
 
 var fullscreenPlayButtonReference: WeakReference<ImageButton>? = null
     set(newPlayButton) {
-        contextReference?.get()?.let { context ->
-            if (exoPlayer?.isPlaying == true) {
-                newPlayButton?.get()?.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        context,
-                        R.drawable.ic_pause_24dp
-                    )
-                )
-
-            } else {
-                newPlayButton?.get()?.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        context,
-                        R.drawable.ic_play_arrow_24dp
-                    )
-                )
-
-            }
-
-            field = newPlayButton
+        field = newPlayButton
+        exoPlayer?.isPlaying?.let { isPlaying ->
+            playing = isPlaying
         }
     }
 
@@ -232,37 +194,15 @@ var artistDrawable: Drawable? = null
     }
 
 var playing = false
-    set(newBoolean){
-        contextReference?.get()?.let { context ->
-            if (newBoolean) {
-                playButtonReference?.get()?.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        context,
-                        R.drawable.ic_pause_24dp
-                    )
-                )
+    set(newBoolean) {
+        if (newBoolean) {
+            playButtonReference?.get()?.setImageURI(pauseButtonDrawable.toUri())
 
-                fullscreenPlayButtonReference?.get()?.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        context,
-                        R.drawable.ic_pause_24dp
-                    )
-                )
+            fullscreenPlayButtonReference?.get()?.setImageURI(pauseButtonDrawable.toUri())
 
-            } else {
-                playButtonReference?.get()?.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        context,
-                        R.drawable.ic_play_arrow_24dp
-                    )
-                )
-                fullscreenPlayButtonReference?.get()?.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        context,
-                        R.drawable.ic_play_arrow_24dp
-                    )
-                )
-            }
+        } else {
+            playButtonReference?.get()?.setImageURI(playButtonDrawable.toUri())
+            fullscreenPlayButtonReference?.get()?.setImageURI(playButtonDrawable.toUri())
         }
 
         field = newBoolean
@@ -284,7 +224,7 @@ internal fun setCover(
         ImageReceiverInterface {
         override fun setBitmap(id: String, bitmap: Bitmap?) {
             if (id == albumId) {
-                if(getCurrentAlbumId(context) == id){
+                if (getCurrentAlbumId(context) == id) {
                     coverBitmap = bitmap
 
                     bitmap?.let {
@@ -296,7 +236,7 @@ internal fun setCover(
 
         override fun setDrawable(id: String, drawable: Drawable?) {
             if (id == albumId) {
-                if(getCurrentAlbumId(context) == id){
+                if (getCurrentAlbumId(context) == id) {
                     coverDrawable = drawable
 
                     drawable?.toBitmap()?.let {

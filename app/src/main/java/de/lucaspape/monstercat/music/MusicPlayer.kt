@@ -12,7 +12,6 @@ import com.google.android.exoplayer2.ExoPlayer
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.music.notification.startPlayerService
 import de.lucaspape.monstercat.music.notification.stopPlayerService
-import de.lucaspape.monstercat.music.notification.updateNotification
 import de.lucaspape.monstercat.music.save.PlayerSaveState
 import de.lucaspape.monstercat.music.util.*
 import de.lucaspape.monstercat.music.util.playSong
@@ -77,8 +76,8 @@ class NoisyReceiver : BroadcastReceiver() {
  */
 fun createMediaSession() {
     contextReference?.get()?.let {
-        if (!sessionCreated) {
-            PlayerSaveState.restoreMusicPlayerState(it)
+        if (!sessionCreated || mediaSession == null) {
+            PlayerSaveState.restoreMusicPlayerState(it, false)
 
             mediaSession = MediaSessionCompat.fromMediaSession(
                 it,
@@ -137,47 +136,27 @@ fun pause() {
 }
 
 internal fun resume() {
+    startPlayerService(getCurrentSongId())
+
     contextReference?.get()?.let { context ->
-        if (exoPlayer?.isPlaying == false) {
-            if (requestAudioFocus(context) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                listenerEnabled = true
+        listenerEnabled = true
 
-                exoPlayer?.playWhenReady = true
+        val intentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
 
-                val intentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
-                context.registerReceiver(
-                    NoisyReceiver(),
-                    intentFilter
-                )
+        context.registerReceiver(
+            NoisyReceiver(),
+            intentFilter
+        )
 
-                val songId = getCurrentSongId()
+        playSong(
+            context, getCurrentSongId(),
+            showNotification = true,
+            requestAudioFocus = true,
+            playWhenReady = true,
+            progress = currentPosition.toLong()
+        )
 
-                startPlayerService(songId)
-
-                setCover(
-                    context,
-                    songId
-                ) {
-                    if (streamInfoUpdateAsync?.status != AsyncTask.Status.RUNNING) {
-                        runSeekBarUpdate(
-                            context,
-                            prepareNext = true,
-                            crossFade = true
-                        )
-                    }
-
-                    updateNotification(context, songId, it)
-                }
-
-                SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
-                    //UI stuff
-                    title = "${song.title} ${song.version}"
-                    artist = song.artist
-                }
-            }
-
-            PlayerSaveState.saveMusicPlayerState(context)
-        }
+        PlayerSaveState.saveMusicPlayerState(context)
     }
 }
 
