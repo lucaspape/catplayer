@@ -107,6 +107,8 @@ fun next() {
             playWhenReady = true,
             progress = null
         )
+
+        PlayerSaveState.saveMusicPlayerState(context)
     }
 }
 
@@ -119,6 +121,8 @@ fun previous() {
             playWhenReady = true,
             progress = null
         )
+
+        PlayerSaveState.saveMusicPlayerState(context)
     }
 }
 
@@ -127,6 +131,8 @@ fun pause() {
         exoPlayer?.playWhenReady = false
 
         abandonAudioFocus(context)
+
+        PlayerSaveState.saveMusicPlayerState(context)
     }
 }
 
@@ -168,6 +174,8 @@ private fun resume() {
                     artist = song.artist
                 }
             }
+
+            PlayerSaveState.saveMusicPlayerState(context)
         }
     }
 }
@@ -192,6 +200,7 @@ internal fun stop() {
 
         contextReference?.get()?.let { context ->
             abandonAudioFocus(context)
+            PlayerSaveState.saveMusicPlayerState(context)
         }
     }
 
