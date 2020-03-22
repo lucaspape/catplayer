@@ -50,8 +50,17 @@ private var sessionCreated = false
 
 var streamInfoUpdateAsync: StreamInfoUpdateAsync? = null
 
-val audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener {
-    pause()
+val audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener { focusChange ->
+    when (focusChange) {
+        AudioManager.AUDIOFOCUS_GAIN ->
+            resume()
+
+        AudioManager.AUDIOFOCUS_LOSS ->
+            pause()
+
+        AudioManager.AUDIOFOCUS_LOSS_TRANSIENT ->
+            pause()
+    }
 }
 
 class NoisyReceiver : BroadcastReceiver() {
@@ -140,7 +149,7 @@ private fun resume() {
                     context,
                     songId
                 ) {
-                    if(streamInfoUpdateAsync?.status != AsyncTask.Status.RUNNING){
+                    if (streamInfoUpdateAsync?.status != AsyncTask.Status.RUNNING) {
                         runSeekBarUpdate(
                             context,
                             true
@@ -311,7 +320,7 @@ fun getCurrentSongId(): String {
         streamInfoUpdateAsync?.status == AsyncTask.Status.RUNNING -> {
             StreamInfoUpdateAsync.liveSongId
         }
-        playlist.size > playlistIndex && playlistIndex>=0-> {
+        playlist.size > playlistIndex && playlistIndex >= 0 -> {
             playlist[playlistIndex]
         }
         else -> {
