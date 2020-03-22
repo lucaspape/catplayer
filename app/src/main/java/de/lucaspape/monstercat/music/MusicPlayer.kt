@@ -13,6 +13,7 @@ import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.music.notification.startPlayerService
 import de.lucaspape.monstercat.music.notification.stopPlayerService
 import de.lucaspape.monstercat.music.notification.updateNotification
+import de.lucaspape.monstercat.music.save.PlayerSaveState
 import de.lucaspape.monstercat.music.util.*
 import de.lucaspape.monstercat.music.util.playSong
 import java.lang.ref.WeakReference
@@ -77,6 +78,8 @@ class NoisyReceiver : BroadcastReceiver() {
 fun createMediaSession() {
     contextReference?.get()?.let {
         if (!sessionCreated) {
+            PlayerSaveState.restoreMusicPlayerState(it)
+
             mediaSession = MediaSessionCompat.fromMediaSession(
                 it,
                 MediaSession(it, "de.lucaspape.monstercat.music")

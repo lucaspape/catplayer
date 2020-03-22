@@ -174,8 +174,6 @@ class MainActivity : AppCompatActivity() {
 
         setupMusicPlayer()
 
-        PlayerSaveState.restoreMusicPlayerState(this)
-
         //create the MusicPlayer.kt mediasession
         createMediaSession()
 
