@@ -113,7 +113,7 @@ class FullscreenPlayerHandler : Handler {
     }
 
     override fun getLayout(): Int {
-        return R.layout.activity_settings
+        return R.layout.activity_player_fullscreen
     }
 
     override fun onCreate(view: View, search: String?) {
