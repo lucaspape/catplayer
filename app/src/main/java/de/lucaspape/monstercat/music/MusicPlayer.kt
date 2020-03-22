@@ -136,7 +136,7 @@ fun pause() {
     }
 }
 
-private fun resume() {
+internal fun resume() {
     contextReference?.get()?.let { context ->
         if (exoPlayer?.isPlaying == false) {
             if (requestAudioFocus(context) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {

@@ -10,7 +10,7 @@ class MediaSessionCallback : MediaSessionCompat.Callback() {
     }
 
     override fun onPlay() {
-        exoPlayer?.playWhenReady = true
+        resume()
     }
 
     override fun onSkipToNext() {
