@@ -41,8 +41,6 @@ var loopSingle = false
 var shuffle = false
 var crossfade = 12000
 
-var listenerEnabled = false
-
 var mediaSession: MediaSessionCompat? = null
     internal set
 
@@ -139,8 +137,6 @@ internal fun resume() {
     startPlayerService(getCurrentSongId())
 
     contextReference?.get()?.let { context ->
-        listenerEnabled = true
-
         val intentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
 
         context.registerReceiver(
@@ -175,8 +171,6 @@ internal fun stop() {
         artist = ""
 
         exoPlayer?.stop()
-
-        listenerEnabled = false
 
         contextReference?.get()?.let { context ->
             abandonAudioFocus(context)

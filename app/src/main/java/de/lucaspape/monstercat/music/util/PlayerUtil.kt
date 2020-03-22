@@ -11,6 +11,7 @@ import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.notification.startPlayerService
 import de.lucaspape.monstercat.music.notification.updateNotification
 import de.lucaspape.monstercat.util.Settings
+import java.util.*
 
 fun getAudioAttributes(): AudioAttributes {
     return AudioAttributes.Builder()
@@ -62,33 +63,43 @@ fun abandonAudioFocus(context: Context) {
     audioManager.abandonAudioFocus(audioFocusChangeListener)
 }
 
+var currentListenerId = ""
+
 fun getStreamPlayerListener(context: Context): Player.EventListener {
+    val id = UUID.randomUUID().toString()
+    currentListenerId = id
+
     return object : Player.EventListener {
         @Override
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-            exoPlayer?.isPlaying?.let { isPlaying ->
-                playing = isPlaying
-            }
+            if (currentListenerId == id) {
+                exoPlayer?.isPlaying?.let { isPlaying ->
+                    playing = isPlaying
+                }
 
-            setCover(
-                context,
-                StreamInfoUpdateAsync.liveSongId
-            ) { bitmap ->
-                updateNotification(
+                setCover(
                     context,
-                    StreamInfoUpdateAsync.liveSongId,
-                    bitmap
-                )
+                    StreamInfoUpdateAsync.liveSongId
+                ) { bitmap ->
+                    updateNotification(
+                        context,
+                        StreamInfoUpdateAsync.liveSongId,
+                        bitmap
+                    )
+                }
             }
         }
     }
 }
 
 fun getPlayerListener(context: Context, songId: String): Player.EventListener {
+    val id = UUID.randomUUID().toString()
+    currentListenerId = id
+
     return object : Player.EventListener {
         @Override
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-            if (listenerEnabled) {
+            if (currentListenerId == id) {
                 exoPlayer?.isPlaying?.let { isPlaying ->
                     playing = isPlaying
                 }

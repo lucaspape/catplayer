@@ -112,6 +112,7 @@ var fullscreenCoverReference: WeakReference<ImageView>? = null
 var fullscreenPlayButtonReference: WeakReference<ImageButton>? = null
     set(newPlayButton) {
         field = newPlayButton
+
         exoPlayer?.isPlaying?.let { isPlaying ->
             playing = isPlaying
         }
@@ -204,6 +205,7 @@ var playing = false
             playButtonReference?.get()?.setImageURI(playButtonDrawable.toUri())
             fullscreenPlayButtonReference?.get()?.setImageURI(playButtonDrawable.toUri())
         }
+
 
         field = newBoolean
     }

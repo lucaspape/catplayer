@@ -75,14 +75,6 @@ internal fun playSong(
             preparedSong = ""
 
             exoPlayer?.audioComponent?.volume = 1.0f
-
-            //for play/pause button change and if song ended
-            exoPlayer?.addListener(
-                getPlayerListener(
-                    context,
-                    songId
-                )
-            )
         }
 
         if (progress != null) {
@@ -91,11 +83,15 @@ internal fun playSong(
 
         exoPlayer?.playWhenReady = playWhenReady
 
-        currentSong = songId
+        //for play/pause button change and if song ended
+        exoPlayer?.addListener(
+            getPlayerListener(
+                context,
+                songId
+            )
+        )
 
-        if (playWhenReady) {
-            listenerEnabled = true
-        }
+        currentSong = songId
 
         SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
             //UI stuff
@@ -184,6 +180,10 @@ internal fun runSeekBarUpdate(context: Context, prepareNext:Boolean, crossFade: 
 
     val updateSeekBar = object : Runnable {
         override fun run() {
+            exoPlayer?.isPlaying?.let { isPlaying ->
+                playing = isPlaying
+            }
+
             exoPlayer?.duration?.toInt()?.let {
                 duration = it
             }
