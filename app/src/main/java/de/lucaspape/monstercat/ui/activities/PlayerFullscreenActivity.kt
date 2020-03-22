@@ -11,7 +11,7 @@ class PlayerFullscreenActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(fullscreenPlayerHandler.getLayout())
+        setContentView(fullscreenPlayerHandler.layout)
 
         fullscreenPlayerHandler.onCreate(window.decorView.rootView, null)
     }

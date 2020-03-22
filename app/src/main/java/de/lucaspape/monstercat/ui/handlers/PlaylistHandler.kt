@@ -490,9 +490,7 @@ class PlaylistHandler: Handler {
 
     }
 
-    override fun getLayout(): Int {
-        return R.layout.fragment_playlist
-    }
+    override val layout: Int = R.layout.fragment_playlist
 
     override fun onCreate(view: View, search: String?) {
         val settings = Settings(view.context)

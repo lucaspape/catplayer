@@ -112,9 +112,7 @@ class FullscreenPlayerHandler : Handler {
     override fun onPause(view: View) {
     }
 
-    override fun getLayout(): Int {
-        return R.layout.activity_player_fullscreen
-    }
+    override val layout: Int = R.layout.activity_player_fullscreen
 
     override fun onCreate(view: View, search: String?) {
         setupMusicPlayer(view)

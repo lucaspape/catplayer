@@ -1075,9 +1075,7 @@ class HomeHandler:Handler {
         onFragmentPause()
     }
 
-    override fun getLayout(): Int {
-        return R.layout.fragment_home
-    }
+    override val layout: Int = R.layout.fragment_home
 
     override fun onCreate(view: View, search:String?) {
         setupSpinner(view)

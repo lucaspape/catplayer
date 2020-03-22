@@ -30,7 +30,7 @@ class Fragment(private val handler:Handler) : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(handler.getLayout(), container, false)
+        return inflater.inflate(handler.layout, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
