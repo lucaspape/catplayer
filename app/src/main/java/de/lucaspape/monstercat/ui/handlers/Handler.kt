@@ -3,8 +3,8 @@ package de.lucaspape.monstercat.ui.handlers
 import android.view.View
 
 interface Handler {
-    fun onBackPressed()
-    fun onPause()
+    fun onBackPressed(view: View)
+    fun onPause(view: View)
     fun getLayout(): Int
     fun onCreate(view: View, search:String?)
 }

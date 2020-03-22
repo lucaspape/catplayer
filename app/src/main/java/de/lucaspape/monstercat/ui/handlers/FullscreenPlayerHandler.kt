@@ -1,14 +1,17 @@
 package de.lucaspape.monstercat.ui.handlers
 
+import android.content.Context
+import android.content.Intent
 import android.view.View
 import android.widget.*
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.util.*
+import de.lucaspape.monstercat.ui.activities.MainActivity
 import java.lang.ref.WeakReference
 
-class FullscreenPlayerHandler {
-    fun setupMusicPlayer(view: View) {
+class FullscreenPlayerHandler : Handler {
+    private fun setupMusicPlayer(view: View) {
         val titleTextView = view.findViewById<TextView>(R.id.fullscreenTitle)
         val artistTextView = view.findViewById<TextView>(R.id.fullscreenArtist)
         val coverBarImageView = view.findViewById<ImageView>(R.id.fullscreenAlbumImage)
@@ -23,7 +26,7 @@ class FullscreenPlayerHandler {
         fullscreenPlayButtonReference = WeakReference(playButton)
     }
 
-    fun registerListeners(view: View) {
+    private fun registerListeners(view: View) {
         //music control buttons
         val playButton = view.findViewById<ImageButton>(R.id.fullScreenPlay)
         val backButton = view.findViewById<ImageButton>(R.id.fullscreenPrev)
@@ -90,5 +93,37 @@ class FullscreenPlayerHandler {
                 }
             }
         }
+
+        val titleTextView = view.findViewById<TextView>(R.id.fullscreenTitle)
+        val artistTextView = view.findViewById<TextView>(R.id.fullscreenArtist)
+
+        titleTextView.setOnClickListener {
+            search(view.context, titleTextView.text.toString())
+        }
+
+        artistTextView.setOnClickListener {
+            search(view.context, artistTextView.text.toString())
+        }
+    }
+
+    override fun onBackPressed(view: View) {
+    }
+
+    override fun onPause(view: View) {
+    }
+
+    override fun getLayout(): Int {
+        return R.layout.activity_settings
+    }
+
+    override fun onCreate(view: View, search: String?) {
+        setupMusicPlayer(view)
+        registerListeners(view)
+    }
+
+    private fun search(context: Context, term: String) {
+        val intent = Intent(context, MainActivity::class.java)
+        intent.putExtra("search", term)
+        context.startActivity(intent)
     }
 }

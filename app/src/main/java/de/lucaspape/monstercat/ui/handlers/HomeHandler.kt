@@ -444,7 +444,7 @@ class HomeHandler:Handler {
     /**
      * Album/Catalog view selector
      */
-    fun setupSpinner(view: View) {
+    private fun setupSpinner(view: View) {
         val viewSelector = view.findViewById<Spinner>(R.id.viewSelector)
 
         val selectorItems = arrayOf(
@@ -463,7 +463,7 @@ class HomeHandler:Handler {
     /**
      * Listeners (buttons, refresh etc)
      */
-    fun registerListeners(view: View) {
+    private fun registerListeners(view: View) {
         val viewSelector = view.findViewById<Spinner>(R.id.viewSelector)
 
         val settings = Settings(view.context)
@@ -1067,11 +1067,11 @@ class HomeHandler:Handler {
         settings.setInt("$savePrefix-topView", 0)
     }
 
-    override fun onBackPressed() {
+    override fun onBackPressed(view: View) {
         onFragmentBack()
     }
 
-    override fun onPause() {
+    override fun onPause(view: View) {
         onFragmentPause()
     }
 

@@ -42,10 +42,14 @@ class Fragment(private val handler:Handler) : Fragment() {
     override fun onPause() {
         super.onPause()
 
-        handler.onPause()
+        view?.let {
+            handler.onPause(it)
+        }
     }
 
     fun onBackPressed(){
-        handler.onBackPressed()
+        view?.let {
+            handler.onBackPressed(it)
+        }
     }
 }

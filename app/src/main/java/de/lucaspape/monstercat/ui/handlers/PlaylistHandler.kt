@@ -352,7 +352,7 @@ class PlaylistHandler: Handler {
     /**
      * Register listeners (buttons etc)
      */
-    fun registerListeners(view: View) {
+    private fun registerListeners(view: View) {
         //create new playlist button
         view.findViewById<ImageButton>(R.id.newPlaylistButton).setOnClickListener {
             createPlaylist(view)
@@ -362,7 +362,7 @@ class PlaylistHandler: Handler {
     /**
      * Load playlists
      */
-    fun loadPlaylist(view: View, forceReload: Boolean) {
+    private fun loadPlaylist(view: View, forceReload: Boolean) {
         val contextReference = WeakReference(view.context)
 
         val swipeRefreshLayout =
@@ -482,11 +482,11 @@ class PlaylistHandler: Handler {
         }
     }
 
-    override fun onBackPressed() {
+    override fun onBackPressed(view: View) {
         onFragmentBackPressed()
     }
 
-    override fun onPause() {
+    override fun onPause(view: View) {
 
     }
 
