@@ -197,7 +197,7 @@ internal fun runSeekBarUpdate(context: Context, prepareNext:Boolean, crossFade: 
 
             if(prepareNext){
                 if (timeLeft < duration / 2 && exoPlayer?.isPlaying == true) {
-                    prepareSong(context, getNextSong())
+                    prepareSong(context, getNextSongId())
                 }
             }
 

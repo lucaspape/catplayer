@@ -23,14 +23,14 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.download.DownloadService
 import de.lucaspape.monstercat.download.hideDownloadNotification
-import de.lucaspape.monstercat.ui.fragments.HomeFragment
-import de.lucaspape.monstercat.ui.fragments.PlaylistFragment
 import de.lucaspape.monstercat.util.BackgroundAsync
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.notification.updateNotification
 import de.lucaspape.monstercat.music.save.PlayerSaveState
 import de.lucaspape.monstercat.music.util.*
 import de.lucaspape.monstercat.music.util.setCover
+import de.lucaspape.monstercat.ui.handlers.HomeHandler
+import de.lucaspape.monstercat.ui.handlers.PlaylistHandler
 import de.lucaspape.monstercat.util.*
 import java.io.File
 import java.io.FileNotFoundException
@@ -39,9 +39,6 @@ import java.lang.ref.WeakReference
 
 val noisyReceiver = NoisyReceiver()
 var downloadServiceIntent: Intent? = null
-
-//callback function for back pressed, TODO this is not great
-var fragmentBackPressedCallback: () -> Unit = {}
 
 var offlineDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_offline_pin_24dp"
 var downloadDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_file_download_24dp"
@@ -58,7 +55,6 @@ var pauseButtonDrawable = "android.resource://de.lucaspape.monstercat/drawable/i
  * Main activity
  */
 class MainActivity : AppCompatActivity() {
-
     private var fallbackFile = File("")
     private var fallbackFileLow = File("")
 
@@ -67,16 +63,33 @@ class MainActivity : AppCompatActivity() {
     private var fallbackWhiteFile = File("")
     private var fallbackWhiteFileLow = File("")
 
+    private var currentFragment: Fragment? = null
+
+    //callback function for back pressed
+    var fragmentBackPressedCallback: () -> Unit = {
+        val fragment = currentFragment
+
+        if(fragment is de.lucaspape.monstercat.ui.fragments.Fragment){
+           fragment.onBackPressed()
+        }
+    }
+
     private val onNavigationItemSelectedListener =
         BottomNavigationView.OnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_home -> {
-                    openFragment(HomeFragment.newInstance())
+                    currentFragment = de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(HomeHandler())
+                    currentFragment?.let {
+                        openFragment(it)
+                    }
 
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.navigation_dashboard -> {
-                    openFragment(PlaylistFragment.newInstance())
+                    currentFragment = de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(PlaylistHandler())
+                    currentFragment?.let {
+                        openFragment(it)
+                    }
 
                     return@OnNavigationItemSelectedListener true
                 }
@@ -165,10 +178,13 @@ class MainActivity : AppCompatActivity() {
         if (intentExtras != null) {
             if (intentExtras["search"] != null) {
                 //open the home fragment
-                openFragment(HomeFragment.newInstance(intentExtras["search"] as String))
+                currentFragment = de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(HomeHandler(), intentExtras["search"] as String)
+                currentFragment?.let {
+                    openFragment(it)
+                }
             }
         } else {
-            openFragment(HomeFragment.newInstance())
+            openFragment(de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(HomeHandler()))
         }
 
         setContentView(R.layout.activity_main)

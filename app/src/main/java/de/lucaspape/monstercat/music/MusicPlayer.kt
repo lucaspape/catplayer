@@ -46,9 +46,9 @@ var mediaSession: MediaSessionCompat? = null
 
 private var sessionCreated = false
 
-var streamInfoUpdateAsync: StreamInfoUpdateAsync? = null
+internal var streamInfoUpdateAsync: StreamInfoUpdateAsync? = null
 
-val audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener { focusChange ->
+internal val audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener { focusChange ->
     when (focusChange) {
         AudioManager.AUDIOFOCUS_GAIN ->
             resume()
@@ -92,10 +92,10 @@ fun createMediaSession() {
 }
 
 /**
- * General control (public)
+ * General control
  */
 
-fun next() {
+internal fun next() {
     contextReference?.get()?.let { context ->
         playSong(
             context, nextSong(),
@@ -109,7 +109,7 @@ fun next() {
     }
 }
 
-fun previous() {
+internal fun previous() {
     contextReference?.get()?.let { context ->
         playSong(
             context, previousSong(),
@@ -123,7 +123,7 @@ fun previous() {
     }
 }
 
-fun pause() {
+internal fun pause() {
     contextReference?.get()?.let { context ->
         exoPlayer?.playWhenReady = false
 
@@ -156,7 +156,7 @@ internal fun resume() {
     }
 }
 
-fun toggleMusic() {
+internal fun toggleMusic() {
     if (exoPlayer?.isPlaying == true) {
         pause()
     } else {
@@ -265,7 +265,7 @@ private fun previousSong(): String {
 /**
  * Return next song without making changes to vars, only for prediction
  */
-fun getNextSong(): String {
+internal fun getNextSongId(): String {
     if (loopSingle && playlist.size >= playlistIndex) {
         //loop single
         return try {

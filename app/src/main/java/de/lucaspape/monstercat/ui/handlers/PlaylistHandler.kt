@@ -24,6 +24,8 @@ import de.lucaspape.monstercat.ui.abstract_items.PlaylistItem
 import de.lucaspape.monstercat.util.BackgroundAsync
 import de.lucaspape.monstercat.request.async.LoadPlaylistAsync
 import de.lucaspape.monstercat.request.async.LoadPlaylistTracksAsync
+import de.lucaspape.monstercat.util.Settings
+import de.lucaspape.monstercat.util.displayInfo
 import de.lucaspape.monstercat.util.displaySnackbar
 import java.io.File
 import java.lang.IndexOutOfBoundsException
@@ -32,7 +34,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
-class PlaylistHandler {
+class PlaylistHandler: Handler {
     companion object {
         @JvmStatic
         var playlistContentViewData = HashMap<String, ArrayList<CatalogItem>>()
@@ -40,6 +42,8 @@ class PlaylistHandler {
         @JvmStatic
         var playlistViewData = ArrayList<PlaylistItem>()
     }
+
+    var onFragmentBackPressed = {}
 
     /**
      * List for playlist content
@@ -475,6 +479,44 @@ class PlaylistHandler {
                 }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         } else {
             displayData()
+        }
+    }
+
+    override fun onBackPressed() {
+        onFragmentBackPressed()
+    }
+
+    override fun onPause() {
+
+    }
+
+    override fun getLayout(): Int {
+        return R.layout.fragment_playlist
+    }
+
+    override fun onCreate(view: View, search: String?) {
+        val settings = Settings(view.context)
+
+        val username = settings.getString(view.context.getString(R.string.emailSetting))
+        val password = settings.getString(view.context.getString(R.string.passwordSetting))
+
+        if (username == null || password == null) {
+            displayInfo(
+                view.context,
+                view.context.getString(R.string.setUsernamePasswordSettingsMsg)
+            )
+
+            onFragmentBackPressed = {
+
+            }
+        } else {
+            registerListeners(view)
+
+            loadPlaylist(view, false)
+
+            onFragmentBackPressed = {
+                loadPlaylist(view, false)
+            }
         }
     }
 }

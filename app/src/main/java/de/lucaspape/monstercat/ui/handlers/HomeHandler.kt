@@ -16,7 +16,6 @@ import com.mikepenz.fastadapter.listeners.ClickEventHook
 import com.mikepenz.fastadapter.scroll.EndlessRecyclerOnScrollListener
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.ui.activities.SettingsActivity
-import de.lucaspape.monstercat.ui.activities.fragmentBackPressedCallback
 import de.lucaspape.monstercat.database.helper.AlbumDatabaseHelper
 import de.lucaspape.monstercat.database.helper.AlbumItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.CatalogSongDatabaseHelper
@@ -41,7 +40,7 @@ import kotlin.collections.HashMap
 /**
  * Does everything for the home page
  */
-class HomeHandler {
+class HomeHandler:Handler {
     companion object {
         @JvmStatic
         private var viewDataCache = HashMap<String, WeakReference<ArrayList<*>>>()
@@ -54,7 +53,8 @@ class HomeHandler {
 
     private var recyclerView: RecyclerView? = null
 
-    var onHomeHandlerPause: () -> Unit = {}
+    var onFragmentPause: () -> Unit = {}
+    var onFragmentBack: () -> Unit = {}
 
     /**
      * Setup catalog view
@@ -321,9 +321,9 @@ class HomeHandler {
             refreshListener(albumId, albumMcId)
         }
 
-        fragmentBackPressedCallback = backPressedCallback
+        onFragmentBack = backPressedCallback
 
-        onHomeHandlerPause = {
+        onFragmentPause = {
             saveRecyclerViewPosition(view.context, "catalogView")
         }
 
@@ -428,9 +428,9 @@ class HomeHandler {
             refreshListener()
         }
 
-        fragmentBackPressedCallback = backPressedCallback
+        onFragmentBack = backPressedCallback
 
-        onHomeHandlerPause = {
+        onFragmentPause = {
             saveRecyclerViewPosition(view.context, "albumView")
         }
 
@@ -1066,4 +1066,26 @@ class HomeHandler {
         settings.setInt("$savePrefix-positionIndex", 0)
         settings.setInt("$savePrefix-topView", 0)
     }
+
+    override fun onBackPressed() {
+        onFragmentBack()
+    }
+
+    override fun onPause() {
+        onFragmentPause()
+    }
+
+    override fun getLayout(): Int {
+        return R.layout.fragment_home
+    }
+
+    override fun onCreate(view: View, search:String?) {
+        setupSpinner(view)
+        registerListeners(view)
+
+        search?.let {
+            searchSong(view, it, false)
+        }
+    }
+
 }
