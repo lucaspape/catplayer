@@ -115,7 +115,7 @@ fun getPlayerListener(context: Context, songId: String): Player.EventListener {
                         updateNotification(context, songId, it)
                     }
 
-                    runSeekBarUpdate(context, true)
+                    runSeekBarUpdate(context, prepareNext = true, crossFade = true)
                 }
             }
         }

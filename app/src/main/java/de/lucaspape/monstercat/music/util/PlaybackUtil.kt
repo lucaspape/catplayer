@@ -102,7 +102,7 @@ internal fun playSong(
                 song.albumId,
                 song.artistId
             ) {
-                runSeekBarUpdate(context, true)
+                runSeekBarUpdate(context, prepareNext = true, crossFade = true)
 
                 if (showNotification) {
                     updateNotification(
@@ -171,7 +171,7 @@ fun playStream(stream: Stream) {
 private var seekBarUpdateHandler = Handler()
 private var currentSeekBarUpdateHandlerId = ""
 
-internal fun runSeekBarUpdate(context: Context, crossFade: Boolean) {
+internal fun runSeekBarUpdate(context: Context, prepareNext:Boolean, crossFade: Boolean) {
     val id = UUID.randomUUID().toString()
     currentSeekBarUpdateHandlerId = id
 
@@ -188,9 +188,15 @@ internal fun runSeekBarUpdate(context: Context, crossFade: Boolean) {
                 setPlayerState(it.toLong())
             }
 
-            if (crossFade) {
-                val timeLeft = duration - currentPosition
+            val timeLeft = duration - currentPosition
 
+            if(prepareNext){
+                if (timeLeft < duration / 2 && exoPlayer?.isPlaying == true) {
+                    prepareSong(context, getNextSong())
+                }
+            }
+
+            if (crossFade) {
                 if (timeLeft < crossfade && exoPlayer?.isPlaying == true) {
                     if (timeLeft >= 1) {
                         val nextVolume: Float = (crossfade.toFloat() - timeLeft) / crossfade
@@ -201,8 +207,6 @@ internal fun runSeekBarUpdate(context: Context, crossFade: Boolean) {
                     }
 
                     nextExoPlayer?.playWhenReady = true
-                } else if (timeLeft < duration / 2 && exoPlayer?.isPlaying == true) {
-                    prepareSong(context, getNextSong())
                 }
             }
 

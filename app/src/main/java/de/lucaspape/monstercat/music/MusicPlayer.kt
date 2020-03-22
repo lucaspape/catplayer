@@ -161,7 +161,8 @@ private fun resume() {
                     if (streamInfoUpdateAsync?.status != AsyncTask.Status.RUNNING) {
                         runSeekBarUpdate(
                             context,
-                            true
+                            prepareNext = true,
+                            crossFade = true
                         )
                     }
 
