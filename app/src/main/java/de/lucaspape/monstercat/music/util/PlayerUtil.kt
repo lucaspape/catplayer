@@ -89,6 +89,10 @@ fun getPlayerListener(context: Context, songId: String): Player.EventListener {
         @Override
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
             if (listenerEnabled) {
+                exoPlayer?.isPlaying?.let { isPlaying ->
+                    playing = isPlaying
+                }
+
                 startPlayerService(songId)
 
                 exoPlayer?.duration?.let { duration ->
@@ -109,10 +113,6 @@ fun getPlayerListener(context: Context, songId: String): Player.EventListener {
                         songId
                     ) {
                         updateNotification(context, songId, it)
-                    }
-
-                    exoPlayer?.isPlaying?.let { isPlaying ->
-                        playing = isPlaying
                     }
 
                     runSeekBarUpdate(context, true)

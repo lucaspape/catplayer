@@ -102,10 +102,6 @@ internal fun playSong(
                 song.albumId,
                 song.artistId
             ) {
-                exoPlayer?.playWhenReady?.let {
-                    playing = it
-                }
-
                 runSeekBarUpdate(context, true)
 
                 if (showNotification) {
@@ -160,10 +156,6 @@ fun playStream(stream: Stream) {
                     exoPlayer?.prepare(mediaSource)
 
                     exoPlayer?.playWhenReady = true
-
-                    exoPlayer?.playWhenReady?.let {
-                        playing = it
-                    }
 
                     currentSeekBarUpdateHandlerId = ""
                     
