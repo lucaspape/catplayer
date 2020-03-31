@@ -122,6 +122,7 @@ class FullscreenPlayerHandler : Handler {
     private fun search(context: Context, term: String) {
         val intent = Intent(context, MainActivity::class.java)
         intent.putExtra("search", term)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         context.startActivity(intent)
     }
 }
