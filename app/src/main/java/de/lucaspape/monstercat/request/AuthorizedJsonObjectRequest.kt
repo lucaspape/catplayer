@@ -24,7 +24,15 @@ class AuthorizedJsonObjectRequest(
      */
     override fun parseNetworkResponse(response: NetworkResponse?): Response<JSONObject> {
         response?.let {
-            val jsonString = String(response.data, charset(HttpHeaderParser.parseCharset(response.headers, JsonRequest.PROTOCOL_CHARSET)))
+            val jsonString = String(
+                response.data,
+                charset(
+                    HttpHeaderParser.parseCharset(
+                        response.headers,
+                        JsonRequest.PROTOCOL_CHARSET
+                    )
+                )
+            )
 
             val jsonObject = if (jsonString.isEmpty()) {
                 JSONObject()
