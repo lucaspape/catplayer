@@ -8,6 +8,7 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
+import de.lucaspape.monstercat.request.AuthorizedJsonObjectRequest
 import de.lucaspape.monstercat.util.sid
 import org.json.JSONObject
 import java.lang.ref.WeakReference
@@ -31,18 +32,13 @@ class AddToPlaylistAsync(
     override fun doInBackground(vararg params: Void?): Boolean {
         contextReference.get()?.let { context ->
             SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
-                val addToPlaylistUrl = context.getString(R.string.addToPlaylistUrl)
+                val addToPlaylistUrl = context.getString(R.string.playlistUrl) + playlistId + "/record"
 
                 val addToPlaylistQueue = Volley.newRequestQueue(context)
 
                 val songJsonObject = JSONObject()
-                songJsonObject.put("releaseId", song.albumId)
                 songJsonObject.put("trackId", song.songId)
-
-                val putJsonObject = JSONObject()
-                putJsonObject.put("playlistId", playlistId)
-                putJsonObject.put("newSong", songJsonObject)
-                putJsonObject.put("sid", sid)
+                songJsonObject.put("releaseId", song.albumId)
 
                 var success = true
                 val syncObject = Object()
@@ -53,14 +49,12 @@ class AddToPlaylistAsync(
                     }
                 }
 
-                val addToPlaylistRequest =
-                    JsonObjectRequest(Request.Method.POST, addToPlaylistUrl, putJsonObject,
-                        Response.Listener {
-                        },
-                        Response.ErrorListener {
-                            success = false
-                        }
-                    )
+                val addToPlaylistRequest = AuthorizedJsonObjectRequest(Request.Method.PATCH, addToPlaylistUrl, sid, songJsonObject, Response.Listener {
+
+                }, Response.ErrorListener {error->
+                    println(error)
+                    success = false
+                })
 
                 addToPlaylistQueue.add(addToPlaylistRequest)
 

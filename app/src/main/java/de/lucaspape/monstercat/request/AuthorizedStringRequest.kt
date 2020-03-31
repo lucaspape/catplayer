@@ -6,7 +6,7 @@ import com.android.volley.toolbox.StringRequest
 /**
  * Modified stringRequest
  */
-class AuthorizedRequest(
+class AuthorizedStringRequest(
     method: Int,
     url: String,
     private val sid: String?,

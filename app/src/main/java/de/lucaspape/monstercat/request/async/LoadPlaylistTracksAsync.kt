@@ -7,7 +7,7 @@ import com.android.volley.Request
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
-import de.lucaspape.monstercat.request.AuthorizedRequest
+import de.lucaspape.monstercat.request.AuthorizedStringRequest
 import de.lucaspape.monstercat.util.parsePlaylistTrackToDB
 import de.lucaspape.monstercat.util.sid
 import org.json.JSONObject
@@ -72,7 +72,7 @@ class LoadPlaylistTracksAsync(
             var playlistTrackUrl =
                 context.getString(R.string.playlistTrackUrl) + playlistId + "/catalog?skip=" + skip.toString() + "&limit=50"
 
-            var playlistTrackRequest = AuthorizedRequest(Request.Method.GET, playlistTrackUrl, sid, Response.Listener {response ->
+            var playlistTrackRequest = AuthorizedStringRequest(Request.Method.GET, playlistTrackUrl, sid, Response.Listener { response ->
                 val jsonObject = JSONObject(response)
                 val jsonArray = jsonObject.getJSONArray("results")
 
@@ -93,7 +93,7 @@ class LoadPlaylistTracksAsync(
                     skip += 50
                     playlistTrackUrl = context.getString(R.string.playlistTrackUrl) + playlistId + "/catalog?skip=" + skip.toString() + "&limit=50"
 
-                    playlistTrackRequest = AuthorizedRequest(Request.Method.GET, playlistTrackUrl, sid, Response.Listener {response ->
+                    playlistTrackRequest = AuthorizedStringRequest(Request.Method.GET, playlistTrackUrl, sid, Response.Listener { response ->
                         val jsonObject = JSONObject(response)
                         val jsonArray = jsonObject.getJSONArray("results")
 

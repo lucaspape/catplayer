@@ -6,8 +6,7 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.request.AuthorizedRequest
-import de.lucaspape.monstercat.util.displayInfo
+import de.lucaspape.monstercat.request.AuthorizedStringRequest
 import de.lucaspape.monstercat.util.sid
 import java.lang.ref.WeakReference
 
@@ -41,7 +40,7 @@ class DeletePlaylistAsync(
                 }
             }
 
-            val deletePlaylistRequest = AuthorizedRequest(
+            val deletePlaylistRequest = AuthorizedStringRequest(
                 Request.Method.DELETE, deletePlaylistUrl, sid,
                 Response.Listener {
                 },

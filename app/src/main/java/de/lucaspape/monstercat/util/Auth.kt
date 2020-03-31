@@ -14,7 +14,7 @@ import com.android.volley.toolbox.HttpHeaderParser
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.request.AuthorizedRequest
+import de.lucaspape.monstercat.request.AuthorizedStringRequest
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
@@ -215,7 +215,7 @@ class Auth {
 
         //check if sid is valid, get session and user id, if it is null or "" the sid is NOT valid -> login fail
         val checkLoginRequest =
-            AuthorizedRequest(Request.Method.GET, context.getString
+            AuthorizedStringRequest(Request.Method.GET, context.getString
                 (R.string.sessionUrl), sid,
                 Response.Listener { response ->
                     val jsonResponse = JSONObject(response)

@@ -7,7 +7,7 @@ import com.android.volley.Request
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.AlbumItemDatabaseHelper
-import de.lucaspape.monstercat.request.AuthorizedRequest
+import de.lucaspape.monstercat.request.AuthorizedStringRequest
 import de.lucaspape.monstercat.util.parsAlbumSongToDB
 import de.lucaspape.monstercat.util.sid
 import org.json.JSONObject
@@ -71,7 +71,7 @@ class LoadAlbumAsync(
             val requestUrl =
                 context.getString(R.string.loadAlbumSongsUrl) + "/" + mcId
 
-            val listRequest = AuthorizedRequest(
+            val listRequest = AuthorizedStringRequest(
                 Request.Method.GET, requestUrl,
                 sid, Response.Listener { response ->
                     val json = JSONObject(response)

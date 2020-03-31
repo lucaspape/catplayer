@@ -22,7 +22,7 @@ import de.lucaspape.monstercat.ui.abstract_items.AlertListItem
 import de.lucaspape.monstercat.ui.abstract_items.HeaderTextItem
 import de.lucaspape.monstercat.request.async.*
 import de.lucaspape.monstercat.music.prioritySongQueue
-import de.lucaspape.monstercat.request.AuthorizedRequest
+import de.lucaspape.monstercat.request.AuthorizedStringRequest
 import de.lucaspape.monstercat.util.*
 import org.json.JSONObject
 import java.io.File
@@ -39,7 +39,7 @@ private fun loadAlbumTracks(
 
     val albumRequestQueue = Volley.newRequestQueue(context)
 
-    val albumRequest = AuthorizedRequest(Request.Method.GET, requestUrl,
+    val albumRequest = AuthorizedStringRequest(Request.Method.GET, requestUrl,
         sid,
         Response.Listener { response ->
             val jsonObject = JSONObject(response)
@@ -432,7 +432,7 @@ internal fun openAlbum(view: View, albumMcId: String, share: Boolean) {
     val context = view.context
     val volleyRequestQueue = Volley.newRequestQueue(context)
 
-    val albumLinksRequest = AuthorizedRequest(Request.Method.GET,
+    val albumLinksRequest = AuthorizedStringRequest(Request.Method.GET,
         context.getString(R.string.loadAlbumSongsUrl) + "/$albumMcId",
         sid,
         Response.Listener { response ->
