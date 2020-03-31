@@ -3,6 +3,7 @@ package de.lucaspape.monstercat.request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import org.json.JSONObject
+import java.nio.charset.Charset
 
 class AuthorizedJsonObjectRequest(
     method: Int,
@@ -24,7 +25,7 @@ class AuthorizedJsonObjectRequest(
     }
 
     override fun getBody(): ByteArray {
-        return jsonObject.toString().toByteArray()
+        return jsonObject.toString().toByteArray(Charset.forName("UTF-8"))
     }
 
     override fun getBodyContentType(): String {

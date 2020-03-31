@@ -4,10 +4,10 @@ import android.content.Context
 import android.os.AsyncTask
 import com.android.volley.Request
 import com.android.volley.Response
-import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
+import de.lucaspape.monstercat.request.AuthorizedJsonObjectRequest
 import de.lucaspape.monstercat.util.sid
 import org.json.JSONObject
 import java.lang.ref.WeakReference
@@ -33,14 +33,9 @@ class DeletePlaylistTrackAsync(
         contextReference.get()?.let { context ->
             SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
                 val deleteSongObject = JSONObject()
-                deleteSongObject.put("songDeleteIndex", songDeleteIndex)
-                deleteSongObject.put("releaseId", song.albumId)
                 deleteSongObject.put("trackId", song.songId)
-
-                val deleteObject = JSONObject()
-                deleteObject.put("songDelete", deleteSongObject)
-                deleteObject.put("sid", sid)
-                deleteObject.put("playlistId", playlistId)
+                deleteSongObject.put("releaseId", song.albumId)
+                deleteSongObject.put("sort", songDeleteIndex)
 
                 val deleteSongVolleyQueue = Volley.newRequestQueue(context)
 
@@ -53,13 +48,16 @@ class DeletePlaylistTrackAsync(
                     }
                 }
 
-                val deleteSongRequest = JsonObjectRequest(
-                    Request.Method.POST,
-                    context.getString(R.string.removeFromPlaylistUrl),
-                    deleteObject,
+                val deleteTrackFromPlaylistUrl = context.getString(R.string.playlistUrl) + playlistId + "/record"
+
+                val deleteSongRequest = AuthorizedJsonObjectRequest(
+                    Request.Method.DELETE,
+                    deleteTrackFromPlaylistUrl,
+                    sid,
+                    deleteSongObject,
                     Response.Listener {
                     },
-                    Response.ErrorListener {
+                    Response.ErrorListener {error ->
                         success = false
                     })
 
