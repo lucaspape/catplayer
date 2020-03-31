@@ -64,6 +64,8 @@ class LoadPlaylistTracksAsync(
 
             val jsonObjectList = ArrayList<JSONObject?>()
 
+            var success = true
+
             var skip = 0
             var nextEmpty = false
 
@@ -81,13 +83,13 @@ class LoadPlaylistTracksAsync(
                 nextEmpty = jsonArray.length() != 50
 
             }, Response.ErrorListener {
-                //TODO
+                success = false
             })
 
             val trackRequestQueue = Volley.newRequestQueue(context)
 
             trackRequestQueue.addRequestFinishedListener<Any?> {
-                if(!nextEmpty){
+                if(!nextEmpty && success){
                     skip += 50
                     playlistTrackUrl = context.getString(R.string.playlistTrackUrl) + playlistId + "/catalog?skip=" + skip.toString() + "&limit=50"
 
@@ -102,7 +104,7 @@ class LoadPlaylistTracksAsync(
                         nextEmpty = jsonArray.length() != 50
 
                     }, Response.ErrorListener {
-                        //TODO
+                        success = false
                     })
 
                     trackRequestQueue.add(playlistTrackRequest)
@@ -118,22 +120,23 @@ class LoadPlaylistTracksAsync(
             synchronized(syncObject){
                 syncObject.wait()
 
-                playlistItemDatabaseHelper.reCreateTable()
+                if(success){
+                    playlistItemDatabaseHelper.reCreateTable()
 
-                for (playlistObject in jsonObjectList) {
-                    if (playlistObject != null) {
-                        parsePlaylistTrackToDB(
-                            playlistId,
-                            playlistObject,
-                            context
-                        )
+                    for (playlistObject in jsonObjectList) {
+                        if (playlistObject != null) {
+                            parsePlaylistTrackToDB(
+                                playlistId,
+                                playlistObject,
+                                context
+                            )
+                        }
+
                     }
-
                 }
 
-                return true
+                return success
             }
-
         }
 
         return false
