@@ -1,5 +1,6 @@
 package de.lucaspape.monstercat.ui.handlers
 
+import android.content.Intent
 import android.os.AsyncTask
 import android.view.View
 import android.widget.ImageButton
@@ -24,6 +25,7 @@ import de.lucaspape.monstercat.ui.abstract_items.PlaylistItem
 import de.lucaspape.monstercat.util.BackgroundAsync
 import de.lucaspape.monstercat.request.async.LoadPlaylistAsync
 import de.lucaspape.monstercat.request.async.LoadPlaylistTracksAsync
+import de.lucaspape.monstercat.ui.activities.MainActivity
 import de.lucaspape.monstercat.util.Settings
 import de.lucaspape.monstercat.util.displayInfo
 import de.lucaspape.monstercat.util.displaySnackbar
@@ -372,6 +374,12 @@ class PlaylistHandler: Handler {
             updatePlaylistRecyclerView(view, playlistViewData) { loadPlaylist(view, true) }
 
             swipeRefreshLayout.isRefreshing = false
+
+            onFragmentBackPressed = {
+                val intent = Intent(view.context, MainActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NO_ANIMATION
+                view.context.startActivity(intent)
+            }
         }
 
         if (playlistViewData.isEmpty() || forceReload) {
@@ -439,6 +447,10 @@ class PlaylistHandler: Handler {
             }
 
             swipeRefreshLayout.isRefreshing = false
+
+            onFragmentBackPressed = {
+                loadPlaylist(view, false)
+            }
         }
 
         if (playlistContentViewData[playlistId] == null || forceReload) {
@@ -503,18 +515,16 @@ class PlaylistHandler: Handler {
                 view.context,
                 view.context.getString(R.string.setUsernamePasswordSettingsMsg)
             )
-
-            onFragmentBackPressed = {
-
-            }
         } else {
             registerListeners(view)
 
             loadPlaylist(view, false)
+        }
 
-            onFragmentBackPressed = {
-                loadPlaylist(view, false)
-            }
+        onFragmentBackPressed = {
+            val intent = Intent(view.context, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NO_ANIMATION
+            view.context.startActivity(intent)
         }
     }
 }
