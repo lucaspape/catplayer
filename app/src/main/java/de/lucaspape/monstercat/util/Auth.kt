@@ -222,7 +222,7 @@ class Auth {
 
                     val userId = try {
                         val userObject = jsonResponse.getJSONObject("user")
-                        userObject.getString("_id")
+                        userObject.getString("id")
                     } catch (e: JSONException) {
                         ""
                     }
@@ -247,6 +247,5 @@ class Auth {
 
         val checkLoginQueue = Volley.newRequestQueue(context)
         checkLoginQueue.add(checkLoginRequest)
-
     }
 }

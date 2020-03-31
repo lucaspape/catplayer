@@ -14,7 +14,7 @@
     <string name="removeFromPlaylistUrl" translatable="false">https://api.lucaspape.de/monstercat/v1/playlist/deletetrack</string>
 
     <string name="loginUrl" translatable="false">https://connect.monstercat.com/v2/signin</string>
-    <string name="sessionUrl" translatable="false">https://connect.monstercat.com/api/self/session</string>
+    <string name="sessionUrl" translatable="false">https://connect.monstercat.com/v2/self/session</string>
     <string name="loadSongsUrl" translatable="false">https://connect.monstercat.com/v2/catalog/browse</string>
     <string name="tokenUrl" translatable="false">https://connect.monstercat.com/v2/signin/token</string>
 
