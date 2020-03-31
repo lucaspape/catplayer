@@ -17,7 +17,7 @@ class PlaylistDatabaseHelper(context: Context) :
     ) {
     companion object {
         @JvmStatic
-        val DATABASE_VERSION = 2 * SongDatabaseHelper.DATABASE_VERSION
+        val DATABASE_VERSION = 3 * SongDatabaseHelper.DATABASE_VERSION
 
         @JvmStatic
         private val DATABASE_NAME = "playlists_db"
@@ -49,14 +49,13 @@ class PlaylistDatabaseHelper(context: Context) :
         onCreate(db)
     }
 
-    fun insertPlaylist(playlistId: String, name: String, trackCount: Int): Long {
+    fun insertPlaylist(playlistId: String, name: String): Long {
         val db = writableDatabase
 
         val values = ContentValues()
 
         values.put(Playlist.COLUMN_PLAYLIST_ID, playlistId)
         values.put(Playlist.COLUMN_NAME, name)
-        values.put(Playlist.COLUMN_TRACK_COUNT, trackCount)
 
         val id = db.insert(Playlist.TABLE_NAME, null, values)
         db.close()
@@ -73,8 +72,7 @@ class PlaylistDatabaseHelper(context: Context) :
                 Playlist.TABLE_NAME, arrayOf(
                     Playlist.COLUMN_ID,
                     Playlist.COLUMN_PLAYLIST_ID,
-                    Playlist.COLUMN_NAME,
-                    Playlist.COLUMN_TRACK_COUNT
+                    Playlist.COLUMN_NAME
                 ),
                 Playlist.COLUMN_PLAYLIST_ID + "=?",
                 arrayOf(playlistId), null, null, null, null
@@ -87,8 +85,7 @@ class PlaylistDatabaseHelper(context: Context) :
                 val playlist = Playlist(
                     cursor.getInt(cursor.getColumnIndex(Playlist.COLUMN_ID)),
                     cursor.getString(cursor.getColumnIndex(Playlist.COLUMN_PLAYLIST_ID)),
-                    cursor.getString(cursor.getColumnIndex(Playlist.COLUMN_NAME)),
-                    cursor.getInt(cursor.getColumnIndex(Playlist.COLUMN_TRACK_COUNT))
+                    cursor.getString(cursor.getColumnIndex(Playlist.COLUMN_NAME))
                 )
 
                 cursor.close()
@@ -119,8 +116,7 @@ class PlaylistDatabaseHelper(context: Context) :
                 val playlist = Playlist(
                     cursor.getInt(cursor.getColumnIndex(Playlist.COLUMN_ID)),
                     cursor.getString(cursor.getColumnIndex(Playlist.COLUMN_PLAYLIST_ID)),
-                    cursor.getString(cursor.getColumnIndex(Playlist.COLUMN_NAME)),
-                    cursor.getInt(cursor.getColumnIndex(Playlist.COLUMN_TRACK_COUNT))
+                    cursor.getString(cursor.getColumnIndex(Playlist.COLUMN_NAME))
                 )
 
                 playlists.add(playlist)

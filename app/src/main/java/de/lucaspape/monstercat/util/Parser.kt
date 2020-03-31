@@ -134,11 +134,10 @@ fun parseAlbumToDB(jsonObject: JSONObject, context: Context): Long? {
 fun parsePlaylistToDB(context: Context, jsonObject: JSONObject): Long? {
     val playlistName = jsonObject.getString("name") as String
     val playlistId = jsonObject.getString("id") as String
-    val playlistTrackCount = jsonObject.getJSONArray("tracks").length()
 
     val databaseHelper = PlaylistDatabaseHelper(context)
     return if (databaseHelper.getPlaylist(playlistId) == null) {
-        databaseHelper.insertPlaylist(playlistId, playlistName, playlistTrackCount)
+        databaseHelper.insertPlaylist(playlistId, playlistName)
     } else {
         databaseHelper.getPlaylist(playlistId)?.id?.toLong()
     }

@@ -54,106 +54,84 @@ class LoadPlaylistTracksAsync(
 
     override fun doInBackground(vararg param: Void?): Boolean {
         contextReference.get()?.let { context ->
-            var success = true
-            val syncObject = Object()
-
             val playlistItemDatabaseHelper =
                 PlaylistItemDatabaseHelper(
                     context,
                     playlistId
                 )
 
-            val trackCountRequestQueue = Volley.newRequestQueue(context)
+            val syncObject = Object()
 
-            var trackCount = 0
+            val jsonObjectList = ArrayList<JSONObject?>()
 
-            val trackCountRequest = AuthorizedRequest(Request.Method.GET,
-                context.getString(R.string.playlistsUrl),
-                sid,
-                Response.Listener { response ->
-                    val jsonObject = JSONObject(response)
-                    val jsonArray = jsonObject.getJSONArray("results")
+            var skip = 0
+            var nextEmpty = false
 
-                    for (i in (0 until jsonArray.length())) {
-                        if (jsonArray.getJSONObject(i).getString("_id") == playlistId) {
-                            val tracks = jsonArray.getJSONObject(i).getJSONArray("tracks")
-                            trackCount = tracks.length()
-                            break
-                        }
-                    }
-                },
-                Response.ErrorListener {
-                    success = false
-                })
+            var playlistTrackUrl =
+                context.getString(R.string.playlistTrackUrl) + playlistId + "/catalog?skip=" + skip.toString() + "&limit=50"
 
+            var playlistTrackRequest = AuthorizedRequest(Request.Method.GET, playlistTrackUrl, sid, Response.Listener {response ->
+                val jsonObject = JSONObject(response)
+                val jsonArray = jsonObject.getJSONArray("results")
 
-            trackCountRequestQueue.addRequestFinishedListener<Any> {
-                val tempList = arrayOfNulls<JSONObject>(trackCount)
-
-                var finishedRequests = 0
-                var totalRequestsCount = 0
-
-                val requests = ArrayList<AuthorizedRequest>()
-
-                val playlistTrackRequestQueue = Volley.newRequestQueue(context)
-
-                playlistTrackRequestQueue.addRequestFinishedListener<Any> {
-                    finishedRequests++
-
-                    if (finishedRequests >= totalRequestsCount) {
-
-                        playlistItemDatabaseHelper.reCreateTable()
-
-                        for (playlistObject in tempList) {
-                            if (playlistObject != null) {
-                                parsePlaylistTrackToDB(
-                                    playlistId,
-                                    playlistObject,
-                                    context
-                                )
-                            }
-
-                        }
-
-                        synchronized(syncObject) {
-                            syncObject.notify()
-                        }
-                    } else {
-                        playlistTrackRequestQueue.add(requests[finishedRequests])
-                    }
+                for(k in (0 until jsonArray.length())){
+                    jsonObjectList.add(jsonArray.getJSONObject(k))
                 }
 
-                for (i in (0..(trackCount / 50))) {
-                    val playlistTrackUrl =
-                        context.getString(R.string.playlistTrackUrl) + playlistId + "/catalog?skip=" + (i * 50).toString() + "&limit=50"
+                nextEmpty = jsonArray.length() != 50
 
-                    val playlistTrackRequest = AuthorizedRequest(
-                        Request.Method.GET, playlistTrackUrl, sid,
-                        Response.Listener { response ->
-                            val jsonObject = JSONObject(response)
-                            val jsonArray = jsonObject.getJSONArray("results")
+            }, Response.ErrorListener {
+                //TODO
+            })
 
-                            for (k in (0 until jsonArray.length())) {
-                                tempList[i * 50 + k] = jsonArray.getJSONObject(k)
-                            }
-                        },
-                        Response.ErrorListener {
-                            success = false
-                        })
+            val trackRequestQueue = Volley.newRequestQueue(context)
 
-                    totalRequestsCount++
-                    requests.add(playlistTrackRequest)
+            trackRequestQueue.addRequestFinishedListener<Any?> {
+                if(!nextEmpty){
+                    skip += 50
+                    playlistTrackUrl = context.getString(R.string.playlistTrackUrl) + playlistId + "/catalog?skip=" + skip.toString() + "&limit=50"
+
+                    playlistTrackRequest = AuthorizedRequest(Request.Method.GET, playlistTrackUrl, sid, Response.Listener {response ->
+                        val jsonObject = JSONObject(response)
+                        val jsonArray = jsonObject.getJSONArray("results")
+
+                        for(k in (0 until jsonArray.length())){
+                            jsonObjectList.add(jsonArray.getJSONObject(k))
+                        }
+
+                        nextEmpty = jsonArray.length() != 50
+
+                    }, Response.ErrorListener {
+                        //TODO
+                    })
+
+                    trackRequestQueue.add(playlistTrackRequest)
+                }else{
+                    synchronized(syncObject){
+                        syncObject.notify()
+                    }
                 }
-
-                playlistTrackRequestQueue.add(requests[finishedRequests])
             }
 
-            trackCountRequestQueue.add(trackCountRequest)
+            trackRequestQueue.add(playlistTrackRequest)
 
-            synchronized(syncObject) {
+            synchronized(syncObject){
                 syncObject.wait()
 
-                return success
+                playlistItemDatabaseHelper.reCreateTable()
+
+                for (playlistObject in jsonObjectList) {
+                    if (playlistObject != null) {
+                        parsePlaylistTrackToDB(
+                            playlistId,
+                            playlistObject,
+                            context
+                        )
+                    }
+
+                }
+
+                return true
             }
 
         }
