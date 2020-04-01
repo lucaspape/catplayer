@@ -46,9 +46,7 @@ class StreamInfoUpdateAsync(
                             val jsonObject = JSONObject(artistTitleResponse)
 
                             try {
-                                jsonObject.getJSONObject("track")
-
-                                val songId = parseSongToDB(jsonObject, context)
+                                val songId = parseSongToDB(jsonObject.getJSONObject("track"), context)
 
                                 if (songId != liveSongId && songId != null) {
                                     liveSongId = songId
