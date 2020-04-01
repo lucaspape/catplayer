@@ -35,7 +35,7 @@ fun addDownloadSong(context: Context, songId: String, downloadFinished: () -> Un
     }
 }
 
-private fun downloadImageUrlIntoImageReceiver(
+internal fun downloadImageUrlIntoImageReceiver(
     context: Context,
     imageReceiver: ImageReceiverInterface,
     lowRes: Boolean,

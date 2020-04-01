@@ -20,6 +20,18 @@ class StreamInfoUpdateAsync(
     companion object {
         @JvmStatic
         var liveSongId = ""
+
+        @JvmStatic
+        var fallbackTitle = ""
+
+        @JvmStatic
+        var fallbackArtist = ""
+
+        @JvmStatic
+        var fallbackVersion = ""
+
+        @JvmStatic
+        var fallbackCoverUrl = ""
     }
 
     override fun doInBackground(vararg params: Void): String? {
@@ -31,14 +43,30 @@ class StreamInfoUpdateAsync(
                     context.getString(R.string.liveInfoUrl),
                     Response.Listener { artistTitleResponse ->
                         try {
-                            val jsonObject = JSONObject(artistTitleResponse).getJSONObject("track")
+                            val jsonObject = JSONObject(artistTitleResponse)
 
-                            val songId = parseSongToDB(jsonObject, context)
+                            try {
+                                jsonObject.getJSONObject("track")
 
-                            if (songId != liveSongId && songId != null) {
-                                liveSongId = songId
+                                val songId = parseSongToDB(jsonObject, context)
 
-                                publishProgress()
+                                if (songId != liveSongId && songId != null) {
+                                    liveSongId = songId
+
+                                    publishProgress()
+                                }
+                            } catch (e: JSONException) {
+                                try {
+                                    fallbackTitle = jsonObject.getString("title")
+                                    fallbackArtist = jsonObject.getString("artist")
+                                    fallbackVersion = jsonObject.getString("version")
+                                    fallbackCoverUrl = jsonObject.getString("coverUrl")
+                                    liveSongId = ""
+
+                                    publishProgress()
+                                } catch (e: JSONException) {
+
+                                }
                             }
                         } catch (e: JSONException) {
 
@@ -63,22 +91,31 @@ class StreamInfoUpdateAsync(
 
     override fun onProgressUpdate(vararg values: Void) {
         contextReference.get()?.let { context ->
-            setCover(
-                context,
-                liveSongId
-            ) { bitmap ->
-                updateNotification(
+            if (liveSongId != "") {
+                setCover(
                     context,
-                    liveSongId,
-                    bitmap
-                )
-            }
+                    liveSongId
+                ) { bitmap ->
+                    updateNotification(
+                        context,
+                        liveSongId,
+                        bitmap
+                    )
+                }
 
-            val songDatabaseHelper = SongDatabaseHelper(context)
+                val songDatabaseHelper = SongDatabaseHelper(context)
 
-            songDatabaseHelper.getSong(context, liveSongId)?.let { song ->
-                title = "${song.title} ${song.version}"
-                artist = song.artist
+                songDatabaseHelper.getSong(context, liveSongId)?.let { song ->
+                    title = "${song.title} ${song.version}"
+                    artist = song.artist
+                }
+            } else {
+                setCustomCover(context, fallbackCoverUrl) { bitmap ->
+                    updateNotification(fallbackTitle, fallbackVersion, fallbackArtist, bitmap)
+                }
+                
+                title = "$fallbackTitle $fallbackVersion"
+                artist = fallbackArtist
             }
         }
     }

@@ -17,6 +17,7 @@ import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.downloadCoverIntoImageReceiver
 import de.lucaspape.monstercat.download.ImageReceiverInterface
 import de.lucaspape.monstercat.download.downloadArtistImageIntoImageReceiver
+import de.lucaspape.monstercat.download.downloadImageUrlIntoImageReceiver
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.ui.activities.pauseButtonDrawable
 import de.lucaspape.monstercat.ui.activities.playButtonDrawable
@@ -262,6 +263,39 @@ internal fun setCover(
             }
         }
     }, artistId)
+}
+
+internal fun setCustomCover(
+    context: Context,
+    coverUrl: String,
+    callback: (bitmap: Bitmap) -> Unit
+) {
+    downloadImageUrlIntoImageReceiver(context, object :
+        ImageReceiverInterface {
+        override fun setBitmap(id: String, bitmap: Bitmap?) {
+            if (id == coverUrl) {
+                if (getCurrentAlbumId(context) == id) {
+                    coverBitmap = bitmap
+
+                    bitmap?.let {
+                        callback(it)
+                    }
+                }
+            }
+        }
+
+        override fun setDrawable(id: String, drawable: Drawable?) {
+            if (id == coverUrl) {
+                if (getCurrentAlbumId(context) == id) {
+                    coverDrawable = drawable
+
+                    drawable?.toBitmap()?.let {
+                        callback(it)
+                    }
+                }
+            }
+        }
+    }, false, coverUrl, coverUrl)
 }
 
 /**
