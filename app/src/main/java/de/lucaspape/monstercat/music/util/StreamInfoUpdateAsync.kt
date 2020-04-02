@@ -46,7 +46,8 @@ class StreamInfoUpdateAsync(
                             val jsonObject = JSONObject(artistTitleResponse)
 
                             try {
-                                val songId = parseSongToDB(jsonObject.getJSONObject("track"), context)
+                                val songId =
+                                    parseSongToDB(jsonObject.getJSONObject("track"), context)
 
                                 if (songId != liveSongId && songId != null) {
                                     liveSongId = songId
@@ -108,10 +109,14 @@ class StreamInfoUpdateAsync(
                     artist = song.artist
                 }
             } else {
-                setCustomCover(context, fallbackCoverUrl) { bitmap ->
+                setCustomCover(
+                    context,
+                    fallbackTitle + fallbackVersion + fallbackArtist,
+                    fallbackCoverUrl
+                ) { bitmap ->
                     updateNotification(fallbackTitle, fallbackVersion, fallbackArtist, bitmap)
                 }
-                
+
                 title = "$fallbackTitle $fallbackVersion"
                 artist = fallbackArtist
             }

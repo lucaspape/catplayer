@@ -267,35 +267,32 @@ internal fun setCover(
 
 internal fun setCustomCover(
     context: Context,
+    coverId: String,
     coverUrl: String,
     callback: (bitmap: Bitmap) -> Unit
 ) {
     downloadImageUrlIntoImageReceiver(context, object :
         ImageReceiverInterface {
         override fun setBitmap(id: String, bitmap: Bitmap?) {
-            if (id == coverUrl) {
-                if (getCurrentAlbumId(context) == id) {
-                    coverBitmap = bitmap
+            if (id == coverId) {
+                coverBitmap = bitmap
 
-                    bitmap?.let {
-                        callback(it)
-                    }
+                bitmap?.let {
+                    callback(it)
                 }
             }
         }
 
         override fun setDrawable(id: String, drawable: Drawable?) {
-            if (id == coverUrl) {
-                if (getCurrentAlbumId(context) == id) {
-                    coverDrawable = drawable
+            if (id == coverId) {
+                coverDrawable = drawable
 
-                    drawable?.toBitmap()?.let {
-                        callback(it)
-                    }
+                drawable?.toBitmap()?.let {
+                    callback(it)
                 }
             }
         }
-    }, false, coverUrl, coverUrl)
+    }, false, coverId, coverUrl)
 }
 
 /**
