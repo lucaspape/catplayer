@@ -51,6 +51,7 @@ class AuthorizedJsonObjectRequest(
     override fun getHeaders(): Map<String, String> {
         return if (sid != null) {
             val params = HashMap<String, String>()
+            params["Content-Type"] = "application/json"
             params["Cookie"] = "connect.sid=$sid"
             params
         } else {

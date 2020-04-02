@@ -48,7 +48,8 @@ class DeletePlaylistTrackAsync(
                     }
                 }
 
-                val deleteTrackFromPlaylistUrl = context.getString(R.string.playlistUrl) + playlistId + "/record"
+                val deleteTrackFromPlaylistUrl =
+                    context.getString(R.string.playlistUrl) + playlistId + "/record"
 
                 val deleteSongRequest = AuthorizedJsonObjectRequest(
                     Request.Method.DELETE,
@@ -57,7 +58,7 @@ class DeletePlaylistTrackAsync(
                     deleteSongObject,
                     Response.Listener {
                     },
-                    Response.ErrorListener {error ->
+                    Response.ErrorListener {
                         success = false
                     })
 
@@ -73,5 +74,4 @@ class DeletePlaylistTrackAsync(
 
         return false
     }
-
 }

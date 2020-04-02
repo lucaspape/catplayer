@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.AsyncTask
 import com.android.volley.Request
 import com.android.volley.Response
-import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
@@ -32,7 +31,8 @@ class AddToPlaylistAsync(
     override fun doInBackground(vararg params: Void?): Boolean {
         contextReference.get()?.let { context ->
             SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
-                val addToPlaylistUrl = context.getString(R.string.playlistUrl) + playlistId + "/record"
+                val addToPlaylistUrl =
+                    context.getString(R.string.playlistUrl) + playlistId + "/record"
 
                 val addToPlaylistQueue = Volley.newRequestQueue(context)
 
@@ -49,12 +49,17 @@ class AddToPlaylistAsync(
                     }
                 }
 
-                val addToPlaylistRequest = AuthorizedJsonObjectRequest(Request.Method.PATCH, addToPlaylistUrl, sid, songJsonObject, Response.Listener {
+                val addToPlaylistRequest = AuthorizedJsonObjectRequest(
+                    Request.Method.PATCH,
+                    addToPlaylistUrl,
+                    sid,
+                    songJsonObject,
+                    Response.Listener {
 
-                }, Response.ErrorListener {error->
-                    println(error)
-                    success = false
-                })
+                    },
+                    Response.ErrorListener {
+                        success = false
+                    })
 
                 addToPlaylistQueue.add(addToPlaylistRequest)
 
