@@ -5,6 +5,7 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.*
 import de.lucaspape.monstercat.database.objects.Song
 import org.json.JSONArray
+import org.json.JSONException
 import org.json.JSONObject
 import java.lang.IndexOutOfBoundsException
 import java.lang.reflect.InvocationTargetException
@@ -56,9 +57,14 @@ fun parseSongToDB(jsonObject: JSONObject, context: Context): String? {
         coverUrl = context.getString(R.string.trackContentUrl) + "$albumId/cover"
         version = jsonObject.getString("version")
         id = jsonObject.getString("id")
-        downloadable = jsonObject.getBoolean("downloadable")
-        streamable = jsonObject.getBoolean("streamable")
-        inEarlyAccess = jsonObject.getBoolean("inEarlyAccess")
+
+        try{
+            downloadable = jsonObject.getBoolean("downloadable")
+            streamable = jsonObject.getBoolean("streamable")
+            inEarlyAccess = jsonObject.getBoolean("inEarlyAccess")
+        }catch (e: JSONException){
+
+        }
     } catch (e: InvocationTargetException) {
     }
 
