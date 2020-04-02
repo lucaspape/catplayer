@@ -91,7 +91,7 @@ fun downloadFile(
 }
 
 fun displayInfo(context: Context, msg: String) {
-    Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+    Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
 }
 
 fun displaySnackbar(
@@ -100,7 +100,7 @@ fun displaySnackbar(
     buttonText: String?,
     buttonListener: (view: View) -> Unit
 ) {
-    val snackbar = Snackbar.make(view, msg, Snackbar.LENGTH_LONG)
+    val snackbar = Snackbar.make(view, msg, Snackbar.LENGTH_SHORT)
 
     buttonText?.let {
         snackbar.setAction(buttonText, buttonListener)
