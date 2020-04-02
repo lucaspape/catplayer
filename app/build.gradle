@@ -53,4 +53,6 @@ dependencies {
     implementation "com.mikepenz:fastadapter:4.1.0"
     implementation "com.mikepenz:fastadapter-extensions-scroll:4.1.0"
     implementation 'com.squareup.picasso:picasso:2.71828'
+
+    implementation 'org.apache.httpcomponents:httpclient:4.5.6'
 }
