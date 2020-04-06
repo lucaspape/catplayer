@@ -210,6 +210,18 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/crossfadeText" />
 
+            <Switch
+                android:id="@+id/useCustomApi"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:text="Use custom api"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/crossfadeTimeSeekbar" />
+
             <Button
                 android:id="@+id/resetDatabaseButton"
                 android:layout_width="200dp"
@@ -219,7 +231,7 @@
                 android:textColor="?attr/colorOnSurface"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/crossfadeTimeSeekbar" />
+                app:layout_constraintTop_toBottomOf="@+id/useCustomApi" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

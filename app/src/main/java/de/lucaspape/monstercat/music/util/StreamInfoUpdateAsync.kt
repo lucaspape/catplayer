@@ -40,7 +40,7 @@ class StreamInfoUpdateAsync(
             val artistTitleRequest =
                 StringRequest(
                     Request.Method.GET,
-                    context.getString(R.string.liveInfoUrl),
+                    context.getString(R.string.customApiBaseUrl) + "liveinfo",
                     Response.Listener { artistTitleResponse ->
                         try {
                             val jsonObject = JSONObject(artistTitleResponse)

@@ -8,6 +8,7 @@ import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.ui.abstract_items.CatalogItem
 import de.lucaspape.monstercat.request.AuthorizedStringRequest
+import de.lucaspape.monstercat.util.Settings
 import de.lucaspape.monstercat.util.parseSongSearchToSongList
 import de.lucaspape.monstercat.util.sid
 import org.json.JSONObject
@@ -46,8 +47,14 @@ class LoadTitleSearchAsync(
                 }
             }
 
+            val searchUrl = if(Settings(context).getBoolean(context.getString(R.string.useCustomApiSetting)) == true){
+                context.getString(R.string.customApiBaseUrl) + "catalog/search?term=$searchString&limit=50&skip=" + skip.toString()
+            }else{
+                context.getString(R.string.loadSongsUrl) + "?term=$searchString&limit=50&skip=" + skip.toString() + "&fields=&search=$searchString"
+            }
+
             val searchRequest = AuthorizedStringRequest(Request.Method.GET,
-                context.getString(R.string.loadSongsUrl) + "?term=$searchString&limit=50&skip=" + skip.toString() + "&fields=&search=$searchString",
+                searchUrl,
                 sid,
                 Response.Listener { response ->
                     val jsonArray = JSONObject(response).getJSONArray("results")

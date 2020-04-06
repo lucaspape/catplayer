@@ -8,6 +8,7 @@ import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.CatalogSongDatabaseHelper
 import de.lucaspape.monstercat.request.AuthorizedStringRequest
+import de.lucaspape.monstercat.util.Settings
 import de.lucaspape.monstercat.util.parseCatalogSongToDB
 import de.lucaspape.monstercat.util.sid
 import org.json.JSONObject
@@ -61,8 +62,11 @@ class LoadSongListAsync(
                 }
             }
 
-            val requestUrl =
+            val requestUrl = if(Settings(context).getBoolean(context.getString(R.string.useCustomApiSetting)) == true){
+                context.getString(R.string.customApiBaseUrl) + "catalog/?limit=50&skip=" + skip.toString()
+            }else{
                 context.getString(R.string.loadSongsUrl) + "?limit=50&skip=" + skip.toString()
+            }
 
             val listRequest = AuthorizedStringRequest(
                 Request.Method.GET, requestUrl, sid,

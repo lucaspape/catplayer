@@ -70,6 +70,7 @@ class SettingsActivity : AppCompatActivity() {
         crossfadeTimeSeekBar.max = 20000 / 1000
 
         val skipMonstercatSongsSwitch = findViewById<Switch>(R.id.skipMonstercatSongsSwitch)
+        val useCustomApiSwitch = findViewById<Switch>(R.id.useCustomApi)
         val resetDatabaseButton = findViewById<Button>(R.id.resetDatabaseButton)
 
         settings.getBoolean(getString(R.string.streamOverMobileSetting))?.let {
@@ -110,6 +111,10 @@ class SettingsActivity : AppCompatActivity() {
 
         settings.getBoolean(getString(R.string.skipMonstercatSongsSetting))?.let {
             skipMonstercatSongsSwitch.isChecked = it
+        }
+
+        settings.getBoolean(getString(R.string.useCustomApiSetting))?.let {
+            useCustomApiSwitch.isChecked = it
         }
 
         settings.getInt(getString(R.string.crossfadeTimeSetting))?.let {
@@ -210,6 +215,10 @@ class SettingsActivity : AppCompatActivity() {
 
         skipMonstercatSongsSwitch.setOnCheckedChangeListener { _, isChecked ->
             settings.setBoolean(getString(R.string.skipMonstercatSongsSetting), isChecked)
+        }
+
+        useCustomApiSwitch.setOnCheckedChangeListener { _, isChecked ->
+            settings.setBoolean(getString(R.string.useCustomApiSetting), isChecked)
         }
 
         resetDatabaseButton.setOnClickListener {
