@@ -78,7 +78,8 @@ class LoadPlaylistAsync(
                         for (i in (0 until jsonArray.length())) {
                             parsePlaylistToDB(
                                 context,
-                                jsonArray.getJSONObject(i)
+                                jsonArray.getJSONObject(i),
+                                true
                             )
                         }
                     }catch (e: JSONException){

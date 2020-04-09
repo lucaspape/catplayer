@@ -365,26 +365,28 @@ internal fun deletePlaylist(view: View, playlistId: String) {
 
 private fun deletePlaylist(view: View, playlistId: String, force: Boolean) {
     if (force) {
-        val deletePlaylistAsync =
-            DeletePlaylistAsync(WeakReference(view.context), playlistId,
-                deleteRemote = true,
-                deleteLocal = true, finishedCallback = {
-                displaySnackBar(
-                    view,
-                    view.context.getString(R.string.playlistDeletedMsg),
-                    null
-                ) {}
-            },
-                errorCallback = {
-                    displaySnackBar(
-                        view,
-                        view.context.getString(R.string.errorDeletingPlaylist),
-                        view.context.getString(R.string.retry)
-                    ) {
-                        deletePlaylist(view, playlistId, true)
-                    }
-                })
-        deletePlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        PlaylistDatabaseHelper(view.context).getPlaylist(playlistId)?.ownPlaylist?.let { deleteRemote ->
+            val deletePlaylistAsync =
+                DeletePlaylistAsync(WeakReference(view.context), playlistId,
+                    deleteRemote = deleteRemote,
+                    deleteLocal = true, finishedCallback = {
+                        displaySnackBar(
+                            view,
+                            view.context.getString(R.string.playlistDeletedMsg),
+                            null
+                        ) {}
+                    },
+                    errorCallback = {
+                        displaySnackBar(
+                            view,
+                            view.context.getString(R.string.errorDeletingPlaylist),
+                            view.context.getString(R.string.retry)
+                        ) {
+                            deletePlaylist(view, playlistId, true)
+                        }
+                    })
+            deletePlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        }
     }
 }
 

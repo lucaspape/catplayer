@@ -17,7 +17,7 @@ class PlaylistDatabaseHelper(context: Context) :
     ) {
     companion object {
         @JvmStatic
-        val DATABASE_VERSION = 3 * SongDatabaseHelper.DATABASE_VERSION
+        val DATABASE_VERSION = 4 * SongDatabaseHelper.DATABASE_VERSION
 
         @JvmStatic
         private val DATABASE_NAME = "playlists_db"
@@ -49,13 +49,14 @@ class PlaylistDatabaseHelper(context: Context) :
         onCreate(db)
     }
 
-    fun insertPlaylist(playlistId: String, name: String): Long {
+    fun insertPlaylist(playlistId: String, name: String, ownPlaylist:Boolean): Long {
         val db = writableDatabase
 
         val values = ContentValues()
 
         values.put(Playlist.COLUMN_PLAYLIST_ID, playlistId)
         values.put(Playlist.COLUMN_NAME, name)
+        values.put(Playlist.COLUMN_OWN_PLAYLIST, ownPlaylist.toString())
 
         val id = db.insert(Playlist.TABLE_NAME, null, values)
         db.close()
@@ -72,7 +73,8 @@ class PlaylistDatabaseHelper(context: Context) :
                 Playlist.TABLE_NAME, arrayOf(
                     Playlist.COLUMN_ID,
                     Playlist.COLUMN_PLAYLIST_ID,
-                    Playlist.COLUMN_NAME
+                    Playlist.COLUMN_NAME,
+                    Playlist.COLUMN_OWN_PLAYLIST
                 ),
                 Playlist.COLUMN_PLAYLIST_ID + "=?",
                 arrayOf(playlistId), null, null, null, null
@@ -85,7 +87,9 @@ class PlaylistDatabaseHelper(context: Context) :
                 val playlist = Playlist(
                     cursor.getInt(cursor.getColumnIndex(Playlist.COLUMN_ID)),
                     cursor.getString(cursor.getColumnIndex(Playlist.COLUMN_PLAYLIST_ID)),
-                    cursor.getString(cursor.getColumnIndex(Playlist.COLUMN_NAME))
+                    cursor.getString(cursor.getColumnIndex(Playlist.COLUMN_NAME)),
+                    cursor.getString(cursor.getColumnIndex(Playlist.COLUMN_OWN_PLAYLIST))!!
+                        .toBoolean()
                 )
 
                 cursor.close()
@@ -116,7 +120,8 @@ class PlaylistDatabaseHelper(context: Context) :
                 val playlist = Playlist(
                     cursor.getInt(cursor.getColumnIndex(Playlist.COLUMN_ID)),
                     cursor.getString(cursor.getColumnIndex(Playlist.COLUMN_PLAYLIST_ID)),
-                    cursor.getString(cursor.getColumnIndex(Playlist.COLUMN_NAME))
+                    cursor.getString(cursor.getColumnIndex(Playlist.COLUMN_NAME)),
+                    cursor.getString(cursor.getColumnIndex(Playlist.COLUMN_OWN_PLAYLIST))!!.toBoolean()
                 )
 
                 playlists.add(playlist)
@@ -129,7 +134,7 @@ class PlaylistDatabaseHelper(context: Context) :
         return playlists
     }
 
-    fun removePlaylist(playlistId:String){
+    fun removePlaylist(playlistId: String) {
         val db = writableDatabase
         db.delete(Playlist.TABLE_NAME, Playlist.COLUMN_PLAYLIST_ID + "=?", arrayOf(playlistId))
         db.close()
