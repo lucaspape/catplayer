@@ -31,7 +31,7 @@ class DeletePlaylistAsync(
     override fun doInBackground(vararg params: Void?): Boolean {
         contextReference.get()?.let { context ->
             var success = true
-            
+
             if(deleteLocal){
                 val playlistDatabaseHelper = PlaylistDatabaseHelper(context)
                 playlistDatabaseHelper.removePlaylist(playlistId)

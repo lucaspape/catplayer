@@ -94,19 +94,19 @@ fun displayInfo(context: Context, msg: String) {
     Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
 }
 
-fun displaySnackbar(
+fun displaySnackBar(
     view: View,
     msg: String,
     buttonText: String?,
     buttonListener: (view: View) -> Unit
 ) {
-    val snackbar = Snackbar.make(view, msg, Snackbar.LENGTH_SHORT)
+    val snackBar = Snackbar.make(view, msg, Snackbar.LENGTH_SHORT)
 
     buttonText?.let {
-        snackbar.setAction(buttonText, buttonListener)
+        snackBar.setAction(buttonText, buttonListener)
     }
 
-    snackbar.show()
+    snackBar.show()
 }
 
 fun displayAlertDialogList(
