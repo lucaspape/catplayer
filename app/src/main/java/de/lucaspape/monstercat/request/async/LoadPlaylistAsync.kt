@@ -10,6 +10,7 @@ import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.request.AuthorizedStringRequest
 import de.lucaspape.monstercat.util.parsePlaylistToDB
 import de.lucaspape.monstercat.util.sid
+import org.json.JSONException
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
@@ -65,21 +66,24 @@ class LoadPlaylistAsync(
                 }
             }
 
+            playlistDatabaseHelper.reCreateTable(context, false)
+
             val playlistRequest = AuthorizedStringRequest(
                 Request.Method.GET, playlistUrl, sid,
                 Response.Listener { response ->
-                    val jsonObject = JSONObject(response)
-                    val jsonArray = jsonObject.getJSONArray("results")
+                    try{
+                        val jsonObject = JSONObject(response)
+                        val jsonArray = jsonObject.getJSONArray("results")
 
-                    playlistDatabaseHelper.reCreateTable(context, false)
+                        for (i in (0 until jsonArray.length())) {
+                            parsePlaylistToDB(
+                                context,
+                                jsonArray.getJSONObject(i)
+                            )
+                        }
+                    }catch (e: JSONException){
 
-                    for (i in (0 until jsonArray.length())) {
-                        parsePlaylistToDB(
-                            context,
-                            jsonArray.getJSONObject(i)
-                        )
                     }
-
                 },
                 Response.ErrorListener {
                     success = false
