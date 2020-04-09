@@ -22,13 +22,10 @@ import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.ui.abstract_items.CatalogItem
 import de.lucaspape.monstercat.ui.abstract_items.HeaderTextItem
 import de.lucaspape.monstercat.ui.abstract_items.PlaylistItem
-import de.lucaspape.monstercat.util.BackgroundAsync
 import de.lucaspape.monstercat.request.async.LoadPlaylistAsync
 import de.lucaspape.monstercat.request.async.LoadPlaylistTracksAsync
 import de.lucaspape.monstercat.ui.activities.MainActivity
-import de.lucaspape.monstercat.util.Settings
-import de.lucaspape.monstercat.util.displayInfo
-import de.lucaspape.monstercat.util.displaySnackbar
+import de.lucaspape.monstercat.util.*
 import java.io.File
 import java.lang.IndexOutOfBoundsException
 import java.lang.ref.WeakReference
@@ -407,7 +404,7 @@ class PlaylistHandler: Handler {
                     }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
                 }, errorCallback = { _, _ ->
                     swipeRefreshLayout.isRefreshing = false
-                    displaySnackbar(
+                    displaySnackBar(
                         view,
                         view.context.getString(R.string.errorLoadingPlaylists),
                         view.context.getString(R.string.retry)
@@ -481,7 +478,7 @@ class PlaylistHandler: Handler {
 
                 }, errorCallback = { _, _, _ ->
                     swipeRefreshLayout.isRefreshing = false
-                    displaySnackbar(
+                    displaySnackBar(
                         view,
                         view.context.getString(R.string.errorLoadingPlaylistTracks),
                         view.context.getString(R.string.retry)

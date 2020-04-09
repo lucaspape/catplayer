@@ -73,7 +73,7 @@ internal fun playAlbumNext(view: View, mcID: String) {
             prioritySongQueue.add(idArray[i])
         }
     }, errorCallback = {
-        displaySnackbar(
+        displaySnackBar(
             view,
             view.context.getString(R.string.errorRetrieveAlbumData),
             view.context.getString(R.string.retry)
@@ -127,7 +127,7 @@ internal fun downloadPlaylist(view: View, playlistId: String, downloadFinished: 
                 song?.songId?.let { addDownloadSong(view.context, it, downloadFinished) }
             }
         }, errorCallback = { _, _, _ ->
-            displaySnackbar(
+            displaySnackBar(
                 view,
                 view.context.getString(R.string.errorRetrievePlaylist),
                 view.context.getString(R.string.retry)
@@ -191,7 +191,7 @@ internal fun downloadAlbum(view: View, mcID: String) {
             song?.songId?.let { addDownloadSong(view.context, it) {} }
         }
     }, errorCallback = {
-        displaySnackbar(
+        displaySnackBar(
             view,
             view.context.getString(R.string.errorRetrieveAlbumData),
             view.context.getString(R.string.retry)
@@ -246,7 +246,7 @@ internal fun addSongToPlaylist(view: View, songId: String) {
             }
         },
         errorCallback = { _, _ ->
-            displaySnackbar(
+            displaySnackBar(
                 view,
                 view.context.getString(R.string.errorRetrievePlaylist),
                 view.context.getString(R.string.retry)
@@ -262,10 +262,10 @@ private fun addSongToPlaylist(view: View, playlistId: String, songId: String) {
         playlistId,
         songId,
         finishedCallback = { _, _ ->
-            displaySnackbar(view, view.context.getString(R.string.songAddedToPlaylistMsg), null) {}
+            displaySnackBar(view, view.context.getString(R.string.songAddedToPlaylistMsg), null) {}
         },
         errorCallback = { _, _ ->
-            displaySnackbar(
+            displaySnackBar(
                 view,
                 view.context.getString(R.string.errorRetrievePlaylist),
                 view.context.getString(R.string.retry)
@@ -315,17 +315,17 @@ internal fun createPlaylist(view: View) {
             negativeButton.setTextColor(typedValue.data)
         }
     } else {
-        displaySnackbar(view, view.context.getString(R.string.errorNotLoggedIn), null) {}
+        displaySnackBar(view, view.context.getString(R.string.errorNotLoggedIn), null) {}
     }
 }
 
 private fun createPlaylist(view: View, playlistName: String) {
     val createPlaylistAsync =
         CreatePlaylistAsync(WeakReference(view.context), playlistName, finishedCallback = {
-            displaySnackbar(view, view.context.getString(R.string.playlistCreatedMsg), null) {}
+            displaySnackBar(view, view.context.getString(R.string.playlistCreatedMsg), null) {}
         },
             errorCallback = {
-                displaySnackbar(
+                displaySnackBar(
                     view,
                     view.context.getString(R.string.errorCreatingPlaylist),
                     view.context.getString(R.string.retry)
@@ -366,15 +366,17 @@ internal fun deletePlaylist(view: View, playlistId: String) {
 private fun deletePlaylist(view: View, playlistId: String, force: Boolean) {
     if (force) {
         val deletePlaylistAsync =
-            DeletePlaylistAsync(WeakReference(view.context), playlistId, finishedCallback = {
-                displaySnackbar(
+            DeletePlaylistAsync(WeakReference(view.context), playlistId,
+                deleteRemote = true,
+                deleteLocal = true, finishedCallback = {
+                displaySnackBar(
                     view,
                     view.context.getString(R.string.playlistDeletedMsg),
                     null
                 ) {}
             },
                 errorCallback = {
-                    displaySnackbar(
+                    displaySnackBar(
                         view,
                         view.context.getString(R.string.errorDeletingPlaylist),
                         view.context.getString(R.string.retry)
@@ -409,14 +411,14 @@ internal fun deletePlaylistSong(
                 playlistId,
                 songDeleteIndex,
                 finishedCallback = { _, _, _ ->
-                    displaySnackbar(
+                    displaySnackBar(
                         view,
                         view.context.getString(R.string.removedSongFromPlaylistMsg),
                         null
                     ) {}
                 },
                 errorCallback = { _, _, _ ->
-                    displaySnackbar(
+                    displaySnackBar(
                         view,
                         view.context.getString(R.string.errorRemovingSongFromPlaylist),
                         view.context.getString(R.string.retry)
@@ -477,7 +479,7 @@ internal fun openAlbum(view: View, albumMcId: String, share: Boolean) {
             }
         },
         Response.ErrorListener {
-            displaySnackbar(
+            displaySnackBar(
                 view,
                 context.getString(R.string.errorRetrieveAlbumData),
                 context.getString(R.string.retry)

@@ -636,7 +636,7 @@ class HomeHandler:Handler {
             }, errorCallback = { _, _, _ ->
                 swipeRefreshLayout.isRefreshing = false
 
-                displaySnackbar(
+                displaySnackBar(
                     view,
                     view.context.getString(R.string.errorLoadingSongList),
                     view.context.getString(R.string.retry)
@@ -692,7 +692,7 @@ class HomeHandler:Handler {
                 errorCallback = { _, _, _ ->
                     footerAdapter.clear()
 
-                    displaySnackbar(
+                    displaySnackBar(
                         view,
                         view.context.getString(R.string.errorLoadingSongList),
                         view.context.getString(R.string.retry)
@@ -774,7 +774,7 @@ class HomeHandler:Handler {
                 }, errorCallback = { _, _, _ ->
                     swipeRefreshLayout.isRefreshing = false
 
-                    displaySnackbar(
+                    displaySnackBar(
                         view,
                         view.context.getString(R.string.errorLoadingAlbumList),
                         view.context.getString(R.string.retry)
@@ -826,7 +826,7 @@ class HomeHandler:Handler {
                 }, errorCallback = { _, _, _ ->
                     footerAdapter.clear()
 
-                    displaySnackbar(
+                    displaySnackBar(
                         view,
                         view.context.getString(R.string.errorLoadingAlbumList),
                         view.context.getString(R.string.retry)
@@ -899,7 +899,7 @@ class HomeHandler:Handler {
             }, errorCallback = { _, _, _, _ ->
                 swipeRefreshLayout.isRefreshing = false
 
-                displaySnackbar(
+                displaySnackBar(
                     view,
                     view.context.getString(R.string.errorLoadingAlbum),
                     view.context.getString(R.string.retry)
@@ -969,7 +969,7 @@ class HomeHandler:Handler {
             }, errorCallback = { _, _ ->
                 swipeRefreshLayout.isRefreshing = false
 
-                displaySnackbar(
+                displaySnackBar(
                     view,
                     view.context.getString(R.string.errorLoadingSearch),
                     view.context.getString(R.string.retry)
@@ -1007,7 +1007,7 @@ class HomeHandler:Handler {
             }, errorCallback = { _, _ ->
                 footerAdapter.clear()
 
-                displaySnackbar(
+                displaySnackBar(
                     view,
                     view.context.getString(R.string.errorLoadingSearch),
                     view.context.getString(R.string.retry)
