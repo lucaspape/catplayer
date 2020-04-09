@@ -6,6 +6,7 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.database.helper.ManualPlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.request.AuthorizedStringRequest
 import de.lucaspape.monstercat.util.sid
@@ -35,6 +36,9 @@ class DeletePlaylistAsync(
             if(deleteLocal){
                 val playlistDatabaseHelper = PlaylistDatabaseHelper(context)
                 playlistDatabaseHelper.removePlaylist(playlistId)
+
+                val manualPlaylistDatabaseHelper = ManualPlaylistDatabaseHelper(context)
+                manualPlaylistDatabaseHelper.removePlaylist(playlistId)
             }
 
             if(deleteRemote){

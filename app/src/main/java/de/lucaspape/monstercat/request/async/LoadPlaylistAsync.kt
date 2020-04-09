@@ -6,12 +6,14 @@ import com.android.volley.Response
 import com.android.volley.Request
 import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.database.helper.ManualPlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.request.AuthorizedStringRequest
 import de.lucaspape.monstercat.util.parsePlaylistToDB
 import de.lucaspape.monstercat.util.sid
 import org.json.JSONException
 import org.json.JSONObject
+import java.lang.IndexOutOfBoundsException
 import java.lang.ref.WeakReference
 
 /**
@@ -61,8 +63,40 @@ class LoadPlaylistAsync(
             val syncObject = Object()
 
             playlistRequestQueue.addRequestFinishedListener<Any> {
-                synchronized(syncObject) {
-                    syncObject.notify()
+                val manualPlaylists = ManualPlaylistDatabaseHelper(context).getAllPlaylists()
+
+                //LOAD MANUAL ADDED PLAYLISTS
+                val taskList = ArrayList<LoadManualPlaylist>()
+                var i = 0
+
+                for(playlist in manualPlaylists){
+                    taskList.add(LoadManualPlaylist(contextReference, playlist.playlistId, {
+                        try {
+                            val task = taskList[i]
+                            i++
+                            task.executeOnExecutor(THREAD_POOL_EXECUTOR)
+                        }catch (e: IndexOutOfBoundsException){
+                            synchronized(syncObject) {
+                                syncObject.notify()
+                            }
+                        }
+                    }, {
+                        success = false
+
+                        synchronized(syncObject) {
+                            syncObject.notify()
+                        }
+                    }))
+                }
+
+                try{
+                    val task = taskList[i]
+                    i++
+                    task.executeOnExecutor(THREAD_POOL_EXECUTOR)
+                }catch (e: IndexOutOfBoundsException){
+                    synchronized(syncObject) {
+                        syncObject.notify()
+                    }
                 }
             }
 

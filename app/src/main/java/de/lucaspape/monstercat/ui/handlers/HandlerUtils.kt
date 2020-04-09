@@ -14,6 +14,7 @@ import com.android.volley.Response
 import com.android.volley.toolbox.Volley
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.database.helper.ManualPlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
@@ -284,39 +285,64 @@ internal fun createPlaylist(view: View) {
     if (loggedIn) {
         val context = view.context
 
-        MaterialAlertDialogBuilder(context).apply {
-            val layoutInflater =
-                context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val alertListItem = arrayListOf(AlertListItem(context.getString(R.string.createPlaylist), ""), AlertListItem(context.getString(R.string.addPlaylistId), ""))
 
-            val playlistNameInputLayout =
-                layoutInflater.inflate(R.layout.playlistname_input_layout, null)
+        displayAlertDialogList(context, HeaderTextItem(""), alertListItem) { _: Int, item: AlertListItem ->
+            val addPlaylist = item.itemText == context.getString(R.string.addPlaylistId)
 
-            setTitle(context.getString(R.string.createPlaylist))
-            setPositiveButton(context.getString(R.string.ok)) { _, _ ->
+            MaterialAlertDialogBuilder(context).apply {
+                val layoutInflater =
+                    context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+
+                val playlistNameInputLayout =
+                    layoutInflater.inflate(R.layout.playlistname_input_layout, null)
+
                 val playlistNameEditText =
                     playlistNameInputLayout.findViewById<EditText>(R.id.playlistNameInput)
-                val playlistName = playlistNameEditText.text.toString()
 
-                createPlaylist(view, playlistName)
+                if(addPlaylist){
+                    playlistNameEditText.hint = context.getString(R.string.playlistId)
+                }
 
+                if(addPlaylist){
+                    setTitle(context.getString(R.string.addPlaylistId))
+                }else{
+                    setTitle(context.getString(R.string.createPlaylist))
+                }
+
+                setPositiveButton(context.getString(R.string.ok)) { _, _ ->
+                    val playlistName = playlistNameEditText.text.toString()
+
+                    if(addPlaylist){
+                        addPlaylist(view, playlistName)
+                    }else{
+                        createPlaylist(view, playlistName)
+                    }
+                }
+
+                setView(playlistNameInputLayout)
+                setCancelable(true)
+            }.create().run {
+                show()
+
+                val typedValue = TypedValue()
+                context.theme.resolveAttribute(R.attr.colorOnSurface, typedValue, true)
+
+                val positiveButton = getButton(DialogInterface.BUTTON_POSITIVE)
+                positiveButton.setTextColor(typedValue.data)
+
+                val negativeButton = getButton(DialogInterface.BUTTON_NEGATIVE)
+                negativeButton.setTextColor(typedValue.data)
             }
-            setView(playlistNameInputLayout)
-            setCancelable(true)
-        }.create().run {
-            show()
-
-            val typedValue = TypedValue()
-            context.theme.resolveAttribute(R.attr.colorOnSurface, typedValue, true)
-
-            val positiveButton = getButton(DialogInterface.BUTTON_POSITIVE)
-            positiveButton.setTextColor(typedValue.data)
-
-            val negativeButton = getButton(DialogInterface.BUTTON_NEGATIVE)
-            negativeButton.setTextColor(typedValue.data)
         }
     } else {
         displaySnackBar(view, view.context.getString(R.string.errorNotLoggedIn), null) {}
     }
+}
+
+private fun addPlaylist(view:View, playlistId: String){
+    val manualPlaylistDatabaseHelper = ManualPlaylistDatabaseHelper(view.context)
+    manualPlaylistDatabaseHelper.insertPlaylist(playlistId)
 }
 
 private fun createPlaylist(view: View, playlistName: String) {

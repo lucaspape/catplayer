@@ -108,4 +108,7 @@
     <string name="downloadNotificationDescription">Download Notification for Catplayer</string>
     <string name="musicNotificationChannelId">Player Notification</string>
     <string name="musicNotificationDescription">Player Notification for Catplayer</string>
+    <string name="playlistId">Playlist ID</string>
+    <string name="addPlaylistId">Add playlist from Playlist ID</string>
+    <string name="add">Add</string>
 </resources>
