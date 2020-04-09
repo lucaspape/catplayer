@@ -51,6 +51,9 @@ var deleteDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_del
 var playButtonDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_play_arrow_24dp"
 var pauseButtonDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_pause_24dp"
 
+var createPlaylistDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_add_24dp"
+var addPlaylistDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_playlist_add_24"
+
 /**
  * Main activity
  */
@@ -326,6 +329,9 @@ class MainActivity : AppCompatActivity() {
                     "android.resource://de.lucaspape.monstercat/drawable/ic_play_arrow_white_24dp"
                 pauseButtonDrawable =
                     "android.resource://de.lucaspape.monstercat/drawable/ic_pause_white_24dp"
+
+                createPlaylistDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_add_white_24dp"
+                addPlaylistDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_playlist_add_white_24"
             } else {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
@@ -352,6 +358,9 @@ class MainActivity : AppCompatActivity() {
                     "android.resource://de.lucaspape.monstercat/drawable/ic_play_arrow_black_24dp"
                 pauseButtonDrawable =
                     "android.resource://de.lucaspape.monstercat/drawable/ic_pause_black_24dp"
+
+                createPlaylistDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_add_black_24dp"
+                addPlaylistDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_playlist_add_black_24"
             }
         } else {
             if (resources.configuration.uiMode.and(Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) {

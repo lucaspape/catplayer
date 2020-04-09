@@ -24,6 +24,8 @@ import de.lucaspape.monstercat.ui.abstract_items.HeaderTextItem
 import de.lucaspape.monstercat.request.async.*
 import de.lucaspape.monstercat.music.prioritySongQueue
 import de.lucaspape.monstercat.request.AuthorizedStringRequest
+import de.lucaspape.monstercat.ui.activities.addPlaylistDrawable
+import de.lucaspape.monstercat.ui.activities.createPlaylistDrawable
 import de.lucaspape.monstercat.util.*
 import org.json.JSONObject
 import java.io.File
@@ -285,7 +287,7 @@ internal fun createPlaylist(view: View) {
     if (loggedIn) {
         val context = view.context
 
-        val alertListItem = arrayListOf(AlertListItem(context.getString(R.string.createPlaylist), ""), AlertListItem(context.getString(R.string.addPlaylistId), ""))
+        val alertListItem = arrayListOf(AlertListItem(context.getString(R.string.createPlaylist), createPlaylistDrawable), AlertListItem(context.getString(R.string.addPlaylistId), addPlaylistDrawable))
 
         displayAlertDialogList(context, HeaderTextItem(""), alertListItem) { _: Int, item: AlertListItem ->
             val addPlaylist = item.itemText == context.getString(R.string.addPlaylistId)
