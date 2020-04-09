@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.AlbumDatabaseHelper
 import de.lucaspape.monstercat.database.helper.CatalogSongDatabaseHelper
+import de.lucaspape.monstercat.database.helper.ManualPlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.music.crossfade
 import de.lucaspape.monstercat.util.Auth
@@ -229,6 +230,7 @@ class SettingsActivity : AppCompatActivity() {
                     AlbumDatabaseHelper(this).reCreateTable(this, true)
                     CatalogSongDatabaseHelper(this).reCreateTable()
                     PlaylistDatabaseHelper(this).reCreateTable(this, true)
+                    ManualPlaylistDatabaseHelper(this).reCreateTable(this, true)
 
                     try {
                         File("$cacheDir/player_state.obj").delete()
