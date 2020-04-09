@@ -55,12 +55,12 @@ internal fun downloadImageUrlIntoImageReceiver(
         imageReceiver.setBitmap(imageId, cacheBitmap)
     } else {
         val placeholder = if (!lowRes) {
-            Drawable.createFromPath(context.dataDir.toString() + "/fallback.jpg")
+            Drawable.createFromPath(context.dataDir.toString() + "/fallback.webp")
         } else {
-            Drawable.createFromPath(context.dataDir.toString() + "/fallback_low.jpg")
+            Drawable.createFromPath(context.dataDir.toString() + "/fallback_low.webp")
         }
 
-        val cacheFile = File(context.cacheDir.toString() + "/$imageId-$resolution.png")
+        val cacheFile = File(context.cacheDir.toString() + "/$imageId-$resolution.webp")
 
         if (cacheFile.exists()) {
             val bitmap = BitmapFactory.decodeFile(cacheFile.absolutePath)
@@ -83,7 +83,7 @@ internal fun downloadImageUrlIntoImageReceiver(
                         //possible that it changed by this time
                         if (!cacheFile.exists()) {
                             FileOutputStream(cacheFile).use { out ->
-                                bitmap?.compress(Bitmap.CompressFormat.PNG, 100, out)
+                                bitmap?.compress(Bitmap.CompressFormat.WEBP, 100, out)
                             }
                         }
 

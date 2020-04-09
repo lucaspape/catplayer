@@ -110,13 +110,13 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        fallbackFile = File("$dataDir/fallback.jpg")
-        fallbackFileLow = File("$dataDir/fallback_low.jpg")
+        fallbackFile = File("$dataDir/fallback.webp")
+        fallbackFileLow = File("$dataDir/fallback_low.webp")
 
-        fallbackBlackFile = File("$dataDir/fallback_black.jpg")
-        fallbackBlackFileLow = File("$dataDir/fallback_black_low.jpg")
-        fallbackWhiteFile = File("$dataDir/fallback_white.jpg")
-        fallbackWhiteFileLow = File("$dataDir/fallback_white_low.jpg")
+        fallbackBlackFile = File("$dataDir/fallback_black.webp")
+        fallbackBlackFileLow = File("$dataDir/fallback_black_low.webp")
+        fallbackWhiteFile = File("$dataDir/fallback_white.webp")
+        fallbackWhiteFileLow = File("$dataDir/fallback_white_low.webp")
 
         //check for internet
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET)
@@ -265,7 +265,7 @@ class MainActivity : AppCompatActivity() {
                     val originalBitmap = BitmapFactory.decodeFile(fallbackBlackFile.absolutePath)
                     originalBitmap?.let {
                         Bitmap.createScaledBitmap(it, 128, 128, false)
-                            .compress(Bitmap.CompressFormat.JPEG, 100, out)
+                            .compress(Bitmap.CompressFormat.WEBP, 100, out)
                     }
                 }
 
@@ -287,7 +287,7 @@ class MainActivity : AppCompatActivity() {
                     val originalBitmap = BitmapFactory.decodeFile(fallbackWhiteFile.absolutePath)
                     originalBitmap?.let {
                         Bitmap.createScaledBitmap(it, 128, 128, false)
-                            .compress(Bitmap.CompressFormat.JPEG, 100, out)
+                            .compress(Bitmap.CompressFormat.WEBP, 100, out)
                     }
                 }
 
