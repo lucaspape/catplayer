@@ -47,6 +47,7 @@ var shareDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_shar
 var openInAppDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_open_in_new_24dp"
 var addToPlaylistDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_playlist_add_24"
 var deleteDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_delete_outline_24"
+var editDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_edit_24"
 
 var playButtonDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_play_arrow_24dp"
 var pauseButtonDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_pause_24dp"
@@ -72,8 +73,8 @@ class MainActivity : AppCompatActivity() {
     var fragmentBackPressedCallback: () -> Unit = {
         val fragment = currentFragment
 
-        if(fragment is de.lucaspape.monstercat.ui.fragments.Fragment){
-           fragment.onBackPressed()
+        if (fragment is de.lucaspape.monstercat.ui.fragments.Fragment) {
+            fragment.onBackPressed()
         }
     }
 
@@ -81,7 +82,8 @@ class MainActivity : AppCompatActivity() {
         BottomNavigationView.OnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_home -> {
-                    currentFragment = de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(HomeHandler())
+                    currentFragment =
+                        de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(HomeHandler())
                     currentFragment?.let {
                         openFragment(it)
                     }
@@ -89,7 +91,8 @@ class MainActivity : AppCompatActivity() {
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.navigation_dashboard -> {
-                    currentFragment = de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(PlaylistHandler())
+                    currentFragment =
+                        de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(PlaylistHandler())
                     currentFragment?.let {
                         openFragment(it)
                     }
@@ -181,7 +184,10 @@ class MainActivity : AppCompatActivity() {
         if (intentExtras != null) {
             if (intentExtras["search"] != null) {
                 //open the home fragment
-                currentFragment = de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(HomeHandler(), intentExtras["search"] as String)
+                currentFragment = de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
+                    HomeHandler(),
+                    intentExtras["search"] as String
+                )
                 currentFragment?.let {
                     openFragment(it)
                 }
@@ -324,14 +330,18 @@ class MainActivity : AppCompatActivity() {
                     "android.resource://de.lucaspape.monstercat/drawable/ic_playlist_add_white_24"
                 deleteDrawable =
                     "android.resource://de.lucaspape.monstercat/drawable/ic_delete_outline_white_24"
+                editDrawable =
+                    "android.resource://de.lucaspape.monstercat/drawable/ic_edit_white_24"
 
                 playButtonDrawable =
                     "android.resource://de.lucaspape.monstercat/drawable/ic_play_arrow_white_24dp"
                 pauseButtonDrawable =
                     "android.resource://de.lucaspape.monstercat/drawable/ic_pause_white_24dp"
 
-                createPlaylistDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_add_white_24dp"
-                addPlaylistDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_playlist_add_white_24"
+                createPlaylistDrawable =
+                    "android.resource://de.lucaspape.monstercat/drawable/ic_add_white_24dp"
+                addPlaylistDrawable =
+                    "android.resource://de.lucaspape.monstercat/drawable/ic_playlist_add_white_24"
             } else {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
@@ -354,13 +364,17 @@ class MainActivity : AppCompatActivity() {
                     "android.resource://de.lucaspape.monstercat/drawable/ic_playlist_add_black_24"
                 deleteDrawable =
                     "android.resource://de.lucaspape.monstercat/drawable/ic_delete_outline_black_24"
+                editDrawable =
+                    "android.resource://de.lucaspape.monstercat/drawable/ic_edit_black_24"
                 playButtonDrawable =
                     "android.resource://de.lucaspape.monstercat/drawable/ic_play_arrow_black_24dp"
                 pauseButtonDrawable =
                     "android.resource://de.lucaspape.monstercat/drawable/ic_pause_black_24dp"
 
-                createPlaylistDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_add_black_24dp"
-                addPlaylistDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_playlist_add_black_24"
+                createPlaylistDrawable =
+                    "android.resource://de.lucaspape.monstercat/drawable/ic_add_black_24dp"
+                addPlaylistDrawable =
+                    "android.resource://de.lucaspape.monstercat/drawable/ic_playlist_add_black_24"
             }
         } else {
             if (resources.configuration.uiMode.and(Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) {

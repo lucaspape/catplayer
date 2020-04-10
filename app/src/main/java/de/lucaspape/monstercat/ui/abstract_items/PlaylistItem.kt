@@ -13,19 +13,17 @@ import androidx.core.net.toUri
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.ui.activities.addToQueueDrawable
-import de.lucaspape.monstercat.ui.activities.deleteDrawable
-import de.lucaspape.monstercat.ui.activities.downloadDrawable
-import de.lucaspape.monstercat.ui.activities.offlineDrawable
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.ImageReceiverInterface
 import de.lucaspape.monstercat.download.downloadCoverIntoImageReceiver
+import de.lucaspape.monstercat.ui.activities.*
 import de.lucaspape.monstercat.util.BackgroundAsync
 import de.lucaspape.monstercat.ui.handlers.deletePlaylist
 import de.lucaspape.monstercat.ui.handlers.downloadPlaylist
 import de.lucaspape.monstercat.ui.handlers.playPlaylistNext
+import de.lucaspape.monstercat.ui.handlers.renamePlaylist
 import de.lucaspape.monstercat.util.displayAlertDialogList
 import java.io.File
 
@@ -45,7 +43,8 @@ open class PlaylistItem(
             val itemList = arrayListOf(
                 AlertListItem(view.context.getString(R.string.download), downloadDrawable),
                 AlertListItem(view.context.getString(R.string.addToQueue), addToQueueDrawable),
-                AlertListItem(view.context.getString(R.string.delete), deleteDrawable)
+                AlertListItem(view.context.getString(R.string.delete), deleteDrawable),
+                AlertListItem(view.context.getString(R.string.renamePlaylist), editDrawable)
             )
 
             val id = data[listViewPosition]
@@ -68,6 +67,9 @@ open class PlaylistItem(
                         }
                         view.context.getString(R.string.delete) -> {
                             deletePlaylist(view, id)
+                        }
+                        view.context.getString(R.string.renamePlaylist) -> {
+                            renamePlaylist(view, id)
                         }
                     }
                 }

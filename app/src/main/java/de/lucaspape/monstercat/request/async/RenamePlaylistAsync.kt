@@ -11,8 +11,9 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
-class CreatePlaylistAsync(
+class RenamePlaylistAsync(
     private val contextReference: WeakReference<Context>,
+    private val playlistId: String,
     private val playlistName: String,
     private val finishedCallback: (playlistName: String) -> Unit,
     private val errorCallback: (playlistName: String) -> Unit
@@ -28,13 +29,11 @@ class CreatePlaylistAsync(
 
     override fun doInBackground(vararg params: Void?): Boolean {
         contextReference.get()?.let { context ->
-            val playlistPostUrl = context.getString(R.string.newPlaylistUrl)
+            val playlistPatchUrl = context.getString(R.string.playlistUrl) + playlistId
 
             val postObject = JSONObject()
 
             postObject.put("name", playlistName)
-            postObject.put("public", false)
-            postObject.put("tracks", JSONArray())
 
             val newPlaylistVolleyQueue = Volley.newRequestQueue(context)
 
@@ -48,7 +47,7 @@ class CreatePlaylistAsync(
             }
 
             val newPlaylistRequest = object : JsonObjectRequest(
-                Method.POST, playlistPostUrl, postObject,
+                Method.PATCH, playlistPatchUrl, postObject,
                 Response.Listener {
                 },
                 Response.ErrorListener {

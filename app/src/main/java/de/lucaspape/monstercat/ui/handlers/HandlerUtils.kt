@@ -280,6 +280,66 @@ private fun addSongToPlaylist(view: View, playlistId: String, songId: String) {
     addToPlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }
 
+internal fun renamePlaylist(view: View, playlistId: String) {
+    if (loggedIn) {
+        val context = view.context
+
+        MaterialAlertDialogBuilder(context).apply {
+            val layoutInflater =
+                context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+
+            val playlistNameInputLayout =
+                layoutInflater.inflate(R.layout.playlistname_input_layout, null)
+
+            val playlistNameEditText =
+                playlistNameInputLayout.findViewById<EditText>(R.id.playlistNameInput)
+
+            setTitle(context.getString(R.string.renamePlaylist))
+
+            setPositiveButton(context.getString(R.string.ok)) { _, _ ->
+                val playlistName = playlistNameEditText.text.toString()
+                renamePlaylist(view, playlistId, playlistName)
+            }
+
+            setView(playlistNameInputLayout)
+            setCancelable(true)
+        }.create().run {
+            show()
+
+            val typedValue = TypedValue()
+            context.theme.resolveAttribute(R.attr.colorOnSurface, typedValue, true)
+
+            val positiveButton = getButton(DialogInterface.BUTTON_POSITIVE)
+            positiveButton.setTextColor(typedValue.data)
+
+            val negativeButton = getButton(DialogInterface.BUTTON_NEGATIVE)
+            negativeButton.setTextColor(typedValue.data)
+        }
+    } else {
+        displaySnackBar(view, view.context.getString(R.string.errorNotLoggedIn), null) {}
+    }
+}
+
+private fun renamePlaylist(view: View, playlistId: String, playlistName: String) {
+    val renamePlaylistAsync =
+        RenamePlaylistAsync(WeakReference(view.context),
+            playlistId,
+            playlistName,
+            finishedCallback = {
+                displaySnackBar(view, view.context.getString(R.string.playlistRenamedMsg), null) {}
+            },
+            errorCallback = {
+                displaySnackBar(
+                    view,
+                    view.context.getString(R.string.renamePlaylistError),
+                    view.context.getString(R.string.retry)
+                ) {
+                    renamePlaylist(view, playlistName, playlistId)
+                }
+            })
+    renamePlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+}
+
 /**
  * Create a new playlist, will ask for name with alertDialog
  */
@@ -287,9 +347,18 @@ internal fun createPlaylist(view: View) {
     if (loggedIn) {
         val context = view.context
 
-        val alertListItem = arrayListOf(AlertListItem(context.getString(R.string.createPlaylist), createPlaylistDrawable), AlertListItem(context.getString(R.string.addPlaylistId), addPlaylistDrawable))
+        val alertListItem = arrayListOf(
+            AlertListItem(
+                context.getString(R.string.createPlaylist),
+                createPlaylistDrawable
+            ), AlertListItem(context.getString(R.string.addPlaylistId), addPlaylistDrawable)
+        )
 
-        displayAlertDialogList(context, HeaderTextItem(""), alertListItem) { _: Int, item: AlertListItem ->
+        displayAlertDialogList(
+            context,
+            HeaderTextItem(""),
+            alertListItem
+        ) { _: Int, item: AlertListItem ->
             val addPlaylist = item.itemText == context.getString(R.string.addPlaylistId)
 
             MaterialAlertDialogBuilder(context).apply {
@@ -302,22 +371,22 @@ internal fun createPlaylist(view: View) {
                 val playlistNameEditText =
                     playlistNameInputLayout.findViewById<EditText>(R.id.playlistNameInput)
 
-                if(addPlaylist){
+                if (addPlaylist) {
                     playlistNameEditText.hint = context.getString(R.string.playlistId)
                 }
 
-                if(addPlaylist){
+                if (addPlaylist) {
                     setTitle(context.getString(R.string.addPlaylistId))
-                }else{
+                } else {
                     setTitle(context.getString(R.string.createPlaylist))
                 }
 
                 setPositiveButton(context.getString(R.string.ok)) { _, _ ->
                     val playlistName = playlistNameEditText.text.toString()
 
-                    if(addPlaylist){
+                    if (addPlaylist) {
                         addPlaylist(view, playlistName)
-                    }else{
+                    } else {
                         createPlaylist(view, playlistName)
                     }
                 }
@@ -342,7 +411,7 @@ internal fun createPlaylist(view: View) {
     }
 }
 
-private fun addPlaylist(view:View, playlistId: String){
+private fun addPlaylist(view: View, playlistId: String) {
     val manualPlaylistDatabaseHelper = ManualPlaylistDatabaseHelper(view.context)
     manualPlaylistDatabaseHelper.insertPlaylist(playlistId)
 }

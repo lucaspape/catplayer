@@ -111,4 +111,7 @@
     <string name="playlistId">Playlist ID</string>
     <string name="addPlaylistId">Add playlist from Playlist ID</string>
     <string name="add">Add</string>
+    <string name="renamePlaylist">Rename playlist</string>
+    <string name="playlistRenamedMsg">Playlist renamed!</string>
+    <string name="renamePlaylistError">Error renaming playlist</string>
 </resources>
