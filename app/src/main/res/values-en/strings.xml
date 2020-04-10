@@ -109,4 +109,17 @@
     <string name="downloadNotificationDescription">Download Notification for Catplayer</string>
     <string name="musicNotificationChannelId">Player Notification</string>
     <string name="musicNotificationDescription">Player Notification for Catplayer</string>
+    <string name="playlistId">Playlist ID</string>
+    <string name="addPlaylistId">Add playlist from Playlist ID</string>
+    <string name="add">Add</string>
+    <string name="renamePlaylist">Rename playlist</string>
+    <string name="playlistRenamedMsg">Playlist renamed!</string>
+    <string name="renamePlaylistError">Error renaming playlist</string>
+    <string name="makePlaylistPublic">Make public</string>
+    <string name="makePlaylistPrivate">Make private</string>
+    <string name="playlistNowPublicMsg">Playlist is now public</string>
+    <string name="playlistNowPrivateMsg">Playlist is now private</string>
+    <string name="playlistStateChangeError">Error changing playlist state</string>
+    <string name="sharePlaylist">Share playlist</string>
+    <string name="openPlaylistInApp">Open playlist in browser</string>
 </resources>
