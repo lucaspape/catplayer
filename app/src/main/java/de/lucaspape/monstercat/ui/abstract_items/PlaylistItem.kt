@@ -49,7 +49,9 @@ open class PlaylistItem(
                     AlertListItem(view.context.getString(R.string.download), downloadDrawable),
                     AlertListItem(view.context.getString(R.string.addToQueue), addToQueueDrawable),
                     AlertListItem(view.context.getString(R.string.delete), deleteDrawable),
-                    AlertListItem(view.context.getString(R.string.renamePlaylist), editDrawable)
+                    AlertListItem(view.context.getString(R.string.renamePlaylist), editDrawable),
+                    AlertListItem(view.context.getString(R.string.sharePlaylist), shareDrawable),
+                    AlertListItem(view.context.getString(R.string.openPlaylistInApp), openInAppDrawable)
                 )
 
                 if(playlist.public){
@@ -85,6 +87,14 @@ open class PlaylistItem(
 
                         view.context.getString(R.string.makePlaylistPublic) -> {
                             togglePlaylistPublicState(view, id)
+                        }
+
+                        view.context.getString(R.string.sharePlaylist) -> {
+                            openPlaylist(view, id, true)
+                        }
+
+                        view.context.getString(R.string.openPlaylistInApp) -> {
+                            openPlaylist(view, id, false)
                         }
                     }
                 }

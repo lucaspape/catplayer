@@ -19,6 +19,7 @@
     <string name="fallbackCoverBlackUrl" translatable="false">https://lucaspape.de/monstercat-app/artwork-fallback-black.jpg</string>
 
     <string name="shareReleaseUrl" translatable="false">https://www.monstercat.com/release</string>
+    <string name="playlistShareUrl" translatable="false">https://www.monstercat.com/playlist/</string>
 
     <string name="customApiBaseUrl" translatable="false">https://api.lucaspape.de/monstercat/v1/</string>
 

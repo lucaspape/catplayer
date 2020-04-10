@@ -621,3 +621,20 @@ internal fun openAlbum(view: View, albumMcId: String, share: Boolean) {
 
     volleyRequestQueue.add(albumLinksRequest)
 }
+
+internal fun openPlaylist(view: View, playlistId: String, share:Boolean){
+    val url = view.context.getString(R.string.playlistShareUrl) + playlistId
+
+    if (share) {
+        val sendIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, url)
+            type = "text/plain"
+        }
+
+        val shareIntent = Intent.createChooser(sendIntent, null)
+        view.context.startActivity(shareIntent)
+    } else {
+        view.context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+    }
+}

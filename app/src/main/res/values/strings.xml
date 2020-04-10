@@ -119,4 +119,6 @@
     <string name="playlistNowPublicMsg">Playlist is now public</string>
     <string name="playlistNowPrivateMsg">Playlist is now private</string>
     <string name="playlistStateChangeError">Error changing playlist state</string>
+    <string name="sharePlaylist">Share playlist</string>
+    <string name="openPlaylistInApp">Open playlist in browser</string>
 </resources>
