@@ -19,11 +19,13 @@ import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.ImageReceiverInterface
 import de.lucaspape.monstercat.download.downloadCoverIntoImageReceiver
 import de.lucaspape.monstercat.ui.activities.*
-import de.lucaspape.monstercat.util.BackgroundAsync
+import de.lucaspape.monstercat.ui.handlers.*
 import de.lucaspape.monstercat.ui.handlers.deletePlaylist
 import de.lucaspape.monstercat.ui.handlers.downloadPlaylist
 import de.lucaspape.monstercat.ui.handlers.playPlaylistNext
 import de.lucaspape.monstercat.ui.handlers.renamePlaylist
+import de.lucaspape.monstercat.ui.handlers.togglePlaylistPublicState
+import de.lucaspape.monstercat.util.BackgroundAsync
 import de.lucaspape.monstercat.util.displayAlertDialogList
 import java.io.File
 
@@ -40,16 +42,22 @@ open class PlaylistItem(
         ) {
             view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
 
-            val itemList = arrayListOf(
-                AlertListItem(view.context.getString(R.string.download), downloadDrawable),
-                AlertListItem(view.context.getString(R.string.addToQueue), addToQueueDrawable),
-                AlertListItem(view.context.getString(R.string.delete), deleteDrawable),
-                AlertListItem(view.context.getString(R.string.renamePlaylist), editDrawable)
-            )
-
             val id = data[listViewPosition]
 
             PlaylistDatabaseHelper(view.context).getPlaylist(id)?.let { playlist ->
+                val itemList = arrayListOf(
+                    AlertListItem(view.context.getString(R.string.download), downloadDrawable),
+                    AlertListItem(view.context.getString(R.string.addToQueue), addToQueueDrawable),
+                    AlertListItem(view.context.getString(R.string.delete), deleteDrawable),
+                    AlertListItem(view.context.getString(R.string.renamePlaylist), editDrawable)
+                )
+
+                if(playlist.public){
+                    itemList.add(AlertListItem(view.context.getString(R.string.makePlaylistPrivate), playlistPrivateDrawable))
+                }else{
+                    itemList.add(AlertListItem(view.context.getString(R.string.makePlaylistPublic), playlistPublicDrawable))
+                }
+
                 displayAlertDialogList(
                     view.context,
                     AlertListHeaderItem(playlist.playlistName, ""),
@@ -70,6 +78,13 @@ open class PlaylistItem(
                         }
                         view.context.getString(R.string.renamePlaylist) -> {
                             renamePlaylist(view, id)
+                        }
+                        view.context.getString(R.string.makePlaylistPrivate) -> {
+                            togglePlaylistPublicState(view, id)
+                        }
+
+                        view.context.getString(R.string.makePlaylistPublic) -> {
+                            togglePlaylistPublicState(view, id)
                         }
                     }
                 }

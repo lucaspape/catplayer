@@ -17,7 +17,7 @@ class PlaylistDatabaseHelper(context: Context) :
     ) {
     companion object {
         @JvmStatic
-        val DATABASE_VERSION = 4 * SongDatabaseHelper.DATABASE_VERSION
+        val DATABASE_VERSION = 5 * SongDatabaseHelper.DATABASE_VERSION
 
         @JvmStatic
         private val DATABASE_NAME = "playlists_db"
@@ -49,7 +49,12 @@ class PlaylistDatabaseHelper(context: Context) :
         onCreate(db)
     }
 
-    fun insertPlaylist(playlistId: String, name: String, ownPlaylist:Boolean): Long {
+    fun insertPlaylist(
+        playlistId: String,
+        name: String,
+        ownPlaylist: Boolean,
+        public: Boolean
+    ): Long {
         val db = writableDatabase
 
         val values = ContentValues()
@@ -57,6 +62,7 @@ class PlaylistDatabaseHelper(context: Context) :
         values.put(Playlist.COLUMN_PLAYLIST_ID, playlistId)
         values.put(Playlist.COLUMN_NAME, name)
         values.put(Playlist.COLUMN_OWN_PLAYLIST, ownPlaylist.toString())
+        values.put(Playlist.COLUMN_PUBLIC, public.toString())
 
         val id = db.insert(Playlist.TABLE_NAME, null, values)
         db.close()
@@ -74,7 +80,8 @@ class PlaylistDatabaseHelper(context: Context) :
                     Playlist.COLUMN_ID,
                     Playlist.COLUMN_PLAYLIST_ID,
                     Playlist.COLUMN_NAME,
-                    Playlist.COLUMN_OWN_PLAYLIST
+                    Playlist.COLUMN_OWN_PLAYLIST,
+                    Playlist.COLUMN_PUBLIC
                 ),
                 Playlist.COLUMN_PLAYLIST_ID + "=?",
                 arrayOf(playlistId), null, null, null, null
@@ -89,6 +96,8 @@ class PlaylistDatabaseHelper(context: Context) :
                     cursor.getString(cursor.getColumnIndex(Playlist.COLUMN_PLAYLIST_ID)),
                     cursor.getString(cursor.getColumnIndex(Playlist.COLUMN_NAME)),
                     cursor.getString(cursor.getColumnIndex(Playlist.COLUMN_OWN_PLAYLIST))!!
+                        .toBoolean(),
+                    cursor.getString(cursor.getColumnIndex(Playlist.COLUMN_PUBLIC))!!
                         .toBoolean()
                 )
 
@@ -121,7 +130,9 @@ class PlaylistDatabaseHelper(context: Context) :
                     cursor.getInt(cursor.getColumnIndex(Playlist.COLUMN_ID)),
                     cursor.getString(cursor.getColumnIndex(Playlist.COLUMN_PLAYLIST_ID)),
                     cursor.getString(cursor.getColumnIndex(Playlist.COLUMN_NAME)),
-                    cursor.getString(cursor.getColumnIndex(Playlist.COLUMN_OWN_PLAYLIST))!!.toBoolean()
+                    cursor.getString(cursor.getColumnIndex(Playlist.COLUMN_OWN_PLAYLIST))!!
+                        .toBoolean(),
+                    cursor.getString(cursor.getColumnIndex(Playlist.COLUMN_PUBLIC))!!.toBoolean()
                 )
 
                 playlists.add(playlist)

@@ -114,4 +114,9 @@
     <string name="renamePlaylist">Rename playlist</string>
     <string name="playlistRenamedMsg">Playlist renamed!</string>
     <string name="renamePlaylistError">Error renaming playlist</string>
+    <string name="makePlaylistPublic">Make public</string>
+    <string name="makePlaylistPrivate">Make private</string>
+    <string name="playlistNowPublicMsg">Playlist is now public</string>
+    <string name="playlistNowPrivateMsg">Playlist is now private</string>
+    <string name="playlistStateChangeError">Error changing playlist state</string>
 </resources>

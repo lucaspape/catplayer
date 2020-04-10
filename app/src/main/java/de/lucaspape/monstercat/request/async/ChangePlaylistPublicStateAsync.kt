@@ -11,19 +11,19 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
-class RenamePlaylistAsync(
+class ChangePlaylistPublicStateAsync(
     private val contextReference: WeakReference<Context>,
     private val playlistId: String,
-    private val playlistName: String,
-    private val finishedCallback: (playlistName: String, playlistId:String) -> Unit,
-    private val errorCallback: (playlistName: String, playlistId:String) -> Unit
+    private val public: Boolean,
+    private val finishedCallback: (playlistId: String, public:Boolean) -> Unit,
+    private val errorCallback: (playlistId: String, public:Boolean) -> Unit
 ) : AsyncTask<Void, Void, Boolean>() {
 
     override fun onPostExecute(result: Boolean) {
         if (result) {
-            finishedCallback(playlistName, playlistId)
+            finishedCallback(playlistId, public)
         } else {
-            errorCallback(playlistName, playlistId)
+            errorCallback(playlistId, public)
         }
     }
 
@@ -33,7 +33,7 @@ class RenamePlaylistAsync(
 
             val postObject = JSONObject()
 
-            postObject.put("name", playlistName)
+            postObject.put("public", public)
 
             val newPlaylistVolleyQueue = Volley.newRequestQueue(context)
 

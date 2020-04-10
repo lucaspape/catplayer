@@ -325,10 +325,10 @@ private fun renamePlaylist(view: View, playlistId: String, playlistName: String)
         RenamePlaylistAsync(WeakReference(view.context),
             playlistId,
             playlistName,
-            finishedCallback = {
+            finishedCallback = { _, _ ->
                 displaySnackBar(view, view.context.getString(R.string.playlistRenamedMsg), null) {}
             },
-            errorCallback = {
+            errorCallback = { _, _ ->
                 displaySnackBar(
                     view,
                     view.context.getString(R.string.renamePlaylistError),
@@ -338,6 +338,38 @@ private fun renamePlaylist(view: View, playlistId: String, playlistName: String)
                 }
             })
     renamePlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+}
+
+internal fun togglePlaylistPublicState(view: View, playlistId: String) {
+    PlaylistDatabaseHelper(view.context).getPlaylist(playlistId)?.let { playlist ->
+        val changePlaylistPublicStateAsync =
+            ChangePlaylistPublicStateAsync(WeakReference(view.context),
+                playlistId,
+                !playlist.public,
+                finishedCallback = { _, _ ->
+                    val msg = if (playlist.public) {
+                        view.context.getString(R.string.playlistNowPrivateMsg)
+                    } else {
+                        view.context.getString(R.string.playlistNowPublicMsg)
+                    }
+
+                    displaySnackBar(
+                        view,
+                        msg,
+                        null
+                    ) {}
+                },
+                errorCallback = { _, _ ->
+                    displaySnackBar(
+                        view,
+                        view.context.getString(R.string.playlistStateChangeError),
+                        view.context.getString(R.string.retry)
+                    ) {
+                        togglePlaylistPublicState(view, playlistId)
+                    }
+                })
+        changePlaylistPublicStateAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    }
 }
 
 /**

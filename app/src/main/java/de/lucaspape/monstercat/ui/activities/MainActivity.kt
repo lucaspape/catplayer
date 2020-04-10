@@ -48,6 +48,8 @@ var openInAppDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_
 var addToPlaylistDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_playlist_add_24"
 var deleteDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_delete_outline_24"
 var editDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_edit_24"
+var playlistPublicDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_public_24"
+var playlistPrivateDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_block_24"
 
 var playButtonDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_play_arrow_24dp"
 var pauseButtonDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_pause_24dp"
@@ -332,6 +334,10 @@ class MainActivity : AppCompatActivity() {
                     "android.resource://de.lucaspape.monstercat/drawable/ic_delete_outline_white_24"
                 editDrawable =
                     "android.resource://de.lucaspape.monstercat/drawable/ic_edit_white_24"
+                playlistPublicDrawable =
+                    "android.resource://de.lucaspape.monstercat/drawable/ic_public_white_24"
+                playlistPrivateDrawable =
+                    "android.resource://de.lucaspape.monstercat/drawable/ic_block_white_24"
 
                 playButtonDrawable =
                     "android.resource://de.lucaspape.monstercat/drawable/ic_play_arrow_white_24dp"
@@ -366,6 +372,10 @@ class MainActivity : AppCompatActivity() {
                     "android.resource://de.lucaspape.monstercat/drawable/ic_delete_outline_black_24"
                 editDrawable =
                     "android.resource://de.lucaspape.monstercat/drawable/ic_edit_black_24"
+                playlistPublicDrawable =
+                    "android.resource://de.lucaspape.monstercat/drawable/ic_public_black_24"
+                playlistPrivateDrawable =
+                    "android.resource://de.lucaspape.monstercat/drawable/ic_block_black_24"
                 playButtonDrawable =
                     "android.resource://de.lucaspape.monstercat/drawable/ic_play_arrow_black_24dp"
                 pauseButtonDrawable =
