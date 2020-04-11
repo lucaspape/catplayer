@@ -8,6 +8,7 @@ import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.AlbumItemDatabaseHelper
 import de.lucaspape.monstercat.request.AuthorizedStringRequest
+import de.lucaspape.monstercat.util.Settings
 import de.lucaspape.monstercat.util.parsAlbumSongToDB
 import de.lucaspape.monstercat.util.sid
 import org.json.JSONObject
@@ -68,8 +69,11 @@ class LoadAlbumAsync(
                 }
             }
 
-            val requestUrl =
-                context.getString(R.string.loadAlbumSongsUrl) + "/" + mcId
+            val requestUrl = if(Settings(context).getBoolean(context.getString(R.string.useCustomApiSetting)) == true){
+                context.getString(R.string.customApiBaseUrl) + "catalog/release/$mcId"
+            }else{
+                context.getString(R.string.loadAlbumSongsUrl) + "/$mcId"
+            }
 
             val listRequest = AuthorizedStringRequest(
                 Request.Method.GET, requestUrl,
