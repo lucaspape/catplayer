@@ -45,9 +45,9 @@ class LoadRelatedTracksAsync(
             val jsonObject = JSONObject()
             val trackJsonArray = JSONArray()
 
-            for (trackId in trackIdArray) {
+            for(i in(trackIdArray.size -10 until trackIdArray.size)){
                 val trackObject = JSONObject()
-                trackObject.put("id", trackId)
+                trackObject.put("id", trackIdArray[i])
                 trackJsonArray.put(trackObject)
             }
 
@@ -74,7 +74,7 @@ class LoadRelatedTracksAsync(
                 })
 
             relatedTracksRequest.retryPolicy =
-                DefaultRetryPolicy(10000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+                DefaultRetryPolicy(20000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
 
             volleyQueue.add(relatedTracksRequest)
 
