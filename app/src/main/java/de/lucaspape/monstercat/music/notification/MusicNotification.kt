@@ -178,22 +178,24 @@ internal fun startPlayerService(
     songId: String?
 ) {
     if (!serviceRunning) {
-        playerServiceIntent =
-            Intent(contextReference!!.get()!!, PlayerService::class.java)
+        contextReference?.get()?.let { context ->
+            playerServiceIntent =
+                Intent(context, PlayerService::class.java)
 
-        playerServiceIntent?.putExtra("songId", songId)
+            playerServiceIntent?.putExtra("songId", songId)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            contextReference?.get()?.startForegroundService(
-                playerServiceIntent
-            )
-        } else {
-            contextReference?.get()?.startService(
-                playerServiceIntent
-            )
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(
+                    playerServiceIntent
+                )
+            } else {
+                context.startService(
+                    playerServiceIntent
+                )
+            }
+
+            serviceRunning = true
         }
-
-        serviceRunning = true
     }
 }
 
