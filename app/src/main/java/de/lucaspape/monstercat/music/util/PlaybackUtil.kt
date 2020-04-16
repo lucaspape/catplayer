@@ -20,7 +20,7 @@ import java.util.*
 var currentSong = ""
 var preparedSong = ""
 
-internal fun prepareSong(context: Context, songId: String) {
+internal fun prepareSong(context: Context, songId: String, callback: () -> Unit) {
     if (preparedSong != songId) {
         //new exoplayer
         val newExoPlayer = SimpleExoPlayer.Builder(context).build()
@@ -42,13 +42,12 @@ internal fun prepareSong(context: Context, songId: String) {
                 }
             }
 
+            callback()
             return
         }
 
-        val syncObject = Object()
-
         contextReference?.let { weakReference ->
-            AddTrackToDbAsync(weakReference, songId, finishedCallback = {_, song ->
+            AddTrackToDbAsync(weakReference, songId, finishedCallback = { _, song ->
                 if (song.playbackAllowed(context)
                 ) {
                     val mediaSource = song.getMediaSource()
@@ -61,25 +60,18 @@ internal fun prepareSong(context: Context, songId: String) {
                     }
                 }
 
-                synchronized(syncObject){
-                    syncObject.notify()
-                }
+                callback()
+
             }, errorCallback = {
-                synchronized(syncObject){
-                    syncObject.notify()
-                }
             }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 
-            synchronized(syncObject){
-                syncObject.wait()
-            }
         }
     }
 }
 
 internal fun playSong(
     context: Context,
-    songId:String,
+    songId: String,
     showNotification: Boolean,
     requestAudioFocus: Boolean,
     playWhenReady: Boolean,
@@ -94,59 +86,67 @@ internal fun playSong(
     }
 
     if (audioFocus == AudioManager.AUDIOFOCUS_REQUEST_GRANTED || !requestAudioFocus) {
-        if(currentSong != songId){
-            exoPlayer?.release()
-            exoPlayer?.stop()
-
-            if (preparedSong != songId) {
-                prepareSong(context, songId)
-            }
-
+        val preparingDone = {
             exoPlayer =
                 nextExoPlayer
 
             preparedSong = ""
 
             exoPlayer?.audioComponent?.volume = 1.0f
-        }
 
-        if (progress != null) {
-            exoPlayer?.seekTo(progress)
-        }
+            if (progress != null) {
+                exoPlayer?.seekTo(progress)
+            }
 
-        exoPlayer?.playWhenReady = playWhenReady
+            exoPlayer?.playWhenReady = playWhenReady
 
-        //for play/pause button change and if song ended
-        exoPlayer?.addListener(
-            getPlayerListener(
-                context,
-                songId
+            //for play/pause button change and if song ended
+            exoPlayer?.addListener(
+                getPlayerListener(
+                    context,
+                    songId
+                )
             )
-        )
 
-        currentSong = songId
+            currentSong = songId
 
-        SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
-            //UI stuff
-            title = "${song.title} ${song.version}"
-            artist = song.artist
+            SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
+                //UI stuff
+                title = "${song.title} ${song.version}"
+                artist = song.artist
 
-            setCover(
-                context,
-                song.albumId,
-                song.artistId
-            ) {
-                runSeekBarUpdate(context, prepareNext = true, crossFade = true)
+                setCover(
+                    context,
+                    song.albumId,
+                    song.artistId
+                ) {
+                    runSeekBarUpdate(context, prepareNext = true, crossFade = true)
 
-                if (showNotification) {
-                    updateNotification(
-                        song.title,
-                        song.version,
-                        song.artist,
-                        it
-                    )
+                    if (showNotification) {
+                        updateNotification(
+                            song.title,
+                            song.version,
+                            song.artist,
+                            it
+                        )
+                    }
                 }
             }
+        }
+
+        if (currentSong != songId) {
+            exoPlayer?.release()
+            exoPlayer?.stop()
+
+            if (preparedSong != songId) {
+                prepareSong(context, songId) {
+                    preparingDone()
+                }
+            } else {
+                preparingDone()
+            }
+        } else {
+            preparingDone()
         }
     }
 }
@@ -192,7 +192,7 @@ fun playStream(stream: Stream) {
                     exoPlayer?.playWhenReady = true
 
                     currentSeekBarUpdateHandlerId = ""
-                    
+
                     duration = 0
                     currentPosition = 0
                     setPlayerState(0.toLong())
@@ -205,7 +205,7 @@ fun playStream(stream: Stream) {
 private var seekBarUpdateHandler = Handler()
 private var currentSeekBarUpdateHandlerId = ""
 
-internal fun runSeekBarUpdate(context: Context, prepareNext:Boolean, crossFade: Boolean) {
+internal fun runSeekBarUpdate(context: Context, prepareNext: Boolean, crossFade: Boolean) {
     val id = UUID.randomUUID().toString()
     currentSeekBarUpdateHandlerId = id
 
@@ -228,9 +228,9 @@ internal fun runSeekBarUpdate(context: Context, prepareNext:Boolean, crossFade: 
 
             val timeLeft = duration - currentPosition
 
-            if(prepareNext){
+            if (prepareNext) {
                 if (timeLeft < duration / 2 && exoPlayer?.isPlaying == true) {
-                    prepareSong(context, getNextSongId())
+                    prepareSong(context, getNextSongId()) {}
                 }
             }
 
