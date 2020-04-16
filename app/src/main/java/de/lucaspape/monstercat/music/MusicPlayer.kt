@@ -352,7 +352,8 @@ fun playRelatedSongs() {
                     songQueue.add(songId)
                 }
 
-                nextSong()
+                skipPreviousInPlaylist()
+                next()
             },
             errorCallback = { _ ->
                 //TODO handle error
