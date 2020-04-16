@@ -100,13 +100,17 @@ fun displaySnackBar(
     buttonText: String?,
     buttonListener: (view: View) -> Unit
 ) {
-    val snackBar = Snackbar.make(view, msg, Snackbar.LENGTH_SHORT)
+    try {
+        val snackBar = Snackbar.make(view, msg, Snackbar.LENGTH_SHORT)
 
-    buttonText?.let {
-        snackBar.setAction(buttonText, buttonListener)
+        buttonText?.let {
+            snackBar.setAction(buttonText, buttonListener)
+        }
+
+        snackBar.show()
+    } catch (e: IllegalArgumentException) {
+
     }
-
-    snackBar.show()
 }
 
 fun displayAlertDialogList(
