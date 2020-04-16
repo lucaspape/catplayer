@@ -3,7 +3,7 @@ This file is meant for developers who want to contribute to this project. It inf
 ---------------------------------------------------------------------------------------------------
 
 General information:
-IDE: Android Studio
+IDE: Android Studio Canary
 Main programming language: Kotlin
 
 To build this application you need to add
@@ -12,7 +12,7 @@ to strings.xml in res/values.
 
 How does the app retrieve the monstercat data?
 
-The app retrieves the data the exact same way as the website. Monstercat has an API (connect.monstercat.com) which returns JSON.
+The app retrieves the data the exact same way as the website. Monstercat has an API (connect.monstercat.com) which returns JSON. There is also an option to use a custom API which is currently using api.lucaspape.de/monstercat/v1.
 To view all URLs that the app uses please look into "res/values/api_strings.xml".
 
 For almost all requests the library "Volley" is used.
@@ -24,18 +24,16 @@ using the parameters "email" and "password" inside the JSON body.
 The API server will return a cookie inside the header called "sid".
 Please look into "java/de.lucaspape.monstercat.auth/Auth.kt"
 
-All content data is retrieved using ASYNC tasks. These can be found in "java/de.lucaspape.monstercat.ui.handlers/async“.
-These ASYNC tasks are started by the classes HomeHandler and PlaylistHandler (in the same package).
-
-The UI is mainly controlled by the HomeFragment and PlaylistFragment (both of them create a new object of their Handler classes).
+All content data is retrieved using ASYNC tasks. These can be found in "java/de.lucaspape.monstercat.request/async“.
+These ASYNC tasks are started by the classes HomeHandler and PlaylistHandler (in ui.handlers).
 
 All song, album and playlist data is stored in SQLite databases and can be found in the "java/de.lucaspape.monstercat.database" package.
 
-There are also some static files: MusicPlayer.kt, Auth.kt, HandlerUtils.kt, Parser.kt and DownloadHandler.kt.
+There are also some static files: MusicPlayer.kt, Auth.kt, HandlerUtils.kt, Parser.kt, Util.kt and DownloadHandler.kt.
 The functions of these files are called from multiple classes.
-The MusicPlayer file (mainly ControlUtil.kt) controls the playback of the music and the notification.
+The MusicPlayer file controls the playback of the music and the notification.
 DownloadHandler is mainly used as data storage, if the user wants to download a song it will be added to a list. This list is read by the AsyncTask DownloadTask which will download the files requested.
-HandlerUtils has functions that are used by the HomeHandler and PlaylistHandler (no one wants duplicate functions).
+HandlerUtils has functions that are used by the HomeHandler and PlaylistHandler.
 
 The Parser.kt file is for parsing the json of the api and stores objects into the database.
 
