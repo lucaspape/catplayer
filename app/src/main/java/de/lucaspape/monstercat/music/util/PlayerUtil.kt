@@ -117,6 +117,7 @@ fun getPlayerListener(context: Context, songId: String): Player.EventListener {
                 }
 
                 if (playbackState == Player.STATE_ENDED) {
+                    currentListenerId = ""
                     next()
                 } else {
                     setCover(
