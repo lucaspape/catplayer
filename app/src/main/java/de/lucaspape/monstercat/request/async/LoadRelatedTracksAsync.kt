@@ -16,6 +16,7 @@ import java.lang.ref.WeakReference
 class LoadRelatedTracksAsync(
     private val contextReference: WeakReference<Context>,
     private val trackIdArray: ArrayList<String>,
+    private val skipMC:Boolean,
     private val finishedCallback: (trackIdArray: ArrayList<String>, relatedIdArray: ArrayList<String>) -> Unit,
     private val errorCallback: (trackIdArray: ArrayList<String>) -> Unit
 ) : AsyncTask<Void, Void, ArrayList<String>?>() {
@@ -62,7 +63,7 @@ class LoadRelatedTracksAsync(
             jsonObject.put("exclude", excludeJsonArray)
 
             val relatedTracksRequest = JsonObjectRequest(Request.Method.POST,
-                context.getString(R.string.customApiBaseUrl) + "related",
+                context.getString(R.string.customApiBaseUrl) + "related?skipMC=$skipMC",
                 jsonObject,
                 Response.Listener {
                     try {

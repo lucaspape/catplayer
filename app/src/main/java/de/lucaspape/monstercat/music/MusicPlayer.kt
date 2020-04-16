@@ -9,6 +9,7 @@ import android.media.session.MediaSession
 import android.os.AsyncTask
 import android.support.v4.media.session.MediaSessionCompat
 import com.google.android.exoplayer2.ExoPlayer
+import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.music.notification.startPlayerService
 import de.lucaspape.monstercat.music.notification.stopPlayerService
@@ -16,6 +17,7 @@ import de.lucaspape.monstercat.music.save.PlayerSaveState
 import de.lucaspape.monstercat.music.util.*
 import de.lucaspape.monstercat.music.util.playSong
 import de.lucaspape.monstercat.request.async.LoadRelatedTracksAsync
+import de.lucaspape.monstercat.util.Settings
 import java.lang.ref.WeakReference
 import kotlin.random.Random
 
@@ -346,17 +348,23 @@ fun skipPreviousInPlaylist() {
 
 fun playRelatedSongs() {
     contextReference?.let { weakReference ->
-        LoadRelatedTracksAsync(weakReference, playlist,
-            finishedCallback = { _, relatedIdArray ->
-                for (songId in relatedIdArray) {
-                    songQueue.add(songId)
-                }
+        weakReference.get()?.let { context ->
+            Settings(context)
+                .getBoolean(context.getString(R.string.skipMonstercatSongsSetting))?.let {
+                LoadRelatedTracksAsync(weakReference, playlist, it,
+                    finishedCallback = { _, relatedIdArray ->
+                        for (songId in relatedIdArray) {
+                            songQueue.add(songId)
+                        }
 
-                skipPreviousInPlaylist()
-                next()
-            },
-            errorCallback = { _ ->
-                //TODO handle error
-            }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                        skipPreviousInPlaylist()
+                        next()
+                    },
+                    errorCallback = { _ ->
+                        //TODO handle error
+                    }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+            }
+        }
+
     }
 }
