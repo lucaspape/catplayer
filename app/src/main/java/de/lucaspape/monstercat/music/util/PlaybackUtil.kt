@@ -11,6 +11,7 @@ import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.contextReference
 import de.lucaspape.monstercat.music.notification.startPlayerService
 import de.lucaspape.monstercat.music.notification.updateNotification
+import de.lucaspape.monstercat.request.async.AddTrackToDbAsync
 import de.lucaspape.monstercat.twitch.Stream
 import de.lucaspape.monstercat.util.*
 import java.lang.ref.WeakReference
@@ -39,6 +40,38 @@ internal fun prepareSong(context: Context, songId: String) {
                 } else {
                     displayInfo(context, context.getString(R.string.songNotPlayableError))
                 }
+            }
+
+            return
+        }
+
+        val syncObject = Object()
+
+        contextReference?.let { weakReference ->
+            AddTrackToDbAsync(weakReference, songId, finishedCallback = {_, song ->
+                if (song.playbackAllowed(context)
+                ) {
+                    val mediaSource = song.getMediaSource()
+
+                    if (mediaSource != null) {
+                        nextExoPlayer?.prepare(mediaSource)
+                        preparedSong = song.songId
+                    } else {
+                        displayInfo(context, context.getString(R.string.songNotPlayableError))
+                    }
+                }
+
+                synchronized(syncObject){
+                    syncObject.notify()
+                }
+            }, errorCallback = {
+                synchronized(syncObject){
+                    syncObject.notify()
+                }
+            }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+
+            synchronized(syncObject){
+                syncObject.wait()
             }
         }
     }

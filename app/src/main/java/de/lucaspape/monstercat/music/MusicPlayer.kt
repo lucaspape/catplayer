@@ -15,6 +15,7 @@ import de.lucaspape.monstercat.music.notification.stopPlayerService
 import de.lucaspape.monstercat.music.save.PlayerSaveState
 import de.lucaspape.monstercat.music.util.*
 import de.lucaspape.monstercat.music.util.playSong
+import de.lucaspape.monstercat.request.async.LoadRelatedTracksAsync
 import java.lang.ref.WeakReference
 import kotlin.random.Random
 
@@ -40,6 +41,7 @@ var loop = false
 var loopSingle = false
 var shuffle = false
 var crossfade = 12000
+var playRelatedSongsAfterPlaylistFinished = true
 
 var mediaSession: MediaSessionCompat? = null
     internal set
@@ -246,10 +248,12 @@ private fun nextSong(): String {
         playlistIndex = 0
 
         return songId
+    }else if(playRelatedSongsAfterPlaylistFinished){
+        playRelatedSongs()
+        return ""
     } else {
         return ""
     }
-
 }
 
 private fun previousSong(): String {
@@ -338,4 +342,20 @@ fun clearPlaylist() {
  */
 fun skipPreviousInPlaylist() {
     playlistIndex = playlist.size - 1
+}
+
+fun playRelatedSongs() {
+    contextReference?.let { weakReference ->
+        LoadRelatedTracksAsync(weakReference, playlist,
+            finishedCallback = { _, relatedIdArray ->
+                for (songId in relatedIdArray) {
+                    songQueue.add(songId)
+                }
+
+                nextSong()
+            },
+            errorCallback = { _ ->
+                //TODO handle error
+            }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    }
 }
