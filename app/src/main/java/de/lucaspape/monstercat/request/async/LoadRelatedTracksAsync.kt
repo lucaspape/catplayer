@@ -16,7 +16,7 @@ import java.lang.ref.WeakReference
 class LoadRelatedTracksAsync(
     private val contextReference: WeakReference<Context>,
     private val trackIdArray: ArrayList<String>,
-    private val skipMC:Boolean,
+    private val skipMC: Boolean,
     private val finishedCallback: (trackIdArray: ArrayList<String>, relatedIdArray: ArrayList<String>) -> Unit,
     private val errorCallback: (trackIdArray: ArrayList<String>) -> Unit
 ) : AsyncTask<Void, Void, ArrayList<String>?>() {
@@ -47,13 +47,19 @@ class LoadRelatedTracksAsync(
             val trackJsonArray = JSONArray()
             val excludeJsonArray = JSONArray()
 
-            for(i in(trackIdArray.size -10 until trackIdArray.size)){
+            val startIndex = if (trackIdArray.size >= 10) {
+                trackIdArray.size - 10
+            } else {
+                0
+            }
+
+            for (i in (startIndex until trackIdArray.size)) {
                 val trackObject = JSONObject()
                 trackObject.put("id", trackIdArray[i])
                 trackJsonArray.put(trackObject)
             }
 
-            for(trackId in trackIdArray){
+            for (trackId in trackIdArray) {
                 val trackObject = JSONObject()
                 trackObject.put("id", trackId)
                 excludeJsonArray.put(trackObject)
@@ -69,11 +75,11 @@ class LoadRelatedTracksAsync(
                     try {
                         val relatedJsonArray = it.getJSONArray("results")
 
-                        for(i in(0 until relatedJsonArray.length())){
+                        for (i in (0 until relatedJsonArray.length())) {
                             val trackObject = relatedJsonArray.getJSONObject(i)
                             result?.add(trackObject.getString("id"))
                         }
-                    }catch (e: JSONException){
+                    } catch (e: JSONException) {
                         result = null
                     }
 
@@ -83,7 +89,11 @@ class LoadRelatedTracksAsync(
                 })
 
             relatedTracksRequest.retryPolicy =
-                DefaultRetryPolicy(20000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+                DefaultRetryPolicy(
+                    20000,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+                )
 
             volleyQueue.add(relatedTracksRequest)
 
