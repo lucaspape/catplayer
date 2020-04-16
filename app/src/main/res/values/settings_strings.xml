@@ -18,4 +18,5 @@
     <string name="privacyPolicySetting" translatable="false">privacypolicy</string>
     <string name="appVersionSetting" translatable="false">app-version</string>
     <string name="useCustomApiSetting" translatable="false">useCustomApi</string>
+    <string name="playRelatedSetting" translatable="false">playRelated</string>
 </resources>

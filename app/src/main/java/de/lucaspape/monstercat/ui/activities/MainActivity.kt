@@ -158,6 +158,10 @@ class MainActivity : AppCompatActivity() {
             crossfade = it
         }
 
+        settings.getBoolean(getString(R.string.playRelatedSetting))?.let {
+            playRelatedSongsAfterPlaylistFinished = it
+        }
+
         if (!loggedIn) {
             Auth().loadLogin(this, {
                 //login success

@@ -17,6 +17,7 @@ import de.lucaspape.monstercat.database.helper.CatalogSongDatabaseHelper
 import de.lucaspape.monstercat.database.helper.ManualPlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.music.crossfade
+import de.lucaspape.monstercat.music.playRelatedSongsAfterPlaylistFinished
 import de.lucaspape.monstercat.util.Auth
 import de.lucaspape.monstercat.util.Settings
 import de.lucaspape.monstercat.util.displayInfo
@@ -72,6 +73,7 @@ class SettingsActivity : AppCompatActivity() {
 
         val skipMonstercatSongsSwitch = findViewById<Switch>(R.id.skipMonstercatSongsSwitch)
         val useCustomApiSwitch = findViewById<Switch>(R.id.useCustomApi)
+        val playRelatedSwitch = findViewById<Switch>(R.id.playRelatedSwitch)
         val resetDatabaseButton = findViewById<Button>(R.id.resetDatabaseButton)
 
         settings.getBoolean(getString(R.string.streamOverMobileSetting))?.let {
@@ -116,6 +118,10 @@ class SettingsActivity : AppCompatActivity() {
 
         settings.getBoolean(getString(R.string.useCustomApiSetting))?.let {
             useCustomApiSwitch.isChecked = it
+        }
+
+        settings.getBoolean(getString(R.string.playRelatedSetting))?.let {
+            playRelatedSwitch.isChecked = it
         }
 
         settings.getInt(getString(R.string.crossfadeTimeSetting))?.let {
@@ -220,6 +226,11 @@ class SettingsActivity : AppCompatActivity() {
 
         useCustomApiSwitch.setOnCheckedChangeListener { _, isChecked ->
             settings.setBoolean(getString(R.string.useCustomApiSetting), isChecked)
+        }
+
+        playRelatedSwitch.setOnCheckedChangeListener {_, isChecked ->
+            settings.setBoolean(getString(R.string.playRelatedSetting), isChecked)
+            playRelatedSongsAfterPlaylistFinished = isChecked
         }
 
         resetDatabaseButton.setOnClickListener {

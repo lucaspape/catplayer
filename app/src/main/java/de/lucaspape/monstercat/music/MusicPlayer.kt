@@ -41,7 +41,7 @@ var loop = false
 var loopSingle = false
 var shuffle = false
 var crossfade = 12000
-var playRelatedSongsAfterPlaylistFinished = true
+var playRelatedSongsAfterPlaylistFinished = false
 
 var mediaSession: MediaSessionCompat? = null
     internal set
@@ -248,7 +248,7 @@ private fun nextSong(): String {
         playlistIndex = 0
 
         return songId
-    }else if(playRelatedSongsAfterPlaylistFinished){
+    } else if (playRelatedSongsAfterPlaylistFinished) {
         playRelatedSongs()
         return ""
     } else {
