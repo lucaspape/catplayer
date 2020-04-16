@@ -112,8 +112,6 @@ fun getPlayerListener(context: Context, songId: String): Player.EventListener {
 
                         if (timeLeft < crossfade) {
                             nextExoPlayer?.playWhenReady = playWhenReady
-                        }else{
-                            nextExoPlayer?.playWhenReady = false
                         }
                     }
                 }
