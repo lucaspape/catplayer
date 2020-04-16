@@ -44,6 +44,7 @@ class LoadRelatedTracksAsync(
 
             val jsonObject = JSONObject()
             val trackJsonArray = JSONArray()
+            val excludeJsonArray = JSONArray()
 
             for(i in(trackIdArray.size -10 until trackIdArray.size)){
                 val trackObject = JSONObject()
@@ -51,7 +52,14 @@ class LoadRelatedTracksAsync(
                 trackJsonArray.put(trackObject)
             }
 
+            for(trackId in trackIdArray){
+                val trackObject = JSONObject()
+                trackObject.put("id", trackId)
+                excludeJsonArray.put(trackObject)
+            }
+
             jsonObject.put("tracks", trackJsonArray)
+            jsonObject.put("exclude", excludeJsonArray)
 
             val relatedTracksRequest = JsonObjectRequest(Request.Method.POST,
                 context.getString(R.string.customApiBaseUrl) + "related",
