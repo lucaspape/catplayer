@@ -2,6 +2,7 @@ package de.lucaspape.monstercat.request.async
 
 import android.content.Context
 import android.os.AsyncTask
+import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
@@ -71,6 +72,9 @@ class LoadRelatedTracksAsync(
                 Response.ErrorListener {
                     result = null
                 })
+
+            relatedTracksRequest.retryPolicy =
+                DefaultRetryPolicy(10000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
 
             volleyQueue.add(relatedTracksRequest)
 
