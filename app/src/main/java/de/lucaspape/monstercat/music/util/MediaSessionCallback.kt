@@ -30,7 +30,9 @@ class MediaSessionCallback : MediaSessionCompat.Callback() {
     }
 
     override fun onFastForward() {
-        exoPlayer?.seekTo(exoPlayer!!.duration)
+        exoPlayer?.duration?.let {
+            exoPlayer?.seekTo(it)
+        }
     }
 
     override fun onRewind() {

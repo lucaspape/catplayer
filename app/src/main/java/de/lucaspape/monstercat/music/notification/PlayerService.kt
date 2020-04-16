@@ -27,8 +27,6 @@ class PlayerService : Service() {
         //register receiver which checks if headphones unplugged
         registerReceiver(noisyReceiver, IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY))
 
-        val songId = intent!!.getStringExtra("songId")!!
-
         var title = ""
         var artist = ""
         var version = ""
@@ -45,28 +43,30 @@ class PlayerService : Service() {
             )
         )
 
-        SongDatabaseHelper(this).getSong(this, songId)?.let { song ->
-            title = song.title
-            artist = song.artist
-            version = song.version
 
-            setCover(
-                this,
-                song.albumId,
-                song.artistId
-            ) {
-                startForeground(
-                    musicNotificationID,
-                    createPlayerNotification(
-                        song.title,
-                        song.version,
-                        song.artist,
-                        it
+        intent?.getStringExtra("songId")?.let { songId ->
+            SongDatabaseHelper(this).getSong(this, songId)?.let { song ->
+                title = song.title
+                artist = song.artist
+                version = song.version
+
+                setCover(
+                    this,
+                    song.albumId,
+                    song.artistId
+                ) {
+                    startForeground(
+                        musicNotificationID,
+                        createPlayerNotification(
+                            song.title,
+                            song.version,
+                            song.artist,
+                            it
+                        )
                     )
-                )
+                }
             }
         }
-
 
         return START_NOT_STICKY
     }

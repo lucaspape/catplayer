@@ -40,7 +40,7 @@ import kotlin.collections.HashMap
 /**
  * Does everything for the home page
  */
-class HomeHandler:Handler {
+class HomeHandler : Handler {
     companion object {
         @JvmStatic
         private var viewDataCache = HashMap<String, WeakReference<ArrayList<*>>>()
@@ -863,7 +863,7 @@ class HomeHandler:Handler {
             , finishedCallback = { _, _, _, _ ->
                 BackgroundAsync({
                     val albumItemDatabaseHelper =
-                        AlbumItemDatabaseHelper(contextReference.get()!!, albumId)
+                        AlbumItemDatabaseHelper(view.context, albumId)
                     val albumItemList = albumItemDatabaseHelper.getAllData()
 
                     for (albumItem in albumItemList) {
@@ -1077,7 +1077,7 @@ class HomeHandler:Handler {
 
     override val layout: Int = R.layout.fragment_home
 
-    override fun onCreate(view: View, search:String?) {
+    override fun onCreate(view: View, search: String?) {
         setupSpinner(view)
         registerListeners(view)
 
