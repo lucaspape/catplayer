@@ -64,6 +64,7 @@ class HomeHandler : Handler {
         headerText: String?,
         albumId: String?,
         albumMcId: String?,
+        searchString: String?,
         restoreScrollPosition: Boolean,
         catalogViewData: ArrayList<CatalogItem>,
         cacheId: String,
@@ -127,7 +128,7 @@ class HomeHandler : Handler {
 
                 val songDatabaseHelper = SongDatabaseHelper(view.context)
 
-                if (albumId == null) {
+                if (albumId == null && searchString == null) {
                     //add next songs from database
                     val catalogSongDatabaseHelper = CatalogSongDatabaseHelper(view.context)
 
@@ -581,6 +582,7 @@ class HomeHandler : Handler {
                 null,
                 null,
                 null,
+                null,
                 true,
                 catalogViewData,
                 "catalogView",
@@ -877,6 +879,7 @@ class HomeHandler : Handler {
                         albumName,
                         albumId,
                         mcId,
+                        null,
                         false,
                         catalogViewData,
                         "singleAlbum-$albumId",
@@ -938,6 +941,7 @@ class HomeHandler : Handler {
                     null,
                     null,
                     null,
+                    searchString,
                     false,
                     searchResults,
                     "search-$searchString",
