@@ -121,6 +121,6 @@
     <string name="playlistStateChangeError">Error changing playlist state</string>
     <string name="sharePlaylist">Share playlist</string>
     <string name="openPlaylistInApp">Open playlist in browser</string>
-    <string name="useCustomApi">Use custom API</string>
+    <string name="useCustomApi">Use custom API instead monstercat connect (for catalog/album/search/cover images)</string>
     <string name="playRelatedAfter">Play related songs after playback finished</string>
 </resources>
