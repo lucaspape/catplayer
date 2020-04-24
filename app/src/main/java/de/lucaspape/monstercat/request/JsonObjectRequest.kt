@@ -9,7 +9,7 @@ import com.android.volley.toolbox.JsonRequest
 import org.json.JSONObject
 import java.lang.NullPointerException
 
-class AuthorizedJsonObjectRequest(
+class JsonObjectRequest(
     method: Int,
     url: String,
     jsonObject: JSONObject,

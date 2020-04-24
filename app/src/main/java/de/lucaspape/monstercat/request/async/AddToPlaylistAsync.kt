@@ -6,7 +6,7 @@ import com.android.volley.Request
 import com.android.volley.Response
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
-import de.lucaspape.monstercat.request.AuthorizedJsonObjectRequest
+import de.lucaspape.monstercat.request.JsonObjectRequest
 import de.lucaspape.monstercat.util.newRequestQueue
 import org.json.JSONObject
 import java.lang.ref.WeakReference
@@ -48,7 +48,7 @@ class AddToPlaylistAsync(
                     }
                 }
 
-                val addToPlaylistRequest = AuthorizedJsonObjectRequest(
+                val addToPlaylistRequest = JsonObjectRequest(
                     Request.Method.PATCH,
                     addToPlaylistUrl,
                     songJsonObject,
