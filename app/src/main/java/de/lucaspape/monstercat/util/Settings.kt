@@ -63,12 +63,13 @@ class Settings(private val context: Context) {
      */
     private fun setDefaultSettings(overwrite: Boolean) {
         val defaultDownloadType = "mp3_320"
-        val defaultPrimaryCoverResolution = "512"
-        val defaultSecondaryCoverResolution = "128"
-        val defaultStreamOverMobile = false.toString()
-        val defaultDownloadOverMobile = false.toString()
-        val defaultDownloadCoversMobile = false.toString()
-        val defaultCrossfadeTime = 0.toString()
+        val defaultPrimaryCoverResolution = 512
+        val defaultSecondaryCoverResolution = 128
+        val defaultStreamOverMobile = false
+        val defaultDownloadOverMobile = false
+        val defaultDownloadCoversMobile = false
+        val defaultCrossfadeTime = 0
+        val defaultSaveCoverImagesToCache = true
 
         if (getString(context.getString(R.string.downloadTypeSetting)) == null || overwrite) {
             setString(context.getString(R.string.downloadTypeSetting), defaultDownloadType)
@@ -78,40 +79,46 @@ class Settings(private val context: Context) {
                 context.getString(R.string.secondaryCoverResolutionSetting)
             ) == null || overwrite
         ) {
-            setString(
+            setInt(
                 context.getString(R.string.primaryCoverResolutionSetting),
                 defaultPrimaryCoverResolution
             )
-            setString(
+            setInt(
                 context.getString(R.string.secondaryCoverResolutionSetting),
                 defaultSecondaryCoverResolution
             )
         }
 
         if (getString(context.getString(R.string.streamOverMobileSetting)) == null || overwrite) {
-            setString(
+            setBoolean(
                 context.getString(R.string.streamOverMobileSetting),
                 defaultStreamOverMobile
             )
         }
 
         if (getString(context.getString(R.string.downloadOverMobileSetting)) == null || overwrite) {
-            setString(
+            setBoolean(
                 context.getString(R.string.downloadOverMobileSetting),
                 defaultDownloadOverMobile
             )
         }
 
         if (getString(context.getString(R.string.downloadCoversOverMobileSetting)) == null || overwrite) {
-            setString(
+            setBoolean(
                 context.getString(R.string.downloadCoversOverMobileSetting),
                 defaultDownloadCoversMobile
             )
         }
 
         if (getString(context.getString(R.string.crossfadeTimeSetting)) == null || overwrite) {
-            setString(context.getString(R.string.crossfadeTimeSetting), defaultCrossfadeTime)
+            setInt(context.getString(R.string.crossfadeTimeSetting), defaultCrossfadeTime)
         }
 
+        if (getString(context.getString(R.string.saveCoverImagesToCacheSetting)) == null || overwrite) {
+            setBoolean(
+                context.getString(R.string.saveCoverImagesToCacheSetting),
+                defaultSaveCoverImagesToCache
+            )
+        }
     }
 }

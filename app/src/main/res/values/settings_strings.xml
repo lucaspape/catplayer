@@ -19,4 +19,5 @@
     <string name="appVersionSetting" translatable="false">app-version</string>
     <string name="useCustomApiSetting" translatable="false">useCustomApi</string>
     <string name="playRelatedSetting" translatable="false">playRelated</string>
+    <string name="saveCoverImagesToCacheSetting" translatable="false">saveCoverImagesToCache</string>
 </resources>

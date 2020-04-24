@@ -66,6 +66,8 @@ class SettingsActivity : AppCompatActivity() {
 
         coverResolutionSeekBar.max = 2048 / 256
 
+        val saveCoverImagesToCacheSwitch = findViewById<Switch>(R.id.saveCoverImagesToCacheSwitch)
+
         val crossfadeTimeSeekBar = findViewById<SeekBar>(R.id.crossfadeTimeSeekbar)
         val shownCrossfadeTime = findViewById<TextView>(R.id.shownCrossfadeTime)
 
@@ -130,6 +132,9 @@ class SettingsActivity : AppCompatActivity() {
             crossfade = it
         }
 
+        settings.getBoolean(getString(R.string.saveCoverImagesToCacheSetting))?.let {
+            saveCoverImagesToCacheSwitch.isChecked = it
+        }
 
         //set switch listeners
         streamMobileSwitch.setOnCheckedChangeListener { _, isChecked ->
@@ -189,6 +194,10 @@ class SettingsActivity : AppCompatActivity() {
 
             }
         })
+
+        saveCoverImagesToCacheSwitch.setOnCheckedChangeListener { _, isChecked ->
+            settings.setBoolean(getString(R.string.saveCoverImagesToCacheSetting), isChecked)
+        }
 
         crossfadeTimeSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {

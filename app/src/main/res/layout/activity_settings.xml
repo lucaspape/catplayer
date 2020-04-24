@@ -167,6 +167,18 @@
                 app:layout_constraintTop_toBottomOf="@+id/coverResolutionText" />
 
             <Switch
+                android:id="@+id/saveCoverImagesToCacheSwitch"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:text="@string/saveCoverImagesToCache"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/coverResolutionSeekbar" />
+
+            <Switch
                 android:id="@+id/skipMonstercatSongsSwitch"
                 android:layout_width="0dp"
                 android:layout_height="50dp"
@@ -176,7 +188,7 @@
                 android:text="@string/skipSongsMonstercat"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/coverResolutionSeekbar" />
+                app:layout_constraintTop_toBottomOf="@+id/saveCoverImagesToCacheSwitch" />
 
             <TextView
                 android:id="@+id/crossfadeText"

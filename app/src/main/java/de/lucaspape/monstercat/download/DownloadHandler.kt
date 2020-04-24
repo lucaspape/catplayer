@@ -49,6 +49,12 @@ internal fun downloadImageUrlIntoImageReceiver(
         settings.getInt(context.getString(R.string.secondaryCoverResolutionSetting))
     }
 
+    var saveToCache = settings.getBoolean(context.getString(R.string.saveCoverImagesToCacheSetting))
+
+    if(saveToCache == null){
+        saveToCache = true
+    }
+
     val cacheBitmap = bitmapCache[imageId + resolution]?.get()
 
     if (cacheBitmap != null) {
@@ -81,7 +87,7 @@ internal fun downloadImageUrlIntoImageReceiver(
                         imageReceiver.setBitmap(imageId, bitmap)
 
                         //possible that it changed by this time
-                        if (!cacheFile.exists()) {
+                        if (!cacheFile.exists() && saveToCache) {
                             FileOutputStream(cacheFile).use { out ->
                                 bitmap?.compress(Bitmap.CompressFormat.WEBP, 100, out)
                             }
