@@ -24,7 +24,8 @@ import com.mikepenz.fastadapter.adapters.ItemAdapter
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.request.OkHttp3Stack
 import de.lucaspape.monstercat.ui.abstract_items.AlertListItem
-import okhttp3.OkHttpClient
+import okhttp3.Cookie
+import okhttp3.HttpUrl
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -174,13 +175,22 @@ fun displayAlertDialogList(
     }
 }
 
+/**
+ * Creates new volley queue using OkHttp3Stack and cookies from connect.monstercat.com
+ */
 fun newRequestQueue(context: Context): RequestQueue {
     return Volley.newRequestQueue(
         context, OkHttp3Stack(
-            context, PersistentCookieJar(
+            context, object : PersistentCookieJar(
                 SetCookieCache(),
                 SharedPrefsCookiePersistor(context)
-            )
+            ) {
+                override fun loadForRequest(url: HttpUrl): List<Cookie> {
+                    return super.loadForRequest(
+                        HttpUrl.Builder().scheme("https").host("connect.monstercat.com").build()
+                    )
+                }
+            }
         )
     )
 }
