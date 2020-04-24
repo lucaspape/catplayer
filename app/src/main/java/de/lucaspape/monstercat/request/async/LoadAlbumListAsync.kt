@@ -4,13 +4,12 @@ import android.content.Context
 import android.os.AsyncTask
 import com.android.volley.Request
 import com.android.volley.Response
-import com.android.volley.toolbox.Volley
+import com.android.volley.toolbox.StringRequest
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.AlbumDatabaseHelper
-import de.lucaspape.monstercat.request.AuthorizedStringRequest
 import de.lucaspape.monstercat.util.Settings
+import de.lucaspape.monstercat.util.newRequestQueue
 import de.lucaspape.monstercat.util.parseAlbumToDB
-import de.lucaspape.monstercat.util.sid
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
@@ -54,7 +53,7 @@ class LoadAlbumListAsync(
             var success = true
             val syncObject = Object()
 
-            val requestQueue = Volley.newRequestQueue(context)
+            val requestQueue = newRequestQueue(context)
 
             requestQueue.addRequestFinishedListener<Any?> {
                 synchronized(syncObject) {
@@ -68,8 +67,8 @@ class LoadAlbumListAsync(
                 context.getString(R.string.loadAlbumsUrl) + "?limit=50&skip=" + skip.toString()
             }
 
-            val albumsRequest = AuthorizedStringRequest(
-                Request.Method.GET, requestUrl, sid,
+            val albumsRequest = StringRequest(
+                Request.Method.GET, requestUrl,
                 Response.Listener { response ->
                     val json = JSONObject(response)
                     val jsonArray = json.getJSONArray("results")

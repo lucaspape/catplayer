@@ -9,6 +9,7 @@ import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.music.notification.updateNotification
+import de.lucaspape.monstercat.util.newRequestQueue
 import de.lucaspape.monstercat.util.parseSongToDB
 import org.json.JSONException
 import org.json.JSONObject
@@ -76,7 +77,7 @@ class StreamInfoUpdateAsync(
                         println(error)
                     })
 
-            val requestQueue = Volley.newRequestQueue(context)
+            val requestQueue = newRequestQueue(context)
 
             while (true) {
                 requestQueue.add(artistTitleRequest)

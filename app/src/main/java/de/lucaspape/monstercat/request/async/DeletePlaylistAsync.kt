@@ -4,12 +4,11 @@ import android.content.Context
 import android.os.AsyncTask
 import com.android.volley.Request
 import com.android.volley.Response
-import com.android.volley.toolbox.Volley
+import com.android.volley.toolbox.StringRequest
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.ManualPlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
-import de.lucaspape.monstercat.request.AuthorizedStringRequest
-import de.lucaspape.monstercat.util.sid
+import de.lucaspape.monstercat.util.newRequestQueue
 import java.lang.ref.WeakReference
 
 class DeletePlaylistAsync(
@@ -42,7 +41,7 @@ class DeletePlaylistAsync(
             }
 
             if(deleteRemote){
-                val deletePlaylistVolleyQueue = Volley.newRequestQueue(context)
+                val deletePlaylistVolleyQueue = newRequestQueue(context)
 
                 val deletePlaylistUrl = context.getString(R.string.playlistUrl) + playlistId
 
@@ -54,8 +53,8 @@ class DeletePlaylistAsync(
                     }
                 }
 
-                val deletePlaylistRequest = AuthorizedStringRequest(
-                    Request.Method.DELETE, deletePlaylistUrl, sid,
+                val deletePlaylistRequest = StringRequest(
+                    Request.Method.DELETE, deletePlaylistUrl,
                     Response.Listener {
                     },
                     Response.ErrorListener {

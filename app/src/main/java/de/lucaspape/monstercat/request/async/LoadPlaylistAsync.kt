@@ -4,13 +4,12 @@ import android.content.Context
 import android.os.AsyncTask
 import com.android.volley.Response
 import com.android.volley.Request
-import com.android.volley.toolbox.Volley
+import com.android.volley.toolbox.StringRequest
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.ManualPlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
-import de.lucaspape.monstercat.request.AuthorizedStringRequest
+import de.lucaspape.monstercat.util.newRequestQueue
 import de.lucaspape.monstercat.util.parsePlaylistToDB
-import de.lucaspape.monstercat.util.sid
 import org.json.JSONException
 import org.json.JSONObject
 import java.lang.IndexOutOfBoundsException
@@ -55,7 +54,7 @@ class LoadPlaylistAsync(
             val playlistDatabaseHelper =
                 PlaylistDatabaseHelper(context)
 
-            val playlistRequestQueue = Volley.newRequestQueue(context)
+            val playlistRequestQueue = newRequestQueue(context)
 
             val playlistUrl = context.getString(R.string.playlistsUrl)
 
@@ -102,8 +101,8 @@ class LoadPlaylistAsync(
 
             playlistDatabaseHelper.reCreateTable(context, false)
 
-            val playlistRequest = AuthorizedStringRequest(
-                Request.Method.GET, playlistUrl, sid,
+            val playlistRequest = StringRequest(
+                Request.Method.GET, playlistUrl,
                 Response.Listener { response ->
                     try{
                         val jsonObject = JSONObject(response)

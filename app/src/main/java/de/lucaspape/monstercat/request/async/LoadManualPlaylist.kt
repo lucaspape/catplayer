@@ -4,11 +4,10 @@ import android.content.Context
 import android.os.AsyncTask
 import com.android.volley.Response
 import com.android.volley.Request
-import com.android.volley.toolbox.Volley
+import com.android.volley.toolbox.StringRequest
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.request.AuthorizedStringRequest
+import de.lucaspape.monstercat.util.newRequestQueue
 import de.lucaspape.monstercat.util.parsePlaylistToDB
-import de.lucaspape.monstercat.util.sid
 import org.json.JSONException
 import org.json.JSONObject
 import java.lang.ref.WeakReference
@@ -36,7 +35,7 @@ class LoadManualPlaylist(
             var success = true
             val syncObject = Object()
 
-            val getManualPlaylistsRequestQueue = Volley.newRequestQueue(context)
+            val getManualPlaylistsRequestQueue = newRequestQueue(context)
 
             getManualPlaylistsRequestQueue.addRequestFinishedListener<Any?> {
                 synchronized(syncObject) {
@@ -44,9 +43,9 @@ class LoadManualPlaylist(
                 }
             }
 
-            val getManualPlaylistInfoRequest = AuthorizedStringRequest(
+            val getManualPlaylistInfoRequest = StringRequest(
                 Request.Method.GET,
-                context.getString(R.string.playlistUrl) + playlistId, sid,
+                context.getString(R.string.playlistUrl) + playlistId,
                 Response.Listener { response ->
                     try {
                         val jsonObject = JSONObject(response)

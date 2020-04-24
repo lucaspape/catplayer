@@ -31,6 +31,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                                     context,
                                     currentDownloadObject.songId
                                 )
+
                             currentDownloadSong?.let {
                                 if (currentDownloadSong.isDownloadable) {
                                     if (!File(currentDownloadSong.downloadLocation).exists()) {
@@ -38,7 +39,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                                             currentDownloadSong.downloadLocation,
                                             currentDownloadSong.downloadUrl,
                                             context.cacheDir.toString(),
-                                            sid
+                                            getSid(context)
                                         ) { max, current ->
                                             publishProgress(
                                                 "progressUpdate",

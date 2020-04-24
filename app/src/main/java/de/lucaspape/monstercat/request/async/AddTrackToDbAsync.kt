@@ -4,13 +4,12 @@ import android.content.Context
 import android.os.AsyncTask
 import com.android.volley.Request
 import com.android.volley.Response
-import com.android.volley.toolbox.Volley
+import com.android.volley.toolbox.StringRequest
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.database.objects.Song
-import de.lucaspape.monstercat.request.AuthorizedStringRequest
+import de.lucaspape.monstercat.util.newRequestQueue
 import de.lucaspape.monstercat.util.parseSongToDB
-import de.lucaspape.monstercat.util.sid
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
@@ -35,7 +34,7 @@ class AddTrackToDbAsync(
 
             val syncObject = Object()
 
-            val volleyQueue = Volley.newRequestQueue(context)
+            val volleyQueue = newRequestQueue(context)
 
             volleyQueue.addRequestFinishedListener<Any?> {
                 synchronized(syncObject) {
@@ -43,9 +42,8 @@ class AddTrackToDbAsync(
                 }
             }
 
-            val trackRequest = AuthorizedStringRequest(Request.Method.GET,
+            val trackRequest = StringRequest(Request.Method.GET,
                 context.getString(R.string.customApiBaseUrl) + "catalog/search?term=$trackId",
-                sid,
                 Response.Listener {
                     val response = JSONObject(it)
                     val jsonArray = response.getJSONArray("results")

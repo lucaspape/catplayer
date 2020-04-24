@@ -11,13 +11,17 @@ import android.view.View
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.RequestQueue
+import com.android.volley.toolbox.Volley
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.GenericItem
 import com.mikepenz.fastadapter.adapters.ItemAdapter
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.request.OkHttp3Stack
 import de.lucaspape.monstercat.ui.abstract_items.AlertListItem
+import okhttp3.OkHttpClient
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -86,7 +90,7 @@ fun downloadFile(
 
         tempFile.renameTo(destinationFile)
     } catch (e: Exception) {
-        println(e.stackTrace)
+        println(e.printStackTrace())
     }
 }
 
@@ -165,4 +169,8 @@ fun displayAlertDialogList(
 
         false
     }
+}
+
+fun newRequestQueue(context: Context): RequestQueue{
+    return Volley.newRequestQueue(context, OkHttp3Stack(context))
 }

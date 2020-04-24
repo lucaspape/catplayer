@@ -4,13 +4,12 @@ import android.content.Context
 import android.os.AsyncTask
 import com.android.volley.Request
 import com.android.volley.Response
-import com.android.volley.toolbox.Volley
+import com.android.volley.toolbox.StringRequest
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.ui.abstract_items.CatalogItem
-import de.lucaspape.monstercat.request.AuthorizedStringRequest
 import de.lucaspape.monstercat.util.Settings
+import de.lucaspape.monstercat.util.newRequestQueue
 import de.lucaspape.monstercat.util.parseSongSearchToSongList
-import de.lucaspape.monstercat.util.sid
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
@@ -25,7 +24,7 @@ class LoadTitleSearchAsync(
     private val errorCallback: (searchString: String, skip: Int) -> Unit
 ) : AsyncTask<Void, Void, Boolean>() {
 
-    var searchResults = ArrayList<CatalogItem>()
+    private var searchResults = ArrayList<CatalogItem>()
 
     override fun onPostExecute(result: Boolean) {
         if (result) {
@@ -39,7 +38,7 @@ class LoadTitleSearchAsync(
         contextReference.get()?.let { context ->
             var success = true
             val syncObject = Object()
-            val searchQueue = Volley.newRequestQueue(context)
+            val searchQueue = newRequestQueue(context)
 
             searchQueue.addRequestFinishedListener<Any?> {
                 synchronized(syncObject) {
@@ -53,9 +52,8 @@ class LoadTitleSearchAsync(
                 context.getString(R.string.loadSongsUrl) + "?term=$searchString&limit=50&skip=" + skip.toString() + "&fields=&search=$searchString"
             }
 
-            val searchRequest = AuthorizedStringRequest(Request.Method.GET,
+            val searchRequest = StringRequest(Request.Method.GET,
                 searchUrl,
-                sid,
                 Response.Listener { response ->
                     val jsonArray = JSONObject(response).getJSONArray("results")
 
@@ -67,7 +65,7 @@ class LoadTitleSearchAsync(
                     }
 
                 },
-                Response.ErrorListener { _ ->
+                Response.ErrorListener {
                     success = false
                 })
 

@@ -6,8 +6,8 @@ import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
-import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.util.newRequestQueue
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -35,7 +35,7 @@ class LoadRelatedTracksAsync(
 
             var result: ArrayList<String>? = ArrayList()
 
-            val volleyQueue = Volley.newRequestQueue(context)
+            val volleyQueue = newRequestQueue(context)
 
             volleyQueue.addRequestFinishedListener<Any?> {
                 synchronized(syncObject) {

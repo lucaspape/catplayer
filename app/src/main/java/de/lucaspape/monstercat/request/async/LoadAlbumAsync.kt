@@ -4,13 +4,12 @@ import android.content.Context
 import android.os.AsyncTask
 import com.android.volley.Response
 import com.android.volley.Request
-import com.android.volley.toolbox.Volley
+import com.android.volley.toolbox.StringRequest
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.AlbumItemDatabaseHelper
-import de.lucaspape.monstercat.request.AuthorizedStringRequest
 import de.lucaspape.monstercat.util.Settings
+import de.lucaspape.monstercat.util.newRequestQueue
 import de.lucaspape.monstercat.util.parsAlbumSongToDB
-import de.lucaspape.monstercat.util.sid
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
@@ -53,7 +52,7 @@ class LoadAlbumAsync(
 
     override fun doInBackground(vararg param: Void?): Boolean {
         contextReference.get()?.let { context ->
-            val requestQueue = Volley.newRequestQueue(context)
+            val requestQueue = newRequestQueue(context)
 
             val albumItemDatabaseHelper =
                 AlbumItemDatabaseHelper(context, albumId)
@@ -75,9 +74,9 @@ class LoadAlbumAsync(
                 context.getString(R.string.loadAlbumSongsUrl) + "/$mcId"
             }
 
-            val listRequest = AuthorizedStringRequest(
+            val listRequest = StringRequest(
                 Request.Method.GET, requestUrl,
-                sid, Response.Listener { response ->
+                Response.Listener { response ->
                     val json = JSONObject(response)
                     val jsonArray = json.getJSONArray("tracks")
 

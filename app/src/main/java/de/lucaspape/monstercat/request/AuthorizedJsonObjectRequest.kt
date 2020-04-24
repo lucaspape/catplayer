@@ -12,7 +12,6 @@ import java.lang.NullPointerException
 class AuthorizedJsonObjectRequest(
     method: Int,
     url: String,
-    private val sid: String?,
     jsonObject: JSONObject,
     listener: Response.Listener<JSONObject>,
     errorListener: Response.ErrorListener
@@ -46,16 +45,5 @@ class AuthorizedJsonObjectRequest(
         }
 
         return Response.error(ParseError(NullPointerException()));
-    }
-
-    override fun getHeaders(): Map<String, String> {
-        return if (sid != null) {
-            val params = HashMap<String, String>()
-            params["Content-Type"] = "application/json"
-            params["Cookie"] = "connect.sid=$sid"
-            params
-        } else {
-            super.getHeaders()
-        }
     }
 }

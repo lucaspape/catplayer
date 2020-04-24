@@ -163,7 +163,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (!loggedIn) {
-            Auth().loadLogin(this, {
+            Auth().checkLogin(this, {
                 //login success
                 displayInfo(this, getString(R.string.loginSuccessfulMsg))
             }, {

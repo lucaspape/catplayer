@@ -12,7 +12,7 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.ui.activities.downloadDrawable
 import de.lucaspape.monstercat.ui.activities.offlineDrawable
 import de.lucaspape.monstercat.util.Settings
-import de.lucaspape.monstercat.util.sid
+import de.lucaspape.monstercat.util.getSid
 import de.lucaspape.monstercat.util.wifiConnected
 import java.io.File
 
@@ -157,7 +157,7 @@ data class Song(
                 )
             )
 
-        httpSourceFactory.defaultRequestProperties.set("Cookie", "connect.sid=$sid")
+        httpSourceFactory.defaultRequestProperties.set("Cookie", "connect.sid=${getSid(context)}")
 
         return ProgressiveMediaSource.Factory(httpSourceFactory)
             .createMediaSource(url.toUri())

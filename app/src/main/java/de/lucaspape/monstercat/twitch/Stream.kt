@@ -10,6 +10,7 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.request.TwitchRequest
+import de.lucaspape.monstercat.util.newRequestQueue
 import org.json.JSONObject
 import kotlin.math.floor
 
@@ -34,7 +35,7 @@ class Stream(private val clientId: String, private val channel: String) {
             Response.ErrorListener { }
         )
 
-        val volleyQueue = Volley.newRequestQueue(context)
+        val volleyQueue = newRequestQueue(context)
         volleyQueue.add(accessTokenRequest)
     }
 
@@ -51,7 +52,7 @@ class Stream(private val clientId: String, private val channel: String) {
         val type = "any"
         val p = floor(Math.random() * 99999) + 1
 
-        val volleyQueue = Volley.newRequestQueue(context)
+        val volleyQueue = newRequestQueue(context)
 
         val playlistRequest = TwitchRequest(Request.Method.GET,
             context.getString(R.string.twitchPlaylistUrl) + "$channel.m3u8?player=$player&token=$token&sig=$sig&allow_audio_only=$allowAudioOnly&allow_source=$allowSource&type=$type&p=$p",

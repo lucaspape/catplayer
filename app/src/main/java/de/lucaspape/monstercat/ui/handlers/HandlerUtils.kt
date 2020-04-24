@@ -11,7 +11,7 @@ import android.view.View
 import android.widget.EditText
 import com.android.volley.Request
 import com.android.volley.Response
-import com.android.volley.toolbox.Volley
+import com.android.volley.toolbox.StringRequest
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.ManualPlaylistDatabaseHelper
@@ -23,7 +23,6 @@ import de.lucaspape.monstercat.ui.abstract_items.AlertListItem
 import de.lucaspape.monstercat.ui.abstract_items.HeaderTextItem
 import de.lucaspape.monstercat.request.async.*
 import de.lucaspape.monstercat.music.prioritySongQueue
-import de.lucaspape.monstercat.request.AuthorizedStringRequest
 import de.lucaspape.monstercat.ui.activities.addPlaylistDrawable
 import de.lucaspape.monstercat.ui.activities.createPlaylistDrawable
 import de.lucaspape.monstercat.util.*
@@ -40,10 +39,9 @@ private fun loadAlbumTracks(
     val requestUrl =
         context.getString(R.string.loadAlbumSongsUrl) + "/" + mcID
 
-    val albumRequestQueue = Volley.newRequestQueue(context)
+    val albumRequestQueue = newRequestQueue(context)
 
-    val albumRequest = AuthorizedStringRequest(Request.Method.GET, requestUrl,
-        sid,
+    val albumRequest = StringRequest(Request.Method.GET, requestUrl,
         Response.Listener { response ->
             val jsonObject = JSONObject(response)
             val jsonArray = jsonObject.getJSONArray("tracks")
@@ -563,11 +561,10 @@ internal fun deletePlaylistSong(
 
 internal fun openAlbum(view: View, albumMcId: String, share: Boolean) {
     val context = view.context
-    val volleyRequestQueue = Volley.newRequestQueue(context)
+    val volleyRequestQueue = newRequestQueue(context)
 
-    val albumLinksRequest = AuthorizedStringRequest(Request.Method.GET,
+    val albumLinksRequest = StringRequest(Request.Method.GET,
         context.getString(R.string.loadAlbumSongsUrl) + "/$albumMcId",
-        sid,
         Response.Listener { response ->
             val responseJsonObject = JSONObject(response)
             val releaseObject = responseJsonObject.getJSONObject("release")

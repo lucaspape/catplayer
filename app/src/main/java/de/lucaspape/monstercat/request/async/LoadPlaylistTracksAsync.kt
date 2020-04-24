@@ -4,12 +4,11 @@ import android.content.Context
 import android.os.AsyncTask
 import com.android.volley.Response
 import com.android.volley.Request
-import com.android.volley.toolbox.Volley
+import com.android.volley.toolbox.StringRequest
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
-import de.lucaspape.monstercat.request.AuthorizedStringRequest
+import de.lucaspape.monstercat.util.newRequestQueue
 import de.lucaspape.monstercat.util.parsePlaylistTrackToDB
-import de.lucaspape.monstercat.util.sid
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 import kotlin.collections.ArrayList
@@ -72,7 +71,7 @@ class LoadPlaylistTracksAsync(
             var playlistTrackUrl =
                 context.getString(R.string.playlistTrackUrl) + playlistId + "/catalog?skip=" + skip.toString() + "&limit=50"
 
-            var playlistTrackRequest = AuthorizedStringRequest(Request.Method.GET, playlistTrackUrl, sid, Response.Listener { response ->
+            var playlistTrackRequest = StringRequest(Request.Method.GET, playlistTrackUrl, Response.Listener { response ->
                 val jsonObject = JSONObject(response)
                 val jsonArray = jsonObject.getJSONArray("results")
 
@@ -86,14 +85,14 @@ class LoadPlaylistTracksAsync(
                 success = false
             })
 
-            val trackRequestQueue = Volley.newRequestQueue(context)
+            val trackRequestQueue = newRequestQueue(context)
 
             trackRequestQueue.addRequestFinishedListener<Any?> {
                 if(!nextEmpty && success){
                     skip += 50
                     playlistTrackUrl = context.getString(R.string.playlistTrackUrl) + playlistId + "/catalog?skip=" + skip.toString() + "&limit=50"
 
-                    playlistTrackRequest = AuthorizedStringRequest(Request.Method.GET, playlistTrackUrl, sid, Response.Listener { response ->
+                    playlistTrackRequest = StringRequest(Request.Method.GET, playlistTrackUrl, Response.Listener { response ->
                         val jsonObject = JSONObject(response)
                         val jsonArray = jsonObject.getJSONArray("results")
 
