@@ -6,35 +6,33 @@ import android.content.DialogInterface
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.widget.EditText
-import com.android.volley.NetworkResponse
-import com.android.volley.ParseError
 import com.android.volley.Request
 import com.android.volley.Response
-import com.android.volley.toolbox.HttpHeaderParser
-import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.request.JsonObjectRequest
 import okhttp3.HttpUrl
 import org.json.JSONException
 import org.json.JSONObject
-import java.io.UnsupportedEncodingException
 
 var loggedIn = false
     private set
 
-fun getSid(context: Context):String{
+fun getSid(context: Context): String {
     val cookieJar =
         PersistentCookieJar(SetCookieCache(), SharedPrefsCookiePersistor(context))
 
-    val cookies = cookieJar.loadForRequest(HttpUrl.Builder().scheme("https").host("connect.monstercat.com").build())
+    val cookies = cookieJar.loadForRequest(
+        HttpUrl.Builder().scheme("https").host("connect.monstercat.com").build()
+    )
 
     var sid = ""
 
-    for(cookie in cookies){
-        if(cookie.name == "connect.sid"){
+    for (cookie in cookies) {
+        if (cookie.name == "connect.sid") {
             sid = cookie.value
         }
     }
@@ -64,53 +62,24 @@ class Auth {
         val loginUrl = context.getString(R.string.loginUrl)
 
         val loginPostRequest =
-            object : JsonObjectRequest(Method.POST, loginUrl, loginPostParams,
+            JsonObjectRequest(
+                Request.Method.POST, loginUrl, loginPostParams,
                 Response.Listener { response ->
-                        //check if 2FA is needed
-                        try {
-                            val networkResponse = response.get("data") as String
-                            val responseJsonObject = JSONObject(networkResponse)
-
-                            if (responseJsonObject.getString("message") == "Enter the code sent to your device") {
-                                showTwoFAInput(context, loginSuccess, loginFailed)
-                            } else {
-                                checkLogin(context, loginSuccess, loginFailed)
-                            }
-                        } catch (e: JSONException) {
+                    //check if 2FA is needed
+                    try {
+                        if (response.getString("message") == "Enter the code sent to your device") {
+                            showTwoFAInput(context, loginSuccess, loginFailed)
+                        } else {
                             checkLogin(context, loginSuccess, loginFailed)
                         }
+                    } catch (e: JSONException) {
+                        checkLogin(context, loginSuccess, loginFailed)
+                    }
 
                 },
                 Response.ErrorListener {
 
-                }) {
-                override fun parseNetworkResponse(response: NetworkResponse?): Response<JSONObject> {
-                    val jsonResponse = JSONObject()
-
-                    //set cookie in response object
-                    val responseHeaders = response?.headers
-                    val cookies = responseHeaders?.get("Set-Cookie")
-
-                    val responseData = response?.data
-
-                    responseData?.let {
-                        jsonResponse.put("data", String(it))
-                    }
-
-                    cookies?.let {
-                        jsonResponse.put("cookies", it)
-                    }
-
-                    return try {
-                        Response.success(
-                            jsonResponse,
-                            HttpHeaderParser.parseCacheHeaders(response)
-                        )
-                    } catch (e: UnsupportedEncodingException) {
-                        Response.error(ParseError(e))
-                    }
-                }
-            }
+                })
 
         val loginQueue = newRequestQueue(context)
 
@@ -145,7 +114,8 @@ class Auth {
             val twoFaTokenParams = JSONObject()
             twoFaTokenParams.put("token", twoFACode)
 
-            val twoFaPostRequest = object : JsonObjectRequest(Method.POST,
+            val twoFaPostRequest = JsonObjectRequest(
+                Request.Method.POST,
                 context.getString(R.string.tokenUrl),
                 twoFaTokenParams,
                 Response.Listener {
@@ -153,27 +123,7 @@ class Auth {
                 },
                 Response.ErrorListener {
                     //TODO show 2FA again/request new code
-                }) {
-
-                override fun parseNetworkResponse(response: NetworkResponse?): Response<JSONObject> {
-                    val jsonResponse = JSONObject()
-
-                    val responseData = response?.data
-
-                    responseData?.let {
-                        jsonResponse.put("data", String(it))
-                    }
-
-                    return try {
-                        Response.success(
-                            jsonResponse,
-                            HttpHeaderParser.parseCacheHeaders(response)
-                        )
-                    } catch (e: UnsupportedEncodingException) {
-                        Response.error(ParseError(e))
-                    }
-                }
-            }
+                })
 
             val twoFAQueue = newRequestQueue(context)
 
