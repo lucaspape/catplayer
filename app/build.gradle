@@ -15,8 +15,8 @@ android {
         applicationId "de.lucaspape.monstercat"
         minSdkVersion 24
         targetSdkVersion 29
-        versionCode 1084
-        versionName "1.0.8.4"
+        versionCode 1085
+        versionName "1.0.8.5"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
