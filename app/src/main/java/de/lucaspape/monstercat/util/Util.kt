@@ -13,6 +13,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.Volley
+import com.franmontiel.persistentcookiejar.PersistentCookieJar
+import com.franmontiel.persistentcookiejar.cache.SetCookieCache
+import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.mikepenz.fastadapter.FastAdapter
@@ -171,6 +174,13 @@ fun displayAlertDialogList(
     }
 }
 
-fun newRequestQueue(context: Context): RequestQueue{
-    return Volley.newRequestQueue(context, OkHttp3Stack(context))
+fun newRequestQueue(context: Context): RequestQueue {
+    return Volley.newRequestQueue(
+        context, OkHttp3Stack(
+            context, PersistentCookieJar(
+                SetCookieCache(),
+                SharedPrefsCookiePersistor(context)
+            )
+        )
+    )
 }

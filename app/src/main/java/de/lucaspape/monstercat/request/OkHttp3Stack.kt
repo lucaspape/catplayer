@@ -6,9 +6,7 @@ import com.android.volley.AuthFailureError
 import com.android.volley.Request
 import com.android.volley.toolbox.BaseHttpStack
 import com.android.volley.toolbox.HttpResponse
-import com.franmontiel.persistentcookiejar.PersistentCookieJar
-import com.franmontiel.persistentcookiejar.cache.SetCookieCache
-import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
+import okhttp3.CookieJar
 import okhttp3.Headers
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
@@ -16,7 +14,8 @@ import okhttp3.RequestBody
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 
-class OkHttp3Stack(private val context: Context) : BaseHttpStack() {
+class OkHttp3Stack(private val context: Context, private val cookieJar: CookieJar) :
+    BaseHttpStack() {
 
     @Throws(IOException::class, AuthFailureError::class)
     private fun setConnectionParametersForRequest(
@@ -97,12 +96,7 @@ class OkHttp3Stack(private val context: Context) : BaseHttpStack() {
             setConnectionParametersForRequest(okHttpRequestBuilder, request)
         }
 
-        val client = clientBuilder.cookieJar(
-            PersistentCookieJar(
-                SetCookieCache(),
-                SharedPrefsCookiePersistor(context)
-            )
-        ).build()
+        val client = clientBuilder.cookieJar(cookieJar).build()
         val okHttpRequest = okHttpRequestBuilder.build()
         val okHttpCall = client.newCall(okHttpRequest)
 
