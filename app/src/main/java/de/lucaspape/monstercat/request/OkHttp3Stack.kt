@@ -14,6 +14,10 @@ import okhttp3.RequestBody
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 
+/**
+ * Custom BaseHttpStack for Volley using OkHttp3 and cookieJar
+ * Delete request also sends body
+ */
 class OkHttp3Stack(private val context: Context, private val cookieJar: CookieJar) :
     BaseHttpStack() {
 

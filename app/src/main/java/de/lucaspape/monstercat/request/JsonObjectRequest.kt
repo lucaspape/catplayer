@@ -9,6 +9,9 @@ import com.android.volley.toolbox.JsonRequest
 import org.json.JSONObject
 import java.lang.NullPointerException
 
+/**
+ * JsonObjectRequest which does not return an error if response is empty
+ */
 class JsonObjectRequest(
     method: Int,
     url: String,

@@ -17,6 +17,10 @@ import kotlin.math.floor
  * Play twitch streams
  */
 class Stream(private val clientId: String, private val channel: String) {
+
+    /**
+     * Get token and sig for channel
+     */
     private fun getAccessToken(
         context: Context,
         finished: (token: String, sig: String) -> Unit
@@ -38,6 +42,9 @@ class Stream(private val clientId: String, private val channel: String) {
         volleyQueue.add(accessTokenRequest)
     }
 
+    /**
+     * Get m3u stream URL of stream
+     */
     private fun getStreamUrl(
         context: Context,
         token: String,
@@ -74,6 +81,9 @@ class Stream(private val clientId: String, private val channel: String) {
         volleyQueue.add(playlistRequest)
     }
 
+    /**
+     * Returns hlsMediaSource of twitch stream for ExoPlayer
+     */
     fun getMediaSource(context: Context, callback: (mediaSource: HlsMediaSource) -> Unit) {
         getAccessToken(context) { token, sig ->
             getStreamUrl(context, token, sig, "audio_only") { streamUrl ->
