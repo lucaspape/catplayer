@@ -1,6 +1,7 @@
 package de.lucaspape.monstercat.request
 
 import android.content.Context
+import android.content.pm.PackageInfo
 import com.android.volley.AuthFailureError
 import com.android.volley.Request
 import com.android.volley.toolbox.BaseHttpStack
@@ -8,10 +9,13 @@ import com.android.volley.toolbox.HttpResponse
 import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
-import okhttp3.*
+import okhttp3.Headers
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.OkHttpClient
+import okhttp3.RequestBody
 import java.io.IOException
 import java.util.concurrent.TimeUnit
+
 
 class OkHttp3Stack(private val context: Context) : BaseHttpStack() {
 
@@ -67,8 +71,13 @@ class OkHttp3Stack(private val context: Context) : BaseHttpStack() {
         clientBuilder.readTimeout(timeoutMs, TimeUnit.MILLISECONDS)
         clientBuilder.writeTimeout(timeoutMs, TimeUnit.MILLISECONDS)
 
-        val okHttpRequestBuilder = okhttp3.Request.Builder()
+        val pInfo: PackageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+        val version = pInfo.versionName
 
+        clientBuilder.addInterceptor(UserAgentInterceptor(context.packageName, version))
+
+        val okHttpRequestBuilder = okhttp3.Request.Builder()
+        
         request?.let {
             okHttpRequestBuilder.url(request.url)
 
