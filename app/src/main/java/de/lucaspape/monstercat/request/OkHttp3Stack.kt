@@ -16,7 +16,6 @@ import okhttp3.RequestBody
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 
-
 class OkHttp3Stack(private val context: Context) : BaseHttpStack() {
 
     @Throws(IOException::class, AuthFailureError::class)
@@ -38,7 +37,7 @@ class OkHttp3Stack(private val context: Context) : BaseHttpStack() {
                 }
             }
             Request.Method.GET -> builder.get()
-            Request.Method.DELETE -> builder.delete(createRequestBody(request)!!)
+            Request.Method.DELETE -> builder.delete(createRequestBody(request))
             Request.Method.POST -> builder.post(createRequestBody(request)!!)
             Request.Method.PUT -> builder.put(createRequestBody(request)!!)
             Request.Method.HEAD -> builder.head()
@@ -77,7 +76,7 @@ class OkHttp3Stack(private val context: Context) : BaseHttpStack() {
         clientBuilder.addInterceptor(UserAgentInterceptor(context.packageName, version))
 
         val okHttpRequestBuilder = okhttp3.Request.Builder()
-        
+
         request?.let {
             okHttpRequestBuilder.url(request.url)
 
