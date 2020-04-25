@@ -178,19 +178,27 @@ fun displayAlertDialogList(
 /**
  * Creates new volley queue using OkHttp3Stack and cookies from connect.monstercat.com
  */
-fun newAuthorizedRequestQueue(context: Context, requestHost:String): RequestQueue {
-    return Volley.newRequestQueue(
-        context, OkHttp3Stack(
-            context, object : PersistentCookieJar(
-                SetCookieCache(),
-                SharedPrefsCookiePersistor(context)
-            ) {
-                override fun loadForRequest(url: HttpUrl): List<Cookie> {
-                    return super.loadForRequest(
-                        HttpUrl.Builder().scheme("https").host(requestHost).build()
-                    )
-                }
-            }
+fun newAuthorizedRequestQueue(context: Context, requestHost:String?): RequestQueue {
+    return if(requestHost == null){
+        Volley.newRequestQueue(
+            context, OkHttp3Stack(
+                context, null
+            )
         )
-    )
+    }else{
+        Volley.newRequestQueue(
+            context, OkHttp3Stack(
+                context, object : PersistentCookieJar(
+                    SetCookieCache(),
+                    SharedPrefsCookiePersistor(context)
+                ) {
+                    override fun loadForRequest(url: HttpUrl): List<Cookie> {
+                        return super.loadForRequest(
+                            HttpUrl.Builder().scheme("https").host(requestHost).build()
+                        )
+                    }
+                }
+            )
+        )
+    }
 }
