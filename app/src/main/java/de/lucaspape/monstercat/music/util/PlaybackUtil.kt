@@ -17,7 +17,10 @@ import de.lucaspape.monstercat.util.*
 import java.lang.ref.WeakReference
 import java.util.*
 
+//songId of song which is prepared in exoPlayer
 var currentSong = ""
+
+//songId of song which is prepared in nextExoPlayer
 var preparedSong = ""
 
 internal fun prepareSong(context: Context, songId: String, callback: () -> Unit) {
@@ -87,10 +90,12 @@ internal fun playSong(
 
     if (audioFocus == AudioManager.AUDIOFOCUS_REQUEST_GRANTED || !requestAudioFocus) {
         val preparingDone = {
-            exoPlayer =
-                nextExoPlayer
+            if (currentSong != songId) {
+                exoPlayer =
+                    nextExoPlayer
 
-            preparedSong = ""
+                preparedSong = ""
+            }
 
             exoPlayer?.audioComponent?.volume = 1.0f
 
