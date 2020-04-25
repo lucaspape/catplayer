@@ -178,7 +178,7 @@ fun displayAlertDialogList(
 /**
  * Creates new volley queue using OkHttp3Stack and cookies from connect.monstercat.com
  */
-fun newRequestQueue(context: Context): RequestQueue {
+fun newAuthorizedRequestQueue(context: Context, requestHost:String): RequestQueue {
     return Volley.newRequestQueue(
         context, OkHttp3Stack(
             context, object : PersistentCookieJar(
@@ -187,7 +187,7 @@ fun newRequestQueue(context: Context): RequestQueue {
             ) {
                 override fun loadForRequest(url: HttpUrl): List<Cookie> {
                     return super.loadForRequest(
-                        HttpUrl.Builder().scheme("https").host("connect.monstercat.com").build()
+                        HttpUrl.Builder().scheme("https").host(requestHost).build()
                     )
                 }
             }

@@ -7,7 +7,7 @@ import com.android.volley.Response
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.request.JsonObjectRequest
-import de.lucaspape.monstercat.util.newRequestQueue
+import de.lucaspape.monstercat.util.newAuthorizedRequestQueue
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
@@ -33,7 +33,7 @@ class AddToPlaylistAsync(
                 val addToPlaylistUrl =
                     context.getString(R.string.playlistUrl) + playlistId + "/record"
 
-                val addToPlaylistQueue = newRequestQueue(context)
+                val addToPlaylistQueue = newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
                 val songJsonObject = JSONObject()
                 songJsonObject.put("trackId", song.songId)

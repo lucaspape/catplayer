@@ -8,7 +8,7 @@ import com.android.volley.toolbox.StringRequest
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.ui.abstract_items.CatalogItem
 import de.lucaspape.monstercat.util.Settings
-import de.lucaspape.monstercat.util.newRequestQueue
+import de.lucaspape.monstercat.util.newAuthorizedRequestQueue
 import de.lucaspape.monstercat.util.parseSongSearchToSongList
 import org.json.JSONObject
 import java.lang.ref.WeakReference
@@ -38,7 +38,7 @@ class LoadTitleSearchAsync(
         contextReference.get()?.let { context ->
             var success = true
             val syncObject = Object()
-            val searchQueue = newRequestQueue(context)
+            val searchQueue = newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
             searchQueue.addRequestFinishedListener<Any?> {
                 synchronized(syncObject) {

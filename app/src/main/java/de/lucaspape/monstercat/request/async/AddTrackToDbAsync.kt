@@ -8,7 +8,7 @@ import com.android.volley.toolbox.StringRequest
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.database.objects.Song
-import de.lucaspape.monstercat.util.newRequestQueue
+import de.lucaspape.monstercat.util.newAuthorizedRequestQueue
 import de.lucaspape.monstercat.util.parseSongToDB
 import org.json.JSONObject
 import java.lang.ref.WeakReference
@@ -34,7 +34,7 @@ class AddTrackToDbAsync(
 
             val syncObject = Object()
 
-            val volleyQueue = newRequestQueue(context)
+            val volleyQueue = newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
             volleyQueue.addRequestFinishedListener<Any?> {
                 synchronized(syncObject) {

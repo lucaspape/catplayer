@@ -81,7 +81,7 @@ class Auth {
 
                 })
 
-        val loginQueue = newRequestQueue(context)
+        val loginQueue = newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
         //add to queue
         loginQueue.add(loginPostRequest)
@@ -125,7 +125,7 @@ class Auth {
                     //TODO show 2FA again/request new code
                 })
 
-            val twoFAQueue = newRequestQueue(context)
+            val twoFAQueue = newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
             twoFAQueue.addRequestFinishedListener<Any> {
                 checkLogin(context, loginSuccess, loginFailed)
@@ -177,7 +177,7 @@ class Auth {
                 })
 
 
-        val checkLoginQueue = newRequestQueue(context)
+        val checkLoginQueue = newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
         checkLoginQueue.add(checkLoginRequest)
     }
 }

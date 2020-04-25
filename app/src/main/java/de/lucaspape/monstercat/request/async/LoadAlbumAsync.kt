@@ -8,7 +8,7 @@ import com.android.volley.toolbox.StringRequest
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.AlbumItemDatabaseHelper
 import de.lucaspape.monstercat.util.Settings
-import de.lucaspape.monstercat.util.newRequestQueue
+import de.lucaspape.monstercat.util.newAuthorizedRequestQueue
 import de.lucaspape.monstercat.util.parsAlbumSongToDB
 import org.json.JSONObject
 import java.lang.ref.WeakReference
@@ -52,7 +52,7 @@ class LoadAlbumAsync(
 
     override fun doInBackground(vararg param: Void?): Boolean {
         contextReference.get()?.let { context ->
-            val requestQueue = newRequestQueue(context)
+            val requestQueue = newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
             val albumItemDatabaseHelper =
                 AlbumItemDatabaseHelper(context, albumId)

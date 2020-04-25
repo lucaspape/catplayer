@@ -6,7 +6,7 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.util.newRequestQueue
+import de.lucaspape.monstercat.util.newAuthorizedRequestQueue
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
@@ -34,7 +34,7 @@ class ChangePlaylistPublicStateAsync(
 
             postObject.put("public", public)
 
-            val newPlaylistVolleyQueue = newRequestQueue(context)
+            val newPlaylistVolleyQueue = newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
             var success = true
             val syncObject = Object()

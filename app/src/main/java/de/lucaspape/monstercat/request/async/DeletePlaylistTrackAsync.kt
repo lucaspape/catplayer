@@ -7,7 +7,7 @@ import com.android.volley.Response
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.request.JsonObjectRequest
-import de.lucaspape.monstercat.util.newRequestQueue
+import de.lucaspape.monstercat.util.newAuthorizedRequestQueue
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
@@ -36,7 +36,7 @@ class DeletePlaylistTrackAsync(
                 deleteSongObject.put("releaseId", song.albumId)
                 deleteSongObject.put("sort", songDeleteIndex)
 
-                val deleteSongVolleyQueue = newRequestQueue(context)
+                val deleteSongVolleyQueue = newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
                 var success = true
                 val syncObject = Object()

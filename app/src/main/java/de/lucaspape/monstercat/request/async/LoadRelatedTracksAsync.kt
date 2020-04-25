@@ -7,7 +7,7 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.util.newRequestQueue
+import de.lucaspape.monstercat.util.newAuthorizedRequestQueue
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -35,7 +35,7 @@ class LoadRelatedTracksAsync(
 
             var result: ArrayList<String>? = ArrayList()
 
-            val volleyQueue = newRequestQueue(context)
+            val volleyQueue = newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
             volleyQueue.addRequestFinishedListener<Any?> {
                 synchronized(syncObject) {

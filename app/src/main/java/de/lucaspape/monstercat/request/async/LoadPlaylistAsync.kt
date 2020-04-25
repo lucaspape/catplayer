@@ -8,7 +8,7 @@ import com.android.volley.toolbox.StringRequest
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.ManualPlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
-import de.lucaspape.monstercat.util.newRequestQueue
+import de.lucaspape.monstercat.util.newAuthorizedRequestQueue
 import de.lucaspape.monstercat.util.parsePlaylistToDB
 import org.json.JSONException
 import org.json.JSONObject
@@ -54,7 +54,7 @@ class LoadPlaylistAsync(
             val playlistDatabaseHelper =
                 PlaylistDatabaseHelper(context)
 
-            val playlistRequestQueue = newRequestQueue(context)
+            val playlistRequestQueue = newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
             val playlistUrl = context.getString(R.string.playlistsUrl)
 

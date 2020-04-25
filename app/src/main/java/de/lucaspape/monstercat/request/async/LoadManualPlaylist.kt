@@ -6,7 +6,7 @@ import com.android.volley.Response
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.util.newRequestQueue
+import de.lucaspape.monstercat.util.newAuthorizedRequestQueue
 import de.lucaspape.monstercat.util.parsePlaylistToDB
 import org.json.JSONException
 import org.json.JSONObject
@@ -35,7 +35,7 @@ class LoadManualPlaylist(
             var success = true
             val syncObject = Object()
 
-            val getManualPlaylistsRequestQueue = newRequestQueue(context)
+            val getManualPlaylistsRequestQueue = newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
             getManualPlaylistsRequestQueue.addRequestFinishedListener<Any?> {
                 synchronized(syncObject) {

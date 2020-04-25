@@ -5,11 +5,10 @@ import android.os.AsyncTask
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.music.notification.updateNotification
-import de.lucaspape.monstercat.util.newRequestQueue
+import de.lucaspape.monstercat.util.newAuthorizedRequestQueue
 import de.lucaspape.monstercat.util.parseSongToDB
 import org.json.JSONException
 import org.json.JSONObject
@@ -77,7 +76,7 @@ class StreamInfoUpdateAsync(
                         println(error)
                     })
 
-            val requestQueue = newRequestQueue(context)
+            val requestQueue = newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
             while (true) {
                 requestQueue.add(artistTitleRequest)

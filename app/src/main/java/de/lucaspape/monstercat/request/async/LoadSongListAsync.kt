@@ -8,7 +8,7 @@ import com.android.volley.toolbox.StringRequest
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.CatalogSongDatabaseHelper
 import de.lucaspape.monstercat.util.Settings
-import de.lucaspape.monstercat.util.newRequestQueue
+import de.lucaspape.monstercat.util.newAuthorizedRequestQueue
 import de.lucaspape.monstercat.util.parseCatalogSongToDB
 import org.json.JSONObject
 import java.lang.ref.WeakReference
@@ -53,7 +53,7 @@ class LoadSongListAsync(
             var success = true
             val syncObject = Object()
 
-            val requestQueue = newRequestQueue(context)
+            val requestQueue = newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
             requestQueue.addRequestFinishedListener<Any> {
                 synchronized(syncObject) {

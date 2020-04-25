@@ -39,7 +39,7 @@ private fun loadAlbumTracks(
     val requestUrl =
         context.getString(R.string.loadAlbumSongsUrl) + "/" + mcID
 
-    val albumRequestQueue = newRequestQueue(context)
+    val albumRequestQueue = newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
     val albumRequest = StringRequest(Request.Method.GET, requestUrl,
         Response.Listener { response ->
@@ -561,7 +561,7 @@ internal fun deletePlaylistSong(
 
 internal fun openAlbum(view: View, albumMcId: String, share: Boolean) {
     val context = view.context
-    val volleyRequestQueue = newRequestQueue(context)
+    val volleyRequestQueue = newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
     val albumLinksRequest = StringRequest(Request.Method.GET,
         context.getString(R.string.loadAlbumSongsUrl) + "/$albumMcId",

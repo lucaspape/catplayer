@@ -7,7 +7,7 @@ import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
-import de.lucaspape.monstercat.util.newRequestQueue
+import de.lucaspape.monstercat.util.newAuthorizedRequestQueue
 import de.lucaspape.monstercat.util.parsePlaylistTrackToDB
 import org.json.JSONObject
 import java.lang.ref.WeakReference
@@ -85,7 +85,7 @@ class LoadPlaylistTracksAsync(
                 success = false
             })
 
-            val trackRequestQueue = newRequestQueue(context)
+            val trackRequestQueue = newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
             trackRequestQueue.addRequestFinishedListener<Any?> {
                 if(!nextEmpty && success){
