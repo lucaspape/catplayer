@@ -13,9 +13,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.Volley
-import com.franmontiel.persistentcookiejar.PersistentCookieJar
-import com.franmontiel.persistentcookiejar.cache.SetCookieCache
-import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.mikepenz.fastadapter.FastAdapter
@@ -24,6 +21,9 @@ import com.mikepenz.fastadapter.adapters.ItemAdapter
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.request.OkHttp3Stack
 import de.lucaspape.monstercat.ui.abstract_items.AlertListItem
+import de.lucaspape.persistentcookiejar.PersistentCookieJar
+import de.lucaspape.persistentcookiejar.cache.SetCookieCache
+import de.lucaspape.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import okhttp3.Cookie
 import okhttp3.HttpUrl
 import java.io.BufferedInputStream
@@ -178,14 +178,14 @@ fun displayAlertDialogList(
 /**
  * Creates new volley queue using OkHttp3Stack and cookies from connect.monstercat.com
  */
-fun newAuthorizedRequestQueue(context: Context, requestHost:String?): RequestQueue {
-    return if(requestHost == null){
+fun newAuthorizedRequestQueue(context: Context, requestHost: String?): RequestQueue {
+    return if (requestHost == null) {
         Volley.newRequestQueue(
             context, OkHttp3Stack(
                 context, null
             )
         )
-    }else{
+    } else {
         Volley.newRequestQueue(
             context, OkHttp3Stack(
                 context, object : PersistentCookieJar(

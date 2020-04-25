@@ -9,11 +9,11 @@ import android.widget.EditText
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
-import com.franmontiel.persistentcookiejar.PersistentCookieJar
-import com.franmontiel.persistentcookiejar.cache.SetCookieCache
-import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.request.JsonObjectRequest
+import de.lucaspape.persistentcookiejar.PersistentCookieJar
+import de.lucaspape.persistentcookiejar.cache.SetCookieCache
+import de.lucaspape.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import okhttp3.HttpUrl
 import org.json.JSONException
 import org.json.JSONObject
