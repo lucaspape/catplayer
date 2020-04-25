@@ -26,6 +26,8 @@ import de.lucaspape.monstercat.request.async.LoadPlaylistAsync
 import de.lucaspape.monstercat.request.async.LoadPlaylistTracksAsync
 import de.lucaspape.monstercat.ui.activities.MainActivity
 import de.lucaspape.monstercat.util.*
+import de.lucaspape.util.BackgroundAsync
+import de.lucaspape.util.Settings
 import java.io.File
 import java.lang.IndexOutOfBoundsException
 import java.lang.ref.WeakReference

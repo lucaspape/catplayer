@@ -9,7 +9,10 @@ import java.util.*
 /**
  * Forked from https://github.com/franmontiel/PersistentCookieJar
  */
-open class PersistentCookieJar(private val cache: CookieCache, private val persistor: CookiePersistor) :
+open class PersistentCookieJar(
+    private val cache: CookieCache,
+    private val persistor: CookiePersistor
+) :
     ClearableCookieJar {
     @Synchronized
     override fun saveFromResponse(
@@ -22,18 +25,19 @@ open class PersistentCookieJar(private val cache: CookieCache, private val persi
 
     @Synchronized
     override fun loadForRequest(url: HttpUrl): List<Cookie> {
-        val cookiesToRemove: MutableList<Cookie?> =
+        val cookiesToRemove: MutableList<Cookie> =
             ArrayList()
         val validCookies: MutableList<Cookie> =
             ArrayList()
         val it = cache.iterator()
         while (it.hasNext()) {
-            val currentCookie = it.next()
-            if (isCookieExpired(currentCookie)) {
-                cookiesToRemove.add(currentCookie)
-                it.remove()
-            } else if (currentCookie!!.matches(url)) {
-                validCookies.add(currentCookie)
+            it.next().let { currentCookie ->
+                if (isCookieExpired(currentCookie)) {
+                    cookiesToRemove.add(currentCookie)
+                    it.remove()
+                } else if (currentCookie.matches(url)) {
+                    validCookies.add(currentCookie)
+                }
             }
         }
         persistor.removeAll(cookiesToRemove)
@@ -53,8 +57,8 @@ open class PersistentCookieJar(private val cache: CookieCache, private val persi
     }
 
     companion object {
-        private fun filterPersistentCookies(cookies: List<Cookie>): List<Cookie?> {
-            val persistentCookies: MutableList<Cookie?> =
+        private fun filterPersistentCookies(cookies: List<Cookie>): List<Cookie> {
+            val persistentCookies: MutableList<Cookie> =
                 ArrayList()
             for (cookie in cookies) {
                 if (cookie.persistent) {
@@ -64,8 +68,8 @@ open class PersistentCookieJar(private val cache: CookieCache, private val persi
             return persistentCookies
         }
 
-        private fun isCookieExpired(cookie: Cookie?): Boolean {
-            return cookie!!.expiresAt < System.currentTimeMillis()
+        private fun isCookieExpired(cookie: Cookie): Boolean {
+            return cookie.expiresAt < System.currentTimeMillis()
         }
     }
 

@@ -30,6 +30,8 @@ import de.lucaspape.monstercat.request.async.*
 import de.lucaspape.monstercat.music.util.playStream
 import de.lucaspape.monstercat.twitch.Stream
 import de.lucaspape.monstercat.util.*
+import de.lucaspape.util.BackgroundAsync
+import de.lucaspape.util.Settings
 import java.io.File
 import java.lang.IndexOutOfBoundsException
 import java.lang.ref.WeakReference

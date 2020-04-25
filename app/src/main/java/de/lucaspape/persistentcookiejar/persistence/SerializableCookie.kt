@@ -11,7 +11,7 @@ import java.io.*
 class SerializableCookie : Serializable {
     @Transient
     private var cookie: Cookie? = null
-    fun encode(cookie: Cookie?): String? {
+    fun encode(cookie: Cookie): String? {
         this.cookie = cookie
         val byteArrayOutputStream = ByteArrayOutputStream()
         var objectOutputStream: ObjectOutputStream? = null
@@ -79,14 +79,16 @@ class SerializableCookie : Serializable {
 
     @Throws(IOException::class)
     private fun writeObject(out: ObjectOutputStream) {
-        out.writeObject(cookie!!.name)
-        out.writeObject(cookie!!.value)
-        out.writeLong(if (cookie!!.persistent) cookie!!.expiresAt else NON_VALID_EXPIRES_AT)
-        out.writeObject(cookie!!.domain)
-        out.writeObject(cookie!!.path)
-        out.writeBoolean(cookie!!.secure)
-        out.writeBoolean(cookie!!.httpOnly)
-        out.writeBoolean(cookie!!.hostOnly)
+        cookie?.let {
+            out.writeObject(it.name)
+            out.writeObject(it.value)
+            out.writeLong(if (it.persistent) it.expiresAt else NON_VALID_EXPIRES_AT)
+            out.writeObject(it.domain)
+            out.writeObject(it.path)
+            out.writeBoolean(it.secure)
+            out.writeBoolean(it.httpOnly)
+            out.writeBoolean(it.hostOnly)
+        }
     }
 
     @Throws(IOException::class, ClassNotFoundException::class)

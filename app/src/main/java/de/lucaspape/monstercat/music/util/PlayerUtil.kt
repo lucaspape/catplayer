@@ -10,7 +10,7 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.notification.startPlayerService
 import de.lucaspape.monstercat.music.notification.updateNotification
-import de.lucaspape.monstercat.util.Settings
+import de.lucaspape.util.Settings
 import java.util.*
 
 fun getAudioAttributes(): AudioAttributes {

@@ -23,7 +23,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.download.DownloadService
 import de.lucaspape.monstercat.download.hideDownloadNotification
-import de.lucaspape.monstercat.util.BackgroundAsync
+import de.lucaspape.util.BackgroundAsync
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.notification.updateNotification
 import de.lucaspape.monstercat.music.save.PlayerSaveState
@@ -32,6 +32,7 @@ import de.lucaspape.monstercat.music.util.setCover
 import de.lucaspape.monstercat.ui.handlers.HomeHandler
 import de.lucaspape.monstercat.ui.handlers.PlaylistHandler
 import de.lucaspape.monstercat.util.*
+import de.lucaspape.util.Settings
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream

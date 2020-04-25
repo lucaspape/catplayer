@@ -19,7 +19,7 @@ import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.music.crossfade
 import de.lucaspape.monstercat.music.playRelatedSongsAfterPlaylistFinished
 import de.lucaspape.monstercat.util.Auth
-import de.lucaspape.monstercat.util.Settings
+import de.lucaspape.util.Settings
 import de.lucaspape.monstercat.util.displayInfo
 import java.io.File
 import java.io.FileNotFoundException

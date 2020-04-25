@@ -7,7 +7,7 @@ import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.ui.abstract_items.CatalogItem
-import de.lucaspape.monstercat.util.Settings
+import de.lucaspape.util.Settings
 import de.lucaspape.monstercat.util.newAuthorizedRequestQueue
 import de.lucaspape.monstercat.util.parseSongSearchToSongList
 import org.json.JSONObject

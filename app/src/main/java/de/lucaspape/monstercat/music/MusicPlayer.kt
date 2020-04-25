@@ -17,7 +17,7 @@ import de.lucaspape.monstercat.music.save.PlayerSaveState
 import de.lucaspape.monstercat.music.util.*
 import de.lucaspape.monstercat.music.util.playSong
 import de.lucaspape.monstercat.request.async.LoadRelatedTracksAsync
-import de.lucaspape.monstercat.util.Settings
+import de.lucaspape.util.Settings
 import java.lang.ref.WeakReference
 import kotlin.random.Random
 

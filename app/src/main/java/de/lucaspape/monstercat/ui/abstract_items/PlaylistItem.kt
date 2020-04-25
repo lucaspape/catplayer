@@ -25,7 +25,7 @@ import de.lucaspape.monstercat.ui.handlers.downloadPlaylist
 import de.lucaspape.monstercat.ui.handlers.playPlaylistNext
 import de.lucaspape.monstercat.ui.handlers.renamePlaylist
 import de.lucaspape.monstercat.ui.handlers.togglePlaylistPublicState
-import de.lucaspape.monstercat.util.BackgroundAsync
+import de.lucaspape.util.BackgroundAsync
 import de.lucaspape.monstercat.util.displayAlertDialogList
 import java.io.File
 

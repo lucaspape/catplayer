@@ -14,6 +14,7 @@ import de.lucaspape.monstercat.music.notification.updateNotification
 import de.lucaspape.monstercat.request.async.AddTrackToDbAsync
 import de.lucaspape.monstercat.twitch.Stream
 import de.lucaspape.monstercat.util.*
+import de.lucaspape.util.Settings
 import java.lang.ref.WeakReference
 import java.util.*
 

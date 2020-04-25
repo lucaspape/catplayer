@@ -6,6 +6,7 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.music.contextReference
 import de.lucaspape.monstercat.util.*
+import de.lucaspape.util.Settings
 import java.io.File
 import java.lang.Exception
 import java.lang.ref.WeakReference

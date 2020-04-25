@@ -8,7 +8,7 @@ import android.os.AsyncTask
 import com.squareup.picasso.Picasso
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.download.DownloadService.Companion.downloadTask
-import de.lucaspape.monstercat.util.Settings
+import de.lucaspape.util.Settings
 import de.lucaspape.monstercat.util.wifiConnected
 import java.io.File
 import java.io.FileOutputStream

@@ -11,7 +11,7 @@ import com.google.android.exoplayer2.util.Util
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.ui.activities.downloadDrawable
 import de.lucaspape.monstercat.ui.activities.offlineDrawable
-import de.lucaspape.monstercat.util.Settings
+import de.lucaspape.util.Settings
 import de.lucaspape.monstercat.util.getSid
 import de.lucaspape.monstercat.util.wifiConnected
 import java.io.File
@@ -133,7 +133,9 @@ data class Song(
     }
 
     fun playbackAllowed(context: Context):Boolean{
-        return wifiConnected(context) == true || Settings(context).getBoolean(context.getString(R.string.streamOverMobileSetting)) == true || File(
+        return wifiConnected(context) == true || Settings(
+            context
+        ).getBoolean(context.getString(R.string.streamOverMobileSetting)) == true || File(
                 getUrl()
             ).exists()
     }

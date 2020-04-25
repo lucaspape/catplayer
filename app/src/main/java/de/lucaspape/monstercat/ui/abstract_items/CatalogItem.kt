@@ -21,7 +21,7 @@ import de.lucaspape.monstercat.ui.handlers.deletePlaylistSong
 import de.lucaspape.monstercat.ui.handlers.openAlbum
 import de.lucaspape.monstercat.download.ImageReceiverInterface
 import de.lucaspape.monstercat.music.prioritySongQueue
-import de.lucaspape.monstercat.util.BackgroundAsync
+import de.lucaspape.util.BackgroundAsync
 import de.lucaspape.monstercat.util.displayAlertDialogList
 
 open class CatalogItem(

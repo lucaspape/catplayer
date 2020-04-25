@@ -9,12 +9,10 @@ import java.util.*
  */
 class SetCookieCache : CookieCache {
     private val cookies: MutableSet<IdentifiableCookie>
-    override fun addAll(cookies: Collection<Cookie?>?) {
-        cookies?.let {
-            for (cookie in decorateAll(cookies)) {
-                this.cookies.remove(cookie)
-                this.cookies.add(cookie)
-            }
+    override fun addAll(cookies: Collection<Cookie>) {
+        for (cookie in decorateAll(cookies)) {
+            this.cookies.remove(cookie)
+            this.cookies.add(cookie)
         }
     }
 

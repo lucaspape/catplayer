@@ -3,6 +3,7 @@ package de.lucaspape.persistentcookiejar.persistence
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
+import de.lucaspape.util.Settings
 import okhttp3.Cookie
 import java.util.*
 
@@ -14,14 +15,11 @@ class SharedPrefsCookiePersistor(private val sharedPreferences: SharedPreference
     CookiePersistor {
 
     constructor(context: Context) : this(
-        context.getSharedPreferences(
-            "CookiePersistence",
-            Context.MODE_PRIVATE
-        )
+        checkUpgrade(context)
     )
 
-    override fun loadAll(): List<Cookie?>? {
-        val cookies: MutableList<Cookie?> =
+    override fun loadAll(): List<Cookie> {
+        val cookies: MutableList<Cookie> =
             ArrayList(sharedPreferences.all.size)
         for ((_, value) in sharedPreferences.all) {
             val serializedCookie = value as String
@@ -35,9 +33,9 @@ class SharedPrefsCookiePersistor(private val sharedPreferences: SharedPreference
         return cookies
     }
 
-    override fun saveAll(cookies: Collection<Cookie?>?) {
+    override fun saveAll(cookies: Collection<Cookie>) {
         val editor = sharedPreferences.edit()
-        for (cookie in cookies!!) {
+        for (cookie in cookies) {
             editor.putString(
                 createCookieKey(
                     cookie
@@ -49,9 +47,9 @@ class SharedPrefsCookiePersistor(private val sharedPreferences: SharedPreference
         editor.apply()
     }
 
-    override fun removeAll(cookies: Collection<Cookie?>?) {
+    override fun removeAll(cookies: Collection<Cookie>) {
         val editor = sharedPreferences.edit()
-        for (cookie in cookies!!) {
+        for (cookie in cookies) {
             editor.remove(
                 createCookieKey(
                     cookie
@@ -66,8 +64,28 @@ class SharedPrefsCookiePersistor(private val sharedPreferences: SharedPreference
     }
 
     companion object {
-        private fun createCookieKey(cookie: Cookie?): String {
-            return (if (cookie!!.secure) "https" else "http") + "://" + cookie.domain + cookie.path + "|" + cookie.name
+        private fun createCookieKey(cookie: Cookie): String {
+            return (if (cookie.secure) "https" else "http") + "://" + cookie.domain + cookie.path + "|" + cookie.name
+        }
+
+        private const val version = "1.0"
+
+        fun checkUpgrade(context: Context): SharedPreferences {
+            val settings = Settings(context)
+
+            if (settings.getString("cookie-persistor-version") != version) {
+                context.getSharedPreferences(
+                    "CookiePersistence",
+                    Context.MODE_PRIVATE
+                ).edit().clear().apply()
+
+                settings.setString("cookie-persistor-version", version)
+            }
+
+            return context.getSharedPreferences(
+                "CookiePersistence",
+                Context.MODE_PRIVATE
+            )
         }
     }
 
