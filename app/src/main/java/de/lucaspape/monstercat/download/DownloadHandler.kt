@@ -71,7 +71,11 @@ internal fun downloadImageUrlIntoImageReceiver(
         if (cacheFile.exists()) {
             val bitmap = BitmapFactory.decodeFile(cacheFile.absolutePath)
             imageReceiver.setBitmap(imageId, bitmap)
-            bitmapCache[imageId + resolution] = SoftReference(bitmap)
+
+            if(saveToCache){
+                bitmapCache[imageId + resolution] = SoftReference(bitmap)
+            }
+
         } else {
             if (wifiConnected(context) == true || settings.getBoolean(context.getString(R.string.downloadCoversOverMobileSetting)) == true) {
                 val picassoTarget = object : com.squareup.picasso.Target {
@@ -93,7 +97,9 @@ internal fun downloadImageUrlIntoImageReceiver(
                             }
                         }
 
-                        bitmapCache[imageId + resolution] = SoftReference(bitmap)
+                        if(saveToCache){
+                            bitmapCache[imageId + resolution] = SoftReference(bitmap)
+                        }
                     }
                 }
 
