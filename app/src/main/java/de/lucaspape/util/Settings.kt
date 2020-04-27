@@ -82,7 +82,7 @@ class Settings(private val context: Context) {
         val defaultDownloadCoversMobile = false
         val defaultCrossfadeTime = 0
         val defaultSaveCoverImagesToCache = true
-        val defaultVolume = 0.0f
+        val defaultVolume = 1.0f
 
         if (getString(context.getString(R.string.downloadTypeSetting)) == null || overwrite) {
             setString(context.getString(R.string.downloadTypeSetting), defaultDownloadType)
