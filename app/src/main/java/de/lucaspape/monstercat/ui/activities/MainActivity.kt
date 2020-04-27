@@ -159,6 +159,10 @@ class MainActivity : AppCompatActivity() {
             crossfade = it
         }
 
+        settings.getFloat(getString(R.string.volumeSetting))?.let {
+            volume = it
+        }
+
         settings.getBoolean(getString(R.string.playRelatedSetting))?.let {
             playRelatedSongsAfterPlaylistFinished = it
         }

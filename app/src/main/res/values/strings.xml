@@ -124,4 +124,5 @@
     <string name="useCustomApi">Use custom API instead monstercat connect (for catalog/album/search/cover images)</string>
     <string name="playRelatedAfter">Play related songs after playback finished</string>
     <string name="saveCoverImagesToCache">Save cover images to cache</string>
+    <string name="volume">Volume</string>
 </resources>

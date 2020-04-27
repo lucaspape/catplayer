@@ -43,6 +43,12 @@ var loop = false
 var loopSingle = false
 var shuffle = false
 var crossfade = 12000
+var volume:Float = 1.0f
+    set(value) {
+        exoPlayer?.audioComponent?.volume = value
+        field = value
+    }
+
 var playRelatedSongsAfterPlaylistFinished = false
 
 var mediaSession: MediaSessionCompat? = null

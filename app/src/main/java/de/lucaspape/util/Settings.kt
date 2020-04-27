@@ -53,6 +53,18 @@ class Settings(private val context: Context) {
         return null
     }
 
+    fun setFloat(key: String, float:Float){
+        setString(key, float.toString())
+    }
+
+    fun getFloat(key: String):Float?{
+        getString(key)?.let {
+            return it.toFloatOrNull()
+        }
+
+        return null
+    }
+
     private fun onUpgrade() {
         setDefaultSettings(true)
         setString("settings-version", version)
@@ -70,6 +82,7 @@ class Settings(private val context: Context) {
         val defaultDownloadCoversMobile = false
         val defaultCrossfadeTime = 0
         val defaultSaveCoverImagesToCache = true
+        val defaultVolume = 0.0f
 
         if (getString(context.getString(R.string.downloadTypeSetting)) == null || overwrite) {
             setString(context.getString(R.string.downloadTypeSetting), defaultDownloadType)
@@ -119,6 +132,10 @@ class Settings(private val context: Context) {
                 context.getString(R.string.saveCoverImagesToCacheSetting),
                 defaultSaveCoverImagesToCache
             )
+        }
+
+        if(getString(context.getString(R.string.volumeSetting)) == null || overwrite){
+            setFloat(context.getString(R.string.volumeSetting), defaultVolume)
         }
     }
 }

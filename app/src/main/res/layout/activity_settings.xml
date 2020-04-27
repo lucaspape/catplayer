@@ -122,6 +122,38 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/darkThemeSwitch" />
 
+            <TextView
+                android:id="@+id/volumeText"
+                android:layout_width="0dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="10dp"
+                android:text="@string/volume"
+                android:textColor="?attr/colorOnSurface"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/audioFocusSwitch" />
+
+            <TextView
+                android:id="@+id/shownVolumeText"
+                android:layout_width="40dp"
+                android:layout_height="50dp"
+                android:layout_margin="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/volumeText" />
+
+            <SeekBar
+                android:id="@+id/volumeSeekBar"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="20dp"
+                android:contentDescription="@string/coverResolution"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/shownVolumeText"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/volumeText" />
+
             <Switch
                 android:id="@+id/downloadFlacSwitch"
                 android:layout_width="0dp"
@@ -132,7 +164,7 @@
                 android:text="@string/downloadFlacInsteadMp3"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/audioFocusSwitch" />
+                app:layout_constraintTop_toBottomOf="@+id/volumeSeekBar" />
 
             <TextView
                 android:id="@+id/coverResolutionText"
@@ -148,7 +180,7 @@
 
             <TextView
                 android:id="@+id/shownCoverResolution"
-                android:layout_width="wrap_content"
+                android:layout_width="40dp"
                 android:layout_height="50dp"
                 android:layout_margin="10dp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -204,7 +236,7 @@
 
             <TextView
                 android:id="@+id/shownCrossfadeTime"
-                android:layout_width="wrap_content"
+                android:layout_width="40dp"
                 android:layout_height="50dp"
                 android:layout_margin="10dp"
                 app:layout_constraintEnd_toEndOf="parent"

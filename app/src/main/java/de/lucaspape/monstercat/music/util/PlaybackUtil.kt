@@ -17,6 +17,7 @@ import de.lucaspape.monstercat.util.*
 import de.lucaspape.util.Settings
 import java.lang.ref.WeakReference
 import java.util.*
+import kotlin.math.log
 
 //songId of song which is prepared in exoPlayer
 var currentSong = ""
@@ -98,7 +99,7 @@ internal fun playSong(
                 preparedSong = ""
             }
 
-            exoPlayer?.audioComponent?.volume = 1.0f
+            exoPlayer?.audioComponent?.volume = volume
 
             if (progress != null) {
                 exoPlayer?.seekTo(progress)
@@ -243,11 +244,18 @@ internal fun runSeekBarUpdate(context: Context, prepareNext: Boolean, crossFade:
             if (crossFade) {
                 if (timeLeft < crossfade && exoPlayer?.isPlaying == true) {
                     if (timeLeft >= 1) {
-                        val nextVolume: Float = (crossfade.toFloat() - timeLeft) / crossfade
-                        nextExoPlayer?.audioComponent?.volume = nextVolume
+                        val crossVolume = 1- log(100-((crossfade.toFloat() - timeLeft) / crossfade*100), 100.toFloat())
 
-                        val currentVolume = 1 - nextVolume
-                        exoPlayer?.audioComponent?.volume = currentVolume
+                        val higherVolume = crossVolume * volume
+                        val lowerVolume = volume - higherVolume
+
+                        if(higherVolume > 0.toFloat() && higherVolume.isFinite()){
+                            nextExoPlayer?.audioComponent?.volume = higherVolume
+                        }
+
+                        if(lowerVolume > 0.toFloat() &&lowerVolume.isFinite()){
+                            exoPlayer?.audioComponent?.volume = lowerVolume
+                        }
                     }
 
                     nextExoPlayer?.playWhenReady = true
