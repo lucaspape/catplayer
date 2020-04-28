@@ -14,7 +14,6 @@ import com.mikepenz.fastadapter.adapters.ItemAdapter
 import com.mikepenz.fastadapter.listeners.ClickEventHook
 import com.mikepenz.fastadapter.scroll.EndlessRecyclerOnScrollListener
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.database.helper.CatalogSongDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.music.*
@@ -27,11 +26,16 @@ import de.lucaspape.monstercat.util.displaySnackBar
 import de.lucaspape.util.BackgroundAsync
 import de.lucaspape.util.Settings
 import java.io.File
+import java.lang.IndexOutOfBoundsException
 import java.lang.ref.WeakReference
 import java.util.*
 import kotlin.collections.ArrayList
 
-class SearchHandler(private val search: String?, onSearch:(searchString:String?) -> Unit, private val closeSearch:() -> Unit): Handler(onSearch) {
+class SearchHandler(
+    private val search: String?,
+    onSearch: (searchString: String?) -> Unit,
+    private val closeSearch: () -> Unit
+) : Handler(onSearch) {
     override val layout: Int = R.layout.fragment_search
 
     override fun onBackPressed(view: View) {
@@ -53,7 +57,7 @@ class SearchHandler(private val search: String?, onSearch:(searchString:String?)
         }
     }
 
-    private fun registerListeners(view: View){
+    private fun registerListeners(view: View) {
         //search
         val search = view.findViewById<SearchView>(R.id.searchInput)
 
@@ -134,45 +138,41 @@ class SearchHandler(private val search: String?, onSearch:(searchString:String?)
 
                 val songDatabaseHelper = SongDatabaseHelper(view.context)
 
-                    //add next songs from database
-                    val catalogSongDatabaseHelper = CatalogSongDatabaseHelper(view.context)
+                //add visible next songs
+                BackgroundAsync({
+                    val id = UUID.randomUUID().toString()
+                    HomeHandler.addSongsTaskId = id
 
-                    BackgroundAsync({
-                        val id = UUID.randomUUID().toString()
-                        HomeHandler.addSongsTaskId = id
+                    for (i in (itemIndex + 1 until catalogViewData.size)) {
+                        try {
+                            if (skipMonstercatSongs == true) {
+                                val song =
+                                    songDatabaseHelper.getSong(
+                                        view.context,
+                                        catalogViewData[i].songId
+                                    )
 
-                        catalogSongDatabaseHelper.getIndexFromSongId(fistItem.songId)?.toLong()
-                            ?.let { skip ->
-                                val nextSongs = catalogSongDatabaseHelper.getSongs(skip)
-
-                                nextSongs.reverse()
-
-                                for (catalogSong in nextSongs) {
-
-                                    if (skipMonstercatSongs == true) {
-                                        val song =
-                                            songDatabaseHelper.getSong(
-                                                view.context,
-                                                catalogSong.songId
-                                            )
-                                        if (!song?.artist.equals("monstercat", true)) {
-                                            if (id == HomeHandler.addSongsTaskId) {
-                                                songQueue.add(catalogSong.songId)
-                                            } else {
-                                                break
-                                            }
-                                        }
+                                if (!song?.artist.equals("monstercat", true)) {
+                                    if (id == HomeHandler.addSongsTaskId) {
+                                        songQueue.add(catalogViewData[i].songId)
                                     } else {
-                                        if (id == HomeHandler.addSongsTaskId) {
-                                            songQueue.add(catalogSong.songId)
-                                        } else {
-                                            break
-                                        }
+                                        break
                                     }
-
+                                }
+                            } else {
+                                if (id == HomeHandler.addSongsTaskId) {
+                                    songQueue.add(catalogViewData[i].songId)
+                                } else {
+                                    break
                                 }
                             }
-                    }, {}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+
+                        } catch (e: IndexOutOfBoundsException) {
+
+                        }
+
+                    }
+                }, {}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 
             }
 
