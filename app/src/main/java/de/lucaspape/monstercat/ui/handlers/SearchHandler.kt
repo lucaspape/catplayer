@@ -33,9 +33,8 @@ import kotlin.collections.ArrayList
 
 class SearchHandler(
     private val search: String?,
-    onSearch: (searchString: String?) -> Unit,
     private val closeSearch: () -> Unit
-) : Handler(onSearch) {
+) : Handler {
     override val layout: Int = R.layout.fragment_search
 
     override fun onBackPressed(view: View) {

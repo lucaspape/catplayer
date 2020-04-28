@@ -100,11 +100,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.navigation_dashboard -> {
                     openFragment(
                         de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
-                            PlaylistHandler { searchString ->
-                                search(
-                                    searchString
-                                )
-                            })
+                            PlaylistHandler())
                     )
 
                     return@OnNavigationItemSelectedListener true
@@ -117,21 +113,17 @@ class MainActivity : AppCompatActivity() {
         openFragment(
             de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
                 SearchHandler(
-                    searchString,
-                    { newSearchString ->
-                        search(
-                            newSearchString
-                        )
-                    }, {
-                        openFragment(
-                            de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
-                                HomeHandler { searchString ->
-                                    search(
-                                        searchString
-                                    )
-                                })
-                        )
-                    })
+                    searchString
+                ) {
+                    openFragment(
+                        de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
+                            HomeHandler { searchString ->
+                                search(
+                                    searchString
+                                )
+                            })
+                    )
+                }
             )
         )
     }

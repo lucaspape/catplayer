@@ -35,7 +35,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
-class PlaylistHandler(onSearch:(searchString:String?) -> Unit): Handler(onSearch) {
+class PlaylistHandler : Handler {
     companion object {
         @JvmStatic
         var playlistContentViewData = HashMap<String, ArrayList<CatalogItem>>()

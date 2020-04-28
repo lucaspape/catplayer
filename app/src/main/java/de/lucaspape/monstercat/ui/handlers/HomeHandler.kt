@@ -42,7 +42,7 @@ import kotlin.collections.HashMap
 /**
  * Does everything for the home page
  */
-class HomeHandler(private val onSearch:(searchString:String?) -> Unit): Handler(onSearch) {
+class HomeHandler(private val onSearch:(searchString:String?) -> Unit): Handler{
     companion object {
         @JvmStatic
         private var viewDataCache = HashMap<String, WeakReference<ArrayList<*>>>()

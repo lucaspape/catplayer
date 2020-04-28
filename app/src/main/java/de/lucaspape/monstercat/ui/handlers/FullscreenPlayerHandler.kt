@@ -7,7 +7,7 @@ import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.util.*
 import java.lang.ref.WeakReference
 
-class FullscreenPlayerHandler(private val onSearch:(searchString:String?) -> Unit): Handler(onSearch) {
+class FullscreenPlayerHandler(private val onSearch:(searchString:String?) -> Unit): Handler {
     private fun setupMusicPlayer(view: View) {
         val titleTextView = view.findViewById<TextView>(R.id.fullscreenTitle)
         val artistTextView = view.findViewById<TextView>(R.id.fullscreenArtist)
