@@ -3,9 +3,26 @@ package de.lucaspape.util
 import android.content.Context
 import de.lucaspape.monstercat.R
 
-private const val version = "1.3"
-
 class Settings(private val context: Context) {
+
+    companion object {
+        private const val version = "1.3"
+
+        @JvmStatic
+        var settings: Settings? = null
+
+        @JvmStatic
+        fun getSettings(context: Context): Settings {
+            settings?.let {
+                return it
+            }
+
+            val nSettings = Settings(context)
+            settings = nSettings
+
+            return nSettings
+        }
+    }
 
     init {
         if (getString("settings-version") != version) {
@@ -53,11 +70,11 @@ class Settings(private val context: Context) {
         return null
     }
 
-    fun setFloat(key: String, float:Float){
+    fun setFloat(key: String, float: Float) {
         setString(key, float.toString())
     }
 
-    fun getFloat(key: String):Float?{
+    fun getFloat(key: String): Float? {
         getString(key)?.let {
             return it.toFloatOrNull()
         }
@@ -134,7 +151,7 @@ class Settings(private val context: Context) {
             )
         }
 
-        if(getString(context.getString(R.string.volumeSetting)) == null || overwrite){
+        if (getString(context.getString(R.string.volumeSetting)) == null || overwrite) {
             setFloat(context.getString(R.string.volumeSetting), defaultVolume)
         }
     }

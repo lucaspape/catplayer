@@ -42,7 +42,7 @@ import kotlin.collections.HashMap
 /**
  * Does everything for the home page
  */
-class HomeHandler : Handler {
+class HomeHandler(private val onSearch:(searchString:String?) -> Unit): Handler(onSearch) {
     companion object {
         @JvmStatic
         private var viewDataCache = HashMap<String, WeakReference<ArrayList<*>>>()
@@ -74,7 +74,7 @@ class HomeHandler : Handler {
         refreshListener: (albumId: String?, albumMcId: String?) -> Unit,
         backPressedCallback: () -> Unit
     ) {
-        recyclerView = view.findViewById(R.id.musiclistview)
+        recyclerView = view.findViewById(R.id.homeRecyclerView)
 
         recyclerView?.layoutManager =
             LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
@@ -319,7 +319,7 @@ class HomeHandler : Handler {
             }
         })
 
-        val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
+        val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.homePullToRefresh)
         swipeRefreshLayout.setOnRefreshListener {
             refreshListener(albumId, albumMcId)
         }
@@ -348,7 +348,7 @@ class HomeHandler : Handler {
         refreshListener: () -> Unit,
         backPressedCallback: () -> Unit
     ) {
-        recyclerView = view.findViewById(R.id.musiclistview)
+        recyclerView = view.findViewById(R.id.homeRecyclerView)
 
         recyclerView?.layoutManager =
             LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
@@ -426,7 +426,7 @@ class HomeHandler : Handler {
             }
         })
 
-        val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
+        val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.homePullToRefresh)
         swipeRefreshLayout.setOnRefreshListener {
             refreshListener()
         }
@@ -469,7 +469,7 @@ class HomeHandler : Handler {
     private fun registerListeners(view: View) {
         val viewSelector = view.findViewById<Spinner>(R.id.viewSelector)
 
-        val settings = Settings(view.context)
+        val settings = Settings.getSettings(view.context)
 
         var albumViewSelected =
             settings.getBoolean(view.context.getString(R.string.albumViewSelectedSetting))
@@ -541,32 +541,9 @@ class HomeHandler : Handler {
             playStream(Stream(view.context.getString(R.string.twitchClientID), "monstercat"))
         }
 
-        //search
-        val search = view.findViewById<SearchView>(R.id.homeSearch)
-
-        search.setOnCloseListener {
-            if (albumViewSelected == true) {
-                initAlbumListLoad(view, false)
-            } else {
-                initSongListLoad(view, false)
-            }
-
-            false
+        view.findViewById<ImageButton>(R.id.searchButton).setOnClickListener {
+            onSearch(null)
         }
-
-        search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextChange(newText: String?): Boolean {
-                return false
-            }
-
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                query?.let {
-                    searchSong(view, it, false)
-                }
-
-                return false
-            }
-        })
     }
 
     /**
@@ -576,7 +553,7 @@ class HomeHandler : Handler {
         initDone = false
 
         val swipeRefreshLayout =
-            view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
+            view.findViewById<SwipeRefreshLayout>(R.id.homePullToRefresh)
 
         val finished: (catalogViewData: ArrayList<CatalogItem>) -> Unit = { catalogViewData ->
             updateCatalogRecyclerView(
@@ -714,7 +691,7 @@ class HomeHandler : Handler {
         initDone = false
 
         val swipeRefreshLayout =
-            view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
+            view.findViewById<SwipeRefreshLayout>(R.id.homePullToRefresh)
 
         val finished: (albumViewData: ArrayList<AlbumItem>) -> Unit = { albumViewData ->
             updateAlbumRecyclerView(
@@ -848,7 +825,7 @@ class HomeHandler : Handler {
         val contextReference = WeakReference(view.context)
 
         val swipeRefreshLayout =
-            view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
+            view.findViewById<SwipeRefreshLayout>(R.id.homePullToRefresh)
 
         var albumName = ""
         val catalogViewData = ArrayList<CatalogItem>()
@@ -916,122 +893,6 @@ class HomeHandler : Handler {
         )
     }
 
-    /**
-     * Search for string
-     */
-    fun searchSong(view: View, searchString: String, forceReload: Boolean) {
-        //search can also be performed without this view
-        val search = view.findViewById<SearchView>(R.id.homeSearch)
-        search.onActionViewExpanded()
-        search.setQuery(searchString, false)
-        search.clearFocus()
-
-        val contextReference = WeakReference(view.context)
-
-        val swipeRefreshLayout =
-            view.findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
-
-        swipeRefreshLayout.isRefreshing = true
-
-        LoadTitleSearchAsync(
-            contextReference,
-            searchString,
-            0
-            , finishedCallback = { _, _, searchResults ->
-                updateCatalogRecyclerView(
-                    view,
-                    null,
-                    null,
-                    null,
-                    searchString,
-                    false,
-                    searchResults,
-                    "search-$searchString",
-                    { itemAdapter, footerAdapter, currentPage, callback ->
-                        footerAdapter.clear()
-                        footerAdapter.add(ProgressItem())
-
-                        searchMore(
-                            view,
-                            searchString,
-                            itemAdapter,
-                            footerAdapter,
-                            currentPage,
-                            callback
-                        )
-                    },
-                    { _, _ ->
-                        searchSong(view, searchString, true)
-                    },
-                    {
-                        if (Settings(view.context).getBoolean(view.context.getString(R.string.albumViewSelectedSetting)) == true) {
-                            initAlbumListLoad(view, false)
-                        } else {
-                            initSongListLoad(view, false)
-                        }
-                    })
-
-                swipeRefreshLayout.isRefreshing = false
-            }, errorCallback = { _, _ ->
-                swipeRefreshLayout.isRefreshing = false
-
-                displaySnackBar(
-                    view,
-                    view.context.getString(R.string.errorLoadingSearch),
-                    view.context.getString(R.string.retry)
-                ) { searchSong(view, searchString, forceReload) }
-            }).executeOnExecutor(
-            AsyncTask.THREAD_POOL_EXECUTOR
-        )
-
-    }
-
-    private fun searchMore(
-        view: View,
-        searchString: String,
-        itemAdapter: ItemAdapter<CatalogItem>,
-        footerAdapter: ItemAdapter<ProgressItem>,
-        currentPage: Int,
-        callback: (newList: ArrayList<CatalogItem>) -> Unit
-    ) {
-        val contextReference = WeakReference(view.context)
-
-        val skip = currentPage * 50
-
-        LoadTitleSearchAsync(
-            contextReference,
-            searchString,
-            skip
-            , finishedCallback = { _, _, searchResults ->
-                for (result in searchResults) {
-                    itemAdapter.add(result)
-                }
-
-                callback(searchResults)
-
-                footerAdapter.clear()
-            }, errorCallback = { _, _ ->
-                footerAdapter.clear()
-
-                displaySnackBar(
-                    view,
-                    view.context.getString(R.string.errorLoadingSearch),
-                    view.context.getString(R.string.retry)
-                ) {
-                    searchMore(
-                        view,
-                        searchString,
-                        itemAdapter,
-                        footerAdapter,
-                        currentPage,
-                        callback
-                    )
-                }
-            }).executeOnExecutor(
-            AsyncTask.THREAD_POOL_EXECUTOR
-        )
-    }
-
     private fun saveRecyclerViewPosition(
         context: Context,
         savePrefix: String
@@ -1045,7 +906,7 @@ class HomeHandler : Handler {
             startView?.let { sView ->
                 val topView = sView.top - sView.paddingTop
 
-                val settings = Settings(context)
+                val settings = Settings.getSettings(context)
                 settings.setInt("$savePrefix-positionIndex", positionIndex)
                 settings.setInt("$savePrefix-topView", topView)
             }
@@ -1057,7 +918,7 @@ class HomeHandler : Handler {
         savePrefix: String
     ) {
         recyclerView?.let {
-            val settings = Settings(context)
+            val settings = Settings.getSettings(context)
             settings.getInt("$savePrefix-positionIndex")?.let { positionIndex ->
                 settings.getInt("$savePrefix-topView")?.let { topView ->
                     val layoutManager = it.layoutManager as LinearLayoutManager
@@ -1068,7 +929,7 @@ class HomeHandler : Handler {
     }
 
     private fun resetRecyclerViewPosition(context: Context, savePrefix: String) {
-        val settings = Settings(context)
+        val settings = Settings.getSettings(context)
         settings.setInt("$savePrefix-positionIndex", 0)
         settings.setInt("$savePrefix-topView", 0)
     }
@@ -1083,13 +944,9 @@ class HomeHandler : Handler {
 
     override val layout: Int = R.layout.fragment_home
 
-    override fun onCreate(view: View, search: String?) {
+    override fun onCreate(view: View) {
         setupSpinner(view)
         registerListeners(view)
-
-        search?.let {
-            searchSong(view, it, false)
-        }
     }
 
 }

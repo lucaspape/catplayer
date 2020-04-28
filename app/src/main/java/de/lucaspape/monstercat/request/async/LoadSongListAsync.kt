@@ -61,7 +61,7 @@ class LoadSongListAsync(
                 }
             }
 
-            val requestUrl = if(Settings(context).getBoolean(context.getString(R.string.useCustomApiSetting)) == true){
+            val requestUrl = if(Settings.getSettings(context).getBoolean(context.getString(R.string.useCustomApiSetting)) == true){
                 context.getString(R.string.customApiBaseUrl) + "catalog/?limit=50&skip=" + skip.toString()
             }else{
                 context.getString(R.string.loadSongsUrl) + "?limit=50&skip=" + skip.toString()

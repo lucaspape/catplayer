@@ -13,7 +13,7 @@
         android:layout_marginTop="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.442"
-        app:layout_constraintStart_toStartOf="@+id/pullToRefresh"
+        app:layout_constraintStart_toStartOf="@+id/homePullToRefresh"
         app:layout_constraintTop_toTopOf="parent">
 
         <Spinner
@@ -43,19 +43,22 @@
             app:layout_constraintEnd_toEndOf="@+id/settingsButton"
             app:layout_constraintStart_toEndOf="@+id/homeSearch" />
 
-        <SearchView
-            android:id="@+id/homeSearch"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
+        <ImageButton
+            android:id="@+id/searchButton"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="end"
+            android:layout_marginStart="20dp"
+            android:background="@null"
             android:contentDescription="@string/homeSearchDescription"
-            app:layout_constraintEnd_toStartOf="@+id/liveButton"
-            app:layout_constraintStart_toEndOf="@+id/viewSelector"
-            tools:layout_editor_absoluteY="14dp" />
+            android:src="@drawable/ic_search_24"
+            app:layout_constraintEnd_toEndOf="@+id/liveButton"
+            app:layout_constraintStart_toEndOf="@+id/viewSelector" />
 
     </androidx.appcompat.widget.Toolbar>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/pullToRefresh"
+        android:id="@+id/homePullToRefresh"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="10dp"
@@ -68,7 +71,7 @@
         app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/musiclistview"
+            android:id="@+id/homeRecyclerView"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:contentDescription="@string/contentView"

@@ -16,7 +16,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
 
     override fun doInBackground(vararg p0: Void?): String? {
         weakReference.get()?.let { context ->
-            val settings = Settings(context)
+            val settings = Settings.getSettings(context)
             val songDatabaseHelper = SongDatabaseHelper(context)
 
             var failedDownloads = 0

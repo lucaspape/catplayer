@@ -68,7 +68,7 @@ class LoadAlbumAsync(
                 }
             }
 
-            val requestUrl = if(Settings(context).getBoolean(context.getString(R.string.useCustomApiSetting)) == true){
+            val requestUrl = if(Settings.getSettings(context).getBoolean(context.getString(R.string.useCustomApiSetting)) == true){
                 context.getString(R.string.customApiBaseUrl) + "catalog/release/$mcId"
             }else{
                 context.getString(R.string.loadAlbumSongsUrl) + "/$mcId"

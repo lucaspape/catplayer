@@ -35,7 +35,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
-class PlaylistHandler: Handler {
+class PlaylistHandler(onSearch:(searchString:String?) -> Unit): Handler(onSearch) {
     companion object {
         @JvmStatic
         var playlistContentViewData = HashMap<String, ArrayList<CatalogItem>>()
@@ -503,8 +503,8 @@ class PlaylistHandler: Handler {
 
     override val layout: Int = R.layout.fragment_playlist
 
-    override fun onCreate(view: View, search: String?) {
-        val settings = Settings(view.context)
+    override fun onCreate(view: View) {
+        val settings = Settings.getSettings(view.context)
 
         val username = settings.getString(view.context.getString(R.string.emailSetting))
         val password = settings.getString(view.context.getString(R.string.passwordSetting))

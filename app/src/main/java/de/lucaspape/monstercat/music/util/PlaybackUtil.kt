@@ -162,7 +162,7 @@ fun playStream(stream: Stream) {
     contextReference?.get()?.let { context ->
         streamInfoUpdateAsync?.cancel(true)
 
-        val settings = Settings(context)
+        val settings = Settings.getSettings(context)
 
         startPlayerService("")
 

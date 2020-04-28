@@ -355,7 +355,7 @@ fun skipPreviousInPlaylist() {
 fun playRelatedSongs() {
     contextReference?.let { weakReference ->
         weakReference.get()?.let { context ->
-            Settings(context)
+            Settings.getSettings(context)
                 .getBoolean(context.getString(R.string.skipMonstercatSongsSetting))?.let {
                 LoadRelatedTracksAsync(weakReference, playlist, it,
                     finishedCallback = { _, relatedIdArray ->

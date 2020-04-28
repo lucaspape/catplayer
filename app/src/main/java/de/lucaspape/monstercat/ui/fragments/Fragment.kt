@@ -10,23 +10,13 @@ import de.lucaspape.monstercat.ui.handlers.Handler
 
 class Fragment() : Fragment() {
 
-    private var search: String? = null
     private var handler:Handler? = null
-
-    constructor(handler: Handler, search: String) : this(handler) {
-        if (search != "") {
-            this.search = search
-        }
-    }
 
     constructor(handler:Handler): this(){
         this.handler = handler
     }
 
     companion object {
-        fun newInstance(handler: Handler, search: String): Fragment =
-            Fragment(handler, search)
-
         fun newInstance(handler: Handler): Fragment =
             Fragment(handler)
     }
@@ -46,7 +36,7 @@ class Fragment() : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        handler?.onCreate(view, search)
+        handler?.onCreate(view)
     }
 
     override fun onPause() {

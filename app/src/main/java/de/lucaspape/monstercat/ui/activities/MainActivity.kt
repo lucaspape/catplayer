@@ -31,6 +31,7 @@ import de.lucaspape.monstercat.music.util.*
 import de.lucaspape.monstercat.music.util.setCover
 import de.lucaspape.monstercat.ui.handlers.HomeHandler
 import de.lucaspape.monstercat.ui.handlers.PlaylistHandler
+import de.lucaspape.monstercat.ui.handlers.SearchHandler
 import de.lucaspape.monstercat.util.*
 import de.lucaspape.util.Settings
 import java.io.File
@@ -85,20 +86,26 @@ class MainActivity : AppCompatActivity() {
         BottomNavigationView.OnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_home -> {
-                    currentFragment =
-                        de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(HomeHandler())
-                    currentFragment?.let {
-                        openFragment(it)
-                    }
+                    openFragment(
+                        de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
+                            HomeHandler { searchString ->
+                                search(
+                                    searchString
+                                )
+                            })
+                    )
 
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.navigation_dashboard -> {
-                    currentFragment =
-                        de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(PlaylistHandler())
-                    currentFragment?.let {
-                        openFragment(it)
-                    }
+                    openFragment(
+                        de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
+                            PlaylistHandler { searchString ->
+                                search(
+                                    searchString
+                                )
+                            })
+                    )
 
                     return@OnNavigationItemSelectedListener true
                 }
@@ -106,7 +113,32 @@ class MainActivity : AppCompatActivity() {
             false
         }
 
+    private fun search(searchString: String?) {
+        openFragment(
+            de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
+                SearchHandler(
+                    searchString,
+                    { newSearchString ->
+                        search(
+                            newSearchString
+                        )
+                    }, {
+                        openFragment(
+                            de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
+                                HomeHandler { searchString ->
+                                    search(
+                                        searchString
+                                    )
+                                })
+                        )
+                    })
+            )
+        )
+    }
+
     private fun openFragment(fragment: Fragment) {
+        currentFragment = fragment
+
         val transaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.container, fragment)
         transaction.addToBackStack(null)
@@ -136,7 +168,7 @@ class MainActivity : AppCompatActivity() {
         //adjust theme
         changeTheme()
 
-        val settings = Settings(this)
+        val settings = Settings.getSettings(this)
 
         if (settings.getString(getString(R.string.appVersionSetting)) != packageManager.getPackageInfo(
                 packageName,
@@ -191,20 +223,16 @@ class MainActivity : AppCompatActivity() {
         }
 
         val intentExtras = intent.extras
-
         if (intentExtras != null) {
             if (intentExtras["search"] != null) {
-                //open the home fragment
-                currentFragment = de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
-                    HomeHandler(),
-                    intentExtras["search"] as String
-                )
-                currentFragment?.let {
-                    openFragment(it)
-                }
+                search(intentExtras["search"] as String)
             }
         } else {
-            openFragment(de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(HomeHandler()))
+            openFragment(de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(HomeHandler { searchString ->
+                search(
+                    searchString
+                )
+            }))
         }
 
         setContentView(R.layout.activity_main)
@@ -314,7 +342,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun changeTheme() {
-        val settings = Settings(this)
+        val settings = Settings.getSettings(this)
 
         val darkMode = settings.getBoolean(getString(R.string.darkThemeSetting))
 
@@ -407,7 +435,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showPrivacyPolicy() {
-        val settings = Settings(this)
+        val settings = Settings.getSettings(this)
 
         //for new privacy policy change version number
         if (settings.getString(getString(R.string.privacyPolicySetting)) != "1.1") {

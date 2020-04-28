@@ -42,7 +42,7 @@ internal fun downloadImageUrlIntoImageReceiver(
     imageId: String,
     url: String
 ) {
-    val settings = Settings(context)
+    val settings = Settings.getSettings(context)
     val resolution = if (!lowRes) {
         settings.getInt(context.getString(R.string.primaryCoverResolutionSetting))
     } else {
@@ -144,7 +144,7 @@ fun downloadCoverIntoImageReceiver(
     albumId: String,
     lowRes: Boolean
 ) {
-    val url = if(Settings(context).getBoolean(context.getString(R.string.useCustomApiSetting)) == true){
+    val url = if(Settings.getSettings(context).getBoolean(context.getString(R.string.useCustomApiSetting)) == true){
         context.getString(R.string.customApiBaseUrl) + "release/" + albumId + "/cover"
     }else{
         context.getString(R.string.trackContentUrl) + "$albumId/cover"

@@ -1,16 +1,13 @@
 package de.lucaspape.monstercat.ui.handlers
 
-import android.content.Context
-import android.content.Intent
 import android.view.View
 import android.widget.*
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.util.*
-import de.lucaspape.monstercat.ui.activities.MainActivity
 import java.lang.ref.WeakReference
 
-class FullscreenPlayerHandler : Handler {
+class FullscreenPlayerHandler(private val onSearch:(searchString:String?) -> Unit): Handler(onSearch) {
     private fun setupMusicPlayer(view: View) {
         val titleTextView = view.findViewById<TextView>(R.id.fullscreenTitle)
         val artistTextView = view.findViewById<TextView>(R.id.fullscreenArtist)
@@ -98,11 +95,11 @@ class FullscreenPlayerHandler : Handler {
         val artistTextView = view.findViewById<TextView>(R.id.fullscreenArtist)
 
         titleTextView.setOnClickListener {
-            search(view.context, titleTextView.text.toString())
+            onSearch(titleTextView.text.toString())
         }
 
         artistTextView.setOnClickListener {
-            search(view.context, artistTextView.text.toString())
+            onSearch(artistTextView.text.toString())
         }
     }
 
@@ -114,15 +111,8 @@ class FullscreenPlayerHandler : Handler {
 
     override val layout: Int = R.layout.activity_player_fullscreen
 
-    override fun onCreate(view: View, search: String?) {
+    override fun onCreate(view: View) {
         setupMusicPlayer(view)
         registerListeners(view)
-    }
-
-    private fun search(context: Context, term: String) {
-        val intent = Intent(context, MainActivity::class.java)
-        intent.putExtra("search", term)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        context.startActivity(intent)
     }
 }

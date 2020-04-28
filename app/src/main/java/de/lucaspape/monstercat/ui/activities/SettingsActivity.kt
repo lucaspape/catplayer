@@ -42,7 +42,7 @@ class SettingsActivity : AppCompatActivity() {
         val playRelatedSwitch = findViewById<Switch>(R.id.playRelatedSwitch)
         val saveCoverImagesToCacheSwitch = findViewById<Switch>(R.id.saveCoverImagesToCacheSwitch)
 
-        val settings = Settings(this)
+        val settings = Settings.getSettings(this)
 
         settings.getBoolean(getString(R.string.saveCoverImagesToCacheSetting))?.let {
             saveCoverImagesToCacheSwitch.isChecked = it
@@ -187,7 +187,7 @@ class SettingsActivity : AppCompatActivity() {
             negativeButton.setTextColor(typedValue.data)
         }
 
-        val settings = Settings(this)
+        val settings = Settings.getSettings(this)
 
         //login button listener
         findViewById<Button>(R.id.add_account).setOnClickListener {
@@ -213,7 +213,7 @@ class SettingsActivity : AppCompatActivity() {
 
         coverResolutionSeekBar.max = 2048 / 256
 
-        val settings = Settings(this)
+        val settings = Settings.getSettings(this)
 
         settings.getInt(getString(R.string.primaryCoverResolutionSetting))?.let {
             coverResolutionSeekBar.progress = it / 256
@@ -258,7 +258,7 @@ class SettingsActivity : AppCompatActivity() {
 
         crossfadeTimeSeekBar.max = 20000 / 1000
 
-        val settings = Settings(this)
+        val settings = Settings.getSettings(this)
 
         settings.getInt(getString(R.string.crossfadeTimeSetting))?.let {
             crossfadeTimeSeekBar.progress = it / 1000
@@ -296,7 +296,7 @@ class SettingsActivity : AppCompatActivity() {
 
         volumeSeekBar.max = 100
 
-        val settings = Settings(this)
+        val settings = Settings.getSettings(this)
 
         settings.getFloat(getString(R.string.volumeSetting))?.let {
             volumeSeekBar.progress = (it*100).toInt()

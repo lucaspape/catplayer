@@ -47,6 +47,6 @@ class JsonObjectRequest(
             )
         }
 
-        return Response.error(ParseError(NullPointerException()));
+        return Response.error(ParseError(NullPointerException()))
     }
 }

@@ -46,7 +46,7 @@ class LoadTitleSearchAsync(
                 }
             }
 
-            val searchUrl = if(Settings(context).getBoolean(context.getString(R.string.useCustomApiSetting)) == true){
+            val searchUrl = if(Settings.getSettings(context).getBoolean(context.getString(R.string.useCustomApiSetting)) == true){
                 context.getString(R.string.customApiBaseUrl) + "catalog/search?term=$searchString&limit=50&skip=" + skip.toString()
             }else{
                 context.getString(R.string.loadSongsUrl) + "?term=$searchString&limit=50&skip=" + skip.toString() + "&fields=&search=$searchString"

@@ -2,10 +2,10 @@ package de.lucaspape.monstercat.ui.handlers
 
 import android.view.View
 
-interface Handler {
-    val layout:Int
+abstract class Handler(onSearch:(searchString:String?) -> Unit) {
+    abstract val layout:Int
 
-    fun onBackPressed(view: View)
-    fun onPause(view: View)
-    fun onCreate(view: View, search:String?)
+    abstract fun onBackPressed(view: View)
+    abstract fun onPause(view: View)
+    abstract fun onCreate(view: View)
 }

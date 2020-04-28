@@ -21,7 +21,7 @@ fun getAudioAttributes(): AudioAttributes {
 }
 
 fun requestAudioFocus(context: Context): Int {
-    val settings = Settings(context)
+    val settings = Settings.getSettings(context)
 
     return if (settings.getBoolean(context.getString(R.string.disableAudioFocusSetting)) == true) {
         AudioManager.AUDIOFOCUS_REQUEST_GRANTED
