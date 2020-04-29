@@ -27,18 +27,6 @@ class OkHttp3Stack(private val context: Context, private val cookieJar: CookieJa
         request: Request<*>
     ) {
         when (request.method) {
-            Request.Method.DEPRECATED_GET_OR_POST -> {
-                // Ensure backwards compatibility.  Volley assumes a request with a null body is a GET.
-                val postBody = request.postBody
-                if (postBody != null) {
-                    builder.post(
-                        RequestBody.create(
-                            request.postBodyContentType.toMediaTypeOrNull(),
-                            postBody
-                        )
-                    )
-                }
-            }
             Request.Method.GET -> builder.get()
             Request.Method.DELETE -> builder.delete(createRequestBody(request))
             Request.Method.POST -> builder.post(createRequestBody(request)!!)
