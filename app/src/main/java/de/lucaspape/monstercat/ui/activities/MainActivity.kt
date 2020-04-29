@@ -202,15 +202,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         val intentExtras = intent.extras
+        val path = intent.data?.path
+
         if (intentExtras != null) {
             if (intentExtras["search"] != null) {
                 search(intentExtras["search"] as String)
             }
-        }
-
-        val path = intent.data?.path
-
-        if (path != null) {
+        } else if (path != null) {
             val id = path.substring(path.lastIndexOf("/") + 1, path.length)
 
             when {
