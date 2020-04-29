@@ -42,7 +42,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 /**
- * Does everything for the home page
+ * Does everything for the home page, pass albumMcId to open album on init
  */
 class HomeHandler(
     private val onSearch: (searchString: String?) -> Unit,
@@ -472,7 +472,7 @@ class HomeHandler(
     private fun registerListeners(view: View): Boolean {
         val viewSelector = view.findViewById<CustomSpinnerClass>(R.id.viewSelector)
 
-        val settings = Settings.getSettings(view.context)
+        val settings = getSettings(view.context)
 
         var albumViewSelected =
             settings.getBoolean(view.context.getString(R.string.albumViewSelectedSetting))
@@ -506,6 +506,7 @@ class HomeHandler(
                 id: Long,
                 userSelected: Boolean
             ) {
+                //dont call on initial change, only if from user
                 if (++selected > 1 && userSelected) {
                     when {
                         viewSelector.getItemAtPosition(position) == view.context.getString(R.string.catalogView) -> {
@@ -913,7 +914,7 @@ class HomeHandler(
             startView?.let { sView ->
                 val topView = sView.top - sView.paddingTop
 
-                val settings = Settings.getSettings(context)
+                val settings = getSettings(context)
                 settings.setInt("$savePrefix-positionIndex", positionIndex)
                 settings.setInt("$savePrefix-topView", topView)
             }
@@ -925,7 +926,7 @@ class HomeHandler(
         savePrefix: String
     ) {
         recyclerView?.let {
-            val settings = Settings.getSettings(context)
+            val settings = getSettings(context)
             settings.getInt("$savePrefix-positionIndex")?.let { positionIndex ->
                 settings.getInt("$savePrefix-topView")?.let { topView ->
                     val layoutManager = it.layoutManager as LinearLayoutManager
@@ -936,7 +937,7 @@ class HomeHandler(
     }
 
     private fun resetRecyclerViewPosition(context: Context, savePrefix: String) {
-        val settings = Settings.getSettings(context)
+        val settings = getSettings(context)
         settings.setInt("$savePrefix-positionIndex", 0)
         settings.setInt("$savePrefix-topView", 0)
     }
@@ -955,6 +956,7 @@ class HomeHandler(
         setupSpinner(view)
 
         if (albumMcId != null) {
+            //open album
             val albumViewSelected = registerListeners(view)
 
             val swipeRefreshLayout =
@@ -1007,11 +1009,12 @@ class HomeHandler(
                 swipeRefreshLayout.isRefreshing = false
             })
         } else {
+            //open catalog/album view
             init(view, registerListeners(view))
         }
     }
 
-    fun init(view: View, albumViewSelected:Boolean){
+    private fun init(view: View, albumViewSelected:Boolean){
         val settings = getSettings(view.context)
         if (albumViewSelected) {
             settings.setBoolean(

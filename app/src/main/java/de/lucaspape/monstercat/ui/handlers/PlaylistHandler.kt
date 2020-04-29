@@ -35,6 +35,9 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
+/**
+ * PlaylistHandler, pass playlistId to open playlist on init
+ */
 class PlaylistHandler(private val initPlaylistId: String?) : Handler {
     companion object {
         @JvmStatic

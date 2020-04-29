@@ -103,7 +103,7 @@ class CustomSpinnerClass : AppCompatSpinner,
          */
         fun onItemSelected(
             parent: AdapterView<*>?,
-            view: View?,
+            v: View?,
             position: Int,
             id: Long,
             userSelected: Boolean
