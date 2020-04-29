@@ -389,7 +389,7 @@ class PlaylistHandler(private val initPlaylistId: String?) : Handler {
 
             LoadPlaylistAsync(
                 contextReference,
-                forceReload, displayLoading = {
+                forceReload, true, displayLoading = {
                     swipeRefreshLayout.isRefreshing = true
                 }
                 , finishedCallback = { _, _ ->
@@ -513,9 +513,37 @@ class PlaylistHandler(private val initPlaylistId: String?) : Handler {
         val password = settings.getString(view.context.getString(R.string.passwordSetting))
 
         registerListeners(view)
-        
+
         if (initPlaylistId != null) {
-            loadPlaylistTracks(view, false, initPlaylistId)
+            addPlaylist(view, initPlaylistId)
+
+            val swipeRefreshLayout =
+                view.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
+
+            LoadPlaylistAsync(
+                WeakReference(view.context),
+                false, loadManual = true, displayLoading = {
+                    swipeRefreshLayout.isRefreshing = true
+                }
+                , finishedCallback = { _, _ ->
+                    BackgroundAsync({
+
+                        val playlistDatabaseHelper =
+                            PlaylistDatabaseHelper(view.context)
+                        val playlists = playlistDatabaseHelper.getAllPlaylists()
+
+                        for (playlist in playlists) {
+                            playlistViewData.add(PlaylistItem(playlist.playlistId))
+                        }
+
+                    }, {
+                        loadPlaylistTracks(view, false, initPlaylistId)
+                        swipeRefreshLayout.isRefreshing = false
+                    }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                }, errorCallback = { _, _ ->
+                    loadPlaylistTracks(view, false, initPlaylistId)
+                    swipeRefreshLayout.isRefreshing = false
+                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         } else if (username != null || password != null) {
             loadPlaylist(view, false)
         } else {

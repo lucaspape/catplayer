@@ -21,6 +21,7 @@ import java.lang.ref.WeakReference
 class LoadPlaylistAsync(
     private val contextReference: WeakReference<Context>,
     private val forceReload: Boolean,
+    private val loadManual: Boolean,
     private val displayLoading: () -> Unit,
     private val finishedCallback: (forceReload:Boolean, displayLoading:() -> Unit) -> Unit,
     private val errorCallback: (forceReload:Boolean, displayLoading:() -> Unit) -> Unit
@@ -62,37 +63,43 @@ class LoadPlaylistAsync(
             val syncObject = Object()
 
             playlistRequestQueue.addRequestFinishedListener<Any> {
-                val manualPlaylists = ManualPlaylistDatabaseHelper(context).getAllPlaylists()
+                if(loadManual){
+                    val manualPlaylists = ManualPlaylistDatabaseHelper(context).getAllPlaylists()
 
-                //LOAD MANUAL ADDED PLAYLISTS
-                val taskList = ArrayList<LoadManualPlaylist>()
-                var i = 0
+                    //LOAD MANUAL ADDED PLAYLISTS
+                    val taskList = ArrayList<LoadManualPlaylist>()
+                    var i = 0
 
-                for(playlist in manualPlaylists){
-                    taskList.add(LoadManualPlaylist(contextReference, playlist.playlistId, {
-                        try {
-                            val task = taskList[i]
-                            i++
-                            task.executeOnExecutor(THREAD_POOL_EXECUTOR)
-                        }catch (e: IndexOutOfBoundsException){
+                    for(playlist in manualPlaylists){
+                        taskList.add(LoadManualPlaylist(contextReference, playlist.playlistId, {
+                            try {
+                                val task = taskList[i]
+                                i++
+                                task.executeOnExecutor(THREAD_POOL_EXECUTOR)
+                            }catch (e: IndexOutOfBoundsException){
+                                synchronized(syncObject) {
+                                    syncObject.notify()
+                                }
+                            }
+                        }, {
+                            success = false
+
                             synchronized(syncObject) {
                                 syncObject.notify()
                             }
-                        }
-                    }, {
-                        success = false
+                        }))
+                    }
 
+                    try{
+                        val task = taskList[i]
+                        i++
+                        task.executeOnExecutor(THREAD_POOL_EXECUTOR)
+                    }catch (e: IndexOutOfBoundsException){
                         synchronized(syncObject) {
                             syncObject.notify()
                         }
-                    }))
-                }
-
-                try{
-                    val task = taskList[i]
-                    i++
-                    task.executeOnExecutor(THREAD_POOL_EXECUTOR)
-                }catch (e: IndexOutOfBoundsException){
+                    }
+                }else{
                     synchronized(syncObject) {
                         syncObject.notify()
                     }

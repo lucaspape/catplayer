@@ -211,6 +211,7 @@ internal fun addSongToPlaylist(view: View, songId: String) {
     LoadPlaylistAsync(
         WeakReference(view.context),
         true,
+        false,
         displayLoading = {},
         finishedCallback = { _, _ ->
             val playlistDatabaseHelper =
@@ -443,7 +444,7 @@ internal fun createPlaylist(view: View) {
     }
 }
 
-private fun addPlaylist(view: View, playlistId: String) {
+internal fun addPlaylist(view: View, playlistId: String) {
     val manualPlaylistDatabaseHelper = ManualPlaylistDatabaseHelper(view.context)
     manualPlaylistDatabaseHelper.insertPlaylist(playlistId)
 }
