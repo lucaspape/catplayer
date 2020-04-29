@@ -59,7 +59,7 @@ class LoadAlbumAsync(
             var success = true
             val syncObject = Object()
 
-            requestQueue.add(newLoadAlbumRequest(context, albumId, {
+            requestQueue.add(newLoadAlbumRequest(context, mcId, {
                 val jsonArray = it.getJSONArray("tracks")
 
                 albumItemDatabaseHelper.reCreateTable()
