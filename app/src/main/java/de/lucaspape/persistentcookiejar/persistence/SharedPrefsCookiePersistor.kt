@@ -71,7 +71,7 @@ class SharedPrefsCookiePersistor(private val sharedPreferences: SharedPreference
         private const val version = "1.0"
 
         fun checkUpgrade(context: Context): SharedPreferences {
-            val settings = Settings(context)
+            val settings = Settings.getSettings(context)
 
             if (settings.getString("cookie-persistor-version") != version) {
                 context.getSharedPreferences(
