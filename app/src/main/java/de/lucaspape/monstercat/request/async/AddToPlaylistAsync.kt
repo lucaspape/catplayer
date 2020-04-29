@@ -2,13 +2,10 @@ package de.lucaspape.monstercat.request.async
 
 import android.content.Context
 import android.os.AsyncTask
-import com.android.volley.Request
-import com.android.volley.Response
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
-import de.lucaspape.monstercat.request.JsonObjectRequest
+import de.lucaspape.monstercat.request.newAddToPlaylistRequest
 import de.lucaspape.monstercat.util.newAuthorizedRequestQueue
-import org.json.JSONObject
 import java.lang.ref.WeakReference
 
 class AddToPlaylistAsync(
@@ -30,14 +27,8 @@ class AddToPlaylistAsync(
     override fun doInBackground(vararg params: Void?): Boolean {
         contextReference.get()?.let { context ->
             SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
-                val addToPlaylistUrl =
-                    context.getString(R.string.playlistUrl) + playlistId + "/record"
-
-                val addToPlaylistQueue = newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
-
-                val songJsonObject = JSONObject()
-                songJsonObject.put("trackId", song.songId)
-                songJsonObject.put("releaseId", song.albumId)
+                val addToPlaylistQueue =
+                    newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
                 var success = true
                 val syncObject = Object()
@@ -48,18 +39,18 @@ class AddToPlaylistAsync(
                     }
                 }
 
-                val addToPlaylistRequest = JsonObjectRequest(
-                    Request.Method.PATCH,
-                    addToPlaylistUrl,
-                    songJsonObject,
-                    Response.Listener {
+                addToPlaylistQueue.add(
+                    newAddToPlaylistRequest(
+                        context,
+                        playlistId,
+                        song,
+                        {
 
-                    },
-                    Response.ErrorListener {
-                        success = false
-                    })
-
-                addToPlaylistQueue.add(addToPlaylistRequest)
+                        },
+                        {
+                            success = false
+                        })
+                )
 
                 synchronized(syncObject) {
                     syncObject.wait()

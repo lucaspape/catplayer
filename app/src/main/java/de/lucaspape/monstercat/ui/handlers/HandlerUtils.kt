@@ -9,9 +9,6 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.EditText
-import com.android.volley.Request
-import com.android.volley.Response
-import com.android.volley.toolbox.StringRequest
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.*
@@ -21,12 +18,12 @@ import de.lucaspape.monstercat.music.next
 import de.lucaspape.monstercat.ui.abstract_items.AlertListItem
 import de.lucaspape.monstercat.ui.abstract_items.HeaderTextItem
 import de.lucaspape.monstercat.request.async.*
+import de.lucaspape.monstercat.request.newLoadAlbumRequest
 import de.lucaspape.monstercat.ui.abstract_items.CatalogItem
 import de.lucaspape.monstercat.ui.addPlaylistDrawable
 import de.lucaspape.monstercat.ui.createPlaylistDrawable
 import de.lucaspape.monstercat.util.*
 import de.lucaspape.util.BackgroundAsync
-import org.json.JSONObject
 import java.io.File
 import java.lang.IndexOutOfBoundsException
 import java.lang.ref.WeakReference
@@ -39,36 +36,28 @@ fun loadAlbumTracks(
     finishedCallback: (trackIds: ArrayList<String>) -> Unit,
     errorCallback: () -> Unit
 ) {
-    val requestUrl =
-        context.getString(R.string.loadAlbumSongsUrl) + "/" + mcID
+    val albumRequestQueue =
+        newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
-    val albumRequestQueue = newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+    albumRequestQueue.add(newLoadAlbumRequest(context, mcID, {
+        parseAlbumToDB(it.getJSONObject("release"), context)
 
-    val albumRequest = StringRequest(Request.Method.GET, requestUrl,
-        Response.Listener { response ->
-            val jsonObject = JSONObject(response)
+        val jsonArray = it.getJSONArray("tracks")
 
-            parseAlbumToDB(jsonObject.getJSONObject("release"), context)
+        val idArray = ArrayList<String>()
 
-            val jsonArray = jsonObject.getJSONArray("tracks")
-
-            val idArray = ArrayList<String>()
-
-            AlbumDatabaseHelper(context).getAlbumFromMcId(mcID)?.let {album ->
-                for (i in (0 until jsonArray.length())) {
-                    parseAlbumSongToDB(jsonArray.getJSONObject(i), album.albumId, context)?.let {id ->
-                        idArray.add(id)
-                    }
+        AlbumDatabaseHelper(context).getAlbumFromMcId(mcID)?.let { album ->
+            for (i in (0 until jsonArray.length())) {
+                parseAlbumSongToDB(jsonArray.getJSONObject(i), album.albumId, context)?.let { id ->
+                    idArray.add(id)
                 }
             }
+        }
 
-            finishedCallback(idArray)
-        },
-        Response.ErrorListener {
-            errorCallback()
-        })
-
-    albumRequestQueue.add(albumRequest)
+        finishedCallback(idArray)
+    }, {
+        errorCallback()
+    }))
 }
 
 /**
@@ -570,65 +559,60 @@ internal fun deletePlaylistSong(
 
 internal fun openAlbum(view: View, albumMcId: String, share: Boolean) {
     val context = view.context
-    val volleyRequestQueue = newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+    val volleyRequestQueue =
+        newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
-    val albumLinksRequest = StringRequest(Request.Method.GET,
-        context.getString(R.string.loadAlbumSongsUrl) + "/$albumMcId",
-        Response.Listener { response ->
-            val responseJsonObject = JSONObject(response)
-            val releaseObject = responseJsonObject.getJSONObject("release")
-            val linksArray = releaseObject.getJSONArray("links")
+    volleyRequestQueue.add(newLoadAlbumRequest(context, albumMcId, {
+        val releaseObject = it.getJSONObject("release")
+        val linksArray = releaseObject.getJSONArray("links")
 
-            val itemArray = ArrayList<AlertListItem>()
-            val urlArray = ArrayList<String>()
+        val itemArray = ArrayList<AlertListItem>()
+        val urlArray = ArrayList<String>()
 
-            itemArray.add(AlertListItem("monstercat.com", ""))
-            urlArray.add(context.getString(R.string.shareReleaseUrl) + "/$albumMcId")
+        itemArray.add(AlertListItem("monstercat.com", ""))
+        urlArray.add(context.getString(R.string.shareReleaseUrl) + "/$albumMcId")
 
-            for (i in (0 until linksArray.length())) {
-                val linkObject = linksArray.getJSONObject(i)
+        for (i in (0 until linksArray.length())) {
+            val linkObject = linksArray.getJSONObject(i)
 
-                itemArray.add(AlertListItem(linkObject.getString("platform"), ""))
-                urlArray.add(linkObject.getString("original"))
-            }
+            itemArray.add(AlertListItem(linkObject.getString("platform"), ""))
+            urlArray.add(linkObject.getString("original"))
+        }
 
-            val title = if (share) {
-                context.getString(R.string.pickLinkToShare)
-            } else {
-                context.getString(R.string.pickApp)
-            }
+        val title = if (share) {
+            context.getString(R.string.pickLinkToShare)
+        } else {
+            context.getString(R.string.pickApp)
+        }
 
-            displayAlertDialogList(context, HeaderTextItem(title), itemArray) { position, _ ->
-                urlArray[position].let { url ->
-                    if (share) {
-                        val sendIntent = Intent().apply {
-                            action = Intent.ACTION_SEND
-                            putExtra(Intent.EXTRA_TEXT, url)
-                            type = "text/plain"
-                        }
-
-                        val shareIntent = Intent.createChooser(sendIntent, null)
-                        context.startActivity(shareIntent)
-                    } else {
-                        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+        displayAlertDialogList(context, HeaderTextItem(title), itemArray) { position, _ ->
+            urlArray[position].let { url ->
+                if (share) {
+                    val sendIntent = Intent().apply {
+                        action = Intent.ACTION_SEND
+                        putExtra(Intent.EXTRA_TEXT, url)
+                        type = "text/plain"
                     }
+
+                    val shareIntent = Intent.createChooser(sendIntent, null)
+                    context.startActivity(shareIntent)
+                } else {
+                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
                 }
             }
-        },
-        Response.ErrorListener {
-            displaySnackBar(
-                view,
-                context.getString(R.string.errorRetrieveAlbumData),
-                context.getString(R.string.retry)
-            ) {
-                openAlbum(view, albumMcId, share)
-            }
-        })
-
-    volleyRequestQueue.add(albumLinksRequest)
+        }
+    }, {
+        displaySnackBar(
+            view,
+            context.getString(R.string.errorRetrieveAlbumData),
+            context.getString(R.string.retry)
+        ) {
+            openAlbum(view, albumMcId, share)
+        }
+    }))
 }
 
-internal fun openPlaylist(view: View, playlistId: String, share:Boolean){
+internal fun openPlaylist(view: View, playlistId: String, share: Boolean) {
     val url = view.context.getString(R.string.playlistShareUrl) + playlistId
 
     if (share) {
@@ -645,7 +629,11 @@ internal fun openPlaylist(view: View, playlistId: String, share:Boolean){
     }
 }
 
-internal fun playSongsFromCatalogDb(context: Context, skipMonstercatSongs:Boolean, firstSongId:String){
+internal fun playSongsFromCatalogDb(
+    context: Context,
+    skipMonstercatSongs: Boolean,
+    firstSongId: String
+) {
     HomeHandler.addSongsTaskId = ""
 
     clearPlaylist()
@@ -698,7 +686,12 @@ internal fun playSongsFromCatalogDb(context: Context, skipMonstercatSongs:Boolea
 }
 
 
-internal fun playSongsFromViewData(context: Context, skipMonstercatSongs: Boolean, catalogViewData: ArrayList<CatalogItem>, itemIndex:Int){
+internal fun playSongsFromViewData(
+    context: Context,
+    skipMonstercatSongs: Boolean,
+    catalogViewData: ArrayList<CatalogItem>,
+    itemIndex: Int
+) {
     HomeHandler.addSongsTaskId = ""
 
     clearPlaylist()

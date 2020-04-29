@@ -2,15 +2,11 @@ package de.lucaspape.monstercat.request.async
 
 import android.content.Context
 import android.os.AsyncTask
-import com.android.volley.Response
-import com.android.volley.Request
-import com.android.volley.toolbox.StringRequest
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.CatalogSongDatabaseHelper
-import de.lucaspape.util.Settings
+import de.lucaspape.monstercat.request.newLoadSongListRequest
 import de.lucaspape.monstercat.util.newAuthorizedRequestQueue
 import de.lucaspape.monstercat.util.parseCatalogSongToDB
-import org.json.JSONObject
 import java.lang.ref.WeakReference
 
 /**
@@ -53,7 +49,8 @@ class LoadSongListAsync(
             var success = true
             val syncObject = Object()
 
-            val requestQueue = newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+            val requestQueue =
+                newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
             requestQueue.addRequestFinishedListener<Any> {
                 synchronized(syncObject) {
@@ -61,31 +58,18 @@ class LoadSongListAsync(
                 }
             }
 
-            val requestUrl = if(Settings.getSettings(context).getBoolean(context.getString(R.string.useCustomApiSetting)) == true){
-                context.getString(R.string.customApiBaseUrl) + "catalog/?limit=50&skip=" + skip.toString()
-            }else{
-                context.getString(R.string.loadSongsUrl) + "?limit=50&skip=" + skip.toString()
-            }
+            requestQueue.add(newLoadSongListRequest(context, skip, {
+                val jsonArray = it.getJSONArray("results")
 
-            val listRequest = StringRequest(
-                Request.Method.GET, requestUrl,
-                Response.Listener { response ->
-                    val json = JSONObject(response)
-                    val jsonArray = json.getJSONArray("results")
-
-                    for (i in (0 until jsonArray.length())) {
-                        parseCatalogSongToDB(
-                            jsonArray.getJSONObject(i),
-                            context
-                        )
-                    }
-
-                }, Response.ErrorListener {
-                    success = false
+                for (i in (0 until jsonArray.length())) {
+                    parseCatalogSongToDB(
+                        jsonArray.getJSONObject(i),
+                        context
+                    )
                 }
-            )
-
-            requestQueue.add(listRequest)
+            }, {
+                success = false
+            }))
 
             synchronized(syncObject) {
                 syncObject.wait()

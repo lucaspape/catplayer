@@ -2,12 +2,10 @@ package de.lucaspape.monstercat.request.async
 
 import android.content.Context
 import android.os.AsyncTask
-import com.android.volley.Request
-import com.android.volley.Response
-import com.android.volley.toolbox.StringRequest
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.ManualPlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
+import de.lucaspape.monstercat.request.newDeletePlaylistRequest
 import de.lucaspape.monstercat.util.newAuthorizedRequestQueue
 import java.lang.ref.WeakReference
 
@@ -32,7 +30,7 @@ class DeletePlaylistAsync(
         contextReference.get()?.let { context ->
             var success = true
 
-            if(deleteLocal){
+            if (deleteLocal) {
                 val playlistDatabaseHelper = PlaylistDatabaseHelper(context)
                 playlistDatabaseHelper.removePlaylist(playlistId)
 
@@ -40,11 +38,9 @@ class DeletePlaylistAsync(
                 manualPlaylistDatabaseHelper.removePlaylist(playlistId)
             }
 
-            if(deleteRemote){
-                val deletePlaylistVolleyQueue = newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
-
-                val deletePlaylistUrl = context.getString(R.string.playlistUrl) + playlistId
-
+            if (deleteRemote) {
+                val deletePlaylistVolleyQueue =
+                    newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
                 val syncObject = Object()
 
                 deletePlaylistVolleyQueue.addRequestFinishedListener<Any?> {
@@ -53,15 +49,9 @@ class DeletePlaylistAsync(
                     }
                 }
 
-                val deletePlaylistRequest = StringRequest(
-                    Request.Method.DELETE, deletePlaylistUrl,
-                    Response.Listener {
-                    },
-                    Response.ErrorListener {
-                        success = false
-                    })
-
-                deletePlaylistVolleyQueue.add(deletePlaylistRequest)
+                deletePlaylistVolleyQueue.add(newDeletePlaylistRequest(context, playlistId, {}, {
+                    success = false
+                }))
 
                 synchronized(syncObject) {
                     syncObject.wait()

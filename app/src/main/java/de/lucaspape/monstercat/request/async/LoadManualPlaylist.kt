@@ -2,14 +2,10 @@ package de.lucaspape.monstercat.request.async
 
 import android.content.Context
 import android.os.AsyncTask
-import com.android.volley.Response
-import com.android.volley.Request
-import com.android.volley.toolbox.StringRequest
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.request.newLoadPlaylistRequest
 import de.lucaspape.monstercat.util.newAuthorizedRequestQueue
 import de.lucaspape.monstercat.util.parsePlaylistToDB
-import org.json.JSONException
-import org.json.JSONObject
 import java.lang.ref.WeakReference
 
 /**
@@ -43,28 +39,15 @@ class LoadManualPlaylist(
                 }
             }
 
-            val getManualPlaylistInfoRequest = StringRequest(
-                Request.Method.GET,
-                context.getString(R.string.playlistUrl) + playlistId,
-                Response.Listener { response ->
-                    try {
-                        val jsonObject = JSONObject(response)
-
-                        parsePlaylistToDB(
-                            context,
-                            jsonObject,
-                            false
-                        )
-                    } catch (e: JSONException) {
-                        success = false
-                    }
-                },
-                Response.ErrorListener {
-                    success = false
-                }
-            )
-
-            getManualPlaylistsRequestQueue.add(getManualPlaylistInfoRequest)
+            getManualPlaylistsRequestQueue.add(newLoadPlaylistRequest(context, playlistId, {
+                parsePlaylistToDB(
+                    context,
+                    it,
+                    false
+                )
+            }, {
+                success = false
+            }))
 
             synchronized(syncObject) {
                 syncObject.wait()

@@ -2,11 +2,9 @@ package de.lucaspape.monstercat.request.async
 
 import android.content.Context
 import android.os.AsyncTask
-import com.android.volley.Response
-import com.android.volley.Request
-import com.android.volley.toolbox.StringRequest
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
+import de.lucaspape.monstercat.request.newLoadPlaylistTracksRequest
 import de.lucaspape.monstercat.util.newAuthorizedRequestQueue
 import de.lucaspape.monstercat.util.parsePlaylistTrackToDB
 import org.json.JSONObject
@@ -68,58 +66,45 @@ class LoadPlaylistTracksAsync(
             var skip = 0
             var nextEmpty = false
 
-            var playlistTrackUrl =
-                context.getString(R.string.playlistTrackUrl) + playlistId + "/catalog?skip=" + skip.toString() + "&limit=50"
-
-            var playlistTrackRequest = StringRequest(Request.Method.GET, playlistTrackUrl, Response.Listener { response ->
-                val jsonObject = JSONObject(response)
-                val jsonArray = jsonObject.getJSONArray("results")
-
-                for(k in (0 until jsonArray.length())){
-                    jsonObjectList.add(jsonArray.getJSONObject(k))
-                }
-
-                nextEmpty = jsonArray.length() != 50
-
-            }, Response.ErrorListener {
-                success = false
-            })
-
-            val trackRequestQueue = newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+            val trackRequestQueue =
+                newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
             trackRequestQueue.addRequestFinishedListener<Any?> {
-                if(!nextEmpty && success){
+                if (!nextEmpty && success) {
                     skip += 50
-                    playlistTrackUrl = context.getString(R.string.playlistTrackUrl) + playlistId + "/catalog?skip=" + skip.toString() + "&limit=50"
 
-                    playlistTrackRequest = StringRequest(Request.Method.GET, playlistTrackUrl, Response.Listener { response ->
-                        val jsonObject = JSONObject(response)
-                        val jsonArray = jsonObject.getJSONArray("results")
+                    trackRequestQueue.add(newLoadPlaylistTracksRequest(context, playlistId, skip, {
+                        val jsonArray = it.getJSONArray("results")
 
-                        for(k in (0 until jsonArray.length())){
+                        for (k in (0 until jsonArray.length())) {
                             jsonObjectList.add(jsonArray.getJSONObject(k))
                         }
 
                         nextEmpty = jsonArray.length() != 50
-
-                    }, Response.ErrorListener {
-                        success = false
-                    })
-
-                    trackRequestQueue.add(playlistTrackRequest)
-                }else{
-                    synchronized(syncObject){
+                    }, { success = false }))
+                } else {
+                    synchronized(syncObject) {
                         syncObject.notify()
                     }
                 }
             }
 
-            trackRequestQueue.add(playlistTrackRequest)
+            trackRequestQueue.add(newLoadPlaylistTracksRequest(context, playlistId, skip, {
+                val jsonArray = it.getJSONArray("results")
 
-            synchronized(syncObject){
+                for (k in (0 until jsonArray.length())) {
+                    jsonObjectList.add(jsonArray.getJSONObject(k))
+                }
+
+                nextEmpty = jsonArray.length() != 50
+            }, {
+                success = false
+            }))
+
+            synchronized(syncObject) {
                 syncObject.wait()
 
-                if(success){
+                if (success) {
                     playlistItemDatabaseHelper.reCreateTable()
 
                     for (playlistObject in jsonObjectList) {

@@ -2,16 +2,13 @@ package de.lucaspape.monstercat.request.async
 
 import android.content.Context
 import android.os.AsyncTask
-import com.android.volley.Response
-import com.android.volley.Request
-import com.android.volley.toolbox.StringRequest
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.ManualPlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
+import de.lucaspape.monstercat.request.newLoadPlaylistsRequest
 import de.lucaspape.monstercat.util.newAuthorizedRequestQueue
 import de.lucaspape.monstercat.util.parsePlaylistToDB
 import org.json.JSONException
-import org.json.JSONObject
 import java.lang.IndexOutOfBoundsException
 import java.lang.ref.WeakReference
 
@@ -56,8 +53,6 @@ class LoadPlaylistAsync(
                 PlaylistDatabaseHelper(context)
 
             val playlistRequestQueue = newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
-
-            val playlistUrl = context.getString(R.string.playlistsUrl)
 
             var success = true
             val syncObject = Object()
@@ -108,29 +103,23 @@ class LoadPlaylistAsync(
 
             playlistDatabaseHelper.reCreateTable(context, false)
 
-            val playlistRequest = StringRequest(
-                Request.Method.GET, playlistUrl,
-                Response.Listener { response ->
-                    try{
-                        val jsonObject = JSONObject(response)
-                        val jsonArray = jsonObject.getJSONArray("results")
+            playlistRequestQueue.add(newLoadPlaylistsRequest(context, {
+                try{
+                    val jsonArray = it.getJSONArray("results")
 
-                        for (i in (0 until jsonArray.length())) {
-                            parsePlaylistToDB(
-                                context,
-                                jsonArray.getJSONObject(i),
-                                true
-                            )
-                        }
-                    }catch (e: JSONException){
-
+                    for (i in (0 until jsonArray.length())) {
+                        parsePlaylistToDB(
+                            context,
+                            jsonArray.getJSONObject(i),
+                            true
+                        )
                     }
-                },
-                Response.ErrorListener {
-                    success = false
-                })
+                }catch (e: JSONException){
 
-            playlistRequestQueue.add(playlistRequest)
+                }
+            }, {
+                success = false
+            }))
 
             synchronized(syncObject) {
                 syncObject.wait()

@@ -2,13 +2,9 @@ package de.lucaspape.monstercat.request.async
 
 import android.content.Context
 import android.os.AsyncTask
-import com.android.volley.Request
-import com.android.volley.Response
-import com.android.volley.toolbox.JsonObjectRequest
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.request.newCreatePlaylistRequest
 import de.lucaspape.monstercat.util.newAuthorizedRequestQueue
-import org.json.JSONArray
-import org.json.JSONObject
 import java.lang.ref.WeakReference
 
 class CreatePlaylistAsync(
@@ -28,14 +24,6 @@ class CreatePlaylistAsync(
 
     override fun doInBackground(vararg params: Void?): Boolean {
         contextReference.get()?.let { context ->
-            val playlistPostUrl = context.getString(R.string.newPlaylistUrl)
-
-            val postObject = JSONObject()
-
-            postObject.put("name", playlistName)
-            postObject.put("public", false)
-            postObject.put("tracks", JSONArray())
-
             val newPlaylistVolleyQueue = newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
             var success = true
@@ -47,16 +35,9 @@ class CreatePlaylistAsync(
                 }
             }
 
-            val newPlaylistRequest = JsonObjectRequest(
-                Request.Method.POST, playlistPostUrl, postObject,
-                Response.Listener {
-                },
-                Response.ErrorListener {
-                    success = false
-                }
-            )
-
-            newPlaylistVolleyQueue.add(newPlaylistRequest)
+            newPlaylistVolleyQueue.add(newCreatePlaylistRequest(context, playlistName, {}, {
+                success = false
+            }))
 
             synchronized(syncObject) {
                 syncObject.wait()

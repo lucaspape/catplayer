@@ -2,15 +2,11 @@ package de.lucaspape.monstercat.request.async
 
 import android.content.Context
 import android.os.AsyncTask
-import com.android.volley.Request
-import com.android.volley.Response
-import com.android.volley.toolbox.StringRequest
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.request.newSearchTrackRequest
 import de.lucaspape.monstercat.ui.abstract_items.CatalogItem
-import de.lucaspape.util.Settings
 import de.lucaspape.monstercat.util.newAuthorizedRequestQueue
 import de.lucaspape.monstercat.util.parseSongSearchToSongList
-import org.json.JSONObject
 import java.lang.ref.WeakReference
 
 /**
@@ -38,7 +34,8 @@ class LoadTitleSearchAsync(
         contextReference.get()?.let { context ->
             var success = true
             val syncObject = Object()
-            val searchQueue = newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+            val searchQueue =
+                newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
             searchQueue.addRequestFinishedListener<Any?> {
                 synchronized(syncObject) {
@@ -46,30 +43,18 @@ class LoadTitleSearchAsync(
                 }
             }
 
-            val searchUrl = if(Settings.getSettings(context).getBoolean(context.getString(R.string.useCustomApiSetting)) == true){
-                context.getString(R.string.customApiBaseUrl) + "catalog/search?term=$searchString&limit=50&skip=" + skip.toString()
-            }else{
-                context.getString(R.string.loadSongsUrl) + "?term=$searchString&limit=50&skip=" + skip.toString() + "&fields=&search=$searchString"
-            }
+            searchQueue.add(newSearchTrackRequest(context, searchString, skip, false, {
+                val jsonArray = it.getJSONArray("results")
 
-            val searchRequest = StringRequest(Request.Method.GET,
-                searchUrl,
-                Response.Listener { response ->
-                    val jsonArray = JSONObject(response).getJSONArray("results")
+                val songList =
+                    parseSongSearchToSongList(context, jsonArray)
 
-                    val songList =
-                        parseSongSearchToSongList(context, jsonArray)
-
-                    for (song in songList) {
-                        searchResults.add(CatalogItem(song.songId))
-                    }
-
-                },
-                Response.ErrorListener {
-                    success = false
-                })
-
-            searchQueue.add(searchRequest)
+                for (song in songList) {
+                    searchResults.add(CatalogItem(song.songId))
+                }
+            }, {
+                success = false
+            }))
 
             synchronized(syncObject) {
                 syncObject.wait()

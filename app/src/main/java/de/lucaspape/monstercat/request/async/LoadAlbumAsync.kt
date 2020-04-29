@@ -2,15 +2,11 @@ package de.lucaspape.monstercat.request.async
 
 import android.content.Context
 import android.os.AsyncTask
-import com.android.volley.Response
-import com.android.volley.Request
-import com.android.volley.toolbox.StringRequest
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.AlbumItemDatabaseHelper
-import de.lucaspape.util.Settings
+import de.lucaspape.monstercat.request.newLoadAlbumRequest
 import de.lucaspape.monstercat.util.newAuthorizedRequestQueue
 import de.lucaspape.monstercat.util.parseAlbumSongToDB
-import org.json.JSONObject
 import java.lang.ref.WeakReference
 
 /**
@@ -22,14 +18,14 @@ class LoadAlbumAsync(
     private val albumId: String,
     private val mcId: String,
     private val displayLoading: () -> Unit,
-    private val finishedCallback: (forceReload:Boolean, albumId:String, mcId:String, displayLoading:() -> Unit) -> Unit,
-    private val errorCallback: (forceReload:Boolean, albumId:String, mcId:String, displayLoading:() -> Unit) -> Unit
+    private val finishedCallback: (forceReload: Boolean, albumId: String, mcId: String, displayLoading: () -> Unit) -> Unit,
+    private val errorCallback: (forceReload: Boolean, albumId: String, mcId: String, displayLoading: () -> Unit) -> Unit
 ) : AsyncTask<Void, Void, Boolean>() {
 
     override fun onPostExecute(result: Boolean) {
-        if(result){
+        if (result) {
             finishedCallback(forceReload, albumId, mcId, displayLoading)
-        }else{
+        } else {
             errorCallback(forceReload, albumId, mcId, displayLoading)
         }
     }
@@ -52,7 +48,8 @@ class LoadAlbumAsync(
 
     override fun doInBackground(vararg param: Void?): Boolean {
         contextReference.get()?.let { context ->
-            val requestQueue = newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+            val requestQueue =
+                newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
             val albumItemDatabaseHelper =
                 AlbumItemDatabaseHelper(context, albumId)
@@ -68,35 +65,22 @@ class LoadAlbumAsync(
                 }
             }
 
-            val requestUrl = if(Settings.getSettings(context).getBoolean(context.getString(R.string.useCustomApiSetting)) == true){
-                context.getString(R.string.customApiBaseUrl) + "catalog/release/$mcId"
-            }else{
-                context.getString(R.string.loadAlbumSongsUrl) + "/$mcId"
-            }
+            requestQueue.add(newLoadAlbumRequest(context, albumId, {
+                val jsonArray = it.getJSONArray("tracks")
 
-            val listRequest = StringRequest(
-                Request.Method.GET, requestUrl,
-                Response.Listener { response ->
-                    val json = JSONObject(response)
-                    val jsonArray = json.getJSONArray("tracks")
+                albumItemDatabaseHelper.reCreateTable()
 
-                    albumItemDatabaseHelper.reCreateTable()
-
-                    //parse every single song into list
-                    for (k in (0 until jsonArray.length())) {
-                        parseAlbumSongToDB(
-                            jsonArray.getJSONObject(k),
-                            albumId,
-                            context
-                        )
-                    }
-
-                }, Response.ErrorListener {
-                    success = false
+                //parse every single song into list
+                for (k in (0 until jsonArray.length())) {
+                    parseAlbumSongToDB(
+                        jsonArray.getJSONObject(k),
+                        albumId,
+                        context
+                    )
                 }
-            )
-
-            requestQueue.add(listRequest)
+            }, {
+                success = false
+            }))
             synchronized(syncObject) {
                 syncObject.wait()
 
