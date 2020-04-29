@@ -6,17 +6,15 @@ import android.content.DialogInterface
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.widget.EditText
-import com.android.volley.Request
-import com.android.volley.Response
-import com.android.volley.toolbox.StringRequest
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.request.JsonObjectRequest
+import de.lucaspape.monstercat.request.newCheckLoginRequest
+import de.lucaspape.monstercat.request.newLoginRequest
+import de.lucaspape.monstercat.request.newTwoFaRequest
 import de.lucaspape.persistentcookiejar.PersistentCookieJar
 import de.lucaspape.persistentcookiejar.cache.SetCookieCache
 import de.lucaspape.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import okhttp3.HttpUrl
 import org.json.JSONException
-import org.json.JSONObject
 
 var loggedIn = false
     private set
@@ -55,36 +53,21 @@ class Auth {
         loginSuccess: () -> Unit,
         loginFailed: () -> Unit
     ) {
-        val loginPostParams = JSONObject()
-        loginPostParams.put("email", username)
-        loginPostParams.put("password", password)
-
-        val loginUrl = context.getString(R.string.loginUrl)
-
-        val loginPostRequest =
-            JsonObjectRequest(
-                Request.Method.POST, loginUrl, loginPostParams,
-                Response.Listener { response ->
-                    //check if 2FA is needed
-                    try {
-                        if (response.getString("message") == "Enter the code sent to your device") {
-                            showTwoFAInput(context, loginSuccess, loginFailed)
-                        } else {
-                            checkLogin(context, loginSuccess, loginFailed)
-                        }
-                    } catch (e: JSONException) {
-                        checkLogin(context, loginSuccess, loginFailed)
-                    }
-
-                },
-                Response.ErrorListener {
-
-                })
-
-        val loginQueue = newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+        val loginQueue =
+            newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
         //add to queue
-        loginQueue.add(loginPostRequest)
+        loginQueue.add(newLoginRequest(context, username, password, {
+            try {
+                if (it.getString("message") == "Enter the code sent to your device") {
+                    showTwoFAInput(context, loginSuccess, loginFailed)
+                } else {
+                    checkLogin(context, loginSuccess, loginFailed)
+                }
+            } catch (e: JSONException) {
+                checkLogin(context, loginSuccess, loginFailed)
+            }
+        }, {}))
     }
 
     /**
@@ -111,27 +94,18 @@ class Auth {
             val twoFAEditText = twoFAInputView.findViewById<EditText>(R.id.twoFAInput)
             val twoFACode = twoFAEditText.text.toString()
 
-            val twoFaTokenParams = JSONObject()
-            twoFaTokenParams.put("token", twoFACode)
-
-            val twoFaPostRequest = JsonObjectRequest(
-                Request.Method.POST,
-                context.getString(R.string.tokenUrl),
-                twoFaTokenParams,
-                Response.Listener {
-                    //all good
-                },
-                Response.ErrorListener {
-                    //TODO show 2FA again/request new code
-                })
-
-            val twoFAQueue = newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+            val twoFAQueue =
+                newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
             twoFAQueue.addRequestFinishedListener<Any> {
                 checkLogin(context, loginSuccess, loginFailed)
             }
 
-            twoFAQueue.add(twoFaPostRequest)
+            twoFAQueue.add(newTwoFaRequest(context, twoFACode, {
+                //all good
+            }, {
+                //TODO show 2FA again/request new code
+            }))
         }
 
         val dialog = alertDialogBuilder.create()
@@ -148,36 +122,28 @@ class Auth {
      * Checks if sid is valid
      */
     fun checkLogin(context: Context, loginSuccess: () -> Unit, loginFailed: () -> Unit) {
-
         //check if sid is valid, get session and user id, if it is null or "" the sid is NOT valid -> login fail
-        val checkLoginRequest =
-            StringRequest(Request.Method.GET, context.getString
-                (R.string.sessionUrl),
-                Response.Listener { response ->
-                    val jsonResponse = JSONObject(response)
 
-                    val userId = try {
-                        val userObject = jsonResponse.getJSONObject("user")
-                        userObject.getString("id")
-                    } catch (e: JSONException) {
-                        ""
-                    }
+        val checkLoginQueue =
+            newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+        checkLoginQueue.add(newCheckLoginRequest(context, {
+            val userId = try {
+                val userObject = it.getJSONObject("user")
+                userObject.getString("id")
+            } catch (e: JSONException) {
+                ""
+            }
 
-                    if (userId != "null" && userId != "") {
-                        loggedIn = true
-                        loginSuccess()
-                    } else {
-                        loggedIn = false
-                        loginFailed()
-                    }
-                },
-                Response.ErrorListener {
-                    loggedIn = false
-                    loginFailed()
-                })
-
-
-        val checkLoginQueue = newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
-        checkLoginQueue.add(checkLoginRequest)
+            if (userId != "null" && userId != "") {
+                loggedIn = true
+                loginSuccess()
+            } else {
+                loggedIn = false
+                loginFailed()
+            }
+        }, {
+            loggedIn = false
+            loginFailed()
+        }))
     }
 }

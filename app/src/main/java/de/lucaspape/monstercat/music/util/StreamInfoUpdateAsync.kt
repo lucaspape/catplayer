@@ -2,16 +2,13 @@ package de.lucaspape.monstercat.music.util
 
 import android.content.Context
 import android.os.AsyncTask
-import com.android.volley.Request
-import com.android.volley.Response
-import com.android.volley.toolbox.StringRequest
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.music.notification.updateNotification
+import de.lucaspape.monstercat.request.newLiveInfoRequest
 import de.lucaspape.monstercat.util.newAuthorizedRequestQueue
 import de.lucaspape.monstercat.util.parseSongToDB
 import org.json.JSONException
-import org.json.JSONObject
 import java.lang.ref.WeakReference
 
 class StreamInfoUpdateAsync(
@@ -37,46 +34,33 @@ class StreamInfoUpdateAsync(
     override fun doInBackground(vararg params: Void): String? {
         contextReference.get()?.let { context ->
 
-            val artistTitleRequest =
-                StringRequest(
-                    Request.Method.GET,
-                    context.getString(R.string.customApiBaseUrl) + "liveinfo",
-                    Response.Listener { artistTitleResponse ->
-                        try {
-                            val jsonObject = JSONObject(artistTitleResponse)
+            val artistTitleRequest = newLiveInfoRequest(context, {
+                try {
+                    val songId =
+                        parseSongToDB(it.getJSONObject("track"), context)
 
-                            try {
-                                val songId =
-                                    parseSongToDB(jsonObject.getJSONObject("track"), context)
+                    if (songId != liveSongId && songId != null) {
+                        liveSongId = songId
 
-                                if (songId != liveSongId && songId != null) {
-                                    liveSongId = songId
+                        publishProgress()
+                    }
+                } catch (e: JSONException) {
+                    try {
+                        fallbackTitle = it.getString("title")
+                        fallbackArtist = it.getString("artist")
+                        fallbackVersion = it.getString("version")
+                        fallbackCoverUrl = it.getString("coverUrl")
+                        liveSongId = ""
 
-                                    publishProgress()
-                                }
-                            } catch (e: JSONException) {
-                                try {
-                                    fallbackTitle = jsonObject.getString("title")
-                                    fallbackArtist = jsonObject.getString("artist")
-                                    fallbackVersion = jsonObject.getString("version")
-                                    fallbackCoverUrl = jsonObject.getString("coverUrl")
-                                    liveSongId = ""
+                        publishProgress()
+                    } catch (e: JSONException) {
 
-                                    publishProgress()
-                                } catch (e: JSONException) {
+                    }
+                }
+            }, {})
 
-                                }
-                            }
-                        } catch (e: JSONException) {
-
-                        }
-
-                    },
-                    Response.ErrorListener { error ->
-                        println(error)
-                    })
-
-            val requestQueue = newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+            val requestQueue =
+                newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
             while (true) {
                 requestQueue.add(artistTitleRequest)

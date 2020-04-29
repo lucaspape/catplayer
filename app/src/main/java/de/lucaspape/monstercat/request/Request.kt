@@ -8,6 +8,9 @@ import com.android.volley.VolleyError
 import com.android.volley.toolbox.StringRequest
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.objects.Song
+import de.lucaspape.monstercat.music.util.StreamInfoUpdateAsync
+import de.lucaspape.monstercat.util.loggedIn
+import de.lucaspape.monstercat.util.parseSongToDB
 import de.lucaspape.util.Settings
 import org.json.JSONArray
 import org.json.JSONException
@@ -382,6 +385,89 @@ fun newLoadPlaylistsRequest(
 
     return StringRequest(
         Request.Method.GET, playlistUrl,
+        Response.Listener {
+            try {
+                callback(JSONObject(it))
+            } catch (e: JSONException) {
+                errorCallback(null)
+            }
+        },
+        Response.ErrorListener {
+            errorCallback(it)
+        })
+}
+
+fun newLiveInfoRequest(
+    context: Context,
+    callback: (response: JSONObject) -> Unit,
+    errorCallback: (error: VolleyError?) -> Unit
+): StringRequest {
+    return StringRequest(
+        Request.Method.GET,
+        context.getString(R.string.customApiBaseUrl) + "liveinfo",
+        Response.Listener {
+            try {
+                callback(JSONObject(it))
+            } catch (e: JSONException) {
+                errorCallback(null)
+            }
+
+        },
+        Response.ErrorListener {
+            errorCallback(it)
+        })
+}
+
+fun newLoginRequest(
+    context: Context,
+    username: String,
+    password: String,
+    callback: (response: JSONObject) -> Unit,
+    errorCallback: (error: VolleyError) -> Unit
+): JsonObjectRequest {
+    val loginPostParams = JSONObject()
+    loginPostParams.put("email", username)
+    loginPostParams.put("password", password)
+
+    val loginUrl = context.getString(R.string.loginUrl)
+
+    return JsonObjectRequest(
+        Request.Method.POST, loginUrl, loginPostParams,
+        Response.Listener {
+            callback(it)
+
+        },
+        Response.ErrorListener {
+            errorCallback(it)
+        })
+}
+
+fun newTwoFaRequest(
+    context: Context, twoFACode: String, callback: (response: JSONObject) -> Unit,
+    errorCallback: (error: VolleyError) -> Unit
+): JsonObjectRequest {
+
+    val twoFaTokenParams = JSONObject()
+    twoFaTokenParams.put("token", twoFACode)
+
+    return JsonObjectRequest(
+        Request.Method.POST,
+        context.getString(R.string.tokenUrl),
+        twoFaTokenParams,
+        Response.Listener {
+            callback(it)
+        },
+        Response.ErrorListener {
+            errorCallback(it)
+        })
+}
+
+fun newCheckLoginRequest(
+    context: Context, callback: (response: JSONObject) -> Unit,
+    errorCallback: (error: VolleyError?) -> Unit
+): StringRequest {
+    return StringRequest(Request.Method.GET, context.getString
+        (R.string.sessionUrl),
         Response.Listener {
             try {
                 callback(JSONObject(it))
