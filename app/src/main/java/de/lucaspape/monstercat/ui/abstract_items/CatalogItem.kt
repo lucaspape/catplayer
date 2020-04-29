@@ -12,7 +12,6 @@ import androidx.core.net.toUri
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.ui.activities.*
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.download.downloadCoverIntoImageReceiver
@@ -21,6 +20,7 @@ import de.lucaspape.monstercat.ui.handlers.deletePlaylistSong
 import de.lucaspape.monstercat.ui.handlers.openAlbum
 import de.lucaspape.monstercat.download.ImageReceiverInterface
 import de.lucaspape.monstercat.music.prioritySongQueue
+import de.lucaspape.monstercat.ui.*
 import de.lucaspape.util.BackgroundAsync
 import de.lucaspape.monstercat.util.displayAlertDialogList
 

@@ -1,8 +1,6 @@
 package de.lucaspape.util
 
-import com.google.gson.reflect.TypeToken
-
-class Cache() {
+class Cache {
     companion object {
         @JvmStatic
         val cacheMap = HashMap<String, Any?>()

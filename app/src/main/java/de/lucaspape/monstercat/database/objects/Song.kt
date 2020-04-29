@@ -9,8 +9,8 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.ui.activities.downloadDrawable
-import de.lucaspape.monstercat.ui.activities.offlineDrawable
+import de.lucaspape.monstercat.ui.downloadDrawable
+import de.lucaspape.monstercat.ui.offlineDrawable
 import de.lucaspape.util.Settings
 import de.lucaspape.monstercat.util.getSid
 import de.lucaspape.monstercat.util.wifiConnected

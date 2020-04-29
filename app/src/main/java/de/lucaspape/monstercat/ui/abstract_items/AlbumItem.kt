@@ -9,16 +9,16 @@ import android.widget.TextView
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.ui.activities.addToQueueDrawable
-import de.lucaspape.monstercat.ui.activities.downloadDrawable
-import de.lucaspape.monstercat.ui.activities.openInAppDrawable
-import de.lucaspape.monstercat.ui.activities.shareDrawable
 import de.lucaspape.monstercat.database.helper.AlbumDatabaseHelper
 import de.lucaspape.monstercat.download.downloadCoverIntoImageReceiver
 import de.lucaspape.monstercat.ui.handlers.downloadAlbum
 import de.lucaspape.monstercat.ui.handlers.openAlbum
 import de.lucaspape.monstercat.ui.handlers.playAlbumNext
 import de.lucaspape.monstercat.download.ImageReceiverInterface
+import de.lucaspape.monstercat.ui.addToQueueDrawable
+import de.lucaspape.monstercat.ui.downloadDrawable
+import de.lucaspape.monstercat.ui.openInAppDrawable
+import de.lucaspape.monstercat.ui.shareDrawable
 import de.lucaspape.monstercat.util.displayAlertDialogList
 
 open class AlbumItem(

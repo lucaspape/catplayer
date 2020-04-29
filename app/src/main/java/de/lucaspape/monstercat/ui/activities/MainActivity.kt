@@ -29,6 +29,7 @@ import de.lucaspape.monstercat.music.notification.updateNotification
 import de.lucaspape.monstercat.music.save.PlayerSaveState
 import de.lucaspape.monstercat.music.util.*
 import de.lucaspape.monstercat.music.util.setCover
+import de.lucaspape.monstercat.ui.*
 import de.lucaspape.monstercat.ui.handlers.HomeHandler
 import de.lucaspape.monstercat.ui.handlers.PlaylistHandler
 import de.lucaspape.monstercat.ui.handlers.SearchHandler
@@ -41,23 +42,6 @@ import java.lang.ref.WeakReference
 
 val noisyReceiver = NoisyReceiver()
 var downloadServiceIntent: Intent? = null
-
-var offlineDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_offline_pin_24dp"
-var downloadDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_file_download_24dp"
-var addToQueueDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_playlist_play_24"
-var shareDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_share_24dp"
-var openInAppDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_open_in_new_24dp"
-var addToPlaylistDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_playlist_add_24"
-var deleteDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_delete_outline_24"
-var editDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_edit_24"
-var playlistPublicDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_public_24"
-var playlistPrivateDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_block_24"
-
-var playButtonDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_play_arrow_24dp"
-var pauseButtonDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_pause_24dp"
-
-var createPlaylistDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_add_24dp"
-var addPlaylistDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_playlist_add_24"
 
 /**
  * Main activity
@@ -347,36 +331,7 @@ class MainActivity : AppCompatActivity() {
                     fallbackBlackFileLow.copyTo(fallbackFileLow, true)
                 }
 
-                offlineDrawable =
-                    "android.resource://de.lucaspape.monstercat/drawable/ic_offline_pin_white_24dp"
-                downloadDrawable =
-                    "android.resource://de.lucaspape.monstercat/drawable/ic_file_download_white_24dp"
-                addToQueueDrawable =
-                    "android.resource://de.lucaspape.monstercat/drawable/ic_playlist_play_white_24"
-                shareDrawable =
-                    "android.resource://de.lucaspape.monstercat/drawable/ic_share_white_24dp"
-                openInAppDrawable =
-                    "android.resource://de.lucaspape.monstercat/drawable/ic_open_in_new_white_24dp"
-                addToPlaylistDrawable =
-                    "android.resource://de.lucaspape.monstercat/drawable/ic_playlist_add_white_24"
-                deleteDrawable =
-                    "android.resource://de.lucaspape.monstercat/drawable/ic_delete_outline_white_24"
-                editDrawable =
-                    "android.resource://de.lucaspape.monstercat/drawable/ic_edit_white_24"
-                playlistPublicDrawable =
-                    "android.resource://de.lucaspape.monstercat/drawable/ic_public_white_24"
-                playlistPrivateDrawable =
-                    "android.resource://de.lucaspape.monstercat/drawable/ic_block_white_24"
-
-                playButtonDrawable =
-                    "android.resource://de.lucaspape.monstercat/drawable/ic_play_arrow_white_24dp"
-                pauseButtonDrawable =
-                    "android.resource://de.lucaspape.monstercat/drawable/ic_pause_white_24dp"
-
-                createPlaylistDrawable =
-                    "android.resource://de.lucaspape.monstercat/drawable/ic_add_white_24dp"
-                addPlaylistDrawable =
-                    "android.resource://de.lucaspape.monstercat/drawable/ic_playlist_add_white_24"
+                switchDrawablesToWhite()
             } else {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
@@ -385,35 +340,7 @@ class MainActivity : AppCompatActivity() {
                     fallbackWhiteFileLow.copyTo(fallbackFileLow, true)
                 }
 
-                offlineDrawable =
-                    "android.resource://de.lucaspape.monstercat/drawable/ic_offline_pin_black_24dp"
-                downloadDrawable =
-                    "android.resource://de.lucaspape.monstercat/drawable/ic_file_download_black_24dp"
-                addToQueueDrawable =
-                    "android.resource://de.lucaspape.monstercat/drawable/ic_playlist_play_black_24"
-                shareDrawable =
-                    "android.resource://de.lucaspape.monstercat/drawable/ic_share_black_24dp"
-                openInAppDrawable =
-                    "android.resource://de.lucaspape.monstercat/drawable/ic_open_in_new_black_24dp"
-                addToPlaylistDrawable =
-                    "android.resource://de.lucaspape.monstercat/drawable/ic_playlist_add_black_24"
-                deleteDrawable =
-                    "android.resource://de.lucaspape.monstercat/drawable/ic_delete_outline_black_24"
-                editDrawable =
-                    "android.resource://de.lucaspape.monstercat/drawable/ic_edit_black_24"
-                playlistPublicDrawable =
-                    "android.resource://de.lucaspape.monstercat/drawable/ic_public_black_24"
-                playlistPrivateDrawable =
-                    "android.resource://de.lucaspape.monstercat/drawable/ic_block_black_24"
-                playButtonDrawable =
-                    "android.resource://de.lucaspape.monstercat/drawable/ic_play_arrow_black_24dp"
-                pauseButtonDrawable =
-                    "android.resource://de.lucaspape.monstercat/drawable/ic_pause_black_24dp"
-
-                createPlaylistDrawable =
-                    "android.resource://de.lucaspape.monstercat/drawable/ic_add_black_24dp"
-                addPlaylistDrawable =
-                    "android.resource://de.lucaspape.monstercat/drawable/ic_playlist_add_black_24"
+                switchDrawablesToBlack()
             }
         } else {
             if (resources.configuration.uiMode.and(Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) {

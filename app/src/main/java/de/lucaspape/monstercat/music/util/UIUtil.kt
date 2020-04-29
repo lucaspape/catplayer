@@ -19,8 +19,8 @@ import de.lucaspape.monstercat.download.ImageReceiverInterface
 import de.lucaspape.monstercat.download.downloadArtistImageIntoImageReceiver
 import de.lucaspape.monstercat.download.downloadImageUrlIntoImageReceiver
 import de.lucaspape.monstercat.music.*
-import de.lucaspape.monstercat.ui.activities.pauseButtonDrawable
-import de.lucaspape.monstercat.ui.activities.playButtonDrawable
+import de.lucaspape.monstercat.ui.pauseButtonDrawable
+import de.lucaspape.monstercat.ui.playButtonDrawable
 import java.lang.ref.WeakReference
 
 var textViewReference: WeakReference<TextView>? = null

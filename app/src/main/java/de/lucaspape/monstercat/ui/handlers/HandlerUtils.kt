@@ -23,8 +23,8 @@ import de.lucaspape.monstercat.ui.abstract_items.AlertListItem
 import de.lucaspape.monstercat.ui.abstract_items.HeaderTextItem
 import de.lucaspape.monstercat.request.async.*
 import de.lucaspape.monstercat.music.prioritySongQueue
-import de.lucaspape.monstercat.ui.activities.addPlaylistDrawable
-import de.lucaspape.monstercat.ui.activities.createPlaylistDrawable
+import de.lucaspape.monstercat.ui.addPlaylistDrawable
+import de.lucaspape.monstercat.ui.createPlaylistDrawable
 import de.lucaspape.monstercat.util.*
 import org.json.JSONObject
 import java.io.File
