@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.AsyncTask
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
-import de.lucaspape.monstercat.music.contextReference
 import de.lucaspape.monstercat.util.*
 import de.lucaspape.util.Settings
 import java.io.File
@@ -89,7 +88,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
     override fun onProgressUpdate(vararg values: String?) {
         val type = values[0]
 
-        contextReference?.get()?.let { context ->
+        weakReference.get()?.let { context ->
             when (type) {
                 "alreadyDownloadedError" -> {
                     val shownTitle = values[1]

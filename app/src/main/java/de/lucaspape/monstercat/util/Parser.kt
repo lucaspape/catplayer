@@ -106,20 +106,20 @@ fun parseCatalogSongToDB(jsonObject: JSONObject, context: Context): Long? {
     return null
 }
 
-fun parsAlbumSongToDB(jsonObject: JSONObject, sAlbumId: String, context: Context): Long? {
+fun parseAlbumSongToDB(jsonObject: JSONObject, sAlbumId: String, context: Context): String? {
     val songId = parseSongToDB(jsonObject, context)
 
     val albumItemDatabaseHelper = AlbumItemDatabaseHelper(context, sAlbumId)
 
     songId?.let {
-        return if (albumItemDatabaseHelper.getItemFromSongId(it) == null) {
+        if (albumItemDatabaseHelper.getItemFromSongId(it) == null) {
             albumItemDatabaseHelper.insertSongId(it)
         } else {
             albumItemDatabaseHelper.getItemFromSongId(it)?.id
         }
     }
 
-    return null
+    return songId
 }
 
 fun parseAlbumToDB(jsonObject: JSONObject, context: Context): Long? {

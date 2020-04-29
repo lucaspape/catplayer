@@ -1,13 +1,13 @@
 package de.lucaspape.monstercat.download
 
 import android.app.Service
-import android.content.Context
 import android.content.Intent
 import android.os.AsyncTask
 import android.os.IBinder
-import java.lang.ref.WeakReference
+import de.lucaspape.monstercat.music.contextReference
 
-class DownloadService(private val contextReference: WeakReference<Context>):Service(){
+class DownloadService():Service(){
+
     companion object{
         @JvmStatic
         var downloadTask: DownloadTask? = null
@@ -18,8 +18,10 @@ class DownloadService(private val contextReference: WeakReference<Context>):Serv
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        downloadTask = DownloadTask(contextReference)
-        downloadTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        contextReference?.let {
+            downloadTask = DownloadTask(it)
+            downloadTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        }
 
         return START_STICKY
     }

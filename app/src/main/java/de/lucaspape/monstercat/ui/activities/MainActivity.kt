@@ -72,11 +72,12 @@ class MainActivity : AppCompatActivity() {
                 R.id.navigation_home -> {
                     openFragment(
                         de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
-                            HomeHandler { searchString ->
+                            HomeHandler({ searchString ->
                                 search(
                                     searchString
                                 )
-                            })
+                            }, null)
+                        )
                     )
 
                     return@OnNavigationItemSelectedListener true
@@ -84,7 +85,8 @@ class MainActivity : AppCompatActivity() {
                 R.id.navigation_dashboard -> {
                     openFragment(
                         de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
-                            PlaylistHandler())
+                            PlaylistHandler(null)
+                        )
                     )
 
                     return@OnNavigationItemSelectedListener true
@@ -101,11 +103,12 @@ class MainActivity : AppCompatActivity() {
                 ) {
                     openFragment(
                         de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
-                            HomeHandler { searchString ->
+                            HomeHandler({ searchString ->
                                 search(
                                     searchString
                                 )
-                            })
+                            }, null)
+                        )
                     )
                 }
             )
@@ -203,12 +206,48 @@ class MainActivity : AppCompatActivity() {
             if (intentExtras["search"] != null) {
                 search(intentExtras["search"] as String)
             }
-        } else {
-            openFragment(de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(HomeHandler { searchString ->
-                search(
-                    searchString
+        }
+
+        val path = intent.data?.path
+
+        if (path != null) {
+            val id = path.substring(path.lastIndexOf("/") + 1, path.length)
+
+            when {
+                path.contains("release") -> openFragment(
+                    de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
+                        HomeHandler({ searchString ->
+                            search(
+                                searchString
+                            )
+                        }, id)
+                    )
                 )
-            }))
+                path.contains("playlist") -> openFragment(
+                    de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
+                        PlaylistHandler(id)
+                    )
+                )
+                else -> openFragment(
+                    de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
+                        HomeHandler({ searchString ->
+                            search(
+                                searchString
+                            )
+                        }, null)
+                    )
+                )
+            }
+        } else {
+            openFragment(
+                de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
+                    HomeHandler({ searchString ->
+                        search(
+                            searchString
+                        )
+                    }, null)
+                )
+            )
         }
 
         setContentView(R.layout.activity_main)

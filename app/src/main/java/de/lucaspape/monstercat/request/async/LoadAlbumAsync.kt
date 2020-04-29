@@ -9,7 +9,7 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.AlbumItemDatabaseHelper
 import de.lucaspape.util.Settings
 import de.lucaspape.monstercat.util.newAuthorizedRequestQueue
-import de.lucaspape.monstercat.util.parsAlbumSongToDB
+import de.lucaspape.monstercat.util.parseAlbumSongToDB
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
@@ -84,7 +84,7 @@ class LoadAlbumAsync(
 
                     //parse every single song into list
                     for (k in (0 until jsonArray.length())) {
-                        parsAlbumSongToDB(
+                        parseAlbumSongToDB(
                             jsonArray.getJSONObject(k),
                             albumId,
                             context

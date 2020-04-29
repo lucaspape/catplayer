@@ -35,7 +35,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
-class PlaylistHandler : Handler {
+class PlaylistHandler(private val initPlaylistId: String?) : Handler {
     companion object {
         @JvmStatic
         var playlistContentViewData = HashMap<String, ArrayList<CatalogItem>>()
@@ -509,15 +509,17 @@ class PlaylistHandler : Handler {
         val username = settings.getString(view.context.getString(R.string.emailSetting))
         val password = settings.getString(view.context.getString(R.string.passwordSetting))
 
-        if (username == null || password == null) {
+        registerListeners(view)
+        
+        if (initPlaylistId != null) {
+            loadPlaylistTracks(view, false, initPlaylistId)
+        } else if (username != null || password != null) {
+            loadPlaylist(view, false)
+        } else {
             displayInfo(
                 view.context,
                 view.context.getString(R.string.setUsernamePasswordSettingsMsg)
             )
-        } else {
-            registerListeners(view)
-
-            loadPlaylist(view, false)
         }
 
         onFragmentBackPressed = {

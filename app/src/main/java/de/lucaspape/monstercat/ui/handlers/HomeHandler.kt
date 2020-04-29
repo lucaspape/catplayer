@@ -32,7 +32,9 @@ import de.lucaspape.monstercat.twitch.Stream
 import de.lucaspape.monstercat.util.*
 import de.lucaspape.util.BackgroundAsync
 import de.lucaspape.util.Cache
+import de.lucaspape.util.CustomSpinnerClass
 import de.lucaspape.util.Settings
+import de.lucaspape.util.Settings.Companion.getSettings
 import java.io.File
 import java.lang.IndexOutOfBoundsException
 import java.lang.ref.WeakReference
@@ -42,7 +44,10 @@ import kotlin.collections.ArrayList
 /**
  * Does everything for the home page
  */
-class HomeHandler(private val onSearch: (searchString: String?) -> Unit) : Handler {
+class HomeHandler(
+    private val onSearch: (searchString: String?) -> Unit,
+    private val albumMcId: String?
+) : Handler {
     companion object {
         @JvmStatic
         var addSongsTaskId = ""
@@ -446,7 +451,7 @@ class HomeHandler(private val onSearch: (searchString: String?) -> Unit) : Handl
      * Album/Catalog view selector
      */
     private fun setupSpinner(view: View) {
-        val viewSelector = view.findViewById<Spinner>(R.id.viewSelector)
+        val viewSelector = view.findViewById<CustomSpinnerClass>(R.id.viewSelector)
 
         val selectorItems = arrayOf(
             view.context.getString(R.string.catalogView),
@@ -464,8 +469,8 @@ class HomeHandler(private val onSearch: (searchString: String?) -> Unit) : Handl
     /**
      * Listeners (buttons, refresh etc)
      */
-    private fun registerListeners(view: View) {
-        val viewSelector = view.findViewById<Spinner>(R.id.viewSelector)
+    private fun registerListeners(view: View): Boolean {
+        val viewSelector = view.findViewById<CustomSpinnerClass>(R.id.viewSelector)
 
         val settings = Settings.getSettings(view.context)
 
@@ -477,18 +482,20 @@ class HomeHandler(private val onSearch: (searchString: String?) -> Unit) : Handl
         }
 
         if (albumViewSelected) {
-            viewSelector.setSelection(1)
+            viewSelector.programmaticallySetPosition(1, false)
         } else {
-            viewSelector.setSelection(0)
+            viewSelector.programmaticallySetPosition(0, false)
         }
 
-        viewSelector.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        var selected = 0
+
+        viewSelector.setOnItemSelectedListener(object : CustomSpinnerClass.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) {
 
                 if (albumViewSelected == true) {
-                    viewSelector.setSelection(1)
+                    viewSelector.programmaticallySetPosition(1, false)
                 } else {
-                    viewSelector.setSelection(0)
+                    viewSelector.programmaticallySetPosition(0, false)
                 }
             }
 
@@ -496,38 +503,42 @@ class HomeHandler(private val onSearch: (searchString: String?) -> Unit) : Handl
                 parent: AdapterView<*>?,
                 v: View?,
                 position: Int,
-                id: Long
+                id: Long,
+                userSelected: Boolean
             ) {
-                when {
-                    viewSelector.getItemAtPosition(position) == view.context.getString(R.string.catalogView) -> {
-                        albumViewSelected = false
+                if (++selected > 1 && userSelected) {
+                    when {
+                        viewSelector.getItemAtPosition(position) == view.context.getString(R.string.catalogView) -> {
+                            albumViewSelected = false
 
-                        settings.setBoolean(
-                            view.context.getString(R.string.albumViewSelectedSetting),
-                            false
-                        )
+                            settings.setBoolean(
+                                view.context.getString(R.string.albumViewSelectedSetting),
+                                false
+                            )
 
-                        resetRecyclerViewPosition(view.context, "catalogView")
-                        resetRecyclerViewPosition(view.context, "albumView")
+                            resetRecyclerViewPosition(view.context, "catalogView")
+                            resetRecyclerViewPosition(view.context, "albumView")
 
-                        initSongListLoad(view, false)
-                    }
-                    viewSelector.getItemAtPosition(position) == view.context.getString(R.string.albumView) -> {
-                        albumViewSelected = true
+                            initSongListLoad(view, false)
+                        }
+                        viewSelector.getItemAtPosition(position) == view.context.getString(R.string.albumView) -> {
+                            albumViewSelected = true
 
-                        settings.setBoolean(
-                            view.context.getString(R.string.albumViewSelectedSetting),
-                            true
-                        )
+                            settings.setBoolean(
+                                view.context.getString(R.string.albumViewSelectedSetting),
+                                true
+                            )
 
-                        resetRecyclerViewPosition(view.context, "catalogView")
-                        resetRecyclerViewPosition(view.context, "albumView")
+                            resetRecyclerViewPosition(view.context, "catalogView")
+                            resetRecyclerViewPosition(view.context, "albumView")
 
-                        initAlbumListLoad(view, false)
+                            initAlbumListLoad(view, false)
+                        }
                     }
                 }
+
             }
-        }
+        })
 
         //settings button
         view.findViewById<ImageButton>(R.id.settingsButton).setOnClickListener {
@@ -542,6 +553,8 @@ class HomeHandler(private val onSearch: (searchString: String?) -> Unit) : Handl
         view.findViewById<ImageButton>(R.id.searchButton).setOnClickListener {
             onSearch(null)
         }
+
+        return albumViewSelected == true
     }
 
     /**
@@ -940,7 +953,86 @@ class HomeHandler(private val onSearch: (searchString: String?) -> Unit) : Handl
 
     override fun onCreate(view: View) {
         setupSpinner(view)
-        registerListeners(view)
+
+        if (albumMcId != null) {
+            val albumViewSelected = registerListeners(view)
+
+            val swipeRefreshLayout =
+                view.findViewById<SwipeRefreshLayout>(R.id.homePullToRefresh)
+
+            swipeRefreshLayout.isRefreshing = true
+
+            loadAlbumTracks(view.context, albumMcId, finishedCallback = { trackIds ->
+                val albumDatabaseHelper = AlbumDatabaseHelper(view.context)
+                albumDatabaseHelper.getAlbumFromMcId(albumMcId)?.let { album ->
+                    val albumItemDatabaseHelper =
+                        AlbumItemDatabaseHelper(view.context, album.albumId)
+                    val albumItemList = albumItemDatabaseHelper.getAllData()
+
+                    val catalogViewData = ArrayList<CatalogItem>()
+
+                    for (albumItem in albumItemList) {
+                        catalogViewData.add(
+                            CatalogItem(albumItem.songId)
+                        )
+                    }
+
+                    swipeRefreshLayout.isRefreshing = false
+
+                    updateCatalogRecyclerView(
+                        view,
+                        album.title,
+                        album.albumId,
+                        albumMcId,
+                        false,
+                        catalogViewData,
+                        "singleAlbum-${album.albumId}",
+                        { _, _, _, _ -> },
+                        { albumId, albumMcId ->
+                            albumId?.let {
+                                albumMcId?.let {
+                                    loadAlbum(view, albumId, albumMcId, true)
+                                }
+                            }
+                        },
+                        {
+                            init(view, albumViewSelected)
+                        }
+                    )
+                }
+
+
+            }, errorCallback = {
+                //TODO handle error
+                swipeRefreshLayout.isRefreshing = false
+            })
+        } else {
+            init(view, registerListeners(view))
+        }
     }
 
+    fun init(view: View, albumViewSelected:Boolean){
+        val settings = getSettings(view.context)
+        if (albumViewSelected) {
+            settings.setBoolean(
+                view.context.getString(R.string.albumViewSelectedSetting),
+                true
+            )
+
+            resetRecyclerViewPosition(view.context, "catalogView")
+            resetRecyclerViewPosition(view.context, "albumView")
+
+            initAlbumListLoad(view, false)
+        } else {
+            settings.setBoolean(
+                view.context.getString(R.string.albumViewSelectedSetting),
+                false
+            )
+
+            resetRecyclerViewPosition(view.context, "catalogView")
+            resetRecyclerViewPosition(view.context, "albumView")
+
+            initSongListLoad(view, false)
+        }
+    }
 }

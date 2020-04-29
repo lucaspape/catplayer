@@ -14,10 +14,7 @@ import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.database.helper.ManualPlaylistDatabaseHelper
-import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
-import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
-import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
+import de.lucaspape.monstercat.database.helper.*
 import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.ui.abstract_items.AlertListItem
 import de.lucaspape.monstercat.ui.abstract_items.HeaderTextItem
@@ -30,7 +27,7 @@ import org.json.JSONObject
 import java.io.File
 import java.lang.ref.WeakReference
 
-private fun loadAlbumTracks(
+fun loadAlbumTracks(
     context: Context,
     mcID: String,
     finishedCallback: (trackIds: ArrayList<String>) -> Unit,
@@ -44,13 +41,18 @@ private fun loadAlbumTracks(
     val albumRequest = StringRequest(Request.Method.GET, requestUrl,
         Response.Listener { response ->
             val jsonObject = JSONObject(response)
+
+            parseAlbumToDB(jsonObject.getJSONObject("release"), context)
+
             val jsonArray = jsonObject.getJSONArray("tracks")
 
             val idArray = ArrayList<String>()
 
-            for (i in (0 until jsonArray.length())) {
-                parseSongToDB(jsonArray.getJSONObject(i), context)?.let { id ->
-                    idArray.add(id)
+            AlbumDatabaseHelper(context).getAlbumFromMcId(mcID)?.let {album ->
+                for (i in (0 until jsonArray.length())) {
+                    parseAlbumSongToDB(jsonArray.getJSONObject(i), album.albumId, context)?.let {id ->
+                        idArray.add(id)
+                    }
                 }
             }
 

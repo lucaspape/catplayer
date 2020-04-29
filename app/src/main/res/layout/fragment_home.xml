@@ -16,7 +16,7 @@
         app:layout_constraintStart_toStartOf="@+id/homePullToRefresh"
         app:layout_constraintTop_toTopOf="parent">
 
-        <Spinner
+        <de.lucaspape.util.CustomSpinnerClass
             android:id="@+id/viewSelector"
             android:layout_width="160dp"
             android:layout_height="wrap_content" />
