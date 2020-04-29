@@ -36,9 +36,7 @@ import de.lucaspape.util.CustomSpinnerClass
 import de.lucaspape.util.Settings
 import de.lucaspape.util.Settings.Companion.getSettings
 import java.io.File
-import java.lang.IndexOutOfBoundsException
 import java.lang.ref.WeakReference
-import java.util.*
 import kotlin.collections.ArrayList
 
 /**
@@ -118,96 +116,13 @@ class HomeHandler(
             if (itemIndex >= 0 && itemIndex < catalogViewData.size) {
                 val fistItem = catalogViewData[itemIndex]
 
-                addSongsTaskId = ""
-
-                clearPlaylist()
-                clearQueue()
-
-                songQueue.add(fistItem.songId)
-                skipPreviousInPlaylist()
-                next()
-
                 val skipMonstercatSongs =
-                    Settings(view.context).getBoolean(view.context.getString(R.string.skipMonstercatSongsSetting))
-
-                val songDatabaseHelper = SongDatabaseHelper(view.context)
+                    Settings(view.context).getBoolean(view.context.getString(R.string.skipMonstercatSongsSetting)) == true
 
                 if (albumId == null) {
-                    //add next songs from database
-                    val catalogSongDatabaseHelper = CatalogSongDatabaseHelper(view.context)
-
-                    BackgroundAsync({
-                        val id = UUID.randomUUID().toString()
-                        addSongsTaskId = id
-
-                        catalogSongDatabaseHelper.getIndexFromSongId(fistItem.songId)?.toLong()
-                            ?.let { skip ->
-                                val nextSongs = catalogSongDatabaseHelper.getSongs(skip)
-
-                                nextSongs.reverse()
-
-                                for (catalogSong in nextSongs) {
-
-                                    if (skipMonstercatSongs == true) {
-                                        val song =
-                                            songDatabaseHelper.getSong(
-                                                view.context,
-                                                catalogSong.songId
-                                            )
-                                        if (!song?.artist.equals("monstercat", true)) {
-                                            if (id == addSongsTaskId) {
-                                                songQueue.add(catalogSong.songId)
-                                            } else {
-                                                break
-                                            }
-                                        }
-                                    } else {
-                                        if (id == addSongsTaskId) {
-                                            songQueue.add(catalogSong.songId)
-                                        } else {
-                                            break
-                                        }
-                                    }
-
-                                }
-                            }
-                    }, {}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                    playSongsFromCatalogDb(view.context, skipMonstercatSongs, fistItem.songId)
                 } else {
-                    //add visible next songs
-                    BackgroundAsync({
-                        val id = UUID.randomUUID().toString()
-                        addSongsTaskId = id
-
-                        for (i in (itemIndex + 1 until catalogViewData.size)) {
-                            try {
-                                if (skipMonstercatSongs == true) {
-                                    val song =
-                                        songDatabaseHelper.getSong(
-                                            view.context,
-                                            catalogViewData[i].songId
-                                        )
-
-                                    if (!song?.artist.equals("monstercat", true)) {
-                                        if (id == addSongsTaskId) {
-                                            songQueue.add(catalogViewData[i].songId)
-                                        } else {
-                                            break
-                                        }
-                                    }
-                                } else {
-                                    if (id == addSongsTaskId) {
-                                        songQueue.add(catalogViewData[i].songId)
-                                    } else {
-                                        break
-                                    }
-                                }
-
-                            } catch (e: IndexOutOfBoundsException) {
-
-                            }
-
-                        }
-                    }, {}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                    playSongsFromViewData(view.context, skipMonstercatSongs, catalogViewData, itemIndex)
                 }
             }
 

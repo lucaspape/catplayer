@@ -17,7 +17,6 @@ import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadSong
-import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.ui.abstract_items.CatalogItem
 import de.lucaspape.monstercat.ui.abstract_items.HeaderTextItem
 import de.lucaspape.monstercat.ui.abstract_items.PlaylistItem
@@ -29,9 +28,7 @@ import de.lucaspape.monstercat.util.*
 import de.lucaspape.util.BackgroundAsync
 import de.lucaspape.util.Settings
 import java.io.File
-import java.lang.IndexOutOfBoundsException
 import java.lang.ref.WeakReference
-import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
@@ -89,31 +86,12 @@ class PlaylistHandler(private val initPlaylistId: String?) : Handler {
             val itemIndex = position + itemIndexOffset
 
             if (itemIndex >= 0) {
-                HomeHandler.addSongsTaskId = ""
-
-                clearPlaylist()
-                clearQueue()
-
-                songQueue.add(data[itemIndex].songId)
-                skipPreviousInPlaylist()
-                next()
-
-                BackgroundAsync({
-                    val id = UUID.randomUUID().toString()
-                    HomeHandler.addSongsTaskId = id
-
-                    for (i in (itemIndex + 1 until data.size)) {
-                        try {
-                            if (HomeHandler.addSongsTaskId == id) {
-                                songQueue.add(data[i].songId)
-                            } else {
-                                break
-                            }
-                        } catch (e: IndexOutOfBoundsException) {
-
-                        }
-                    }
-                }, {}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                playSongsFromViewData(
+                    view.context,
+                    Settings(view.context).getBoolean(view.context.getString(R.string.skipMonstercatSongsSetting)) == true,
+                    data,
+                    itemIndex
+                )
             }
 
             false

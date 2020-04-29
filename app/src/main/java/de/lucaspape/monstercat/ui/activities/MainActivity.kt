@@ -204,29 +204,42 @@ class MainActivity : AppCompatActivity() {
         val intentExtras = intent.extras
         val path = intent.data?.path
 
-        if (intentExtras != null) {
-            if (intentExtras["search"] != null) {
+
+        when {
+            intentExtras?.get("search") != null -> {
                 search(intentExtras["search"] as String)
             }
-        } else if (path != null) {
-            val id = path.substring(path.lastIndexOf("/") + 1, path.length)
+            path != null -> {
+                val id = path.substring(path.lastIndexOf("/") + 1, path.length)
 
-            when {
-                path.contains("release") -> openFragment(
-                    de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
-                        HomeHandler({ searchString ->
-                            search(
-                                searchString
-                            )
-                        }, id)
+                when {
+                    path.contains("release") -> openFragment(
+                        de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
+                            HomeHandler({ searchString ->
+                                search(
+                                    searchString
+                                )
+                            }, id)
+                        )
                     )
-                )
-                path.contains("playlist") -> openFragment(
-                    de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
-                        PlaylistHandler(id)
+                    path.contains("playlist") -> openFragment(
+                        de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
+                            PlaylistHandler(id)
+                        )
                     )
-                )
-                else -> openFragment(
+                    else -> openFragment(
+                        de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
+                            HomeHandler({ searchString ->
+                                search(
+                                    searchString
+                                )
+                            }, null)
+                        )
+                    )
+                }
+            }
+            else -> {
+                openFragment(
                     de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
                         HomeHandler({ searchString ->
                             search(
@@ -236,16 +249,6 @@ class MainActivity : AppCompatActivity() {
                     )
                 )
             }
-        } else {
-            openFragment(
-                de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
-                    HomeHandler({ searchString ->
-                        search(
-                            searchString
-                        )
-                    }, null)
-                )
-            )
         }
 
         setContentView(R.layout.activity_main)
