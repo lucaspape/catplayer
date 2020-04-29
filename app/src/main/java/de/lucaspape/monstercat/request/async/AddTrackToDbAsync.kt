@@ -6,7 +6,7 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.database.objects.Song
 import de.lucaspape.monstercat.request.newSearchTrackRequest
-import de.lucaspape.monstercat.util.newAuthorizedRequestQueue
+import de.lucaspape.monstercat.util.getAuthorizedRequestQueue
 import de.lucaspape.monstercat.util.parseSongToDB
 import java.lang.ref.WeakReference
 
@@ -30,13 +30,7 @@ class AddTrackToDbAsync(
             val syncObject = Object()
 
             val volleyQueue =
-                newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
-
-            volleyQueue.addRequestFinishedListener<Any?> {
-                synchronized(syncObject) {
-                    syncObject.notify()
-                }
-            }
+                getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
             volleyQueue.add(newSearchTrackRequest(context, trackId, 0, true, {
                 val jsonArray = it.getJSONArray("results")
@@ -44,7 +38,15 @@ class AddTrackToDbAsync(
                 for (i in (0 until jsonArray.length())) {
                     parseSongToDB(jsonArray.getJSONObject(i), context)
                 }
-            }, {}))
+
+                synchronized(syncObject) {
+                    syncObject.notify()
+                }
+            }, {
+                synchronized(syncObject) {
+                    syncObject.notify()
+                }
+            }))
 
             synchronized(syncObject) {
                 syncObject.wait()

@@ -5,7 +5,7 @@ import android.os.AsyncTask
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.CatalogSongDatabaseHelper
 import de.lucaspape.monstercat.request.newLoadSongListRequest
-import de.lucaspape.monstercat.util.newAuthorizedRequestQueue
+import de.lucaspape.monstercat.util.getAuthorizedRequestQueue
 import de.lucaspape.monstercat.util.parseCatalogSongToDB
 import java.lang.ref.WeakReference
 
@@ -50,13 +50,7 @@ class LoadSongListAsync(
             val syncObject = Object()
 
             val requestQueue =
-                newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
-
-            requestQueue.addRequestFinishedListener<Any> {
-                synchronized(syncObject) {
-                    syncObject.notify()
-                }
-            }
+                getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
             requestQueue.add(newLoadSongListRequest(context, skip, {
                 val jsonArray = it.getJSONArray("results")
@@ -67,8 +61,15 @@ class LoadSongListAsync(
                         context
                     )
                 }
+
+                synchronized(syncObject) {
+                    syncObject.notify()
+                }
             }, {
                 success = false
+                synchronized(syncObject) {
+                    syncObject.notify()
+                }
             }))
 
             synchronized(syncObject) {

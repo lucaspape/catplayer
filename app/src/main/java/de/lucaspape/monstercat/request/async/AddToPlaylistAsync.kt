@@ -5,7 +5,7 @@ import android.os.AsyncTask
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.request.newAddToPlaylistRequest
-import de.lucaspape.monstercat.util.newAuthorizedRequestQueue
+import de.lucaspape.monstercat.util.getAuthorizedRequestQueue
 import java.lang.ref.WeakReference
 
 class AddToPlaylistAsync(
@@ -28,16 +28,10 @@ class AddToPlaylistAsync(
         contextReference.get()?.let { context ->
             SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
                 val addToPlaylistQueue =
-                    newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+                    getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
                 var success = true
                 val syncObject = Object()
-
-                addToPlaylistQueue.addRequestFinishedListener<Any?> {
-                    synchronized(syncObject) {
-                        syncObject.notify()
-                    }
-                }
 
                 addToPlaylistQueue.add(
                     newAddToPlaylistRequest(
@@ -45,10 +39,15 @@ class AddToPlaylistAsync(
                         playlistId,
                         song,
                         {
-
+                            synchronized(syncObject) {
+                                syncObject.notify()
+                            }
                         },
                         {
                             success = false
+                            synchronized(syncObject) {
+                                syncObject.notify()
+                            }
                         })
                 )
 

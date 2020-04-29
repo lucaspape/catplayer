@@ -33,6 +33,7 @@ import java.lang.Exception
 import java.net.URL
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 fun wifiConnected(context: Context): Boolean? {
     val connectivityManager =
@@ -175,11 +176,54 @@ fun displayAlertDialogList(
     }
 }
 
+val requestQueues = HashMap<String, RequestQueue?>()
+
 /**
  * Creates new volley queue using OkHttp3Stack and cookies from connect.monstercat.com
  */
-fun newAuthorizedRequestQueue(context: Context, requestHost: String?): RequestQueue {
-    return if (requestHost == null) {
+fun getAuthorizedRequestQueue(context: Context, requestHost: String?): RequestQueue {
+    var queue = if(requestHost == null){
+        requestQueues["default"]
+    }else{
+        requestQueues[requestHost]
+    }
+
+    if(queue == null){
+         if (requestHost == null) {
+            queue = Volley.newRequestQueue(
+                context, OkHttp3Stack(
+                    context, null
+                )
+            )
+        } else {
+            queue = Volley.newRequestQueue(
+                context, OkHttp3Stack(
+                    context, object : PersistentCookieJar(
+                        SetCookieCache(),
+                        SharedPrefsCookiePersistor(context)
+                    ) {
+                        override fun loadForRequest(url: HttpUrl): List<Cookie> {
+                            return super.loadForRequest(
+                                HttpUrl.Builder().scheme("https").host(requestHost).build()
+                            )
+                        }
+                    }
+                )
+            )
+        }
+
+        if(requestHost == null){
+            requestQueues["default"] = queue
+        }else{
+            requestQueues[requestHost] = queue
+        }
+    }
+
+    return queue!!
+}
+
+fun newAuthorizedRequestQueue(context: Context, requestHost: String?, finishedListener:(queue:RequestQueue) -> Unit): RequestQueue {
+    val queue = if (requestHost == null) {
         Volley.newRequestQueue(
             context, OkHttp3Stack(
                 context, null
@@ -201,4 +245,10 @@ fun newAuthorizedRequestQueue(context: Context, requestHost: String?): RequestQu
             )
         )
     }
+
+    queue.addRequestFinishedListener<Any?> {
+        finishedListener(queue)
+    }
+
+    return queue
 }

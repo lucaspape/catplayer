@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.AsyncTask
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.request.newChangePlaylistPublicStateRequest
-import de.lucaspape.monstercat.util.newAuthorizedRequestQueue
+import de.lucaspape.monstercat.util.getAuthorizedRequestQueue
 import java.lang.ref.WeakReference
 
 class ChangePlaylistPublicStateAsync(
@@ -26,16 +26,10 @@ class ChangePlaylistPublicStateAsync(
     override fun doInBackground(vararg params: Void?): Boolean {
         contextReference.get()?.let { context ->
             val newPlaylistVolleyQueue =
-                newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+                getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
             var success = true
             val syncObject = Object()
-
-            newPlaylistVolleyQueue.addRequestFinishedListener<Any?> {
-                synchronized(syncObject) {
-                    syncObject.notify()
-                }
-            }
 
             newPlaylistVolleyQueue.add(
                 newChangePlaylistPublicStateRequest(
@@ -43,10 +37,15 @@ class ChangePlaylistPublicStateAsync(
                     playlistId,
                     public,
                     {
-
+                        synchronized(syncObject) {
+                            syncObject.notify()
+                        }
                     },
                     {
                         success = false
+                        synchronized(syncObject) {
+                            syncObject.notify()
+                        }
                     })
             )
 

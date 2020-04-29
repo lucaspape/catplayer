@@ -5,7 +5,7 @@ import android.os.AsyncTask
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.request.newSearchTrackRequest
 import de.lucaspape.monstercat.ui.abstract_items.CatalogItem
-import de.lucaspape.monstercat.util.newAuthorizedRequestQueue
+import de.lucaspape.monstercat.util.getAuthorizedRequestQueue
 import de.lucaspape.monstercat.util.parseSongSearchToSongList
 import java.lang.ref.WeakReference
 
@@ -35,13 +35,7 @@ class LoadTitleSearchAsync(
             var success = true
             val syncObject = Object()
             val searchQueue =
-                newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
-
-            searchQueue.addRequestFinishedListener<Any?> {
-                synchronized(syncObject) {
-                    syncObject.notify()
-                }
-            }
+                getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
             searchQueue.add(newSearchTrackRequest(context, searchString, skip, false, {
                 val jsonArray = it.getJSONArray("results")
@@ -52,8 +46,15 @@ class LoadTitleSearchAsync(
                 for (song in songList) {
                     searchResults.add(CatalogItem(song.songId))
                 }
+
+                synchronized(syncObject) {
+                    syncObject.notify()
+                }
             }, {
                 success = false
+                synchronized(syncObject) {
+                    syncObject.notify()
+                }
             }))
 
             synchronized(syncObject) {

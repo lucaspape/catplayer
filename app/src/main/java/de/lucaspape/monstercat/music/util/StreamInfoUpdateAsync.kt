@@ -6,6 +6,7 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.music.notification.updateNotification
 import de.lucaspape.monstercat.request.newLiveInfoRequest
+import de.lucaspape.monstercat.util.getAuthorizedRequestQueue
 import de.lucaspape.monstercat.util.newAuthorizedRequestQueue
 import de.lucaspape.monstercat.util.parseSongToDB
 import org.json.JSONException
@@ -60,7 +61,7 @@ class StreamInfoUpdateAsync(
             }, {})
 
             val requestQueue =
-                newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+                getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
             while (true) {
                 requestQueue.add(artistTitleRequest)

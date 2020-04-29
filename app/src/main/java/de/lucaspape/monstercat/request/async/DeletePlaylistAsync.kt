@@ -6,7 +6,7 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.ManualPlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.request.newDeletePlaylistRequest
-import de.lucaspape.monstercat.util.newAuthorizedRequestQueue
+import de.lucaspape.monstercat.util.getAuthorizedRequestQueue
 import java.lang.ref.WeakReference
 
 class DeletePlaylistAsync(
@@ -40,17 +40,18 @@ class DeletePlaylistAsync(
 
             if (deleteRemote) {
                 val deletePlaylistVolleyQueue =
-                    newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+                    getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
                 val syncObject = Object()
 
-                deletePlaylistVolleyQueue.addRequestFinishedListener<Any?> {
+                deletePlaylistVolleyQueue.add(newDeletePlaylistRequest(context, playlistId, {
                     synchronized(syncObject) {
                         syncObject.notify()
                     }
-                }
-
-                deletePlaylistVolleyQueue.add(newDeletePlaylistRequest(context, playlistId, {}, {
+                }, {
                     success = false
+                    synchronized(syncObject) {
+                        syncObject.notify()
+                    }
                 }))
 
                 synchronized(syncObject) {

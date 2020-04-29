@@ -37,7 +37,7 @@ fun loadAlbumTracks(
     errorCallback: () -> Unit
 ) {
     val albumRequestQueue =
-        newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+        getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
     albumRequestQueue.add(newLoadAlbumRequest(context, mcID, {
         parseAlbumToDB(it.getJSONObject("release"), context)
@@ -560,7 +560,7 @@ internal fun deletePlaylistSong(
 internal fun openAlbum(view: View, albumMcId: String, share: Boolean) {
     val context = view.context
     val volleyRequestQueue =
-        newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+        getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
     volleyRequestQueue.add(newLoadAlbumRequest(context, albumMcId, {
         val releaseObject = it.getJSONObject("release")

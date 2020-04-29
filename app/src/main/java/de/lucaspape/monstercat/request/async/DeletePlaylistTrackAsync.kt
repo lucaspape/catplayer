@@ -5,7 +5,7 @@ import android.os.AsyncTask
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.request.newDeletePlaylistTrackRequest
-import de.lucaspape.monstercat.util.newAuthorizedRequestQueue
+import de.lucaspape.monstercat.util.getAuthorizedRequestQueue
 import java.lang.ref.WeakReference
 
 class DeletePlaylistTrackAsync(
@@ -28,19 +28,20 @@ class DeletePlaylistTrackAsync(
     override fun doInBackground(vararg params: Void?): Boolean {
         contextReference.get()?.let { context ->
             SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
-                val deleteSongVolleyQueue = newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+                val deleteSongVolleyQueue = getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
                 var success = true
                 val syncObject = Object()
 
-                deleteSongVolleyQueue.addRequestFinishedListener<Any?> {
+                deleteSongVolleyQueue.add(newDeletePlaylistTrackRequest(context, playlistId, song, songDeleteIndex, {
                     synchronized(syncObject) {
                         syncObject.notify()
                     }
-                }
-
-                deleteSongVolleyQueue.add(newDeletePlaylistTrackRequest(context, playlistId, song, songDeleteIndex, {}, {
+                }, {
                     success = false
+                    synchronized(syncObject) {
+                        syncObject.notify()
+                    }
                 }))
 
                 synchronized(syncObject) {

@@ -5,7 +5,7 @@ import android.os.AsyncTask
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.AlbumItemDatabaseHelper
 import de.lucaspape.monstercat.request.newLoadAlbumRequest
-import de.lucaspape.monstercat.util.newAuthorizedRequestQueue
+import de.lucaspape.monstercat.util.getAuthorizedRequestQueue
 import de.lucaspape.monstercat.util.parseAlbumSongToDB
 import java.lang.ref.WeakReference
 
@@ -49,7 +49,7 @@ class LoadAlbumAsync(
     override fun doInBackground(vararg param: Void?): Boolean {
         contextReference.get()?.let { context ->
             val requestQueue =
-                newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+                getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
             val albumItemDatabaseHelper =
                 AlbumItemDatabaseHelper(context, albumId)
@@ -58,12 +58,6 @@ class LoadAlbumAsync(
 
             var success = true
             val syncObject = Object()
-
-            requestQueue.addRequestFinishedListener<Any> {
-                synchronized(syncObject) {
-                    syncObject.notify()
-                }
-            }
 
             requestQueue.add(newLoadAlbumRequest(context, albumId, {
                 val jsonArray = it.getJSONArray("tracks")
@@ -78,8 +72,15 @@ class LoadAlbumAsync(
                         context
                     )
                 }
+
+                synchronized(syncObject) {
+                    syncObject.notify()
+                }
             }, {
                 success = false
+                synchronized(syncObject) {
+                    syncObject.notify()
+                }
             }))
             synchronized(syncObject) {
                 syncObject.wait()

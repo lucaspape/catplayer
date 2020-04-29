@@ -54,7 +54,7 @@ class Auth {
         loginFailed: () -> Unit
     ) {
         val loginQueue =
-            newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+            getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
         //add to queue
         loginQueue.add(newLoginRequest(context, username, password, {
@@ -95,14 +95,11 @@ class Auth {
             val twoFACode = twoFAEditText.text.toString()
 
             val twoFAQueue =
-                newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
-
-            twoFAQueue.addRequestFinishedListener<Any> {
-                checkLogin(context, loginSuccess, loginFailed)
-            }
+                getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
             twoFAQueue.add(newTwoFaRequest(context, twoFACode, {
                 //all good
+                checkLogin(context, loginSuccess, loginFailed)
             }, {
                 //TODO show 2FA again/request new code
             }))
@@ -125,7 +122,7 @@ class Auth {
         //check if sid is valid, get session and user id, if it is null or "" the sid is NOT valid -> login fail
 
         val checkLoginQueue =
-            newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+            getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
         checkLoginQueue.add(newCheckLoginRequest(context, {
             val userId = try {
                 val userObject = it.getJSONObject("user")

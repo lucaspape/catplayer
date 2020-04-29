@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.AsyncTask
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.request.newLoadRelatedTracksRequest
-import de.lucaspape.monstercat.util.newAuthorizedRequestQueue
+import de.lucaspape.monstercat.util.getAuthorizedRequestQueue
 import org.json.JSONException
 import java.lang.ref.WeakReference
 
@@ -30,13 +30,8 @@ class LoadRelatedTracksAsync(
 
             var result: ArrayList<String>? = ArrayList()
 
-            val volleyQueue = newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
-
-            volleyQueue.addRequestFinishedListener<Any?> {
-                synchronized(syncObject) {
-                    syncObject.notify()
-                }
-            }
+            val volleyQueue =
+                getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
             volleyQueue.add(newLoadRelatedTracksRequest(context, trackIdArray, skipMC, {
                 try {
@@ -49,7 +44,16 @@ class LoadRelatedTracksAsync(
                 } catch (e: JSONException) {
                     result = null
                 }
-            }, {result = null}))
+
+                synchronized(syncObject) {
+                    syncObject.notify()
+                }
+            }, {
+                result = null
+                synchronized(syncObject) {
+                    syncObject.notify()
+                }
+            }))
 
             synchronized(syncObject) {
                 syncObject.wait()

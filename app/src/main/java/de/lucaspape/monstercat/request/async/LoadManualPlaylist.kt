@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.AsyncTask
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.request.newLoadPlaylistRequest
-import de.lucaspape.monstercat.util.newAuthorizedRequestQueue
+import de.lucaspape.monstercat.util.getAuthorizedRequestQueue
 import de.lucaspape.monstercat.util.parsePlaylistToDB
 import java.lang.ref.WeakReference
 
@@ -31,13 +31,7 @@ class LoadManualPlaylist(
             var success = true
             val syncObject = Object()
 
-            val getManualPlaylistsRequestQueue = newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
-
-            getManualPlaylistsRequestQueue.addRequestFinishedListener<Any?> {
-                synchronized(syncObject) {
-                    syncObject.notify()
-                }
-            }
+            val getManualPlaylistsRequestQueue = getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
             getManualPlaylistsRequestQueue.add(newLoadPlaylistRequest(context, playlistId, {
                 parsePlaylistToDB(
@@ -45,8 +39,15 @@ class LoadManualPlaylist(
                     it,
                     false
                 )
+
+                synchronized(syncObject) {
+                    syncObject.notify()
+                }
             }, {
                 success = false
+                synchronized(syncObject) {
+                    syncObject.notify()
+                }
             }))
 
             synchronized(syncObject) {

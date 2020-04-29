@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.AsyncTask
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.request.newCreatePlaylistRequest
-import de.lucaspape.monstercat.util.newAuthorizedRequestQueue
+import de.lucaspape.monstercat.util.getAuthorizedRequestQueue
 import java.lang.ref.WeakReference
 
 class CreatePlaylistAsync(
@@ -24,19 +24,20 @@ class CreatePlaylistAsync(
 
     override fun doInBackground(vararg params: Void?): Boolean {
         contextReference.get()?.let { context ->
-            val newPlaylistVolleyQueue = newAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+            val newPlaylistVolleyQueue = getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
             var success = true
             val syncObject = Object()
 
-            newPlaylistVolleyQueue.addRequestFinishedListener<Any?> {
+            newPlaylistVolleyQueue.add(newCreatePlaylistRequest(context, playlistName, {
                 synchronized(syncObject) {
                     syncObject.notify()
                 }
-            }
-
-            newPlaylistVolleyQueue.add(newCreatePlaylistRequest(context, playlistName, {}, {
+            }, {
                 success = false
+                synchronized(syncObject) {
+                    syncObject.notify()
+                }
             }))
 
             synchronized(syncObject) {
