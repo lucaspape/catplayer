@@ -31,22 +31,19 @@ import de.lucaspape.monstercat.music.util.playStream
 import de.lucaspape.monstercat.twitch.Stream
 import de.lucaspape.monstercat.util.*
 import de.lucaspape.util.BackgroundAsync
+import de.lucaspape.util.Cache
 import de.lucaspape.util.Settings
 import java.io.File
 import java.lang.IndexOutOfBoundsException
 import java.lang.ref.WeakReference
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 /**
  * Does everything for the home page
  */
-class HomeHandler(private val onSearch:(searchString:String?) -> Unit): Handler{
+class HomeHandler(private val onSearch: (searchString: String?) -> Unit) : Handler {
     companion object {
-        @JvmStatic
-        private var viewDataCache = HashMap<String, WeakReference<ArrayList<*>>>()
-
         @JvmStatic
         var addSongsTaskId = ""
     }
@@ -104,7 +101,8 @@ class HomeHandler(private val onSearch:(searchString:String?) -> Unit): Handler{
             restoreRecyclerViewPosition(view.context, "catalogView")
         }
 
-        viewDataCache[cacheId] = WeakReference(catalogViewData as ArrayList<*>)
+        val cache = Cache()
+        cache.set(cacheId, catalogViewData)
 
         /**
          * On song click
@@ -313,7 +311,7 @@ class HomeHandler(private val onSearch:(searchString:String?) -> Unit): Handler{
                         catalogViewData.add(catalogItem)
                     }
 
-                    viewDataCache[cacheId] = WeakReference(catalogViewData as ArrayList<*>)
+                    cache.set(cacheId, catalogViewData)
                 }
             }
         })
@@ -368,7 +366,8 @@ class HomeHandler(private val onSearch:(searchString:String?) -> Unit): Handler{
 
         restoreRecyclerViewPosition(view.context, "albumView")
 
-        viewDataCache[cacheId] = WeakReference(albumViewData as ArrayList<*>)
+        val cache = Cache()
+        cache.set(cacheId, albumViewData)
 
         val albumDatabaseHelper = AlbumDatabaseHelper(view.context)
 
@@ -420,7 +419,7 @@ class HomeHandler(private val onSearch:(searchString:String?) -> Unit): Handler{
                         albumViewData.add(albumItem)
                     }
 
-                    viewDataCache[cacheId] = WeakReference(albumViewData as ArrayList<*>)
+                    cache.set(cacheId, albumViewData)
                 }
             }
         })
@@ -579,7 +578,8 @@ class HomeHandler(private val onSearch:(searchString:String?) -> Unit): Handler{
             swipeRefreshLayout.isRefreshing = false
         }
 
-        var isEmpty = viewDataCache["catalogView"]?.get()?.isEmpty()
+        val cache = Cache()
+        var isEmpty = cache.get<ArrayList<CatalogItem>>("catalogView")?.isEmpty()
 
         if (isEmpty == null) {
             isEmpty = true
@@ -624,9 +624,7 @@ class HomeHandler(private val onSearch:(searchString:String?) -> Unit): Handler{
                 }
             }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         } else {
-            viewDataCache["catalogView"]?.get()?.let {
-                finished(it as ArrayList<CatalogItem>)
-            }
+            cache.get<ArrayList<CatalogItem>>("catalogView")?.let(finished)
         }
     }
 
@@ -712,7 +710,8 @@ class HomeHandler(private val onSearch:(searchString:String?) -> Unit): Handler{
             swipeRefreshLayout.isRefreshing = false
         }
 
-        var isEmpty = viewDataCache["albumView"]?.get()?.isEmpty()
+        val cache = Cache()
+        var isEmpty = cache.get<ArrayList<AlbumItem>>("albumView")?.isEmpty()
 
         if (isEmpty == null) {
             isEmpty = true
@@ -762,9 +761,7 @@ class HomeHandler(private val onSearch:(searchString:String?) -> Unit): Handler{
                     }
                 }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         } else {
-            viewDataCache["albumView"]?.get()?.let {
-                finished(it as ArrayList<AlbumItem>)
-            }
+            cache.get<ArrayList<AlbumItem>>("albumView")?.let(finished)
         }
     }
 

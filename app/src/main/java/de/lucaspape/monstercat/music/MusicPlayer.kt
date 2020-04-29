@@ -366,7 +366,7 @@ fun playRelatedSongs() {
                         skipPreviousInPlaylist()
                         next()
                     },
-                    errorCallback = { _ ->
+                    errorCallback = {
                         //TODO handle error
                     }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
             }
