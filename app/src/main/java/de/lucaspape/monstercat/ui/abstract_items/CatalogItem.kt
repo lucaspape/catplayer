@@ -161,7 +161,7 @@ open class CatalogItem(
 
         private var albumId = ""
 
-        override fun bindView(item: CatalogItem, payloads: MutableList<Any>) {
+        override fun bindView(item: CatalogItem, payloads: List<Any>) {
             val songDatabaseHelper = SongDatabaseHelper(context)
             val song = songDatabaseHelper.getSong(context, item.songId)
 

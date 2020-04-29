@@ -24,7 +24,7 @@ class AlertListItem(val itemText:String, val itemDrawable:String?): AbstractItem
         private val alertItemText: TextView = view.findViewById(R.id.alertItemText)
         private val alertItemImage: ImageView = view.findViewById(R.id.alertItemImage)
 
-        override fun bindView(item: AlertListItem, payloads: MutableList<Any>) {
+        override fun bindView(item: AlertListItem, payloads: List<Any>) {
             alertItemText.text = item.itemText
             alertItemImage.setImageURI(item.itemDrawable?.toUri())
         }

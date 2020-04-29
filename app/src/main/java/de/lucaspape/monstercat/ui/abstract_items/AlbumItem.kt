@@ -85,7 +85,7 @@ open class AlbumItem(
 
         private var albumId = ""
 
-        override fun bindView(item: AlbumItem, payloads: MutableList<Any>) {
+        override fun bindView(item: AlbumItem, payloads: List<Any>) {
             val albumDatabaseHelper = AlbumDatabaseHelper(context)
 
             val album = albumDatabaseHelper.getAlbum(item.albumId)

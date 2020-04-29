@@ -147,7 +147,7 @@ open class PlaylistItem(
             view.findViewById(R.id.titleDownloadButton)
         private val context = view.context
 
-        override fun bindView(item: PlaylistItem, payloads: MutableList<Any>) {
+        override fun bindView(item: PlaylistItem, payloads: List<Any>) {
             val playlistDatabaseHelper = PlaylistDatabaseHelper(context)
 
             val playlist = playlistDatabaseHelper.getPlaylist(item.playlistId)

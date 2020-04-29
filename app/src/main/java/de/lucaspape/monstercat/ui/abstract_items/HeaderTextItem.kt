@@ -21,7 +21,7 @@ open class HeaderTextItem(private val headerText:String): AbstractItem<HeaderTex
     class ViewHolder(view: View) : FastAdapter.ViewHolder<HeaderTextItem>(view) {
         private val playlistNameTextView: TextView = view.findViewById(R.id.textHeader)
 
-        override fun bindView(item: HeaderTextItem, payloads: MutableList<Any>) {
+        override fun bindView(item: HeaderTextItem, payloads: List<Any>) {
             playlistNameTextView.text = item.headerText
         }
 

@@ -29,7 +29,7 @@ open class AlertListHeaderItem(private val headerText: String, private val album
         private val headerItemText: TextView = view.findViewById(R.id.headerItemText)
         private val context = view.context
 
-        override fun bindView(item: AlertListHeaderItem, payloads: MutableList<Any>) {
+        override fun bindView(item: AlertListHeaderItem, payloads: List<Any>) {
             headerItemText.text = item.headerText
 
             downloadCoverIntoImageReceiver(context, object : ImageReceiverInterface {

@@ -11,6 +11,7 @@ import okhttp3.Headers
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 
@@ -42,7 +43,7 @@ class OkHttp3Stack(private val context: Context, private val cookieJar: CookieJa
     @Throws(AuthFailureError::class)
     private fun createRequestBody(r: Request<*>): RequestBody? {
         val body = r.body ?: return null
-        return RequestBody.create(r.bodyContentType.toMediaTypeOrNull(), body)
+        return body.toRequestBody(r.bodyContentType.toMediaTypeOrNull(), 0, body.size)
     }
 
     override fun executeRequest(

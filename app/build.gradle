@@ -45,16 +45,15 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
     implementation 'com.android.volley:volley:1.1.1'
-    implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.google.android.material:material:1.2.0-alpha06'
 
     implementation project(':exoplayer-library-core')
     implementation project(':exoplayer-library-hls')
     implementation project(':exoplayer-extension-flac')
 
-    implementation "com.mikepenz:fastadapter:4.1.0"
-    implementation "com.mikepenz:fastadapter-extensions-scroll:4.1.0"
+    implementation "com.mikepenz:fastadapter:5.0.0"
+    implementation "com.mikepenz:fastadapter-extensions-scroll:5.0.0"
     implementation 'com.squareup.picasso:picasso:2.71828'
 
-    implementation 'com.squareup.okhttp3:okhttp:4.5.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.6.0'
 }
