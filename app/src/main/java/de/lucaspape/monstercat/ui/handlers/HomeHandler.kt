@@ -15,7 +15,6 @@ import com.mikepenz.fastadapter.adapters.ItemAdapter
 import com.mikepenz.fastadapter.listeners.ClickEventHook
 import com.mikepenz.fastadapter.scroll.EndlessRecyclerOnScrollListener
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.ui.activities.SettingsActivity
 import de.lucaspape.monstercat.database.helper.AlbumDatabaseHelper
 import de.lucaspape.monstercat.database.helper.AlbumItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.CatalogSongDatabaseHelper
@@ -43,6 +42,7 @@ import kotlin.collections.ArrayList
  */
 class HomeHandler(
     private val onSearch: (searchString: String?) -> Unit,
+    private val openSettings:() -> Unit,
     private val albumMcId: String?
 ) : Handler {
     companion object {
@@ -457,7 +457,7 @@ class HomeHandler(
 
         //settings button
         view.findViewById<ImageButton>(R.id.settingsButton).setOnClickListener {
-            view.context.startActivity(Intent(view.context, SettingsActivity::class.java))
+            openSettings()
         }
 
         //livestream button

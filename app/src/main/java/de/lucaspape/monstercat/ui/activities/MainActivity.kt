@@ -33,6 +33,7 @@ import de.lucaspape.monstercat.ui.*
 import de.lucaspape.monstercat.ui.handlers.HomeHandler
 import de.lucaspape.monstercat.ui.handlers.PlaylistHandler
 import de.lucaspape.monstercat.ui.handlers.SearchHandler
+import de.lucaspape.monstercat.ui.handlers.SettingsHandler
 import de.lucaspape.monstercat.util.*
 import de.lucaspape.util.Settings
 import java.io.File
@@ -76,7 +77,7 @@ class MainActivity : AppCompatActivity() {
                                 search(
                                     searchString
                                 )
-                            }, null)
+                            }, { openSettings() }, null)
                         )
                     )
 
@@ -107,7 +108,25 @@ class MainActivity : AppCompatActivity() {
                                 search(
                                     searchString
                                 )
-                            }, null)
+                            }, { openSettings() }, null)
+                        )
+                    )
+                }
+            )
+        )
+    }
+
+    private fun openSettings() {
+        openFragment(
+            de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
+                SettingsHandler {
+                    openFragment(
+                        de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
+                            HomeHandler({ searchString ->
+                                search(
+                                    searchString
+                                )
+                            }, { openSettings() }, null)
                         )
                     )
                 }
@@ -219,7 +238,7 @@ class MainActivity : AppCompatActivity() {
                                 search(
                                     searchString
                                 )
-                            }, id)
+                            }, { openSettings() }, id)
                         )
                     )
                     path.contains("playlist") -> openFragment(
@@ -233,7 +252,7 @@ class MainActivity : AppCompatActivity() {
                                 search(
                                     searchString
                                 )
-                            }, null)
+                            }, { openSettings() }, null)
                         )
                     )
                 }
@@ -245,7 +264,7 @@ class MainActivity : AppCompatActivity() {
                             search(
                                 searchString
                             )
-                        }, null)
+                        }, { openSettings() }, null)
                     )
                 )
             }

@@ -20,14 +20,14 @@
         <service
             android:name=".music.notification.PlayerService"
             android:enabled="true"
-            android:stopWithTask="true"
-            android:exported="false" />
+            android:exported="false"
+            android:stopWithTask="true" />
 
         <service
             android:name=".download.DownloadService"
             android:enabled="true"
-            android:stopWithTask="true"
-            android:exported="false" />
+            android:exported="false"
+            android:stopWithTask="true" />
 
         <receiver
             android:name=".music.notification.NotificationIntentReceiver"
@@ -42,8 +42,8 @@
 
         <activity
             android:name="de.lucaspape.monstercat.ui.activities.MainActivity"
-            android:theme="@style/AppTheme"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -61,9 +61,9 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="https"
                     android:host="monstercat.com"
-                    android:pathPrefix="/release" />
+                    android:pathPrefix="/release"
+                    android:scheme="https" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -72,9 +72,9 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="https"
                     android:host="monstercat.com"
-                    android:pathPrefix="/playlist" />
+                    android:pathPrefix="/playlist"
+                    android:scheme="https" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -83,9 +83,9 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="https"
                     android:host="www.monstercat.com"
-                    android:pathPrefix="/release" />
+                    android:pathPrefix="/release"
+                    android:scheme="https" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -94,15 +94,12 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="https"
                     android:host="www.monstercat.com"
-                    android:pathPrefix="/playlist" />
+                    android:pathPrefix="/playlist"
+                    android:scheme="https" />
             </intent-filter>
         </activity>
 
-        <activity android:name="de.lucaspape.monstercat.ui.activities.SettingsActivity" />
         <activity android:name="de.lucaspape.monstercat.ui.activities.PlayerFullscreenActivity" />
-
     </application>
-
 </manifest>
