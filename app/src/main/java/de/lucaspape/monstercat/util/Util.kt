@@ -179,7 +179,7 @@ fun displayAlertDialogList(
 val requestQueues = HashMap<String, RequestQueue?>()
 
 /**
- * Creates new volley queue using OkHttp3Stack and cookies from connect.monstercat.com
+ * Get volley queue from hashmap and create new if it does not exists
  */
 fun getAuthorizedRequestQueue(context: Context, requestHost: String?): RequestQueue {
     var queue = if(requestHost == null){
@@ -222,6 +222,9 @@ fun getAuthorizedRequestQueue(context: Context, requestHost: String?): RequestQu
     return queue!!
 }
 
+/**
+ * Creates new volley queue
+ */
 fun newAuthorizedRequestQueue(context: Context, requestHost: String?, finishedListener:(queue:RequestQueue) -> Unit): RequestQueue {
     val queue = if (requestHost == null) {
         Volley.newRequestQueue(

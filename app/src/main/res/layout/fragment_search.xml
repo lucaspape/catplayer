@@ -11,8 +11,7 @@
         android:layout_height="50dp"
         android:layout_marginTop="5dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.442"
-        app:layout_constraintStart_toStartOf="@+id/searchPullToRefresh"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <SearchView
@@ -21,8 +20,7 @@
             android:layout_height="40dp"
             android:contentDescription="@string/homeSearchDescription"
             app:layout_constraintEnd_toStartOf="parent"
-            app:layout_constraintStart_toEndOf="parent"
-            tools:layout_editor_absoluteY="14dp" />
+            app:layout_constraintStart_toEndOf="parent" />
 
     </androidx.appcompat.widget.Toolbar>
 
@@ -30,7 +28,6 @@
         android:id="@+id/searchPullToRefresh"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginBottom="123dp"
