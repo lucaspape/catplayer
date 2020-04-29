@@ -1,5 +1,9 @@
 package de.lucaspape.monstercat.ui
 
+/**
+ * Yes this is kinda ugly but it works so i dont give a shit
+ */
+
 var offlineDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_offline_pin_24dp"
 var downloadDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_file_download_24dp"
 var addToQueueDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_playlist_play_24"
@@ -15,62 +19,62 @@ var pauseButtonDrawable = "android.resource://de.lucaspape.monstercat/drawable/i
 var createPlaylistDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_add_24dp"
 var addPlaylistDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_playlist_add_24"
 
-private val offlineDrawableBlack =
+private const val offlineDrawableBlack =
     "android.resource://de.lucaspape.monstercat/drawable/ic_offline_pin_black_24dp"
-private val downloadDrawableBlack =
+private const val downloadDrawableBlack =
     "android.resource://de.lucaspape.monstercat/drawable/ic_file_download_black_24dp"
-private val addToQueueDrawableBlack =
+private const val addToQueueDrawableBlack =
     "android.resource://de.lucaspape.monstercat/drawable/ic_playlist_play_black_24"
-private val shareDrawableBlack =
+private const val shareDrawableBlack =
     "android.resource://de.lucaspape.monstercat/drawable/ic_share_black_24dp"
-private val openInAppDrawableBlack =
+private const val openInAppDrawableBlack =
     "android.resource://de.lucaspape.monstercat/drawable/ic_open_in_new_black_24dp"
-private val addToPlaylistDrawableBlack =
+private const val addToPlaylistDrawableBlack =
     "android.resource://de.lucaspape.monstercat/drawable/ic_playlist_add_black_24"
-private val deleteDrawableBlack =
+private const val deleteDrawableBlack =
     "android.resource://de.lucaspape.monstercat/drawable/ic_delete_outline_black_24"
-private val editDrawableBlack =
+private const val editDrawableBlack =
     "android.resource://de.lucaspape.monstercat/drawable/ic_edit_black_24"
-private val playlistPublicDrawableBlack =
+private const val playlistPublicDrawableBlack =
     "android.resource://de.lucaspape.monstercat/drawable/ic_public_black_24"
-private val playlistPrivateDrawableBlack =
+private const val playlistPrivateDrawableBlack =
     "android.resource://de.lucaspape.monstercat/drawable/ic_block_black_24"
-private val playButtonDrawableBlack =
+private const val playButtonDrawableBlack =
     "android.resource://de.lucaspape.monstercat/drawable/ic_play_arrow_black_24dp"
-private val pauseButtonDrawableBlack =
+private const val pauseButtonDrawableBlack =
     "android.resource://de.lucaspape.monstercat/drawable/ic_pause_black_24dp"
-private val createPlaylistDrawableBlack =
+private const val createPlaylistDrawableBlack =
     "android.resource://de.lucaspape.monstercat/drawable/ic_add_black_24dp"
-private val addPlaylistDrawableBlack =
+private const val addPlaylistDrawableBlack =
     "android.resource://de.lucaspape.monstercat/drawable/ic_playlist_add_black_24"
 
-private val offlineDrawableWhite =
+private const val offlineDrawableWhite =
     "android.resource://de.lucaspape.monstercat/drawable/ic_offline_pin_white_24dp"
-private val downloadDrawableWhite =
+private const val downloadDrawableWhite =
     "android.resource://de.lucaspape.monstercat/drawable/ic_file_download_white_24dp"
-private val addToQueueDrawableWhite =
+private const val addToQueueDrawableWhite =
     "android.resource://de.lucaspape.monstercat/drawable/ic_playlist_play_white_24"
-private val shareDrawableWhite =
+private const val shareDrawableWhite =
     "android.resource://de.lucaspape.monstercat/drawable/ic_share_white_24dp"
-private val openInAppDrawableWhite =
+private const val openInAppDrawableWhite =
     "android.resource://de.lucaspape.monstercat/drawable/ic_open_in_new_white_24dp"
-private val addToPlaylistDrawableWhite =
+private const val addToPlaylistDrawableWhite =
     "android.resource://de.lucaspape.monstercat/drawable/ic_playlist_add_white_24"
-private val deleteDrawableWhite =
+private const val deleteDrawableWhite =
     "android.resource://de.lucaspape.monstercat/drawable/ic_delete_outline_white_24"
-private val editDrawableWhite =
+private const val editDrawableWhite =
     "android.resource://de.lucaspape.monstercat/drawable/ic_edit_white_24"
-private val playlistPublicDrawableWhite =
+private const val playlistPublicDrawableWhite =
     "android.resource://de.lucaspape.monstercat/drawable/ic_public_white_24"
-private val playlistPrivateDrawableWhite =
+private const val playlistPrivateDrawableWhite =
     "android.resource://de.lucaspape.monstercat/drawable/ic_block_white_24"
-private val playButtonDrawableWhite =
+private const val playButtonDrawableWhite =
     "android.resource://de.lucaspape.monstercat/drawable/ic_play_arrow_white_24dp"
-private val pauseButtonDrawableWhite =
+private const val pauseButtonDrawableWhite =
     "android.resource://de.lucaspape.monstercat/drawable/ic_pause_white_24dp"
-private val createPlaylistDrawableWhite =
+private const val createPlaylistDrawableWhite =
     "android.resource://de.lucaspape.monstercat/drawable/ic_add_white_24dp"
-private val addPlaylistDrawableWhite =
+private const val addPlaylistDrawableWhite =
     "android.resource://de.lucaspape.monstercat/drawable/ic_playlist_add_white_24"
 
 fun switchDrawablesToWhite() {
