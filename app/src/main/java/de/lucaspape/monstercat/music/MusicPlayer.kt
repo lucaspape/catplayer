@@ -206,7 +206,15 @@ private fun nextSong(): String {
         //get from priority list
         val songId = prioritySongQueue[0]
         prioritySongQueue.removeAt(0)
-        playlist.add(songId)
+
+        try {
+            playlist.add(playlistIndex+1, songId)
+            playlistIndex++
+        }catch (e: IndexOutOfBoundsException){
+            playlist.add(songId)
+            skipPreviousInPlaylist()
+        }
+
         return songId
     } else if (playlist.size > playlistIndex + 1) {
         //get from playlist
