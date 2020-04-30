@@ -58,6 +58,9 @@ private var sessionCreated = false
 
 internal var streamInfoUpdateAsync: StreamInfoUpdateAsync? = null
 
+/**
+ * Listener for audioFocusChange
+ */
 internal val audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener { focusChange ->
     when (focusChange) {
         AudioManager.AUDIOFOCUS_GAIN ->
@@ -71,6 +74,9 @@ internal val audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener 
     }
 }
 
+/**
+ * Listener for headphones disconnected
+ */
 class NoisyReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         if (intent?.action == AudioManager.ACTION_AUDIO_BECOMING_NOISY) {
@@ -105,6 +111,9 @@ fun createMediaSession() {
  * General control
  */
 
+/**
+ * Play next song
+ */
 internal fun next() {
     contextReference?.get()?.let { context ->
         playSong(
@@ -119,6 +128,9 @@ internal fun next() {
     }
 }
 
+/**
+ * Play previous song
+ */
 internal fun previous() {
     contextReference?.get()?.let { context ->
         playSong(
@@ -133,6 +145,9 @@ internal fun previous() {
     }
 }
 
+/**
+ * Pause playback
+ */
 internal fun pause() {
     contextReference?.get()?.let { context ->
         exoPlayer?.playWhenReady = false
@@ -143,6 +158,9 @@ internal fun pause() {
     }
 }
 
+/**
+ * Resume playback
+ */
 internal fun resume() {
     startPlayerService(getCurrentSongId())
 
@@ -166,6 +184,9 @@ internal fun resume() {
     }
 }
 
+/**
+ * Toggle playback (play/pause)
+ */
 internal fun toggleMusic() {
     if (exoPlayer?.isPlaying == true) {
         pause()
@@ -174,6 +195,9 @@ internal fun toggleMusic() {
     }
 }
 
+/**
+ * Stop playback
+ */
 internal fun stop() {
     if (exoPlayer?.isPlaying == true) {
 
@@ -272,6 +296,9 @@ private fun nextSong(): String {
     }
 }
 
+/**
+ * Get previous song (and sets vars)
+ */
 private fun previousSong(): String {
     return try {
         val songId = playlist[playlistIndex - 1]
@@ -321,6 +348,9 @@ internal fun getNextSongId(): String {
     }
 }
 
+/**
+ * Returns songId of currently playing song
+ */
 fun getCurrentSongId(): String {
     return when {
         streamInfoUpdateAsync?.status == AsyncTask.Status.RUNNING -> {
@@ -335,6 +365,9 @@ fun getCurrentSongId(): String {
     }
 }
 
+/**
+ * Get albumId of current song (needed for album cover)
+ */
 fun getCurrentAlbumId(context: Context): String {
     SongDatabaseHelper(context).getSong(context, getCurrentSongId())?.let { song ->
         return song.albumId
@@ -343,23 +376,32 @@ fun getCurrentAlbumId(context: Context): String {
     return ""
 }
 
+/**
+ * Empty queue
+ */
 fun clearQueue() {
     nextRandom = -1
     songQueue = ArrayList()
 }
 
+/**
+ * Empty playlist
+ */
 fun clearPlaylist() {
     playlistIndex = 0
     playlist = ArrayList()
 }
 
 /**
- * Dont play from playlist, play from queue
+ * Set index to most recent song added to playlist
  */
 fun skipPreviousInPlaylist() {
     playlistIndex = playlist.size - 1
 }
 
+/**
+ * Fetch songs which are related to songs in playlist
+ */
 fun playRelatedSongs() {
     contextReference?.let { weakReference ->
         weakReference.get()?.let { context ->
