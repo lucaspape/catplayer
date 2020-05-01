@@ -615,8 +615,8 @@ internal fun openAlbum(view: View, albumMcId: String, share: Boolean) {
     }))
 }
 
-internal fun openPlaylist(view: View, playlistId: String, share: Boolean) {
-    val url = view.context.getString(R.string.playlistShareUrl) + playlistId
+internal fun openPlaylist(context: Context, playlistId: String, share: Boolean) {
+    val url = context.getString(R.string.playlistShareUrl) + playlistId
 
     if (share) {
         val sendIntent = Intent().apply {
@@ -626,9 +626,12 @@ internal fun openPlaylist(view: View, playlistId: String, share: Boolean) {
         }
 
         val shareIntent = Intent.createChooser(sendIntent, null)
-        view.context.startActivity(shareIntent)
+        shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(shareIntent)
     } else {
-        view.context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(intent)
     }
 }
 

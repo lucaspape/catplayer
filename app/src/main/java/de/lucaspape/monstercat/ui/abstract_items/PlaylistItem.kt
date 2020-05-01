@@ -88,11 +88,11 @@ open class PlaylistItem(
                         }
 
                         view.context.getString(R.string.sharePlaylist) -> {
-                            openPlaylist(view, id, true)
+                            openPlaylist(view.context, id, true)
                         }
 
                         view.context.getString(R.string.openPlaylistInApp) -> {
-                            openPlaylist(view, id, false)
+                            openPlaylist(view.context, id, false)
                         }
                     }
                 }
