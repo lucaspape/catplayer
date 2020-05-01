@@ -163,6 +163,11 @@ internal fun playSong(
                 preparingDone()
             }
         }else{
+            //song is the same as current/last song -> set progress to zero
+            if(progress == null){
+                exoPlayer?.seekTo(0)
+            }
+
             preparingDone()
         }
     }
