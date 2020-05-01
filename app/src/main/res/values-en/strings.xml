@@ -128,4 +128,5 @@
     <string name="volume">Volume</string>
     <string name="customApiEnabledMsg">Custom API enabled!</string>
     <string name="customApiEnableError">Could not enable custom API!</string>
+    <string name="setCustomApiUrl">Set custom API URL</string>
 </resources>

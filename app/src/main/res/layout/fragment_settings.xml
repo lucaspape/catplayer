@@ -267,6 +267,17 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/crossfadeTimeSeekbar" />
 
+            <Button
+                android:id="@+id/customApiInputButton"
+                android:layout_width="200dp"
+                android:layout_height="50dp"
+                android:backgroundTint="?attr/colorButtonNormal"
+                android:text="Set custom API URL"
+                android:textColor="?attr/colorOnSurface"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/useCustomApi" />
+
             <Switch
                 android:id="@+id/playRelatedSwitch"
                 android:layout_width="0dp"
@@ -277,7 +288,7 @@
                 android:text="@string/playRelatedAfter"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/useCustomApi" />
+                app:layout_constraintTop_toBottomOf="@+id/customApiInputButton" />
 
             <Button
                 android:id="@+id/resetDatabaseButton"

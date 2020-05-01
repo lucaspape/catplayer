@@ -1,15 +1,18 @@
 package de.lucaspape.monstercat.ui.handlers
 
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.os.AsyncTask
 import android.os.Build
 import android.util.TypedValue
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.AlbumDatabaseHelper
 import de.lucaspape.monstercat.database.helper.CatalogSongDatabaseHelper
@@ -136,19 +139,20 @@ class SettingsHandler(private val closeSettings:() -> Unit) : Handler {
 
         useCustomApiSwitch.setOnCheckedChangeListener { _, isChecked ->
             if(isChecked){
-                settings.setString(view.context.getString(R.string.customApiBaseUrlSetting), "https://api.lucaspape.de/monstercat/")
-
                 //check for custom api features
                 CheckCustomApiFeaturesAsync(WeakReference(view.context), {
+                    useCustomApiSwitch.isChecked = true
                     settings.setBoolean(view.context.getString(R.string.useCustomApiSetting), true)
                     displaySnackBar(view, view.context.getString(R.string.customApiEnabledMsg), null) {}
                 }, {
+                    useCustomApiSwitch.isChecked = false
                     settings.setBoolean(view.context.getString(R.string.useCustomApiSetting), false)
                     displaySnackBar(view, view.context.getString(R.string.customApiEnableError), null) {}
                 }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
             }else{
                 settings.setBoolean(view.context.getString(R.string.useCustomApiSetting), false)
             }
+
         }
 
         playRelatedSwitch.setOnCheckedChangeListener {_, isChecked ->
@@ -218,6 +222,46 @@ class SettingsHandler(private val closeSettings:() -> Unit) : Handler {
             }, {
                 displayInfo(view.context, view.context.getString(R.string.loginFailedMsg))
             })
+        }
+
+        view.findViewById<Button>(R.id.customApiInputButton).setOnClickListener {
+            MaterialAlertDialogBuilder(view.context).apply {
+                val layoutInflater =
+                    context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+
+                val customApiInputLayout =
+                    layoutInflater.inflate(R.layout.customapi_input_layout, null)
+
+                val customApiEditText =
+                    customApiInputLayout.findViewById<EditText>(R.id.customApiInput)
+
+                settings.getString(context.getString(R.string.customApiBaseUrlSetting))?.let {
+                    customApiEditText.setText(it)
+                }
+
+                setTitle(view.context.getString(R.string.setCustomApiUrl))
+
+                setPositiveButton(context.getString(R.string.ok)) { _, _ ->
+                    val newCustomApiUrl = customApiEditText.text.toString()
+                    settings.setString(view.context.getString(R.string.customApiBaseUrlSetting), newCustomApiUrl)
+                    settings.setBoolean(view.context.getString(R.string.useCustomApiSetting), false)
+                    view.findViewById<Switch>(R.id.useCustomApi).isChecked = false
+                }
+
+                setView(customApiInputLayout)
+                setCancelable(true)
+            }.create().run {
+                show()
+
+                val typedValue = TypedValue()
+                context.theme.resolveAttribute(R.attr.colorOnSurface, typedValue, true)
+
+                val positiveButton = getButton(DialogInterface.BUTTON_POSITIVE)
+                positiveButton.setTextColor(typedValue.data)
+
+                val negativeButton = getButton(DialogInterface.BUTTON_NEGATIVE)
+                negativeButton.setTextColor(typedValue.data)
+            }
         }
     }
 

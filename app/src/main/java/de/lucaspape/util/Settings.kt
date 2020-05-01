@@ -100,6 +100,7 @@ class Settings(private val context: Context) {
         val defaultCrossfadeTime = 0
         val defaultSaveCoverImagesToCache = true
         val defaultVolume = 1.0f
+        val defaultCustomApiBaseUrl = "https://api.lucaspape.de/monstercat/"
 
         if (getString(context.getString(R.string.downloadTypeSetting)) == null || overwrite) {
             setString(context.getString(R.string.downloadTypeSetting), defaultDownloadType)
@@ -153,6 +154,10 @@ class Settings(private val context: Context) {
 
         if (getString(context.getString(R.string.volumeSetting)) == null || overwrite) {
             setFloat(context.getString(R.string.volumeSetting), defaultVolume)
+        }
+
+        if(getString(context.getString(R.string.customApiBaseUrlSetting)) == null || overwrite){
+            setString(context.getString(R.string.customApiBaseUrlSetting), defaultCustomApiBaseUrl)
         }
     }
 }
