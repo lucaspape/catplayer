@@ -218,8 +218,6 @@ internal fun setCover(context: Context, songId: String, callback: (bitmap: Bitma
     }
 }
 
-private val targetList = ArrayList<Target>()
-
 internal fun setCover(
     context: Context,
     albumId: String,
@@ -253,7 +251,13 @@ internal fun setCover(
         }
 
         override fun setTag(target: Target) {
-            targetList.add(target)
+            fullscreenCoverReference?.get()?.let {
+                it.tag = target
+            }
+
+            barCoverImageReference?.get()?.let {
+                it.tag = target
+            }
         }
     }, albumId, false)
 
@@ -271,7 +275,6 @@ internal fun setCover(
         }
 
         override fun setTag(target: Target) {
-            targetList.add(target)
         }
     }, artistId)
 }
@@ -305,7 +308,13 @@ internal fun setCustomCover(
         }
 
         override fun setTag(target: Target) {
-            targetList.add(target)
+            fullscreenCoverReference?.get()?.let {
+                it.tag = target
+            }
+
+            barCoverImageReference?.get()?.let {
+                it.tag = target
+            }
         }
     }, false, coverId, coverUrl)
 }
