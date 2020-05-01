@@ -5,6 +5,7 @@ import android.widget.*
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.util.*
+import de.lucaspape.monstercat.ui.abstract_items.CatalogItem
 import java.lang.ref.WeakReference
 
 class FullscreenPlayerHandler(
@@ -34,6 +35,7 @@ class FullscreenPlayerHandler(
         val shuffleButton = view.findViewById<ImageButton>(R.id.fullscreenShuffle)
         val loopButton = view.findViewById<ImageButton>(R.id.fullscreenLoop)
         val closeButton = view.findViewById<ImageButton>(R.id.fullscreenBack)
+        val fullscreenMenuButton = view.findViewById<ImageButton>(R.id.fullscreenMenuButton)
 
         if (shuffle) {
             shuffleButton.setImageResource(R.drawable.ic_shuffle_green_24dp)
@@ -97,6 +99,10 @@ class FullscreenPlayerHandler(
 
         closeButton.setOnClickListener {
             closeFullscreen()
+        }
+
+        fullscreenMenuButton.setOnClickListener {
+            CatalogItem.showContextMenu(view, arrayListOf(currentSongId), 0)
         }
 
         val titleTextView = view.findViewById<TextView>(R.id.fullscreenTitle)
