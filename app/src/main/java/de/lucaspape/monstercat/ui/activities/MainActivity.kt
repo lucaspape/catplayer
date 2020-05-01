@@ -287,15 +287,13 @@ class MainActivity : AppCompatActivity() {
 
         //update notification after restart of activity (screen orientation change etc)
         if (exoPlayer?.isPlaying == true) {
-            val currentSong = getCurrentSongId()
-
             setCover(
                 this,
-                currentSong
+                currentSongId
             ) { bitmap ->
                 updateNotification(
                     this,
-                    currentSong,
+                    currentSongId,
                     bitmap
                 )
             }
@@ -320,8 +318,8 @@ class MainActivity : AppCompatActivity() {
 
         PlayerSaveState.saveMusicPlayerState(this)
 
-        currentSong = ""
-        preparedSong = ""
+        exoPlayerSongId = ""
+        preparedExoPlayerSongId = ""
     }
 
     override fun onPause() {

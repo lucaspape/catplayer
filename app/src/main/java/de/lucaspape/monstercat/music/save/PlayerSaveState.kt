@@ -56,10 +56,8 @@ data class PlayerSaveState(
                                 playerSaveState.progress?.let { progress ->
                                     currentPosition = progress.toInt()
 
-                                    val songId = getCurrentSongId()
-
                                     playSong(
-                                        context, songId,
+                                        context, currentSongId,
                                         showNotification = false,
                                         requestAudioFocus = false,
                                         playWhenReady = false,

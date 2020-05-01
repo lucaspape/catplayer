@@ -162,7 +162,7 @@ internal fun pause() {
  * Resume playback
  */
 internal fun resume() {
-    startPlayerService(getCurrentSongId())
+    startPlayerService(currentSongId)
 
     contextReference?.get()?.let { context ->
         val intentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
@@ -173,7 +173,7 @@ internal fun resume() {
         )
 
         playSong(
-            context, getCurrentSongId(),
+            context, currentSongId,
             showNotification = true,
             requestAudioFocus = true,
             playWhenReady = true,
@@ -312,64 +312,66 @@ private fun previousSong(): String {
 /**
  * Return next song without making changes to vars, only for prediction
  */
-internal fun getNextSongId(): String {
-    if (loopSingle && playlist.size >= playlistIndex) {
-        //loop single
-        return try {
-            playlist[playlistIndex]
-        } catch (e: java.lang.IndexOutOfBoundsException) {
-            ""
-        }
-    } else if (prioritySongQueue.size > 0) {
-        //get from priority list
-        return prioritySongQueue[0]
-    } else if (playlist.size > playlistIndex + 1) {
-        //get from playlist
-        return playlist[playlistIndex + 1]
-    } else if (songQueue.size > 0) {
-        //get from queue
+val nextSongId:String
+    get() {
+        if (loopSingle && playlist.size >= playlistIndex) {
+            //loop single
+            return try {
+                playlist[playlistIndex]
+            } catch (e: java.lang.IndexOutOfBoundsException) {
+                ""
+            }
+        } else if (prioritySongQueue.size > 0) {
+            //get from priority list
+            return prioritySongQueue[0]
+        } else if (playlist.size > playlistIndex + 1) {
+            //get from playlist
+            return playlist[playlistIndex + 1]
+        } else if (songQueue.size > 0) {
+            //get from queue
 
-        val queueIndex = if (shuffle && songQueue.size > 0) {
-            if (nextRandom == -1) {
-                nextRandom = Random.nextInt(0, songQueue.size)
+            val queueIndex = if (shuffle && songQueue.size > 0) {
+                if (nextRandom == -1) {
+                    nextRandom = Random.nextInt(0, songQueue.size)
+                }
+
+                nextRandom
+            } else {
+                0
             }
 
-            nextRandom
+            return songQueue[queueIndex]
+        } else if (loop && playlist.size > 0) {
+            //if loop go back to beginning of playlist
+            return playlist[0]
         } else {
-            0
+            return ""
         }
-
-        return songQueue[queueIndex]
-    } else if (loop && playlist.size > 0) {
-        //if loop go back to beginning of playlist
-        return playlist[0]
-    } else {
-        return ""
     }
-}
 
 /**
  * Returns songId of currently playing song
  */
-fun getCurrentSongId(): String {
-    return when {
-        streamInfoUpdateAsync?.status == AsyncTask.Status.RUNNING -> {
-            StreamInfoUpdateAsync.liveSongId
-        }
-        playlist.size > playlistIndex && playlistIndex >= 0 -> {
-            playlist[playlistIndex]
-        }
-        else -> {
-            ""
+val currentSongId:String
+    get() {
+        return when {
+            streamInfoUpdateAsync?.status == AsyncTask.Status.RUNNING -> {
+                StreamInfoUpdateAsync.liveSongId
+            }
+            playlist.size > playlistIndex && playlistIndex >= 0 -> {
+                playlist[playlistIndex]
+            }
+            else -> {
+                ""
+            }
         }
     }
-}
 
 /**
  * Get albumId of current song (needed for album cover)
  */
 fun getCurrentAlbumId(context: Context): String {
-    SongDatabaseHelper(context).getSong(context, getCurrentSongId())?.let { song ->
+    SongDatabaseHelper(context).getSong(context, currentSongId)?.let { song ->
         return song.albumId
     }
 

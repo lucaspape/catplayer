@@ -20,13 +20,13 @@ import java.util.*
 import kotlin.math.log
 
 //songId of song which is prepared in exoPlayer
-var currentSong = ""
+var exoPlayerSongId = ""
 
 //songId of song which is prepared in nextExoPlayer
-var preparedSong = ""
+var preparedExoPlayerSongId = ""
 
 internal fun prepareSong(context: Context, songId: String, callback: () -> Unit) {
-    if (preparedSong != songId) {
+    if (preparedExoPlayerSongId != songId) {
         //new exoplayer
         val newExoPlayer = SimpleExoPlayer.Builder(context).build()
         newExoPlayer.audioAttributes =
@@ -41,7 +41,7 @@ internal fun prepareSong(context: Context, songId: String, callback: () -> Unit)
 
                 if (mediaSource != null) {
                     nextExoPlayer?.prepare(mediaSource)
-                    preparedSong = song.songId
+                    preparedExoPlayerSongId = song.songId
                 } else {
                     displayInfo(context, context.getString(R.string.songNotPlayableError))
                 }
@@ -59,7 +59,7 @@ internal fun prepareSong(context: Context, songId: String, callback: () -> Unit)
 
                     if (mediaSource != null) {
                         nextExoPlayer?.prepare(mediaSource)
-                        preparedSong = song.songId
+                        preparedExoPlayerSongId = song.songId
                     } else {
                         displayInfo(context, context.getString(R.string.songNotPlayableError))
                     }
@@ -92,11 +92,11 @@ internal fun playSong(
 
     if (audioFocus == AudioManager.AUDIOFOCUS_REQUEST_GRANTED || !requestAudioFocus) {
         val preparingDone = {
-            if (currentSong != songId) {
+            if (exoPlayerSongId != songId) {
                 exoPlayer =
                     nextExoPlayer
 
-                preparedSong = ""
+                preparedExoPlayerSongId = ""
             }
 
             exoPlayer?.audioComponent?.volume = volume
@@ -115,7 +115,7 @@ internal fun playSong(
                 )
             )
 
-            currentSong = songId
+            exoPlayerSongId = songId
 
             SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
                 //UI stuff
@@ -141,11 +141,11 @@ internal fun playSong(
             }
         }
 
-        if (currentSong != songId) {
+        if (exoPlayerSongId != songId) {
             exoPlayer?.release()
             exoPlayer?.stop()
 
-            if (preparedSong != songId) {
+            if (preparedExoPlayerSongId != songId) {
                 prepareSong(context, songId) {
                     preparingDone()
                 }
@@ -237,7 +237,7 @@ internal fun runSeekBarUpdate(context: Context, prepareNext: Boolean, crossFade:
 
             if (prepareNext) {
                 if (timeLeft < duration / 2 && exoPlayer?.isPlaying == true) {
-                    prepareSong(context, getNextSongId()) {}
+                    prepareSong(context, nextSongId) {}
                 }
             }
 
