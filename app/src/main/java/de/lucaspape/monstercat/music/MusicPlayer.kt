@@ -177,7 +177,7 @@ internal fun resume() {
     contextReference?.get()?.let { context ->
         //check if should resume livestream or song
         if(streamInfoUpdateAsync?.status == AsyncTask.Status.RUNNING){
-            playStream(Stream(context.getString(R.string.twitchClientID), "monstercat"))
+            playStream(Stream(context.getString(R.string.twitchClientID), context.getString(R.string.twitchChannel)))
         }else{
             val intentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
 

@@ -27,4 +27,5 @@
 
     <string name="twitchPlaylistUrl" translatable="false">https://usher.ttvnw.net/api/channel/hls/</string>
     <string name="twitchApiUrl" translatable="false">https://api.twitch.tv/</string>
+    <string name="twitchChannel" translatable="false">monstercat</string>
 </resources>

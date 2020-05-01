@@ -461,7 +461,7 @@ class HomeHandler(
 
         //livestream button
         view.findViewById<ImageButton>(R.id.liveButton).setOnClickListener {
-            playStream(Stream(view.context.getString(R.string.twitchClientID), "monstercat"))
+            playStream(Stream(view.context.getString(R.string.twitchClientID), view.context.getString(R.string.twitchChannel)))
         }
 
         view.findViewById<ImageButton>(R.id.searchButton).setOnClickListener {
