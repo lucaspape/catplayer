@@ -174,22 +174,22 @@ fun playStream(stream: Stream) {
 
         startPlayerService("")
 
+        exoPlayer?.playWhenReady = false
         exoPlayer?.release()
         exoPlayer?.stop()
+        exoPlayer = null
 
         //new exoplayer
-        val newExoPlayer = SimpleExoPlayer.Builder(context).build()
-        newExoPlayer.audioAttributes =
+        exoPlayer = SimpleExoPlayer.Builder(context).build()
+        exoPlayer?.audioAttributes =
             getAudioAttributes()
 
         //for play/pause button change and if song ended
-        newExoPlayer.addListener(
+        exoPlayer?.addListener(
             getStreamPlayerListener(
                 context
             )
         )
-
-        exoPlayer = newExoPlayer
 
         //request audio focus
         if (requestAudioFocus(context) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {

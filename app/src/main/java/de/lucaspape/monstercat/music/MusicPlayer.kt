@@ -17,6 +17,7 @@ import de.lucaspape.monstercat.music.save.PlayerSaveState
 import de.lucaspape.monstercat.music.util.*
 import de.lucaspape.monstercat.music.util.playSong
 import de.lucaspape.monstercat.request.async.LoadRelatedTracksAsync
+import de.lucaspape.monstercat.twitch.Stream
 import de.lucaspape.util.Settings
 import java.lang.ref.WeakReference
 import kotlin.random.Random
@@ -174,22 +175,27 @@ internal fun resume() {
     startPlayerService(currentSongId)
 
     contextReference?.get()?.let { context ->
-        val intentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
+        //check if should resume livestream or song
+        if(streamInfoUpdateAsync?.status == AsyncTask.Status.RUNNING){
+            playStream(Stream(context.getString(R.string.twitchClientID), "monstercat"))
+        }else{
+            val intentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
 
-        context.registerReceiver(
-            NoisyReceiver(),
-            intentFilter
-        )
+            context.registerReceiver(
+                NoisyReceiver(),
+                intentFilter
+            )
 
-        playSong(
-            context, currentSongId,
-            showNotification = true,
-            requestAudioFocus = true,
-            playWhenReady = true,
-            progress = currentPosition.toLong()
-        )
+            playSong(
+                context, currentSongId,
+                showNotification = true,
+                requestAudioFocus = true,
+                playWhenReady = true,
+                progress = currentPosition.toLong()
+            )
 
-        PlayerSaveState.saveMusicPlayerState(context)
+            PlayerSaveState.saveMusicPlayerState(context)
+        }
     }
 }
 
