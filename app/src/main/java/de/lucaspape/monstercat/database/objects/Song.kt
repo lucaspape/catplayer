@@ -93,19 +93,29 @@ data class Song(
             context
         ).getString("downloadType")
 
-    val downloadUrl = if(Settings.getSettings(context).getBoolean(context.getString(R.string.useCustomApiSetting)) == true && Settings.getSettings(context).getBoolean(context.getString(R.string.customApiSupportsV1Setting)) == true){
-        Settings.getSettings(context).getString(context.getString(R.string.customDownloadUrlSetting)) + albumId + "/track-download/" + songId + "?format=" + Settings.getSettings(
+    val downloadUrl = if (Settings.getSettings(context)
+            .getBoolean(context.getString(R.string.useCustomApiSetting)) == true && Settings.getSettings(
+            context
+        ).getBoolean(context.getString(R.string.customApiSupportsV1Setting)) == true
+    ) {
+        Settings.getSettings(context)
+            .getString(context.getString(R.string.customDownloadUrlSetting)) + albumId + "/track-download/" + songId + "?format=" + Settings.getSettings(
             context
         ).getString("downloadType")
-    }else{
+    } else {
         context.getString(R.string.trackContentUrl) + albumId + "/track-download/" + songId + "?format=" + Settings.getSettings(
             context
         ).getString("downloadType")
     }
 
-    private val streamUrl = if(Settings.getSettings(context).getBoolean(context.getString(R.string.useCustomApiSetting)) == true && Settings.getSettings(context).getBoolean(context.getString(R.string.customApiSupportsV1Setting)) == true){
-        Settings.getSettings(context).getString(context.getString(R.string.customStreamUrlSetting)) + albumId + "/track-stream/" + songId
-    }else{
+    private val streamUrl = if (Settings.getSettings(context)
+            .getBoolean(context.getString(R.string.useCustomApiSetting)) == true && Settings.getSettings(
+            context
+        ).getBoolean(context.getString(R.string.customApiSupportsV1Setting)) == true
+    ) {
+        Settings.getSettings(context)
+            .getString(context.getString(R.string.customStreamUrlSetting)) + albumId + "/track-stream/" + songId
+    } else {
         context.getString(R.string.trackContentUrl) + albumId + "/track-stream/" + songId
     }
 
@@ -121,31 +131,31 @@ data class Song(
     }
 
     private fun getUrl(): String {
-        return if(File(downloadLocation).exists()){
+        return if (File(downloadLocation).exists()) {
             downloadLocation
-        }else{
+        } else {
             streamUrl
         }
     }
 
     fun getMediaSource(): MediaSource? {
-        return if(File(downloadLocation).exists()){
+        return if (File(downloadLocation).exists()) {
             fileToMediaSource(downloadLocation)
-        }else{
-            if(isStreamable){
+        } else {
+            if (isStreamable) {
                 urlToMediaSource(streamUrl)
-            }else{
+            } else {
                 null
             }
         }
     }
 
-    fun playbackAllowed(context: Context):Boolean{
+    fun playbackAllowed(context: Context): Boolean {
         return wifiConnected(context) == true || Settings.getSettings(
             context
         ).getBoolean(context.getString(R.string.streamOverMobileSetting)) == true || File(
-                getUrl()
-            ).exists()
+            getUrl()
+        ).exists()
     }
 
     private fun fileToMediaSource(fileLocation: String): ProgressiveMediaSource {
