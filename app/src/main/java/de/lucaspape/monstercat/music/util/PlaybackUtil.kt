@@ -94,17 +94,16 @@ internal fun playSong(
         //preparingDone callback, see below
         val preparingDone = {
             //prepared player to main player handover
-            if (exoPlayerSongId != songId) {
-                exoPlayer?.playWhenReady = false
-                exoPlayer?.stop(true)
-                exoPlayer = null
+            exoPlayer?.playWhenReady = false
+            exoPlayer?.stop(true)
+            exoPlayer = null
 
-                exoPlayer =
-                    preparedExoPlayer
+            exoPlayer =
+                preparedExoPlayer
 
-                exoPlayerSongId = songId
-            }
+            exoPlayerSongId = songId
 
+            //reset prepared
             preparedExoPlayer?.playWhenReady = false
             preparedExoPlayer = null
             preparedExoPlayerSongId = ""
@@ -155,23 +154,13 @@ internal fun playSong(
                 }
             }
         }
-
-        //if song differs from currently/last played song
-        if(exoPlayerSongId != songId){
-            //check if player needs to be prepared
-            if(preparedExoPlayerSongId != songId){
-                prepareSong(context, songId){
-                    preparingDone()
-                }
-            }else{
+        
+        //check if player needs to be prepared
+        if (preparedExoPlayerSongId != songId) {
+            prepareSong(context, songId) {
                 preparingDone()
             }
-        }else{
-            //song is the same as current/last song -> set progress to zero
-            if(progress == null){
-                exoPlayer?.seekTo(0)
-            }
-
+        } else {
             preparingDone()
         }
     }
@@ -263,16 +252,19 @@ internal fun runSeekBarUpdate(context: Context, prepareNext: Boolean, crossFade:
             if (crossFade) {
                 if (timeLeft < crossfade && exoPlayer?.isPlaying == true && nextSongId == preparedExoPlayerSongId) {
                     if (timeLeft >= 1) {
-                        val crossVolume = 1- log(100-((crossfade.toFloat() - timeLeft) / crossfade*100), 100.toFloat())
+                        val crossVolume = 1 - log(
+                            100 - ((crossfade.toFloat() - timeLeft) / crossfade * 100),
+                            100.toFloat()
+                        )
 
                         val higherVolume = crossVolume * volume
                         val lowerVolume = volume - higherVolume
 
-                        if(higherVolume > 0.toFloat() && higherVolume.isFinite()){
+                        if (higherVolume > 0.toFloat() && higherVolume.isFinite()) {
                             preparedExoPlayer?.audioComponent?.volume = higherVolume
                         }
 
-                        if(lowerVolume > 0.toFloat() &&lowerVolume.isFinite()){
+                        if (lowerVolume > 0.toFloat() && lowerVolume.isFinite()) {
                             exoPlayer?.audioComponent?.volume = lowerVolume
                         }
                     }

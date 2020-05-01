@@ -8,7 +8,6 @@ import android.media.AudioManager
 import android.media.session.MediaSession
 import android.os.AsyncTask
 import android.support.v4.media.session.MediaSessionCompat
-import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.SimpleExoPlayer
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
@@ -24,22 +23,30 @@ import kotlin.random.Random
 
 internal var contextReference: WeakReference<Context>? = null
 
+//main exoPlayer
 var exoPlayer: SimpleExoPlayer? = null
     internal set
 
+//secondary exoPlayer -> allows crossFade and gapless playback
 var preparedExoPlayer: SimpleExoPlayer? = null
     internal set
 
+//queue for songs
 var songQueue = ArrayList<String>()
     internal set
 
+//priority queue for songs (will always be played back first)
 var prioritySongQueue = ArrayList<String>()
     internal set
 
+//playlist, contains playback history
 internal var playlist = ArrayList<String>()
 internal var playlistIndex = 0
+
+//nextRandom needs to be prepared before next playing to allow crossfade
 internal var nextRandom = -1
 
+//playback control vars
 var loop = false
 var loopSingle = false
 var shuffle = false
@@ -57,6 +64,7 @@ var mediaSession: MediaSessionCompat? = null
 
 private var sessionCreated = false
 
+//updater which updates information about playing livestream (title, artist, coverImage)
 internal var streamInfoUpdateAsync: StreamInfoUpdateAsync? = null
 
 /**
