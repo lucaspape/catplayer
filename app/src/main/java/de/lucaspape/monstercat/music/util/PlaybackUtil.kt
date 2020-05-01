@@ -95,6 +95,10 @@ internal fun playSong(
         val preparingDone = {
             //prepared player to main player handover
             if (exoPlayerSongId != songId) {
+                exoPlayer?.playWhenReady = false
+                exoPlayer?.stop(true)
+                exoPlayer = null
+
                 exoPlayer =
                     preparedExoPlayer
 
