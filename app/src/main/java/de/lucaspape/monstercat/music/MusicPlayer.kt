@@ -73,18 +73,20 @@ class AudioFocusChangeListener{
     companion object{
         @JvmStatic var audioFocusChangeListener:AudioManager.OnAudioFocusChangeListener? = null
 
-        @JvmStatic fun getAudioFocusChangeListener(context: Context):AudioManager.OnAudioFocusChangeListener{
+        @JvmStatic fun getAudioFocusChangeListener(contextReference: WeakReference<Context>):AudioManager.OnAudioFocusChangeListener{
             if(audioFocusChangeListener == null){
                 audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener { focusChange ->
-                    when (focusChange) {
-                        AudioManager.AUDIOFOCUS_GAIN ->
-                            resume(context)
+                    contextReference.get()?.let { context ->
+                        when (focusChange) {
+                            AudioManager.AUDIOFOCUS_GAIN ->
+                                resume(context)
 
-                        AudioManager.AUDIOFOCUS_LOSS ->
-                            pause(context)
+                            AudioManager.AUDIOFOCUS_LOSS ->
+                                pause(context)
 
-                        AudioManager.AUDIOFOCUS_LOSS_TRANSIENT ->
-                            pause(context)
+                            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT ->
+                                pause(context)
+                        }
                     }
                 }
             }
@@ -97,7 +99,7 @@ class AudioFocusChangeListener{
 /**
  * Listener for headphones disconnected
  */
-class NoisyReceiver() : BroadcastReceiver() {
+class NoisyReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         if (intent?.action == AudioManager.ACTION_AUDIO_BECOMING_NOISY) {
             context?.let {
