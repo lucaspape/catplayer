@@ -330,7 +330,11 @@ private fun setSongMetadata() {
     mediaMetadata.putString(MediaMetadata.METADATA_KEY_ARTIST, artist)
     mediaMetadata.putString(MediaMetadata.METADATA_KEY_TITLE, title)
     mediaMetadata.putLong(MediaMetadata.METADATA_KEY_DURATION, duration.toLong())
-    mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, coverBitmap)
-    mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ART, coverBitmap)
+
+    coverBitmap?.let {
+        mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, it)
+        mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ART, it)
+    }
+
     mediaSession?.setMetadata(mediaMetadata.build())
 }
