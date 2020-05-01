@@ -93,20 +93,17 @@ internal fun playSong(
     if (audioFocus == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
         //preparingDone callback, see below
         val preparingDone = {
-            //prepared player to main player handover
-            exoPlayer?.playWhenReady = false
-            exoPlayer?.stop(true)
-            exoPlayer = null
+            if(exoPlayerSongId != songId || (exoPlayerSongId == songId && preparedExoPlayer?.isPlaying == true)){
+                //prepared player to main player handover
+                exoPlayer?.playWhenReady = false
+                exoPlayer?.stop(true)
+                exoPlayer = null
 
-            exoPlayer =
-                preparedExoPlayer
+                exoPlayer =
+                    preparedExoPlayer
 
-            exoPlayerSongId = songId
-
-            //reset prepared
-            preparedExoPlayer?.playWhenReady = false
-            preparedExoPlayer = null
-            preparedExoPlayerSongId = ""
+                exoPlayerSongId = songId
+            }
 
             //set volume
             exoPlayer?.audioComponent?.volume = volume
@@ -114,7 +111,14 @@ internal fun playSong(
             //set progress if not null (for session recovering)
             if (progress != null) {
                 exoPlayer?.seekTo(progress)
+            }else if(exoPlayer?.isPlaying == false){
+                exoPlayer?.seekTo(0)
             }
+
+            //reset prepared
+            preparedExoPlayer?.playWhenReady = false
+            preparedExoPlayer = null
+            preparedExoPlayerSongId = ""
 
             //enable playback
             exoPlayer?.playWhenReady = playWhenReady
@@ -154,13 +158,17 @@ internal fun playSong(
                 }
             }
         }
-        
-        //check if player needs to be prepared
-        if (preparedExoPlayerSongId != songId) {
-            prepareSong(context, songId) {
+
+        if(exoPlayerSongId != songId){
+            //check if player needs to be prepared
+            if (preparedExoPlayerSongId != songId) {
+                prepareSong(context, songId) {
+                    preparingDone()
+                }
+            } else {
                 preparingDone()
             }
-        } else {
+        }else{
             preparingDone()
         }
     }
