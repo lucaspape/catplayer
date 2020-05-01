@@ -21,4 +21,7 @@
     <string name="playRelatedSetting" translatable="false">playRelated</string>
     <string name="saveCoverImagesToCacheSetting" translatable="false">saveCoverImagesToCache</string>
     <string name="volumeSetting" translatable="false">volumeSetting</string>
+    <string name="customApiSupportsV2Setting" translatable="false">customApiSupportsV2</string>
+    <string name="customApiSupportsV1Setting" translatable="false">customApiSupportsV1</string>
+    <string name="customApiBaseUrlSetting" translatable="false">customApiBaseUrl</string>
 </resources>

@@ -20,8 +20,17 @@ fun newAddToPlaylistRequest(
     callback: (response: JSONObject) -> Unit,
     errorCallback: (error: VolleyError) -> Unit
 ): JsonObjectRequest {
+    val settings = Settings.getSettings(context)
+
     val addToPlaylistUrl =
-        context.getString(R.string.playlistUrl) + playlistId + "/record"
+        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(
+                context.getString(R.string.customApiSupportsV2Setting)
+            ) == true
+        ) {
+            settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v2/playlist/" + playlistId + "/record"
+        } else {
+            context.getString(R.string.playlistUrl) + playlistId + "/record"
+        }
 
     val songJsonObject = JSONObject()
     songJsonObject.put("trackId", song.songId)
@@ -31,12 +40,9 @@ fun newAddToPlaylistRequest(
         Request.Method.PATCH,
         addToPlaylistUrl,
         songJsonObject,
-        Response.Listener {
-            callback(it)
-        },
-        Response.ErrorListener {
-            errorCallback(it)
-        })
+        Response.Listener(callback),
+        Response.ErrorListener(errorCallback)
+    )
 }
 
 fun newSearchTrackRequest(
@@ -46,16 +52,23 @@ fun newSearchTrackRequest(
     forceCustomApi: Boolean,
     callback: (response: JSONObject) -> Unit,
     errorCallback: (error: VolleyError?) -> Unit
-): StringRequest {
-    val searchUrl = if (Settings.getSettings(context)
-            .getBoolean(context.getString(R.string.useCustomApiSetting)) == true || forceCustomApi
-    ) {
-        context.getString(R.string.customApiBaseUrl) + "catalog/search?term=$term&limit=50&skip=" + skip.toString()
-    } else {
-        context.getString(R.string.loadSongsUrl) + "?term=$term&limit=50&skip=" + skip.toString() + "&fields=&search=$term"
-    }
+): StringRequest? {
+    val settings = Settings.getSettings(context)
 
-    return StringRequest(Request.Method.GET,
+    val searchUrl =
+        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true || forceCustomApi
+        ) {
+            if (settings.getBoolean(context.getString(R.string.customApiSupportsV1Setting)) == true) {
+                settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v1/catalog/search?term=$term&limit=50&skip=" + skip.toString()
+            } else {
+                return null
+            }
+        } else {
+            context.getString(R.string.loadSongsUrl) + "?term=$term&limit=50&skip=" + skip.toString() + "&fields=&search=$term"
+        }
+
+    return StringRequest(
+        Request.Method.GET,
         searchUrl,
         Response.Listener {
             try {
@@ -65,9 +78,8 @@ fun newSearchTrackRequest(
             }
 
         },
-        Response.ErrorListener {
-            errorCallback(it)
-        })
+        Response.ErrorListener(errorCallback)
+    )
 }
 
 fun newChangePlaylistPublicStateRequest(
@@ -77,7 +89,17 @@ fun newChangePlaylistPublicStateRequest(
     callback: (response: JSONObject) -> Unit,
     errorCallback: (error: VolleyError) -> Unit
 ): com.android.volley.toolbox.JsonObjectRequest {
-    val playlistPatchUrl = context.getString(R.string.playlistUrl) + playlistId
+    val settings = Settings.getSettings(context)
+
+    val playlistPatchUrl =
+        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(
+                context.getString(R.string.customApiSupportsV2Setting)
+            ) == true
+        ) {
+            settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v2/playlist/" + playlistId
+        } else {
+            context.getString(R.string.playlistUrl) + playlistId
+        }
 
     val postObject = JSONObject()
 
@@ -85,12 +107,8 @@ fun newChangePlaylistPublicStateRequest(
 
     return com.android.volley.toolbox.JsonObjectRequest(
         Request.Method.PATCH, playlistPatchUrl, postObject,
-        Response.Listener {
-            callback(it)
-        },
-        Response.ErrorListener {
-            errorCallback(it)
-        }
+        Response.Listener(callback),
+        Response.ErrorListener(errorCallback)
     )
 }
 
@@ -100,7 +118,17 @@ fun newCreatePlaylistRequest(
     callback: (response: JSONObject) -> Unit,
     errorCallback: (error: VolleyError) -> Unit
 ): com.android.volley.toolbox.JsonObjectRequest {
-    val playlistPostUrl = context.getString(R.string.newPlaylistUrl)
+    val settings = Settings.getSettings(context)
+
+    val playlistPostUrl =
+        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(
+                context.getString(R.string.customApiSupportsV2Setting)
+            ) == true
+        ) {
+            settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v2/playlist"
+        } else {
+            context.getString(R.string.newPlaylistUrl)
+        }
 
     val postObject = JSONObject()
 
@@ -110,12 +138,8 @@ fun newCreatePlaylistRequest(
 
     return com.android.volley.toolbox.JsonObjectRequest(
         Request.Method.POST, playlistPostUrl, postObject,
-        Response.Listener {
-            callback(it)
-        },
-        Response.ErrorListener {
-            errorCallback(it)
-        }
+        Response.Listener(callback),
+        Response.ErrorListener(errorCallback)
     )
 }
 
@@ -125,16 +149,23 @@ fun newDeletePlaylistRequest(
     callback: (response: String) -> Unit,
     errorCallback: (error: VolleyError) -> Unit
 ): StringRequest {
-    val deletePlaylistUrl = context.getString(R.string.playlistUrl) + playlistId
+    val settings = Settings.getSettings(context)
+
+    val deletePlaylistUrl =
+        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(
+                context.getString(R.string.customApiSupportsV2Setting)
+            ) == true
+        ) {
+            settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v2/playlist/" + playlistId
+        } else {
+            context.getString(R.string.playlistUrl) + playlistId
+        }
 
     return StringRequest(
         Request.Method.DELETE, deletePlaylistUrl,
-        Response.Listener {
-            callback(it)
-        },
-        Response.ErrorListener {
-            errorCallback(it)
-        })
+        Response.Listener(callback),
+        Response.ErrorListener(errorCallback)
+    )
 }
 
 fun newDeletePlaylistTrackRequest(
@@ -145,8 +176,17 @@ fun newDeletePlaylistTrackRequest(
     callback: (response: JSONObject) -> Unit,
     errorCallback: (error: VolleyError) -> Unit
 ): JsonObjectRequest {
+    val settings = Settings.getSettings(context)
+
     val deleteTrackFromPlaylistUrl =
-        context.getString(R.string.playlistUrl) + playlistId + "/record"
+        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(
+                context.getString(R.string.customApiSupportsV2Setting)
+            ) == true
+        ) {
+            settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v2/playlist/" + playlistId + "/record"
+        } else {
+            context.getString(R.string.playlistUrl) + playlistId + "/record"
+        }
 
     val deleteSongObject = JSONObject()
     deleteSongObject.put("trackId", song.songId)
@@ -157,12 +197,9 @@ fun newDeletePlaylistTrackRequest(
         Request.Method.DELETE,
         deleteTrackFromPlaylistUrl,
         deleteSongObject,
-        Response.Listener {
-            callback(it)
-        },
-        Response.ErrorListener {
-            errorCallback(it)
-        })
+        Response.Listener(callback),
+        Response.ErrorListener(errorCallback)
+    )
 }
 
 fun newLoadAlbumRequest(
@@ -171,13 +208,15 @@ fun newLoadAlbumRequest(
     callback: (response: JSONObject) -> Unit,
     errorCallback: (error: VolleyError?) -> Unit
 ): StringRequest {
-    val requestUrl = if (Settings.getSettings(context)
-            .getBoolean(context.getString(R.string.useCustomApiSetting)) == true
-    ) {
-        context.getString(R.string.customApiBaseUrl) + "catalog/release/$mcID"
-    } else {
-        context.getString(R.string.loadAlbumSongsUrl) + "/$mcID"
-    }
+    val settings = Settings.getSettings(context)
+
+    val requestUrl =
+        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(context.getString(R.string.customApiSupportsV1Setting)) == true
+        ) {
+            settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v1/catalog/release/$mcID"
+        } else {
+            context.getString(R.string.loadAlbumSongsUrl) + "/$mcID"
+        }
 
     return StringRequest(
         Request.Method.GET, requestUrl,
@@ -187,9 +226,7 @@ fun newLoadAlbumRequest(
             } catch (e: JSONException) {
                 errorCallback(null)
             }
-        }, Response.ErrorListener {
-            errorCallback(it)
-        }
+        }, Response.ErrorListener(errorCallback)
     )
 }
 
@@ -199,13 +236,15 @@ fun newLoadAlbumListRequest(
     callback: (response: JSONObject) -> Unit,
     errorCallback: (error: VolleyError?) -> Unit
 ): StringRequest {
-    val requestUrl = if (Settings.getSettings(context)
-            .getBoolean(context.getString(R.string.useCustomApiSetting)) == true
-    ) {
-        context.getString(R.string.customApiBaseUrl) + "releases?limit=50&skip=" + skip.toString()
-    } else {
-        context.getString(R.string.loadAlbumsUrl) + "?limit=50&skip=" + skip.toString()
-    }
+    val settings = Settings.getSettings(context)
+
+    val requestUrl =
+        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(context.getString(R.string.customApiSupportsV1Setting)) == true
+        ) {
+            settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v1/releases?limit=50&skip=" + skip.toString()
+        } else {
+            context.getString(R.string.loadAlbumsUrl) + "?limit=50&skip=" + skip.toString()
+        }
 
     return StringRequest(
         Request.Method.GET, requestUrl,
@@ -216,9 +255,7 @@ fun newLoadAlbumListRequest(
                 errorCallback(null)
             }
         },
-        Response.ErrorListener {
-            errorCallback(it)
-        }
+        Response.ErrorListener(errorCallback)
     )
 }
 
@@ -228,9 +265,21 @@ fun newLoadPlaylistRequest(
     callback: (response: JSONObject) -> Unit,
     errorCallback: (error: VolleyError?) -> Unit
 ): StringRequest {
+    val settings = Settings.getSettings(context)
+
+    val playlistUrl =
+        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(
+                context.getString(R.string.customApiSupportsV2Setting)
+            ) == true
+        ) {
+            settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v2/playlist/" + playlistId
+        } else {
+            context.getString(R.string.playlistUrl) + playlistId
+        }
+
     return StringRequest(
         Request.Method.GET,
-        context.getString(R.string.playlistUrl) + playlistId,
+        playlistUrl,
         Response.Listener {
             try {
                 callback(JSONObject(it))
@@ -238,9 +287,7 @@ fun newLoadPlaylistRequest(
                 errorCallback(null)
             }
         },
-        Response.ErrorListener {
-            errorCallback(it)
-        }
+        Response.ErrorListener(errorCallback)
     )
 }
 
@@ -251,8 +298,17 @@ fun newLoadPlaylistTracksRequest(
     callback: (response: JSONObject) -> Unit,
     errorCallback: (error: VolleyError?) -> Unit
 ): StringRequest {
+    val settings = Settings.getSettings(context)
+
     val playlistTrackUrl =
-        context.getString(R.string.playlistTrackUrl) + playlistId + "/catalog?skip=" + skip.toString() + "&limit=50"
+        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(
+                context.getString(R.string.customApiSupportsV2Setting)
+            ) == true
+        ) {
+            settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v2/playlist/" + playlistId + "/catalog?skip=" + skip.toString() + "&limit=50"
+        } else {
+            context.getString(R.string.playlistTrackUrl) + playlistId + "/catalog?skip=" + skip.toString() + "&limit=50"
+        }
 
     return StringRequest(Request.Method.GET, playlistTrackUrl, Response.Listener {
         try {
@@ -261,9 +317,7 @@ fun newLoadPlaylistTracksRequest(
             errorCallback(null)
         }
 
-    }, Response.ErrorListener {
-        errorCallback(it)
-    })
+    }, Response.ErrorListener(errorCallback))
 }
 
 fun newLoadRelatedTracksRequest(
@@ -272,7 +326,7 @@ fun newLoadRelatedTracksRequest(
     skipMC: Boolean,
     callback: (response: JSONObject) -> Unit,
     errorCallback: (error: VolleyError) -> Unit
-): com.android.volley.toolbox.JsonObjectRequest {
+): com.android.volley.toolbox.JsonObjectRequest? {
     val jsonObject = JSONObject()
     val trackJsonArray = JSONArray()
     val excludeJsonArray = JSONArray()
@@ -298,16 +352,25 @@ fun newLoadRelatedTracksRequest(
     jsonObject.put("tracks", trackJsonArray)
     jsonObject.put("exclude", excludeJsonArray)
 
-    val loadRelatedTracksRequest = com.android.volley.toolbox.JsonObjectRequest(Request.Method.POST,
-        context.getString(R.string.customApiBaseUrl) + "related?skipMC=$skipMC",
-        jsonObject,
-        Response.Listener {
-            callback(it)
+    val settings = Settings.getSettings(context)
 
-        },
-        Response.ErrorListener {
-            errorCallback(it)
-        })
+    val relatedTracksUrl =
+        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(
+                context.getString(R.string.customApiSupportsV1Setting)
+            ) == true
+        ) {
+            settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v1/related?skipMC=$skipMC"
+        } else {
+            return null
+        }
+
+    val loadRelatedTracksRequest = com.android.volley.toolbox.JsonObjectRequest(
+        Request.Method.POST,
+        relatedTracksUrl,
+        jsonObject,
+        Response.Listener(callback),
+        Response.ErrorListener(errorCallback)
+    )
 
     loadRelatedTracksRequest.retryPolicy =
         DefaultRetryPolicy(
@@ -325,13 +388,15 @@ fun newLoadSongListRequest(
     callback: (response: JSONObject) -> Unit,
     errorCallback: (error: VolleyError?) -> Unit
 ): StringRequest {
-    val requestUrl = if (Settings.getSettings(context)
-            .getBoolean(context.getString(R.string.useCustomApiSetting)) == true
-    ) {
-        context.getString(R.string.customApiBaseUrl) + "catalog/?limit=50&skip=" + skip.toString()
-    } else {
-        context.getString(R.string.loadSongsUrl) + "?limit=50&skip=" + skip.toString()
-    }
+    val settings = Settings.getSettings(context)
+
+    val requestUrl =
+        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(context.getString(R.string.customApiSupportsV1Setting)) == true
+        ) {
+            settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v1/catalog/?limit=50&skip=" + skip.toString()
+        } else {
+            context.getString(R.string.loadSongsUrl) + "?limit=50&skip=" + skip.toString()
+        }
 
     return StringRequest(
         Request.Method.GET, requestUrl,
@@ -342,10 +407,7 @@ fun newLoadSongListRequest(
                 errorCallback(null)
             }
 
-
-        }, Response.ErrorListener {
-            errorCallback(it)
-        }
+        }, Response.ErrorListener(errorCallback)
     )
 }
 
@@ -356,7 +418,17 @@ fun newRenamePlaylistRequest(
     callback: (response: JSONObject) -> Unit,
     errorCallback: (error: VolleyError) -> Unit
 ): com.android.volley.toolbox.JsonObjectRequest {
-    val playlistPatchUrl = context.getString(R.string.playlistUrl) + playlistId
+    val settings = Settings.getSettings(context)
+
+    val playlistPatchUrl =
+        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(
+                context.getString(R.string.customApiSupportsV2Setting)
+            ) == true
+        ) {
+            settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v2/playlist/" + playlistId
+        } else {
+            context.getString(R.string.playlistUrl) + playlistId
+        }
 
     val postObject = JSONObject()
 
@@ -364,12 +436,8 @@ fun newRenamePlaylistRequest(
 
     return com.android.volley.toolbox.JsonObjectRequest(
         Request.Method.PATCH, playlistPatchUrl, postObject,
-        Response.Listener {
-            callback(it)
-        },
-        Response.ErrorListener {
-            errorCallback(it)
-        }
+        Response.Listener(callback),
+        Response.ErrorListener(errorCallback)
     )
 }
 
@@ -378,7 +446,17 @@ fun newLoadPlaylistsRequest(
     callback: (response: JSONObject) -> Unit,
     errorCallback: (error: VolleyError?) -> Unit
 ): StringRequest {
-    val playlistUrl = context.getString(R.string.playlistsUrl)
+    val settings = Settings.getSettings(context)
+
+    val playlistUrl =
+        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(
+                context.getString(R.string.customApiSupportsV2Setting)
+            ) == true
+        ) {
+            settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v2/playlists"
+        } else {
+            context.getString(R.string.playlistsUrl)
+        }
 
     return StringRequest(
         Request.Method.GET, playlistUrl,
@@ -389,19 +467,28 @@ fun newLoadPlaylistsRequest(
                 errorCallback(null)
             }
         },
-        Response.ErrorListener {
-            errorCallback(it)
-        })
+        Response.ErrorListener(errorCallback)
+    )
 }
 
 fun newLiveInfoRequest(
     context: Context,
     callback: (response: JSONObject) -> Unit,
     errorCallback: (error: VolleyError?) -> Unit
-): StringRequest {
+): StringRequest? {
+    val settings = Settings.getSettings(context)
+
+    val requestUrl =
+        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(context.getString(R.string.customApiSupportsV1Setting)) == true
+        ) {
+            settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v1/liveinfo"
+        } else {
+            return null
+        }
+
     return StringRequest(
         Request.Method.GET,
-        context.getString(R.string.customApiBaseUrl) + "liveinfo",
+        requestUrl,
         Response.Listener {
             try {
                 callback(JSONObject(it))
@@ -410,9 +497,8 @@ fun newLiveInfoRequest(
             }
 
         },
-        Response.ErrorListener {
-            errorCallback(it)
-        })
+        Response.ErrorListener(errorCallback)
+    )
 }
 
 fun newLoginRequest(
@@ -426,17 +512,23 @@ fun newLoginRequest(
     loginPostParams.put("email", username)
     loginPostParams.put("password", password)
 
-    val loginUrl = context.getString(R.string.loginUrl)
+    val settings = Settings.getSettings(context)
+
+    val loginUrl =
+        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(
+                context.getString(R.string.customApiSupportsV2Setting)
+            ) == true
+        ) {
+            settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v2/login"
+        } else {
+            context.getString(R.string.loginUrl)
+        }
 
     return JsonObjectRequest(
         Request.Method.POST, loginUrl, loginPostParams,
-        Response.Listener {
-            callback(it)
-
-        },
-        Response.ErrorListener {
-            errorCallback(it)
-        })
+        Response.Listener(callback),
+        Response.ErrorListener(errorCallback)
+    )
 }
 
 fun newTwoFaRequest(
@@ -447,24 +539,45 @@ fun newTwoFaRequest(
     val twoFaTokenParams = JSONObject()
     twoFaTokenParams.put("token", twoFACode)
 
+    val settings = Settings.getSettings(context)
+
+    val twoFaUrl =
+        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(
+                context.getString(R.string.customApiSupportsV2Setting)
+            ) == true
+        ) {
+            settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v2/login/token"
+        } else {
+            context.getString(R.string.tokenUrl)
+        }
+
     return JsonObjectRequest(
         Request.Method.POST,
-        context.getString(R.string.tokenUrl),
+        twoFaUrl,
         twoFaTokenParams,
-        Response.Listener {
-            callback(it)
-        },
-        Response.ErrorListener {
-            errorCallback(it)
-        })
+        Response.Listener(callback),
+        Response.ErrorListener(errorCallback)
+    )
 }
 
 fun newCheckLoginRequest(
     context: Context, callback: (response: JSONObject) -> Unit,
     errorCallback: (error: VolleyError?) -> Unit
 ): StringRequest {
-    return StringRequest(Request.Method.GET, context.getString
-        (R.string.sessionUrl),
+    val settings = Settings.getSettings(context)
+
+    val sessionUrl =
+        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(
+                context.getString(R.string.customApiSupportsV2Setting)
+            ) == true
+        ) {
+            settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v2/session"
+        } else {
+            context.getString(R.string.sessionUrl)
+        }
+
+    return StringRequest(
+        Request.Method.GET, sessionUrl,
         Response.Listener {
             try {
                 callback(JSONObject(it))
@@ -472,7 +585,25 @@ fun newCheckLoginRequest(
                 errorCallback(null)
             }
         },
-        Response.ErrorListener {
-            errorCallback(it)
-        })
+        Response.ErrorListener(errorCallback)
+    )
+}
+
+fun newCustomApiFeatureRequest(
+    context: Context,
+    callback: (response: JSONObject) -> Unit,
+    errorCallback: (error: VolleyError?) -> Unit
+): StringRequest {
+    return StringRequest(
+        Request.Method.GET,
+        Settings.getSettings(context).getString(context.getString(R.string.customApiBaseUrlSetting)) + "features",
+        Response.Listener {
+            try {
+                callback(JSONObject(it))
+            } catch (e: JSONException) {
+                errorCallback(null)
+            }
+        },
+        Response.ErrorListener(errorCallback)
+    )
 }

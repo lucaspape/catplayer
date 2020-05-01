@@ -3,6 +3,7 @@ package de.lucaspape.monstercat.ui.handlers
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+import android.os.AsyncTask
 import android.os.Build
 import android.util.TypedValue
 import android.view.View
@@ -17,12 +18,15 @@ import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.music.crossfade
 import de.lucaspape.monstercat.music.playRelatedSongsAfterPlaylistFinished
 import de.lucaspape.monstercat.music.volume
+import de.lucaspape.monstercat.request.async.CheckCustomApiFeaturesAsync
 import de.lucaspape.monstercat.ui.activities.MainActivity
 import de.lucaspape.monstercat.util.Auth
 import de.lucaspape.util.Settings
 import de.lucaspape.monstercat.util.displayInfo
+import de.lucaspape.monstercat.util.displaySnackBar
 import java.io.File
 import java.io.FileNotFoundException
+import java.lang.ref.WeakReference
 import kotlin.math.log
 
 /**
@@ -131,7 +135,20 @@ class SettingsHandler(private val closeSettings:() -> Unit) : Handler {
         }
 
         useCustomApiSwitch.setOnCheckedChangeListener { _, isChecked ->
-            settings.setBoolean(view.context.getString(R.string.useCustomApiSetting), isChecked)
+            if(isChecked){
+                settings.setString(view.context.getString(R.string.customApiBaseUrlSetting), "https://api.lucaspape.de/monstercat/")
+
+                //check for custom api features
+                CheckCustomApiFeaturesAsync(WeakReference(view.context), {
+                    settings.setBoolean(view.context.getString(R.string.useCustomApiSetting), true)
+                    displaySnackBar(view, view.context.getString(R.string.customApiEnabledMsg), null) {}
+                }, {
+                    settings.setBoolean(view.context.getString(R.string.useCustomApiSetting), false)
+                    displaySnackBar(view, view.context.getString(R.string.customApiEnableError), null) {}
+                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+            }else{
+                settings.setBoolean(view.context.getString(R.string.useCustomApiSetting), false)
+            }
         }
 
         playRelatedSwitch.setOnCheckedChangeListener {_, isChecked ->

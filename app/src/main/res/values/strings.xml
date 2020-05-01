@@ -125,4 +125,6 @@
     <string name="playRelatedAfter">Play related songs after playback finished</string>
     <string name="saveCoverImagesToCache">Save cover images to cache</string>
     <string name="volume">Volume</string>
+    <string name="customApiEnabledMsg">Custom API enabled!</string>
+    <string name="customApiEnableError">Could not enable custom API!</string>
 </resources>
