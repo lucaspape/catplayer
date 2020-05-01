@@ -7,7 +7,10 @@ import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.util.*
 import java.lang.ref.WeakReference
 
-class FullscreenPlayerHandler(private val onSearch:(searchString:String?) -> Unit): Handler {
+class FullscreenPlayerHandler(
+    private val onSearch: (searchString: String?) -> Unit,
+    private val closeFullscreen: () -> Unit
+) : Handler {
     private fun setupMusicPlayer(view: View) {
         val titleTextView = view.findViewById<TextView>(R.id.fullscreenTitle)
         val artistTextView = view.findViewById<TextView>(R.id.fullscreenArtist)
@@ -30,6 +33,7 @@ class FullscreenPlayerHandler(private val onSearch:(searchString:String?) -> Uni
         val nextButton = view.findViewById<ImageButton>(R.id.fullscreenNext)
         val shuffleButton = view.findViewById<ImageButton>(R.id.fullscreenShuffle)
         val loopButton = view.findViewById<ImageButton>(R.id.fullscreenLoop)
+        val closeButton = view.findViewById<ImageButton>(R.id.fullscreenBack)
 
         if (shuffle) {
             shuffleButton.setImageResource(R.drawable.ic_shuffle_green_24dp)
@@ -91,6 +95,10 @@ class FullscreenPlayerHandler(private val onSearch:(searchString:String?) -> Uni
             }
         }
 
+        closeButton.setOnClickListener {
+            closeFullscreen()
+        }
+
         val titleTextView = view.findViewById<TextView>(R.id.fullscreenTitle)
         val artistTextView = view.findViewById<TextView>(R.id.fullscreenArtist)
 
@@ -104,6 +112,7 @@ class FullscreenPlayerHandler(private val onSearch:(searchString:String?) -> Uni
     }
 
     override fun onBackPressed(view: View) {
+        closeFullscreen()
     }
 
     override fun onPause(view: View) {

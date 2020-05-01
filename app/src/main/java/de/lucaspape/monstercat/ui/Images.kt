@@ -15,7 +15,7 @@ var fallbackBlackFileLow = File("")
 var fallbackWhiteFile = File("")
 var fallbackWhiteFileLow = File("")
 
-fun setFallbackCoverFiles(context: Context){
+fun setFallbackCoverFiles(context: Context) {
     fallbackFile = File("${context.dataDir}/fallback.webp")
     fallbackFileLow = File("${context.dataDir}/fallback_low.webp")
 
@@ -39,6 +39,7 @@ var playButtonDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic
 var pauseButtonDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_pause_24dp"
 var createPlaylistDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_add_24dp"
 var addPlaylistDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_playlist_add_24"
+var backButtonDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_arrow_back_24"
 
 private const val offlineDrawableBlack =
     "android.resource://de.lucaspape.monstercat/drawable/ic_offline_pin_black_24dp"
@@ -68,6 +69,8 @@ private const val createPlaylistDrawableBlack =
     "android.resource://de.lucaspape.monstercat/drawable/ic_add_black_24dp"
 private const val addPlaylistDrawableBlack =
     "android.resource://de.lucaspape.monstercat/drawable/ic_playlist_add_black_24"
+private const val backButtonDrawableBlack =
+    "android.resource://de.lucaspape.monstercat/drawable/ic_arrow_back_black_24dp"
 
 private const val offlineDrawableWhite =
     "android.resource://de.lucaspape.monstercat/drawable/ic_offline_pin_white_24dp"
@@ -97,6 +100,8 @@ private const val createPlaylistDrawableWhite =
     "android.resource://de.lucaspape.monstercat/drawable/ic_add_white_24dp"
 private const val addPlaylistDrawableWhite =
     "android.resource://de.lucaspape.monstercat/drawable/ic_playlist_add_white_24"
+private const val backButtonDrawableWhite =
+    "android.resource://de.lucaspape.monstercat/drawable/ic_arrow_back_white_24"
 
 fun switchDrawablesToWhite() {
     offlineDrawable =
@@ -123,11 +128,11 @@ fun switchDrawablesToWhite() {
         playButtonDrawableWhite
     pauseButtonDrawable =
         pauseButtonDrawableWhite
-
     createPlaylistDrawable =
         createPlaylistDrawableWhite
     addPlaylistDrawable =
         addPlaylistDrawableWhite
+    backButtonDrawable = backButtonDrawableWhite
 }
 
 fun switchDrawablesToBlack() {
@@ -159,4 +164,5 @@ fun switchDrawablesToBlack() {
         createPlaylistDrawableBlack
     addPlaylistDrawable =
         addPlaylistDrawableBlack
+    backButtonDrawable = backButtonDrawableBlack
 }

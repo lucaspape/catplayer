@@ -454,7 +454,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<androidx.appcompat.widget.Toolbar>(R.id.musicBar).setOnClickListener {
-            startActivity(Intent(applicationContext, PlayerFullscreenActivity::class.java))
+            startActivity(
+                Intent(applicationContext, PlayerFullscreenActivity::class.java))
         }
     }
 }
