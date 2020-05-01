@@ -80,29 +80,40 @@ internal fun playSong(
     playWhenReady: Boolean,
     progress: Long?
 ) {
+    //cancel stream info updater if running
     streamInfoUpdateAsync?.cancel(true)
 
+    //request audio focus if enabled
     val audioFocus = if (requestAudioFocus) {
         requestAudioFocus(context)
     } else {
-        null
+        AudioManager.AUDIOFOCUS_REQUEST_GRANTED
     }
 
-    if (audioFocus == AudioManager.AUDIOFOCUS_REQUEST_GRANTED || !requestAudioFocus) {
+    if (audioFocus == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+        //preparingDone callback, see below
         val preparingDone = {
+            //prepared player to main player handover
             if (exoPlayerSongId != songId) {
                 exoPlayer =
                     preparedExoPlayer
 
-                preparedExoPlayerSongId = ""
+                exoPlayerSongId = songId
             }
 
+            preparedExoPlayer?.playWhenReady = false
+            preparedExoPlayer = null
+            preparedExoPlayerSongId = ""
+
+            //set volume
             exoPlayer?.audioComponent?.volume = volume
 
+            //set progress if not null (for session recovering)
             if (progress != null) {
                 exoPlayer?.seekTo(progress)
             }
 
+            //enable playback
             exoPlayer?.playWhenReady = playWhenReady
 
             //for play/pause button change and if song ended
@@ -113,20 +124,22 @@ internal fun playSong(
                 )
             )
 
-            exoPlayerSongId = songId
-
+            //show title, artist, cover
             SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
-                //UI stuff
+                //set title/artist
                 title = "${song.title} ${song.version}"
                 artist = song.artist
 
+                //start seekbar updater
+                runSeekBarUpdate(context, prepareNext = true, crossFade = true)
+
+                //set cover
                 setCover(
                     context,
                     song.albumId,
                     song.artistId
                 ) {
-                    runSeekBarUpdate(context, prepareNext = true, crossFade = true)
-
+                    //show notification
                     if (showNotification) {
                         updateNotification(
                             song.title,
@@ -139,18 +152,17 @@ internal fun playSong(
             }
         }
 
-        if (exoPlayerSongId != songId) {
-            exoPlayer?.release()
-            exoPlayer?.stop()
-
-            if (preparedExoPlayerSongId != songId) {
-                prepareSong(context, songId) {
+        //if song differs from currently/last played song
+        if(exoPlayerSongId != songId){
+            //check if player needs to be prepared
+            if(preparedExoPlayerSongId != songId){
+                prepareSong(context, songId){
                     preparingDone()
                 }
-            } else {
+            }else{
                 preparingDone()
             }
-        } else {
+        }else{
             preparingDone()
         }
     }
