@@ -641,7 +641,7 @@ internal fun playSongsFromCatalogDbAsync(
 
     songQueue.add(firstSongId)
     skipPreviousInPlaylist()
-    next()
+    next(context)
 
     //add next songs from database
     val songDatabaseHelper = SongDatabaseHelper(context)
@@ -698,7 +698,7 @@ internal fun playSongsFromViewDataAsync(
 
     songQueue.add(catalogViewData[itemIndex].songId)
     skipPreviousInPlaylist()
-    next()
+    next(context)
 
     //add visible next songs
     BackgroundAsync({

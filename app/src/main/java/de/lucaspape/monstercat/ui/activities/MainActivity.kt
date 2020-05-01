@@ -253,12 +253,10 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
-        contextReference = WeakReference(this)
-
         setupMusicPlayer()
 
         //create the MusicPlayer.kt mediasession
-        createMediaSession()
+        createMediaSession(this)
 
         findViewById<BottomNavigationView>(R.id.nav_view).setOnNavigationItemSelectedListener(
             onNavigationItemSelectedListener
@@ -450,7 +448,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun registerButtonListeners() {
         findViewById<ImageButton>(R.id.playButton).setOnClickListener {
-            toggleMusic()
+            toggleMusic(this)
         }
 
         findViewById<androidx.appcompat.widget.Toolbar>(R.id.musicBar).setOnClickListener {

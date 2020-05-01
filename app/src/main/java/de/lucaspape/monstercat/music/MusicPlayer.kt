@@ -22,8 +22,6 @@ import de.lucaspape.util.Settings
 import java.lang.ref.WeakReference
 import kotlin.random.Random
 
-internal var contextReference: WeakReference<Context>? = null
-
 //main exoPlayer
 var exoPlayer: SimpleExoPlayer? = null
     internal set
@@ -71,26 +69,40 @@ internal var streamInfoUpdateAsync: StreamInfoUpdateAsync? = null
 /**
  * Listener for audioFocusChange
  */
-internal val audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener { focusChange ->
-    when (focusChange) {
-        AudioManager.AUDIOFOCUS_GAIN ->
-            resume()
+class AudioFocusChangeListener{
+    companion object{
+        @JvmStatic var audioFocusChangeListener:AudioManager.OnAudioFocusChangeListener? = null
 
-        AudioManager.AUDIOFOCUS_LOSS ->
-            pause()
+        @JvmStatic fun getAudioFocusChangeListener(context: Context):AudioManager.OnAudioFocusChangeListener{
+            if(audioFocusChangeListener == null){
+                audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener { focusChange ->
+                    when (focusChange) {
+                        AudioManager.AUDIOFOCUS_GAIN ->
+                            resume(context)
 
-        AudioManager.AUDIOFOCUS_LOSS_TRANSIENT ->
-            pause()
+                        AudioManager.AUDIOFOCUS_LOSS ->
+                            pause(context)
+
+                        AudioManager.AUDIOFOCUS_LOSS_TRANSIENT ->
+                            pause(context)
+                    }
+                }
+            }
+
+            return audioFocusChangeListener!!
+        }
     }
 }
 
 /**
  * Listener for headphones disconnected
  */
-class NoisyReceiver : BroadcastReceiver() {
+class NoisyReceiver() : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         if (intent?.action == AudioManager.ACTION_AUDIO_BECOMING_NOISY) {
-            pause()
+            context?.let {
+                pause(context)
+            }
         }
     }
 }
@@ -98,22 +110,20 @@ class NoisyReceiver : BroadcastReceiver() {
 /**
  * Create mediaSession and listen for callbacks (pause, play buttons on headphones etc.)
  */
-fun createMediaSession() {
-    contextReference?.get()?.let { context ->
-        if (!sessionCreated || mediaSession == null) {
-            PlayerSaveState.restoreMusicPlayerState(context, false)
+fun createMediaSession(context: Context) {
+    if (!sessionCreated || mediaSession == null) {
+        PlayerSaveState.restoreMusicPlayerState(context, false)
 
-            mediaSession = MediaSessionCompat.fromMediaSession(
-                context,
-                MediaSession(context, "de.lucaspape.monstercat.music")
-            )
+        mediaSession = MediaSessionCompat.fromMediaSession(
+            context,
+            MediaSession(context, "de.lucaspape.monstercat.music")
+        )
 
-            mediaSession?.setCallback(MediaSessionCallback())
+        mediaSession?.setCallback(MediaSessionCallback(context))
 
-            mediaSession?.isActive = true
+        mediaSession?.isActive = true
 
-            sessionCreated = true
-        }
+        sessionCreated = true
     }
 }
 
@@ -140,101 +150,94 @@ fun applyPlayerSettings(context: Context) {
 /**
  * Play next song
  */
-internal fun next() {
-    contextReference?.get()?.let { context ->
-        playSong(
-            context, nextSong(),
-            showNotification = true,
-            requestAudioFocus = true,
-            playWhenReady = true,
-            progress = null
-        )
+internal fun next(context: Context) {
+    playSong(
+        context, nextSong(context),
+        showNotification = true,
+        requestAudioFocus = true,
+        playWhenReady = true,
+        progress = null
+    )
 
-        PlayerSaveState.saveMusicPlayerState(context)
-    }
+    PlayerSaveState.saveMusicPlayerState(context)
 }
 
 /**
  * Play previous song
  */
-internal fun previous() {
-    contextReference?.get()?.let { context ->
-        playSong(
-            context, previousSong(),
-            showNotification = true,
-            requestAudioFocus = true,
-            playWhenReady = true,
-            progress = null
-        )
+internal fun previous(context: Context) {
+    playSong(
+        context, previousSong(),
+        showNotification = true,
+        requestAudioFocus = true,
+        playWhenReady = true,
+        progress = null
+    )
 
-        PlayerSaveState.saveMusicPlayerState(context)
-    }
+    PlayerSaveState.saveMusicPlayerState(context)
 }
 
 /**
  * Pause playback
  */
-internal fun pause() {
-    contextReference?.get()?.let { context ->
-        exoPlayer?.playWhenReady = false
+internal fun pause(context: Context) {
+    exoPlayer?.playWhenReady = false
 
-        abandonAudioFocus(context)
+    abandonAudioFocus(context)
 
-        PlayerSaveState.saveMusicPlayerState(context)
-    }
+    PlayerSaveState.saveMusicPlayerState(context)
 }
 
 /**
  * Resume playback
  */
-internal fun resume() {
-    startPlayerService(currentSongId)
+internal fun resume(context: Context) {
+    startPlayerService(context, currentSongId)
 
-    contextReference?.get()?.let { context ->
-        //check if should resume livestream or song
-        if (streamInfoUpdateAsync?.status == AsyncTask.Status.RUNNING) {
-            playStream(
-                Stream(
-                    context.getString(R.string.twitchClientID),
-                    context.getString(R.string.twitchChannel)
-                )
+    //check if should resume livestream or song
+    if (streamInfoUpdateAsync?.status == AsyncTask.Status.RUNNING) {
+        playStream(
+            context,
+            Stream(
+                context.getString(R.string.twitchClientID),
+                context.getString(R.string.twitchChannel)
             )
-        } else {
-            val intentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
+        )
+    } else {
+        val intentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
 
-            context.registerReceiver(
-                NoisyReceiver(),
-                intentFilter
-            )
+        context.registerReceiver(
+            NoisyReceiver(),
+            intentFilter
+        )
 
-            playSong(
-                context, currentSongId,
-                showNotification = true,
-                requestAudioFocus = true,
-                playWhenReady = true,
-                progress = currentPosition.toLong()
-            )
+        playSong(
+            context, currentSongId,
+            showNotification = true,
+            requestAudioFocus = true,
+            playWhenReady = true,
+            progress = currentPosition.toLong()
+        )
 
-            PlayerSaveState.saveMusicPlayerState(context)
-        }
+        PlayerSaveState.saveMusicPlayerState(context)
     }
 }
 
 /**
  * Toggle playback (play/pause)
  */
-internal fun toggleMusic() {
+internal fun toggleMusic(context: Context) {
     if (exoPlayer?.isPlaying == true) {
-        pause()
+        pause(context)
     } else {
-        resume()
+        resume(context)
     }
 }
 
 /**
  * Stop playback
  */
-internal fun stop() {
+internal fun stop(context: Context) {
     if (exoPlayer?.isPlaying == true) {
 
         title = ""
@@ -242,19 +245,18 @@ internal fun stop() {
 
         exoPlayer?.stop()
 
-        contextReference?.get()?.let { context ->
-            abandonAudioFocus(context)
-            PlayerSaveState.saveMusicPlayerState(context)
-        }
+        abandonAudioFocus(context)
+        PlayerSaveState.saveMusicPlayerState(context)
+
     }
 
-    stopPlayerService()
+    stopPlayerService(context)
 }
 
 /**
  * Returns next song and makes changes to vars
  */
-private fun nextSong(): String {
+private fun nextSong(context: Context): String {
     if (loopSingle && playlist.size >= playlistIndex) {
         //loop single
         return try {
@@ -325,7 +327,7 @@ private fun nextSong(): String {
 
         return songId
     } else if (playRelatedSongsAfterPlaylistFinished) {
-        playRelatedSongs()
+        playRelatedSongs(context)
         return ""
     } else {
         return ""
@@ -440,25 +442,23 @@ fun skipPreviousInPlaylist() {
 /**
  * Fetch songs which are related to songs in playlist
  */
-fun playRelatedSongs() {
-    contextReference?.let { weakReference ->
-        weakReference.get()?.let { context ->
-            Settings.getSettings(context)
-                .getBoolean(context.getString(R.string.skipMonstercatSongsSetting))?.let {
-                    LoadRelatedTracksAsync(weakReference, playlist, it,
-                        finishedCallback = { _, relatedIdArray ->
-                            for (songId in relatedIdArray) {
-                                songQueue.add(songId)
-                            }
+fun playRelatedSongs(context: Context) {
+    Settings.getSettings(context)
+        .getBoolean(context.getString(R.string.skipMonstercatSongsSetting))?.let {
+            LoadRelatedTracksAsync(
+                WeakReference(context), playlist, it,
+                finishedCallback = { _, relatedIdArray ->
+                    for (songId in relatedIdArray) {
+                        songQueue.add(songId)
+                    }
 
-                            skipPreviousInPlaylist()
-                            next()
-                        },
-                        errorCallback = {
-                            //TODO handle error
-                        }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-                }
+                    skipPreviousInPlaylist()
+                    next(context)
+                },
+                errorCallback = {
+                    //TODO handle error
+                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         }
 
-    }
+
 }

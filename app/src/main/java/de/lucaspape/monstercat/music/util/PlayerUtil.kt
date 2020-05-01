@@ -35,7 +35,7 @@ fun requestAudioFocus(context: Context): Int {
             val audioFocusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
                 .setAudioAttributes(audioAttributes)
                 .setAcceptsDelayedFocusGain(false)
-                .setOnAudioFocusChangeListener(audioFocusChangeListener)
+                .setOnAudioFocusChangeListener(AudioFocusChangeListener.getAudioFocusChangeListener(context))
                 .build()
 
             val audioManager =
@@ -47,7 +47,7 @@ fun requestAudioFocus(context: Context): Int {
 
             @Suppress("DEPRECATION")
             audioManager.requestAudioFocus(
-                audioFocusChangeListener,
+                AudioFocusChangeListener.getAudioFocusChangeListener(context),
                 AudioManager.STREAM_MUSIC,
                 AudioManager.AUDIOFOCUS_GAIN
             )
@@ -60,7 +60,7 @@ fun abandonAudioFocus(context: Context) {
         context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
     @Suppress("DEPRECATION")
-    audioManager.abandonAudioFocus(audioFocusChangeListener)
+    audioManager.abandonAudioFocus(AudioFocusChangeListener.audioFocusChangeListener)
 }
 
 var currentListenerId = ""
@@ -104,7 +104,7 @@ fun getPlayerListener(context: Context, songId: String): Player.EventListener {
                     playing = isPlaying
                 }
 
-                startPlayerService(songId)
+                startPlayerService(context, songId)
 
                 exoPlayer?.duration?.let { duration ->
                     exoPlayer?.currentPosition?.let { currentPosition ->
@@ -118,7 +118,7 @@ fun getPlayerListener(context: Context, songId: String): Player.EventListener {
 
                 if (playbackState == Player.STATE_ENDED) {
                     currentListenerId = ""
-                    next()
+                    next(context)
                 } else {
                     setCover(
                         context,

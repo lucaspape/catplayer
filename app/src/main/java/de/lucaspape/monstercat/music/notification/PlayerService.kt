@@ -8,10 +8,8 @@ import android.os.IBinder
 import de.lucaspape.monstercat.ui.activities.noisyReceiver
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.music.*
-import de.lucaspape.monstercat.music.contextReference
 import de.lucaspape.monstercat.music.util.setCover
 import java.lang.IllegalArgumentException
-import java.lang.ref.WeakReference
 
 class PlayerService : Service() {
     override fun onBind(intent: Intent?): IBinder? {
@@ -19,10 +17,8 @@ class PlayerService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        contextReference = WeakReference(applicationContext)
-
         //make sure session is started
-        createMediaSession()
+        createMediaSession(applicationContext)
 
         //register receiver which checks if headphones unplugged
         registerReceiver(noisyReceiver, IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY))
@@ -31,11 +27,12 @@ class PlayerService : Service() {
         var artist = ""
         var version = ""
 
-        createNotificationChannel()
+        createNotificationChannel(applicationContext)
 
         startForeground(
             musicNotificationID,
             createPlayerNotification(
+                applicationContext,
                 title,
                 version,
                 artist,
@@ -58,6 +55,7 @@ class PlayerService : Service() {
                     startForeground(
                         musicNotificationID,
                         createPlayerNotification(
+                            applicationContext,
                             song.title,
                             song.version,
                             song.artist,

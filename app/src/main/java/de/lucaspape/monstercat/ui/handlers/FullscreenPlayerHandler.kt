@@ -56,15 +56,15 @@ class FullscreenPlayerHandler(
         }
 
         playButton.setOnClickListener {
-            toggleMusic()
+            toggleMusic(view.context)
         }
 
         nextButton.setOnClickListener {
-            next()
+            next(view.context)
         }
 
         backButton.setOnClickListener {
-            previous()
+            previous(view.context)
         }
 
         shuffleButton.setOnClickListener {

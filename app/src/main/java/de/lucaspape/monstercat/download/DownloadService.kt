@@ -1,14 +1,15 @@
 package de.lucaspape.monstercat.download
 
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.os.AsyncTask
 import android.os.IBinder
-import de.lucaspape.monstercat.music.contextReference
+import java.lang.ref.WeakReference
 
-class DownloadService():Service(){
+class DownloadService : Service() {
 
-    companion object{
+    companion object {
         @JvmStatic
         var downloadTask: DownloadTask? = null
     }
@@ -18,10 +19,8 @@ class DownloadService():Service(){
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        contextReference?.let {
-            downloadTask = DownloadTask(it)
-            downloadTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-        }
+        downloadTask = DownloadTask(WeakReference(applicationContext))
+        downloadTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 
         return START_STICKY
     }
@@ -32,5 +31,4 @@ class DownloadService():Service(){
         downloadTask?.cancel(true)
         hideDownloadNotification(this)
     }
-
 }

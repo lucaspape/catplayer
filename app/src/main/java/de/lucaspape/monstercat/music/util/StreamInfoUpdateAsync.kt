@@ -100,7 +100,7 @@ class StreamInfoUpdateAsync(
                     fallbackTitle + fallbackVersion + fallbackArtist,
                     fallbackCoverUrl
                 ) { bitmap ->
-                    updateNotification(fallbackTitle, fallbackVersion, fallbackArtist, bitmap)
+                    updateNotification(context, fallbackTitle, fallbackVersion, fallbackArtist, bitmap)
                 }
 
                 title = "$fallbackTitle $fallbackVersion"

@@ -1,28 +1,29 @@
 package de.lucaspape.monstercat.music.util
 
+import android.content.Context
 import android.support.v4.media.session.MediaSessionCompat
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.stop
 
-class MediaSessionCallback : MediaSessionCompat.Callback() {
+class MediaSessionCallback(private val context: Context) : MediaSessionCompat.Callback() {
     override fun onPause() {
-        pause()
+        pause(context)
     }
 
     override fun onPlay() {
-        resume()
+        resume(context)
     }
 
     override fun onSkipToNext() {
-        next()
+        next(context)
     }
 
     override fun onSkipToPrevious() {
-        previous()
+        previous(context)
     }
 
     override fun onStop() {
-        stop()
+        stop(context)
     }
 
     override fun onSeekTo(pos: Long) {

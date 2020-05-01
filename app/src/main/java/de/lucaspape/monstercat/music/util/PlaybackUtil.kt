@@ -8,7 +8,6 @@ import com.google.android.exoplayer2.SimpleExoPlayer
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.music.*
-import de.lucaspape.monstercat.music.contextReference
 import de.lucaspape.monstercat.music.notification.startPlayerService
 import de.lucaspape.monstercat.music.notification.updateNotification
 import de.lucaspape.monstercat.request.async.AddTrackToDbAsync
@@ -49,26 +48,24 @@ internal fun prepareSong(context: Context, songId: String, callback: () -> Unit)
             return
         }
 
-        contextReference?.let { weakReference ->
-            AddTrackToDbAsync(weakReference, songId, finishedCallback = { _, song ->
-                if (song.playbackAllowed(context)
-                ) {
-                    val mediaSource = song.getMediaSource()
+        AddTrackToDbAsync(WeakReference(context), songId, finishedCallback = { _, song ->
+            if (song.playbackAllowed(context)
+            ) {
+                val mediaSource = song.getMediaSource()
 
-                    if (mediaSource != null) {
-                        preparedExoPlayer?.prepare(mediaSource)
-                        preparedExoPlayerSongId = song.songId
-                    } else {
-                        displayInfo(context, context.getString(R.string.songNotPlayableError))
-                    }
+                if (mediaSource != null) {
+                    preparedExoPlayer?.prepare(mediaSource)
+                    preparedExoPlayerSongId = song.songId
+                } else {
+                    displayInfo(context, context.getString(R.string.songNotPlayableError))
                 }
+            }
 
-                callback()
+            callback()
 
-            }, errorCallback = {
-            }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        }, errorCallback = {
+        }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 
-        }
     }
 }
 
@@ -93,7 +90,7 @@ internal fun playSong(
     if (audioFocus == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
         //preparingDone callback, see below
         val preparingDone = {
-            if(exoPlayerSongId != songId || (exoPlayerSongId == songId && preparedExoPlayer?.isPlaying == true)){
+            if (exoPlayerSongId != songId || (exoPlayerSongId == songId && preparedExoPlayer?.isPlaying == true)) {
                 //prepared player to main player handover
                 exoPlayer?.playWhenReady = false
                 exoPlayer?.stop(true)
@@ -111,7 +108,7 @@ internal fun playSong(
             //set progress if not null (for session recovering)
             if (progress != null) {
                 exoPlayer?.seekTo(progress)
-            }else if(exoPlayer?.isPlaying == false){
+            } else if (exoPlayer?.isPlaying == false) {
                 exoPlayer?.seekTo(0)
             }
 
@@ -149,6 +146,7 @@ internal fun playSong(
                     //show notification
                     if (showNotification) {
                         updateNotification(
+                            context,
                             song.title,
                             song.version,
                             song.artist,
@@ -159,7 +157,7 @@ internal fun playSong(
             }
         }
 
-        if(exoPlayerSongId != songId){
+        if (exoPlayerSongId != songId) {
             //check if player needs to be prepared
             if (preparedExoPlayerSongId != songId) {
                 prepareSong(context, songId) {
@@ -168,58 +166,56 @@ internal fun playSong(
             } else {
                 preparingDone()
             }
-        }else{
+        } else {
             preparingDone()
         }
     }
 }
 
-fun playStream(stream: Stream) {
-    contextReference?.get()?.let { context ->
-        streamInfoUpdateAsync?.cancel(true)
+fun playStream(context: Context, stream: Stream) {
+    streamInfoUpdateAsync?.cancel(true)
 
-        val settings = Settings.getSettings(context)
+    val settings = Settings.getSettings(context)
 
-        startPlayerService("")
+    startPlayerService(context, "")
 
-        exoPlayer?.playWhenReady = false
-        exoPlayer?.release()
-        exoPlayer?.stop()
-        exoPlayer = null
+    exoPlayer?.playWhenReady = false
+    exoPlayer?.release()
+    exoPlayer?.stop()
+    exoPlayer = null
 
-        //new exoplayer
-        exoPlayer = SimpleExoPlayer.Builder(context).build()
-        exoPlayer?.audioAttributes =
-            getAudioAttributes()
+    //new exoplayer
+    exoPlayer = SimpleExoPlayer.Builder(context).build()
+    exoPlayer?.audioAttributes =
+        getAudioAttributes()
 
-        //for play/pause button change and if song ended
-        exoPlayer?.addListener(
-            getStreamPlayerListener(
-                context
-            )
+    //for play/pause button change and if song ended
+    exoPlayer?.addListener(
+        getStreamPlayerListener(
+            context
         )
+    )
 
-        //request audio focus
-        if (requestAudioFocus(context) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-            //only play stream if allowed
-            if (wifiConnected(context) == true || settings.getBoolean(context.getString(R.string.streamOverMobileSetting)) == true) {
-                streamInfoUpdateAsync =
-                    StreamInfoUpdateAsync(
-                        WeakReference(context)
-                    )
-                streamInfoUpdateAsync?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    //request audio focus
+    if (requestAudioFocus(context) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+        //only play stream if allowed
+        if (wifiConnected(context) == true || settings.getBoolean(context.getString(R.string.streamOverMobileSetting)) == true) {
+            streamInfoUpdateAsync =
+                StreamInfoUpdateAsync(
+                    WeakReference(context)
+                )
+            streamInfoUpdateAsync?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 
-                stream.getMediaSource(context) { mediaSource ->
-                    exoPlayer?.prepare(mediaSource)
+            stream.getMediaSource(context) { mediaSource ->
+                exoPlayer?.prepare(mediaSource)
 
-                    exoPlayer?.playWhenReady = true
+                exoPlayer?.playWhenReady = true
 
-                    currentSeekBarUpdateHandlerId = ""
+                currentSeekBarUpdateHandlerId = ""
 
-                    duration = 0
-                    currentPosition = 0
-                    setPlayerState(0.toLong())
-                }
+                duration = 0
+                currentPosition = 0
+                setPlayerState(0.toLong())
             }
         }
     }
