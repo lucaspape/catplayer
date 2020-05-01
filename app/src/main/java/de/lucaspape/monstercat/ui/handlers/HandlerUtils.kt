@@ -595,9 +595,12 @@ internal fun openAlbum(view: View, albumMcId: String, share: Boolean) {
                     }
 
                     val shareIntent = Intent.createChooser(sendIntent, null)
+                    shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     context.startActivity(shareIntent)
                 } else {
-                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    context.startActivity(intent)
                 }
             }
         }
