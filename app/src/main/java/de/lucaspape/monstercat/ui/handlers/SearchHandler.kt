@@ -16,19 +16,14 @@ import com.mikepenz.fastadapter.scroll.EndlessRecyclerOnScrollListener
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadSong
-import de.lucaspape.monstercat.music.*
-import de.lucaspape.monstercat.music.next
 import de.lucaspape.monstercat.request.async.LoadTitleSearchAsync
 import de.lucaspape.monstercat.ui.abstract_items.CatalogItem
 import de.lucaspape.monstercat.ui.abstract_items.HeaderTextItem
 import de.lucaspape.monstercat.ui.abstract_items.ProgressItem
 import de.lucaspape.monstercat.util.displaySnackBar
-import de.lucaspape.util.BackgroundAsync
 import de.lucaspape.util.Settings
 import java.io.File
-import java.lang.IndexOutOfBoundsException
 import java.lang.ref.WeakReference
-import java.util.*
 import kotlin.collections.ArrayList
 
 class SearchHandler(
@@ -121,58 +116,10 @@ class SearchHandler(
             val itemIndex = position + itemIndexOffset
 
             if (itemIndex >= 0 && itemIndex < catalogViewData.size) {
-                val fistItem = catalogViewData[itemIndex]
-
-                HomeHandler.addSongsTaskId = ""
-
-                clearPlaylist()
-                clearQueue()
-
-                songQueue.add(fistItem.songId)
-                skipPreviousInPlaylist()
-                next()
-
                 val skipMonstercatSongs =
-                    Settings(view.context).getBoolean(view.context.getString(R.string.skipMonstercatSongsSetting))
+                    Settings(view.context).getBoolean(view.context.getString(R.string.skipMonstercatSongsSetting)) == true
 
-                val songDatabaseHelper = SongDatabaseHelper(view.context)
-
-                //add visible next songs
-                BackgroundAsync({
-                    val id = UUID.randomUUID().toString()
-                    HomeHandler.addSongsTaskId = id
-
-                    for (i in (itemIndex + 1 until catalogViewData.size)) {
-                        try {
-                            if (skipMonstercatSongs == true) {
-                                val song =
-                                    songDatabaseHelper.getSong(
-                                        view.context,
-                                        catalogViewData[i].songId
-                                    )
-
-                                if (!song?.artist.equals("monstercat", true)) {
-                                    if (id == HomeHandler.addSongsTaskId) {
-                                        songQueue.add(catalogViewData[i].songId)
-                                    } else {
-                                        break
-                                    }
-                                }
-                            } else {
-                                if (id == HomeHandler.addSongsTaskId) {
-                                    songQueue.add(catalogViewData[i].songId)
-                                } else {
-                                    break
-                                }
-                            }
-
-                        } catch (e: IndexOutOfBoundsException) {
-
-                        }
-
-                    }
-                }, {}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-
+                playSongsFromViewData(view.context, skipMonstercatSongs, catalogViewData, itemIndex)
             }
 
             false
