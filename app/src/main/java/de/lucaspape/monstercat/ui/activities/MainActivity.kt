@@ -48,14 +48,6 @@ var downloadServiceIntent: Intent? = null
  * Main activity
  */
 class MainActivity : AppCompatActivity() {
-    private var fallbackFile = File("")
-    private var fallbackFileLow = File("")
-
-    private var fallbackBlackFile = File("")
-    private var fallbackBlackFileLow = File("")
-    private var fallbackWhiteFile = File("")
-    private var fallbackWhiteFileLow = File("")
-
     private var currentFragment: Fragment? = null
 
     //callback function for back pressed
@@ -146,13 +138,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        fallbackFile = File("$dataDir/fallback.webp")
-        fallbackFileLow = File("$dataDir/fallback_low.webp")
-
-        fallbackBlackFile = File("$dataDir/fallback_black.webp")
-        fallbackBlackFileLow = File("$dataDir/fallback_black_low.webp")
-        fallbackWhiteFile = File("$dataDir/fallback_white.webp")
-        fallbackWhiteFileLow = File("$dataDir/fallback_white_low.webp")
+        //set files for fallback covers
+        setFallbackCoverFiles(this)
 
         //check for internet
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET)
@@ -161,6 +148,7 @@ class MainActivity : AppCompatActivity() {
             displayInfo(this, getString(R.string.noInternetAccessError))
         }
 
+        //download fallback covers
         downloadFallbackCoverImages()
 
         //adjust theme
@@ -168,6 +156,7 @@ class MainActivity : AppCompatActivity() {
 
         val settings = Settings.getSettings(this)
 
+        //check for app version, if changed reset player state
         if (settings.getString(getString(R.string.appVersionSetting)) != packageManager.getPackageInfo(
                 packageName,
                 0
@@ -185,18 +174,9 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-        settings.getInt(getString(R.string.crossfadeTimeSetting))?.let {
-            crossfade = it
-        }
+        applyPlayerSettings(this)
 
-        settings.getFloat(getString(R.string.volumeSetting))?.let {
-            volume = it
-        }
-
-        settings.getBoolean(getString(R.string.playRelatedSetting))?.let {
-            playRelatedSongsAfterPlaylistFinished = it
-        }
-
+        //login
         if (!loggedIn) {
             Auth().checkLogin(this, {
                 //login success
@@ -211,7 +191,7 @@ class MainActivity : AppCompatActivity() {
                     sPassword?.let { password ->
                         //login to monstercat
                         Auth().login(this, username, password, {
-                            displayInfo(this, getString(R.string.loginSuccessfulMsg))
+                            println(getString(R.string.loginSuccessfulMsg))
                         }, {
                             displayInfo(this, getString(R.string.loginFailedMsg))
                         })
@@ -223,7 +203,7 @@ class MainActivity : AppCompatActivity() {
         val intentExtras = intent.extras
         val path = intent.data?.path
 
-
+        //check for extras in intent (open search on startup, open album or playlist on startup using links)
         when {
             intentExtras?.get("search") != null -> {
                 search(intentExtras["search"] as String)
@@ -299,6 +279,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        //start download service
         if (DownloadService.downloadTask?.status != AsyncTask.Status.RUNNING) {
             downloadServiceIntent = Intent(this, DownloadService::class.java)
             startService(downloadServiceIntent)

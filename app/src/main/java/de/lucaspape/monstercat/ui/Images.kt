@@ -1,8 +1,29 @@
 package de.lucaspape.monstercat.ui
 
+import android.content.Context
+import java.io.File
+
 /**
  * Yes this is kinda ugly but it works so i dont give a shit
  */
+
+var fallbackFile = File("")
+var fallbackFileLow = File("")
+
+var fallbackBlackFile = File("")
+var fallbackBlackFileLow = File("")
+var fallbackWhiteFile = File("")
+var fallbackWhiteFileLow = File("")
+
+fun setFallbackCoverFiles(context: Context){
+    fallbackFile = File("${context.dataDir}/fallback.webp")
+    fallbackFileLow = File("${context.dataDir}/fallback_low.webp")
+
+    fallbackBlackFile = File("${context.dataDir}/fallback_black.webp")
+    fallbackBlackFileLow = File("${context.dataDir}/fallback_black_low.webp")
+    fallbackWhiteFile = File("${context.dataDir}/fallback_white.webp")
+    fallbackWhiteFileLow = File("${context.dataDir}/fallback_white_low.webp")
+}
 
 var offlineDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_offline_pin_24dp"
 var downloadDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_file_download_24dp"

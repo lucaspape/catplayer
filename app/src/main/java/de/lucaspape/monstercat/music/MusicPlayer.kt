@@ -52,7 +52,7 @@ var loop = false
 var loopSingle = false
 var shuffle = false
 var crossfade = 12000
-var volume:Float = 1.0f
+var volume: Float = 1.0f
     set(value) {
         exoPlayer?.audioComponent?.volume = value
         field = value
@@ -99,13 +99,13 @@ class NoisyReceiver : BroadcastReceiver() {
  * Create mediaSession and listen for callbacks (pause, play buttons on headphones etc.)
  */
 fun createMediaSession() {
-    contextReference?.get()?.let {
+    contextReference?.get()?.let { context ->
         if (!sessionCreated || mediaSession == null) {
-            PlayerSaveState.restoreMusicPlayerState(it, false)
+            PlayerSaveState.restoreMusicPlayerState(context, false)
 
             mediaSession = MediaSessionCompat.fromMediaSession(
-                it,
-                MediaSession(it, "de.lucaspape.monstercat.music")
+                context,
+                MediaSession(context, "de.lucaspape.monstercat.music")
             )
 
             mediaSession?.setCallback(MediaSessionCallback())
@@ -114,6 +114,22 @@ fun createMediaSession() {
 
             sessionCreated = true
         }
+    }
+}
+
+fun applyPlayerSettings(context: Context) {
+    val settings = Settings.getSettings(context)
+
+    settings.getInt(context.getString(R.string.crossfadeTimeSetting))?.let {
+        crossfade = it
+    }
+
+    settings.getFloat(context.getString(R.string.volumeSetting))?.let {
+        volume = it
+    }
+
+    settings.getBoolean(context.getString(R.string.playRelatedSetting))?.let {
+        playRelatedSongsAfterPlaylistFinished = it
     }
 }
 
@@ -176,9 +192,14 @@ internal fun resume() {
 
     contextReference?.get()?.let { context ->
         //check if should resume livestream or song
-        if(streamInfoUpdateAsync?.status == AsyncTask.Status.RUNNING){
-            playStream(Stream(context.getString(R.string.twitchClientID), context.getString(R.string.twitchChannel)))
-        }else{
+        if (streamInfoUpdateAsync?.status == AsyncTask.Status.RUNNING) {
+            playStream(
+                Stream(
+                    context.getString(R.string.twitchClientID),
+                    context.getString(R.string.twitchChannel)
+                )
+            )
+        } else {
             val intentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
 
             context.registerReceiver(
@@ -247,9 +268,9 @@ private fun nextSong(): String {
         prioritySongQueue.removeAt(0)
 
         try {
-            playlist.add(playlistIndex+1, songId)
+            playlist.add(playlistIndex + 1, songId)
             playlistIndex++
-        }catch (e: IndexOutOfBoundsException){
+        } catch (e: IndexOutOfBoundsException) {
             playlist.add(songId)
             skipPreviousInPlaylist()
         }
@@ -327,7 +348,7 @@ private fun previousSong(): String {
 /**
  * Return next song without making changes to vars, only for prediction
  */
-val nextSongId:String
+val nextSongId: String
     get() {
         if (loopSingle && playlist.size >= playlistIndex) {
             //loop single
@@ -367,7 +388,7 @@ val nextSongId:String
 /**
  * Returns songId of currently playing song
  */
-val currentSongId:String
+val currentSongId: String
     get() {
         return when {
             streamInfoUpdateAsync?.status == AsyncTask.Status.RUNNING -> {
@@ -424,19 +445,19 @@ fun playRelatedSongs() {
         weakReference.get()?.let { context ->
             Settings.getSettings(context)
                 .getBoolean(context.getString(R.string.skipMonstercatSongsSetting))?.let {
-                LoadRelatedTracksAsync(weakReference, playlist, it,
-                    finishedCallback = { _, relatedIdArray ->
-                        for (songId in relatedIdArray) {
-                            songQueue.add(songId)
-                        }
+                    LoadRelatedTracksAsync(weakReference, playlist, it,
+                        finishedCallback = { _, relatedIdArray ->
+                            for (songId in relatedIdArray) {
+                                songQueue.add(songId)
+                            }
 
-                        skipPreviousInPlaylist()
-                        next()
-                    },
-                    errorCallback = {
-                        //TODO handle error
-                    }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-            }
+                            skipPreviousInPlaylist()
+                            next()
+                        },
+                        errorCallback = {
+                            //TODO handle error
+                        }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                }
         }
 
     }

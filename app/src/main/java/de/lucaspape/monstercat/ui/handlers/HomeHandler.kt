@@ -877,7 +877,7 @@ class HomeHandler(
 
             swipeRefreshLayout.isRefreshing = true
 
-            loadAlbumTracks(view.context, albumMcId, finishedCallback = { _ ->
+            loadAlbumTracks(view.context, albumMcId, finishedCallback = {
                 val albumDatabaseHelper = AlbumDatabaseHelper(view.context)
                 albumDatabaseHelper.getAlbumFromMcId(albumMcId)?.let { album ->
                     val albumItemDatabaseHelper =
