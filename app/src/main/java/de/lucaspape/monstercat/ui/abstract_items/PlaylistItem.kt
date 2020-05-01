@@ -21,10 +21,7 @@ import de.lucaspape.monstercat.download.downloadCoverIntoImageReceiver
 import de.lucaspape.monstercat.ui.*
 import de.lucaspape.monstercat.ui.handlers.*
 import de.lucaspape.monstercat.ui.handlers.deletePlaylist
-import de.lucaspape.monstercat.ui.handlers.downloadPlaylist
-import de.lucaspape.monstercat.ui.handlers.playPlaylistNext
 import de.lucaspape.monstercat.ui.handlers.renamePlaylist
-import de.lucaspape.monstercat.ui.handlers.togglePlaylistPublicState
 import de.lucaspape.util.BackgroundAsync
 import de.lucaspape.monstercat.util.displayAlertDialogList
 import java.io.File
@@ -67,13 +64,13 @@ open class PlaylistItem(
                 ) { _, item ->
                     when (item.itemText) {
                         view.context.getString(R.string.download) -> {
-                            downloadPlaylist(
+                            downloadPlaylistAsync(
                                 view,
                                 id
                             ) {}
                         }
                         view.context.getString(R.string.addToQueue) -> {
-                            playPlaylistNext(view.context, id)
+                            playPlaylistNextAsync(view.context, id)
                         }
                         view.context.getString(R.string.delete) -> {
                             deletePlaylist(view, id)
@@ -82,11 +79,11 @@ open class PlaylistItem(
                             renamePlaylist(view, id)
                         }
                         view.context.getString(R.string.makePlaylistPrivate) -> {
-                            togglePlaylistPublicState(view, id)
+                            togglePlaylistPublicStateAsync(view, id)
                         }
 
                         view.context.getString(R.string.makePlaylistPublic) -> {
-                            togglePlaylistPublicState(view, id)
+                            togglePlaylistPublicStateAsync(view, id)
                         }
 
                         view.context.getString(R.string.sharePlaylist) -> {

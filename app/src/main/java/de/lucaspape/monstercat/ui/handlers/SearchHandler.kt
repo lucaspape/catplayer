@@ -119,7 +119,7 @@ class SearchHandler(
                 val skipMonstercatSongs =
                     Settings(view.context).getBoolean(view.context.getString(R.string.skipMonstercatSongsSetting)) == true
 
-                playSongsFromViewData(view.context, skipMonstercatSongs, catalogViewData, itemIndex)
+                playSongsFromViewDataAsync(view.context, skipMonstercatSongs, catalogViewData, itemIndex)
             }
 
             false

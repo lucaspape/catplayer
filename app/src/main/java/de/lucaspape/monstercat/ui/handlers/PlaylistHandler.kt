@@ -86,7 +86,7 @@ class PlaylistHandler(private val initPlaylistId: String?) : Handler {
             val itemIndex = position + itemIndexOffset
 
             if (itemIndex >= 0) {
-                playSongsFromViewData(
+                playSongsFromViewDataAsync(
                     view.context,
                     Settings(view.context).getBoolean(view.context.getString(R.string.skipMonstercatSongsSetting)) == true,
                     data,
@@ -316,7 +316,7 @@ class PlaylistHandler(private val initPlaylistId: String?) : Handler {
                 } else {
                     val titleDownloadButton = v as ImageButton
 
-                    downloadPlaylist(view, item.playlistId) {
+                    downloadPlaylistAsync(view, item.playlistId) {
                         titleDownloadButton.setImageURI(
                             item.getDownloadStatus(view.context).toUri()
                         )

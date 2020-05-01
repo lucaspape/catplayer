@@ -118,9 +118,9 @@ class HomeHandler(
                     Settings(view.context).getBoolean(view.context.getString(R.string.skipMonstercatSongsSetting)) == true
 
                 if (albumId == null) {
-                    playSongsFromCatalogDb(view.context, skipMonstercatSongs, fistItem.songId)
+                    playSongsFromCatalogDbAsync(view.context, skipMonstercatSongs, fistItem.songId)
                 } else {
-                    playSongsFromViewData(view.context, skipMonstercatSongs, catalogViewData, itemIndex)
+                    playSongsFromViewDataAsync(view.context, skipMonstercatSongs, catalogViewData, itemIndex)
                 }
             }
 
