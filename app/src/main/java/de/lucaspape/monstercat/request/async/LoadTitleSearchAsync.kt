@@ -37,7 +37,7 @@ class LoadTitleSearchAsync(
             val searchQueue =
                 getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
-            searchQueue.add(newSearchTrackRequest(context, searchString, skip, false, {
+            newSearchTrackRequest(context, searchString, skip, false, {
                 val jsonArray = it.getJSONArray("results")
 
                 val songList =
@@ -55,12 +55,14 @@ class LoadTitleSearchAsync(
                 synchronized(syncObject) {
                     syncObject.notify()
                 }
-            }))
+            })?.let {
+                searchQueue.add(it)
 
-            synchronized(syncObject) {
-                syncObject.wait()
+                synchronized(syncObject) {
+                    syncObject.wait()
 
-                return success
+                    return success
+                }
             }
         }
 

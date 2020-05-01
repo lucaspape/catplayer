@@ -180,7 +180,7 @@ class MainActivity : AppCompatActivity() {
         if (!loggedIn) {
             Auth().checkLogin(this, {
                 //login success
-                displayInfo(this, getString(R.string.loginSuccessfulMsg))
+                println(getString(R.string.loginSuccessfulMsg))
             }, {
                 //login failed, retrieve new SID
 

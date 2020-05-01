@@ -32,7 +32,7 @@ class AddTrackToDbAsync(
             val volleyQueue =
                 getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
-            volleyQueue.add(newSearchTrackRequest(context, trackId, 0, true, {
+            newSearchTrackRequest(context, trackId, 0, true, {
                 val jsonArray = it.getJSONArray("results")
 
                 for (i in (0 until jsonArray.length())) {
@@ -46,12 +46,14 @@ class AddTrackToDbAsync(
                 synchronized(syncObject) {
                     syncObject.notify()
                 }
-            }))
+            })?.let {
+                volleyQueue.add(it)
 
-            synchronized(syncObject) {
-                syncObject.wait()
+                synchronized(syncObject) {
+                    syncObject.wait()
 
-                return SongDatabaseHelper(context).getSong(context, trackId)
+                    return SongDatabaseHelper(context).getSong(context, trackId)
+                }
             }
         }
 
