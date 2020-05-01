@@ -9,6 +9,7 @@ import android.media.session.MediaSession
 import android.os.AsyncTask
 import android.support.v4.media.session.MediaSessionCompat
 import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.SimpleExoPlayer
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.music.notification.startPlayerService
@@ -23,10 +24,10 @@ import kotlin.random.Random
 
 internal var contextReference: WeakReference<Context>? = null
 
-var exoPlayer: ExoPlayer? = null
+var exoPlayer: SimpleExoPlayer? = null
     internal set
 
-var nextExoPlayer: ExoPlayer? = null
+var preparedExoPlayer: SimpleExoPlayer? = null
     internal set
 
 var songQueue = ArrayList<String>()

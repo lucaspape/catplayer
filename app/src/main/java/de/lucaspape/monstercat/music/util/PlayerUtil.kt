@@ -110,8 +110,8 @@ fun getPlayerListener(context: Context, songId: String): Player.EventListener {
                     exoPlayer?.currentPosition?.let { currentPosition ->
                         val timeLeft = duration - currentPosition
 
-                        if (timeLeft < crossfade) {
-                            nextExoPlayer?.playWhenReady = playWhenReady
+                        if (timeLeft < crossfade && preparedExoPlayerSongId == nextSongId) {
+                            preparedExoPlayer?.playWhenReady = playWhenReady
                         }
                     }
                 }

@@ -28,11 +28,9 @@ var preparedExoPlayerSongId = ""
 internal fun prepareSong(context: Context, songId: String, callback: () -> Unit) {
     if (preparedExoPlayerSongId != songId) {
         //new exoplayer
-        val newExoPlayer = SimpleExoPlayer.Builder(context).build()
-        newExoPlayer.audioAttributes =
+        preparedExoPlayer = SimpleExoPlayer.Builder(context).build()
+        preparedExoPlayer?.audioAttributes =
             getAudioAttributes()
-
-        nextExoPlayer = newExoPlayer
 
         SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
             if (song.playbackAllowed(context)
@@ -40,7 +38,7 @@ internal fun prepareSong(context: Context, songId: String, callback: () -> Unit)
                 val mediaSource = song.getMediaSource()
 
                 if (mediaSource != null) {
-                    nextExoPlayer?.prepare(mediaSource)
+                    preparedExoPlayer?.prepare(mediaSource)
                     preparedExoPlayerSongId = song.songId
                 } else {
                     displayInfo(context, context.getString(R.string.songNotPlayableError))
@@ -58,7 +56,7 @@ internal fun prepareSong(context: Context, songId: String, callback: () -> Unit)
                     val mediaSource = song.getMediaSource()
 
                     if (mediaSource != null) {
-                        nextExoPlayer?.prepare(mediaSource)
+                        preparedExoPlayer?.prepare(mediaSource)
                         preparedExoPlayerSongId = song.songId
                     } else {
                         displayInfo(context, context.getString(R.string.songNotPlayableError))
@@ -94,7 +92,7 @@ internal fun playSong(
         val preparingDone = {
             if (exoPlayerSongId != songId) {
                 exoPlayer =
-                    nextExoPlayer
+                    preparedExoPlayer
 
                 preparedExoPlayerSongId = ""
             }
@@ -242,7 +240,7 @@ internal fun runSeekBarUpdate(context: Context, prepareNext: Boolean, crossFade:
             }
 
             if (crossFade) {
-                if (timeLeft < crossfade && exoPlayer?.isPlaying == true) {
+                if (timeLeft < crossfade && exoPlayer?.isPlaying == true && nextSongId == preparedExoPlayerSongId) {
                     if (timeLeft >= 1) {
                         val crossVolume = 1- log(100-((crossfade.toFloat() - timeLeft) / crossfade*100), 100.toFloat())
 
@@ -250,7 +248,7 @@ internal fun runSeekBarUpdate(context: Context, prepareNext: Boolean, crossFade:
                         val lowerVolume = volume - higherVolume
 
                         if(higherVolume > 0.toFloat() && higherVolume.isFinite()){
-                            nextExoPlayer?.audioComponent?.volume = higherVolume
+                            preparedExoPlayer?.audioComponent?.volume = higherVolume
                         }
 
                         if(lowerVolume > 0.toFloat() &&lowerVolume.isFinite()){
@@ -258,7 +256,7 @@ internal fun runSeekBarUpdate(context: Context, prepareNext: Boolean, crossFade:
                         }
                     }
 
-                    nextExoPlayer?.playWhenReady = true
+                    preparedExoPlayer?.playWhenReady = true
                 }
             }
 
