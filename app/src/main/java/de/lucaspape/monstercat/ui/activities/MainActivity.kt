@@ -30,10 +30,7 @@ import de.lucaspape.monstercat.music.save.PlayerSaveState
 import de.lucaspape.monstercat.music.util.*
 import de.lucaspape.monstercat.music.util.setCover
 import de.lucaspape.monstercat.ui.*
-import de.lucaspape.monstercat.ui.handlers.HomeHandler
-import de.lucaspape.monstercat.ui.handlers.PlaylistHandler
-import de.lucaspape.monstercat.ui.handlers.SearchHandler
-import de.lucaspape.monstercat.ui.handlers.SettingsHandler
+import de.lucaspape.monstercat.ui.handlers.*
 import de.lucaspape.monstercat.util.*
 import de.lucaspape.util.Settings
 import java.io.File
@@ -155,6 +152,10 @@ class MainActivity : AppCompatActivity() {
         changeTheme()
 
         val settings = Settings.getSettings(this)
+
+        if (settings.getString(getString(R.string.customApiSupportsV1Setting)) == null) {
+            checkCustomApiFeaturesAsync(this, {}, {})
+        }
 
         //check for app version, if changed reset player state
         if (settings.getString(getString(R.string.appVersionSetting)) != packageManager.getPackageInfo(

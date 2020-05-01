@@ -738,3 +738,16 @@ internal fun playSongsFromViewDataAsync(
         }
     }, {}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }
+
+fun checkCustomApiFeaturesAsync(
+    context: Context,
+    callback: () -> Unit,
+    errorCallback: () -> Unit
+) {
+    //check for custom api features
+    CheckCustomApiFeaturesAsync(
+        WeakReference(context),
+        callback,
+        errorCallback
+    ).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+}
