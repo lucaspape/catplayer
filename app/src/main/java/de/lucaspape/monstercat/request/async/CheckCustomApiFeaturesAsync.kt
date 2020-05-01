@@ -7,6 +7,7 @@ import de.lucaspape.monstercat.request.newCustomApiFeatureRequest
 import de.lucaspape.monstercat.util.getAuthorizedRequestQueue
 import de.lucaspape.util.Settings
 import org.json.JSONException
+import java.lang.IndexOutOfBoundsException
 import java.lang.ref.WeakReference
 
 class CheckCustomApiFeaturesAsync(
@@ -53,6 +54,9 @@ class CheckCustomApiFeaturesAsync(
                             )
                         }
                     }
+
+                    settings.setString(context.getString(R.string.customDownloadUrlSetting), it.getString("download_base_url"))
+                    settings.setString(context.getString(R.string.customStreamUrlSetting), it.getString("stream_base_url"))
 
                     synchronized(syncObject) {
                         syncObject.notify()

@@ -93,13 +93,21 @@ data class Song(
             context
         ).getString("downloadType")
 
-    val downloadUrl =
+    val downloadUrl = if(Settings.getSettings(context).getBoolean(context.getString(R.string.useCustomApiSetting)) == true && Settings.getSettings(context).getBoolean(context.getString(R.string.customApiSupportsV1Setting)) == true){
+        Settings.getSettings(context).getString(context.getString(R.string.customDownloadUrlSetting)) + albumId + "/track-download/" + songId + "?format=" + Settings.getSettings(
+            context
+        ).getString("downloadType")
+    }else{
         context.getString(R.string.trackContentUrl) + albumId + "/track-download/" + songId + "?format=" + Settings.getSettings(
             context
         ).getString("downloadType")
+    }
 
-    val streamUrl: String =
+    private val streamUrl = if(Settings.getSettings(context).getBoolean(context.getString(R.string.useCustomApiSetting)) == true && Settings.getSettings(context).getBoolean(context.getString(R.string.customApiSupportsV1Setting)) == true){
+        Settings.getSettings(context).getString(context.getString(R.string.customStreamUrlSetting)) + albumId + "/track-stream/" + songId
+    }else{
         context.getString(R.string.trackContentUrl) + albumId + "/track-stream/" + songId
+    }
 
     fun getSongDownloadStatus(): String {
         return when {

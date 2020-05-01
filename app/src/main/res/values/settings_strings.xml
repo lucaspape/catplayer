@@ -24,4 +24,6 @@
     <string name="customApiSupportsV2Setting" translatable="false">customApiSupportsV2</string>
     <string name="customApiSupportsV1Setting" translatable="false">customApiSupportsV1</string>
     <string name="customApiBaseUrlSetting" translatable="false">customApiBaseUrl</string>
+    <string name="customDownloadUrlSetting" translatable="false">customDownloadUrl</string>
+    <string name="customStreamUrlSetting" translatable="false">customStreamUrl</string>
 </resources>
