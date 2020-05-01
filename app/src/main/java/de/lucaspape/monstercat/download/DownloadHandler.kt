@@ -25,7 +25,6 @@ internal val downloadList = ArrayList<SoftReference<DownloadObject>>()
 
 internal var downloadedSongs = 0
 
-internal val targetList = ArrayList<SoftReference<com.squareup.picasso.Target>>()
 internal val bitmapCache = HashMap<String, SoftReference<Bitmap?>>()
 
 fun addDownloadSong(context: Context, songId: String, downloadFinished: () -> Unit) {
@@ -105,19 +104,18 @@ internal fun downloadImageUrlIntoImageReceiver(
                     }
                 }
 
-                //to prevent garbage collect
-                targetList.add(SoftReference(picassoTarget))
-
                 if (placeholder != null) {
                     Picasso.get()
                         .load("$url?image_width=$resolution")
                         .error(placeholder)
                         .placeholder(placeholder)
                         .into(picassoTarget)
+                    imageReceiver.setTag(picassoTarget)
                 } else {
                     Picasso.get()
                         .load("$url?image_width=$resolution")
                         .into(picassoTarget)
+                    imageReceiver.setTag(picassoTarget)
                 }
             } else {
                 imageReceiver.setDrawable(imageId, placeholder)

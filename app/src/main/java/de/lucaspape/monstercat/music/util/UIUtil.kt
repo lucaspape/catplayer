@@ -13,6 +13,7 @@ import android.widget.SeekBar
 import android.widget.TextView
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
+import com.squareup.picasso.Target
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.downloadCoverIntoImageReceiver
 import de.lucaspape.monstercat.download.ImageReceiverInterface
@@ -217,6 +218,8 @@ internal fun setCover(context: Context, songId: String, callback: (bitmap: Bitma
     }
 }
 
+private val targetList = ArrayList<Target>()
+
 internal fun setCover(
     context: Context,
     albumId: String,
@@ -248,6 +251,10 @@ internal fun setCover(
                 }
             }
         }
+
+        override fun setTag(target: Target) {
+            targetList.add(target)
+        }
     }, albumId, false)
 
     downloadArtistImageIntoImageReceiver(context, object : ImageReceiverInterface {
@@ -261,6 +268,10 @@ internal fun setCover(
             if (id == artistId) {
                 artistDrawable = drawable
             }
+        }
+
+        override fun setTag(target: Target) {
+            targetList.add(target)
         }
     }, artistId)
 }
@@ -291,6 +302,10 @@ internal fun setCustomCover(
                     callback(it)
                 }
             }
+        }
+
+        override fun setTag(target: Target) {
+            targetList.add(target)
         }
     }, false, coverId, coverUrl)
 }

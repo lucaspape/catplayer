@@ -11,6 +11,7 @@ import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.notification.startPlayerService
 import de.lucaspape.monstercat.music.notification.updateNotification
 import de.lucaspape.util.Settings
+import java.lang.ref.WeakReference
 import java.util.*
 
 fun getAudioAttributes(): AudioAttributes {
@@ -35,7 +36,9 @@ fun requestAudioFocus(context: Context): Int {
             val audioFocusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
                 .setAudioAttributes(audioAttributes)
                 .setAcceptsDelayedFocusGain(false)
-                .setOnAudioFocusChangeListener(AudioFocusChangeListener.getAudioFocusChangeListener(context))
+                .setOnAudioFocusChangeListener(AudioFocusChangeListener.getAudioFocusChangeListener(
+                    WeakReference(context)
+                ))
                 .build()
 
             val audioManager =
@@ -47,7 +50,7 @@ fun requestAudioFocus(context: Context): Int {
 
             @Suppress("DEPRECATION")
             audioManager.requestAudioFocus(
-                AudioFocusChangeListener.getAudioFocusChangeListener(context),
+                AudioFocusChangeListener.getAudioFocusChangeListener(WeakReference(context)),
                 AudioManager.STREAM_MUSIC,
                 AudioManager.AUDIOFOCUS_GAIN
             )

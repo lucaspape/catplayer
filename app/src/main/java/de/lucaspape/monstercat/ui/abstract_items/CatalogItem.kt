@@ -11,6 +11,7 @@ import android.widget.TextView
 import androidx.core.net.toUri
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
+import com.squareup.picasso.Target
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadSong
@@ -184,6 +185,10 @@ open class CatalogItem(
                         if (id == albumId) {
                             coverImageView.setImageDrawable(drawable)
                         }
+                    }
+
+                    override fun setTag(target: Target) {
+                        coverImageView.tag = target
                     }
                 }, song.albumId, true)
 

@@ -12,6 +12,7 @@ import android.widget.TextView
 import androidx.core.net.toUri
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
+import com.squareup.picasso.Target
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
@@ -163,6 +164,10 @@ open class PlaylistItem(
                         if (id == "") {
                             coverImageView.setImageDrawable(drawable)
                         }
+                    }
+
+                    override fun setTag(target: Target) {
+                        coverImageView.tag = target
                     }
                 }, "", true)
 

@@ -8,6 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
+import com.squareup.picasso.Target
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.AlbumDatabaseHelper
 import de.lucaspape.monstercat.download.downloadCoverIntoImageReceiver
@@ -108,6 +109,10 @@ open class AlbumItem(
                     if (id == albumId) {
                         coverImageView.setImageDrawable(drawable)
                     }
+                }
+
+                override fun setTag(target: Target) {
+                    coverImageView.tag = target
                 }
             }, item.albumId, false)
         }

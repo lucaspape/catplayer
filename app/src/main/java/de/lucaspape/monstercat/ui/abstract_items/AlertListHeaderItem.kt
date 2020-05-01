@@ -7,6 +7,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
+import com.squareup.picasso.Target
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.download.ImageReceiverInterface
 import de.lucaspape.monstercat.download.downloadCoverIntoImageReceiver
@@ -43,6 +44,10 @@ open class AlertListHeaderItem(private val headerText: String, private val album
                     if (id == item.albumId) {
                         headerItemImage.setImageDrawable(drawable)
                     }
+                }
+
+                override fun setTag(target: Target) {
+                    headerItemImage.tag = target
                 }
             }, item.albumId, false)
         }
