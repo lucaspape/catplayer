@@ -8,6 +8,8 @@ import android.os.AsyncTask
 import com.squareup.picasso.Picasso
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.download.DownloadService.Companion.downloadTask
+import de.lucaspape.monstercat.ui.fallbackFile
+import de.lucaspape.monstercat.ui.fallbackFileLow
 import de.lucaspape.util.Settings
 import de.lucaspape.monstercat.util.wifiConnected
 import java.io.File
@@ -61,9 +63,9 @@ internal fun downloadImageUrlIntoImageReceiver(
         imageReceiver.setBitmap(imageId, cacheBitmap)
     } else {
         val placeholder = if (!lowRes) {
-            Drawable.createFromPath(context.dataDir.toString() + "/fallback.webp")
+            Drawable.createFromPath(fallbackFile.absolutePath)
         } else {
-            Drawable.createFromPath(context.dataDir.toString() + "/fallback_low.webp")
+            Drawable.createFromPath(fallbackFileLow.absolutePath)
         }
 
         val cacheFile = File(context.cacheDir.toString() + "/$imageId-$resolution.webp")
