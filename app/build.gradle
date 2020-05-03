@@ -47,9 +47,8 @@ dependencies {
     implementation 'com.android.volley:volley:1.1.1'
     implementation 'com.google.android.material:material:1.2.0-alpha06'
 
-    compile (name: 'exoplayer-library-core-release', ext:'aar')
-    compile (name: 'exoplayer-library-hls-release', ext:'aar')
-    compile (name: 'exoplayer-extension-flac-release', ext:'aar')
+    //exoplayer
+    implementation fileTree(dir: 'src/main/libs', include: ['*.aar'])
 
     implementation "com.mikepenz:fastadapter:5.0.0"
     implementation "com.mikepenz:fastadapter-extensions-scroll:5.0.0"
