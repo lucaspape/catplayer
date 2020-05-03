@@ -47,9 +47,9 @@ dependencies {
     implementation 'com.android.volley:volley:1.1.1'
     implementation 'com.google.android.material:material:1.2.0-alpha06'
 
-    implementation project(':exoplayer-library-core')
-    implementation project(':exoplayer-library-hls')
-    implementation project(':exoplayer-extension-flac')
+    compile (name: 'exoplayer-library-core-release', ext:'aar')
+    compile (name: 'exoplayer-library-hls-release', ext:'aar')
+    compile (name: 'exoplayer-extension-flac-release', ext:'aar')
 
     implementation "com.mikepenz:fastadapter:5.0.0"
     implementation "com.mikepenz:fastadapter-extensions-scroll:5.0.0"
