@@ -33,7 +33,7 @@ class LoadRelatedTracksAsync(
             val volleyQueue =
                 getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
-            volleyQueue.add(newLoadRelatedTracksRequest(context, trackIdArray, skipMC, {
+            newLoadRelatedTracksRequest(context, trackIdArray, skipMC, {
                 try {
                     val relatedJsonArray = it.getJSONArray("results")
 
@@ -53,7 +53,9 @@ class LoadRelatedTracksAsync(
                 synchronized(syncObject) {
                     syncObject.notify()
                 }
-            }))
+            })?.let {
+                volleyQueue.add(it)
+            }
 
             synchronized(syncObject) {
                 syncObject.wait()
