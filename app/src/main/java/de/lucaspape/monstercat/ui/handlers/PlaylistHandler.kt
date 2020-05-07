@@ -20,8 +20,8 @@ import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.ui.abstract_items.CatalogItem
 import de.lucaspape.monstercat.ui.abstract_items.HeaderTextItem
 import de.lucaspape.monstercat.ui.abstract_items.PlaylistItem
-import de.lucaspape.monstercat.request.async.LoadPlaylistAsync
-import de.lucaspape.monstercat.request.async.LoadPlaylistTracksAsync
+import de.lucaspape.monstercat.request.async.loadPlaylistAsync
+import de.lucaspape.monstercat.request.async.loadPlaylistTracksAsync
 import de.lucaspape.monstercat.ui.activities.MainActivity
 import de.lucaspape.monstercat.ui.offlineDrawable
 import de.lucaspape.monstercat.util.*
@@ -345,8 +345,6 @@ class PlaylistHandler(private val initPlaylistId: String?) : Handler {
      * Load playlists
      */
     private fun loadPlaylist(view: View, forceReload: Boolean) {
-        val contextReference = WeakReference(view.context)
-
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
 
@@ -365,34 +363,29 @@ class PlaylistHandler(private val initPlaylistId: String?) : Handler {
         if (playlistViewData.isEmpty() || forceReload) {
             playlistViewData = ArrayList()
 
-            LoadPlaylistAsync(
-                contextReference,
-                forceReload, true, displayLoading = {
-                    swipeRefreshLayout.isRefreshing = true
-                }
-                , finishedCallback = { _, _ ->
-                    BackgroundAsync({
+            loadPlaylistAsync(view.context, forceReload, true, {}, { _, _ ->
+                BackgroundAsync({
 
-                        val playlistDatabaseHelper =
-                            PlaylistDatabaseHelper(view.context)
-                        val playlists = playlistDatabaseHelper.getAllPlaylists()
+                    val playlistDatabaseHelper =
+                        PlaylistDatabaseHelper(view.context)
+                    val playlists = playlistDatabaseHelper.getAllPlaylists()
 
-                        for (playlist in playlists) {
-                            playlistViewData.add(PlaylistItem(playlist.playlistId))
-                        }
+                    for (playlist in playlists) {
+                        playlistViewData.add(PlaylistItem(playlist.playlistId))
+                    }
 
-                    }, {
-                        displayData()
+                }, {
+                    displayData()
 
-                    }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-                }, errorCallback = { _, _ ->
-                    swipeRefreshLayout.isRefreshing = false
-                    displaySnackBar(
-                        view,
-                        view.context.getString(R.string.errorLoadingPlaylists),
-                        view.context.getString(R.string.retry)
-                    ) { loadPlaylist(view, forceReload) }
                 }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+            }, { _, _ ->
+                swipeRefreshLayout.isRefreshing = false
+                displaySnackBar(
+                    view,
+                    view.context.getString(R.string.errorLoadingPlaylists),
+                    view.context.getString(R.string.retry)
+                ) { loadPlaylist(view, forceReload) }
+            })
         } else {
             displayData()
         }
@@ -406,8 +399,6 @@ class PlaylistHandler(private val initPlaylistId: String?) : Handler {
         forceReload: Boolean,
         playlistId: String
     ) {
-        val contextReference = WeakReference(view.context)
-
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
 
@@ -434,8 +425,8 @@ class PlaylistHandler(private val initPlaylistId: String?) : Handler {
         }
 
         if (playlistContentViewData[playlistId] == null || forceReload) {
-            LoadPlaylistTracksAsync(
-                contextReference,
+            loadPlaylistTracksAsync(
+                view.context,
                 forceReload,
                 playlistId, displayLoading = {
                     swipeRefreshLayout.isRefreshing = true
@@ -468,7 +459,7 @@ class PlaylistHandler(private val initPlaylistId: String?) : Handler {
                     ) {
                         loadPlaylistTracks(view, forceReload, playlistId)
                     }
-                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                })
         } else {
             displayData()
         }
@@ -498,30 +489,27 @@ class PlaylistHandler(private val initPlaylistId: String?) : Handler {
             val swipeRefreshLayout =
                 view.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
 
-            LoadPlaylistAsync(
-                WeakReference(view.context),
-                false, loadManual = true, displayLoading = {
-                    swipeRefreshLayout.isRefreshing = true
-                }
-                , finishedCallback = { _, _ ->
-                    BackgroundAsync({
+            loadPlaylistAsync(view.context, false, true, {
+                swipeRefreshLayout.isRefreshing = true
+            }, { _, _ ->
+                BackgroundAsync({
 
-                        val playlistDatabaseHelper =
-                            PlaylistDatabaseHelper(view.context)
-                        val playlists = playlistDatabaseHelper.getAllPlaylists()
+                    val playlistDatabaseHelper =
+                        PlaylistDatabaseHelper(view.context)
+                    val playlists = playlistDatabaseHelper.getAllPlaylists()
 
-                        for (playlist in playlists) {
-                            playlistViewData.add(PlaylistItem(playlist.playlistId))
-                        }
+                    for (playlist in playlists) {
+                        playlistViewData.add(PlaylistItem(playlist.playlistId))
+                    }
 
-                    }, {
-                        loadPlaylistTracks(view, false, initPlaylistId)
-                        swipeRefreshLayout.isRefreshing = false
-                    }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-                }, errorCallback = { _, _ ->
+                }, {
                     loadPlaylistTracks(view, false, initPlaylistId)
                     swipeRefreshLayout.isRefreshing = false
                 }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+            }, { _, _ ->
+                loadPlaylistTracks(view, false, initPlaylistId)
+                swipeRefreshLayout.isRefreshing = false
+            })
         } else if (username != null || password != null) {
             loadPlaylist(view, false)
         } else {

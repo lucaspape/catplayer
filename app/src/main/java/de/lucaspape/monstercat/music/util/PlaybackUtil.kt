@@ -10,7 +10,7 @@ import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.notification.startPlayerService
 import de.lucaspape.monstercat.music.notification.updateNotification
-import de.lucaspape.monstercat.request.async.AddTrackToDbAsync
+import de.lucaspape.monstercat.request.async.addTrackToDBAsync
 import de.lucaspape.monstercat.twitch.Stream
 import de.lucaspape.monstercat.util.*
 import de.lucaspape.util.Settings
@@ -48,24 +48,18 @@ internal fun prepareSong(context: Context, songId: String, callback: () -> Unit)
             return
         }
 
-        AddTrackToDbAsync(WeakReference(context), songId, finishedCallback = { _, song ->
-            if (song.playbackAllowed(context)
-            ) {
-                val mediaSource = song.getMediaSource()
+        addTrackToDBAsync(context, songId, {_, song ->
+            val mediaSource = song.getMediaSource()
 
-                if (mediaSource != null) {
-                    preparedExoPlayer?.prepare(mediaSource)
-                    preparedExoPlayerSongId = song.songId
-                } else {
-                    displayInfo(context, context.getString(R.string.songNotPlayableError))
-                }
+            if (mediaSource != null) {
+                preparedExoPlayer?.prepare(mediaSource)
+                preparedExoPlayerSongId = song.songId
+            } else {
+                displayInfo(context, context.getString(R.string.songNotPlayableError))
             }
+        }, {
 
-            callback()
-
-        }, errorCallback = {
-        }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-
+        })
     }
 }
 

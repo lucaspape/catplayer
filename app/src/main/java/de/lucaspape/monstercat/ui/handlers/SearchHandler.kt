@@ -1,6 +1,5 @@
 package de.lucaspape.monstercat.ui.handlers
 
-import android.os.AsyncTask
 import android.view.View
 import android.widget.ImageButton
 import android.widget.SearchView
@@ -16,14 +15,13 @@ import com.mikepenz.fastadapter.scroll.EndlessRecyclerOnScrollListener
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadSong
-import de.lucaspape.monstercat.request.async.LoadTitleSearchAsync
+import de.lucaspape.monstercat.request.async.loadTitleSearchAsync
 import de.lucaspape.monstercat.ui.abstract_items.CatalogItem
 import de.lucaspape.monstercat.ui.abstract_items.HeaderTextItem
 import de.lucaspape.monstercat.ui.abstract_items.ProgressItem
 import de.lucaspape.monstercat.util.displaySnackBar
 import de.lucaspape.util.Settings
 import java.io.File
-import java.lang.ref.WeakReference
 import kotlin.collections.ArrayList
 
 class SearchHandler(
@@ -119,7 +117,12 @@ class SearchHandler(
                 val skipMonstercatSongs =
                     Settings(view.context).getBoolean(view.context.getString(R.string.skipMonstercatSongsSetting)) == true
 
-                playSongsFromViewDataAsync(view.context, skipMonstercatSongs, catalogViewData, itemIndex)
+                playSongsFromViewDataAsync(
+                    view.context,
+                    skipMonstercatSongs,
+                    catalogViewData,
+                    itemIndex
+                )
             }
 
             false
@@ -246,15 +249,13 @@ class SearchHandler(
         search.setQuery(searchString, false)
         search.clearFocus()
 
-        val contextReference = WeakReference(view.context)
-
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.searchPullToRefresh)
 
         swipeRefreshLayout.isRefreshing = true
 
-        LoadTitleSearchAsync(
-            contextReference,
+        loadTitleSearchAsync(
+            view.context,
             searchString,
             0
             , finishedCallback = { _, _, searchResults ->
@@ -287,10 +288,7 @@ class SearchHandler(
                     view.context.getString(R.string.errorLoadingSearch),
                     view.context.getString(R.string.retry)
                 ) { searchSong(view, searchString, forceReload) }
-            }).executeOnExecutor(
-            AsyncTask.THREAD_POOL_EXECUTOR
-        )
-
+            })
     }
 
     private fun searchMore(
@@ -301,12 +299,10 @@ class SearchHandler(
         currentPage: Int,
         callback: (newList: ArrayList<CatalogItem>) -> Unit
     ) {
-        val contextReference = WeakReference(view.context)
-
         val skip = currentPage * 50
 
-        LoadTitleSearchAsync(
-            contextReference,
+        loadTitleSearchAsync(
+            view.context,
             searchString,
             skip
             , finishedCallback = { _, _, searchResults ->
@@ -334,8 +330,6 @@ class SearchHandler(
                         callback
                     )
                 }
-            }).executeOnExecutor(
-            AsyncTask.THREAD_POOL_EXECUTOR
-        )
+            })
     }
 }

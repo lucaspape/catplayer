@@ -16,7 +16,7 @@ import de.lucaspape.monstercat.music.notification.stopPlayerService
 import de.lucaspape.monstercat.music.save.PlayerSaveState
 import de.lucaspape.monstercat.music.util.*
 import de.lucaspape.monstercat.music.util.playSong
-import de.lucaspape.monstercat.request.async.LoadRelatedTracksAsync
+import de.lucaspape.monstercat.request.async.loadRelatedTracksAsync
 import de.lucaspape.monstercat.twitch.Stream
 import de.lucaspape.util.Settings
 import java.lang.ref.WeakReference
@@ -447,8 +447,8 @@ fun skipPreviousInPlaylist() {
 fun playRelatedSongs(context: Context) {
     Settings.getSettings(context)
         .getBoolean(context.getString(R.string.skipMonstercatSongsSetting))?.let {
-            LoadRelatedTracksAsync(
-                WeakReference(context), playlist, it,
+            loadRelatedTracksAsync(
+                context, playlist, it,
                 finishedCallback = { _, relatedIdArray ->
                     for (songId in relatedIdArray) {
                         songQueue.add(songId)
@@ -459,8 +459,6 @@ fun playRelatedSongs(context: Context) {
                 },
                 errorCallback = {
                     //TODO handle error
-                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                })
         }
-
-
 }

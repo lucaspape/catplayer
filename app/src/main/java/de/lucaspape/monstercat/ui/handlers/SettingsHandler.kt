@@ -20,6 +20,7 @@ import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.music.crossfade
 import de.lucaspape.monstercat.music.playRelatedSongsAfterPlaylistFinished
 import de.lucaspape.monstercat.music.volume
+import de.lucaspape.monstercat.request.async.checkCustomApiFeaturesAsync
 import de.lucaspape.monstercat.ui.activities.MainActivity
 import de.lucaspape.monstercat.util.Auth
 import de.lucaspape.util.Settings

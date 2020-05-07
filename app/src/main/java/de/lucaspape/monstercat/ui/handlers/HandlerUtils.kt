@@ -26,7 +26,6 @@ import de.lucaspape.monstercat.util.*
 import de.lucaspape.util.BackgroundAsync
 import java.io.File
 import java.lang.IndexOutOfBoundsException
-import java.lang.ref.WeakReference
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -82,57 +81,55 @@ internal fun playAlbumNext(view: View, mcID: String) {
 }
 
 internal fun playPlaylistNextAsync(context: Context, playlistId: String) {
-    LoadPlaylistTracksAsync(WeakReference(context), true, playlistId, displayLoading = {},
-        finishedCallback = { _, _, _ ->
-            val playlistItemDatabaseHelper =
-                PlaylistItemDatabaseHelper(context, playlistId)
-            val playlistItemList = playlistItemDatabaseHelper.getAllData().reversed()
+    loadPlaylistTracksAsync(context, true, playlistId, {}, { _, _, _ ->
+        val playlistItemDatabaseHelper =
+            PlaylistItemDatabaseHelper(context, playlistId)
+        val playlistItemList = playlistItemDatabaseHelper.getAllData().reversed()
 
-            val songDatabaseHelper = SongDatabaseHelper(context)
+        val songDatabaseHelper = SongDatabaseHelper(context)
 
+        songDatabaseHelper.getSong(
+            context,
+            playlistItemList[0].songId
+        )?.songId?.let { songId ->
+            prioritySongQueue.add(songId)
+        }
+
+        for (i in (1 until playlistItemList.size)) {
             songDatabaseHelper.getSong(
                 context,
-                playlistItemList[0].songId
+                playlistItemList[i].songId
             )?.songId?.let { songId ->
                 prioritySongQueue.add(songId)
             }
-
-            for (i in (1 until playlistItemList.size)) {
-                songDatabaseHelper.getSong(
-                    context,
-                    playlistItemList[i].songId
-                )?.songId?.let { songId ->
-                    prioritySongQueue.add(songId)
-                }
-            }
-        }, errorCallback = { _, _, _ -> }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        }
+    }, { _, _, _ -> })
 }
 
 /**
  * Download an entire playlist
  */
 internal fun downloadPlaylistAsync(view: View, playlistId: String, downloadFinished: () -> Unit) {
-    LoadPlaylistTracksAsync(WeakReference(view.context), true, playlistId, displayLoading = {},
-        finishedCallback = { _, _, _ ->
-            val playlistItemDatabaseHelper =
-                PlaylistItemDatabaseHelper(view.context, playlistId)
-            val playlistItemList = playlistItemDatabaseHelper.getAllData()
+    loadPlaylistTracksAsync(view.context, true, playlistId, {} , {_,_,_->
+        val playlistItemDatabaseHelper =
+            PlaylistItemDatabaseHelper(view.context, playlistId)
+        val playlistItemList = playlistItemDatabaseHelper.getAllData()
 
-            for (playlistItem in playlistItemList) {
-                val songDatabaseHelper = SongDatabaseHelper(view.context)
-                val song = songDatabaseHelper.getSong(view.context, playlistItem.songId)
+        for (playlistItem in playlistItemList) {
+            val songDatabaseHelper = SongDatabaseHelper(view.context)
+            val song = songDatabaseHelper.getSong(view.context, playlistItem.songId)
 
-                song?.songId?.let { addDownloadSong(view.context, it, downloadFinished) }
-            }
-        }, errorCallback = { _, _, _ ->
-            displaySnackBar(
-                view,
-                view.context.getString(R.string.errorRetrievePlaylist),
-                view.context.getString(R.string.retry)
-            ) {
-                downloadPlaylistAsync(view, playlistId, downloadFinished)
-            }
-        }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+            song?.songId?.let { addDownloadSong(view.context, it, downloadFinished) }
+        }
+    }, {_,_,_->
+        displaySnackBar(
+            view,
+            view.context.getString(R.string.errorRetrievePlaylist),
+            view.context.getString(R.string.retry)
+        ) {
+            downloadPlaylistAsync(view, playlistId, downloadFinished)
+        }
+    })
 }
 
 /**
@@ -203,8 +200,7 @@ internal fun downloadAlbum(view: View, mcID: String) {
  * Add single song to playlist, will ask for playlist with alertDialog TODO check if logged in
  */
 internal fun addSongToPlaylist(view: View, songId: String) {
-    LoadPlaylistAsync(
-        WeakReference(view.context),
+    loadPlaylistAsync(view.context,
         forceReload = true,
         loadManual = false,
         displayLoading = {},
@@ -252,28 +248,21 @@ internal fun addSongToPlaylist(view: View, songId: String) {
             ) {
                 addSongToPlaylist(view, songId)
             }
-        }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        })
 }
 
 private fun addSongToPlaylistAsync(view: View, playlistId: String, songId: String) {
-    val addToPlaylistAsync = AddToPlaylistAsync(
-        WeakReference(view.context),
-        playlistId,
-        songId,
-        finishedCallback = { _, _ ->
-            displaySnackBar(view, view.context.getString(R.string.songAddedToPlaylistMsg), null) {}
-        },
-        errorCallback = { _, _ ->
-            displaySnackBar(
-                view,
-                view.context.getString(R.string.errorRetrievePlaylist),
-                view.context.getString(R.string.retry)
-            ) {
-                addSongToPlaylistAsync(view, playlistId, songId)
-            }
-        })
-
-    addToPlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    addToPlaylistAsync(view.context, songId, playlistId, { _, _ ->
+        displaySnackBar(view, view.context.getString(R.string.songAddedToPlaylistMsg), null) {}
+    }, { _, _ ->
+        displaySnackBar(
+            view,
+            view.context.getString(R.string.errorRetrievePlaylist),
+            view.context.getString(R.string.retry)
+        ) {
+            addSongToPlaylistAsync(view, playlistId, songId)
+        }
+    })
 }
 
 internal fun renamePlaylist(view: View, playlistId: String) {
@@ -317,8 +306,7 @@ internal fun renamePlaylist(view: View, playlistId: String) {
 }
 
 private fun renamePlaylistAsync(view: View, playlistId: String, playlistName: String) {
-    val renamePlaylistAsync =
-        RenamePlaylistAsync(WeakReference(view.context),
+        renamePlaylistAsync(view.context,
             playlistId,
             playlistName,
             finishedCallback = { _, _ ->
@@ -333,38 +321,31 @@ private fun renamePlaylistAsync(view: View, playlistId: String, playlistName: St
                     renamePlaylistAsync(view, playlistName, playlistId)
                 }
             })
-    renamePlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }
 
 internal fun togglePlaylistPublicStateAsync(view: View, playlistId: String) {
     PlaylistDatabaseHelper(view.context).getPlaylist(playlistId)?.let { playlist ->
-        val changePlaylistPublicStateAsync =
-            ChangePlaylistPublicStateAsync(WeakReference(view.context),
-                playlistId,
-                !playlist.public,
-                finishedCallback = { _, _ ->
-                    val msg = if (playlist.public) {
-                        view.context.getString(R.string.playlistNowPrivateMsg)
-                    } else {
-                        view.context.getString(R.string.playlistNowPublicMsg)
-                    }
+        changePlaylistPublicStateAsync(view.context, playlistId, !playlist.public, { _, _ ->
+            val msg = if (playlist.public) {
+                view.context.getString(R.string.playlistNowPrivateMsg)
+            } else {
+                view.context.getString(R.string.playlistNowPublicMsg)
+            }
 
-                    displaySnackBar(
-                        view,
-                        msg,
-                        null
-                    ) {}
-                },
-                errorCallback = { _, _ ->
-                    displaySnackBar(
-                        view,
-                        view.context.getString(R.string.playlistStateChangeError),
-                        view.context.getString(R.string.retry)
-                    ) {
-                        togglePlaylistPublicStateAsync(view, playlistId)
-                    }
-                })
-        changePlaylistPublicStateAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+            displaySnackBar(
+                view,
+                msg,
+                null
+            ) {}
+        }, { _, _ ->
+            displaySnackBar(
+                view,
+                view.context.getString(R.string.playlistStateChangeError),
+                view.context.getString(R.string.retry)
+            ) {
+                togglePlaylistPublicStateAsync(view, playlistId)
+            }
+        })
     }
 }
 
@@ -445,20 +426,17 @@ internal fun addPlaylist(view: View, playlistId: String) {
 }
 
 private fun createPlaylistAsync(view: View, playlistName: String) {
-    val createPlaylistAsync =
-        CreatePlaylistAsync(WeakReference(view.context), playlistName, finishedCallback = {
-            displaySnackBar(view, view.context.getString(R.string.playlistCreatedMsg), null) {}
-        },
-            errorCallback = {
-                displaySnackBar(
-                    view,
-                    view.context.getString(R.string.errorCreatingPlaylist),
-                    view.context.getString(R.string.retry)
-                ) {
-                    createPlaylistAsync(view, playlistName)
-                }
-            })
-    createPlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    createPlaylistAsync(view.context, playlistName, {
+        displaySnackBar(view, view.context.getString(R.string.playlistCreatedMsg), null) {}
+    }, {
+        displaySnackBar(
+            view,
+            view.context.getString(R.string.errorCreatingPlaylist),
+            view.context.getString(R.string.retry)
+        ) {
+            createPlaylistAsync(view, playlistName)
+        }
+    })
 }
 
 /**
@@ -491,26 +469,21 @@ internal fun deletePlaylist(view: View, playlistId: String) {
 private fun deletePlaylistAsync(view: View, playlistId: String, force: Boolean) {
     if (force) {
         PlaylistDatabaseHelper(view.context).getPlaylist(playlistId)?.ownPlaylist?.let { deleteRemote ->
-            val deletePlaylistAsync =
-                DeletePlaylistAsync(WeakReference(view.context), playlistId,
-                    deleteRemote = deleteRemote,
-                    deleteLocal = true, finishedCallback = {
-                        displaySnackBar(
-                            view,
-                            view.context.getString(R.string.playlistDeletedMsg),
-                            null
-                        ) {}
-                    },
-                    errorCallback = {
-                        displaySnackBar(
-                            view,
-                            view.context.getString(R.string.errorDeletingPlaylist),
-                            view.context.getString(R.string.retry)
-                        ) {
-                            deletePlaylistAsync(view, playlistId, true)
-                        }
-                    })
-            deletePlaylistAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+            deletePlaylistAsync(view.context, playlistId, deleteRemote, true, {
+                displaySnackBar(
+                    view,
+                    view.context.getString(R.string.playlistDeletedMsg),
+                    null
+                ) {}
+            }, {
+                displaySnackBar(
+                    view,
+                    view.context.getString(R.string.errorDeletingPlaylist),
+                    view.context.getString(R.string.retry)
+                ) {
+                    deletePlaylistAsync(view, playlistId, true)
+                }
+            })
         }
     }
 }
@@ -532,28 +505,21 @@ internal fun deletePlaylistSong(
         //required because api sorts by oldest songs added
         val songDeleteIndex = playlistMax - index
 
-        val deletePlaylistTrackAsync =
-            DeletePlaylistTrackAsync(WeakReference(view.context),
-                songId,
-                playlistId,
-                songDeleteIndex,
-                finishedCallback = { _, _, _ ->
-                    displaySnackBar(
-                        view,
-                        view.context.getString(R.string.removedSongFromPlaylistMsg),
-                        null
-                    ) {}
-                },
-                errorCallback = { _, _, _ ->
-                    displaySnackBar(
-                        view,
-                        view.context.getString(R.string.errorRemovingSongFromPlaylist),
-                        view.context.getString(R.string.retry)
-                    ) {
-                        deletePlaylistSong(view, songId, playlistId, index, playlistMax)
-                    }
-                })
-        deletePlaylistTrackAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        deletePlaylistTrackAsync(view.context, songId, playlistId, songDeleteIndex, { _, _, _ ->
+            displaySnackBar(
+                view,
+                view.context.getString(R.string.removedSongFromPlaylistMsg),
+                null
+            ) {}
+        }, { _, _, _ ->
+            displaySnackBar(
+                view,
+                view.context.getString(R.string.errorRemovingSongFromPlaylist),
+                view.context.getString(R.string.retry)
+            ) {
+                deletePlaylistSong(view, songId, playlistId, index, playlistMax)
+            }
+        })
     }
 }
 
@@ -743,17 +709,4 @@ internal fun playSongsFromViewDataAsync(
 
         }
     }, {}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-}
-
-fun checkCustomApiFeaturesAsync(
-    context: Context,
-    callback: () -> Unit,
-    errorCallback: () -> Unit
-) {
-    //check for custom api features
-    CheckCustomApiFeaturesAsync(
-        WeakReference(context),
-        callback,
-        errorCallback
-    ).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }

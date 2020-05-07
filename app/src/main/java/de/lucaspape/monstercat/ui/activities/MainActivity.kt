@@ -29,6 +29,7 @@ import de.lucaspape.monstercat.music.notification.updateNotification
 import de.lucaspape.monstercat.music.save.PlayerSaveState
 import de.lucaspape.monstercat.music.util.*
 import de.lucaspape.monstercat.music.util.setCover
+import de.lucaspape.monstercat.request.async.checkCustomApiFeaturesAsync
 import de.lucaspape.monstercat.ui.*
 import de.lucaspape.monstercat.ui.handlers.*
 import de.lucaspape.monstercat.util.*
