@@ -33,7 +33,6 @@ import de.lucaspape.util.CustomSpinnerClass
 import de.lucaspape.util.Settings
 import de.lucaspape.util.Settings.Companion.getSettings
 import java.io.File
-import java.lang.ref.WeakReference
 import kotlin.collections.ArrayList
 
 /**
@@ -662,8 +661,6 @@ class HomeHandler(
                 resetRecyclerViewPosition(view.context, "albumView")
             }
 
-            val contextReference = WeakReference(view.context)
-
             val albumDatabaseHelper = AlbumDatabaseHelper(view.context)
 
             if (forceReload) {
@@ -748,8 +745,6 @@ class HomeHandler(
      * Load single album
      */
     private fun loadAlbum(view: View, albumId: String, mcId: String, forceReload: Boolean) {
-        val contextReference = WeakReference(view.context)
-
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.homePullToRefresh)
 
