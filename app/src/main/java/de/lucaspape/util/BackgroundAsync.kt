@@ -8,12 +8,12 @@ import android.os.AsyncTask
 
 class BackgroundAsync<T>(
     private val preBackground: () -> Boolean,
-    private val background: () -> T,
-    private val finished: (result: T) -> Unit
+    private val background: () -> T?,
+    private val finished: (result: T?) -> Unit
 ) :
-    AsyncTask<Void, Void, T>() {
+    AsyncTask<Void, Void, T?>() {
 
-    constructor(background: () -> T, finished: (result: T) -> Unit) : this(
+    constructor(background: () -> T?, finished: (result: T?) -> Unit) : this(
         { true },
         background,
         finished
@@ -25,14 +25,11 @@ class BackgroundAsync<T>(
         }
     }
 
-    override fun onPostExecute(result: T) {
+    override fun onPostExecute(result: T?) {
         finished(result)
     }
 
     override fun doInBackground(vararg params: Void?): T? {
-        background()
-
-        return null
+        return background()
     }
-
 }

@@ -61,7 +61,7 @@ fun addToPlaylistAsync(
 
         return@BackgroundAsync false
     }, {
-        if (it) {
+        if (it == true) {
             finishedCallback(playlistId, songId)
         } else {
             errorCallback(playlistId, songId)
@@ -164,7 +164,7 @@ fun changePlaylistPublicStateAsync(
 
         return@BackgroundAsync false
     }, {
-        if (it) {
+        if (it == true) {
             finishedCallback(playlistId, public)
         } else {
             errorCallback(playlistId, public)
@@ -246,7 +246,7 @@ fun checkCustomApiFeaturesAsync(
 
         return@BackgroundAsync false
     }, {
-        if (it) {
+        if (it == true) {
             finishedCallback()
         } else {
             errorCallback()
@@ -291,7 +291,7 @@ fun createPlaylistAsync(
 
         return@BackgroundAsync false
     }, {
-        if (it) {
+        if (it == true) {
             finishedCallback(playlistName)
         } else {
             errorCallback(playlistName)
@@ -349,7 +349,7 @@ fun deletePlaylistAsync(
 
         return@BackgroundAsync false
     }, {
-        if (it) {
+        if (it == true) {
             finishedCallback(playlistId)
         } else {
             errorCallback(playlistId)
@@ -405,7 +405,7 @@ fun deletePlaylistTrackAsync(
 
         return@BackgroundAsync false
     }, {
-        if (it) {
+        if (it == true) {
             finishedCallback(songId, playlistId, songDeleteIndex)
         } else {
             errorCallback(songId, playlistId, songDeleteIndex)
@@ -487,7 +487,7 @@ fun loadAlbumAsync(
 
         return@BackgroundAsync false
     }, {
-        if (it) {
+        if (it == true) {
             finishedCallback(forceReload, albumId, mcId, displayLoading)
         } else {
             errorCallback(forceReload, albumId, mcId, displayLoading)
@@ -556,7 +556,7 @@ fun loadAlbumListAsync(
 
         return@BackgroundAsync false
     }, {
-        if (it) {
+        if (it == true) {
             finishedCallback(forceReload, skip, displayLoading)
         } else {
             errorCallback(forceReload, skip, displayLoading)
@@ -605,7 +605,7 @@ fun loadManualPlaylistAsync(
 
         return@BackgroundAsync false
     }, {
-        if (it) {
+        if (it == true) {
             finishedCallback()
         } else {
             errorCallback()
@@ -724,7 +724,7 @@ fun loadPlaylistAsync(
 
         return@BackgroundAsync false
     }, {
-        if (it) {
+        if (it == true) {
             finishedCallback(forceReload, displayLoading)
         } else {
             errorCallback(forceReload, displayLoading)
@@ -838,7 +838,7 @@ fun loadPlaylistTracksAsync(
 
         return@BackgroundAsync false
     }, {
-        if (it) {
+        if (it == true) {
             finishedCallback(forceReload, playlistId, displayLoading)
         } else {
             errorCallback(forceReload, playlistId, displayLoading)
@@ -969,7 +969,7 @@ fun loadSongListAsync(
 
         return@BackgroundAsync false
     }, {
-        if (it) {
+        if (it == true) {
             finishedCallback(forceReload, skip, displayLoading)
         } else {
             errorCallback(forceReload, skip, displayLoading)
@@ -1079,7 +1079,7 @@ fun renamePlaylistAsync(
 
         return@BackgroundAsync false
     }, {
-        if (it) {
+        if (it == true) {
             finishedCallback(playlistName, playlistId)
         } else {
             errorCallback(playlistName, playlistId)
