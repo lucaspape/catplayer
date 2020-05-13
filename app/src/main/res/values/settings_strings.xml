@@ -26,4 +26,5 @@
     <string name="customApiBaseUrlSetting" translatable="false">customApiBaseUrl</string>
     <string name="customDownloadUrlSetting" translatable="false">customDownloadUrl</string>
     <string name="customStreamUrlSetting" translatable="false">customStreamUrl</string>
+    <string name="liveInfoSetting" translatable="false">liveInfo</string>
 </resources>

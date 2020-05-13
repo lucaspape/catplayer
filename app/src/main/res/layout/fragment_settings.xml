@@ -112,6 +112,18 @@
                 app:layout_constraintTop_toBottomOf="@+id/downloadCoversMobileSwitch" />
 
             <Switch
+                android:id="@+id/liveInfoSwitch"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:text="@string/loadLiveInfo"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/darkThemeSwitch" />
+
+            <Switch
                 android:id="@+id/audioFocusSwitch"
                 android:layout_width="0dp"
                 android:layout_height="50dp"
@@ -121,7 +133,7 @@
                 android:text="@string/disableAudioFocusSwitch"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/darkThemeSwitch" />
+                app:layout_constraintTop_toBottomOf="@+id/liveInfoSwitch" />
 
             <TextView
                 android:id="@+id/volumeText"

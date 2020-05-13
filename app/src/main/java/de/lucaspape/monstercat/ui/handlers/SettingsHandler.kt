@@ -38,6 +38,7 @@ class SettingsHandler(private val closeSettings:() -> Unit) : Handler {
         val streamMobileSwitch = view.findViewById<Switch>(R.id.streamMobileSwitch)
         val downloadMobileSwitch = view.findViewById<Switch>(R.id.downloadMobileSwitch)
         val downloadCoversMobileSwitch = view.findViewById<Switch>(R.id.downloadCoversMobileSwitch)
+        val liveInfoSwitch = view.findViewById<Switch>(R.id.liveInfoSwitch)
         val darkThemeSwitch = view.findViewById<Switch>(R.id.darkThemeSwitch)
         val disableAudioFocusSwitch = view.findViewById<Switch>(R.id.audioFocusSwitch)
         val downloadFlacSwitch = view.findViewById<Switch>(R.id.downloadFlacSwitch)
@@ -67,6 +68,10 @@ class SettingsHandler(private val closeSettings:() -> Unit) : Handler {
 
         settings.getBoolean(view.context.getString(R.string.disableAudioFocusSetting))?.let {
             disableAudioFocusSwitch.isChecked = it
+        }
+
+        settings.getBoolean(view.context.getString(R.string.liveInfoSetting))?.let {
+            liveInfoSwitch.isChecked = it
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -121,6 +126,10 @@ class SettingsHandler(private val closeSettings:() -> Unit) : Handler {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
             }
 
+        }
+
+        liveInfoSwitch.setOnCheckedChangeListener { _, isChecked ->
+            settings.setBoolean(view.context.getString(R.string.liveInfoSetting), isChecked)
         }
 
         downloadFlacSwitch.setOnCheckedChangeListener { _, isChecked ->

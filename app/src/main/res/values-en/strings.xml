@@ -123,11 +123,12 @@
     <string name="sharePlaylist">Share playlist</string>
     <string name="openPlaylistInApp">Open playlist in browser</string>
     <string name="useCustomApi">Use custom API instead monstercat connect (for catalog/album/search/cover images)</string>
-    <string name="playRelatedAfter">Play related songs after playback finished</string>
+    <string name="playRelatedAfter">Play related songs after playback finished (requires custom API)</string>
     <string name="saveCoverImagesToCache">Save cover images to cache</string>
     <string name="volume">Volume</string>
     <string name="customApiEnabledMsg">Custom API enabled!</string>
     <string name="customApiEnableError">Could not enable custom API!</string>
     <string name="setCustomApiUrl">Set custom API URL</string>
     <string name="back">Back</string>
+    <string name="loadLiveInfo">Load liveinfo while playing livestream (requires custom API)</string>
 </resources>

@@ -8,6 +8,7 @@ import de.lucaspape.monstercat.music.notification.updateNotification
 import de.lucaspape.monstercat.request.newLiveInfoRequest
 import de.lucaspape.monstercat.util.getAuthorizedRequestQueue
 import de.lucaspape.monstercat.util.parseSongToDB
+import de.lucaspape.util.Settings
 import org.json.JSONException
 import java.lang.ref.WeakReference
 
@@ -33,6 +34,7 @@ class StreamInfoUpdateAsync(
 
     override fun doInBackground(vararg params: Void): String? {
         contextReference.get()?.let { context ->
+            val settings = Settings.getSettings(context)
 
             val artistTitleRequest = newLiveInfoRequest(context, {
                 try {
@@ -63,8 +65,20 @@ class StreamInfoUpdateAsync(
                 getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
             while (true) {
-                artistTitleRequest?.let{
-                    requestQueue.add(it)
+                artistTitleRequest?.let{request ->
+                    settings.getBoolean(context.getString(R.string.liveInfoSetting)).let {
+                        if(it == true){
+                            requestQueue.add(request)
+                        }else{
+                            fallbackTitle = "Livestream"
+                            fallbackArtist = "Monstercat"
+                            fallbackVersion = ""
+                            fallbackCoverUrl = context.getString(R.string.fallbackCoverUrl)
+                            liveSongId = ""
+
+                            publishProgress()
+                        }
+                    }
                 }
 
                 Thread.sleep(500)
