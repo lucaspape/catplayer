@@ -48,9 +48,13 @@ fun parseSongToDB(jsonObject: JSONObject, context: Context): String? {
         title = jsonObject.getString("title")
         artist = jsonObject.getString("artistsTitle")
 
-        try {
-            artistId = jsonObject.getJSONArray("artists").getJSONObject(0).getString("id")
-        }catch (e: IndexOutOfBoundsException){
+        try{
+            try {
+                artistId = jsonObject.getJSONArray("artists").getJSONObject(0).getString("id")
+            }catch (e: IndexOutOfBoundsException){
+
+            }
+        }catch (e: JSONException){
 
         }
 
