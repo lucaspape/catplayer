@@ -1,22 +1,19 @@
-        FOSS LITERALLY ANYTHING PUBLIC SOFTWARE LICENCE
+             FOSS LIBRE AND PUBLIC SOFTWARE LICENCE
                      
-                   Version 0.2, March 2020
+                    Version 0.3, May 2020
 
-     Catplayer Copyright (C) 2020 Lucas Pape lucas.pape@web.de
-
+    Catplayer Copyright (C) 2020 Lucas Pape lucas.pape@web.de
                     Under 1 KB since 2020
 -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
-Don't edit this license without changing the name 
  
-          FOSS LITERALLY ANYTHING PUBLIC SOFTWARE LICENCE
+                 FOSS LIBRE PUBLIC SOFTWARE LICENCE
   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
 
- 0. Do literally anything with this software, it's yours. Redistribute and fork
-    to your heart's content.
- 1. If you are making modifications to the code and wish to redistribute it, 
-    do so under a different name than the original software.
+ 0. You are free to do as you with this code (see clauses 1 and 2).
+ 1. If you modify the code and plan to redistribute it, change the name of the
+ software.
+ 2. You may not copy this code and release it under an EULA. 
 
 THIS SOFTWARE IS DISTRIBUTED "AS IS" AND THE AUTHOR OFFERS NO WARRANTY UPON IT.
-THE AUTHOR IS NOT LIABLE FOR ANY DAMAGE AT ALL UNDER ANY CIRCUMSTANCE, INCLUDI-
-NG BUT NOT LIMITED TO: DATA LOSS, MONETARY LOSS, PERFORMANCE DROPS OR ANY OTHER
-DAMAGE.
+THE AUTHOR IS NOT LIABLE FOR ANY DAMAGE UNDER ANY CIRCUMSTANCE, INCLUDING BUT
+NOT LIMITED TO: LOSS OF DATA, MONITARY LOSS or DAMAGED HARDWARE.
