@@ -45,10 +45,11 @@ class PushNotificationService :FirebaseMessagingService(){
         val notificationBuilder = NotificationCompat.Builder(this, getString(R.string.pushNotificationChannelId))
             .setContentTitle(title)
             .setContentText(msg)
-            .setAutoCancel(true)
             .setContentIntent(pendingIntent)
             .setContentInfo(title)
             .setSmallIcon(R.drawable.ic_icon)
+            .setAutoCancel(true)
+            .setOngoing(false)
 
         createNotificationChannel(this)
 
