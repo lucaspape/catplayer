@@ -139,4 +139,6 @@
     <string name="loadLiveInfo">Load liveinfo while playing livestream (requires custom API)</string>
 
     <string name="defaultNotificationTopics">[{\"description\": \"Default push notifications\", \"topicname\": \"default\"}, {\"description\": \"Monstercat Newsletter\", \"topicname\": \"newsletter\"}]</string>
+    <string name="pushNotifications">Push notifications</string>
+    <string name="pushNotificationSettings">Change push notification settings</string>
 </resources>

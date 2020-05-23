@@ -21,9 +21,8 @@ import de.lucaspape.monstercat.music.crossfade
 import de.lucaspape.monstercat.music.playRelatedSongsAfterPlaylistFinished
 import de.lucaspape.monstercat.music.volume
 import de.lucaspape.monstercat.push.subscribeToChannel
-import de.lucaspape.monstercat.push.unsubscribeToChannel
+import de.lucaspape.monstercat.push.unsubscribeFromChannel
 import de.lucaspape.monstercat.request.async.checkCustomApiFeaturesAsync
-import de.lucaspape.monstercat.ui.abstract_items.AlertListItem
 import de.lucaspape.monstercat.ui.abstract_items.AlertListToggleItem
 import de.lucaspape.monstercat.ui.abstract_items.HeaderTextItem
 import de.lucaspape.monstercat.ui.activities.MainActivity
@@ -37,14 +36,13 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.io.File
 import java.io.FileNotFoundException
-import kotlin.coroutines.coroutineContext
 import kotlin.math.log
 
 /**
  * SettingsActivity
  */
-class SettingsHandler(private val closeSettings:() -> Unit) : Handler {
-    private fun setupSwitches(view: View){
+class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
+    private fun setupSwitches(view: View) {
         val streamMobileSwitch = view.findViewById<Switch>(R.id.streamMobileSwitch)
         val downloadMobileSwitch = view.findViewById<Switch>(R.id.downloadMobileSwitch)
         val downloadCoversMobileSwitch = view.findViewById<Switch>(R.id.downloadCoversMobileSwitch)
@@ -55,7 +53,8 @@ class SettingsHandler(private val closeSettings:() -> Unit) : Handler {
         val skipMonstercatSongsSwitch = view.findViewById<Switch>(R.id.skipMonstercatSongsSwitch)
         val useCustomApiSwitch = view.findViewById<Switch>(R.id.useCustomApi)
         val playRelatedSwitch = view.findViewById<Switch>(R.id.playRelatedSwitch)
-        val saveCoverImagesToCacheSwitch = view.findViewById<Switch>(R.id.saveCoverImagesToCacheSwitch)
+        val saveCoverImagesToCacheSwitch =
+            view.findViewById<Switch>(R.id.saveCoverImagesToCacheSwitch)
 
         val settings = Settings.getSettings(view.context)
 
@@ -116,15 +115,24 @@ class SettingsHandler(private val closeSettings:() -> Unit) : Handler {
         }
 
         downloadMobileSwitch.setOnCheckedChangeListener { _, isChecked ->
-            settings.setBoolean(view.context.getString(R.string.downloadOverMobileSetting), isChecked)
+            settings.setBoolean(
+                view.context.getString(R.string.downloadOverMobileSetting),
+                isChecked
+            )
         }
 
         downloadCoversMobileSwitch.setOnCheckedChangeListener { _, isChecked ->
-            settings.setBoolean(view.context.getString(R.string.downloadCoversOverMobileSetting), isChecked)
+            settings.setBoolean(
+                view.context.getString(R.string.downloadCoversOverMobileSetting),
+                isChecked
+            )
         }
 
         disableAudioFocusSwitch.setOnCheckedChangeListener { _, isChecked ->
-            settings.setBoolean(view.context.getString(R.string.disableAudioFocusSetting), isChecked)
+            settings.setBoolean(
+                view.context.getString(R.string.disableAudioFocusSetting),
+                isChecked
+            )
         }
 
         darkThemeSwitch.setOnCheckedChangeListener { _, isChecked ->
@@ -151,38 +159,52 @@ class SettingsHandler(private val closeSettings:() -> Unit) : Handler {
         }
 
         skipMonstercatSongsSwitch.setOnCheckedChangeListener { _, isChecked ->
-            settings.setBoolean(view.context.getString(R.string.skipMonstercatSongsSetting), isChecked)
+            settings.setBoolean(
+                view.context.getString(R.string.skipMonstercatSongsSetting),
+                isChecked
+            )
         }
 
         useCustomApiSwitch.setOnCheckedChangeListener { _, isChecked ->
-            if(isChecked){
+            if (isChecked) {
                 //check for custom api features
                 checkCustomApiFeaturesAsync(view.context, {
                     useCustomApiSwitch.isChecked = true
                     settings.setBoolean(view.context.getString(R.string.useCustomApiSetting), true)
-                    displaySnackBar(view, view.context.getString(R.string.customApiEnabledMsg), null) {}
+                    displaySnackBar(
+                        view,
+                        view.context.getString(R.string.customApiEnabledMsg),
+                        null
+                    ) {}
                 }, {
                     useCustomApiSwitch.isChecked = false
                     settings.setBoolean(view.context.getString(R.string.useCustomApiSetting), false)
-                    displaySnackBar(view, view.context.getString(R.string.customApiEnableError), null) {}
+                    displaySnackBar(
+                        view,
+                        view.context.getString(R.string.customApiEnableError),
+                        null
+                    ) {}
                 })
-            }else{
+            } else {
                 settings.setBoolean(view.context.getString(R.string.useCustomApiSetting), false)
             }
 
         }
 
-        playRelatedSwitch.setOnCheckedChangeListener {_, isChecked ->
+        playRelatedSwitch.setOnCheckedChangeListener { _, isChecked ->
             settings.setBoolean(view.context.getString(R.string.playRelatedSetting), isChecked)
             playRelatedSongsAfterPlaylistFinished = isChecked
         }
 
         saveCoverImagesToCacheSwitch.setOnCheckedChangeListener { _, isChecked ->
-            settings.setBoolean(view.context.getString(R.string.saveCoverImagesToCacheSetting), isChecked)
+            settings.setBoolean(
+                view.context.getString(R.string.saveCoverImagesToCacheSetting),
+                isChecked
+            )
         }
     }
 
-    private fun setupButtons(view: View){
+    private fun setupButtons(view: View) {
         val resetDatabaseButton = view.findViewById<Button>(R.id.resetDatabaseButton)
 
         resetDatabaseButton.setOnClickListener {
@@ -260,7 +282,10 @@ class SettingsHandler(private val closeSettings:() -> Unit) : Handler {
 
                 setPositiveButton(context.getString(R.string.ok)) { _, _ ->
                     val newCustomApiUrl = customApiEditText.text.toString()
-                    settings.setString(view.context.getString(R.string.customApiBaseUrlSetting), newCustomApiUrl)
+                    settings.setString(
+                        view.context.getString(R.string.customApiBaseUrlSetting),
+                        newCustomApiUrl
+                    )
                     settings.setBoolean(view.context.getString(R.string.useCustomApiSetting), false)
                     view.findViewById<Switch>(R.id.useCustomApi).isChecked = false
                 }
@@ -282,45 +307,56 @@ class SettingsHandler(private val closeSettings:() -> Unit) : Handler {
         }
 
         view.findViewById<Button>(R.id.pushNotificationButton).setOnClickListener {
-            val notificationTopics = JSONArray((view.context.getString(R.string.defaultNotificationTopics)))
+            val notificationTopics =
+                JSONArray((view.context.getString(R.string.defaultNotificationTopics)))
 
             var notificationTopicsEnabled = JSONObject()
 
-            settings.getString(view.context.getString(R.string.enabledPushNotificationTopicsSetting))?.let {
-                notificationTopicsEnabled = JSONObject(it)
-            }
+            settings.getString(view.context.getString(R.string.enabledPushNotificationTopicsSetting))
+                ?.let {
+                    notificationTopicsEnabled = JSONObject(it)
+                }
 
-            val pushNotificationsDescriptionArray = Array( notificationTopics.length()) {AlertListToggleItem("", "", false)}
-            val pushNotificationsTopicNameArray = Array( notificationTopics.length()) {""}
+            val pushNotificationsDescriptionArray =
+                Array(notificationTopics.length()) { AlertListToggleItem("", "", false) }
+            val pushNotificationsTopicNameArray = Array(notificationTopics.length()) { "" }
 
-            for(i in (0 until notificationTopics.length() )){
+            for (i in (0 until notificationTopics.length())) {
                 val jsonObject = notificationTopics.getJSONObject(i)
 
                 val enabled = try {
                     notificationTopicsEnabled.getBoolean(jsonObject.getString("topicname"))
-                }catch (e: JSONException){
+                } catch (e: JSONException) {
                     false
                 }
 
-                pushNotificationsDescriptionArray[i] = AlertListToggleItem(jsonObject.getString("description"), "",  enabled)
+                pushNotificationsDescriptionArray[i] =
+                    AlertListToggleItem(jsonObject.getString("description"), "", enabled)
                 pushNotificationsTopicNameArray[i] = jsonObject.getString("topicname")
             }
 
-            displayAlertDialogToggleList(view.context, HeaderTextItem("PUSH"), pushNotificationsDescriptionArray) { position, _, enabled ->
-                if(enabled){
+            displayAlertDialogToggleList(
+                view.context,
+                HeaderTextItem(view.context.getString(R.string.pushNotifications)),
+                pushNotificationsDescriptionArray
+            ) { position, _, enabled ->
+                if (enabled) {
                     subscribeToChannel(view.context, pushNotificationsTopicNameArray[position])
-                }else{
-                    unsubscribeToChannel(view.context, pushNotificationsTopicNameArray[position])
+                } else {
+                    unsubscribeFromChannel(view.context, pushNotificationsTopicNameArray[position])
                 }
 
                 notificationTopicsEnabled.put(pushNotificationsTopicNameArray[position], enabled)
 
-                settings.setString(view.context.getString(R.string.enabledPushNotificationTopicsSetting), notificationTopicsEnabled.toString())
+                settings.setString(
+                    view.context.getString(R.string.enabledPushNotificationTopicsSetting),
+                    notificationTopicsEnabled.toString()
+                )
             }
         }
     }
 
-    private fun setupCoverResolutionSeekBar(view: View){
+    private fun setupCoverResolutionSeekBar(view: View) {
         val coverResolutionSeekBar = view.findViewById<SeekBar>(R.id.coverResolutionSeekbar)
         val shownCoverResolution = view.findViewById<TextView>(R.id.shownCoverResolution)
 
@@ -346,8 +382,14 @@ class SettingsHandler(private val closeSettings:() -> Unit) : Handler {
                             (((progress) * 256) / 4)
                         )
                     } else {
-                        settings.setInt(view.context.getString(R.string.primaryCoverResolutionSetting), (128))
-                        settings.setInt(view.context.getString(R.string.secondaryCoverResolutionSetting), (64))
+                        settings.setInt(
+                            view.context.getString(R.string.primaryCoverResolutionSetting),
+                            (128)
+                        )
+                        settings.setInt(
+                            view.context.getString(R.string.secondaryCoverResolutionSetting),
+                            (64)
+                        )
                     }
 
                     settings.getInt(view.context.getString(R.string.primaryCoverResolutionSetting))
@@ -365,7 +407,7 @@ class SettingsHandler(private val closeSettings:() -> Unit) : Handler {
         })
     }
 
-    private fun setupCrossfadeSeekBar(view: View){
+    private fun setupCrossfadeSeekBar(view: View) {
         val crossfadeTimeSeekBar = view.findViewById<SeekBar>(R.id.crossfadeTimeSeekbar)
         val shownCrossfadeTime = view.findViewById<TextView>(R.id.shownCrossfadeTime)
 
@@ -383,7 +425,10 @@ class SettingsHandler(private val closeSettings:() -> Unit) : Handler {
         crossfadeTimeSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    settings.setInt(view.context.getString(R.string.crossfadeTimeSetting), (progress * 1000))
+                    settings.setInt(
+                        view.context.getString(R.string.crossfadeTimeSetting),
+                        (progress * 1000)
+                    )
 
                     settings.getInt(view.context.getString(R.string.crossfadeTimeSetting))
                         ?.let {
@@ -403,7 +448,7 @@ class SettingsHandler(private val closeSettings:() -> Unit) : Handler {
         })
     }
 
-    private fun setupVolumeSeekBar(view: View){
+    private fun setupVolumeSeekBar(view: View) {
         val volumeSeekBar = view.findViewById<SeekBar>(R.id.volumeSeekBar)
         val shownVolume = view.findViewById<TextView>(R.id.shownVolumeText)
 
@@ -412,20 +457,23 @@ class SettingsHandler(private val closeSettings:() -> Unit) : Handler {
         val settings = Settings.getSettings(view.context)
 
         settings.getFloat(view.context.getString(R.string.volumeSetting))?.let {
-            volumeSeekBar.progress = (it*100).toInt()
-            shownVolume.text = (it*100).toString()
-            volume = 1-log(100-(it*100), 100.toFloat())
+            volumeSeekBar.progress = (it * 100).toInt()
+            shownVolume.text = (it * 100).toString()
+            volume = 1 - log(100 - (it * 100), 100.toFloat())
         }
 
         volumeSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    settings.setFloat(view.context.getString(R.string.volumeSetting), (progress.toFloat() / 100.toFloat()))
+                    settings.setFloat(
+                        view.context.getString(R.string.volumeSetting),
+                        (progress.toFloat() / 100.toFloat())
+                    )
 
                     settings.getFloat(view.context.getString(R.string.volumeSetting))
                         ?.let {
-                            shownVolume.text = ((it*100).toInt()).toString()
-                            volume = 1-log(100-(it*100), 100.toFloat())
+                            shownVolume.text = ((it * 100).toInt()).toString()
+                            volume = 1 - log(100 - (it * 100), 100.toFloat())
                         }
                 }
             }

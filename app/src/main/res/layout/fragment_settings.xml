@@ -70,7 +70,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 android:backgroundTint="?attr/colorButtonNormal"
-                android:text="Change push notification settings"
+                android:text="@string/pushNotificationSettings"
                 android:textColor="?attr/colorOnSurface"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

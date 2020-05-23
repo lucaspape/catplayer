@@ -32,8 +32,6 @@ class PushNotificationService :FirebaseMessagingService(){
     }
 
     private fun sendNotification(title:String, msg:String, url:String?){
-        val notificationIcon = BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher)
-
         val pendingIntent = if(url != null){
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -50,8 +48,7 @@ class PushNotificationService :FirebaseMessagingService(){
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
             .setContentInfo(title)
-            .setLargeIcon(notificationIcon)
-            .setSmallIcon(R.mipmap.ic_launcher)
+            .setSmallIcon(R.drawable.ic_icon)
 
         createNotificationChannel(this)
 

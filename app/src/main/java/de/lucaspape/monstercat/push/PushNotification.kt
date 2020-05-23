@@ -7,21 +7,21 @@ import com.google.firebase.messaging.FirebaseMessaging
 fun subscribeToChannel(context:Context, channelName:String){
     FirebaseMessaging.getInstance().subscribeToTopic(channelName)
         .addOnCompleteListener { task ->
-            var msg = "Subscribed"
+            var msg = "Subscribed to $channelName"
             if (!task.isSuccessful) {
-                msg = "Failed"
+                msg = "Failed to subscribe to $channelName"
             }
 
             Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
         }
 }
 
-fun unsubscribeToChannel(context:Context, channelName:String){
+fun unsubscribeFromChannel(context:Context, channelName:String){
     FirebaseMessaging.getInstance().unsubscribeFromTopic(channelName)
         .addOnCompleteListener { task ->
-            var msg = "Unsubscribed"
+            var msg = "Unsubscribed fom $channelName"
             if (!task.isSuccessful) {
-                msg = "Failed"
+                msg = "Failed to unsubscribe from $channelName"
             }
 
             Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
