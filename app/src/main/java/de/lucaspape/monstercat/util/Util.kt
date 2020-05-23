@@ -8,6 +8,7 @@ import android.net.NetworkCapabilities
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.Switch
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,9 +19,12 @@ import com.google.android.material.snackbar.Snackbar
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.GenericItem
 import com.mikepenz.fastadapter.adapters.ItemAdapter
+import com.mikepenz.fastadapter.listeners.ClickEventHook
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.request.OkHttp3Stack
 import de.lucaspape.monstercat.ui.abstract_items.AlertListItem
+import de.lucaspape.monstercat.ui.abstract_items.AlertListToggleItem
+import de.lucaspape.monstercat.ui.abstract_items.CatalogItem
 import de.lucaspape.persistentcookiejar.PersistentCookieJar
 import de.lucaspape.persistentcookiejar.cache.SetCookieCache
 import de.lucaspape.persistentcookiejar.persistence.SharedPrefsCookiePersistor
@@ -120,6 +124,72 @@ fun displaySnackBar(
     } catch (e: IllegalArgumentException) {
 
     }
+}
+
+fun displayAlertDialogToggleList(
+    context: Context,
+    headerItem: GenericItem?,
+    listItems: Array<AlertListToggleItem>,
+    onToggle: (position:Int, item: AlertListToggleItem, enabled: Boolean) -> Unit
+){
+    val alertDialogBuilder = MaterialAlertDialogBuilder(context, R.style.DialogSlideAnim)
+
+    val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+    val alertListLayout = layoutInflater.inflate(R.layout.alert_list, null, false)
+
+    alertDialogBuilder.setView(alertListLayout)
+    alertDialogBuilder.setCancelable(true)
+    val dialog = alertDialogBuilder.create()
+
+    dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+    dialog.window?.setGravity(Gravity.BOTTOM)
+
+    dialog.show()
+
+    val recyclerView = alertListLayout.findViewById<RecyclerView>(R.id.alertDialogList)
+    recyclerView.layoutManager =
+        LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+
+    val headerAdapter = ItemAdapter<GenericItem>()
+    val itemAdapter = ItemAdapter<AlertListToggleItem>()
+    val fastAdapter: FastAdapter<GenericItem> =
+        FastAdapter.with(listOf(headerAdapter, itemAdapter))
+
+    var indexOffset = 0
+
+    headerItem?.let {
+        headerAdapter.add(headerItem)
+        indexOffset = -1
+    }
+
+    for (listItem in listItems) {
+        itemAdapter.add(listItem)
+    }
+
+    recyclerView.adapter = fastAdapter
+
+    fastAdapter.addEventHook(object : ClickEventHook<AlertListToggleItem>() {
+        override fun onBind(viewHolder: RecyclerView.ViewHolder): View? {
+            return if (viewHolder is AlertListToggleItem.ViewHolder) {
+                viewHolder.alertItemSwitch
+            } else null
+        }
+
+        override fun onClick(
+            v: View,
+            position: Int,
+            fastAdapter: FastAdapter<AlertListToggleItem>,
+            item: AlertListToggleItem
+        ) {
+            if(v is Switch){
+                val index = position + indexOffset
+
+                if (index >= 0) {
+                    onToggle(index, listItems[index], v.isChecked)
+                }
+            }
+        }
+    })
 }
 
 fun displayAlertDialogList(

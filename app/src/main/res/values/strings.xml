@@ -104,10 +104,16 @@
     <string name="errorLoadingSearch">Error loading search</string>
     <string name="errorLoadingPlaylists">Error loading playlists</string>
     <string name="errorLoadingPlaylistTracks">Error loading playlist tracks</string>
+
     <string name="downloadNotificationChannelId">Download Notification</string>
     <string name="downloadNotificationDescription">Download Notification for Catplayer</string>
+
     <string name="musicNotificationChannelId">Player Notification</string>
     <string name="musicNotificationDescription">Player Notification for Catplayer</string>
+
+    <string name="pushNotificationChannelId">Push notifications</string>
+    <string name="pushNotificationDescription">Push notifications for Catplayer</string>
+
     <string name="playlistId">Playlist ID</string>
     <string name="addPlaylistId">Add playlist from Playlist ID</string>
     <string name="add">Add</string>
@@ -130,4 +136,6 @@
     <string name="setCustomApiUrl">Set custom API URL</string>
     <string name="back">Back</string>
     <string name="loadLiveInfo">Load liveinfo while playing livestream (requires custom API)</string>
+
+    <string name="defaultNotificationTopics">[{\"description\": \"Default push notifications\", \"topicname\": \"default\"}, {\"description\": \"Monstercat Newsletter\", \"topicname\": \"newsletter\"}]</string>
 </resources>

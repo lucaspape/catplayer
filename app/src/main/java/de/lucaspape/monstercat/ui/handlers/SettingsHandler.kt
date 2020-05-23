@@ -20,14 +20,24 @@ import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.music.crossfade
 import de.lucaspape.monstercat.music.playRelatedSongsAfterPlaylistFinished
 import de.lucaspape.monstercat.music.volume
+import de.lucaspape.monstercat.push.subscribeToChannel
+import de.lucaspape.monstercat.push.unsubscribeToChannel
 import de.lucaspape.monstercat.request.async.checkCustomApiFeaturesAsync
+import de.lucaspape.monstercat.ui.abstract_items.AlertListItem
+import de.lucaspape.monstercat.ui.abstract_items.AlertListToggleItem
+import de.lucaspape.monstercat.ui.abstract_items.HeaderTextItem
 import de.lucaspape.monstercat.ui.activities.MainActivity
 import de.lucaspape.monstercat.util.Auth
+import de.lucaspape.monstercat.util.displayAlertDialogToggleList
 import de.lucaspape.util.Settings
 import de.lucaspape.monstercat.util.displayInfo
 import de.lucaspape.monstercat.util.displaySnackBar
+import org.json.JSONArray
+import org.json.JSONException
+import org.json.JSONObject
 import java.io.File
 import java.io.FileNotFoundException
+import kotlin.coroutines.coroutineContext
 import kotlin.math.log
 
 /**
@@ -268,6 +278,44 @@ class SettingsHandler(private val closeSettings:() -> Unit) : Handler {
 
                 val negativeButton = getButton(DialogInterface.BUTTON_NEGATIVE)
                 negativeButton.setTextColor(typedValue.data)
+            }
+        }
+
+        view.findViewById<Button>(R.id.pushNotificationButton).setOnClickListener {
+            val notificationTopics = JSONArray((view.context.getString(R.string.defaultNotificationTopics)))
+
+            var notificationTopicsEnabled = JSONObject()
+
+            settings.getString(view.context.getString(R.string.enabledPushNotificationTopicsSetting))?.let {
+                notificationTopicsEnabled = JSONObject(it)
+            }
+
+            val pushNotificationsDescriptionArray = Array( notificationTopics.length()) {AlertListToggleItem("", "", false)}
+            val pushNotificationsTopicNameArray = Array( notificationTopics.length()) {""}
+
+            for(i in (0 until notificationTopics.length() )){
+                val jsonObject = notificationTopics.getJSONObject(i)
+
+                val enabled = try {
+                    notificationTopicsEnabled.getBoolean(jsonObject.getString("topicname"))
+                }catch (e: JSONException){
+                    false
+                }
+
+                pushNotificationsDescriptionArray[i] = AlertListToggleItem(jsonObject.getString("description"), "",  enabled)
+                pushNotificationsTopicNameArray[i] = jsonObject.getString("topicname")
+            }
+
+            displayAlertDialogToggleList(view.context, HeaderTextItem("PUSH"), pushNotificationsDescriptionArray) { position, _, enabled ->
+                if(enabled){
+                    subscribeToChannel(view.context, pushNotificationsTopicNameArray[position])
+                }else{
+                    unsubscribeToChannel(view.context, pushNotificationsTopicNameArray[position])
+                }
+
+                notificationTopicsEnabled.put(pushNotificationsTopicNameArray[position], enabled)
+
+                settings.setString(view.context.getString(R.string.enabledPushNotificationTopicsSetting), notificationTopicsEnabled.toString())
             }
         }
     }
