@@ -252,7 +252,7 @@ internal fun addSongToPlaylist(view: View, songId: String) {
 }
 
 private fun addSongToPlaylistAsync(view: View, playlistId: String, songId: String) {
-    addToPlaylistAsync(view.context, songId, playlistId, { _, _ ->
+    addToPlaylistAsync(view.context, playlistId, songId, { _, _ ->
         displaySnackBar(view, view.context.getString(R.string.songAddedToPlaylistMsg), null) {}
     }, { _, _ ->
         displaySnackBar(
