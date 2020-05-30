@@ -16,7 +16,7 @@ class SettingsToggleItem(
     override val type: Int = 120
 
     override val layoutRes: Int
-        get() = R.layout.alert_list_toggle_item
+        get() = R.layout.settings_switch_item
 
     override fun getViewHolder(v: View): ViewHolder {
         return ViewHolder(

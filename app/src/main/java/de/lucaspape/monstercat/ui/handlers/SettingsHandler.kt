@@ -47,6 +47,30 @@ import kotlin.math.log
  * SettingsActivity
  */
 class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
+    override fun onCreate(view: View) {
+        setupRecyclerView(view)
+
+        itemAdapter.add(SettingsLabelItem("Catplayer settings"))
+
+        addLogin(view)
+        addPlaybackSettings(view)
+        addDataSettings(view)
+        addSwitches(view)
+        addPushNotificationSettingsButton(view)
+        addCustomApiButton(view)
+        addResetDatabaseButton(view)
+    }
+
+    override val layout: Int = R.layout.fragment_settings
+
+    override fun onBackPressed(view: View) {
+        closeSettings()
+    }
+
+    override fun onPause(view: View) {
+
+    }
+
     private var recyclerView: RecyclerView? = null
     private var itemAdapter: ItemAdapter<GenericItem> = ItemAdapter()
 
@@ -101,14 +125,88 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
         })
     }
 
-    override val layout: Int = R.layout.fragment_settings
+    private fun addDataSettings(view: View){
+        val settings = Settings.getSettings(view.context)
 
-    override fun onBackPressed(view: View) {
-        closeSettings()
+        itemAdapter.add(SettingsLabelItem("Data settings"))
+
+        val changeSetting: (setting: String, value: Boolean, switch: Switch) -> Boolean =
+            { setting, value, _ ->
+                settings.setBoolean(setting, value)
+                value
+            }
+
+        itemAdapter.add(
+            SettingsToggleItem(
+                view.context.getString(R.string.streamOverMobileSetting),
+                true,
+                view.context.getString(R.string.allowStreamMobile),
+                changeSetting
+            )
+        )
+        itemAdapter.add(
+            SettingsToggleItem(
+                view.context.getString(R.string.downloadOverMobileSetting),
+                true,
+                view.context.getString(R.string.allowDownloadMobile),
+                changeSetting
+            )
+        )
+        itemAdapter.add(
+            SettingsToggleItem(
+                view.context.getString(R.string.downloadCoversOverMobileSetting),
+                true,
+                view.context.getString(R.string.allowCoverDownloadMobile),
+                changeSetting
+            )
+        )
+
+        addCoverResolutionSeekBar(view)
     }
 
-    override fun onPause(view: View) {
+    private fun addPlaybackSettings(view: View){
+        val settings = Settings.getSettings(view.context)
 
+        itemAdapter.add(SettingsLabelItem("Playback settings"))
+
+        val changeSetting: (setting: String, value: Boolean, switch: Switch) -> Boolean =
+            { setting, value, _ ->
+                settings.setBoolean(setting, value)
+                value
+            }
+
+        itemAdapter.add(
+            SettingsToggleItem(
+                view.context.getString(R.string.disableAudioFocusSetting),
+                true,
+                view.context.getString(R.string.disableAudioFocusSwitch),
+                changeSetting
+            )
+        )
+
+        itemAdapter.add(
+            SettingsToggleItem(
+                view.context.getString(R.string.skipMonstercatSongsSetting),
+                true,
+                view.context.getString(R.string.skipSongsMonstercat),
+                changeSetting
+            )
+        )
+
+        itemAdapter.add(
+            SettingsToggleItem(
+                view.context.getString(R.string.playRelatedSetting),
+                true,
+                view.context.getString(R.string.playRelatedAfter)
+            ) { setting, value, _ ->
+                playRelatedSongsAfterPlaylistFinished = value
+                settings.setBoolean(setting, value)
+                value
+            }
+        )
+
+        addVolumeSeekBar(view)
+        addCrossFadeSeekBar(view)
     }
 
     private fun addResetDatabaseButton(view: View) {
@@ -254,6 +352,8 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
     }
 
     private fun addLogin(view: View) {
+        itemAdapter.add(SettingsLabelItem("Account settings"))
+
         itemAdapter.add(SettingsLoginItem { username, password ->
             val settings = Settings.getSettings(view.context)
             settings.setString(view.context.getString(R.string.emailSetting), username)
@@ -271,6 +371,8 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
         val context = view.context
         val settings = Settings.getSettings(context)
 
+        itemAdapter.add(SettingsLabelItem("Advanced settings"))
+
         val changeSetting: (setting: String, value: Boolean, switch: Switch) -> Boolean =
             { setting, value, _ ->
                 settings.setBoolean(setting, value)
@@ -285,38 +387,8 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
                 changeSetting
             )
         )
-        itemAdapter.add(
-            SettingsToggleItem(
-                context.getString(R.string.streamOverMobileSetting),
-                true,
-                context.getString(R.string.allowStreamMobile),
-                changeSetting
-            )
-        )
-        itemAdapter.add(
-            SettingsToggleItem(
-                context.getString(R.string.downloadOverMobileSetting),
-                true,
-                context.getString(R.string.allowDownloadMobile),
-                changeSetting
-            )
-        )
-        itemAdapter.add(
-            SettingsToggleItem(
-                context.getString(R.string.downloadCoversOverMobileSetting),
-                true,
-                context.getString(R.string.allowCoverDownloadMobile),
-                changeSetting
-            )
-        )
-        itemAdapter.add(
-            SettingsToggleItem(
-                context.getString(R.string.disableAudioFocusSetting),
-                true,
-                context.getString(R.string.disableAudioFocusSwitch),
-                changeSetting
-            )
-        )
+
+
         itemAdapter.add(
             SettingsToggleItem(
                 context.getString(R.string.liveInfoSetting),
@@ -361,14 +433,7 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
                 return@SettingsToggleItem value
             })
 
-        itemAdapter.add(
-            SettingsToggleItem(
-                context.getString(R.string.skipMonstercatSongsSetting),
-                true,
-                context.getString(R.string.skipSongsMonstercat),
-                changeSetting
-            )
-        )
+
         itemAdapter.add(
             SettingsToggleItem(
                 context.getString(R.string.useCustomApiSetting),
@@ -405,17 +470,7 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
                 }
             })
 
-        itemAdapter.add(
-            SettingsToggleItem(
-                context.getString(R.string.playRelatedSetting),
-                true,
-                context.getString(R.string.playRelatedAfter)
-            ) { setting, value, _ ->
-                playRelatedSongsAfterPlaylistFinished = value
-                settings.setBoolean(setting, value)
-                value
-            }
-        )
+
     }
 
     private fun addCoverResolutionSeekBar(view: View) {
@@ -510,17 +565,5 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
                         }
                 })
         }
-    }
-
-    override fun onCreate(view: View) {
-        setupRecyclerView(view)
-        addSwitches(view)
-        addLogin(view)
-        addResetDatabaseButton(view)
-        addCustomApiButton(view)
-        addPushNotificationSettingsButton(view)
-        addCoverResolutionSeekBar(view)
-        addVolumeSeekBar(view)
-        addCrossFadeSeekBar(view)
     }
 }
