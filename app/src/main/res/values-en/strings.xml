@@ -141,4 +141,9 @@
     <string name="defaultNotificationTopics">[{\"description\": \"Default push notifications\", \"topicname\": \"default\"}, {\"description\": \"Monstercat Newsletter\", \"topicname\": \"newsletter\"}]</string>
     <string name="pushNotifications">Push notifications</string>
     <string name="pushNotificationSettings">Change push notification settings</string>
+    <string name="catplayerSettings">Catplayer Settings</string>
+    <string name="accountSettings">Account Settings</string>
+    <string name="playbackSettings">Playback Settings</string>
+    <string name="dataSettings">Data Settings</string>
+    <string name="advancedSettings">Advanced Settings</string>
 </resources>

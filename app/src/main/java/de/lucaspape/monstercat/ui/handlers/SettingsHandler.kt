@@ -50,7 +50,7 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
     override fun onCreate(view: View) {
         setupRecyclerView(view)
 
-        itemAdapter.add(SettingsLabelItem("Catplayer settings"))
+        itemAdapter.add(SettingsLabelItem(view.context.getString(R.string.catplayerSettings)))
 
         addLogin(view)
         addPlaybackSettings(view)
@@ -128,7 +128,7 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
     private fun addDataSettings(view: View){
         val settings = Settings.getSettings(view.context)
 
-        itemAdapter.add(SettingsLabelItem("Data settings"))
+        itemAdapter.add(SettingsLabelItem(view.context.getString(R.string.dataSettings)))
 
         val changeSetting: (setting: String, value: Boolean, switch: Switch) -> Boolean =
             { setting, value, _ ->
@@ -167,7 +167,7 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
     private fun addPlaybackSettings(view: View){
         val settings = Settings.getSettings(view.context)
 
-        itemAdapter.add(SettingsLabelItem("Playback settings"))
+        itemAdapter.add(SettingsLabelItem(view.context.getString(R.string.playbackSettings)))
 
         val changeSetting: (setting: String, value: Boolean, switch: Switch) -> Boolean =
             { setting, value, _ ->
@@ -352,7 +352,7 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
     }
 
     private fun addLogin(view: View) {
-        itemAdapter.add(SettingsLabelItem("Account settings"))
+        itemAdapter.add(SettingsLabelItem(view.context.getString(R.string.accountSettings)))
 
         itemAdapter.add(SettingsLoginItem { username, password ->
             val settings = Settings.getSettings(view.context)
@@ -371,7 +371,7 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
         val context = view.context
         val settings = Settings.getSettings(context)
 
-        itemAdapter.add(SettingsLabelItem("Advanced settings"))
+        itemAdapter.add(SettingsLabelItem(view.context.getString(R.string.advancedSettings)))
 
         val changeSetting: (setting: String, value: Boolean, switch: Switch) -> Boolean =
             { setting, value, _ ->
