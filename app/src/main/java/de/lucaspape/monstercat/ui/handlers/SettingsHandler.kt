@@ -11,7 +11,13 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.mikepenz.fastadapter.FastAdapter
+import com.mikepenz.fastadapter.GenericItem
+import com.mikepenz.fastadapter.adapters.ItemAdapter
+import com.mikepenz.fastadapter.listeners.ClickEventHook
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.AlbumDatabaseHelper
 import de.lucaspape.monstercat.database.helper.CatalogSongDatabaseHelper
@@ -23,8 +29,7 @@ import de.lucaspape.monstercat.music.volume
 import de.lucaspape.monstercat.push.subscribeToChannel
 import de.lucaspape.monstercat.push.unsubscribeFromChannel
 import de.lucaspape.monstercat.request.async.checkCustomApiFeaturesAsync
-import de.lucaspape.monstercat.ui.abstract_items.AlertListToggleItem
-import de.lucaspape.monstercat.ui.abstract_items.HeaderTextItem
+import de.lucaspape.monstercat.ui.abstract_items.*
 import de.lucaspape.monstercat.ui.activities.MainActivity
 import de.lucaspape.monstercat.util.Auth
 import de.lucaspape.monstercat.util.displayAlertDialogToggleList
@@ -42,172 +47,72 @@ import kotlin.math.log
  * SettingsActivity
  */
 class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
-    private fun setupSwitches(view: View) {
-        val streamMobileSwitch = view.findViewById<Switch>(R.id.streamMobileSwitch)
-        val downloadMobileSwitch = view.findViewById<Switch>(R.id.downloadMobileSwitch)
-        val downloadCoversMobileSwitch = view.findViewById<Switch>(R.id.downloadCoversMobileSwitch)
-        val liveInfoSwitch = view.findViewById<Switch>(R.id.liveInfoSwitch)
-        val darkThemeSwitch = view.findViewById<Switch>(R.id.darkThemeSwitch)
-        val disableAudioFocusSwitch = view.findViewById<Switch>(R.id.audioFocusSwitch)
-        val downloadFlacSwitch = view.findViewById<Switch>(R.id.downloadFlacSwitch)
-        val skipMonstercatSongsSwitch = view.findViewById<Switch>(R.id.skipMonstercatSongsSwitch)
-        val useCustomApiSwitch = view.findViewById<Switch>(R.id.useCustomApi)
-        val playRelatedSwitch = view.findViewById<Switch>(R.id.playRelatedSwitch)
-        val saveCoverImagesToCacheSwitch =
-            view.findViewById<Switch>(R.id.saveCoverImagesToCacheSwitch)
+    private var recyclerView: RecyclerView? = null
+    private var itemAdapter: ItemAdapter<GenericItem> = ItemAdapter()
 
-        val settings = Settings.getSettings(view.context)
+    private fun setupRecyclerView(view: View) {
+        recyclerView = view.findViewById(R.id.settingsRecyclerView)
 
-        settings.getBoolean(view.context.getString(R.string.saveCoverImagesToCacheSetting))?.let {
-            saveCoverImagesToCacheSwitch.isChecked = it
-        }
+        recyclerView?.layoutManager =
+            LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
 
-        settings.getBoolean(view.context.getString(R.string.streamOverMobileSetting))?.let {
-            streamMobileSwitch.isChecked = it
-        }
+        itemAdapter = ItemAdapter()
 
+        val fastAdapter: FastAdapter<GenericItem> = FastAdapter.with(listOf(itemAdapter))
 
-        settings.getBoolean(view.context.getString(R.string.downloadOverMobileSetting))?.let {
-            downloadMobileSwitch.isChecked = it
-        }
+        recyclerView?.adapter = fastAdapter
 
-        settings.getBoolean(view.context.getString(R.string.downloadCoversOverMobileSetting))?.let {
-            downloadCoversMobileSwitch.isChecked = it
-        }
-
-        settings.getBoolean(view.context.getString(R.string.disableAudioFocusSetting))?.let {
-            disableAudioFocusSwitch.isChecked = it
-        }
-
-        settings.getBoolean(view.context.getString(R.string.liveInfoSetting))?.let {
-            liveInfoSwitch.isChecked = it
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            darkThemeSwitch.visibility = View.VISIBLE
-        } else {
-            darkThemeSwitch.visibility = View.GONE
-        }
-
-        settings.getBoolean(view.context.getString(R.string.darkThemeSetting))?.let {
-            darkThemeSwitch.isChecked = it
-        }
-
-        settings.getString(view.context.getString(R.string.downloadTypeSetting))?.let {
-            downloadFlacSwitch.isChecked = it == "flac"
-        }
-
-        settings.getBoolean(view.context.getString(R.string.skipMonstercatSongsSetting))?.let {
-            skipMonstercatSongsSwitch.isChecked = it
-        }
-
-        settings.getBoolean(view.context.getString(R.string.useCustomApiSetting))?.let {
-            useCustomApiSwitch.isChecked = it
-        }
-
-        settings.getBoolean(view.context.getString(R.string.playRelatedSetting))?.let {
-            playRelatedSwitch.isChecked = it
-        }
-
-        //set switch listeners
-        streamMobileSwitch.setOnCheckedChangeListener { _, isChecked ->
-            settings.setBoolean(view.context.getString(R.string.streamOverMobileSetting), isChecked)
-        }
-
-        downloadMobileSwitch.setOnCheckedChangeListener { _, isChecked ->
-            settings.setBoolean(
-                view.context.getString(R.string.downloadOverMobileSetting),
-                isChecked
-            )
-        }
-
-        downloadCoversMobileSwitch.setOnCheckedChangeListener { _, isChecked ->
-            settings.setBoolean(
-                view.context.getString(R.string.downloadCoversOverMobileSetting),
-                isChecked
-            )
-        }
-
-        disableAudioFocusSwitch.setOnCheckedChangeListener { _, isChecked ->
-            settings.setBoolean(
-                view.context.getString(R.string.disableAudioFocusSetting),
-                isChecked
-            )
-        }
-
-        darkThemeSwitch.setOnCheckedChangeListener { _, isChecked ->
-            settings.setBoolean(view.context.getString(R.string.darkThemeSetting), isChecked)
-
-            if (isChecked) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            } else {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        fastAdapter.addEventHook(object : ClickEventHook<GenericItem>() {
+            override fun onBind(viewHolder: RecyclerView.ViewHolder): View? {
+                return when (viewHolder) {
+                    is SettingsToggleItem.ViewHolder -> {
+                        viewHolder.alertItemSwitch
+                    }
+                    is SettingsButtonItem.ViewHolder -> {
+                        viewHolder.button
+                    }
+                    is SettingsLoginItem.ViewHolder -> {
+                        viewHolder.button
+                    }
+                    else -> null
+                }
             }
 
-        }
+            override fun onClick(
+                v: View,
+                position: Int,
+                fastAdapter: FastAdapter<GenericItem>,
+                item: GenericItem
+            ) {
+                if (item is SettingsToggleItem && v is Switch) {
+                    v.isChecked = item.onSwitchChange(item.setting, v.isChecked, v)
+                } else if (item is SettingsButtonItem && v is Button) {
+                    item.onClick()
+                } else if (item is SettingsLoginItem) {
+                    val usernameTextInput = view.findViewById<EditText>(R.id.settings_usernameInput)
+                    val passwordTextInput = view.findViewById<EditText>(R.id.settings_passwordInput)
 
-        liveInfoSwitch.setOnCheckedChangeListener { _, isChecked ->
-            settings.setBoolean(view.context.getString(R.string.liveInfoSetting), isChecked)
-        }
-
-        downloadFlacSwitch.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                settings.setString(view.context.getString(R.string.downloadTypeSetting), "flac")
-            } else {
-                settings.setString(view.context.getString(R.string.downloadTypeSetting), "mp3_320")
+                    item.onLogin(
+                        usernameTextInput.text.toString(),
+                        passwordTextInput.text.toString()
+                    )
+                }
             }
-        }
-
-        skipMonstercatSongsSwitch.setOnCheckedChangeListener { _, isChecked ->
-            settings.setBoolean(
-                view.context.getString(R.string.skipMonstercatSongsSetting),
-                isChecked
-            )
-        }
-
-        useCustomApiSwitch.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                //check for custom api features
-                checkCustomApiFeaturesAsync(view.context, {
-                    useCustomApiSwitch.isChecked = true
-                    settings.setBoolean(view.context.getString(R.string.useCustomApiSetting), true)
-                    displaySnackBar(
-                        view,
-                        view.context.getString(R.string.customApiEnabledMsg),
-                        null
-                    ) {}
-                }, {
-                    useCustomApiSwitch.isChecked = false
-                    settings.setBoolean(view.context.getString(R.string.useCustomApiSetting), false)
-                    displaySnackBar(
-                        view,
-                        view.context.getString(R.string.customApiEnableError),
-                        null
-                    ) {}
-                })
-            } else {
-                settings.setBoolean(view.context.getString(R.string.useCustomApiSetting), false)
-            }
-
-        }
-
-        playRelatedSwitch.setOnCheckedChangeListener { _, isChecked ->
-            settings.setBoolean(view.context.getString(R.string.playRelatedSetting), isChecked)
-            playRelatedSongsAfterPlaylistFinished = isChecked
-        }
-
-        saveCoverImagesToCacheSwitch.setOnCheckedChangeListener { _, isChecked ->
-            settings.setBoolean(
-                view.context.getString(R.string.saveCoverImagesToCacheSetting),
-                isChecked
-            )
-        }
+        })
     }
 
-    private fun setupButtons(view: View) {
-        val resetDatabaseButton = view.findViewById<Button>(R.id.resetDatabaseButton)
+    override val layout: Int = R.layout.fragment_settings
 
-        resetDatabaseButton.setOnClickListener {
+    override fun onBackPressed(view: View) {
+        closeSettings()
+    }
+
+    override fun onPause(view: View) {
+
+    }
+
+    private fun addResetDatabaseButton(view: View) {
+        itemAdapter.add(SettingsButtonItem(view.context.getString(R.string.resetDatabase)) {
             val alertDialogBuilder = AlertDialog.Builder(view.context)
                 .setTitle(view.context.getString(R.string.resetDatabase))
                 .setMessage(view.context.getString(R.string.resetDatabaseQuestion))
@@ -242,71 +147,13 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
 
             val negativeButton = dialog.getButton(DialogInterface.BUTTON_NEGATIVE)
             negativeButton.setTextColor(typedValue.data)
-        }
+        })
+    }
 
-        val settings = Settings.getSettings(view.context)
+    private fun addPushNotificationSettingsButton(view: View) {
+        itemAdapter.add(SettingsButtonItem(view.context.getString(R.string.pushNotifications)) {
+            val settings = Settings.getSettings(view.context)
 
-        //login button listener
-        view.findViewById<Button>(R.id.add_account).setOnClickListener {
-            val usernameInput = view.findViewById<EditText>(R.id.usernameInput)
-            val passwordInput = view.findViewById<EditText>(R.id.passwordInput)
-
-            val username = usernameInput.text.toString()
-            val password = passwordInput.text.toString()
-            settings.setString(view.context.getString(R.string.emailSetting), username)
-            settings.setString(view.context.getString(R.string.passwordSetting), password)
-
-            Auth().login(view.context, username, password, {
-                displayInfo(view.context, view.context.getString(R.string.loginSuccessfulMsg))
-            }, {
-                displayInfo(view.context, view.context.getString(R.string.loginFailedMsg))
-            })
-        }
-
-        view.findViewById<Button>(R.id.customApiInputButton).setOnClickListener {
-            MaterialAlertDialogBuilder(view.context).apply {
-                val layoutInflater =
-                    context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-
-                val customApiInputLayout =
-                    layoutInflater.inflate(R.layout.customapi_input_layout, null)
-
-                val customApiEditText =
-                    customApiInputLayout.findViewById<EditText>(R.id.customApiInput)
-
-                settings.getString(context.getString(R.string.customApiBaseUrlSetting))?.let {
-                    customApiEditText.setText(it)
-                }
-
-                setTitle(view.context.getString(R.string.setCustomApiUrl))
-
-                setPositiveButton(context.getString(R.string.ok)) { _, _ ->
-                    val newCustomApiUrl = customApiEditText.text.toString()
-                    settings.setString(
-                        view.context.getString(R.string.customApiBaseUrlSetting),
-                        newCustomApiUrl
-                    )
-                    settings.setBoolean(view.context.getString(R.string.useCustomApiSetting), false)
-                    view.findViewById<Switch>(R.id.useCustomApi).isChecked = false
-                }
-
-                setView(customApiInputLayout)
-                setCancelable(true)
-            }.create().run {
-                show()
-
-                val typedValue = TypedValue()
-                context.theme.resolveAttribute(R.attr.colorOnSurface, typedValue, true)
-
-                val positiveButton = getButton(DialogInterface.BUTTON_POSITIVE)
-                positiveButton.setTextColor(typedValue.data)
-
-                val negativeButton = getButton(DialogInterface.BUTTON_NEGATIVE)
-                negativeButton.setTextColor(typedValue.data)
-            }
-        }
-
-        view.findViewById<Button>(R.id.pushNotificationButton).setOnClickListener {
             val notificationTopics =
                 JSONArray((view.context.getString(R.string.defaultNotificationTopics)))
 
@@ -353,156 +200,327 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
                     notificationTopicsEnabled.toString()
                 )
             }
-        }
-    }
-
-    private fun setupCoverResolutionSeekBar(view: View) {
-        val coverResolutionSeekBar = view.findViewById<SeekBar>(R.id.coverResolutionSeekbar)
-        val shownCoverResolution = view.findViewById<TextView>(R.id.shownCoverResolution)
-
-        coverResolutionSeekBar.max = 2048 / 256
-
-        val settings = Settings.getSettings(view.context)
-
-        settings.getInt(view.context.getString(R.string.primaryCoverResolutionSetting))?.let {
-            coverResolutionSeekBar.progress = it / 256
-            shownCoverResolution.text = it.toString()
-        }
-
-        coverResolutionSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                if (fromUser) {
-                    if (progress != 0) {
-                        settings.setInt(
-                            view.context.getString(R.string.primaryCoverResolutionSetting),
-                            (progress * 256)
-                        )
-                        settings.setInt(
-                            view.context.getString(R.string.secondaryCoverResolutionSetting),
-                            (((progress) * 256) / 4)
-                        )
-                    } else {
-                        settings.setInt(
-                            view.context.getString(R.string.primaryCoverResolutionSetting),
-                            (128)
-                        )
-                        settings.setInt(
-                            view.context.getString(R.string.secondaryCoverResolutionSetting),
-                            (64)
-                        )
-                    }
-
-                    settings.getInt(view.context.getString(R.string.primaryCoverResolutionSetting))
-                        ?.let { shownCoverResolution.text = it.toString() }
-                }
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {
-
-            }
-
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {
-
-            }
         })
     }
 
-    private fun setupCrossfadeSeekBar(view: View) {
-        val crossfadeTimeSeekBar = view.findViewById<SeekBar>(R.id.crossfadeTimeSeekbar)
-        val shownCrossfadeTime = view.findViewById<TextView>(R.id.shownCrossfadeTime)
+    private fun addCustomApiButton(view: View) {
+        itemAdapter.add(SettingsButtonItem(view.context.getString(R.string.setCustomApiUrl)) {
+            val settings = Settings.getSettings(view.context)
 
-        crossfadeTimeSeekBar.max = 20000 / 1000
+            MaterialAlertDialogBuilder(view.context).apply {
+                val layoutInflater =
+                    context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
-        val settings = Settings.getSettings(view.context)
+                val customApiInputLayout =
+                    layoutInflater.inflate(R.layout.customapi_input_layout, null)
 
-        settings.getInt(view.context.getString(R.string.crossfadeTimeSetting))?.let {
-            crossfadeTimeSeekBar.progress = it / 1000
-            shownCrossfadeTime.text = (it / 1000).toString()
-            crossfade = it
-        }
+                val customApiEditText =
+                    customApiInputLayout.findViewById<EditText>(R.id.customApiInput)
 
+                settings.getString(context.getString(R.string.customApiBaseUrlSetting))?.let {
+                    customApiEditText.setText(it)
+                }
 
-        crossfadeTimeSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                if (fromUser) {
-                    settings.setInt(
-                        view.context.getString(R.string.crossfadeTimeSetting),
-                        (progress * 1000)
+                setTitle(view.context.getString(R.string.setCustomApiUrl))
+
+                setPositiveButton(context.getString(R.string.ok)) { _, _ ->
+                    val newCustomApiUrl = customApiEditText.text.toString()
+                    settings.setString(
+                        view.context.getString(R.string.customApiBaseUrlSetting),
+                        newCustomApiUrl
                     )
 
-                    settings.getInt(view.context.getString(R.string.crossfadeTimeSetting))
-                        ?.let {
-                            shownCrossfadeTime.text = (it / 1000).toString()
-                            crossfade = it
-                        }
+                    settings.setBoolean(view.context.getString(R.string.useCustomApiSetting), false)
+
+                    //recreate settings to reload
+                    onCreate(view)
                 }
-            }
 
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                setView(customApiInputLayout)
+                setCancelable(true)
+            }.create().run {
+                show()
 
-            }
+                val typedValue = TypedValue()
+                context.theme.resolveAttribute(R.attr.colorOnSurface, typedValue, true)
 
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                val positiveButton = getButton(DialogInterface.BUTTON_POSITIVE)
+                positiveButton.setTextColor(typedValue.data)
 
+                val negativeButton = getButton(DialogInterface.BUTTON_NEGATIVE)
+                negativeButton.setTextColor(typedValue.data)
             }
         })
     }
 
-    private fun setupVolumeSeekBar(view: View) {
-        val volumeSeekBar = view.findViewById<SeekBar>(R.id.volumeSeekBar)
-        val shownVolume = view.findViewById<TextView>(R.id.shownVolumeText)
+    private fun addLogin(view: View) {
+        itemAdapter.add(SettingsLoginItem { username, password ->
+            val settings = Settings.getSettings(view.context)
+            settings.setString(view.context.getString(R.string.emailSetting), username)
+            settings.setString(view.context.getString(R.string.passwordSetting), password)
 
-        volumeSeekBar.max = 100
+            Auth().login(view.context, username, password, {
+                displayInfo(view.context, view.context.getString(R.string.loginSuccessfulMsg))
+            }, {
+                displayInfo(view.context, view.context.getString(R.string.loginFailedMsg))
+            })
+        })
+    }
 
-        val settings = Settings.getSettings(view.context)
+    private fun addSwitches(view: View) {
+        val context = view.context
+        val settings = Settings.getSettings(context)
 
-        settings.getFloat(view.context.getString(R.string.volumeSetting))?.let {
-            volumeSeekBar.progress = (it * 100).toInt()
-            shownVolume.text = (it * 100).toString()
-            volume = 1 - log(100 - (it * 100), 100.toFloat())
+        val changeSetting: (setting: String, value: Boolean, switch: Switch) -> Boolean =
+            { setting, value, _ ->
+                settings.setBoolean(setting, value)
+                value
+            }
+
+        itemAdapter.add(
+            SettingsToggleItem(
+                context.getString(R.string.saveCoverImagesToCacheSetting),
+                true,
+                context.getString(R.string.saveCoverImagesToCache),
+                changeSetting
+            )
+        )
+        itemAdapter.add(
+            SettingsToggleItem(
+                context.getString(R.string.streamOverMobileSetting),
+                true,
+                context.getString(R.string.allowStreamMobile),
+                changeSetting
+            )
+        )
+        itemAdapter.add(
+            SettingsToggleItem(
+                context.getString(R.string.downloadOverMobileSetting),
+                true,
+                context.getString(R.string.allowDownloadMobile),
+                changeSetting
+            )
+        )
+        itemAdapter.add(
+            SettingsToggleItem(
+                context.getString(R.string.downloadCoversOverMobileSetting),
+                true,
+                context.getString(R.string.allowCoverDownloadMobile),
+                changeSetting
+            )
+        )
+        itemAdapter.add(
+            SettingsToggleItem(
+                context.getString(R.string.disableAudioFocusSetting),
+                true,
+                context.getString(R.string.disableAudioFocusSwitch),
+                changeSetting
+            )
+        )
+        itemAdapter.add(
+            SettingsToggleItem(
+                context.getString(R.string.liveInfoSetting),
+                true,
+                context.getString(R.string.loadLiveInfo),
+                changeSetting
+            )
+        )
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            itemAdapter.add(
+                SettingsToggleItem(
+                    context.getString(R.string.darkThemeSetting),
+                    true,
+                    context.getString(R.string.darkThemeSwitch)
+                ) { setting, value, _ ->
+                    settings.setBoolean(setting, value)
+
+                    if (value) {
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                    } else {
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                    }
+
+                    return@SettingsToggleItem value
+                })
         }
 
-        volumeSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                if (fromUser) {
+        itemAdapter.add(
+            SettingsToggleItem(
+                context.getString(R.string.downloadTypeSetting),
+                "flac",
+                context.getString(R.string.downloadFlacInsteadMp3)
+            ) { setting, value, _ ->
+                if (value) {
+                    settings.setString(setting, "flac")
+                } else {
+                    settings.setString(setting, "mp3_320")
+                }
+
+                return@SettingsToggleItem value
+            })
+
+        itemAdapter.add(
+            SettingsToggleItem(
+                context.getString(R.string.skipMonstercatSongsSetting),
+                true,
+                context.getString(R.string.skipSongsMonstercat),
+                changeSetting
+            )
+        )
+        itemAdapter.add(
+            SettingsToggleItem(
+                context.getString(R.string.useCustomApiSetting),
+                true,
+                context.getString(R.string.useCustomApi)
+            ) { setting, value, switch ->
+                if (value) {
+                    //check for custom api features
+
+                    checkCustomApiFeaturesAsync(context, {
+                        switch.isChecked = true
+                        settings.setBoolean(setting, true)
+                        displaySnackBar(
+                            view,
+                            context.getString(R.string.customApiEnabledMsg),
+                            null
+                        ) {}
+
+                    }, {
+                        switch.isChecked = false
+                        settings.setBoolean(setting, false)
+                        displaySnackBar(
+                            view,
+                            context.getString(R.string.customApiEnableError),
+                            null
+                        ) {}
+
+                    })
+
+                    true
+                } else {
+                    settings.setBoolean(setting, false)
+                    false
+                }
+            })
+
+        itemAdapter.add(
+            SettingsToggleItem(
+                context.getString(R.string.playRelatedSetting),
+                true,
+                context.getString(R.string.playRelatedAfter)
+            ) { setting, value, _ ->
+                playRelatedSongsAfterPlaylistFinished = value
+                settings.setBoolean(setting, value)
+                value
+            }
+        )
+    }
+
+    private fun addCoverResolutionSeekBar(view: View) {
+        val settings = Settings.getSettings(view.context)
+
+        settings.getInt(view.context.getString(R.string.primaryCoverResolutionSetting))
+            ?.let { orig ->
+                itemAdapter.add(
+                    SettingsSeekBarItem(
+                        view.context.getString(R.string.coverResolution),
+                        2048 / 256,
+                        orig / 256,
+                        orig
+                    ) { value, shownValueView ->
+                        if (value != 0) {
+                            settings.setInt(
+                                view.context.getString(R.string.primaryCoverResolutionSetting),
+                                (value * 256)
+                            )
+                            settings.setInt(
+                                view.context.getString(R.string.secondaryCoverResolutionSetting),
+                                (((value) * 256) / 4)
+                            )
+                        } else {
+                            settings.setInt(
+                                view.context.getString(R.string.primaryCoverResolutionSetting),
+                                (128)
+                            )
+                            settings.setInt(
+                                view.context.getString(R.string.secondaryCoverResolutionSetting),
+                                (64)
+                            )
+                        }
+
+                        settings.getInt(view.context.getString(R.string.primaryCoverResolutionSetting))
+                            ?.let { shownValueView.text = it.toString() }
+                    })
+            }
+    }
+
+    private fun addVolumeSeekBar(view: View) {
+        val settings = Settings.getSettings(view.context)
+
+        settings.getFloat(view.context.getString(R.string.volumeSetting))?.let { orig ->
+            volume = 1 - log(100 - (orig * 100), 100.toFloat())
+
+            itemAdapter.add(
+                SettingsSeekBarItem(
+                    view.context.getString(R.string.volume),
+                    100,
+                    (orig * 100).toInt(),
+                    (orig * 100).toInt()
+                ) { value, shownValueView ->
                     settings.setFloat(
                         view.context.getString(R.string.volumeSetting),
-                        (progress.toFloat() / 100.toFloat())
+                        (value.toFloat() / 100.toFloat())
                     )
 
                     settings.getFloat(view.context.getString(R.string.volumeSetting))
                         ?.let {
-                            shownVolume.text = ((it * 100).toInt()).toString()
+                            shownValueView.text = ((it * 100).toInt()).toString()
                             volume = 1 - log(100 - (it * 100), 100.toFloat())
                         }
-                }
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {
-
-            }
-
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {
-
-            }
-        })
+                })
+        }
     }
 
-    override val layout: Int = R.layout.fragment_settings
+    private fun addCrossFadeSeekBar(view: View) {
+        val settings = Settings.getSettings(view.context)
 
-    override fun onBackPressed(view: View) {
-        closeSettings()
-    }
+        settings.getInt(view.context.getString(R.string.crossfadeTimeSetting))?.let { orig ->
+            crossfade = orig
 
-    override fun onPause(view: View) {
+            itemAdapter.add(
+                SettingsSeekBarItem(
+                    view.context.getString(R.string.crossfade),
+                    20000 / 1000,
+                    orig / 1000,
+                    orig / 1000
+                ) { value, shownValueView ->
+                    shownValueView.text = value.toString()
 
+                    settings.setInt(
+                        view.context.getString(R.string.crossfadeTimeSetting),
+                        (value * 1000)
+                    )
+
+                    settings.getInt(view.context.getString(R.string.crossfadeTimeSetting))
+                        ?.let {
+                            shownValueView.text = (it / 1000).toString()
+                            crossfade = it
+                        }
+                })
+        }
     }
 
     override fun onCreate(view: View) {
-        setupSwitches(view)
-        setupButtons(view)
-        setupCoverResolutionSeekBar(view)
-        setupCrossfadeSeekBar(view)
-        setupVolumeSeekBar(view)
+        setupRecyclerView(view)
+        addSwitches(view)
+        addLogin(view)
+        addResetDatabaseButton(view)
+        addCustomApiButton(view)
+        addPushNotificationSettingsButton(view)
+        addCoverResolutionSeekBar(view)
+        addVolumeSeekBar(view)
+        addCrossFadeSeekBar(view)
     }
 }
