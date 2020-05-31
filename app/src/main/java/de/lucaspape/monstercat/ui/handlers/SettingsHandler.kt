@@ -48,6 +48,8 @@ import kotlin.math.log
  */
 class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
     override fun onCreate(view: View) {
+        HomeHandler.lastOpen = "settings-view"
+
         setupRecyclerView(view)
 
         itemAdapter.add(SettingsLabelItem(view.context.getString(R.string.catplayerSettings)))
