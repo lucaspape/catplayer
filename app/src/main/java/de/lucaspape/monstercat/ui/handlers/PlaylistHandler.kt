@@ -23,6 +23,7 @@ import de.lucaspape.monstercat.ui.abstract_items.PlaylistItem
 import de.lucaspape.monstercat.request.async.loadPlaylistAsync
 import de.lucaspape.monstercat.request.async.loadPlaylistTracksAsync
 import de.lucaspape.monstercat.ui.activities.MainActivity
+import de.lucaspape.monstercat.ui.handlers.HomeHandler.Companion.lastOpen
 import de.lucaspape.monstercat.ui.offlineDrawable
 import de.lucaspape.monstercat.util.*
 import de.lucaspape.util.BackgroundAsync
@@ -476,6 +477,8 @@ class PlaylistHandler(private val initPlaylistId: String?) : Handler {
     override val layout: Int = R.layout.fragment_playlist
 
     override fun onCreate(view: View) {
+        lastOpen = "playlist-view"
+
         val settings = Settings.getSettings(view.context)
 
         val username = settings.getString(view.context.getString(R.string.emailSetting))

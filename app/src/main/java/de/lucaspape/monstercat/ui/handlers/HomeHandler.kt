@@ -1,5 +1,6 @@
 package de.lucaspape.monstercat.ui.handlers
 
+import android.content.Context
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -10,12 +11,19 @@ import de.lucaspape.monstercat.twitch.Stream
 import de.lucaspape.util.CustomSpinnerClass
 import de.lucaspape.util.Settings
 
+interface HomeHandlerInterface{
+    fun saveRecyclerViewPosition(context: Context)
+    fun onCreate(view: View)
+    fun resetRecyclerViewSavedPosition(context: Context)
+}
+
 class HomeHandler(private val onSearch: (searchString: String?) -> Unit,
                   private val openSettings: () -> Unit,
                   private val albumMcId: String?) : Handler{
 
     companion object{
         @JvmStatic var addSongsTaskId = ""
+        @JvmStatic var lastOpen = ""
     }
 
     override val layout: Int = R.layout.fragment_home
@@ -24,32 +32,59 @@ class HomeHandler(private val onSearch: (searchString: String?) -> Unit,
     }
 
     override fun onPause(view: View) {
+        homeHandlerObject?.saveRecyclerViewPosition(view.context)
     }
+
+    var homeHandlerObject:HomeHandlerInterface? = null
 
     override fun onCreate(view: View) {
         setupSpinner(view)
 
         if(!registerListeners(view) && albumMcId == null){
-            catalogView(view)
+            catalogView(view, lastOpen == "catalog-view")
         }else if(albumMcId != null){
-            openAlbum(view, null, albumMcId)
+            openAlbum(view, null, albumMcId, lastOpen == "catalog-view-album")
         }else{
-            albumView(view)
+            albumView(view, lastOpen == "album-view")
         }
     }
 
-    private fun catalogView(view: View){
-        HomeCatalogHandler(null, null).onCreate(view)
+    private fun catalogView(view: View, resetPosition:Boolean){
+        homeHandlerObject?.saveRecyclerViewPosition(view.context)
+
+        homeHandlerObject = HomeCatalogHandler(null, null)
+
+        if(resetPosition)
+            homeHandlerObject?.resetRecyclerViewSavedPosition(view.context)
+
+        homeHandlerObject?.onCreate(view)
+
+        lastOpen = "catalog-view"
     }
 
-    private fun openAlbum(view: View, albumId:String?, albumMcId: String){
-        HomeCatalogHandler(albumId, albumMcId).onCreate(view)
+    private fun openAlbum(view: View, albumId:String?, albumMcId: String, resetPosition: Boolean){
+        homeHandlerObject?.saveRecyclerViewPosition(view.context)
+        homeHandlerObject = HomeCatalogHandler(albumId, albumMcId)
+        if(resetPosition)
+            homeHandlerObject?.resetRecyclerViewSavedPosition(view.context)
+
+        homeHandlerObject?.onCreate(view)
+
+        lastOpen = "catalog-view-album"
     }
 
-    private fun albumView(view: View){
-        HomeAlbumHandler { albumId, albumMcId ->
-            openAlbum(view, albumId, albumMcId)
-        }.onCreate(view)
+    private fun albumView(view: View, resetPosition: Boolean){
+        homeHandlerObject?.saveRecyclerViewPosition(view.context)
+        homeHandlerObject = HomeAlbumHandler { albumId, albumMcId ->
+            openAlbum(view, albumId, albumMcId, false)
+        }
+
+        if(resetPosition)
+            homeHandlerObject?.resetRecyclerViewSavedPosition(view.context)
+
+        homeHandlerObject?.onCreate(view)
+
+        lastOpen = "album-view"
     }
 
     /**
@@ -122,7 +157,7 @@ class HomeHandler(private val onSearch: (searchString: String?) -> Unit,
                                 false
                             )
 
-                            catalogView(view)
+                            catalogView(view, false)
                         }
                         viewSelector.getItemAtPosition(position) == view.context.getString(R.string.albumView) -> {
                             albumViewSelected = true
@@ -132,7 +167,7 @@ class HomeHandler(private val onSearch: (searchString: String?) -> Unit,
                                 true
                             )
 
-                            albumView(view)
+                            albumView(view, false)
                         }
                     }
                 }

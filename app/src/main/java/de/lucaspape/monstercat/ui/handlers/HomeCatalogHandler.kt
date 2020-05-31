@@ -1,5 +1,6 @@
 package de.lucaspape.monstercat.ui.handlers
 
+import android.content.Context
 import android.view.View
 import android.widget.ImageButton
 import androidx.core.net.toUri
@@ -23,15 +24,16 @@ import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.request.async.loadAlbumAsync
 import de.lucaspape.monstercat.request.async.loadSongListAsync
 import de.lucaspape.monstercat.util.displaySnackBar
+import de.lucaspape.util.Cache
 import de.lucaspape.util.Settings
 import java.io.File
 
 class HomeCatalogHandler(
     private val albumId: String?,
     private val albumMcId: String?
-) {
+):HomeHandlerInterface {
 
-    fun onCreate(view: View) {
+    override fun onCreate(view: View) {
         setupRecyclerView(view)
 
         if (albumMcId != null) {
@@ -198,26 +200,113 @@ class HomeCatalogHandler(
 
         viewData.add(item)
         itemAdapter.add(item)
+
+        val cache = Cache()
+        var cacheList = cache.get<ArrayList<String>>("catalog-view")
+
+        if(cacheList == null){
+            cacheList = ArrayList()
+        }
+
+        cacheList.add(songId)
+        cache.set("catalog-view", cacheList)
+    }
+
+    private fun addSongFromCache(songId: String){
+        val item = CatalogItem(songId)
+
+        viewData.add(item)
+        itemAdapter.add(item)
+    }
+
+    override fun resetRecyclerViewSavedPosition(context: Context){
+        val settings = Settings.getSettings(context)
+        settings.setInt("catalogview-positionIndex", 0)
+        settings.setInt("catalogview-topView", 0)
+    }
+
+    private fun restoreRecyclerViewPosition(context: Context){
+        recyclerView?.let {
+            val settings = Settings.getSettings(context)
+            settings.getInt("catalogview-positionIndex")?.let { positionIndex ->
+                settings.getInt("catalogview-topView")?.let { topView ->
+                    val layoutManager = it.layoutManager as LinearLayoutManager
+                    layoutManager.scrollToPositionWithOffset(positionIndex, topView)
+                }
+            }
+        }
+    }
+
+    override fun saveRecyclerViewPosition(context: Context){
+        recyclerView?.let {
+            val layoutManager = it.layoutManager as LinearLayoutManager
+
+            val positionIndex = layoutManager.findFirstVisibleItemPosition()
+            val startView = it.getChildAt(0)
+
+            startView?.let { sView ->
+                val topView = sView.top - sView.paddingTop
+
+                val settings = Settings.getSettings(context)
+                settings.setInt("catalogview-positionIndex", positionIndex)
+                settings.setInt("catalogview-topView", topView)
+            }
+        }
     }
 
     private fun loadInitSongList(view: View, forceReload: Boolean) {
+        val songListCache = Cache().get<ArrayList<String>>("catalog-view")
+
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.homePullToRefresh)
 
-        val catalogSongDatabaseHelper =
-            CatalogSongDatabaseHelper(view.context)
+        if(songListCache.isNullOrEmpty() || forceReload){
+            val catalogSongDatabaseHelper =
+                CatalogSongDatabaseHelper(view.context)
 
-        if (forceReload) {
-            catalogSongDatabaseHelper.reCreateTable()
-        }
+            if (forceReload) {
+                catalogSongDatabaseHelper.reCreateTable()
+            }
 
-        loadSongListAsync(view.context, forceReload, 0, displayLoading = {
-            swipeRefreshLayout.isRefreshing = true
-        }, finishedCallback = { _, _, _ ->
-            val songList = catalogSongDatabaseHelper.getSongs(0, 50)
+            loadSongListAsync(view.context, forceReload, 0, displayLoading = {
+                swipeRefreshLayout.isRefreshing = true
+            }, finishedCallback = { _, _, _ ->
+                val songList = catalogSongDatabaseHelper.getSongs(0, 50)
 
-            for (song in songList) {
-                addSong(song.songId)
+                for (song in songList) {
+                    addSong(song.songId)
+                }
+
+                /**
+                 * On scroll down (load next)
+                 */
+                recyclerView?.addOnScrollListener(object :
+                    EndlessRecyclerOnScrollListener(footerAdapter) {
+                    override fun onLoadMore(currentPage: Int) {
+                        loadSongList(view, currentPage)
+                    }
+                })
+
+                //refresh
+                swipeRefreshLayout.setOnRefreshListener {
+                    loadInitSongList(view, true)
+                }
+
+                swipeRefreshLayout.isRefreshing = false
+            }, errorCallback = { _, _, _ ->
+                swipeRefreshLayout.isRefreshing = false
+
+                displaySnackBar(
+                    view,
+                    view.context.getString(R.string.errorLoadingSongList),
+                    view.context.getString(R.string.retry)
+                ) {
+                    loadInitSongList(view, forceReload)
+                }
+            })
+        }else{
+            for (songId in songListCache) {
+                addSongFromCache(songId)
             }
 
             /**
@@ -236,17 +325,10 @@ class HomeCatalogHandler(
             }
 
             swipeRefreshLayout.isRefreshing = false
-        }, errorCallback = { _, _, _ ->
-            swipeRefreshLayout.isRefreshing = false
 
-            displaySnackBar(
-                view,
-                view.context.getString(R.string.errorLoadingSongList),
-                view.context.getString(R.string.retry)
-            ) {
-                loadInitSongList(view, forceReload)
-            }
-        })
+            restoreRecyclerViewPosition(view.context)
+            resetRecyclerViewSavedPosition(view.context)
+        }
     }
 
     /**

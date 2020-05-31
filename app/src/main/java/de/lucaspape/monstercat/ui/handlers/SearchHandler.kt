@@ -39,6 +39,8 @@ class SearchHandler(
     }
 
     override fun onCreate(view: View) {
+        HomeHandler.lastOpen = "search-view"
+
         registerListeners(view)
 
         val searchView = view.findViewById<SearchView>(R.id.searchInput)

@@ -18,8 +18,8 @@ import de.lucaspape.monstercat.util.displaySnackBar
 import de.lucaspape.util.Cache
 import de.lucaspape.util.Settings
 
-class HomeAlbumHandler(private val onSingleAlbumLoad: (albumId: String, albumMcId: String) -> Unit) {
-    fun onCreate(view: View) {
+class HomeAlbumHandler(private val onSingleAlbumLoad: (albumId: String, albumMcId: String) -> Unit):HomeHandlerInterface {
+    override fun onCreate(view: View) {
         setupRecyclerView(view)
         loadInitAlbumList(view, false)
     }
@@ -56,7 +56,6 @@ class HomeAlbumHandler(private val onSingleAlbumLoad: (albumId: String, albumMcI
                 val albumItem = viewData[position]
 
                 albumDatabaseHelper.getAlbum(albumItem.albumId)?.mcID?.let { mcID ->
-                    saveRecyclerViewPosition(view.context)
                     onSingleAlbumLoad(albumItem.albumId, mcID)
                 }
 
@@ -90,6 +89,23 @@ class HomeAlbumHandler(private val onSingleAlbumLoad: (albumId: String, albumMcI
 
         itemAdapter.add(item)
         viewData.add(item)
+
+        val cache = Cache()
+        var cacheList = cache.get<ArrayList<String>>("album-view")
+
+        if(cacheList == null){
+            cacheList = ArrayList()
+        }
+
+        cacheList.add(albumId)
+        cache.set("album-view", cacheList)
+    }
+
+    private fun addAlbumFromCache(albumId:String){
+        val item = AlbumItem(albumId)
+
+        itemAdapter.add(item)
+        viewData.add(item)
     }
 
     private fun loadInitAlbumList(view: View, forceReload: Boolean) {
@@ -110,14 +126,9 @@ class HomeAlbumHandler(private val onSingleAlbumLoad: (albumId: String, albumMcI
             }, { _, _, _ ->
                 val albumList = albumDatabaseHelper.getAlbums(0, 50)
 
-                val cacheList = ArrayList<String>()
-
                 for (album in albumList) {
                     addAlbum(album.albumId)
-                    cacheList.add(album.albumId)
                 }
-
-                Cache().set("album-view", cacheList)
 
                 /**
                  * On scroll down (load next)
@@ -148,7 +159,7 @@ class HomeAlbumHandler(private val onSingleAlbumLoad: (albumId: String, albumMcI
             })
         }else{
             for (albumId in albumListCache) {
-                addAlbum(albumId)
+                addAlbumFromCache(albumId)
             }
 
             /**
@@ -173,7 +184,7 @@ class HomeAlbumHandler(private val onSingleAlbumLoad: (albumId: String, albumMcI
         }
     }
 
-    private fun resetRecyclerViewSavedPosition(context: Context){
+    override fun resetRecyclerViewSavedPosition(context: Context){
         val settings = Settings.getSettings(context)
         settings.setInt("albumview-positionIndex", 0)
         settings.setInt("albumview-topView", 0)
@@ -191,7 +202,7 @@ class HomeAlbumHandler(private val onSingleAlbumLoad: (albumId: String, albumMcI
         }
     }
 
-    private fun saveRecyclerViewPosition(context:Context){
+    override fun saveRecyclerViewPosition(context:Context){
         recyclerView?.let {
             val layoutManager = it.layoutManager as LinearLayoutManager
 
