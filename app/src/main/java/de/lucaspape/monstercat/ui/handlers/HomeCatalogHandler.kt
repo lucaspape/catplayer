@@ -1,0 +1,380 @@
+package de.lucaspape.monstercat.ui.handlers
+
+import android.view.View
+import android.widget.ImageButton
+import androidx.core.net.toUri
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.mikepenz.fastadapter.FastAdapter
+import com.mikepenz.fastadapter.GenericItem
+import com.mikepenz.fastadapter.adapters.ItemAdapter
+import com.mikepenz.fastadapter.listeners.ClickEventHook
+import com.mikepenz.fastadapter.scroll.EndlessRecyclerOnScrollListener
+import de.lucaspape.monstercat.ui.abstract_items.CatalogItem
+import de.lucaspape.monstercat.ui.abstract_items.HeaderTextItem
+import de.lucaspape.monstercat.ui.abstract_items.ProgressItem
+import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.database.helper.AlbumDatabaseHelper
+import de.lucaspape.monstercat.database.helper.AlbumItemDatabaseHelper
+import de.lucaspape.monstercat.database.helper.CatalogSongDatabaseHelper
+import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
+import de.lucaspape.monstercat.download.addDownloadSong
+import de.lucaspape.monstercat.request.async.loadAlbumAsync
+import de.lucaspape.monstercat.request.async.loadSongListAsync
+import de.lucaspape.monstercat.util.displaySnackBar
+import de.lucaspape.util.Settings
+import java.io.File
+
+class HomeCatalogHandler(
+    private val albumId: String?,
+    private val albumMcId: String?
+) {
+
+    fun onCreate(view: View) {
+        setupRecyclerView(view)
+
+        if (albumMcId != null) {
+            loadAlbum(view, albumId, albumMcId, false)
+        } else {
+            loadInitSongList(view, false)
+        }
+    }
+
+    private var recyclerView: RecyclerView? = null
+    private var itemAdapter = ItemAdapter<CatalogItem>()
+    private var headerAdapter = ItemAdapter<HeaderTextItem>()
+    private var footerAdapter = ItemAdapter<ProgressItem>()
+
+    private var viewData = ArrayList<CatalogItem>()
+
+    private var itemHeaderOffset = 0
+
+    private fun setupRecyclerView(view: View) {
+        recyclerView = view.findViewById(R.id.homeRecyclerView)
+
+        itemAdapter = ItemAdapter()
+        headerAdapter = ItemAdapter()
+        footerAdapter = ItemAdapter()
+
+        itemHeaderOffset = 0
+
+        viewData = ArrayList()
+
+        val fastAdapter: FastAdapter<GenericItem> =
+            FastAdapter.with(listOf(headerAdapter, itemAdapter, footerAdapter))
+
+        recyclerView?.layoutManager =
+            LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
+
+        recyclerView?.adapter = fastAdapter
+
+        /**
+         * On song click
+         */
+        fastAdapter.onClickListener = { _, _, _, position ->
+            val itemIndex = position + itemHeaderOffset
+
+            if (itemIndex >= 0 && itemIndex < viewData.size) {
+                val fistItem = viewData[itemIndex]
+
+                val skipMonstercatSongs =
+                    Settings(view.context).getBoolean(view.context.getString(R.string.skipMonstercatSongsSetting)) == true
+
+                if (albumId == null) {
+                    playSongsFromCatalogDbAsync(view.context, skipMonstercatSongs, fistItem.songId)
+                } else {
+                    playSongsFromViewDataAsync(
+                        view.context,
+                        skipMonstercatSongs,
+                        viewData,
+                        itemIndex
+                    )
+                }
+            }
+
+            false
+        }
+
+        /**
+         * On song long click
+         */
+        fastAdapter.onLongClickListener = { _, _, _, position ->
+            val itemIndex = position + itemHeaderOffset
+
+            if (itemIndex >= 0 && itemIndex < viewData.size) {
+                val idList = ArrayList<String>()
+
+                for (catalogItem in viewData) {
+                    idList.add(catalogItem.songId)
+                }
+
+                CatalogItem.showContextMenu(view, idList, itemIndex)
+            }
+
+            false
+        }
+
+        /**
+         * On menu button click
+         */
+        fastAdapter.addEventHook(object : ClickEventHook<CatalogItem>() {
+            override fun onBind(viewHolder: RecyclerView.ViewHolder): View? {
+                return if (viewHolder is CatalogItem.ViewHolder) {
+                    viewHolder.titleMenuButton
+                } else null
+            }
+
+            override fun onClick(
+                v: View,
+                position: Int,
+                fastAdapter: FastAdapter<CatalogItem>,
+                item: CatalogItem
+            ) {
+                val itemIndex = position + itemHeaderOffset
+
+                if (itemIndex >= 0 && itemIndex < viewData.size) {
+                    val idList = ArrayList<String>()
+
+                    for (catalogItem in viewData) {
+                        idList.add(catalogItem.songId)
+                    }
+
+                    CatalogItem.showContextMenu(view, idList, itemIndex)
+                }
+            }
+        })
+
+        /**
+         * On download button click
+         */
+        fastAdapter.addEventHook(object : ClickEventHook<CatalogItem>() {
+            override fun onBind(viewHolder: RecyclerView.ViewHolder): View? {
+                return if (viewHolder is CatalogItem.ViewHolder) {
+                    viewHolder.titleDownloadButton
+                } else null
+            }
+
+            override fun onClick(
+                v: View,
+                position: Int,
+                fastAdapter: FastAdapter<CatalogItem>,
+                item: CatalogItem
+            ) {
+                val songDatabaseHelper = SongDatabaseHelper(view.context)
+                val song = songDatabaseHelper.getSong(view.context, item.songId)
+
+                song?.let {
+                    val titleDownloadButton = v as ImageButton
+
+                    when {
+                        File(song.downloadLocation).exists() -> {
+                            File(song.downloadLocation).delete()
+                            titleDownloadButton.setImageURI(song.getSongDownloadStatus().toUri())
+                        }
+                        else -> {
+                            addDownloadSong(
+                                v.context,
+                                item.songId
+                            ) {
+                                titleDownloadButton.setImageURI(
+                                    song.getSongDownloadStatus().toUri()
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        })
+    }
+
+    private fun addHeader(headerText: String) {
+        headerAdapter.add(HeaderTextItem(headerText))
+        itemHeaderOffset + -1
+    }
+
+    private fun addSong(songId: String) {
+        val item = CatalogItem(songId)
+
+        viewData.add(item)
+        itemAdapter.add(item)
+    }
+
+    private fun loadInitSongList(view: View, forceReload: Boolean) {
+        val swipeRefreshLayout =
+            view.findViewById<SwipeRefreshLayout>(R.id.homePullToRefresh)
+
+        val catalogSongDatabaseHelper =
+            CatalogSongDatabaseHelper(view.context)
+
+        if (forceReload) {
+            catalogSongDatabaseHelper.reCreateTable()
+        }
+
+        loadSongListAsync(view.context, forceReload, 0, displayLoading = {
+            swipeRefreshLayout.isRefreshing = true
+        }, finishedCallback = { _, _, _ ->
+            val songList = catalogSongDatabaseHelper.getSongs(0, 50)
+
+            for (song in songList) {
+                addSong(song.songId)
+            }
+
+            /**
+             * On scroll down (load next)
+             */
+            recyclerView?.addOnScrollListener(object :
+                EndlessRecyclerOnScrollListener(footerAdapter) {
+                override fun onLoadMore(currentPage: Int) {
+                    loadSongList(view, currentPage)
+                }
+            })
+
+            //refresh
+            swipeRefreshLayout.setOnRefreshListener {
+                loadInitSongList(view, true)
+            }
+
+            swipeRefreshLayout.isRefreshing = false
+        }, errorCallback = { _, _, _ ->
+            swipeRefreshLayout.isRefreshing = false
+
+            displaySnackBar(
+                view,
+                view.context.getString(R.string.errorLoadingSongList),
+                view.context.getString(R.string.retry)
+            ) {
+                loadInitSongList(view, forceReload)
+            }
+        })
+    }
+
+    /**
+     * Loads next 50 songs
+     */
+    private fun loadSongList(
+        view: View,
+        currentPage: Int
+    ) {
+        footerAdapter.clear()
+        footerAdapter.add(ProgressItem())
+
+        loadSongListAsync(view.context,
+            false,
+            (currentPage * 50),
+            displayLoading = {},
+            finishedCallback = { _, _, _ ->
+                val catalogSongDatabaseHelper =
+                    CatalogSongDatabaseHelper(view.context)
+
+                val songList =
+                    catalogSongDatabaseHelper.getSongs((currentPage * 50).toLong(), 50)
+
+                for (song in songList) {
+                    addSong(song.songId)
+                }
+
+                footerAdapter.clear()
+
+                //DONE
+            },
+            errorCallback = { _, _, _ ->
+                footerAdapter.clear()
+
+                displaySnackBar(
+                    view,
+                    view.context.getString(R.string.errorLoadingSongList),
+                    view.context.getString(R.string.retry)
+                ) {
+                    loadSongList(view, currentPage)
+                }
+            })
+    }
+
+    private fun loadAlbum(view: View, albumId: String?, albumMcId: String, forceReload: Boolean) {
+        val swipeRefreshLayout =
+            view.findViewById<SwipeRefreshLayout>(R.id.homePullToRefresh)
+
+        if (albumId == null) {
+            loadAlbumTracks(view.context, albumMcId, finishedCallback = {
+                val albumDatabaseHelper = AlbumDatabaseHelper(view.context)
+                albumDatabaseHelper.getAlbumFromMcId(albumMcId)?.let { album ->
+                    val albumItemDatabaseHelper =
+                        AlbumItemDatabaseHelper(view.context, album.albumId)
+                    val albumItemList = albumItemDatabaseHelper.getAllData()
+
+                    for (albumItem in albumItemList) {
+                        addSong(albumItem.songId)
+                    }
+
+                    /**
+                     * On scroll down (load next)
+                     */
+                    recyclerView?.addOnScrollListener(object :
+                        EndlessRecyclerOnScrollListener(footerAdapter) {
+                        override fun onLoadMore(currentPage: Int) {
+                        }
+                    })
+
+                    //refresh
+                    swipeRefreshLayout.setOnRefreshListener {
+                        loadAlbum(view, albumId, albumMcId, true)
+                    }
+
+                    swipeRefreshLayout.isRefreshing = false
+                }
+            }, errorCallback = {
+                //TODO handle error
+                swipeRefreshLayout.isRefreshing = false
+            })
+        } else {
+            var albumName = ""
+
+            AlbumDatabaseHelper(view.context).getAlbum(albumId)?.let {
+                albumName = it.title
+            }
+
+            loadAlbumAsync(view.context, forceReload, albumId, albumMcId, {
+                swipeRefreshLayout.isRefreshing = true
+            }, { _, _, _, _ ->
+                val albumItemDatabaseHelper =
+                    AlbumItemDatabaseHelper(view.context, albumId)
+
+                val albumItemList = albumItemDatabaseHelper.getAllData()
+
+                addHeader(albumName)
+
+                for (albumItem in albumItemList) {
+                    addSong(albumItem.songId)
+                }
+
+                /**
+                 * On scroll down (load next)
+                 */
+                recyclerView?.addOnScrollListener(object :
+                    EndlessRecyclerOnScrollListener(footerAdapter) {
+                    override fun onLoadMore(currentPage: Int) {
+                    }
+                })
+
+                //refresh
+                swipeRefreshLayout.setOnRefreshListener {
+                    loadAlbum(view, albumId, albumMcId, true)
+                }
+
+                swipeRefreshLayout.isRefreshing = false
+
+            }, { _, _, _, _ ->
+                swipeRefreshLayout.isRefreshing = false
+
+                displaySnackBar(
+                    view,
+                    view.context.getString(R.string.errorLoadingAlbum),
+                    view.context.getString(R.string.retry)
+                ) {
+                    loadAlbum(view, albumId, albumMcId, forceReload)
+                }
+            })
+        }
+    }
+}

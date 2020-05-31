@@ -1,0 +1,239 @@
+package de.lucaspape.monstercat.ui.handlers
+
+import android.content.Context
+import android.view.View
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.mikepenz.fastadapter.FastAdapter
+import com.mikepenz.fastadapter.GenericItem
+import com.mikepenz.fastadapter.adapters.ItemAdapter
+import com.mikepenz.fastadapter.scroll.EndlessRecyclerOnScrollListener
+import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.database.helper.AlbumDatabaseHelper
+import de.lucaspape.monstercat.request.async.loadAlbumListAsync
+import de.lucaspape.monstercat.ui.abstract_items.AlbumItem
+import de.lucaspape.monstercat.ui.abstract_items.ProgressItem
+import de.lucaspape.monstercat.util.displaySnackBar
+import de.lucaspape.util.Cache
+import de.lucaspape.util.Settings
+
+class HomeAlbumHandler(private val onSingleAlbumLoad: (albumId: String, albumMcId: String) -> Unit) {
+    fun onCreate(view: View) {
+        setupRecyclerView(view)
+        loadInitAlbumList(view, false)
+    }
+
+    private var recyclerView: RecyclerView? = null
+    private var itemAdapter = ItemAdapter<AlbumItem>()
+    private var footerAdapter = ItemAdapter<ProgressItem>()
+
+    private var viewData = ArrayList<AlbumItem>()
+
+    private fun setupRecyclerView(view: View) {
+        recyclerView = view.findViewById(R.id.homeRecyclerView)
+
+        itemAdapter = ItemAdapter()
+        footerAdapter = ItemAdapter()
+
+        viewData = ArrayList()
+
+        val fastAdapter: FastAdapter<GenericItem> =
+            FastAdapter.with(listOf(itemAdapter, footerAdapter))
+
+        recyclerView?.layoutManager =
+            LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
+
+        recyclerView?.adapter = fastAdapter
+
+        val albumDatabaseHelper = AlbumDatabaseHelper(view.context)
+
+        /**
+         * On item click
+         */
+        fastAdapter.onClickListener = { _, _, _, position ->
+            if (position < viewData.size) {
+                val albumItem = viewData[position]
+
+                albumDatabaseHelper.getAlbum(albumItem.albumId)?.mcID?.let { mcID ->
+                    saveRecyclerViewPosition(view.context)
+                    onSingleAlbumLoad(albumItem.albumId, mcID)
+                }
+
+            }
+
+            false
+        }
+
+        /**
+         * On item long click
+         */
+        fastAdapter.onLongClickListener = { _, _, _, position ->
+            if (position < viewData.size) {
+                val albumMcIdList = ArrayList<String>()
+
+                for (albumItem in viewData) {
+                    albumDatabaseHelper.getAlbum(albumItem.albumId)?.mcID?.let { mcID ->
+                        albumMcIdList.add(mcID)
+                    }
+                }
+
+                AlbumItem.showContextMenu(view, albumMcIdList, position)
+            }
+
+            false
+        }
+    }
+
+    private fun addAlbum(albumId: String) {
+        val item = AlbumItem(albumId)
+
+        itemAdapter.add(item)
+        viewData.add(item)
+    }
+
+    private fun loadInitAlbumList(view: View, forceReload: Boolean) {
+        val swipeRefreshLayout =
+            view.findViewById<SwipeRefreshLayout>(R.id.homePullToRefresh)
+
+        val albumListCache = Cache().get<ArrayList<String>>("album-view")
+
+        if(albumListCache.isNullOrEmpty() || forceReload){
+            val albumDatabaseHelper = AlbumDatabaseHelper(view.context)
+
+            if (forceReload) {
+                albumDatabaseHelper.reCreateTable(view.context, false)
+            }
+
+            loadAlbumListAsync(view.context, forceReload, 0, {
+                swipeRefreshLayout.isRefreshing = true
+            }, { _, _, _ ->
+                val albumList = albumDatabaseHelper.getAlbums(0, 50)
+
+                val cacheList = ArrayList<String>()
+
+                for (album in albumList) {
+                    addAlbum(album.albumId)
+                    cacheList.add(album.albumId)
+                }
+
+                Cache().set("album-view", cacheList)
+
+                /**
+                 * On scroll down (load next)
+                 */
+                recyclerView?.addOnScrollListener(object :
+                    EndlessRecyclerOnScrollListener(footerAdapter) {
+                    override fun onLoadMore(currentPage: Int) {
+                        loadAlbumList(view, currentPage)
+                    }
+                })
+
+                //refresh
+                swipeRefreshLayout.setOnRefreshListener {
+                    loadInitAlbumList(view, true)
+                }
+
+                swipeRefreshLayout.isRefreshing = false
+            }, { _, _, _ ->
+                swipeRefreshLayout.isRefreshing = false
+
+                displaySnackBar(
+                    view,
+                    view.context.getString(R.string.errorLoadingAlbumList),
+                    view.context.getString(R.string.retry)
+                ) {
+                    loadInitAlbumList(view, forceReload)
+                }
+            })
+        }else{
+            for (albumId in albumListCache) {
+                addAlbum(albumId)
+            }
+
+            /**
+             * On scroll down (load next)
+             */
+            recyclerView?.addOnScrollListener(object :
+                EndlessRecyclerOnScrollListener(footerAdapter) {
+                override fun onLoadMore(currentPage: Int) {
+                    loadAlbumList(view, currentPage)
+                }
+            })
+
+            //refresh
+            swipeRefreshLayout.setOnRefreshListener {
+                loadInitAlbumList(view, true)
+            }
+
+            swipeRefreshLayout.isRefreshing = false
+
+            restoreRecyclerViewPosition(view.context)
+            resetRecyclerViewSavedPosition(view.context)
+        }
+    }
+
+    private fun resetRecyclerViewSavedPosition(context: Context){
+        val settings = Settings.getSettings(context)
+        settings.setInt("albumview-positionIndex", 0)
+        settings.setInt("albumview-topView", 0)
+    }
+
+    private fun restoreRecyclerViewPosition(context: Context){
+        recyclerView?.let {
+            val settings = Settings.getSettings(context)
+            settings.getInt("albumview-positionIndex")?.let { positionIndex ->
+                settings.getInt("albumview-topView")?.let { topView ->
+                    val layoutManager = it.layoutManager as LinearLayoutManager
+                    layoutManager.scrollToPositionWithOffset(positionIndex, topView)
+                }
+            }
+        }
+    }
+
+    private fun saveRecyclerViewPosition(context:Context){
+        recyclerView?.let {
+            val layoutManager = it.layoutManager as LinearLayoutManager
+
+            val positionIndex = layoutManager.findFirstVisibleItemPosition()
+            val startView = it.getChildAt(0)
+
+            startView?.let { sView ->
+                val topView = sView.top - sView.paddingTop
+
+                val settings = Settings.getSettings(context)
+                settings.setInt("albumview-positionIndex", positionIndex)
+                settings.setInt("albumview-topView", topView)
+            }
+        }
+    }
+
+    private fun loadAlbumList(view: View, currentPage: Int) {
+        footerAdapter.clear()
+        footerAdapter.add(ProgressItem())
+        
+        loadAlbumListAsync(view.context, false, (currentPage * 50), {}, { _, _, _ ->
+            val albumDatabaseHelper =
+                AlbumDatabaseHelper(view.context)
+            val albumList =
+                albumDatabaseHelper.getAlbums((currentPage * 50).toLong(), 50)
+
+            for (album in albumList) {
+                addAlbum(album.albumId)
+            }
+
+            footerAdapter.clear()
+        }, { _, _, _ ->
+            footerAdapter.clear()
+
+            displaySnackBar(
+                view,
+                view.context.getString(R.string.errorLoadingAlbumList),
+                view.context.getString(R.string.retry)
+            ) {
+                loadAlbumList(view, currentPage)
+            }
+        })
+    }
+
+}
