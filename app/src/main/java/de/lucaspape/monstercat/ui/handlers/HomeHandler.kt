@@ -19,37 +19,38 @@ interface HomeHandlerInterface{
 
 class HomeHandler(private val onSearch: (searchString: String?) -> Unit,
                   private val openSettings: () -> Unit,
-                  private val albumMcId: String?) : Handler{
+                  private val albumMcId: String?,
+                  private val resetPosition: Boolean) : Handler{
 
     companion object{
         @JvmStatic var addSongsTaskId = ""
-        @JvmStatic var lastOpen = ""
     }
 
     override val layout: Int = R.layout.fragment_home
 
     override fun onBackPressed(view: View) {
+        onCreate(view)
     }
 
     override fun onPause(view: View) {
         homeHandlerObject?.saveRecyclerViewPosition(view.context)
     }
 
-    var homeHandlerObject:HomeHandlerInterface? = null
+    private var homeHandlerObject:HomeHandlerInterface? = null
 
     override fun onCreate(view: View) {
         setupSpinner(view)
 
         if(!registerListeners(view) && albumMcId == null){
-            catalogView(view, lastOpen == "catalog-view")
+            catalogView(view)
         }else if(albumMcId != null){
-            openAlbum(view, null, albumMcId, lastOpen == "catalog-view-album")
+            openAlbum(view, null, albumMcId)
         }else{
-            albumView(view, lastOpen == "album-view")
+            albumView(view)
         }
     }
 
-    private fun catalogView(view: View, resetPosition:Boolean){
+    private fun catalogView(view: View){
         homeHandlerObject?.saveRecyclerViewPosition(view.context)
 
         homeHandlerObject = HomeCatalogHandler(null, null)
@@ -58,33 +59,27 @@ class HomeHandler(private val onSearch: (searchString: String?) -> Unit,
             homeHandlerObject?.resetRecyclerViewSavedPosition(view.context)
 
         homeHandlerObject?.onCreate(view)
-
-        lastOpen = "catalog-view"
     }
 
-    private fun openAlbum(view: View, albumId:String?, albumMcId: String, resetPosition: Boolean){
+    private fun openAlbum(view: View, albumId:String?, albumMcId: String){
         homeHandlerObject?.saveRecyclerViewPosition(view.context)
         homeHandlerObject = HomeCatalogHandler(albumId, albumMcId)
         if(resetPosition)
             homeHandlerObject?.resetRecyclerViewSavedPosition(view.context)
 
         homeHandlerObject?.onCreate(view)
-
-        lastOpen = "catalog-view-album"
     }
 
-    private fun albumView(view: View, resetPosition: Boolean){
+    private fun albumView(view: View){
         homeHandlerObject?.saveRecyclerViewPosition(view.context)
         homeHandlerObject = HomeAlbumHandler { albumId, albumMcId ->
-            openAlbum(view, albumId, albumMcId, false)
+            openAlbum(view, albumId, albumMcId)
         }
 
         if(resetPosition)
             homeHandlerObject?.resetRecyclerViewSavedPosition(view.context)
 
         homeHandlerObject?.onCreate(view)
-
-        lastOpen = "album-view"
     }
 
     /**
@@ -157,7 +152,7 @@ class HomeHandler(private val onSearch: (searchString: String?) -> Unit,
                                 false
                             )
 
-                            catalogView(view, false)
+                            catalogView(view)
                         }
                         viewSelector.getItemAtPosition(position) == view.context.getString(R.string.albumView) -> {
                             albumViewSelected = true
@@ -167,7 +162,7 @@ class HomeHandler(private val onSearch: (searchString: String?) -> Unit,
                                 true
                             )
 
-                            albumView(view, false)
+                            albumView(view)
                         }
                     }
                 }

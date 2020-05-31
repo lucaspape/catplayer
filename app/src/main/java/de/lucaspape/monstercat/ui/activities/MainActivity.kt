@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity() {
                                 search(
                                     searchString
                                 )
-                            }, { openSettings() }, null)
+                            }, { openSettings() }, null, resetPosition = true)
                         )
                     )
 
@@ -98,7 +98,7 @@ class MainActivity : AppCompatActivity() {
                                 search(
                                     searchString
                                 )
-                            }, { openSettings() }, null)
+                            }, { openSettings() }, null, resetPosition = false)
                         )
                     )
                 }
@@ -116,7 +116,7 @@ class MainActivity : AppCompatActivity() {
                                 search(
                                     searchString
                                 )
-                            }, { openSettings() }, null)
+                            }, { openSettings() }, null, resetPosition = false)
                         )
                     )
                 }
@@ -220,7 +220,7 @@ class MainActivity : AppCompatActivity() {
                                 search(
                                     searchString
                                 )
-                            }, { openSettings() }, id)
+                            }, { openSettings() }, id, resetPosition = false)
                         )
                     )
                     path.contains("playlist") -> openFragment(
@@ -234,7 +234,7 @@ class MainActivity : AppCompatActivity() {
                                 search(
                                     searchString
                                 )
-                            }, { openSettings() }, null)
+                            }, { openSettings() }, null, resetPosition = false)
                         )
                     )
                 }
@@ -246,7 +246,7 @@ class MainActivity : AppCompatActivity() {
                             search(
                                 searchString
                             )
-                        }, { openSettings() }, null)
+                        }, { openSettings() }, null, resetPosition = false)
                     )
                 )
             }
