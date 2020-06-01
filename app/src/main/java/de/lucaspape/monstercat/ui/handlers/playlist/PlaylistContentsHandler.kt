@@ -200,46 +200,69 @@ class PlaylistContentsHandler(private val playlistId: String) : PlaylistHandlerI
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
 
-        loadPlaylistTracksAsync(
-            view.context,
-            forceReload,
-            playlistId, displayLoading = {
-                swipeRefreshLayout.isRefreshing = true
+        val playlistContentsCache = Cache().get<ArrayList<String>>("playlist-view-$playlistId")
+
+        if(playlistContentsCache.isNullOrEmpty() || forceReload){
+            loadPlaylistTracksAsync(
+                view.context,
+                forceReload,
+                playlistId, displayLoading = {
+                    swipeRefreshLayout.isRefreshing = true
+                }
+                , finishedCallback = { _, _, _ ->
+                    PlaylistDatabaseHelper(view.context).getPlaylist(playlistId)?.playlistName?.let {
+                        addHeader(it)
+                    }
+
+                    val playlistItemDatabaseHelper =
+                        PlaylistItemDatabaseHelper(
+                            view.context,
+                            playlistId
+                        )
+
+                    val playlistItems = playlistItemDatabaseHelper.getAllData()
+
+                    for (i in (playlistItems.size - 1 downTo 0)) {
+                        addSong(playlistItems[i].songId)
+                    }
+
+                    //refresh
+                    swipeRefreshLayout.setOnRefreshListener {
+                        loadPlaylistContents(view, true)
+                    }
+
+                    swipeRefreshLayout.isRefreshing = false
+
+                }, errorCallback = { _, _, _ ->
+                    swipeRefreshLayout.isRefreshing = false
+                    displaySnackBar(
+                        view,
+                        view.context.getString(R.string.errorLoadingPlaylistTracks),
+                        view.context.getString(R.string.retry)
+                    ) {
+                        loadPlaylistContents(view, forceReload)
+                    }
+                })
+        }else{
+            PlaylistDatabaseHelper(view.context).getPlaylist(playlistId)?.playlistName?.let {
+                addHeader(it)
             }
-            , finishedCallback = { _, _, _ ->
-                PlaylistDatabaseHelper(view.context).getPlaylist(playlistId)?.playlistName?.let {
-                    addHeader(it)
-                }
 
-                val playlistItemDatabaseHelper =
-                    PlaylistItemDatabaseHelper(
-                        view.context,
-                        playlistId
-                    )
+            for(songId in playlistContentsCache){
+                addSongFromCache(songId)
+            }
 
-                val playlistItems = playlistItemDatabaseHelper.getAllData()
+            //refresh
+            swipeRefreshLayout.setOnRefreshListener {
+                loadPlaylistContents(view, true)
+            }
 
-                for (i in (playlistItems.size - 1 downTo 0)) {
-                    addSong(playlistItems[i].songId)
-                }
+            swipeRefreshLayout.isRefreshing = false
 
-                //refresh
-                swipeRefreshLayout.setOnRefreshListener {
-                    loadPlaylistContents(view, true)
-                }
+            restoreRecyclerViewPosition(view.context)
+            resetRecyclerViewSavedPosition(view.context)
 
-                swipeRefreshLayout.isRefreshing = false
-
-            }, errorCallback = { _, _, _ ->
-                swipeRefreshLayout.isRefreshing = false
-                displaySnackBar(
-                    view,
-                    view.context.getString(R.string.errorLoadingPlaylistTracks),
-                    view.context.getString(R.string.retry)
-                ) {
-                    loadPlaylistContents(view, forceReload)
-                }
-            })
+        }
     }
 
     override fun resetRecyclerViewSavedPosition(context: Context) {

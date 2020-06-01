@@ -194,15 +194,39 @@ class PlaylistListHandler(private val loadPlaylist: (playlistId: String) -> Unit
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)
 
-        loadPlaylistAsync(view.context, forceReload, true, {}, { _, _ ->
+        val playlistListCache = Cache().get<ArrayList<String>>("playlist-view-list")
+
+        if(playlistListCache.isNullOrEmpty() || forceReload){
+            loadPlaylistAsync(view.context, forceReload, true, {}, { _, _ ->
+                addHeader(view.context.getString(R.string.yourPlaylists))
+
+                val playlistDatabaseHelper =
+                    PlaylistDatabaseHelper(view.context)
+                val playlists = playlistDatabaseHelper.getAllPlaylists()
+
+                for (playlist in playlists) {
+                    addPlaylist(playlist.playlistId)
+                }
+
+                //refresh
+                swipeRefreshLayout.setOnRefreshListener {
+                    loadPlaylistList(view, true)
+                }
+
+                swipeRefreshLayout.isRefreshing = false
+            }, { _, _ ->
+                swipeRefreshLayout.isRefreshing = false
+                displaySnackBar(
+                    view,
+                    view.context.getString(R.string.errorLoadingPlaylists),
+                    view.context.getString(R.string.retry)
+                ) { loadPlaylistList(view, forceReload) }
+            })
+        }else{
             addHeader(view.context.getString(R.string.yourPlaylists))
 
-            val playlistDatabaseHelper =
-                PlaylistDatabaseHelper(view.context)
-            val playlists = playlistDatabaseHelper.getAllPlaylists()
-
-            for (playlist in playlists) {
-                addPlaylist(playlist.playlistId)
+            for(playlistId in playlistListCache){
+                addPlaylistFromCache(playlistId)
             }
 
             //refresh
@@ -211,14 +235,10 @@ class PlaylistListHandler(private val loadPlaylist: (playlistId: String) -> Unit
             }
 
             swipeRefreshLayout.isRefreshing = false
-        }, { _, _ ->
-            swipeRefreshLayout.isRefreshing = false
-            displaySnackBar(
-                view,
-                view.context.getString(R.string.errorLoadingPlaylists),
-                view.context.getString(R.string.retry)
-            ) { loadPlaylistList(view, forceReload) }
-        })
+
+            restoreRecyclerViewPosition(view.context)
+            resetRecyclerViewSavedPosition(view.context)
+        }
     }
 
     override fun resetRecyclerViewSavedPosition(context: Context) {
