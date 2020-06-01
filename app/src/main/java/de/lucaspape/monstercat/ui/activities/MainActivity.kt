@@ -63,47 +63,12 @@ class MainActivity : AppCompatActivity() {
         BottomNavigationView.OnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_home -> {
-                    openFragment(
-                        de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
-                            HomeHandler(
-                                { searchString ->
-                                    search(
-                                        searchString
-                                    )
-                                },
-                                { openSettings() },
-                                null,
-                                resetPosition = true
-                            )
-                        )
-                    )
+                    openHome(null, true)
 
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.navigation_dashboard -> {
-                    openFragment(
-                        de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
-                            PlaylistHandler(
-                                null,
-                                true
-                            ) {
-                                openFragment(
-                                    de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
-                                        HomeHandler(
-                                            { searchString ->
-                                                search(
-                                                    searchString
-                                                )
-                                            },
-                                            { openSettings() },
-                                            null,
-                                            resetPosition = true
-                                        )
-                                    )
-                                )
-                            }
-                        )
-                    )
+                    openPlaylist(null, true)
 
                     return@OnNavigationItemSelectedListener true
                 }
@@ -117,20 +82,7 @@ class MainActivity : AppCompatActivity() {
                 SearchHandler(
                     searchString
                 ) {
-                    openFragment(
-                        de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
-                            HomeHandler(
-                                { searchString ->
-                                    search(
-                                        searchString
-                                    )
-                                },
-                                { openSettings() },
-                                null,
-                                resetPosition = false
-                            )
-                        )
-                    )
+                    openHome(null, false)
                 }
             )
         )
@@ -140,20 +92,37 @@ class MainActivity : AppCompatActivity() {
         openFragment(
             de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
                 SettingsHandler {
-                    openFragment(
-                        de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
-                            HomeHandler(
-                                { searchString ->
-                                    search(
-                                        searchString
-                                    )
-                                },
-                                { openSettings() },
-                                null,
-                                resetPosition = false
-                            )
+                    openHome(null, false)
+                }
+            )
+        )
+    }
+
+    private fun openHome(albumMcId:String?, resetPosition:Boolean){
+        openFragment(
+            de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
+                HomeHandler(
+                    { searchString ->
+                        search(
+                            searchString
                         )
-                    )
+                    },
+                    { openSettings() },
+                    albumMcId,
+                    resetPosition
+                )
+            )
+        )
+    }
+
+    private fun openPlaylist(playlistId:String?, resetPosition: Boolean){
+        openFragment(
+            de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
+                PlaylistHandler(
+                    playlistId,
+                    resetPosition
+                ) {
+                    openHome(null, false)
                 }
             )
         )
@@ -249,68 +218,13 @@ class MainActivity : AppCompatActivity() {
                 val id = path.substring(path.lastIndexOf("/") + 1, path.length)
 
                 when {
-                    path.contains("release") -> openFragment(
-                        de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
-                            HomeHandler(
-                                { searchString ->
-                                    search(
-                                        searchString
-                                    )
-                                },
-                                { openSettings() },
-                                id,
-                                resetPosition = false
-                            )
-                        )
-                    )
-                    path.contains("playlist") -> openFragment(
-                        de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
-                            PlaylistHandler(
-                                id, false
-                            ) {
-                                openFragment(
-                                    de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
-                                        HomeHandler(
-                                            { searchString ->
-                                                search(
-                                                    searchString
-                                                )
-                                            },
-                                            { openSettings() },
-                                            null,
-                                            resetPosition = true
-                                        )
-                                    )
-                                )
-                            }
-                        )
-                    )
-                    else -> openFragment(
-                        de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
-                            HomeHandler(
-                                { searchString ->
-                                    search(
-                                        searchString
-                                    )
-                                },
-                                { openSettings() },
-                                null,
-                                resetPosition = false
-                            )
-                        )
-                    )
+                    path.contains("release") -> openHome(id, false)
+                    path.contains("playlist") -> openPlaylist(id, false)
+                    else -> openHome(null, false)
                 }
             }
             else -> {
-                openFragment(
-                    de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
-                        HomeHandler({ searchString ->
-                            search(
-                                searchString
-                            )
-                        }, { openSettings() }, null, resetPosition = false)
-                    )
-                )
+                openHome(null, false)
             }
         }
 
