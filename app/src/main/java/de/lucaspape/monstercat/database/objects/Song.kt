@@ -15,7 +15,6 @@ import de.lucaspape.util.Settings
 import de.lucaspape.monstercat.util.getSid
 import de.lucaspape.monstercat.util.wifiConnected
 import java.io.File
-import java.net.URI
 
 data class Song(
     val context: Context,
@@ -122,9 +121,12 @@ data class Song(
             context.getString(R.string.trackContentUrl) + albumId + "/track-stream/" + songId
         }
 
+    private val downloaded: Boolean
+        get() = File(downloadLocation).exists()
+
     val downloadStatus: Uri
         get() = when {
-            File(downloadLocation).exists() -> {
+            downloaded -> {
                 offlineDrawable.toUri()
             }
             else -> {
@@ -133,14 +135,14 @@ data class Song(
         }
 
     val url: String
-        get() = if (File(downloadLocation).exists()) {
+        get() = if (downloaded) {
             downloadLocation
         } else {
             streamUrl
         }
 
     val mediaSource: MediaSource?
-        get() = if (File(downloadLocation).exists()) {
+        get() = if (downloaded) {
             fileToMediaSource(downloadLocation)
         } else {
             if (isStreamable) {
@@ -154,7 +156,7 @@ data class Song(
         return wifiConnected(context) == true || Settings.getSettings(
             context
         )
-            .getBoolean(context.getString(R.string.streamOverMobileSetting)) == true || File(url).exists()
+            .getBoolean(context.getString(R.string.streamOverMobileSetting)) == true || downloaded
     }
 
     private fun fileToMediaSource(fileLocation: String): ProgressiveMediaSource {
