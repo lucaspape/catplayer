@@ -18,8 +18,8 @@ import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.request.async.loadPlaylistTracksAsync
 import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
 import de.lucaspape.monstercat.ui.abstract_items.util.HeaderTextItem
-import de.lucaspape.monstercat.ui.activities.lastOpenId
 import de.lucaspape.monstercat.ui.activities.lastOpenType
+import de.lucaspape.monstercat.ui.activities.lastOpenedPlaylistId
 import de.lucaspape.monstercat.ui.handlers.playSongsFromViewDataAsync
 import de.lucaspape.monstercat.util.displaySnackBar
 import de.lucaspape.util.Cache
@@ -209,7 +209,7 @@ class PlaylistContentsHandler(private val playlistId: String) : PlaylistHandlerI
 
         val playlistContentsCache = Cache().get<ArrayList<String>>("playlist-view-$playlistId")
 
-        lastOpenId = playlistId
+        lastOpenedPlaylistId = playlistId
         lastOpenType = "playlist"
 
         if (playlistContentsCache.isNullOrEmpty() || forceReload) {

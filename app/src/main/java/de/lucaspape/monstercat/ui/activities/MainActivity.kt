@@ -44,7 +44,9 @@ import java.lang.ref.WeakReference
 val noisyReceiver = NoisyReceiver()
 var downloadServiceIntent: Intent? = null
 
-var lastOpenId = ""
+var lastOpenedAlbumId = ""
+var lastOpenedPlaylistId = ""
+
 var lastOpenType = ""
 
 var lastOpenFragment = ""
@@ -70,6 +72,9 @@ class MainActivity : AppCompatActivity() {
                 R.id.navigation_home -> {
                     if(lastOpenFragment == "home"){
                         openHome(null, true)
+                    }else if(lastOpenedAlbumId != ""){
+                        lastOpenType = "album"
+                        restoreLastFragment()
                     }else{
                         openHome(null, false)
                     }
@@ -79,6 +84,9 @@ class MainActivity : AppCompatActivity() {
                 R.id.navigation_playlist -> {
                     if(lastOpenFragment == "playlist"){
                         openPlaylist(null, true)
+                    }else if(lastOpenedPlaylistId != ""){
+                       lastOpenType = "playlist"
+                        restoreLastFragment()
                     }else{
                         openPlaylist(null, false)
                     }
@@ -91,8 +99,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun restoreLastFragment(){
         when(lastOpenType){
-            "playlist" -> openPlaylist(lastOpenId, false)
-            "album" -> openHome(lastOpenId, false)
+            "playlist" -> openPlaylist(lastOpenedPlaylistId, false)
+            "album" -> openHome(lastOpenedAlbumId, false)
             "playlist-list" -> openPlaylist(null, false)
             "catalog-list" -> openHome(null, false)
             "album-list" -> openHome(null, false)

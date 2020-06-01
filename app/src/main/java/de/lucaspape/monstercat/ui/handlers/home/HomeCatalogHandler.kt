@@ -23,8 +23,8 @@ import de.lucaspape.monstercat.database.objects.Album
 import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.request.async.loadAlbumAsync
 import de.lucaspape.monstercat.request.async.loadSongListAsync
-import de.lucaspape.monstercat.ui.activities.lastOpenId
 import de.lucaspape.monstercat.ui.activities.lastOpenType
+import de.lucaspape.monstercat.ui.activities.lastOpenedAlbumId
 import de.lucaspape.monstercat.ui.handlers.loadAlbumTracks
 import de.lucaspape.monstercat.ui.handlers.playSongsFromCatalogDbAsync
 import de.lucaspape.monstercat.ui.handlers.playSongsFromViewDataAsync
@@ -236,6 +236,7 @@ class HomeCatalogHandler(
         val songListCache = Cache().get<ArrayList<String>>("catalog-view")
 
         lastOpenType = "catalog-list"
+        lastOpenedAlbumId = ""
 
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.homePullToRefresh)
@@ -328,6 +329,7 @@ class HomeCatalogHandler(
         footerAdapter.add(ProgressItem())
 
         lastOpenType = "catalog-list"
+        lastOpenedAlbumId = ""
 
         loadSongListAsync(view.context,
             false,
@@ -368,7 +370,7 @@ class HomeCatalogHandler(
         setupRecyclerView(view)
 
         lastOpenType = "album"
-        lastOpenId = albumMcId
+        lastOpenedAlbumId = albumMcId
 
         if (albumId == null) {
             val albumDatabaseHelper = AlbumDatabaseHelper(view.context)
@@ -383,7 +385,7 @@ class HomeCatalogHandler(
                 val albumItemList = albumItemDatabaseHelper.getAllData()
 
                 for (albumItem in albumItemList) {
-                    addSong(albumItem.songId)
+                    addSongFromCache(albumItem.songId)
                 }
 
                 /**
@@ -435,7 +437,7 @@ class HomeCatalogHandler(
                 val albumItemList = albumItemDatabaseHelper.getAllData()
 
                 for (albumItem in albumItemList) {
-                    addSong(albumItem.songId)
+                    addSongFromCache(albumItem.songId)
                 }
 
                 /**
