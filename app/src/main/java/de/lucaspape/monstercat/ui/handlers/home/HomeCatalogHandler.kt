@@ -390,6 +390,8 @@ class HomeCatalogHandler(
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.homePullToRefresh)
 
+        setupRecyclerView(view)
+
         if (albumId == null) {
             loadAlbumTracks(
                 view.context,
