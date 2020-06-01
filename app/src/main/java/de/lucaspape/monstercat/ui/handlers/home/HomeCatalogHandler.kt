@@ -368,7 +368,7 @@ class HomeCatalogHandler(
         if (albumId == null) {
             val albumDatabaseHelper = AlbumDatabaseHelper(view.context)
 
-            val finished:(album:Album) -> Unit = { album ->
+            val finished: (album: Album) -> Unit = { album ->
                 AlbumDatabaseHelper(view.context).getAlbum(album.albumId)?.let {
                     addHeader(it.title)
                 }
@@ -400,7 +400,7 @@ class HomeCatalogHandler(
 
             val album = albumDatabaseHelper.getAlbumFromMcId(albumMcId)
 
-            if(album == null || forceReload){
+            if (album == null || forceReload) {
                 loadAlbumTracks(
                     view.context,
                     albumMcId,
@@ -413,7 +413,7 @@ class HomeCatalogHandler(
                         //TODO handle error
                         swipeRefreshLayout.isRefreshing = false
                     })
-            }else{
+            } else {
                 finished(album)
             }
         } else {
