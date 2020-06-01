@@ -21,7 +21,7 @@ interface HomeHandlerInterface {
 class HomeHandler(
     private val onSearch: (searchString: String?) -> Unit,
     private val openSettings: () -> Unit,
-    private val albumMcId: String?,
+    private var albumMcId: String?,
     private val resetPosition: Boolean
 ) :
     Handler {
@@ -45,10 +45,13 @@ class HomeHandler(
     override fun onCreate(view: View) {
         setupSpinner(view)
 
+        val id = albumMcId
+
         if (!registerListeners(view) && albumMcId == null) {
             catalogView(view)
-        } else if (albumMcId != null) {
-            openAlbum(view, null, albumMcId)
+        } else if (id != null) {
+            openAlbum(view, null, id)
+            albumMcId = null
         } else {
             albumView(view)
         }
