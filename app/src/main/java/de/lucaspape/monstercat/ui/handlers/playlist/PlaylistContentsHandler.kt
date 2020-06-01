@@ -16,8 +16,8 @@ import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.request.async.loadPlaylistTracksAsync
-import de.lucaspape.monstercat.ui.abstract_items.CatalogItem
-import de.lucaspape.monstercat.ui.abstract_items.HeaderTextItem
+import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
+import de.lucaspape.monstercat.ui.abstract_items.util.HeaderTextItem
 import de.lucaspape.monstercat.ui.activities.lastOpenId
 import de.lucaspape.monstercat.ui.activities.lastOpenType
 import de.lucaspape.monstercat.ui.handlers.playSongsFromViewDataAsync
@@ -167,12 +167,17 @@ class PlaylistContentsHandler(private val playlistId: String) : PlaylistHandlerI
     }
 
     private fun addHeader(headerText: String) {
-        headerAdapter.add(HeaderTextItem(headerText))
+        headerAdapter.add(
+            HeaderTextItem(
+                headerText
+            )
+        )
         itemHeaderOffset += -1
     }
 
     private fun addSong(songId: String) {
-        val item = CatalogItem(songId)
+        val item =
+            CatalogItem(songId)
 
         viewData.add(item)
         itemAdapter.add(item)
@@ -189,7 +194,8 @@ class PlaylistContentsHandler(private val playlistId: String) : PlaylistHandlerI
     }
 
     private fun addSongFromCache(songId: String) {
-        val item = CatalogItem(songId)
+        val item =
+            CatalogItem(songId)
 
         viewData.add(item)
         itemAdapter.add(item)

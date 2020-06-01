@@ -29,7 +29,9 @@ import de.lucaspape.monstercat.music.volume
 import de.lucaspape.monstercat.push.subscribeToChannel
 import de.lucaspape.monstercat.push.unsubscribeFromChannel
 import de.lucaspape.monstercat.request.async.checkCustomApiFeaturesAsync
-import de.lucaspape.monstercat.ui.abstract_items.*
+import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListToggleItem
+import de.lucaspape.monstercat.ui.abstract_items.settings.*
+import de.lucaspape.monstercat.ui.abstract_items.util.HeaderTextItem
 import de.lucaspape.monstercat.ui.activities.MainActivity
 import de.lucaspape.monstercat.util.Auth
 import de.lucaspape.monstercat.util.displayAlertDialogToggleList
@@ -50,7 +52,11 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
     override fun onCreate(view: View) {
         setupRecyclerView(view)
 
-        itemAdapter.add(SettingsLabelItem(view.context.getString(R.string.catplayerSettings)))
+        itemAdapter.add(
+            SettingsLabelItem(
+                view.context.getString(R.string.catplayerSettings)
+            )
+        )
 
         addLogin(view)
         addPlaybackSettings(view)
@@ -128,7 +134,11 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
     private fun addDataSettings(view: View){
         val settings = Settings.getSettings(view.context)
 
-        itemAdapter.add(SettingsLabelItem(view.context.getString(R.string.dataSettings)))
+        itemAdapter.add(
+            SettingsLabelItem(
+                view.context.getString(R.string.dataSettings)
+            )
+        )
 
         val changeSetting: (setting: String, value: Boolean, switch: Switch) -> Boolean =
             { setting, value, _ ->
@@ -167,7 +177,11 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
     private fun addPlaybackSettings(view: View){
         val settings = Settings.getSettings(view.context)
 
-        itemAdapter.add(SettingsLabelItem(view.context.getString(R.string.playbackSettings)))
+        itemAdapter.add(
+            SettingsLabelItem(
+                view.context.getString(R.string.playbackSettings)
+            )
+        )
 
         val changeSetting: (setting: String, value: Boolean, switch: Switch) -> Boolean =
             { setting, value, _ ->
@@ -210,149 +224,183 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
     }
 
     private fun addResetDatabaseButton(view: View) {
-        itemAdapter.add(SettingsButtonItem(view.context.getString(R.string.resetDatabase)) {
-            val alertDialogBuilder = AlertDialog.Builder(view.context)
-                .setTitle(view.context.getString(R.string.resetDatabase))
-                .setMessage(view.context.getString(R.string.resetDatabaseQuestion))
-                .setPositiveButton(android.R.string.yes) { _, _ ->
-                    AlbumDatabaseHelper(view.context).reCreateTable(view.context, true)
-                    CatalogSongDatabaseHelper(view.context).reCreateTable()
-                    PlaylistDatabaseHelper(view.context).reCreateTable(view.context, true)
-                    ManualPlaylistDatabaseHelper(view.context).reCreateTable(view.context, true)
+        itemAdapter.add(
+            SettingsButtonItem(
+                view.context.getString(R.string.resetDatabase)
+            ) {
+                val alertDialogBuilder = AlertDialog.Builder(view.context)
+                    .setTitle(view.context.getString(R.string.resetDatabase))
+                    .setMessage(view.context.getString(R.string.resetDatabaseQuestion))
+                    .setPositiveButton(android.R.string.yes) { _, _ ->
+                        AlbumDatabaseHelper(view.context).reCreateTable(view.context, true)
+                        CatalogSongDatabaseHelper(view.context).reCreateTable()
+                        PlaylistDatabaseHelper(view.context).reCreateTable(view.context, true)
+                        ManualPlaylistDatabaseHelper(view.context).reCreateTable(view.context, true)
 
-                    try {
-                        File("${view.context.cacheDir}/player_state.obj").delete()
-                    } catch (e: FileNotFoundException) {
+                        try {
+                            File("${view.context.cacheDir}/player_state.obj").delete()
+                        } catch (e: FileNotFoundException) {
 
+                        }
+
+                        val intent = Intent(view.context, MainActivity::class.java)
+                        intent.addFlags(FLAG_ACTIVITY_NEW_TASK)
+                        view.context.startActivity(intent)
+
+                        Runtime.getRuntime().exit(0)
                     }
+                    .setNegativeButton(android.R.string.no, null)
 
-                    val intent = Intent(view.context, MainActivity::class.java)
-                    intent.addFlags(FLAG_ACTIVITY_NEW_TASK)
-                    view.context.startActivity(intent)
+                val dialog = alertDialogBuilder.create()
+                dialog.show()
 
-                    Runtime.getRuntime().exit(0)
-                }
-                .setNegativeButton(android.R.string.no, null)
+                val typedValue = TypedValue()
+                view.context.theme.resolveAttribute(R.attr.colorOnSurface, typedValue, true)
 
-            val dialog = alertDialogBuilder.create()
-            dialog.show()
+                val positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE)
+                positiveButton.setTextColor(typedValue.data)
 
-            val typedValue = TypedValue()
-            view.context.theme.resolveAttribute(R.attr.colorOnSurface, typedValue, true)
-
-            val positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE)
-            positiveButton.setTextColor(typedValue.data)
-
-            val negativeButton = dialog.getButton(DialogInterface.BUTTON_NEGATIVE)
-            negativeButton.setTextColor(typedValue.data)
-        })
+                val negativeButton = dialog.getButton(DialogInterface.BUTTON_NEGATIVE)
+                negativeButton.setTextColor(typedValue.data)
+            })
     }
 
     private fun addPushNotificationSettingsButton(view: View) {
-        itemAdapter.add(SettingsButtonItem(view.context.getString(R.string.pushNotifications)) {
-            val settings = Settings.getSettings(view.context)
+        itemAdapter.add(
+            SettingsButtonItem(
+                view.context.getString(R.string.pushNotifications)
+            ) {
+                val settings = Settings.getSettings(view.context)
 
-            val notificationTopics =
-                JSONArray((view.context.getString(R.string.defaultNotificationTopics)))
+                val notificationTopics =
+                    JSONArray((view.context.getString(R.string.defaultNotificationTopics)))
 
-            var notificationTopicsEnabled = JSONObject()
+                var notificationTopicsEnabled = JSONObject()
 
-            settings.getString(view.context.getString(R.string.enabledPushNotificationTopicsSetting))
-                ?.let {
-                    notificationTopicsEnabled = JSONObject(it)
+                settings.getString(view.context.getString(R.string.enabledPushNotificationTopicsSetting))
+                    ?.let {
+                        notificationTopicsEnabled = JSONObject(it)
+                    }
+
+                val pushNotificationsDescriptionArray =
+                    Array(notificationTopics.length()) {
+                        AlertListToggleItem(
+                            "",
+                            "",
+                            false
+                        )
+                    }
+                val pushNotificationsTopicNameArray = Array(notificationTopics.length()) { "" }
+
+                for (i in (0 until notificationTopics.length())) {
+                    val jsonObject = notificationTopics.getJSONObject(i)
+
+                    val enabled = try {
+                        notificationTopicsEnabled.getBoolean(jsonObject.getString("topicname"))
+                    } catch (e: JSONException) {
+                        false
+                    }
+
+                    pushNotificationsDescriptionArray[i] =
+                        AlertListToggleItem(
+                            jsonObject.getString("description"),
+                            "",
+                            enabled
+                        )
+                    pushNotificationsTopicNameArray[i] = jsonObject.getString("topicname")
                 }
 
-            val pushNotificationsDescriptionArray =
-                Array(notificationTopics.length()) { AlertListToggleItem("", "", false) }
-            val pushNotificationsTopicNameArray = Array(notificationTopics.length()) { "" }
+                displayAlertDialogToggleList(
+                    view.context,
+                    HeaderTextItem(
+                        view.context.getString(R.string.pushNotifications)
+                    ),
+                    pushNotificationsDescriptionArray
+                ) { position, _, enabled ->
+                    if (enabled) {
+                        subscribeToChannel(view.context, pushNotificationsTopicNameArray[position])
+                    } else {
+                        unsubscribeFromChannel(
+                            view.context,
+                            pushNotificationsTopicNameArray[position]
+                        )
+                    }
 
-            for (i in (0 until notificationTopics.length())) {
-                val jsonObject = notificationTopics.getJSONObject(i)
+                    notificationTopicsEnabled.put(
+                        pushNotificationsTopicNameArray[position],
+                        enabled
+                    )
 
-                val enabled = try {
-                    notificationTopicsEnabled.getBoolean(jsonObject.getString("topicname"))
-                } catch (e: JSONException) {
-                    false
+                    settings.setString(
+                        view.context.getString(R.string.enabledPushNotificationTopicsSetting),
+                        notificationTopicsEnabled.toString()
+                    )
                 }
-
-                pushNotificationsDescriptionArray[i] =
-                    AlertListToggleItem(jsonObject.getString("description"), "", enabled)
-                pushNotificationsTopicNameArray[i] = jsonObject.getString("topicname")
-            }
-
-            displayAlertDialogToggleList(
-                view.context,
-                HeaderTextItem(view.context.getString(R.string.pushNotifications)),
-                pushNotificationsDescriptionArray
-            ) { position, _, enabled ->
-                if (enabled) {
-                    subscribeToChannel(view.context, pushNotificationsTopicNameArray[position])
-                } else {
-                    unsubscribeFromChannel(view.context, pushNotificationsTopicNameArray[position])
-                }
-
-                notificationTopicsEnabled.put(pushNotificationsTopicNameArray[position], enabled)
-
-                settings.setString(
-                    view.context.getString(R.string.enabledPushNotificationTopicsSetting),
-                    notificationTopicsEnabled.toString()
-                )
-            }
-        })
+            })
     }
 
     private fun addCustomApiButton(view: View) {
-        itemAdapter.add(SettingsButtonItem(view.context.getString(R.string.setCustomApiUrl)) {
-            val settings = Settings.getSettings(view.context)
+        itemAdapter.add(
+            SettingsButtonItem(
+                view.context.getString(R.string.setCustomApiUrl)
+            ) {
+                val settings = Settings.getSettings(view.context)
 
-            MaterialAlertDialogBuilder(view.context).apply {
-                val layoutInflater =
-                    context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                MaterialAlertDialogBuilder(view.context).apply {
+                    val layoutInflater =
+                        context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
-                val customApiInputLayout =
-                    layoutInflater.inflate(R.layout.customapi_input_layout, null)
+                    val customApiInputLayout =
+                        layoutInflater.inflate(R.layout.customapi_input_layout, null)
 
-                val customApiEditText =
-                    customApiInputLayout.findViewById<EditText>(R.id.customApiInput)
+                    val customApiEditText =
+                        customApiInputLayout.findViewById<EditText>(R.id.customApiInput)
 
-                settings.getString(context.getString(R.string.customApiBaseUrlSetting))?.let {
-                    customApiEditText.setText(it)
+                    settings.getString(context.getString(R.string.customApiBaseUrlSetting))?.let {
+                        customApiEditText.setText(it)
+                    }
+
+                    setTitle(view.context.getString(R.string.setCustomApiUrl))
+
+                    setPositiveButton(context.getString(R.string.ok)) { _, _ ->
+                        val newCustomApiUrl = customApiEditText.text.toString()
+                        settings.setString(
+                            view.context.getString(R.string.customApiBaseUrlSetting),
+                            newCustomApiUrl
+                        )
+
+                        settings.setBoolean(
+                            view.context.getString(R.string.useCustomApiSetting),
+                            false
+                        )
+
+                        //recreate settings to reload
+                        onCreate(view)
+                    }
+
+                    setView(customApiInputLayout)
+                    setCancelable(true)
+                }.create().run {
+                    show()
+
+                    val typedValue = TypedValue()
+                    context.theme.resolveAttribute(R.attr.colorOnSurface, typedValue, true)
+
+                    val positiveButton = getButton(DialogInterface.BUTTON_POSITIVE)
+                    positiveButton.setTextColor(typedValue.data)
+
+                    val negativeButton = getButton(DialogInterface.BUTTON_NEGATIVE)
+                    negativeButton.setTextColor(typedValue.data)
                 }
-
-                setTitle(view.context.getString(R.string.setCustomApiUrl))
-
-                setPositiveButton(context.getString(R.string.ok)) { _, _ ->
-                    val newCustomApiUrl = customApiEditText.text.toString()
-                    settings.setString(
-                        view.context.getString(R.string.customApiBaseUrlSetting),
-                        newCustomApiUrl
-                    )
-
-                    settings.setBoolean(view.context.getString(R.string.useCustomApiSetting), false)
-
-                    //recreate settings to reload
-                    onCreate(view)
-                }
-
-                setView(customApiInputLayout)
-                setCancelable(true)
-            }.create().run {
-                show()
-
-                val typedValue = TypedValue()
-                context.theme.resolveAttribute(R.attr.colorOnSurface, typedValue, true)
-
-                val positiveButton = getButton(DialogInterface.BUTTON_POSITIVE)
-                positiveButton.setTextColor(typedValue.data)
-
-                val negativeButton = getButton(DialogInterface.BUTTON_NEGATIVE)
-                negativeButton.setTextColor(typedValue.data)
-            }
-        })
+            })
     }
 
     private fun addLogin(view: View) {
-        itemAdapter.add(SettingsLabelItem(view.context.getString(R.string.accountSettings)))
+        itemAdapter.add(
+            SettingsLabelItem(
+                view.context.getString(R.string.accountSettings)
+            )
+        )
 
         itemAdapter.add(SettingsLoginItem { username, password ->
             val settings = Settings.getSettings(view.context)
@@ -371,7 +419,11 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
         val context = view.context
         val settings = Settings.getSettings(context)
 
-        itemAdapter.add(SettingsLabelItem(view.context.getString(R.string.advancedSettings)))
+        itemAdapter.add(
+            SettingsLabelItem(
+                view.context.getString(R.string.advancedSettings)
+            )
+        )
 
         val changeSetting: (setting: String, value: Boolean, switch: Switch) -> Boolean =
             { setting, value, _ ->

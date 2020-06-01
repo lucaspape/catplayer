@@ -14,8 +14,8 @@ import com.mikepenz.fastadapter.listeners.ClickEventHook
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.request.async.loadPlaylistAsync
-import de.lucaspape.monstercat.ui.abstract_items.HeaderTextItem
-import de.lucaspape.monstercat.ui.abstract_items.PlaylistItem
+import de.lucaspape.monstercat.ui.abstract_items.util.HeaderTextItem
+import de.lucaspape.monstercat.ui.abstract_items.content.PlaylistItem
 import de.lucaspape.monstercat.ui.activities.lastOpenType
 import de.lucaspape.monstercat.ui.handlers.deleteDownloadedPlaylistTracks
 import de.lucaspape.monstercat.ui.handlers.downloadPlaylistAsync
@@ -161,12 +161,19 @@ class PlaylistListHandler(private val loadPlaylist: (playlistId: String) -> Unit
     }
 
     private fun addHeader(headerText: String) {
-        headerAdapter.add(HeaderTextItem(headerText))
+        headerAdapter.add(
+            HeaderTextItem(
+                headerText
+            )
+        )
         itemHeaderOffset += -1
     }
 
     private fun addPlaylist(playlistId: String) {
-        val item = PlaylistItem(playlistId)
+        val item =
+            PlaylistItem(
+                playlistId
+            )
 
         viewData.add(item)
         itemAdapter.add(item)
@@ -183,7 +190,10 @@ class PlaylistListHandler(private val loadPlaylist: (playlistId: String) -> Unit
     }
 
     private fun addPlaylistFromCache(playlistId: String) {
-        val item = PlaylistItem(playlistId)
+        val item =
+            PlaylistItem(
+                playlistId
+            )
 
         viewData.add(item)
         itemAdapter.add(item)

@@ -5,7 +5,7 @@ import android.widget.*
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.util.*
-import de.lucaspape.monstercat.ui.abstract_items.CatalogItem
+import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
 import java.lang.ref.WeakReference
 
 class FullscreenPlayerHandler(

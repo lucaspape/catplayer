@@ -15,9 +15,9 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.request.async.loadTitleSearchAsync
-import de.lucaspape.monstercat.ui.abstract_items.CatalogItem
-import de.lucaspape.monstercat.ui.abstract_items.HeaderTextItem
-import de.lucaspape.monstercat.ui.abstract_items.ProgressItem
+import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
+import de.lucaspape.monstercat.ui.abstract_items.util.HeaderTextItem
+import de.lucaspape.monstercat.ui.abstract_items.util.ProgressItem
 import de.lucaspape.monstercat.util.displaySnackBar
 import de.lucaspape.util.Settings
 import java.io.File

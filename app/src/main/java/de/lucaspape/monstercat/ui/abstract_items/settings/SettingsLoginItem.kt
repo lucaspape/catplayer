@@ -1,4 +1,4 @@
-package de.lucaspape.monstercat.ui.abstract_items
+package de.lucaspape.monstercat.ui.abstract_items.settings
 
 import android.view.View
 import android.widget.Button

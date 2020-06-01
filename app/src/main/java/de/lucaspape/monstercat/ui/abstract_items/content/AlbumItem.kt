@@ -1,4 +1,4 @@
-package de.lucaspape.monstercat.ui.abstract_items
+package de.lucaspape.monstercat.ui.abstract_items.content
 
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
@@ -16,6 +16,8 @@ import de.lucaspape.monstercat.ui.handlers.downloadAlbum
 import de.lucaspape.monstercat.ui.handlers.openAlbum
 import de.lucaspape.monstercat.ui.handlers.playAlbumNext
 import de.lucaspape.monstercat.download.ImageReceiverInterface
+import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListHeaderItem
+import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListItem
 import de.lucaspape.monstercat.ui.addToQueueDrawable
 import de.lucaspape.monstercat.ui.downloadDrawable
 import de.lucaspape.monstercat.ui.openInAppDrawable
@@ -36,10 +38,22 @@ open class AlbumItem(
             view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
 
             val itemList = arrayListOf(
-                AlertListItem(view.context.getString(R.string.downloadAlbum), downloadDrawable),
-                AlertListItem(view.context.getString(R.string.addAlbumToQueue), addToQueueDrawable),
-                AlertListItem(view.context.getString(R.string.shareAlbum), shareDrawable),
-                AlertListItem(view.context.getString(R.string.openAlbumInApp), openInAppDrawable)
+                AlertListItem(
+                    view.context.getString(R.string.downloadAlbum),
+                    downloadDrawable
+                ),
+                AlertListItem(
+                    view.context.getString(R.string.addAlbumToQueue),
+                    addToQueueDrawable
+                ),
+                AlertListItem(
+                    view.context.getString(R.string.shareAlbum),
+                    shareDrawable
+                ),
+                AlertListItem(
+                    view.context.getString(R.string.openAlbumInApp),
+                    openInAppDrawable
+                )
             )
 
             val id = contentList[listViewPosition]
@@ -47,7 +61,10 @@ open class AlbumItem(
             AlbumDatabaseHelper(view.context).getAlbumFromMcId(id)?.let { album ->
                 displayAlertDialogList(
                     view.context,
-                    AlertListHeaderItem(album.title, album.albumId),
+                    AlertListHeaderItem(
+                        album.title,
+                        album.albumId
+                    ),
                     itemList
                 ) { _, item ->
                     when (item.itemText) {

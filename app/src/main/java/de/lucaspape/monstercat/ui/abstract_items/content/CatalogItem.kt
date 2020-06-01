@@ -1,4 +1,4 @@
-package de.lucaspape.monstercat.ui.abstract_items
+package de.lucaspape.monstercat.ui.abstract_items.content
 
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
@@ -22,6 +22,8 @@ import de.lucaspape.monstercat.ui.handlers.openAlbum
 import de.lucaspape.monstercat.download.ImageReceiverInterface
 import de.lucaspape.monstercat.music.prioritySongQueue
 import de.lucaspape.monstercat.ui.*
+import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListHeaderItem
+import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListItem
 import de.lucaspape.util.BackgroundAsync
 import de.lucaspape.monstercat.util.displayAlertDialogList
 
@@ -39,14 +41,26 @@ open class CatalogItem(
             view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
 
             val itemList = arrayListOf(
-                AlertListItem(view.context.getString(R.string.download), downloadDrawable),
-                AlertListItem(view.context.getString(R.string.addToQueue), addToQueueDrawable),
+                AlertListItem(
+                    view.context.getString(R.string.download),
+                    downloadDrawable
+                ),
+                AlertListItem(
+                    view.context.getString(R.string.addToQueue),
+                    addToQueueDrawable
+                ),
                 AlertListItem(
                     view.context.getString(R.string.addToPlaylist),
                     addToPlaylistDrawable
                 ),
-                AlertListItem(view.context.getString(R.string.shareAlbum), shareDrawable),
-                AlertListItem(view.context.getString(R.string.openAlbumInApp), openInAppDrawable)
+                AlertListItem(
+                    view.context.getString(R.string.shareAlbum),
+                    shareDrawable
+                ),
+                AlertListItem(
+                    view.context.getString(R.string.openAlbumInApp),
+                    openInAppDrawable
+                )
             )
 
             val id = contentList[listViewPosition]
@@ -54,7 +68,10 @@ open class CatalogItem(
             SongDatabaseHelper(view.context).getSong(view.context, id)?.let { song ->
                 displayAlertDialogList(
                     view.context,
-                    AlertListHeaderItem(song.shownTitle, song.albumId),
+                    AlertListHeaderItem(
+                        song.shownTitle,
+                        song.albumId
+                    ),
                     itemList
                 ) { _, item ->
                     when (item.itemText) {
@@ -92,11 +109,26 @@ open class CatalogItem(
             view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
 
             val itemList = arrayListOf(
-                AlertListItem(view.context.getString(R.string.download), downloadDrawable),
-                AlertListItem(view.context.getString(R.string.addToQueue), addToQueueDrawable),
-                AlertListItem(view.context.getString(R.string.delete), deleteDrawable),
-                AlertListItem(view.context.getString(R.string.shareAlbum), shareDrawable),
-                AlertListItem(view.context.getString(R.string.openAlbumInApp), openInAppDrawable)
+                AlertListItem(
+                    view.context.getString(R.string.download),
+                    downloadDrawable
+                ),
+                AlertListItem(
+                    view.context.getString(R.string.addToQueue),
+                    addToQueueDrawable
+                ),
+                AlertListItem(
+                    view.context.getString(R.string.delete),
+                    deleteDrawable
+                ),
+                AlertListItem(
+                    view.context.getString(R.string.shareAlbum),
+                    shareDrawable
+                ),
+                AlertListItem(
+                    view.context.getString(R.string.openAlbumInApp),
+                    openInAppDrawable
+                )
             )
 
             val id = data[listViewPosition]
@@ -104,7 +136,10 @@ open class CatalogItem(
             SongDatabaseHelper(view.context).getSong(view.context, id)?.let { song ->
                 displayAlertDialogList(
                     view.context,
-                    AlertListHeaderItem(song.shownTitle, song.albumId),
+                    AlertListHeaderItem(
+                        song.shownTitle,
+                        song.albumId
+                    ),
                     itemList
                 ) { _, item ->
 

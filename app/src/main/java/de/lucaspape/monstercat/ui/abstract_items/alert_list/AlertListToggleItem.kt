@@ -1,9 +1,8 @@
-package de.lucaspape.monstercat.ui.abstract_items
+package de.lucaspape.monstercat.ui.abstract_items.alert_list
 
 import android.view.View
 import android.widget.ImageView
 import android.widget.Switch
-import android.widget.TextView
 import androidx.core.net.toUri
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem

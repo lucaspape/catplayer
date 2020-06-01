@@ -12,8 +12,8 @@ import com.mikepenz.fastadapter.scroll.EndlessRecyclerOnScrollListener
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.AlbumDatabaseHelper
 import de.lucaspape.monstercat.request.async.loadAlbumListAsync
-import de.lucaspape.monstercat.ui.abstract_items.AlbumItem
-import de.lucaspape.monstercat.ui.abstract_items.ProgressItem
+import de.lucaspape.monstercat.ui.abstract_items.content.AlbumItem
+import de.lucaspape.monstercat.ui.abstract_items.util.ProgressItem
 import de.lucaspape.monstercat.ui.activities.lastOpenType
 import de.lucaspape.monstercat.util.displaySnackBar
 import de.lucaspape.util.Cache
@@ -87,7 +87,8 @@ class HomeAlbumHandler(private val onSingleAlbumLoad: (albumId: String, albumMcI
     }
 
     private fun addAlbum(albumId: String) {
-        val item = AlbumItem(albumId)
+        val item =
+            AlbumItem(albumId)
 
         itemAdapter.add(item)
         viewData.add(item)
@@ -104,7 +105,8 @@ class HomeAlbumHandler(private val onSingleAlbumLoad: (albumId: String, albumMcI
     }
 
     private fun addAlbumFromCache(albumId: String) {
-        val item = AlbumItem(albumId)
+        val item =
+            AlbumItem(albumId)
 
         itemAdapter.add(item)
         viewData.add(item)

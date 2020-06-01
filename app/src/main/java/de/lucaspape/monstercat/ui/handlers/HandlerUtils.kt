@@ -15,11 +15,11 @@ import de.lucaspape.monstercat.database.helper.*
 import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.next
-import de.lucaspape.monstercat.ui.abstract_items.AlertListItem
-import de.lucaspape.monstercat.ui.abstract_items.HeaderTextItem
+import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListItem
+import de.lucaspape.monstercat.ui.abstract_items.util.HeaderTextItem
 import de.lucaspape.monstercat.request.async.*
 import de.lucaspape.monstercat.request.newLoadAlbumRequest
-import de.lucaspape.monstercat.ui.abstract_items.CatalogItem
+import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
 import de.lucaspape.monstercat.ui.addPlaylistDrawable
 import de.lucaspape.monstercat.ui.createPlaylistDrawable
 import de.lucaspape.monstercat.ui.handlers.home.HomeHandler
@@ -223,13 +223,20 @@ internal fun addSongToPlaylist(view: View, songId: String) {
 
                 for (name in playlistNames) {
                     name?.let {
-                        alertListItems.add(AlertListItem(name, ""))
+                        alertListItems.add(
+                            AlertListItem(
+                                name,
+                                ""
+                            )
+                        )
                     }
                 }
 
                 displayAlertDialogList(
                     view.context,
-                    HeaderTextItem(view.context.getString(R.string.pickPlaylistMsg)),
+                    HeaderTextItem(
+                        view.context.getString(R.string.pickPlaylistMsg)
+                    ),
                     alertListItems
                 ) { position, _ ->
                     playlistIds[position]?.let { playlistId ->
@@ -361,7 +368,11 @@ internal fun createPlaylist(view: View) {
             AlertListItem(
                 context.getString(R.string.createPlaylist),
                 createPlaylistDrawable
-            ), AlertListItem(context.getString(R.string.addPlaylistId), addPlaylistDrawable)
+            ),
+            AlertListItem(
+                context.getString(R.string.addPlaylistId),
+                addPlaylistDrawable
+            )
         )
 
         displayAlertDialogList(
@@ -536,13 +547,23 @@ internal fun openAlbum(view: View, albumMcId: String, share: Boolean) {
         val itemArray = ArrayList<AlertListItem>()
         val urlArray = ArrayList<String>()
 
-        itemArray.add(AlertListItem("monstercat.com", ""))
+        itemArray.add(
+            AlertListItem(
+                "monstercat.com",
+                ""
+            )
+        )
         urlArray.add(context.getString(R.string.shareReleaseUrl) + "/$albumMcId")
 
         for (i in (0 until linksArray.length())) {
             val linkObject = linksArray.getJSONObject(i)
 
-            itemArray.add(AlertListItem(linkObject.getString("platform"), ""))
+            itemArray.add(
+                AlertListItem(
+                    linkObject.getString("platform"),
+                    ""
+                )
+            )
             urlArray.add(linkObject.getString("original"))
         }
 
@@ -552,7 +573,8 @@ internal fun openAlbum(view: View, albumMcId: String, share: Boolean) {
             context.getString(R.string.pickApp)
         }
 
-        displayAlertDialogList(context, HeaderTextItem(title), itemArray) { position, _ ->
+        displayAlertDialogList(context,
+            HeaderTextItem(title), itemArray) { position, _ ->
             urlArray[position].let { url ->
                 if (share) {
                     val sendIntent = Intent().apply {

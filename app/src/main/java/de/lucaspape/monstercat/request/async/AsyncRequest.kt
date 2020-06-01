@@ -6,7 +6,7 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.*
 import de.lucaspape.monstercat.database.objects.Song
 import de.lucaspape.monstercat.request.*
-import de.lucaspape.monstercat.ui.abstract_items.CatalogItem
+import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
 import de.lucaspape.monstercat.util.*
 import de.lucaspape.util.BackgroundAsync
 import de.lucaspape.util.Settings
@@ -1002,7 +1002,11 @@ fun loadTitleSearchAsync(
                     parseSongSearchToSongList(context, jsonArray)
 
                 for (song in songList) {
-                    searchResults?.add(CatalogItem(song.songId))
+                    searchResults?.add(
+                        CatalogItem(
+                            song.songId
+                        )
+                    )
                 }
 
                 synchronized(syncObject) {

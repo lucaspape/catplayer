@@ -22,8 +22,8 @@ import com.mikepenz.fastadapter.adapters.ItemAdapter
 import com.mikepenz.fastadapter.listeners.ClickEventHook
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.request.OkHttp3Stack
-import de.lucaspape.monstercat.ui.abstract_items.AlertListItem
-import de.lucaspape.monstercat.ui.abstract_items.AlertListToggleItem
+import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListItem
+import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListToggleItem
 import de.lucaspape.persistentcookiejar.PersistentCookieJar
 import de.lucaspape.persistentcookiejar.cache.SetCookieCache
 import de.lucaspape.persistentcookiejar.persistence.SharedPrefsCookiePersistor

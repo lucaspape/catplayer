@@ -1,4 +1,4 @@
-package de.lucaspape.monstercat.ui.abstract_items
+package de.lucaspape.monstercat.ui.abstract_items.content
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -20,6 +20,8 @@ import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.ImageReceiverInterface
 import de.lucaspape.monstercat.download.downloadCoverIntoImageReceiver
 import de.lucaspape.monstercat.ui.*
+import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListHeaderItem
+import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListItem
 import de.lucaspape.monstercat.ui.handlers.*
 import de.lucaspape.monstercat.ui.handlers.deletePlaylist
 import de.lucaspape.monstercat.ui.handlers.renamePlaylist
@@ -44,23 +46,54 @@ open class PlaylistItem(
 
             PlaylistDatabaseHelper(view.context).getPlaylist(id)?.let { playlist ->
                 val itemList = arrayListOf(
-                    AlertListItem(view.context.getString(R.string.download), downloadDrawable),
-                    AlertListItem(view.context.getString(R.string.addToQueue), addToQueueDrawable),
-                    AlertListItem(view.context.getString(R.string.delete), deleteDrawable),
-                    AlertListItem(view.context.getString(R.string.renamePlaylist), editDrawable),
-                    AlertListItem(view.context.getString(R.string.sharePlaylist), shareDrawable),
-                    AlertListItem(view.context.getString(R.string.openPlaylistInApp), openInAppDrawable)
+                    AlertListItem(
+                        view.context.getString(R.string.download),
+                        downloadDrawable
+                    ),
+                    AlertListItem(
+                        view.context.getString(R.string.addToQueue),
+                        addToQueueDrawable
+                    ),
+                    AlertListItem(
+                        view.context.getString(R.string.delete),
+                        deleteDrawable
+                    ),
+                    AlertListItem(
+                        view.context.getString(R.string.renamePlaylist),
+                        editDrawable
+                    ),
+                    AlertListItem(
+                        view.context.getString(R.string.sharePlaylist),
+                        shareDrawable
+                    ),
+                    AlertListItem(
+                        view.context.getString(R.string.openPlaylistInApp),
+                        openInAppDrawable
+                    )
                 )
 
                 if(playlist.public){
-                    itemList.add(AlertListItem(view.context.getString(R.string.makePlaylistPrivate), playlistPrivateDrawable))
+                    itemList.add(
+                        AlertListItem(
+                            view.context.getString(R.string.makePlaylistPrivate),
+                            playlistPrivateDrawable
+                        )
+                    )
                 }else{
-                    itemList.add(AlertListItem(view.context.getString(R.string.makePlaylistPublic), playlistPublicDrawable))
+                    itemList.add(
+                        AlertListItem(
+                            view.context.getString(R.string.makePlaylistPublic),
+                            playlistPublicDrawable
+                        )
+                    )
                 }
 
                 displayAlertDialogList(
                     view.context,
-                    AlertListHeaderItem(playlist.playlistName, ""),
+                    AlertListHeaderItem(
+                        playlist.playlistName,
+                        ""
+                    ),
                     itemList
                 ) { _, item ->
                     when (item.itemText) {

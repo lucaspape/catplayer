@@ -11,9 +11,9 @@ import com.mikepenz.fastadapter.GenericItem
 import com.mikepenz.fastadapter.adapters.ItemAdapter
 import com.mikepenz.fastadapter.listeners.ClickEventHook
 import com.mikepenz.fastadapter.scroll.EndlessRecyclerOnScrollListener
-import de.lucaspape.monstercat.ui.abstract_items.CatalogItem
-import de.lucaspape.monstercat.ui.abstract_items.HeaderTextItem
-import de.lucaspape.monstercat.ui.abstract_items.ProgressItem
+import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
+import de.lucaspape.monstercat.ui.abstract_items.util.HeaderTextItem
+import de.lucaspape.monstercat.ui.abstract_items.util.ProgressItem
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.AlbumDatabaseHelper
 import de.lucaspape.monstercat.database.helper.AlbumItemDatabaseHelper
@@ -198,12 +198,17 @@ class HomeCatalogHandler(
     }
 
     private fun addHeader(headerText: String) {
-        headerAdapter.add(HeaderTextItem(headerText))
+        headerAdapter.add(
+            HeaderTextItem(
+                headerText
+            )
+        )
         itemHeaderOffset += -1
     }
 
     private fun addSong(songId: String) {
-        val item = CatalogItem(songId)
+        val item =
+            CatalogItem(songId)
 
         viewData.add(item)
         itemAdapter.add(item)
@@ -220,7 +225,8 @@ class HomeCatalogHandler(
     }
 
     private fun addSongFromCache(songId: String) {
-        val item = CatalogItem(songId)
+        val item =
+            CatalogItem(songId)
 
         viewData.add(item)
         itemAdapter.add(item)
