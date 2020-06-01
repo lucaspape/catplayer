@@ -126,6 +126,8 @@ class HomeAlbumHandler(private val onSingleAlbumLoad: (albumId: String, albumMcI
             loadAlbumListAsync(view.context, forceReload, 0, {
                 swipeRefreshLayout.isRefreshing = true
             }, { _, _, _ ->
+                setupRecyclerView(view)
+
                 val albumList = albumDatabaseHelper.getAlbums(0, 50)
 
                 for (album in albumList) {
@@ -160,6 +162,8 @@ class HomeAlbumHandler(private val onSingleAlbumLoad: (albumId: String, albumMcI
                 }
             })
         }else{
+            setupRecyclerView(view)
+
             for (albumId in albumListCache) {
                 addAlbumFromCache(albumId)
             }

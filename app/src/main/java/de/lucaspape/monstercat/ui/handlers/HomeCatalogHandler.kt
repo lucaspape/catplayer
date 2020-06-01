@@ -273,6 +273,8 @@ class HomeCatalogHandler(
             loadSongListAsync(view.context, forceReload, 0, displayLoading = {
                 swipeRefreshLayout.isRefreshing = true
             }, finishedCallback = { _, _, _ ->
+                setupRecyclerView(view)
+
                 val songList = catalogSongDatabaseHelper.getSongs(0, 50)
 
                 for (song in songList) {
@@ -307,6 +309,8 @@ class HomeCatalogHandler(
                 }
             })
         }else{
+            setupRecyclerView(view)
+
             for (songId in songListCache) {
                 addSongFromCache(songId)
             }
