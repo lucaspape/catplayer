@@ -86,7 +86,22 @@ class MainActivity : AppCompatActivity() {
                             PlaylistHandler(
                                 null,
                                 true
-                            )
+                            ) {
+                                openFragment(
+                                    de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
+                                        HomeHandler(
+                                            { searchString ->
+                                                search(
+                                                    searchString
+                                                )
+                                            },
+                                            { openSettings() },
+                                            null,
+                                            resetPosition = true
+                                        )
+                                    )
+                                )
+                            }
                         )
                     )
 
@@ -252,7 +267,22 @@ class MainActivity : AppCompatActivity() {
                         de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
                             PlaylistHandler(
                                 id, false
-                            )
+                            ) {
+                                openFragment(
+                                    de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
+                                        HomeHandler(
+                                            { searchString ->
+                                                search(
+                                                    searchString
+                                                )
+                                            },
+                                            { openSettings() },
+                                            null,
+                                            resetPosition = true
+                                        )
+                                    )
+                                )
+                            }
                         )
                     )
                     else -> openFragment(

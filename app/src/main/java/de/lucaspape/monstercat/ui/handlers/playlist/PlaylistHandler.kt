@@ -15,16 +15,18 @@ interface PlaylistHandlerInterface{
     fun resetRecyclerViewSavedPosition(context: Context)
 }
 
-class PlaylistHandler(private val playlistId: String?, private val resetPosition:Boolean):Handler{
+class PlaylistHandler(private val playlistId: String?, private val resetPosition:Boolean, private var returnToHome:() -> Unit):Handler{
     override val layout: Int = R.layout.fragment_playlist
     private var playlistHandlerObject:PlaylistHandlerInterface? = null
 
-    override fun onBackPressed(view: View) {
-        //TODO
+    private var lastOpen = ""
 
-        val intent = Intent(view.context, MainActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NO_ANIMATION
-        view.context.startActivity(intent)
+    override fun onBackPressed(view: View) {
+        if(lastOpen == "playlistContents"){
+            playlistListView(view)
+        }else{
+            returnToHome()
+        }
     }
 
     override fun onPause(view: View) {
@@ -52,6 +54,8 @@ class PlaylistHandler(private val playlistId: String?, private val resetPosition
 
         if(resetPosition)
             playlistHandlerObject?.resetRecyclerViewSavedPosition(view.context)
+
+        lastOpen = "playlistList"
     }
 
     private fun playlistContentView(view: View, playlistId:String){
@@ -62,6 +66,8 @@ class PlaylistHandler(private val playlistId: String?, private val resetPosition
 
         if(resetPosition)
             playlistHandlerObject?.resetRecyclerViewSavedPosition(view.context)
+
+        lastOpen = "playlistContents"
     }
 
     private fun registerListeners(view: View){
