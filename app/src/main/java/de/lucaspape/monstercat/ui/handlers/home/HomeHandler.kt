@@ -12,20 +12,23 @@ import de.lucaspape.monstercat.ui.handlers.Handler
 import de.lucaspape.util.CustomSpinnerClass
 import de.lucaspape.util.Settings
 
-interface HomeHandlerInterface{
+interface HomeHandlerInterface {
     fun saveRecyclerViewPosition(context: Context)
     fun onCreate(view: View)
     fun resetRecyclerViewSavedPosition(context: Context)
 }
 
-class HomeHandler(private val onSearch: (searchString: String?) -> Unit,
-                  private val openSettings: () -> Unit,
-                  private val albumMcId: String?,
-                  private val resetPosition: Boolean) :
+class HomeHandler(
+    private val onSearch: (searchString: String?) -> Unit,
+    private val openSettings: () -> Unit,
+    private val albumMcId: String?,
+    private val resetPosition: Boolean
+) :
     Handler {
 
-    companion object{
-        @JvmStatic var addSongsTaskId = ""
+    companion object {
+        @JvmStatic
+        var addSongsTaskId = ""
     }
 
     private var homeHandlerObject: HomeHandlerInterface? = null
@@ -42,16 +45,16 @@ class HomeHandler(private val onSearch: (searchString: String?) -> Unit,
     override fun onCreate(view: View) {
         setupSpinner(view)
 
-        if(!registerListeners(view) && albumMcId == null){
+        if (!registerListeners(view) && albumMcId == null) {
             catalogView(view)
-        }else if(albumMcId != null){
+        } else if (albumMcId != null) {
             openAlbum(view, null, albumMcId)
-        }else{
+        } else {
             albumView(view)
         }
     }
 
-    private fun catalogView(view: View){
+    private fun catalogView(view: View) {
         homeHandlerObject?.saveRecyclerViewPosition(view.context)
 
         homeHandlerObject =
@@ -60,33 +63,33 @@ class HomeHandler(private val onSearch: (searchString: String?) -> Unit,
                 null
             )
 
-        if(resetPosition)
+        if (resetPosition)
             homeHandlerObject?.resetRecyclerViewSavedPosition(view.context)
 
         homeHandlerObject?.onCreate(view)
     }
 
-    private fun openAlbum(view: View, albumId:String?, albumMcId: String){
+    private fun openAlbum(view: View, albumId: String?, albumMcId: String) {
         homeHandlerObject?.saveRecyclerViewPosition(view.context)
         homeHandlerObject =
             HomeCatalogHandler(
                 albumId,
                 albumMcId
             )
-        if(resetPosition)
+        if (resetPosition)
             homeHandlerObject?.resetRecyclerViewSavedPosition(view.context)
 
         homeHandlerObject?.onCreate(view)
     }
 
-    private fun albumView(view: View){
+    private fun albumView(view: View) {
         homeHandlerObject?.saveRecyclerViewPosition(view.context)
         homeHandlerObject =
             HomeAlbumHandler { albumId, albumMcId ->
                 openAlbum(view, albumId, albumMcId)
             }
 
-        if(resetPosition)
+        if (resetPosition)
             homeHandlerObject?.resetRecyclerViewSavedPosition(view.context)
 
         homeHandlerObject?.onCreate(view)

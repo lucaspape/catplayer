@@ -202,7 +202,7 @@ class PlaylistContentsHandler(private val playlistId: String) : PlaylistHandlerI
 
         val playlistContentsCache = Cache().get<ArrayList<String>>("playlist-view-$playlistId")
 
-        if(playlistContentsCache.isNullOrEmpty() || forceReload){
+        if (playlistContentsCache.isNullOrEmpty() || forceReload) {
             loadPlaylistTracksAsync(
                 view.context,
                 forceReload,
@@ -243,12 +243,12 @@ class PlaylistContentsHandler(private val playlistId: String) : PlaylistHandlerI
                         loadPlaylistContents(view, forceReload)
                     }
                 })
-        }else{
+        } else {
             PlaylistDatabaseHelper(view.context).getPlaylist(playlistId)?.playlistName?.let {
                 addHeader(it)
             }
 
-            for(songId in playlistContentsCache){
+            for (songId in playlistContentsCache) {
                 addSongFromCache(songId)
             }
 

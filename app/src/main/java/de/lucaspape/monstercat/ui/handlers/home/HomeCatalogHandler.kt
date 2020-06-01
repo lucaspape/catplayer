@@ -34,7 +34,7 @@ import java.io.File
 class HomeCatalogHandler(
     private val albumId: String?,
     private val albumMcId: String?
-): HomeHandlerInterface {
+) : HomeHandlerInterface {
 
     override fun onCreate(view: View) {
         if (albumMcId != null) {
@@ -209,7 +209,7 @@ class HomeCatalogHandler(
         val cache = Cache()
         var cacheList = cache.get<ArrayList<String>>("catalog-view")
 
-        if(cacheList == null){
+        if (cacheList == null) {
             cacheList = ArrayList()
         }
 
@@ -217,7 +217,7 @@ class HomeCatalogHandler(
         cache.set("catalog-view", cacheList)
     }
 
-    private fun addSongFromCache(songId: String){
+    private fun addSongFromCache(songId: String) {
         val item = CatalogItem(songId)
 
         viewData.add(item)
@@ -230,7 +230,7 @@ class HomeCatalogHandler(
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.homePullToRefresh)
 
-        if(songListCache.isNullOrEmpty() || forceReload){
+        if (songListCache.isNullOrEmpty() || forceReload) {
             Cache().set("catalog-view", null)
 
             val catalogSongDatabaseHelper =
@@ -278,7 +278,7 @@ class HomeCatalogHandler(
                     loadInitSongList(view, forceReload)
                 }
             })
-        }else{
+        } else {
             setupRecyclerView(view)
 
             for (songId in songListCache) {
@@ -442,13 +442,13 @@ class HomeCatalogHandler(
         }
     }
 
-    override fun resetRecyclerViewSavedPosition(context: Context){
+    override fun resetRecyclerViewSavedPosition(context: Context) {
         val settings = Settings.getSettings(context)
         settings.setInt("catalogview-positionIndex", 0)
         settings.setInt("catalogview-topView", 0)
     }
 
-    private fun restoreRecyclerViewPosition(context: Context){
+    private fun restoreRecyclerViewPosition(context: Context) {
         recyclerView?.let {
             val settings = Settings.getSettings(context)
             settings.getInt("catalogview-positionIndex")?.let { positionIndex ->
@@ -460,7 +460,7 @@ class HomeCatalogHandler(
         }
     }
 
-    override fun saveRecyclerViewPosition(context: Context){
+    override fun saveRecyclerViewPosition(context: Context) {
         recyclerView?.let {
             val layoutManager = it.layoutManager as LinearLayoutManager
 
