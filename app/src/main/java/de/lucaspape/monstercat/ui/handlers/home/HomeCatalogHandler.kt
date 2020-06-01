@@ -37,8 +37,6 @@ class HomeCatalogHandler(
 ): HomeHandlerInterface {
 
     override fun onCreate(view: View) {
-        setupRecyclerView(view)
-
         if (albumMcId != null) {
             loadAlbum(view, albumId, albumMcId, false)
         } else {
@@ -199,7 +197,7 @@ class HomeCatalogHandler(
 
     private fun addHeader(headerText: String) {
         headerAdapter.add(HeaderTextItem(headerText))
-        itemHeaderOffset + -1
+        itemHeaderOffset += -1
     }
 
     private fun addSong(songId: String) {
@@ -224,41 +222,6 @@ class HomeCatalogHandler(
 
         viewData.add(item)
         itemAdapter.add(item)
-    }
-
-    override fun resetRecyclerViewSavedPosition(context: Context){
-        val settings = Settings.getSettings(context)
-        settings.setInt("catalogview-positionIndex", 0)
-        settings.setInt("catalogview-topView", 0)
-    }
-
-    private fun restoreRecyclerViewPosition(context: Context){
-        recyclerView?.let {
-            val settings = Settings.getSettings(context)
-            settings.getInt("catalogview-positionIndex")?.let { positionIndex ->
-                settings.getInt("catalogview-topView")?.let { topView ->
-                    val layoutManager = it.layoutManager as LinearLayoutManager
-                    layoutManager.scrollToPositionWithOffset(positionIndex, topView)
-                }
-            }
-        }
-    }
-
-    override fun saveRecyclerViewPosition(context: Context){
-        recyclerView?.let {
-            val layoutManager = it.layoutManager as LinearLayoutManager
-
-            val positionIndex = layoutManager.findFirstVisibleItemPosition()
-            val startView = it.getChildAt(0)
-
-            startView?.let { sView ->
-                val topView = sView.top - sView.paddingTop
-
-                val settings = Settings.getSettings(context)
-                settings.setInt("catalogview-positionIndex", positionIndex)
-                settings.setInt("catalogview-topView", topView)
-            }
-        }
     }
 
     private fun loadInitSongList(view: View, forceReload: Boolean) {
@@ -399,6 +362,10 @@ class HomeCatalogHandler(
                 finishedCallback = {
                     val albumDatabaseHelper = AlbumDatabaseHelper(view.context)
                     albumDatabaseHelper.getAlbumFromMcId(albumMcId)?.let { album ->
+                        AlbumDatabaseHelper(view.context).getAlbum(album.albumId)?.let {
+                            addHeader(it.title)
+                        }
+
                         val albumItemDatabaseHelper =
                             AlbumItemDatabaseHelper(view.context, album.albumId)
                         val albumItemList = albumItemDatabaseHelper.getAllData()
@@ -406,10 +373,6 @@ class HomeCatalogHandler(
                         for (albumItem in albumItemList) {
                             addSong(albumItem.songId)
                         }
-
-                        /**
-                         * On scroll down (load next)
-                         */
 
                         /**
                          * On scroll down (load next)
@@ -433,21 +396,17 @@ class HomeCatalogHandler(
                     swipeRefreshLayout.isRefreshing = false
                 })
         } else {
-            var albumName = ""
-
-            AlbumDatabaseHelper(view.context).getAlbum(albumId)?.let {
-                albumName = it.title
-            }
-
             loadAlbumAsync(view.context, forceReload, albumId, albumMcId, {
                 swipeRefreshLayout.isRefreshing = true
             }, { _, _, _, _ ->
+                AlbumDatabaseHelper(view.context).getAlbum(albumId)?.let {
+                    addHeader(it.title)
+                }
+
                 val albumItemDatabaseHelper =
                     AlbumItemDatabaseHelper(view.context, albumId)
 
                 val albumItemList = albumItemDatabaseHelper.getAllData()
-
-                addHeader(albumName)
 
                 for (albumItem in albumItemList) {
                     addSong(albumItem.songId)
@@ -480,6 +439,41 @@ class HomeCatalogHandler(
                     loadAlbum(view, albumId, albumMcId, forceReload)
                 }
             })
+        }
+    }
+
+    override fun resetRecyclerViewSavedPosition(context: Context){
+        val settings = Settings.getSettings(context)
+        settings.setInt("catalogview-positionIndex", 0)
+        settings.setInt("catalogview-topView", 0)
+    }
+
+    private fun restoreRecyclerViewPosition(context: Context){
+        recyclerView?.let {
+            val settings = Settings.getSettings(context)
+            settings.getInt("catalogview-positionIndex")?.let { positionIndex ->
+                settings.getInt("catalogview-topView")?.let { topView ->
+                    val layoutManager = it.layoutManager as LinearLayoutManager
+                    layoutManager.scrollToPositionWithOffset(positionIndex, topView)
+                }
+            }
+        }
+    }
+
+    override fun saveRecyclerViewPosition(context: Context){
+        recyclerView?.let {
+            val layoutManager = it.layoutManager as LinearLayoutManager
+
+            val positionIndex = layoutManager.findFirstVisibleItemPosition()
+            val startView = it.getChildAt(0)
+
+            startView?.let { sView ->
+                val topView = sView.top - sView.paddingTop
+
+                val settings = Settings.getSettings(context)
+                settings.setInt("catalogview-positionIndex", positionIndex)
+                settings.setInt("catalogview-topView", topView)
+            }
         }
     }
 }

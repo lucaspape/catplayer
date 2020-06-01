@@ -28,6 +28,7 @@ class HomeHandler(private val onSearch: (searchString: String?) -> Unit,
         @JvmStatic var addSongsTaskId = ""
     }
 
+    private var homeHandlerObject: HomeHandlerInterface? = null
     override val layout: Int = R.layout.fragment_home
 
     override fun onBackPressed(view: View) {
@@ -37,8 +38,6 @@ class HomeHandler(private val onSearch: (searchString: String?) -> Unit,
     override fun onPause(view: View) {
         homeHandlerObject?.saveRecyclerViewPosition(view.context)
     }
-
-    private var homeHandlerObject: HomeHandlerInterface? = null
 
     override fun onCreate(view: View) {
         setupSpinner(view)

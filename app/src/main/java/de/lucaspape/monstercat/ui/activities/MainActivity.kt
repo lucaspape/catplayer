@@ -33,6 +33,7 @@ import de.lucaspape.monstercat.request.async.checkCustomApiFeaturesAsync
 import de.lucaspape.monstercat.ui.*
 import de.lucaspape.monstercat.ui.handlers.*
 import de.lucaspape.monstercat.ui.handlers.home.HomeHandler
+import de.lucaspape.monstercat.ui.handlers.playlist.PlaylistHandler
 import de.lucaspape.monstercat.util.*
 import de.lucaspape.util.Settings
 import java.io.File
@@ -82,7 +83,10 @@ class MainActivity : AppCompatActivity() {
                 R.id.navigation_dashboard -> {
                     openFragment(
                         de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
-                            PlaylistHandler(null)
+                            PlaylistHandler(
+                                null,
+                                true
+                            )
                         )
                     )
 
@@ -246,7 +250,9 @@ class MainActivity : AppCompatActivity() {
                     )
                     path.contains("playlist") -> openFragment(
                         de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
-                            PlaylistHandler(id)
+                            PlaylistHandler(
+                                id, false
+                            )
                         )
                     )
                     else -> openFragment(
