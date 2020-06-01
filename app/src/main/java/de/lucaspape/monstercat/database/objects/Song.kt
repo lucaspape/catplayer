@@ -15,6 +15,7 @@ import de.lucaspape.util.Settings
 import de.lucaspape.monstercat.util.getSid
 import de.lucaspape.monstercat.util.wifiConnected
 import java.io.File
+import java.net.URI
 
 data class Song(
     val context: Context,
@@ -87,59 +88,59 @@ data class Song(
 
     val shownTitle = "$title $version"
 
-    val downloadLocation: String =
-        context.getExternalFilesDir(null)
+    val downloadLocation: String
+        get() = context.getExternalFilesDir(null)
             .toString() + "/" + artist + title + version + "." + Settings.getSettings(
             context
         ).getString("downloadType")
 
-    val downloadUrl = if (Settings.getSettings(context)
-            .getBoolean(context.getString(R.string.useCustomApiSetting)) == true && Settings.getSettings(
-            context
-        ).getBoolean(context.getString(R.string.customApiSupportsV1Setting)) == true
-    ) {
-        Settings.getSettings(context)
-            .getString(context.getString(R.string.customDownloadUrlSetting)) + albumId + "/track-download/" + songId + "?format=" + Settings.getSettings(
-            context
-        ).getString("downloadType")
-    } else {
-        context.getString(R.string.trackContentUrl) + albumId + "/track-download/" + songId + "?format=" + Settings.getSettings(
-            context
-        ).getString("downloadType")
-    }
+    val downloadUrl: String
+        get() = if (Settings.getSettings(context)
+                .getBoolean(context.getString(R.string.useCustomApiSetting)) == true && Settings.getSettings(
+                context
+            ).getBoolean(context.getString(R.string.customApiSupportsV1Setting)) == true
+        ) {
+            Settings.getSettings(context)
+                .getString(context.getString(R.string.customDownloadUrlSetting)) + albumId + "/track-download/" + songId + "?format=" + Settings.getSettings(
+                context
+            ).getString("downloadType")
+        } else {
+            context.getString(R.string.trackContentUrl) + albumId + "/track-download/" + songId + "?format=" + Settings.getSettings(
+                context
+            ).getString("downloadType")
+        }
 
-    private val streamUrl = if (Settings.getSettings(context)
-            .getBoolean(context.getString(R.string.useCustomApiSetting)) == true && Settings.getSettings(
-            context
-        ).getBoolean(context.getString(R.string.customApiSupportsV1Setting)) == true
-    ) {
-        Settings.getSettings(context)
-            .getString(context.getString(R.string.customStreamUrlSetting)) + albumId + "/track-stream/" + songId
-    } else {
-        context.getString(R.string.trackContentUrl) + albumId + "/track-stream/" + songId
-    }
+    private val streamUrl: String
+        get() = if (Settings.getSettings(context)
+                .getBoolean(context.getString(R.string.useCustomApiSetting)) == true && Settings.getSettings(
+                context
+            ).getBoolean(context.getString(R.string.customApiSupportsV1Setting)) == true
+        ) {
+            Settings.getSettings(context)
+                .getString(context.getString(R.string.customStreamUrlSetting)) + albumId + "/track-stream/" + songId
+        } else {
+            context.getString(R.string.trackContentUrl) + albumId + "/track-stream/" + songId
+        }
 
-    fun getSongDownloadStatus(): String {
-        return when {
+    val downloadStatus: Uri
+        get() = when {
             File(downloadLocation).exists() -> {
-                offlineDrawable
+                offlineDrawable.toUri()
             }
             else -> {
-                downloadDrawable
+                downloadDrawable.toUri()
             }
         }
-    }
 
-    private fun getUrl(): String {
-        return if (File(downloadLocation).exists()) {
+    val url: String
+        get() = if (File(downloadLocation).exists()) {
             downloadLocation
         } else {
             streamUrl
         }
-    }
 
-    fun getMediaSource(): MediaSource? {
-        return if (File(downloadLocation).exists()) {
+    val mediaSource: MediaSource?
+        get() = if (File(downloadLocation).exists()) {
             fileToMediaSource(downloadLocation)
         } else {
             if (isStreamable) {
@@ -148,14 +149,12 @@ data class Song(
                 null
             }
         }
-    }
 
     fun playbackAllowed(context: Context): Boolean {
         return wifiConnected(context) == true || Settings.getSettings(
             context
-        ).getBoolean(context.getString(R.string.streamOverMobileSetting)) == true || File(
-            getUrl()
-        ).exists()
+        )
+            .getBoolean(context.getString(R.string.streamOverMobileSetting)) == true || File(url).exists()
     }
 
     private fun fileToMediaSource(fileLocation: String): ProgressiveMediaSource {

@@ -34,7 +34,7 @@ internal fun prepareSong(context: Context, songId: String, callback: () -> Unit)
         SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
             if (song.playbackAllowed(context)
             ) {
-                val mediaSource = song.getMediaSource()
+                val mediaSource = song.mediaSource
 
                 if (mediaSource != null) {
                     preparedExoPlayer?.prepare(mediaSource)
@@ -49,7 +49,7 @@ internal fun prepareSong(context: Context, songId: String, callback: () -> Unit)
         }
 
         addTrackToDBAsync(context, songId, {_, song ->
-            val mediaSource = song.getMediaSource()
+            val mediaSource = song.mediaSource
 
             if (mediaSource != null) {
                 preparedExoPlayer?.prepare(mediaSource)

@@ -80,7 +80,7 @@ class Stream(private val clientId: String, private val channel: String) {
 
         volleyQueue.add(playlistRequest)
     }
-
+    
     /**
      * Returns hlsMediaSource of twitch stream for ExoPlayer
      */

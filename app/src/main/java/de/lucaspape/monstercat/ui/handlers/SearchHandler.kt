@@ -3,7 +3,6 @@ package de.lucaspape.monstercat.ui.handlers
 import android.view.View
 import android.widget.ImageButton
 import android.widget.SearchView
-import androidx.core.net.toUri
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -202,7 +201,7 @@ class SearchHandler(
                     when {
                         File(song.downloadLocation).exists() -> {
                             File(song.downloadLocation).delete()
-                            titleDownloadButton.setImageURI(song.getSongDownloadStatus().toUri())
+                            titleDownloadButton.setImageURI(song.downloadStatus)
                         }
                         else -> {
                             addDownloadSong(
@@ -210,7 +209,7 @@ class SearchHandler(
                                 item.songId
                             ) {
                                 titleDownloadButton.setImageURI(
-                                    song.getSongDownloadStatus().toUri()
+                                    song.downloadStatus
                                 )
                             }
                         }

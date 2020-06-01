@@ -198,7 +198,7 @@ open class CatalogItem(
                 titleDownloadButton.setImageURI(downloadStatus)
 
                 BackgroundAsync({
-                    downloadStatus = song.getSongDownloadStatus().toUri()
+                    downloadStatus = song.downloadStatus
                 }, {
                     titleDownloadButton.setImageURI(downloadStatus)
                 }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
