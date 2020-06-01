@@ -47,6 +47,8 @@ var downloadServiceIntent: Intent? = null
 var lastOpenId = ""
 var lastOpenType = ""
 
+var lastOpenFragment = ""
+
 /**
  * Main activity
  */
@@ -66,12 +68,20 @@ class MainActivity : AppCompatActivity() {
         BottomNavigationView.OnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_home -> {
-                    openHome(null, true)
+                    if(lastOpenFragment == "home"){
+                        openHome(null, true)
+                    }else{
+                        openHome(null, false)
+                    }
 
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.navigation_playlist -> {
-                    openPlaylist(null, true)
+                    if(lastOpenFragment == "playlist"){
+                        openPlaylist(null, true)
+                    }else{
+                        openPlaylist(null, false)
+                    }
 
                     return@OnNavigationItemSelectedListener true
                 }
@@ -91,6 +101,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun search(searchString: String?) {
+        lastOpenFragment = "search"
+
         openFragment(
             de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
                 SearchHandler(
@@ -103,6 +115,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openSettings() {
+        lastOpenFragment = "settings"
+
         openFragment(
             de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
                 SettingsHandler {
@@ -113,6 +127,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openHome(albumMcId:String?, resetPosition:Boolean){
+        lastOpenFragment = "home"
+
         openFragment(
             de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
                 HomeHandler(
@@ -130,6 +146,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openPlaylist(playlistId:String?, resetPosition: Boolean){
+        lastOpenFragment = "playlist"
+
         openFragment(
             de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
                 PlaylistHandler(
