@@ -70,7 +70,7 @@ class MainActivity : AppCompatActivity() {
 
                     return@OnNavigationItemSelectedListener true
                 }
-                R.id.navigation_dashboard -> {
+                R.id.navigation_playlist -> {
                     openPlaylist(null, true)
 
                     return@OnNavigationItemSelectedListener true
