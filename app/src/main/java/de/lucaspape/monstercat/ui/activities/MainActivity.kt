@@ -32,6 +32,7 @@ import de.lucaspape.monstercat.music.util.setCover
 import de.lucaspape.monstercat.request.async.checkCustomApiFeaturesAsync
 import de.lucaspape.monstercat.ui.*
 import de.lucaspape.monstercat.ui.handlers.*
+import de.lucaspape.monstercat.ui.handlers.home.HomeHandler
 import de.lucaspape.monstercat.util.*
 import de.lucaspape.util.Settings
 import java.io.File
@@ -63,11 +64,16 @@ class MainActivity : AppCompatActivity() {
                 R.id.navigation_home -> {
                     openFragment(
                         de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
-                            HomeHandler({ searchString ->
-                                search(
-                                    searchString
-                                )
-                            }, { openSettings() }, null, resetPosition = true)
+                            HomeHandler(
+                                { searchString ->
+                                    search(
+                                        searchString
+                                    )
+                                },
+                                { openSettings() },
+                                null,
+                                resetPosition = true
+                            )
                         )
                     )
 
@@ -94,11 +100,16 @@ class MainActivity : AppCompatActivity() {
                 ) {
                     openFragment(
                         de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
-                            HomeHandler({ searchString ->
-                                search(
-                                    searchString
-                                )
-                            }, { openSettings() }, null, resetPosition = false)
+                            HomeHandler(
+                                { searchString ->
+                                    search(
+                                        searchString
+                                    )
+                                },
+                                { openSettings() },
+                                null,
+                                resetPosition = false
+                            )
                         )
                     )
                 }
@@ -112,11 +123,16 @@ class MainActivity : AppCompatActivity() {
                 SettingsHandler {
                     openFragment(
                         de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
-                            HomeHandler({ searchString ->
-                                search(
-                                    searchString
-                                )
-                            }, { openSettings() }, null, resetPosition = false)
+                            HomeHandler(
+                                { searchString ->
+                                    search(
+                                        searchString
+                                    )
+                                },
+                                { openSettings() },
+                                null,
+                                resetPosition = false
+                            )
                         )
                     )
                 }
@@ -216,11 +232,16 @@ class MainActivity : AppCompatActivity() {
                 when {
                     path.contains("release") -> openFragment(
                         de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
-                            HomeHandler({ searchString ->
-                                search(
-                                    searchString
-                                )
-                            }, { openSettings() }, id, resetPosition = false)
+                            HomeHandler(
+                                { searchString ->
+                                    search(
+                                        searchString
+                                    )
+                                },
+                                { openSettings() },
+                                id,
+                                resetPosition = false
+                            )
                         )
                     )
                     path.contains("playlist") -> openFragment(
@@ -230,11 +251,16 @@ class MainActivity : AppCompatActivity() {
                     )
                     else -> openFragment(
                         de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
-                            HomeHandler({ searchString ->
-                                search(
-                                    searchString
-                                )
-                            }, { openSettings() }, null, resetPosition = false)
+                            HomeHandler(
+                                { searchString ->
+                                    search(
+                                        searchString
+                                    )
+                                },
+                                { openSettings() },
+                                null,
+                                resetPosition = false
+                            )
                         )
                     )
                 }

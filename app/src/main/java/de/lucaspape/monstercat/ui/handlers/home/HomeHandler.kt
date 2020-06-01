@@ -1,4 +1,4 @@
-package de.lucaspape.monstercat.ui.handlers
+package de.lucaspape.monstercat.ui.handlers.home
 
 import android.content.Context
 import android.view.View
@@ -8,6 +8,7 @@ import android.widget.ImageButton
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.music.util.playStream
 import de.lucaspape.monstercat.twitch.Stream
+import de.lucaspape.monstercat.ui.handlers.Handler
 import de.lucaspape.util.CustomSpinnerClass
 import de.lucaspape.util.Settings
 
@@ -20,7 +21,8 @@ interface HomeHandlerInterface{
 class HomeHandler(private val onSearch: (searchString: String?) -> Unit,
                   private val openSettings: () -> Unit,
                   private val albumMcId: String?,
-                  private val resetPosition: Boolean) : Handler{
+                  private val resetPosition: Boolean) :
+    Handler {
 
     companion object{
         @JvmStatic var addSongsTaskId = ""
@@ -36,7 +38,7 @@ class HomeHandler(private val onSearch: (searchString: String?) -> Unit,
         homeHandlerObject?.saveRecyclerViewPosition(view.context)
     }
 
-    private var homeHandlerObject:HomeHandlerInterface? = null
+    private var homeHandlerObject: HomeHandlerInterface? = null
 
     override fun onCreate(view: View) {
         setupSpinner(view)
@@ -53,7 +55,11 @@ class HomeHandler(private val onSearch: (searchString: String?) -> Unit,
     private fun catalogView(view: View){
         homeHandlerObject?.saveRecyclerViewPosition(view.context)
 
-        homeHandlerObject = HomeCatalogHandler(null, null)
+        homeHandlerObject =
+            HomeCatalogHandler(
+                null,
+                null
+            )
 
         if(resetPosition)
             homeHandlerObject?.resetRecyclerViewSavedPosition(view.context)
@@ -63,7 +69,11 @@ class HomeHandler(private val onSearch: (searchString: String?) -> Unit,
 
     private fun openAlbum(view: View, albumId:String?, albumMcId: String){
         homeHandlerObject?.saveRecyclerViewPosition(view.context)
-        homeHandlerObject = HomeCatalogHandler(albumId, albumMcId)
+        homeHandlerObject =
+            HomeCatalogHandler(
+                albumId,
+                albumMcId
+            )
         if(resetPosition)
             homeHandlerObject?.resetRecyclerViewSavedPosition(view.context)
 
@@ -72,9 +82,10 @@ class HomeHandler(private val onSearch: (searchString: String?) -> Unit,
 
     private fun albumView(view: View){
         homeHandlerObject?.saveRecyclerViewPosition(view.context)
-        homeHandlerObject = HomeAlbumHandler { albumId, albumMcId ->
-            openAlbum(view, albumId, albumMcId)
-        }
+        homeHandlerObject =
+            HomeAlbumHandler { albumId, albumMcId ->
+                openAlbum(view, albumId, albumMcId)
+            }
 
         if(resetPosition)
             homeHandlerObject?.resetRecyclerViewSavedPosition(view.context)

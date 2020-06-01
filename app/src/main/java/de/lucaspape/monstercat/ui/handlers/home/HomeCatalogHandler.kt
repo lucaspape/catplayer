@@ -1,4 +1,4 @@
-package de.lucaspape.monstercat.ui.handlers
+package de.lucaspape.monstercat.ui.handlers.home
 
 import android.content.Context
 import android.view.View
@@ -23,6 +23,9 @@ import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.request.async.loadAlbumAsync
 import de.lucaspape.monstercat.request.async.loadSongListAsync
+import de.lucaspape.monstercat.ui.handlers.loadAlbumTracks
+import de.lucaspape.monstercat.ui.handlers.playSongsFromCatalogDbAsync
+import de.lucaspape.monstercat.ui.handlers.playSongsFromViewDataAsync
 import de.lucaspape.monstercat.util.displaySnackBar
 import de.lucaspape.util.Cache
 import de.lucaspape.util.Settings
@@ -31,7 +34,7 @@ import java.io.File
 class HomeCatalogHandler(
     private val albumId: String?,
     private val albumMcId: String?
-):HomeHandlerInterface {
+): HomeHandlerInterface {
 
     override fun onCreate(view: View) {
         setupRecyclerView(view)
@@ -84,7 +87,11 @@ class HomeCatalogHandler(
                     Settings(view.context).getBoolean(view.context.getString(R.string.skipMonstercatSongsSetting)) == true
 
                 if (albumId == null) {
-                    playSongsFromCatalogDbAsync(view.context, skipMonstercatSongs, fistItem.songId)
+                    playSongsFromCatalogDbAsync(
+                        view.context,
+                        skipMonstercatSongs,
+                        fistItem.songId
+                    )
                 } else {
                     playSongsFromViewDataAsync(
                         view.context,
@@ -384,37 +391,45 @@ class HomeCatalogHandler(
             view.findViewById<SwipeRefreshLayout>(R.id.homePullToRefresh)
 
         if (albumId == null) {
-            loadAlbumTracks(view.context, albumMcId, finishedCallback = {
-                val albumDatabaseHelper = AlbumDatabaseHelper(view.context)
-                albumDatabaseHelper.getAlbumFromMcId(albumMcId)?.let { album ->
-                    val albumItemDatabaseHelper =
-                        AlbumItemDatabaseHelper(view.context, album.albumId)
-                    val albumItemList = albumItemDatabaseHelper.getAllData()
+            loadAlbumTracks(
+                view.context,
+                albumMcId,
+                finishedCallback = {
+                    val albumDatabaseHelper = AlbumDatabaseHelper(view.context)
+                    albumDatabaseHelper.getAlbumFromMcId(albumMcId)?.let { album ->
+                        val albumItemDatabaseHelper =
+                            AlbumItemDatabaseHelper(view.context, album.albumId)
+                        val albumItemList = albumItemDatabaseHelper.getAllData()
 
-                    for (albumItem in albumItemList) {
-                        addSong(albumItem.songId)
-                    }
-
-                    /**
-                     * On scroll down (load next)
-                     */
-                    recyclerView?.addOnScrollListener(object :
-                        EndlessRecyclerOnScrollListener(footerAdapter) {
-                        override fun onLoadMore(currentPage: Int) {
+                        for (albumItem in albumItemList) {
+                            addSong(albumItem.songId)
                         }
-                    })
 
-                    //refresh
-                    swipeRefreshLayout.setOnRefreshListener {
-                        loadAlbum(view, albumId, albumMcId, true)
+                        /**
+                         * On scroll down (load next)
+                         */
+
+                        /**
+                         * On scroll down (load next)
+                         */
+                        recyclerView?.addOnScrollListener(object :
+                            EndlessRecyclerOnScrollListener(footerAdapter) {
+                            override fun onLoadMore(currentPage: Int) {
+                            }
+                        })
+
+                        //refresh
+                        swipeRefreshLayout.setOnRefreshListener {
+                            loadAlbum(view, albumId, albumMcId, true)
+                        }
+
+                        swipeRefreshLayout.isRefreshing = false
                     }
-
+                },
+                errorCallback = {
+                    //TODO handle error
                     swipeRefreshLayout.isRefreshing = false
-                }
-            }, errorCallback = {
-                //TODO handle error
-                swipeRefreshLayout.isRefreshing = false
-            })
+                })
         } else {
             var albumName = ""
 

@@ -1,4 +1,4 @@
-package de.lucaspape.monstercat.ui.handlers
+package de.lucaspape.monstercat.ui.handlers.home
 
 import android.content.Context
 import android.view.View
@@ -18,7 +18,8 @@ import de.lucaspape.monstercat.util.displaySnackBar
 import de.lucaspape.util.Cache
 import de.lucaspape.util.Settings
 
-class HomeAlbumHandler(private val onSingleAlbumLoad: (albumId: String, albumMcId: String) -> Unit):HomeHandlerInterface {
+class HomeAlbumHandler(private val onSingleAlbumLoad: (albumId: String, albumMcId: String) -> Unit):
+    HomeHandlerInterface {
     override fun onCreate(view: View) {
         setupRecyclerView(view)
         loadInitAlbumList(view, false)

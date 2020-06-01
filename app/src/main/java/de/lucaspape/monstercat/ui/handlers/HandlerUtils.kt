@@ -22,6 +22,7 @@ import de.lucaspape.monstercat.request.newLoadAlbumRequest
 import de.lucaspape.monstercat.ui.abstract_items.CatalogItem
 import de.lucaspape.monstercat.ui.addPlaylistDrawable
 import de.lucaspape.monstercat.ui.createPlaylistDrawable
+import de.lucaspape.monstercat.ui.handlers.home.HomeHandler
 import de.lucaspape.monstercat.util.*
 import de.lucaspape.util.BackgroundAsync
 import java.io.File
