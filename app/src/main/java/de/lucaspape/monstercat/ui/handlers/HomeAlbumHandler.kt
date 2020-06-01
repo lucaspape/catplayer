@@ -115,6 +115,8 @@ class HomeAlbumHandler(private val onSingleAlbumLoad: (albumId: String, albumMcI
         val albumListCache = Cache().get<ArrayList<String>>("album-view")
 
         if(albumListCache.isNullOrEmpty() || forceReload){
+            Cache().set("album-view", null)
+
             val albumDatabaseHelper = AlbumDatabaseHelper(view.context)
 
             if (forceReload) {

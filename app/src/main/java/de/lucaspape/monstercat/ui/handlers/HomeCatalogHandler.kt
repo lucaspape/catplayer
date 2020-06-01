@@ -261,6 +261,8 @@ class HomeCatalogHandler(
             view.findViewById<SwipeRefreshLayout>(R.id.homePullToRefresh)
 
         if(songListCache.isNullOrEmpty() || forceReload){
+            Cache().set("catalog-view", null)
+
             val catalogSongDatabaseHelper =
                 CatalogSongDatabaseHelper(view.context)
 
