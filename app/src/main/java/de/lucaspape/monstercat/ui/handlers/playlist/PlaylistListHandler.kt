@@ -16,6 +16,7 @@ import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.request.async.loadPlaylistAsync
 import de.lucaspape.monstercat.ui.abstract_items.HeaderTextItem
 import de.lucaspape.monstercat.ui.abstract_items.PlaylistItem
+import de.lucaspape.monstercat.ui.activities.lastOpenType
 import de.lucaspape.monstercat.ui.handlers.deleteDownloadedPlaylistTracks
 import de.lucaspape.monstercat.ui.handlers.downloadPlaylistAsync
 import de.lucaspape.monstercat.ui.offlineDrawable
@@ -190,6 +191,8 @@ class PlaylistListHandler(private val loadPlaylist: (playlistId: String) -> Unit
 
     private fun loadPlaylistList(view: View, forceReload: Boolean) {
         setupRecyclerView(view)
+
+        lastOpenType = "playlist-list"
 
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.playlistSwipeRefresh)

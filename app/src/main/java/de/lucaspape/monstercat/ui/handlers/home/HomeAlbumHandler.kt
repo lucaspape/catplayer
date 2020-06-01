@@ -14,6 +14,7 @@ import de.lucaspape.monstercat.database.helper.AlbumDatabaseHelper
 import de.lucaspape.monstercat.request.async.loadAlbumListAsync
 import de.lucaspape.monstercat.ui.abstract_items.AlbumItem
 import de.lucaspape.monstercat.ui.abstract_items.ProgressItem
+import de.lucaspape.monstercat.ui.activities.lastOpenType
 import de.lucaspape.monstercat.util.displaySnackBar
 import de.lucaspape.util.Cache
 import de.lucaspape.util.Settings
@@ -114,6 +115,8 @@ class HomeAlbumHandler(private val onSingleAlbumLoad: (albumId: String, albumMcI
             view.findViewById<SwipeRefreshLayout>(R.id.homePullToRefresh)
 
         val albumListCache = Cache().get<ArrayList<String>>("album-view")
+
+        lastOpenType = "album-list"
 
         if (albumListCache.isNullOrEmpty() || forceReload) {
             Cache().set("album-view", null)

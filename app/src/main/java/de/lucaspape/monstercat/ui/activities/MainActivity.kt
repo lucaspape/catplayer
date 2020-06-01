@@ -44,6 +44,9 @@ import java.lang.ref.WeakReference
 val noisyReceiver = NoisyReceiver()
 var downloadServiceIntent: Intent? = null
 
+var lastOpenId = ""
+var lastOpenType = ""
+
 /**
  * Main activity
  */
@@ -76,13 +79,24 @@ class MainActivity : AppCompatActivity() {
             false
         }
 
+    private fun restoreLastFragment(){
+        when(lastOpenType){
+            "playlist" -> openPlaylist(lastOpenId, false)
+            "album" -> openHome(lastOpenId, false)
+            "playlist-list" -> openPlaylist(null, false)
+            "catalog-list" -> openHome(null, false)
+            "album-list" -> openHome(null, false)
+            else -> openHome(null, false)
+        }
+    }
+
     private fun search(searchString: String?) {
         openFragment(
             de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
                 SearchHandler(
                     searchString
                 ) {
-                    openHome(null, false)
+                    restoreLastFragment()
                 }
             )
         )
@@ -92,7 +106,7 @@ class MainActivity : AppCompatActivity() {
         openFragment(
             de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
                 SettingsHandler {
-                    openHome(null, false)
+                    restoreLastFragment()
                 }
             )
         )
@@ -224,7 +238,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             else -> {
-                openHome(null, false)
+                restoreLastFragment()
             }
         }
 

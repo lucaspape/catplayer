@@ -23,6 +23,8 @@ import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.download.addDownloadSong
 import de.lucaspape.monstercat.request.async.loadAlbumAsync
 import de.lucaspape.monstercat.request.async.loadSongListAsync
+import de.lucaspape.monstercat.ui.activities.lastOpenId
+import de.lucaspape.monstercat.ui.activities.lastOpenType
 import de.lucaspape.monstercat.ui.handlers.loadAlbumTracks
 import de.lucaspape.monstercat.ui.handlers.playSongsFromCatalogDbAsync
 import de.lucaspape.monstercat.ui.handlers.playSongsFromViewDataAsync
@@ -227,6 +229,8 @@ class HomeCatalogHandler(
     private fun loadInitSongList(view: View, forceReload: Boolean) {
         val songListCache = Cache().get<ArrayList<String>>("catalog-view")
 
+        lastOpenType = "catalog-list"
+
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.homePullToRefresh)
 
@@ -317,6 +321,8 @@ class HomeCatalogHandler(
         footerAdapter.clear()
         footerAdapter.add(ProgressItem())
 
+        lastOpenType = "catalog-list"
+
         loadSongListAsync(view.context,
             false,
             (currentPage * 50),
@@ -354,6 +360,9 @@ class HomeCatalogHandler(
             view.findViewById<SwipeRefreshLayout>(R.id.homePullToRefresh)
 
         setupRecyclerView(view)
+
+        lastOpenType = "album"
+        lastOpenId = albumMcId
 
         if (albumId == null) {
             loadAlbumTracks(
