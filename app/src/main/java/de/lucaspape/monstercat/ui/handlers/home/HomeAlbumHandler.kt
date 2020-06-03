@@ -1,7 +1,9 @@
 package de.lucaspape.monstercat.ui.handlers.home
 
 import android.content.Context
+import android.content.res.Configuration
 import android.view.View
+import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -43,8 +45,14 @@ class HomeAlbumHandler(private val onSingleAlbumLoad: (albumId: String, albumMcI
         val fastAdapter: FastAdapter<GenericItem> =
             FastAdapter.with(listOf(itemAdapter, footerAdapter))
 
+        val orientation = if(view.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE){
+            LinearLayout.HORIZONTAL
+        }else{
+            LinearLayout.VERTICAL
+        }
+
         recyclerView?.layoutManager =
-            LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
+            LinearLayoutManager(view.context, orientation, false)
 
         recyclerView?.adapter = fastAdapter
 
@@ -86,9 +94,9 @@ class HomeAlbumHandler(private val onSingleAlbumLoad: (albumId: String, albumMcI
         }
     }
 
-    private fun addAlbum(albumId: String) {
+    private fun addAlbum(view: View, albumId: String) {
         val item =
-            AlbumItem(albumId)
+            AlbumItem(albumId, (view.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE))
 
         itemAdapter.add(item)
         viewData.add(item)
@@ -104,9 +112,9 @@ class HomeAlbumHandler(private val onSingleAlbumLoad: (albumId: String, albumMcI
         cache.set("album-view", cacheList)
     }
 
-    private fun addAlbumFromCache(albumId: String) {
+    private fun addAlbumFromCache(view: View, albumId: String) {
         val item =
-            AlbumItem(albumId)
+            AlbumItem(albumId, (view.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE))
 
         itemAdapter.add(item)
         viewData.add(item)
@@ -137,7 +145,7 @@ class HomeAlbumHandler(private val onSingleAlbumLoad: (albumId: String, albumMcI
                 val albumList = albumDatabaseHelper.getAlbums(0, 50)
 
                 for (album in albumList) {
-                    addAlbum(album.albumId)
+                    addAlbum(view, album.albumId)
                 }
 
                 /**
@@ -171,7 +179,7 @@ class HomeAlbumHandler(private val onSingleAlbumLoad: (albumId: String, albumMcI
             setupRecyclerView(view)
 
             for (albumId in albumListCache) {
-                addAlbumFromCache(albumId)
+                addAlbumFromCache(view, albumId)
             }
 
             /**
@@ -206,7 +214,7 @@ class HomeAlbumHandler(private val onSingleAlbumLoad: (albumId: String, albumMcI
                 albumDatabaseHelper.getAlbums((currentPage * 50).toLong(), 50)
 
             for (album in albumList) {
-                addAlbum(album.albumId)
+                addAlbum(view, album.albumId)
             }
 
             footerAdapter.clear()

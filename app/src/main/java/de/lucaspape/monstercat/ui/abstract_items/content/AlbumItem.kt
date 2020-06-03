@@ -25,7 +25,8 @@ import de.lucaspape.monstercat.ui.shareDrawable
 import de.lucaspape.monstercat.util.displayAlertDialogList
 
 open class AlbumItem(
-    val albumId: String
+    val albumId: String,
+    val horizontal: Boolean
 ) : AbstractItem<AlbumItem.ViewHolder>() {
 
     companion object {
@@ -77,7 +78,11 @@ open class AlbumItem(
                             id
                         )
                         view.context.getString(R.string.shareAlbum) -> openAlbum(view, id, true)
-                        view.context.getString(R.string.openAlbumInApp) -> openAlbum(view, id, false)
+                        view.context.getString(R.string.openAlbumInApp) -> openAlbum(
+                            view,
+                            id,
+                            false
+                        )
                     }
                 }
             }
@@ -86,8 +91,11 @@ open class AlbumItem(
 
     override val type: Int = 100
 
-    override val layoutRes: Int
-        get() = R.layout.list_album
+    override val layoutRes = if (horizontal) {
+        R.layout.list_album_horizontal
+    } else {
+        R.layout.list_album
+    }
 
     override fun getViewHolder(v: View): ViewHolder {
         return ViewHolder(
