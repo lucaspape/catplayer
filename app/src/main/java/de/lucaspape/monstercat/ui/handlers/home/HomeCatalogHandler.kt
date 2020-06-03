@@ -314,7 +314,6 @@ class HomeCatalogHandler(
             swipeRefreshLayout.isRefreshing = false
 
             restoreRecyclerViewPosition(view.context)
-            resetRecyclerViewSavedPosition(view.context)
         }
     }
 

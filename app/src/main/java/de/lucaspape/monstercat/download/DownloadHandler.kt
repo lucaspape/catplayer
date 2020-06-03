@@ -12,6 +12,7 @@ import de.lucaspape.monstercat.ui.fallbackFile
 import de.lucaspape.monstercat.ui.fallbackFileLow
 import de.lucaspape.util.Settings
 import de.lucaspape.monstercat.util.wifiConnected
+import de.lucaspape.util.BackgroundAsync
 import java.io.File
 import java.io.FileOutputStream
 import java.lang.Exception
@@ -93,8 +94,8 @@ internal fun downloadImageUrlIntoImageReceiver(
 
                         //possible that it changed by this time
                         if (!cacheFile.exists() && saveToCache) {
-                            FileOutputStream(cacheFile).use { out ->
-                                bitmap?.compress(Bitmap.CompressFormat.WEBP, 100, out)
+                            bitmap?.let {
+                                saveBitmapAsync(it, cacheFile)
                             }
                         }
 
@@ -122,6 +123,14 @@ internal fun downloadImageUrlIntoImageReceiver(
             }
         }
     }
+}
+
+fun saveBitmapAsync(bitmap: Bitmap, outputFile: File){
+    BackgroundAsync {
+        FileOutputStream(outputFile).use { out ->
+            bitmap.compress(Bitmap.CompressFormat.WEBP, 100, out)
+        }
+    }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 }
 
 fun downloadArtistImageIntoImageReceiver(

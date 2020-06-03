@@ -192,8 +192,35 @@ class HomeAlbumHandler(private val onSingleAlbumLoad: (albumId: String, albumMcI
             swipeRefreshLayout.isRefreshing = false
 
             restoreRecyclerViewPosition(view.context)
-            resetRecyclerViewSavedPosition(view.context)
         }
+    }
+
+    private fun loadAlbumList(view: View, currentPage: Int) {
+        footerAdapter.clear()
+        footerAdapter.add(ProgressItem())
+
+        loadAlbumListAsync(view.context, false, (currentPage * 50), {}, { _, _, _ ->
+            val albumDatabaseHelper =
+                AlbumDatabaseHelper(view.context)
+            val albumList =
+                albumDatabaseHelper.getAlbums((currentPage * 50).toLong(), 50)
+
+            for (album in albumList) {
+                addAlbum(album.albumId)
+            }
+
+            footerAdapter.clear()
+        }, { _, _, _ ->
+            footerAdapter.clear()
+
+            displaySnackBar(
+                view,
+                view.context.getString(R.string.errorLoadingAlbumList),
+                view.context.getString(R.string.retry)
+            ) {
+                loadAlbumList(view, currentPage)
+            }
+        })
     }
 
     override fun resetRecyclerViewSavedPosition(context: Context) {
@@ -229,34 +256,6 @@ class HomeAlbumHandler(private val onSingleAlbumLoad: (albumId: String, albumMcI
                 settings.setInt("albumview-topView", topView)
             }
         }
-    }
-
-    private fun loadAlbumList(view: View, currentPage: Int) {
-        footerAdapter.clear()
-        footerAdapter.add(ProgressItem())
-
-        loadAlbumListAsync(view.context, false, (currentPage * 50), {}, { _, _, _ ->
-            val albumDatabaseHelper =
-                AlbumDatabaseHelper(view.context)
-            val albumList =
-                albumDatabaseHelper.getAlbums((currentPage * 50).toLong(), 50)
-
-            for (album in albumList) {
-                addAlbum(album.albumId)
-            }
-
-            footerAdapter.clear()
-        }, { _, _, _ ->
-            footerAdapter.clear()
-
-            displaySnackBar(
-                view,
-                view.context.getString(R.string.errorLoadingAlbumList),
-                view.context.getString(R.string.retry)
-            ) {
-                loadAlbumList(view, currentPage)
-            }
-        })
     }
 
 }

@@ -70,25 +70,33 @@ class MainActivity : AppCompatActivity() {
         BottomNavigationView.OnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_home -> {
-                    if(lastOpenFragment == "home"){
-                        openHome(null, true)
-                    }else if(lastOpenedAlbumId != ""){
-                        lastOpenType = "album"
-                        restoreLastFragment()
-                    }else{
-                        openHome(null, false)
+                    when {
+                        lastOpenFragment == "home" -> {
+                            openHome(null, true)
+                        }
+                        lastOpenedAlbumId != "" -> {
+                            lastOpenType = "album"
+                            restoreLastFragment()
+                        }
+                        else -> {
+                            openHome(null, false)
+                        }
                     }
 
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.navigation_playlist -> {
-                    if(lastOpenFragment == "playlist"){
-                        openPlaylist(null, true)
-                    }else if(lastOpenedPlaylistId != ""){
-                       lastOpenType = "playlist"
-                        restoreLastFragment()
-                    }else{
-                        openPlaylist(null, false)
+                    when {
+                        lastOpenFragment == "playlist" -> {
+                            openPlaylist(null, true)
+                        }
+                        lastOpenedPlaylistId != "" -> {
+                            lastOpenType = "playlist"
+                            restoreLastFragment()
+                        }
+                        else -> {
+                            openPlaylist(null, false)
+                        }
                     }
 
                     return@OnNavigationItemSelectedListener true

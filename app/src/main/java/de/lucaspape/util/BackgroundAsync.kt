@@ -18,6 +18,8 @@ class BackgroundAsync<T>(
         background,
         finished
     )
+    
+    constructor(background: () -> T?) : this(background, {})
 
     override fun onPreExecute() {
         if (!preBackground()) {
