@@ -161,7 +161,6 @@ internal fun playSong(
                     preparingDone()
                 }, {
                     displayInfo(context, context.getString(R.string.errorPlaybackNotAllowed))
-                    next(context)
                 })
             } else {
                 preparingDone()

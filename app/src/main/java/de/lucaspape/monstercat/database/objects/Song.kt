@@ -163,10 +163,14 @@ data class Song(
         )
             .getBoolean(context.getString(R.string.streamOverMobileSetting)) == true || downloaded
 
-        val creatorFriendlyOrAllowed = creatorFriendly || Settings.getSettings(context)
-            .getBoolean(context.getString(R.string.blockNonCreatorFriendlySetting)) == false
+        val blockNonCreatorFriendlySetting = Settings.getSettings(context)
+            .getBoolean(context.getString(R.string.blockNonCreatorFriendlySetting))
 
-        return networkAllowed && creatorFriendlyOrAllowed
+        return if(!networkAllowed){
+            false
+        }else if(creatorFriendly){
+            true
+        }else blockNonCreatorFriendlySetting == false || blockNonCreatorFriendlySetting == null
     }
 
     private fun fileToMediaSource(fileLocation: String): ProgressiveMediaSource {
