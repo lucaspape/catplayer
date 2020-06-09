@@ -28,7 +28,8 @@ data class Song(
     val coverUrl: String,
     val isDownloadable: Boolean,
     val isStreamable: Boolean,
-    val inEarlyAccess: Boolean
+    val inEarlyAccess: Boolean,
+    val creatorFriendly: Boolean
 ) {
 
     companion object {
@@ -69,6 +70,9 @@ data class Song(
         val COLUMN_INEARLYACCESS = "inEarlyAccess"
 
         @JvmStatic
+        val COLUMN_CREATOR_FRIENDLY = "creatorFriendly"
+
+        @JvmStatic
         val CREATE_TABLE =
             "CREATE TABLE " + TABLE_NAME + " (" +
                     COLUMN_SONG_ID + " TEXT PRIMARY KEY," +
@@ -81,7 +85,8 @@ data class Song(
                     COLUMN_COVER_URL + " TEXT," +
                     COLUMN_DOWNLOADABLE + " TEXT," +
                     COLUMN_STREAMABLE + " TEXT," +
-                    COLUMN_INEARLYACCESS + " TEXT" +
+                    COLUMN_INEARLYACCESS + " TEXT," +
+                    COLUMN_CREATOR_FRIENDLY + " TEXT" +
                     ")"
     }
 

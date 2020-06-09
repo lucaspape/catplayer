@@ -19,7 +19,7 @@ class SongDatabaseHelper(context: Context) :
 
     companion object {
         @JvmStatic
-        val DATABASE_VERSION = 6
+        val DATABASE_VERSION = 7
 
         @JvmStatic
         private val DATABASE_NAME = "songs_db"
@@ -51,7 +51,8 @@ class SongDatabaseHelper(context: Context) :
         coverUrl: String,
         downloadable: Boolean,
         streamable: Boolean,
-        inEarlyAccess: Boolean
+        inEarlyAccess: Boolean,
+        creatorFriendly: Boolean
     ): String {
         val values = ContentValues()
 
@@ -66,6 +67,7 @@ class SongDatabaseHelper(context: Context) :
         values.put(Song.COLUMN_DOWNLOADABLE, downloadable.toString())
         values.put(Song.COLUMN_STREAMABLE, streamable.toString())
         values.put(Song.COLUMN_INEARLYACCESS, inEarlyAccess.toString())
+        values.put(Song.COLUMN_CREATOR_FRIENDLY, creatorFriendly.toString())
 
         if (getSong(context, songId) == null) {
             val db = writableDatabase
@@ -107,7 +109,8 @@ class SongDatabaseHelper(context: Context) :
                         Song.COLUMN_COVER_URL,
                         Song.COLUMN_DOWNLOADABLE,
                         Song.COLUMN_STREAMABLE,
-                        Song.COLUMN_INEARLYACCESS
+                        Song.COLUMN_INEARLYACCESS,
+                        Song.COLUMN_CREATOR_FRIENDLY
                     ),
                     Song.COLUMN_SONG_ID + "=?",
                     arrayOf(songId), null, null, null, null
@@ -131,6 +134,8 @@ class SongDatabaseHelper(context: Context) :
                         cursor.getString(cursor.getColumnIndex(Song.COLUMN_STREAMABLE))!!
                             .toBoolean(),
                         cursor.getString(cursor.getColumnIndex(Song.COLUMN_INEARLYACCESS))!!
+                            .toBoolean(),
+                        cursor.getString(cursor.getColumnIndex(Song.COLUMN_CREATOR_FRIENDLY))!!
                             .toBoolean()
                     )
 
