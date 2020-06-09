@@ -146,4 +146,6 @@
     <string name="playbackSettings">Playback Settings</string>
     <string name="dataSettings">Data Settings</string>
     <string name="advancedSettings">Advanced Settings</string>
+    <string name="errorPlaybackNotAllowed">Playback not allowed, skipping</string>
+    <string name="dontPlayNotCreatorFriendly">Don\'t play non-creator-friendly songs</string>
 </resources>

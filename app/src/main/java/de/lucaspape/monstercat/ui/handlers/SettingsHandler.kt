@@ -131,7 +131,7 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
         })
     }
 
-    private fun addDataSettings(view: View){
+    private fun addDataSettings(view: View) {
         val settings = Settings.getSettings(view.context)
 
         itemAdapter.add(
@@ -174,7 +174,7 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
         addCoverResolutionSeekBar(view)
     }
 
-    private fun addPlaybackSettings(view: View){
+    private fun addPlaybackSettings(view: View) {
         val settings = Settings.getSettings(view.context)
 
         itemAdapter.add(
@@ -194,6 +194,15 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
                 view.context.getString(R.string.disableAudioFocusSetting),
                 true,
                 view.context.getString(R.string.disableAudioFocusSwitch),
+                changeSetting
+            )
+        )
+
+        itemAdapter.add(
+            SettingsToggleItem(
+                view.context.getString(R.string.blockNonCreatorFriendlySetting),
+                true,
+                view.context.getString(R.string.dontPlayNotCreatorFriendly),
                 changeSetting
             )
         )

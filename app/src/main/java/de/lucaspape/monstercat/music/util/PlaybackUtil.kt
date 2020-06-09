@@ -24,7 +24,7 @@ var exoPlayerSongId = ""
 //songId of song which is prepared in nextExoPlayer
 var preparedExoPlayerSongId = ""
 
-internal fun prepareSong(context: Context, songId: String, callback: () -> Unit) {
+internal fun prepareSong(context: Context, songId: String, callback: () -> Unit, notAllowedCallback:() -> Unit) {
     if (preparedExoPlayerSongId != songId) {
         //new exoplayer
         preparedExoPlayer = SimpleExoPlayer.Builder(context).build()
@@ -42,10 +42,13 @@ internal fun prepareSong(context: Context, songId: String, callback: () -> Unit)
                 } else {
                     displayInfo(context, context.getString(R.string.songNotPlayableError))
                 }
-            }
 
-            callback()
-            return
+                callback()
+                return
+            }else{
+                notAllowedCallback()
+                return
+            }
         }
 
         addTrackToDBAsync(context, songId, {_, song ->
@@ -154,9 +157,12 @@ internal fun playSong(
         if (exoPlayerSongId != songId) {
             //check if player needs to be prepared
             if (preparedExoPlayerSongId != songId) {
-                prepareSong(context, songId) {
+                prepareSong(context, songId, {
                     preparingDone()
-                }
+                }, {
+                    displayInfo(context, context.getString(R.string.errorPlaybackNotAllowed))
+                    next(context)
+                })
             } else {
                 preparingDone()
             }
@@ -243,7 +249,7 @@ internal fun runSeekBarUpdate(context: Context, prepareNext: Boolean, crossFade:
 
             if (prepareNext) {
                 if (timeLeft < duration / 2 && exoPlayer?.isPlaying == true) {
-                    prepareSong(context, nextSongId) {}
+                    prepareSong(context, nextSongId, {}, {})
                 }
             }
 
