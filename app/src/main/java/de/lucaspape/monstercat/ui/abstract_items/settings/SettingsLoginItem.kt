@@ -20,7 +20,7 @@ class SettingsLoginItem(val onLogin: (username: String, password: String) -> Uni
     }
 
     class ViewHolder(val view: View) : FastAdapter.ViewHolder<SettingsLoginItem>(view) {
-        val button: Button = view.findViewById<Button>(R.id.settings_add_account)
+        val button: Button = view.findViewById(R.id.settings_add_account)
 
         override fun bindView(item: SettingsLoginItem, payloads: List<Any>) {
         }

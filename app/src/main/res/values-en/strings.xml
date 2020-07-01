@@ -148,4 +148,6 @@
     <string name="advancedSettings">Advanced Settings</string>
     <string name="errorPlaybackNotAllowed">Playback not allowed</string>
     <string name="dontPlayNotCreatorFriendly">Don\'t play non-creator-friendly songs</string>
+    <string name="notOnline">Not Online!</string>
+    <string name="logout">Logout</string>
 </resources>

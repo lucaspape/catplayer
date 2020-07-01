@@ -13,11 +13,46 @@ import de.lucaspape.monstercat.request.newTwoFaRequest
 import de.lucaspape.persistentcookiejar.PersistentCookieJar
 import de.lucaspape.persistentcookiejar.cache.SetCookieCache
 import de.lucaspape.persistentcookiejar.persistence.SharedPrefsCookiePersistor
+import de.lucaspape.util.Settings
 import okhttp3.HttpUrl
 import org.json.JSONException
+import java.util.*
+import kotlin.ConcurrentModificationException
+import kotlin.collections.ArrayList
 
 var loggedIn = false
     private set
+
+var waitingForLogin = false
+    private set
+
+var offline = false
+    private set
+
+var username = ""
+    private set
+
+var loggedInStateChangedListeners = ArrayList<LoggedInStateChangedListener>()
+
+private fun runCallbacks(){
+    try {
+        val iterator = loggedInStateChangedListeners.iterator()
+
+        while(iterator.hasNext()){
+            val listener = iterator.next()
+
+            listener.run()
+
+            loggedInStateChangedListeners.removeIf { it.removeOnCalled &&  it.listenerId == listener.listenerId }
+        }
+    }catch (e: ConcurrentModificationException){
+
+    }
+}
+
+class LoggedInStateChangedListener(val run: () -> Unit, val removeOnCalled: Boolean){
+    val listenerId = UUID.randomUUID().toString()
+}
 
 fun getSid(context: Context): String {
     val cookieJar =
@@ -53,6 +88,8 @@ class Auth {
         loginSuccess: () -> Unit,
         loginFailed: () -> Unit
     ) {
+        waitingForLogin = true
+
         val loginQueue =
             getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
@@ -67,7 +104,9 @@ class Auth {
             } catch (e: JSONException) {
                 checkLogin(context, loginSuccess, loginFailed)
             }
-        }, {}))
+        }, {
+            waitingForLogin = false
+        }))
     }
 
     /**
@@ -131,16 +170,46 @@ class Auth {
                 ""
             }
 
-            if (userId != "null" && userId != "") {
+            username = try {
+                val userObject = it.getJSONObject("user")
+                userObject.getString("email")
+            } catch (e: JSONException){
+                ""
+            }
+
+            waitingForLogin = false
+
+            if (userId != "null" && userId != "" && username != "null" && username != "") {
                 loggedIn = true
                 loginSuccess()
+
+                runCallbacks()
             } else {
                 loggedIn = false
                 loginFailed()
+
+                runCallbacks()
             }
         }, {
+            waitingForLogin = false
             loggedIn = false
+            offline = true
             loginFailed()
+
+            runCallbacks()
         }))
+    }
+
+    fun logout(context: Context){
+        waitingForLogin = false
+        loggedIn = false
+
+        val settings = Settings.getSettings(context)
+        settings.setString(context.getString(R.string.emailSetting), "")
+        settings.setString(context.getString(R.string.passwordSetting), "")
+
+        SharedPrefsCookiePersistor(context).clear()
+
+        runCallbacks()
     }
 }

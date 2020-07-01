@@ -33,11 +33,8 @@ import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListToggleItem
 import de.lucaspape.monstercat.ui.abstract_items.settings.*
 import de.lucaspape.monstercat.ui.abstract_items.util.HeaderTextItem
 import de.lucaspape.monstercat.ui.activities.MainActivity
-import de.lucaspape.monstercat.util.Auth
-import de.lucaspape.monstercat.util.displayAlertDialogToggleList
+import de.lucaspape.monstercat.util.*
 import de.lucaspape.util.Settings
-import de.lucaspape.monstercat.util.displayInfo
-import de.lucaspape.monstercat.util.displaySnackBar
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -65,6 +62,10 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
         addPushNotificationSettingsButton(view)
         addCustomApiButton(view)
         addResetDatabaseButton(view)
+
+        loggedInStateChangedListeners.add(LoggedInStateChangedListener({
+            onCreate(view)
+        }, true))
     }
 
     override val layout: Int = R.layout.fragment_settings
@@ -104,6 +105,9 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
                     is SettingsLoginItem.ViewHolder -> {
                         viewHolder.button
                     }
+                    is SettingsProfileItem.ViewHolder -> {
+                        viewHolder.button
+                    }
                     else -> null
                 }
             }
@@ -126,6 +130,8 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
                         usernameTextInput.text.toString(),
                         passwordTextInput.text.toString()
                     )
+                } else if( item is SettingsProfileItem){
+                    item.onLogout()
                 }
             }
         })
@@ -411,17 +417,31 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
             )
         )
 
-        itemAdapter.add(SettingsLoginItem { username, password ->
-            val settings = Settings.getSettings(view.context)
-            settings.setString(view.context.getString(R.string.emailSetting), username)
-            settings.setString(view.context.getString(R.string.passwordSetting), password)
+        when {
+            loggedIn -> {
+                itemAdapter.add(SettingsProfileItem(username) {
+                    Auth().logout(view.context)
+                })
+            }
+            waitingForLogin || offline -> {
+                itemAdapter.add(SettingsProfileItem(view.context.getString(R.string.notOnline)) {
+                    Auth().logout(view.context)
+                })
+            }
+            else -> {
+                itemAdapter.add(SettingsLoginItem { username, password ->
+                    val settings = Settings.getSettings(view.context)
+                    settings.setString(view.context.getString(R.string.emailSetting), username)
+                    settings.setString(view.context.getString(R.string.passwordSetting), password)
 
-            Auth().login(view.context, username, password, {
-                displayInfo(view.context, view.context.getString(R.string.loginSuccessfulMsg))
-            }, {
-                displayInfo(view.context, view.context.getString(R.string.loginFailedMsg))
-            })
-        })
+                    Auth().login(view.context, username, password, {
+                        displayInfo(view.context, view.context.getString(R.string.loginSuccessfulMsg))
+                    }, {
+                        displayInfo(view.context, view.context.getString(R.string.loginFailedMsg))
+                    })
+                })
+            }
+        }
     }
 
     private fun addSwitches(view: View) {
