@@ -49,9 +49,10 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
     override fun onCreate(view: View) {
         setupRecyclerView(view)
 
+        //spacer
         itemAdapter.add(
             SettingsLabelItem(
-                view.context.getString(R.string.catplayerSettings)
+                ""
             )
         )
 
@@ -130,7 +131,7 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
                         usernameTextInput.text.toString(),
                         passwordTextInput.text.toString()
                     )
-                } else if( item is SettingsProfileItem){
+                } else if (item is SettingsProfileItem) {
                     item.onLogout()
                 }
             }
@@ -435,7 +436,10 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
                     settings.setString(view.context.getString(R.string.passwordSetting), password)
 
                     Auth().login(view.context, username, password, {
-                        displayInfo(view.context, view.context.getString(R.string.loginSuccessfulMsg))
+                        displayInfo(
+                            view.context,
+                            view.context.getString(R.string.loginSuccessfulMsg)
+                        )
                     }, {
                         displayInfo(view.context, view.context.getString(R.string.loginFailedMsg))
                     })
