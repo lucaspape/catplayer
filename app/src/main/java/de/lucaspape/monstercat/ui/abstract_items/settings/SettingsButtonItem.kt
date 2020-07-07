@@ -20,7 +20,7 @@ class SettingsButtonItem(private val buttonText: String, val onClick: () -> Unit
     }
 
     class ViewHolder(view: View) : FastAdapter.ViewHolder<SettingsButtonItem>(view) {
-        val button: Button = view.findViewById<Button>(R.id.settingsButton)
+        val button: Button = view.findViewById(R.id.settingsButton)
 
         override fun bindView(item: SettingsButtonItem, payloads: List<Any>) {
             button.text = item.buttonText
