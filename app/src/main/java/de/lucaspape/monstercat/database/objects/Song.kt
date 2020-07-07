@@ -10,6 +10,7 @@ import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.ui.downloadDrawable
+import de.lucaspape.monstercat.ui.emptyDrawable
 import de.lucaspape.monstercat.ui.offlineDrawable
 import de.lucaspape.util.Settings
 import de.lucaspape.monstercat.util.getSid
@@ -134,8 +135,11 @@ data class Song(
             downloaded -> {
                 offlineDrawable.toUri()
             }
-            else -> {
+            isDownloadable -> {
                 downloadDrawable.toUri()
+            }
+            else -> {
+                emptyDrawable.toUri()
             }
         }
 

@@ -40,6 +40,7 @@ var pauseButtonDrawable = "android.resource://de.lucaspape.monstercat/drawable/i
 var createPlaylistDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_add_24dp"
 var addPlaylistDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_playlist_add_24"
 var backButtonDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_arrow_back_24"
+const val emptyDrawable = "android.resource://de.lucaspape.monstercat/drawable/ic_empty_24dp"
 
 private const val offlineDrawableBlack =
     "android.resource://de.lucaspape.monstercat/drawable/ic_offline_pin_black_24dp"

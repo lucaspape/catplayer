@@ -40,32 +40,32 @@ open class CatalogItem(
         ) {
             view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
 
-            val itemList = arrayListOf(
-                AlertListItem(
-                    view.context.getString(R.string.download),
-                    downloadDrawable
-                ),
-                AlertListItem(
-                    view.context.getString(R.string.addToQueue),
-                    addToQueueDrawable
-                ),
-                AlertListItem(
-                    view.context.getString(R.string.addToPlaylist),
-                    addToPlaylistDrawable
-                ),
-                AlertListItem(
-                    view.context.getString(R.string.shareAlbum),
-                    shareDrawable
-                ),
-                AlertListItem(
-                    view.context.getString(R.string.openAlbumInApp),
-                    openInAppDrawable
-                )
-            )
-
             val id = contentList[listViewPosition]
 
             SongDatabaseHelper(view.context).getSong(view.context, id)?.let { song ->
+                val itemList = arrayListOf(
+                    AlertListItem(
+                        view.context.getString(R.string.download),
+                        downloadDrawable
+                    ),
+                    AlertListItem(
+                        view.context.getString(R.string.addToQueue),
+                        addToQueueDrawable
+                    ),
+                    AlertListItem(
+                        view.context.getString(R.string.addToPlaylist),
+                        addToPlaylistDrawable
+                    ),
+                    AlertListItem(
+                        view.context.getString(R.string.shareAlbum),
+                        shareDrawable
+                    ),
+                    AlertListItem(
+                        view.context.getString(R.string.openAlbumInApp),
+                        openInAppDrawable
+                    )
+                )
+
                 displayAlertDialogList(
                     view.context,
                     AlertListHeaderItem(
