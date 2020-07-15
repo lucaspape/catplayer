@@ -355,7 +355,7 @@ fun newLoadRelatedTracksRequest(
     val settings = Settings.getSettings(context)
 
     val relatedTracksUrl =
-        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(
+        if (settings.getBoolean(context.getString(R.string.playRelatedSetting)) == true && settings.getBoolean(
                 context.getString(R.string.customApiSupportsV1Setting)
             ) == true
         ) {
@@ -479,7 +479,7 @@ fun newLiveInfoRequest(
     val settings = Settings.getSettings(context)
 
     val requestUrl =
-        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(context.getString(R.string.customApiSupportsV1Setting)) == true
+        if (settings.getBoolean(context.getString(R.string.liveInfoSetting)) == true && settings.getBoolean(context.getString(R.string.customApiSupportsV1Setting)) == true
         ) {
             settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v1/liveinfo"
         } else {

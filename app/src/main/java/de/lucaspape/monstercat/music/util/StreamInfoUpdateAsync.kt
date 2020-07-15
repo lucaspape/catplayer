@@ -65,19 +65,17 @@ class StreamInfoUpdateAsync(
                 getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
             while (true) {
-                artistTitleRequest?.let{request ->
-                    settings.getBoolean(context.getString(R.string.liveInfoSetting)).let {
-                        if(it == true){
-                            requestQueue.add(request)
-                        }else{
-                            fallbackTitle = "Livestream"
-                            fallbackArtist = "Monstercat"
-                            fallbackVersion = ""
-                            fallbackCoverUrl = context.getString(R.string.fallbackCoverUrl)
-                            liveSongId = ""
+                settings.getBoolean(context.getString(R.string.liveInfoSetting)).let {
+                    if(it == true && artistTitleRequest != null){
+                        requestQueue.add(artistTitleRequest)
+                    }else{
+                        fallbackTitle = "Livestream"
+                        fallbackArtist = "Monstercat"
+                        fallbackVersion = ""
+                        fallbackCoverUrl = context.getString(R.string.fallbackCoverUrl)
+                        liveSongId = ""
 
-                            publishProgress()
-                        }
+                        publishProgress()
                     }
                 }
 
