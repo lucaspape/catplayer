@@ -11,11 +11,11 @@ class CustomSpinnerClass : AppCompatSpinner,
     private var mListener: OnItemSelectedListener? = null
     private var mUserActionOnSpinner = true
 
-    constructor(context: Context?) : super(context) {
+    constructor(context: Context) : super(context) {
         super.setOnItemSelectedListener(this)
     }
 
-    constructor(context: Context?, attrs: AttributeSet?) : super(
+    constructor(context: Context, attrs: AttributeSet?) : super(
         context,
         attrs
     ) {
@@ -23,7 +23,7 @@ class CustomSpinnerClass : AppCompatSpinner,
     }
 
     constructor(
-        context: Context?,
+        context: Context,
         attrs: AttributeSet?,
         defStyle: Int
     ) : super(context, attrs, defStyle) {
