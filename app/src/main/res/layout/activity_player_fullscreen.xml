@@ -131,13 +131,39 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <TextView
+        android:id="@+id/songTimePassed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:layout_marginStart="5dp"
+        android:text="0:00"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/fullScreenPlay"
+        app:layout_constraintEnd_toStartOf="@id/fullscreenSeekBar"
+        />
+
+    <TextView
+        android:id="@+id/songTimeMax"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:layout_marginEnd="5dp"
+        android:text="0:00"
+        app:layout_constraintStart_toEndOf="@id/fullscreenSeekBar"
+        app:layout_constraintBottom_toTopOf="@+id/fullScreenPlay"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+
     <SeekBar
         android:id="@+id/fullscreenSeekBar"
         android:layout_width="0dp"
         android:layout_height="20dp"
         android:layout_marginBottom="20dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
         android:contentDescription="@string/songProgress"
         app:layout_constraintBottom_toTopOf="@+id/fullScreenPlay"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="@id/songTimePassed" />
 </androidx.constraintlayout.widget.ConstraintLayout>
