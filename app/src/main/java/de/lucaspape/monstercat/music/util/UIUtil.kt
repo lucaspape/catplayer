@@ -128,14 +128,14 @@ var fullscreenArtistImageViewReference: WeakReference<ImageView>? = null
     }
 
 var fullscreenSongTimePassedTextReference: WeakReference<TextView>? = null
-    set(newTextView){
+    set(newTextView) {
         newTextView?.get()?.text = fullscreenSongTimePassedTextReference?.get()?.text
 
         field = newTextView
     }
 
 var fullscreenSongTimeMaxTextReference: WeakReference<TextView>? = null
-    set(newTextView){
+    set(newTextView) {
         newTextView?.get()?.text = fullscreenSongTimeMaxTextReference?.get()?.text
 
         field = newTextView
@@ -168,11 +168,13 @@ var currentPosition = 0
         val minutes = newInt / 60000
         val seconds = (newInt % 60000) / 1000
 
-        if(seconds<10){
-            fullscreenSongTimePassedTextReference?.get()?.text = "$minutes:0$seconds"
-        }else{
-            fullscreenSongTimePassedTextReference?.get()?.text = "$minutes:$seconds"
+        val text = if (seconds < 10) {
+            "$minutes:0$seconds"
+        } else {
+            "$minutes:$seconds"
         }
+
+        fullscreenSongTimePassedTextReference?.get()?.text = text
 
         field = newInt
     }
@@ -185,11 +187,13 @@ var duration = 0
         val minutes = newInt / 60000
         val seconds = (newInt % 60000) / 1000
 
-        if(seconds<10){
-            fullscreenSongTimeMaxTextReference?.get()?.text = "$minutes:0$seconds"
-        }else{
-            fullscreenSongTimeMaxTextReference?.get()?.text = "$minutes:$seconds"
+        val text = if (seconds < 10) {
+            "$minutes:0$seconds"
+        } else {
+            "$minutes:$seconds"
         }
+
+        fullscreenSongTimeMaxTextReference?.get()?.text = text
 
         field = newInt
 
