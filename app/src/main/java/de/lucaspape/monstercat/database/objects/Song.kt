@@ -3,6 +3,7 @@ package de.lucaspape.monstercat.database.objects
 import android.content.Context
 import android.net.Uri
 import androidx.core.net.toUri
+import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
@@ -184,7 +185,7 @@ data class Song(
                     context, context.getString(R.string.applicationName)
                 )
             )
-        ).createMediaSource(Uri.parse("file://$fileLocation"))
+        ).createMediaSource(MediaItem.fromUri(Uri.parse("file://$fileLocation")))
     }
 
     private fun urlToMediaSource(url: String): ProgressiveMediaSource {
@@ -199,6 +200,6 @@ data class Song(
         httpSourceFactory.defaultRequestProperties.set("Cookie", "connect.sid=${getSid(context)}")
 
         return ProgressiveMediaSource.Factory(httpSourceFactory)
-            .createMediaSource(url.toUri())
+            .createMediaSource(MediaItem.fromUri(url.toUri()))
     }
 }

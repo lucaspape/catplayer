@@ -9,7 +9,7 @@ android {
         jvmTarget = "1.8"
     }
     compileSdkVersion 29
-    buildToolsVersion "30.0.0"
+    buildToolsVersion "30.0.2"
     defaultConfig {
         applicationId "de.lucaspape.monstercat"
         minSdkVersion 24

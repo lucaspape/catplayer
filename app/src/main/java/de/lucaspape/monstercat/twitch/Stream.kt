@@ -5,6 +5,7 @@ import androidx.core.net.toUri
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.Volley
+import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
@@ -94,7 +95,7 @@ class Stream(private val clientId: String, private val channel: String) {
                                 context, context.getString(R.string.applicationName)
                             )
                         )
-                    ).createMediaSource(streamUrl.toUri())
+                    ).createMediaSource(MediaItem.fromUri(streamUrl.toUri()))
                 )
             }
         }

@@ -37,7 +37,8 @@ internal fun prepareSong(context: Context, songId: String, callback: () -> Unit,
                 val mediaSource = song.mediaSource
 
                 if (mediaSource != null) {
-                    preparedExoPlayer?.prepare(mediaSource)
+                    preparedExoPlayer?.setMediaSource(mediaSource)
+                    preparedExoPlayer?.prepare()
                     preparedExoPlayerSongId = song.songId
                 } else {
                     displayInfo(context, context.getString(R.string.songNotPlayableError))
@@ -55,7 +56,8 @@ internal fun prepareSong(context: Context, songId: String, callback: () -> Unit,
             val mediaSource = song.mediaSource
 
             if (mediaSource != null) {
-                preparedExoPlayer?.prepare(mediaSource)
+                preparedExoPlayer?.setMediaSource(mediaSource)
+                preparedExoPlayer?.prepare()
                 preparedExoPlayerSongId = song.songId
             } else {
                 displayInfo(context, context.getString(R.string.songNotPlayableError))
@@ -206,7 +208,8 @@ fun playStream(context: Context, stream: Stream) {
             streamInfoUpdateAsync?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 
             stream.getMediaSource(context) { mediaSource ->
-                exoPlayer?.prepare(mediaSource)
+                exoPlayer?.setMediaSource(mediaSource)
+                exoPlayer?.prepare()
 
                 exoPlayer?.playWhenReady = true
 
