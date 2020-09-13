@@ -48,6 +48,7 @@ dependencies {
 
     //exoplayer
     implementation fileTree(dir: 'src/main/libs/exoplayer', include: ['*.aar'])
+    api 'com.google.guava:guava:24.1-jre'
 
     implementation "com.mikepenz:fastadapter:5.0.0"
     implementation "com.mikepenz:fastadapter-extensions-scroll:5.0.0"
