@@ -22,6 +22,7 @@ import de.lucaspape.monstercat.download.downloadImageUrlIntoImageReceiver
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.ui.pauseButtonDrawable
 import de.lucaspape.monstercat.ui.playButtonDrawable
+import java.lang.RuntimeException
 import java.lang.ref.WeakReference
 
 var textViewReference: WeakReference<TextView>? = null
@@ -386,15 +387,19 @@ internal fun setPlayerState(progress: Long) {
  * Set song metadata
  */
 private fun setSongMetadata() {
-    val mediaMetadata = MediaMetadataCompat.Builder()
-    mediaMetadata.putString(MediaMetadata.METADATA_KEY_ARTIST, artist)
-    mediaMetadata.putString(MediaMetadata.METADATA_KEY_TITLE, title)
-    mediaMetadata.putLong(MediaMetadata.METADATA_KEY_DURATION, duration.toLong())
+    try{
+        val mediaMetadata = MediaMetadataCompat.Builder()
+        mediaMetadata.putString(MediaMetadata.METADATA_KEY_ARTIST, artist)
+        mediaMetadata.putString(MediaMetadata.METADATA_KEY_TITLE, title)
+        mediaMetadata.putLong(MediaMetadata.METADATA_KEY_DURATION, duration.toLong())
 
-    coverBitmap?.let {
-        mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, it)
-        mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ART, it)
+        coverBitmap?.let {
+            mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, it)
+            mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ART, it)
+        }
+
+        mediaSession?.setMetadata(mediaMetadata.build())
+    }catch(e:RuntimeException){
+        println("Failed to set song metadata.")
     }
-
-    mediaSession?.setMetadata(mediaMetadata.build())
 }
