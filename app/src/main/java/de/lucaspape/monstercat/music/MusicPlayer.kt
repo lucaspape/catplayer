@@ -50,12 +50,27 @@ var songQueue = ArrayList<String>()
 var prioritySongQueue = ArrayList<String>()
     internal set
 
+private var prioritySongQueueHash = prioritySongQueue.hashCode()
+private val prioritySongQueueChanged: Boolean
+    get() {
+        return if (prioritySongQueue.hashCode() != prioritySongQueueHash) {
+            prioritySongQueueHash = prioritySongQueue.hashCode()
+            true
+        } else {
+            false
+        }
+    }
+
+var relatedSongQueue = ArrayList<String>()
+    internal set
+
 //playlist, contains playback history
 internal var playlist = ArrayList<String>()
 internal var playlistIndex = 0
 
 //nextRandom needs to be prepared before next playing to allow crossfade
 internal var nextRandom = -1
+internal var nextRelatedRandom = -1
 
 //playback control vars
 var loop = false
@@ -81,12 +96,14 @@ internal var streamInfoUpdateAsync: StreamInfoUpdateAsync? = null
 /**
  * Listener for audioFocusChange
  */
-class AudioFocusChangeListener{
-    companion object{
-        @JvmStatic var audioFocusChangeListener:AudioManager.OnAudioFocusChangeListener? = null
+class AudioFocusChangeListener {
+    companion object {
+        @JvmStatic
+        var audioFocusChangeListener: AudioManager.OnAudioFocusChangeListener? = null
 
-        @JvmStatic fun getAudioFocusChangeListener(contextReference: WeakReference<Context>):AudioManager.OnAudioFocusChangeListener{
-            if(audioFocusChangeListener == null){
+        @JvmStatic
+        fun getAudioFocusChangeListener(contextReference: WeakReference<Context>): AudioManager.OnAudioFocusChangeListener {
+            if (audioFocusChangeListener == null) {
                 audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener { focusChange ->
                     contextReference.get()?.let { context ->
                         when (focusChange) {
@@ -340,8 +357,35 @@ private fun nextSong(context: Context): String {
         playlistIndex = 0
 
         return songId
+
+        //if the priority queue changed lets re-fetch the related songs and let the user adapt them
+    } else if (playRelatedSongsAfterPlaylistFinished && relatedSongQueue.size > 0 && !prioritySongQueueChanged) {
+        //get from relatedQueue
+        val queueIndex = if (shuffle && relatedSongQueue.size > 0) {
+            if (nextRelatedRandom == -1) {
+                nextRelatedRandom = Random.nextInt(0, relatedSongQueue.size)
+            }
+
+            nextRelatedRandom
+        } else {
+            0
+        }
+
+        val songId = relatedSongQueue[queueIndex]
+        relatedSongQueue.removeAt(queueIndex)
+        playlist.add(songId)
+
+        skipPreviousInPlaylist()
+
+        //prepare nextRandom
+        if (songQueue.size > 0) {
+            nextRelatedRandom = Random.nextInt(0, relatedSongQueue.size)
+        }
+
+        return songId
     } else if (playRelatedSongsAfterPlaylistFinished) {
-        playRelatedSongs(context)
+        loadRelatedSongs(context, playAfter = true)
+
         return ""
     } else {
         return ""
@@ -396,6 +440,20 @@ val nextSongId: String
         } else if (loop && playlist.size > 0) {
             //if loop go back to beginning of playlist
             return playlist[0]
+        } else if (playRelatedSongsAfterPlaylistFinished && relatedSongQueue.size > 0 && !prioritySongQueueChanged) {
+            //get from queue
+
+            val queueIndex = if (shuffle && relatedSongQueue.size > 0) {
+                if (nextRelatedRandom == -1) {
+                    nextRelatedRandom = Random.nextInt(0, relatedSongQueue.size)
+                }
+
+                nextRelatedRandom
+            } else {
+                0
+            }
+
+            return relatedSongQueue[queueIndex]
         } else {
             return ""
         }
@@ -453,21 +511,31 @@ fun skipPreviousInPlaylist() {
     playlistIndex = playlist.size - 1
 }
 
+fun loadRelatedSongs(context: Context, playAfter: Boolean) {
+    loadRelatedSongs(context) {
+        if (playAfter) {
+            skipPreviousInPlaylist()
+            next(context)
+        }
+    }
+}
+
 /**
  * Fetch songs which are related to songs in playlist
  */
-fun playRelatedSongs(context: Context) {
+fun loadRelatedSongs(context: Context, callback: () -> Unit) {
     Settings.getSettings(context)
         .getBoolean(context.getString(R.string.skipMonstercatSongsSetting))?.let {
             loadRelatedTracksAsync(
                 context, playlist, it,
                 finishedCallback = { _, relatedIdArray ->
+                    relatedSongQueue = ArrayList()
+
                     for (songId in relatedIdArray) {
-                        songQueue.add(songId)
+                        relatedSongQueue.add(songId)
                     }
 
-                    skipPreviousInPlaylist()
-                    next(context)
+                    callback()
                 },
                 errorCallback = {
                     //TODO handle error

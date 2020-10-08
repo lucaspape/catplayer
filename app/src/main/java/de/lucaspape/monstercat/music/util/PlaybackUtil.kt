@@ -24,7 +24,12 @@ var exoPlayerSongId = ""
 //songId of song which is prepared in nextExoPlayer
 var preparedExoPlayerSongId = ""
 
-internal fun prepareSong(context: Context, songId: String, callback: () -> Unit, notAllowedCallback:() -> Unit) {
+internal fun prepareSong(
+    context: Context,
+    songId: String,
+    callback: () -> Unit,
+    notAllowedCallback: () -> Unit
+) {
     if (preparedExoPlayerSongId != songId) {
         //new exoplayer
         preparedExoPlayer = SimpleExoPlayer.Builder(context).build()
@@ -46,13 +51,13 @@ internal fun prepareSong(context: Context, songId: String, callback: () -> Unit,
 
                 callback()
                 return
-            }else{
+            } else {
                 notAllowedCallback()
                 return
             }
         }
 
-        addTrackToDBAsync(context, songId, {_, song ->
+        addTrackToDBAsync(context, songId, { _, song ->
             val mediaSource = song.mediaSource
 
             if (mediaSource != null) {
@@ -215,6 +220,7 @@ fun playStream(context: Context, stream: Stream) {
 
 private var seekBarUpdateHandler = Handler()
 private var currentSeekBarUpdateHandlerId = ""
+private var loadingRelatedSongs = false
 
 internal fun runSeekBarUpdate(context: Context, prepareNext: Boolean, crossFade: Boolean) {
     val id = UUID.randomUUID().toString()
@@ -241,7 +247,14 @@ internal fun runSeekBarUpdate(context: Context, prepareNext: Boolean, crossFade:
 
             if (prepareNext) {
                 if (timeLeft < duration / 2 && exoPlayer?.isPlaying == true) {
-                    prepareSong(context, nextSongId, {}, {})
+                    if (nextSongId != "") {
+                        prepareSong(context, nextSongId, {}, {})
+                    } else if (playRelatedSongsAfterPlaylistFinished && !loadingRelatedSongs) {
+                        loadingRelatedSongs = true
+                        loadRelatedSongs(context) {
+                            loadingRelatedSongs = false
+                        }
+                    }
                 }
             }
 
