@@ -34,10 +34,8 @@ var exoPlayer: SimpleExoPlayer? = null
 
 //secondary exoPlayer -> allows crossFade and gapless playback
 var preparedExoPlayer: SimpleExoPlayer? = null
-    internal set(value) {
-        field?.playWhenReady = false
-        field?.release()
-        field?.stop()
+    internal set (value){
+        preparedExoPlayer?.playWhenReady = false
 
         field = value
     }
@@ -50,19 +48,10 @@ var songQueue = ArrayList<String>()
 var prioritySongQueue = ArrayList<String>()
     internal set
 
-private var prioritySongQueueHash = prioritySongQueue.hashCode()
-private val prioritySongQueueChanged: Boolean
-    get() {
-        return if (prioritySongQueue.hashCode() != prioritySongQueueHash) {
-            prioritySongQueueHash = prioritySongQueue.hashCode()
-            true
-        } else {
-            false
-        }
-    }
-
 var relatedSongQueue = ArrayList<String>()
     internal set
+
+var loadedRelatedHash = 0
 
 //playlist, contains playback history
 internal var playlist = ArrayList<String>()
@@ -308,11 +297,18 @@ private fun nextSong(context: Context): String {
             skipPreviousInPlaylist()
         }
 
+        //clear related because playlist change
+        relatedSongQueue = ArrayList()
+
         return songId
     } else if (playlist.size > playlistIndex + 1) {
         //get from playlist
         val songId = playlist[playlistIndex + 1]
         playlistIndex++
+
+        //clear related because playlist change
+        relatedSongQueue = ArrayList()
+
         return songId
     } else if (songQueue.size > 0) {
         //get from queue
@@ -338,6 +334,9 @@ private fun nextSong(context: Context): String {
             nextRandom = Random.nextInt(0, songQueue.size)
         }
 
+        //clear related because playlist change
+        relatedSongQueue = ArrayList()
+
         return songId
     } else if (loop && playlist.size > 0) {
         //if loop go back to beginning of playlist
@@ -356,10 +355,13 @@ private fun nextSong(context: Context): String {
 
         playlistIndex = 0
 
+        //clear related because playlist change
+        relatedSongQueue = ArrayList()
+
         return songId
 
         //if the priority queue changed lets re-fetch the related songs and let the user adapt them
-    } else if (playRelatedSongsAfterPlaylistFinished && relatedSongQueue.size > 0 && !prioritySongQueueChanged) {
+    } else if (playRelatedSongsAfterPlaylistFinished && relatedSongQueue.size > 0) {
         //get from relatedQueue
         val queueIndex = if (shuffle && relatedSongQueue.size > 0) {
             if (nextRelatedRandom == -1) {
@@ -440,7 +442,7 @@ val nextSongId: String
         } else if (loop && playlist.size > 0) {
             //if loop go back to beginning of playlist
             return playlist[0]
-        } else if (playRelatedSongsAfterPlaylistFinished && relatedSongQueue.size > 0 && !prioritySongQueueChanged) {
+        } else if (playRelatedSongsAfterPlaylistFinished && relatedSongQueue.size > 0) {
             //get from queue
 
             val queueIndex = if (shuffle && relatedSongQueue.size > 0) {
@@ -524,21 +526,25 @@ fun loadRelatedSongs(context: Context, playAfter: Boolean) {
  * Fetch songs which are related to songs in playlist
  */
 fun loadRelatedSongs(context: Context, callback: () -> Unit) {
-    Settings.getSettings(context)
-        .getBoolean(context.getString(R.string.skipMonstercatSongsSetting))?.let {
-            loadRelatedTracksAsync(
-                context, playlist, it,
-                finishedCallback = { _, relatedIdArray ->
-                    relatedSongQueue = ArrayList()
+    if(loadedRelatedHash != playlist.hashCode()){
+        loadedRelatedHash = playlist.hashCode()
+        
+        Settings.getSettings(context)
+            .getBoolean(context.getString(R.string.skipMonstercatSongsSetting))?.let {
+                loadRelatedTracksAsync(
+                    context, playlist, it,
+                    finishedCallback = { _, relatedIdArray ->
+                        relatedSongQueue = ArrayList()
 
-                    for (songId in relatedIdArray) {
-                        relatedSongQueue.add(songId)
-                    }
+                        for (songId in relatedIdArray) {
+                            relatedSongQueue.add(songId)
+                        }
 
-                    callback()
-                },
-                errorCallback = {
-                    //TODO handle error
-                })
-        }
+                        callback()
+                    },
+                    errorCallback = {
+                        //TODO handle error
+                    })
+            }
+    }
 }

@@ -220,7 +220,6 @@ fun playStream(context: Context, stream: Stream) {
 
 private var seekBarUpdateHandler = Handler()
 private var currentSeekBarUpdateHandlerId = ""
-private var loadingRelatedSongs = false
 
 internal fun runSeekBarUpdate(context: Context, prepareNext: Boolean, crossFade: Boolean) {
     val id = UUID.randomUUID().toString()
@@ -249,11 +248,8 @@ internal fun runSeekBarUpdate(context: Context, prepareNext: Boolean, crossFade:
                 if (timeLeft < duration / 2 && exoPlayer?.isPlaying == true) {
                     if (nextSongId != "") {
                         prepareSong(context, nextSongId, {}, {})
-                    } else if (playRelatedSongsAfterPlaylistFinished && !loadingRelatedSongs) {
-                        loadingRelatedSongs = true
-                        loadRelatedSongs(context) {
-                            loadingRelatedSongs = false
-                        }
+                    } else if (playRelatedSongsAfterPlaylistFinished) {
+                        loadRelatedSongs(context, playAfter = false)
                     }
                 }
             }
