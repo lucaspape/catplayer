@@ -24,11 +24,23 @@ import kotlin.random.Random
 
 //main exoPlayer
 var exoPlayer: SimpleExoPlayer? = null
-    internal set
+    internal set(value) {
+        field?.playWhenReady = false
+        field?.release()
+        field?.stop()
+
+        field = value
+    }
 
 //secondary exoPlayer -> allows crossFade and gapless playback
 var preparedExoPlayer: SimpleExoPlayer? = null
-    internal set
+    internal set(value) {
+        field?.playWhenReady = false
+        field?.release()
+        field?.stop()
+
+        field = value
+    }
 
 //queue for songs
 var songQueue = ArrayList<String>()

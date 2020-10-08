@@ -91,10 +91,6 @@ internal fun playSong(
         val preparingDone = {
             if (exoPlayerSongId != songId || (exoPlayerSongId == songId && preparedExoPlayer?.isPlaying == true)) {
                 //prepared player to main player handover
-                exoPlayer?.playWhenReady = false
-                exoPlayer?.stop(true)
-                exoPlayer = null
-
                 exoPlayer =
                     preparedExoPlayer
 
@@ -112,8 +108,7 @@ internal fun playSong(
             }
 
             //reset prepared
-            preparedExoPlayer?.playWhenReady = false
-            preparedExoPlayer = null
+            preparedExoPlayer = SimpleExoPlayer.Builder(context).build()
             preparedExoPlayerSongId = ""
 
             //enable playback
@@ -179,11 +174,6 @@ fun playStream(context: Context, stream: Stream) {
     val settings = Settings.getSettings(context)
 
     startPlayerService(context, "")
-
-    exoPlayer?.playWhenReady = false
-    exoPlayer?.release()
-    exoPlayer?.stop()
-    exoPlayer = null
 
     //new exoplayer
     exoPlayer = SimpleExoPlayer.Builder(context).build()
