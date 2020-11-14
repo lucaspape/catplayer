@@ -324,42 +324,44 @@ class HomeCatalogHandler(
         view: View,
         currentPage: Int
     ) {
-        footerAdapter.clear()
-        footerAdapter.add(ProgressItem())
+        recyclerView?.post {
+            footerAdapter.clear()
+            footerAdapter.add(ProgressItem())
 
-        lastOpenType = "catalog-list"
-        lastOpenedAlbumId = ""
+            lastOpenType = "catalog-list"
+            lastOpenedAlbumId = ""
 
-        loadSongListAsync(view.context,
-            false,
-            (currentPage * 50),
-            displayLoading = {},
-            finishedCallback = { _, _, _ ->
-                val catalogSongDatabaseHelper =
-                    CatalogSongDatabaseHelper(view.context)
+            loadSongListAsync(view.context,
+                false,
+                (currentPage * 50),
+                displayLoading = {},
+                finishedCallback = { _, _, _ ->
+                    val catalogSongDatabaseHelper =
+                        CatalogSongDatabaseHelper(view.context)
 
-                val songList =
-                    catalogSongDatabaseHelper.getSongs((currentPage * 50).toLong(), 50)
+                    val songList =
+                        catalogSongDatabaseHelper.getSongs((currentPage * 50).toLong(), 50)
 
-                for (song in songList) {
-                    addSong(song.songId)
-                }
+                    for (song in songList) {
+                        addSong(song.songId)
+                    }
 
-                footerAdapter.clear()
+                    footerAdapter.clear()
 
-                //DONE
-            },
-            errorCallback = { _, _, _ ->
-                footerAdapter.clear()
+                    //DONE
+                },
+                errorCallback = { _, _, _ ->
+                    footerAdapter.clear()
 
-                displaySnackBar(
-                    view,
-                    view.context.getString(R.string.errorLoadingSongList),
-                    view.context.getString(R.string.retry)
-                ) {
-                    loadSongList(view, currentPage)
-                }
-            })
+                    displaySnackBar(
+                        view,
+                        view.context.getString(R.string.errorLoadingSongList),
+                        view.context.getString(R.string.retry)
+                    ) {
+                        loadSongList(view, currentPage)
+                    }
+                })
+        }
     }
 
     private fun loadAlbum(view: View, albumId: String?, albumMcId: String, forceReload: Boolean) {
