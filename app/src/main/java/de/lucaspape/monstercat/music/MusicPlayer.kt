@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.media.AudioManager
 import android.media.session.MediaSession
-import android.os.AsyncTask
 import android.support.v4.media.session.MediaSessionCompat
 import com.google.android.exoplayer2.SimpleExoPlayer
 import de.lucaspape.monstercat.R
@@ -215,7 +214,7 @@ internal fun resume(context: Context) {
     startPlayerService(context, currentSongId)
 
     //check if should resume livestream or song
-    if (streamInfoUpdateAsync?.status == AsyncTask.Status.RUNNING) {
+    if (streamInfoUpdateAsync?.active == true) {
         playStream(
             context,
             Stream(
@@ -467,7 +466,7 @@ val nextSongId: String
 val currentSongId: String
     get() {
         return when {
-            streamInfoUpdateAsync?.status == AsyncTask.Status.RUNNING -> {
+            streamInfoUpdateAsync?.active == true -> {
                 StreamInfoUpdateAsync.liveSongId
             }
             playlist.size > playlistIndex && playlistIndex >= 0 -> {

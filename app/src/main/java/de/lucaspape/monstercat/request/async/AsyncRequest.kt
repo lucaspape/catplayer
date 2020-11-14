@@ -1,7 +1,6 @@
 package de.lucaspape.monstercat.request.async
 
 import android.content.Context
-import android.os.AsyncTask
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.*
 import de.lucaspape.monstercat.database.objects.Song
@@ -66,7 +65,7 @@ fun addToPlaylistAsync(
         } else {
             errorCallback(playlistId, songId)
         }
-    }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    }).execute()
 }
 
 fun addTrackToDBAsync(
@@ -116,7 +115,7 @@ fun addTrackToDBAsync(
         } else {
             errorCallback(trackId)
         }
-    }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    }).execute()
 }
 
 fun changePlaylistPublicStateAsync(
@@ -169,7 +168,7 @@ fun changePlaylistPublicStateAsync(
         } else {
             errorCallback(playlistId, public)
         }
-    }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    }).execute()
 }
 
 fun checkCustomApiFeaturesAsync(
@@ -251,7 +250,7 @@ fun checkCustomApiFeaturesAsync(
         } else {
             errorCallback()
         }
-    }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    }).execute()
 }
 
 fun createPlaylistAsync(
@@ -296,7 +295,7 @@ fun createPlaylistAsync(
         } else {
             errorCallback(playlistName)
         }
-    }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    }).execute()
 }
 
 fun deletePlaylistAsync(
@@ -354,7 +353,7 @@ fun deletePlaylistAsync(
         } else {
             errorCallback(playlistId)
         }
-    }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    }).execute()
 }
 
 fun deletePlaylistTrackAsync(
@@ -410,7 +409,7 @@ fun deletePlaylistTrackAsync(
         } else {
             errorCallback(songId, playlistId, songDeleteIndex)
         }
-    }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    }).execute()
 }
 
 fun loadAlbumAsync(
@@ -492,7 +491,7 @@ fun loadAlbumAsync(
         } else {
             errorCallback(forceReload, albumId, mcId, displayLoading)
         }
-    }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    }).execute()
 }
 
 fun loadAlbumListAsync(
@@ -561,7 +560,7 @@ fun loadAlbumListAsync(
         } else {
             errorCallback(forceReload, skip, displayLoading)
         }
-    }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    }).execute()
 }
 
 fun loadManualPlaylistAsync(
@@ -610,7 +609,7 @@ fun loadManualPlaylistAsync(
         } else {
             errorCallback()
         }
-    }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    }).execute()
 }
 
 fun loadPlaylistAsync(
@@ -679,7 +678,7 @@ fun loadPlaylistAsync(
                             try {
                                 val task = taskList[i]
                                 i++
-                                task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                                task.execute()
                             } catch (e: IndexOutOfBoundsException) {
                                 synchronized(syncObject) {
                                     syncObject.notify()
@@ -697,7 +696,7 @@ fun loadPlaylistAsync(
                     try {
                         val task = taskList[i]
                         i++
-                        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                        task.execute()
                     } catch (e: IndexOutOfBoundsException) {
                         synchronized(syncObject) {
                             syncObject.notify()
@@ -729,7 +728,7 @@ fun loadPlaylistAsync(
         } else {
             errorCallback(forceReload, displayLoading)
         }
-    }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    }).execute()
 }
 
 fun loadPlaylistTracksAsync(
@@ -843,7 +842,7 @@ fun loadPlaylistTracksAsync(
         } else {
             errorCallback(forceReload, playlistId, displayLoading)
         }
-    }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    }).execute()
 }
 
 fun loadRelatedTracksAsync(
@@ -903,7 +902,7 @@ fun loadRelatedTracksAsync(
         } else {
             errorCallback(trackIdArray)
         }
-    }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    }).execute()
 }
 
 fun loadSongListAsync(
@@ -974,7 +973,7 @@ fun loadSongListAsync(
         } else {
             errorCallback(forceReload, skip, displayLoading)
         }
-    }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    }).execute()
 }
 
 fun loadTitleSearchAsync(
@@ -1035,7 +1034,7 @@ fun loadTitleSearchAsync(
         } else {
             errorCallback(searchString, skip)
         }
-    }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    }).execute()
 }
 
 fun renamePlaylistAsync(
@@ -1088,5 +1087,5 @@ fun renamePlaylistAsync(
         } else {
             errorCallback(playlistName, playlistId)
         }
-    }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    }).execute()
 }

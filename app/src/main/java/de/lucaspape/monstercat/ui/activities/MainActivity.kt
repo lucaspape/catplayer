@@ -304,7 +304,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         //start download service
-        if (DownloadService.downloadTask?.status != AsyncTask.Status.RUNNING) {
+        if (DownloadService.downloadTask?.active == true) {
             downloadServiceIntent = Intent(this, DownloadService::class.java)
             startService(downloadServiceIntent)
         }
@@ -353,7 +353,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 changeTheme()
-            }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+            }).execute()
         }
 
         if (!fallbackWhiteFile.exists() || !fallbackWhiteFileLow.exists()) {
@@ -375,7 +375,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 changeTheme()
-            }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+            }).execute()
         }
     }
 

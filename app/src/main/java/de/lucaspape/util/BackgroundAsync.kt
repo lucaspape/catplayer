@@ -1,6 +1,7 @@
 package de.lucaspape.util
 
-import android.os.AsyncTask
+import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.*
 
 /**
  * General purpose background task using higher order functions
@@ -10,28 +11,30 @@ class BackgroundAsync<T>(
     private val preBackground: () -> Boolean,
     private val background: () -> T?,
     private val finished: (result: T?) -> Unit
-) :
-    AsyncTask<Void, Void, T?>() {
+) : ViewModel() {
+
+    private val viewModelJob = SupervisorJob()
+    private val scope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
     constructor(background: () -> T?, finished: (result: T?) -> Unit) : this(
         { true },
         background,
         finished
     )
-    
+
     constructor(background: () -> T?) : this(background, {})
 
-    override fun onPreExecute() {
-        if (!preBackground()) {
-            cancel(true)
+    fun execute() {
+        if (preBackground()) {
+            scope.launch {
+                withContext(Dispatchers.Default) {
+                    val result = background()
+
+                    withContext(Dispatchers.Main) {
+                        finished(result)
+                    }
+                }
+            }
         }
-    }
-
-    override fun onPostExecute(result: T?) {
-        finished(result)
-    }
-
-    override fun doInBackground(vararg params: Void?): T? {
-        return background()
     }
 }

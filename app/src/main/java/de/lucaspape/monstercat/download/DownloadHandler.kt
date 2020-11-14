@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
-import android.os.AsyncTask
 import com.squareup.picasso.Picasso
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.download.DownloadService.Companion.downloadTask
@@ -31,9 +30,9 @@ internal val bitmapCache = HashMap<String, SoftReference<Bitmap?>>()
 fun addDownloadSong(context: Context, songId: String, downloadFinished: () -> Unit) {
     downloadList.add(SoftReference(DownloadObject(songId, downloadFinished)))
 
-    if (downloadTask?.status != AsyncTask.Status.RUNNING) {
+    if (downloadTask?.active != true) {
         downloadTask = DownloadTask(WeakReference(context))
-        downloadTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        downloadTask?.execute()
     }
 }
 
@@ -128,9 +127,9 @@ internal fun downloadImageUrlIntoImageReceiver(
 fun saveBitmapAsync(bitmap: Bitmap, outputFile: File){
     BackgroundAsync {
         FileOutputStream(outputFile).use { out ->
-            bitmap.compress(Bitmap.CompressFormat.WEBP, 100, out)
+            bitmap.compress(Bitmap.CompressFormat.WEBP_LOSSLESS, 100, out)
         }
-    }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    }.execute()
 }
 
 fun downloadArtistImageIntoImageReceiver(

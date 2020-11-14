@@ -212,7 +212,7 @@ open class PlaylistItem(
                     downloadStatus = item.getDownloadStatus(context).toUri()
                 }, {
                     titleDownloadButton.setImageURI(downloadStatus)
-                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                }).execute()
             }
         }
 

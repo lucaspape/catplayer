@@ -2,8 +2,8 @@ package de.lucaspape.monstercat.music.util
 
 import android.content.Context
 import android.media.AudioManager
-import android.os.AsyncTask
 import android.os.Handler
+import android.os.Looper
 import com.google.android.exoplayer2.SimpleExoPlayer
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
@@ -82,7 +82,7 @@ internal fun playSong(
     progress: Long?
 ) {
     //cancel stream info updater if running
-    streamInfoUpdateAsync?.cancel(true)
+    streamInfoUpdateAsync?.destroy()
 
     //request audio focus if enabled
     val audioFocus = if (requestAudioFocus) {
@@ -174,7 +174,7 @@ internal fun playSong(
 }
 
 fun playStream(context: Context, stream: Stream) {
-    streamInfoUpdateAsync?.cancel(true)
+    streamInfoUpdateAsync?.destroy()
 
     val settings = Settings.getSettings(context)
 
@@ -200,7 +200,7 @@ fun playStream(context: Context, stream: Stream) {
                 StreamInfoUpdateAsync(
                     WeakReference(context)
                 )
-            streamInfoUpdateAsync?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+            streamInfoUpdateAsync?.execute()
 
             stream.getMediaSource(context) { mediaSource ->
                 exoPlayer?.setMediaSource(mediaSource)
@@ -218,14 +218,14 @@ fun playStream(context: Context, stream: Stream) {
     }
 }
 
-private var seekBarUpdateHandler = Handler()
+private var seekBarUpdateHandler = Handler(Looper.getMainLooper())
 private var currentSeekBarUpdateHandlerId = ""
 
 internal fun runSeekBarUpdate(context: Context, prepareNext: Boolean, crossFade: Boolean) {
     val id = UUID.randomUUID().toString()
     currentSeekBarUpdateHandlerId = id
 
-    seekBarUpdateHandler = Handler()
+    seekBarUpdateHandler = Handler(Looper.getMainLooper())
 
     val updateSeekBar = object : Runnable {
         override fun run() {

@@ -1,11 +1,12 @@
 package de.lucaspape.monstercat.request.async
 
 import android.content.Context
-import android.os.AsyncTask
+import androidx.lifecycle.ViewModel
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.request.newLoadPlaylistRequest
 import de.lucaspape.monstercat.util.getAuthorizedRequestQueue
 import de.lucaspape.monstercat.util.parsePlaylistToDB
+import kotlinx.coroutines.*
 import java.lang.ref.WeakReference
 
 /**
@@ -16,47 +17,58 @@ class LoadManualPlaylist(
     private val playlistId: String,
     private val finishedCallback: () -> Unit,
     private val errorCallback: () -> Unit
-) : AsyncTask<Void, Void, Boolean>() {
+) : ViewModel() {
 
-    override fun onPostExecute(result: Boolean) {
-        if (result) {
-            finishedCallback()
-        } else {
-            errorCallback()
-        }
-    }
+    private val viewModelJob = SupervisorJob()
+    private val scope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
-    override fun doInBackground(vararg param: Void?): Boolean {
-        contextReference.get()?.let { context ->
-            var success = true
-            val syncObject = Object()
+    fun execute() {
+        scope.launch {
+            withContext(Dispatchers.Default) {
+                contextReference.get()?.let { context ->
+                    var success = true
+                    val syncObject = Object()
 
-            val getManualPlaylistsRequestQueue = getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+                    val getManualPlaylistsRequestQueue = getAuthorizedRequestQueue(
+                        context,
+                        context.getString(R.string.connectApiHost)
+                    )
 
-            getManualPlaylistsRequestQueue.add(newLoadPlaylistRequest(context, playlistId, {
-                parsePlaylistToDB(
-                    context,
-                    it,
-                    false
-                )
+                    getManualPlaylistsRequestQueue.add(newLoadPlaylistRequest(context, playlistId, {
+                        parsePlaylistToDB(
+                            context,
+                            it,
+                            false
+                        )
 
-                synchronized(syncObject) {
-                    syncObject.notify()
+                        synchronized(syncObject) {
+                            syncObject.notify()
+                        }
+                    }, {
+                        success = false
+                        synchronized(syncObject) {
+                            syncObject.notify()
+                        }
+                    }))
+
+                    synchronized(syncObject) {
+                        syncObject.wait()
+
+                        scope.launch {
+                            withContext(Dispatchers.Main) {
+                                if (success) {
+                                    finishedCallback()
+                                } else {
+                                    errorCallback()
+                                }
+                            }
+
+                        }
+
+                    }
                 }
-            }, {
-                success = false
-                synchronized(syncObject) {
-                    syncObject.notify()
-                }
-            }))
-
-            synchronized(syncObject) {
-                syncObject.wait()
-                return success
             }
         }
-
-        return false
     }
 
 }

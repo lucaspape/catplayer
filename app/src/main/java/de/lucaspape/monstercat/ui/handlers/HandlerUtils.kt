@@ -677,7 +677,7 @@ internal fun playSongsFromCatalogDbAsync(
 
                 }
             }
-    }, {}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    }, {}).execute()
 }
 
 internal fun playSongsFromViewDataAsync(
@@ -731,5 +731,5 @@ internal fun playSongsFromViewDataAsync(
             }
 
         }
-    }, {}).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    }, {}).execute()
 }

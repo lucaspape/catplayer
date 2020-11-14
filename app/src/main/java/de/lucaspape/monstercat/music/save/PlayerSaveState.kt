@@ -1,7 +1,6 @@
 package de.lucaspape.monstercat.music.save
 
 import android.content.Context
-import android.os.AsyncTask
 import de.lucaspape.monstercat.music.*
 import de.lucaspape.monstercat.music.nextRandom
 import de.lucaspape.monstercat.music.playlist
@@ -88,7 +87,7 @@ data class PlayerSaveState(
 
         @JvmStatic
         fun saveMusicPlayerState(context: Context) {
-            if (streamInfoUpdateAsync?.status != AsyncTask.Status.RUNNING) {
+            if (streamInfoUpdateAsync?.active == true) {
                 val objectOutputStream =
                     ObjectOutputStream(FileOutputStream(File(context.cacheDir.toString() + "/player_state.obj")))
 

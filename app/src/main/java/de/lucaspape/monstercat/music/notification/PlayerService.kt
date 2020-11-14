@@ -74,7 +74,7 @@ class PlayerService : Service() {
 
         exoPlayer?.release()
         exoPlayer?.stop()
-        streamInfoUpdateAsync?.cancel(true)
+        streamInfoUpdateAsync?.destroy()
 
         try {
             unregisterReceiver(noisyReceiver)

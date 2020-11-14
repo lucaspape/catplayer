@@ -236,7 +236,7 @@ open class CatalogItem(
                     downloadStatus = song.downloadStatus
                 }, {
                     titleDownloadButton.setImageURI(downloadStatus)
-                }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                }).execute()
             }
         }
 
