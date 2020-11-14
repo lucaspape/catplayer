@@ -70,7 +70,7 @@ fun newSearchTrackRequest(
     return StringRequest(
         Request.Method.GET,
         searchUrl,
-        Response.Listener {
+        {
             try {
                 callback(JSONObject(it))
             } catch (e: JSONException) {
@@ -211,7 +211,9 @@ fun newLoadAlbumRequest(
     val settings = Settings.getSettings(context)
 
     val requestUrl =
-        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(context.getString(R.string.customApiSupportsV1Setting)) == true
+        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(
+                context.getString(R.string.customApiSupportsV1Setting)
+            ) == true
         ) {
             settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v1/catalog/release/$mcID"
         } else {
@@ -220,7 +222,7 @@ fun newLoadAlbumRequest(
 
     return StringRequest(
         Request.Method.GET, requestUrl,
-        Response.Listener {
+        {
             try {
                 callback(JSONObject(it))
             } catch (e: JSONException) {
@@ -239,7 +241,9 @@ fun newLoadAlbumListRequest(
     val settings = Settings.getSettings(context)
 
     val requestUrl =
-        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(context.getString(R.string.customApiSupportsV1Setting)) == true
+        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(
+                context.getString(R.string.customApiSupportsV1Setting)
+            ) == true
         ) {
             settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v1/releases?limit=50&skip=" + skip.toString()
         } else {
@@ -248,7 +252,7 @@ fun newLoadAlbumListRequest(
 
     return StringRequest(
         Request.Method.GET, requestUrl,
-        Response.Listener {
+        {
             try {
                 callback(JSONObject(it))
             } catch (e: JSONException) {
@@ -280,7 +284,7 @@ fun newLoadPlaylistRequest(
     return StringRequest(
         Request.Method.GET,
         playlistUrl,
-        Response.Listener {
+        {
             try {
                 callback(JSONObject(it))
             } catch (e: JSONException) {
@@ -310,7 +314,7 @@ fun newLoadPlaylistTracksRequest(
             context.getString(R.string.playlistTrackUrl) + playlistId + "/catalog?skip=" + skip.toString() + "&limit=50"
         }
 
-    return StringRequest(Request.Method.GET, playlistTrackUrl, Response.Listener {
+    return StringRequest(Request.Method.GET, playlistTrackUrl, {
         try {
             callback(JSONObject(it))
         } catch (e: JSONException) {
@@ -391,7 +395,9 @@ fun newLoadSongListRequest(
     val settings = Settings.getSettings(context)
 
     val requestUrl =
-        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(context.getString(R.string.customApiSupportsV1Setting)) == true
+        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(
+                context.getString(R.string.customApiSupportsV1Setting)
+            ) == true
         ) {
             settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v1/catalog/?limit=50&skip=" + skip.toString()
         } else {
@@ -400,7 +406,7 @@ fun newLoadSongListRequest(
 
     return StringRequest(
         Request.Method.GET, requestUrl,
-        Response.Listener {
+        {
             try {
                 callback(JSONObject(it))
             } catch (e: JSONException) {
@@ -460,7 +466,7 @@ fun newLoadPlaylistsRequest(
 
     return StringRequest(
         Request.Method.GET, playlistUrl,
-        Response.Listener {
+        {
             try {
                 callback(JSONObject(it))
             } catch (e: JSONException) {
@@ -479,7 +485,9 @@ fun newLiveInfoRequest(
     val settings = Settings.getSettings(context)
 
     val requestUrl =
-        if (settings.getBoolean(context.getString(R.string.liveInfoSetting)) == true && settings.getBoolean(context.getString(R.string.customApiSupportsV1Setting)) == true
+        if (settings.getBoolean(context.getString(R.string.liveInfoSetting)) == true && settings.getBoolean(
+                context.getString(R.string.customApiSupportsV1Setting)
+            ) == true
         ) {
             settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v1/liveinfo"
         } else {
@@ -489,7 +497,7 @@ fun newLiveInfoRequest(
     return StringRequest(
         Request.Method.GET,
         requestUrl,
-        Response.Listener {
+        {
             try {
                 callback(JSONObject(it))
             } catch (e: JSONException) {
@@ -578,7 +586,7 @@ fun newCheckLoginRequest(
 
     return StringRequest(
         Request.Method.GET, sessionUrl,
-        Response.Listener {
+        {
             try {
                 callback(JSONObject(it))
             } catch (e: JSONException) {
@@ -596,8 +604,9 @@ fun newCustomApiFeatureRequest(
 ): StringRequest {
     return StringRequest(
         Request.Method.GET,
-        Settings.getSettings(context).getString(context.getString(R.string.customApiBaseUrlSetting)) + "features",
-        Response.Listener {
+        Settings.getSettings(context)
+            .getString(context.getString(R.string.customApiBaseUrlSetting)) + "features",
+        {
             try {
                 callback(JSONObject(it))
             } catch (e: JSONException) {
