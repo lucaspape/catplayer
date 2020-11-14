@@ -348,7 +348,7 @@ class MainActivity : AppCompatActivity() {
                     val originalBitmap = BitmapFactory.decodeFile(fallbackBlackFile.absolutePath)
                     originalBitmap?.let {
                         Bitmap.createScaledBitmap(it, 128, 128, false)
-                            .compress(Bitmap.CompressFormat.WEBP, 100, out)
+                            .compress(Bitmap.CompressFormat.JPEG, 100, out)
                     }
                 }
 
@@ -370,7 +370,7 @@ class MainActivity : AppCompatActivity() {
                     val originalBitmap = BitmapFactory.decodeFile(fallbackWhiteFile.absolutePath)
                     originalBitmap?.let {
                         Bitmap.createScaledBitmap(it, 128, 128, false)
-                            .compress(Bitmap.CompressFormat.WEBP, 100, out)
+                            .compress(Bitmap.CompressFormat.JPEG, 100, out)
                     }
                 }
 

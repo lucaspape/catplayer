@@ -15,14 +15,16 @@ var fallbackBlackFileLow = File("")
 var fallbackWhiteFile = File("")
 var fallbackWhiteFileLow = File("")
 
-fun setFallbackCoverFiles(context: Context) {
-    fallbackFile = File("${context.dataDir}/fallback.webp")
-    fallbackFileLow = File("${context.dataDir}/fallback_low.webp")
+private const val fallbackImagesFileFormat = "jpg"
 
-    fallbackBlackFile = File("${context.dataDir}/fallback_black.webp")
-    fallbackBlackFileLow = File("${context.dataDir}/fallback_black_low.webp")
-    fallbackWhiteFile = File("${context.dataDir}/fallback_white.webp")
-    fallbackWhiteFileLow = File("${context.dataDir}/fallback_white_low.webp")
+fun setFallbackCoverFiles(context: Context) {
+    fallbackFile = File("${context.dataDir}/fallback.$fallbackImagesFileFormat")
+    fallbackFileLow = File("${context.dataDir}/fallback_low.$fallbackImagesFileFormat")
+
+    fallbackBlackFile = File("${context.dataDir}/fallback_black.$fallbackImagesFileFormat")
+    fallbackBlackFileLow = File("${context.dataDir}/fallback_black_low.$fallbackImagesFileFormat")
+    fallbackWhiteFile = File("${context.dataDir}/fallback_white.$fallbackImagesFileFormat")
+    fallbackWhiteFileLow = File("${context.dataDir}/fallback_white_low.$fallbackImagesFileFormat")
 }
 
 const val DRAWABLE_URI = "android.resource://de.lucaspape.monstercat/drawable"

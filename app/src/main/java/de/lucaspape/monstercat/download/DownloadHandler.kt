@@ -127,7 +127,7 @@ internal fun downloadImageUrlIntoImageReceiver(
 fun saveBitmapAsync(bitmap: Bitmap, outputFile: File){
     BackgroundAsync {
         FileOutputStream(outputFile).use { out ->
-            bitmap.compress(Bitmap.CompressFormat.WEBP_LOSSLESS, 100, out)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
         }
     }.execute()
 }
