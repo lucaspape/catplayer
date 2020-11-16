@@ -213,6 +213,8 @@ class PlaylistContentsHandler(private val playlistId: String) : PlaylistHandlerI
         lastOpenType = "playlist"
 
         if (playlistContentsCache.isNullOrEmpty() || forceReload) {
+            Cache().set("playlist-view-$playlistId", null)
+
             loadPlaylistTracksAsync(
                 view.context,
                 forceReload,
