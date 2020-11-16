@@ -26,7 +26,7 @@ class DownloadService : Service() {
     override fun onDestroy() {
         super.onDestroy()
 
-        downloadTask?.destroy()
+        downloadTask?.cancel()
         hideDownloadNotification(this)
     }
 }

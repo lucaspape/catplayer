@@ -1,12 +1,11 @@
 package de.lucaspape.monstercat.request.async
 
 import android.content.Context
-import androidx.lifecycle.ViewModel
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.request.newLoadPlaylistRequest
 import de.lucaspape.monstercat.util.getAuthorizedRequestQueue
 import de.lucaspape.monstercat.util.parsePlaylistToDB
-import kotlinx.coroutines.*
+import de.lucaspape.util.BackgroundTask
 import java.lang.ref.WeakReference
 
 /**
@@ -17,58 +16,53 @@ class LoadManualPlaylist(
     private val playlistId: String,
     private val finishedCallback: () -> Unit,
     private val errorCallback: () -> Unit
-) : ViewModel() {
+) : BackgroundTask() {
+    override fun background() {
+        contextReference.get()?.let { context ->
+            var success = true
+            val syncObject = Object()
 
-    private val viewModelJob = SupervisorJob()
-    private val scope = CoroutineScope(Dispatchers.Main + viewModelJob)
+            val getManualPlaylistsRequestQueue = getAuthorizedRequestQueue(
+                context,
+                context.getString(R.string.connectApiHost)
+            )
 
-    fun execute() {
-        scope.launch {
-            withContext(Dispatchers.Default) {
-                contextReference.get()?.let { context ->
-                    var success = true
-                    val syncObject = Object()
+            getManualPlaylistsRequestQueue.add(newLoadPlaylistRequest(context, playlistId, {
+                parsePlaylistToDB(
+                    context,
+                    it,
+                    false
+                )
 
-                    val getManualPlaylistsRequestQueue = getAuthorizedRequestQueue(
-                        context,
-                        context.getString(R.string.connectApiHost)
-                    )
-
-                    getManualPlaylistsRequestQueue.add(newLoadPlaylistRequest(context, playlistId, {
-                        parsePlaylistToDB(
-                            context,
-                            it,
-                            false
-                        )
-
-                        synchronized(syncObject) {
-                            syncObject.notify()
-                        }
-                    }, {
-                        success = false
-                        synchronized(syncObject) {
-                            syncObject.notify()
-                        }
-                    }))
-
-                    synchronized(syncObject) {
-                        syncObject.wait()
-
-                        scope.launch {
-                            withContext(Dispatchers.Main) {
-                                if (success) {
-                                    finishedCallback()
-                                } else {
-                                    errorCallback()
-                                }
-                            }
-
-                        }
-
-                    }
+                synchronized(syncObject) {
+                    syncObject.notify()
                 }
+            }, {
+                success = false
+                synchronized(syncObject) {
+                    syncObject.notify()
+                }
+            }))
+
+            synchronized(syncObject) {
+                syncObject.wait()
+
+                updateProgress(arrayOf(success.toString()))
             }
         }
     }
 
+    override fun publishProgress(values: Array<String>?) {
+        var success = false
+
+        values?.let {
+            success = values[0].toBoolean()
+        }
+
+        if (success) {
+            finishedCallback()
+        } else {
+            errorCallback()
+        }
+    }
 }

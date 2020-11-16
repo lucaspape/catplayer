@@ -82,7 +82,7 @@ internal fun playSong(
     progress: Long?
 ) {
     //cancel stream info updater if running
-    streamInfoUpdateAsync?.destroy()
+    streamInfoUpdateAsync?.cancel()
 
     //request audio focus if enabled
     val audioFocus = if (requestAudioFocus) {
@@ -174,7 +174,7 @@ internal fun playSong(
 }
 
 fun playStream(context: Context, stream: Stream) {
-    streamInfoUpdateAsync?.destroy()
+    streamInfoUpdateAsync?.cancel()
 
     val settings = Settings.getSettings(context)
 
