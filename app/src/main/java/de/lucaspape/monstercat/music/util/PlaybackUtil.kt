@@ -14,7 +14,6 @@ import de.lucaspape.monstercat.request.async.addTrackToDBAsync
 import de.lucaspape.monstercat.twitch.Stream
 import de.lucaspape.monstercat.util.*
 import de.lucaspape.util.Settings
-import java.lang.ref.WeakReference
 import java.util.*
 import kotlin.math.log
 
@@ -198,7 +197,7 @@ fun playStream(context: Context, stream: Stream) {
         if (wifiConnected(context) == true || settings.getBoolean(context.getString(R.string.streamOverMobileSetting)) == true) {
             streamInfoUpdateAsync =
                 StreamInfoUpdateAsync(
-                    WeakReference(context)
+                    context
                 )
             streamInfoUpdateAsync?.execute()
 
