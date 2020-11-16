@@ -204,31 +204,33 @@ class HomeAlbumHandler(private val onSingleAlbumLoad: (albumId: String, albumMcI
     }
 
     private fun loadAlbumList(view: View, currentPage: Int) {
-        footerAdapter.clear()
-        footerAdapter.add(ProgressItem())
-
-        loadAlbumListAsync(view.context, false, (currentPage * 50), {}, { _, _, _ ->
-            val albumDatabaseHelper =
-                AlbumDatabaseHelper(view.context)
-            val albumList =
-                albumDatabaseHelper.getAlbums((currentPage * 50).toLong(), 50)
-
-            for (album in albumList) {
-                addAlbum(view, album.albumId)
-            }
-
+        recyclerView?.post {
             footerAdapter.clear()
-        }, { _, _, _ ->
-            footerAdapter.clear()
+            footerAdapter.add(ProgressItem())
 
-            displaySnackBar(
-                view,
-                view.context.getString(R.string.errorLoadingAlbumList),
-                view.context.getString(R.string.retry)
-            ) {
-                loadAlbumList(view, currentPage)
-            }
-        })
+            loadAlbumListAsync(view.context, false, (currentPage * 50), {}, { _, _, _ ->
+                val albumDatabaseHelper =
+                    AlbumDatabaseHelper(view.context)
+                val albumList =
+                    albumDatabaseHelper.getAlbums((currentPage * 50).toLong(), 50)
+
+                for (album in albumList) {
+                    addAlbum(view, album.albumId)
+                }
+
+                footerAdapter.clear()
+            }, { _, _, _ ->
+                footerAdapter.clear()
+
+                displaySnackBar(
+                    view,
+                    view.context.getString(R.string.errorLoadingAlbumList),
+                    view.context.getString(R.string.retry)
+                ) {
+                    loadAlbumList(view, currentPage)
+                }
+            })
+        }
     }
 
     override fun resetRecyclerViewSavedPosition(context: Context) {

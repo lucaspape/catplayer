@@ -79,7 +79,7 @@ class SongDatabaseHelper(context: Context) :
             db.update(
                 Song.TABLE_NAME,
                 values,
-                Song.COLUMN_SONG_ID + "=\"" + songId + "\"",
+                Song.COLUMN_SONG_ID + "=\'" + songId + "\'",
                 null
             )
 

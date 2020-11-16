@@ -256,23 +256,24 @@ class SearchHandler(
         loadTitleSearchAsync(
             view.context,
             searchString,
-            0
-            , finishedCallback = { _, _, searchResults ->
+            0, finishedCallback = { _, _, searchResults ->
                 updateCatalogRecyclerView(
                     view,
                     searchResults,
                     { itemAdapter, footerAdapter, currentPage, callback ->
-                        footerAdapter.clear()
-                        footerAdapter.add(ProgressItem())
+                        recyclerView?.post {
+                            footerAdapter.clear()
+                            footerAdapter.add(ProgressItem())
 
-                        searchMore(
-                            view,
-                            searchString,
-                            itemAdapter,
-                            footerAdapter,
-                            currentPage,
-                            callback
-                        )
+                            searchMore(
+                                view,
+                                searchString,
+                                itemAdapter,
+                                footerAdapter,
+                                currentPage,
+                                callback
+                            )
+                        }
                     },
                     {
                         searchSong(view, searchString, true)
@@ -303,8 +304,7 @@ class SearchHandler(
         loadTitleSearchAsync(
             view.context,
             searchString,
-            skip
-            , finishedCallback = { _, _, searchResults ->
+            skip, finishedCallback = { _, _, searchResults ->
                 for (result in searchResults) {
                     itemAdapter.add(result)
                 }
