@@ -212,6 +212,8 @@ class PlaylistListHandler(private val loadPlaylist: (playlistId: String) -> Unit
         val playlistListCache = Cache().get<ArrayList<String>>("playlist-view-list")
 
         if (playlistListCache.isNullOrEmpty() || forceReload) {
+            Cache().set("playlist-view-list", null)
+
             loadPlaylistAsync(view.context, forceReload, true, {}, { _, _ ->
                 addHeader(view.context.getString(R.string.yourPlaylists))
 
