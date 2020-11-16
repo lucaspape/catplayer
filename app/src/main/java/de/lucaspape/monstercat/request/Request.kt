@@ -299,6 +299,7 @@ fun newLoadPlaylistTracksRequest(
     context: Context,
     playlistId: String,
     skip: Int,
+    limit: Int,
     callback: (response: JSONObject) -> Unit,
     errorCallback: (error: VolleyError?) -> Unit
 ): StringRequest {
@@ -309,9 +310,9 @@ fun newLoadPlaylistTracksRequest(
                 context.getString(R.string.customApiSupportsV2Setting)
             ) == true
         ) {
-            settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v2/playlist/" + playlistId + "/catalog?skip=" + skip.toString() + "&limit=50"
+            settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v2/playlist/" + playlistId + "/catalog?skip=" + skip.toString() + "&limit=$limit"
         } else {
-            context.getString(R.string.playlistTrackUrl) + playlistId + "/catalog?skip=" + skip.toString() + "&limit=50"
+            context.getString(R.string.playlistTrackUrl) + playlistId + "/catalog?skip=" + skip.toString() + "&limit=$limit"
         }
 
     return StringRequest(Request.Method.GET, playlistTrackUrl, {

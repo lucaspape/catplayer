@@ -647,66 +647,42 @@ fun loadPlaylistTracksAsync(
                 contextReference.get()?.let { context ->
                     val jsonObjectList = ArrayList<JSONObject?>()
 
-                    var success = true
-
-                    var skip = 0
-                    var nextEmpty = false
-
                     val trackRequestQueue =
-                        newAuthorizedRequestQueue(
+                        getAuthorizedRequestQueue(
                             context,
                             context.getString(R.string.connectApiHost)
-                        ) { requestQueue ->
-                            if (!nextEmpty && success) {
-                                skip += 50
+                        )
 
-                                requestQueue.add(
-                                    newLoadPlaylistTracksRequest(
-                                        context,
-                                        playlistId,
-                                        skip,
-                                        {
-                                            val jsonArray = it.getJSONArray("results")
+                    trackRequestQueue.add(
+                        newLoadPlaylistTracksRequest(
+                            context,
+                            playlistId,
+                            0,
+                            -1,
+                            {
+                                val jsonArray = it.getJSONArray("results")
 
-                                            for (k in (0 until jsonArray.length())) {
-                                                jsonObjectList.add(jsonArray.getJSONObject(k))
-                                            }
-
-                                            nextEmpty = jsonArray.length() != 50
-                                        },
-                                        { success = false })
-                                )
-                            } else {
-                                if (success) {
-                                    playlistItemDatabaseHelper.reCreateTable()
-
-                                    for (playlistObject in jsonObjectList) {
-                                        if (playlistObject != null) {
-                                            parsePlaylistTrackToDB(
-                                                playlistId,
-                                                playlistObject,
-                                                context
-                                            )
-                                        }
-
-                                    }
+                                for (k in (0 until jsonArray.length())) {
+                                    jsonObjectList.add(jsonArray.getJSONObject(k))
                                 }
 
-                                updateProgress(success)
-                            }
-                        }
+                                playlistItemDatabaseHelper.reCreateTable()
 
-                    trackRequestQueue.add(newLoadPlaylistTracksRequest(context, playlistId, skip, {
-                        val jsonArray = it.getJSONArray("results")
+                                for (playlistObject in jsonObjectList) {
+                                    if (playlistObject != null) {
+                                        parsePlaylistTrackToDB(
+                                            playlistId,
+                                            playlistObject,
+                                            context
+                                        )
+                                    }
 
-                        for (k in (0 until jsonArray.length())) {
-                            jsonObjectList.add(jsonArray.getJSONObject(k))
-                        }
+                                }
 
-                        nextEmpty = jsonArray.length() != 50
-                    }, {
-                        success = false
-                    }))
+                                updateProgress(true)
+                            },
+                            { updateProgress(false) })
+                    )
                 }
             }
 
