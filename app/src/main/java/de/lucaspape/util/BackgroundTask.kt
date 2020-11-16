@@ -5,11 +5,11 @@ import kotlinx.coroutines.*
 /**
  * Run single task in background
  */
-abstract class BackgroundTask {
+abstract class BackgroundTask<T> {
     private val scope = CoroutineScope(Dispatchers.Main)
 
-    abstract fun background()
-    abstract fun publishProgress(values: Array<String>?)
+    abstract suspend fun background()
+    abstract suspend fun publishProgress(value: T)
 
     fun execute() {
         scope.launch {
@@ -19,10 +19,10 @@ abstract class BackgroundTask {
         }
     }
 
-    fun updateProgress(values: Array<String>?) {
+    fun updateProgress(value: T) {
         scope.launch {
             withContext(Dispatchers.Main) {
-                publishProgress(values)
+                publishProgress(value)
             }
         }
     }

@@ -7,7 +7,7 @@ import de.lucaspape.monstercat.database.objects.Song
 import de.lucaspape.monstercat.request.*
 import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
 import de.lucaspape.monstercat.util.*
-import de.lucaspape.util.BackgroundAsync
+import de.lucaspape.util.BackgroundTask
 import de.lucaspape.util.Settings
 import org.json.JSONException
 import org.json.JSONObject
@@ -23,49 +23,42 @@ fun addToPlaylistAsync(
 ) {
     val contextReference = WeakReference(context)
 
-    BackgroundAsync({
-        contextReference.get()?.let { context ->
-            SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
-                val addToPlaylistQueue =
-                    getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+    val backgroundTask = object : BackgroundTask<Boolean>() {
+        override suspend fun background() {
+            contextReference.get()?.let { context ->
+                SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
+                    val addToPlaylistQueue =
+                        getAuthorizedRequestQueue(
+                            context,
+                            context.getString(R.string.connectApiHost)
+                        )
 
-                var success = true
-                val syncObject = Object()
-
-                addToPlaylistQueue.add(
-                    newAddToPlaylistRequest(
-                        context,
-                        playlistId,
-                        song,
-                        {
-                            synchronized(syncObject) {
-                                syncObject.notify()
-                            }
-                        },
-                        {
-                            success = false
-                            synchronized(syncObject) {
-                                syncObject.notify()
-                            }
-                        })
-                )
-
-                synchronized(syncObject) {
-                    syncObject.wait()
-
-                    return@BackgroundAsync success
+                    addToPlaylistQueue.add(
+                        newAddToPlaylistRequest(
+                            context,
+                            playlistId,
+                            song,
+                            {
+                                updateProgress(true)
+                            },
+                            {
+                                updateProgress(false)
+                            })
+                    )
                 }
             }
         }
 
-        return@BackgroundAsync false
-    }, {
-        if (it == true) {
-            finishedCallback(playlistId, songId)
-        } else {
-            errorCallback(playlistId, songId)
+        override suspend fun publishProgress(value: Boolean) {
+            if (value) {
+                finishedCallback(playlistId, songId)
+            } else {
+                errorCallback(playlistId, songId)
+            }
         }
-    }).execute()
+    }
+
+    backgroundTask.execute()
 }
 
 fun addTrackToDBAsync(
@@ -76,46 +69,38 @@ fun addTrackToDBAsync(
 ) {
     val contextReference = WeakReference(context)
 
-    BackgroundAsync({
-        contextReference.get()?.let { context ->
-            val syncObject = Object()
+    val backgroundTask = object : BackgroundTask<Song?>() {
+        override suspend fun background() {
+            contextReference.get()?.let { context ->
+                val volleyQueue =
+                    getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
-            val volleyQueue =
-                getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+                newSearchTrackRequest(context, trackId, 0, true, {
+                    val jsonArray = it.getJSONArray("results")
 
-            newSearchTrackRequest(context, trackId, 0, true, {
-                val jsonArray = it.getJSONArray("results")
+                    for (i in (0 until jsonArray.length())) {
+                        parseSongToDB(jsonArray.getJSONObject(i), context)
+                    }
 
-                for (i in (0 until jsonArray.length())) {
-                    parseSongToDB(jsonArray.getJSONObject(i), context)
-                }
-
-                synchronized(syncObject) {
-                    syncObject.notify()
-                }
-            }, {
-                synchronized(syncObject) {
-                    syncObject.notify()
-                }
-            })?.let {
-                volleyQueue.add(it)
-
-                synchronized(syncObject) {
-                    syncObject.wait()
-
-                    return@BackgroundAsync SongDatabaseHelper(context).getSong(context, trackId)
+                    updateProgress(SongDatabaseHelper(context).getSong(context, trackId))
+                }, {
+                    updateProgress(SongDatabaseHelper(context).getSong(context, trackId))
+                })?.let {
+                    volleyQueue.add(it)
                 }
             }
         }
 
-        return@BackgroundAsync null
-    }, {
-        if (it != null) {
-            finishedCallback(trackId, it)
-        } else {
-            errorCallback(trackId)
+        override suspend fun publishProgress(value: Song?) {
+            if (value != null) {
+                finishedCallback(trackId, value)
+            } else {
+                errorCallback(trackId)
+            }
         }
-    }).execute()
+    }
+
+    backgroundTask.execute()
 }
 
 fun changePlaylistPublicStateAsync(
@@ -128,47 +113,38 @@ fun changePlaylistPublicStateAsync(
 
     val contextReference = WeakReference(context)
 
-    BackgroundAsync({
-        contextReference.get()?.let { context ->
-            val newPlaylistVolleyQueue =
-                getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+    val backgroundTask = object : BackgroundTask<Boolean>() {
+        override suspend fun background() {
+            contextReference.get()?.let { context ->
+                val newPlaylistVolleyQueue =
+                    getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
-            var success = true
-            val syncObject = Object()
-
-            newPlaylistVolleyQueue.add(
-                newChangePlaylistPublicStateRequest(
-                    context,
-                    playlistId,
-                    public,
-                    {
-                        synchronized(syncObject) {
-                            syncObject.notify()
-                        }
-                    },
-                    {
-                        success = false
-                        synchronized(syncObject) {
-                            syncObject.notify()
-                        }
-                    })
-            )
-
-            synchronized(syncObject) {
-                syncObject.wait()
-
-                return@BackgroundAsync success
+                newPlaylistVolleyQueue.add(
+                    newChangePlaylistPublicStateRequest(
+                        context,
+                        playlistId,
+                        public,
+                        {
+                            updateProgress(true)
+                        },
+                        {
+                            updateProgress(false)
+                        })
+                )
             }
         }
 
-        return@BackgroundAsync false
-    }, {
-        if (it == true) {
-            finishedCallback(playlistId, public)
-        } else {
-            errorCallback(playlistId, public)
+        override suspend fun publishProgress(value: Boolean) {
+            if (value) {
+                finishedCallback(playlistId, public)
+            } else {
+                errorCallback(playlistId, public)
+            }
         }
-    }).execute()
+
+    }
+
+    backgroundTask.execute()
 }
 
 fun checkCustomApiFeaturesAsync(
@@ -178,79 +154,64 @@ fun checkCustomApiFeaturesAsync(
 ) {
     val contextReference = WeakReference(context)
 
-    BackgroundAsync({
-        contextReference.get()?.let { context ->
-            val newVolleyQueue =
-                getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+    val backgroundTask = object : BackgroundTask<Boolean>() {
+        override suspend fun background() {
+            contextReference.get()?.let { context ->
+                val newVolleyQueue =
+                    getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
-            var success = true
-            val syncObject = Object()
+                val settings = Settings.getSettings(context)
 
-            val settings = Settings.getSettings(context)
+                settings.setBoolean(context.getString(R.string.customApiSupportsV1Setting), false)
+                settings.setBoolean(context.getString(R.string.customApiSupportsV2Setting), false)
 
-            settings.setBoolean(context.getString(R.string.customApiSupportsV1Setting), false)
-            settings.setBoolean(context.getString(R.string.customApiSupportsV2Setting), false)
+                newVolleyQueue.add(newCustomApiFeatureRequest(context, {
+                    try {
+                        val apiVersionsArray = it.getJSONArray("api_versions")
 
-            newVolleyQueue.add(newCustomApiFeatureRequest(context, {
-                try {
-                    val apiVersionsArray = it.getJSONArray("api_versions")
-
-                    for (i in (0 until apiVersionsArray.length())) {
-                        if (apiVersionsArray.getString(i) == "v1") {
-                            settings.setBoolean(
-                                context.getString(R.string.customApiSupportsV1Setting),
-                                true
-                            )
-                        } else if (apiVersionsArray.getString(i) == "v2") {
-                            settings.setBoolean(
-                                context.getString(R.string.customApiSupportsV2Setting),
-                                true
-                            )
+                        for (i in (0 until apiVersionsArray.length())) {
+                            if (apiVersionsArray.getString(i) == "v1") {
+                                settings.setBoolean(
+                                    context.getString(R.string.customApiSupportsV1Setting),
+                                    true
+                                )
+                            } else if (apiVersionsArray.getString(i) == "v2") {
+                                settings.setBoolean(
+                                    context.getString(R.string.customApiSupportsV2Setting),
+                                    true
+                                )
+                            }
                         }
+
+                        settings.setString(
+                            context.getString(R.string.customDownloadUrlSetting),
+                            it.getString("download_base_url")
+                        )
+                        settings.setString(
+                            context.getString(R.string.customStreamUrlSetting),
+                            it.getString("stream_base_url")
+                        )
+
+                        updateProgress(true)
+                    } catch (e: JSONException) {
+                        updateProgress(false)
                     }
-
-                    settings.setString(
-                        context.getString(R.string.customDownloadUrlSetting),
-                        it.getString("download_base_url")
-                    )
-                    settings.setString(
-                        context.getString(R.string.customStreamUrlSetting),
-                        it.getString("stream_base_url")
-                    )
-
-                    synchronized(syncObject) {
-                        syncObject.notify()
-                    }
-                } catch (e: JSONException) {
-                    success = false
-
-                    synchronized(syncObject) {
-                        syncObject.notify()
-                    }
-                }
-            }, {
-                success = false
-
-                synchronized(syncObject) {
-                    syncObject.notify()
-                }
-            }))
-
-            synchronized(syncObject) {
-                syncObject.wait()
-
-                return@BackgroundAsync success
+                }, {
+                    updateProgress(false)
+                }))
             }
         }
 
-        return@BackgroundAsync false
-    }, {
-        if (it == true) {
-            finishedCallback()
-        } else {
-            errorCallback()
+        override suspend fun publishProgress(value: Boolean) {
+            if (value) {
+                finishedCallback()
+            } else {
+                errorCallback()
+            }
         }
-    }).execute()
+    }
+
+    backgroundTask.execute()
 }
 
 fun createPlaylistAsync(
@@ -262,40 +223,31 @@ fun createPlaylistAsync(
 
     val contextReference = WeakReference(context)
 
-    BackgroundAsync({
-        contextReference.get()?.let { context ->
-            val newPlaylistVolleyQueue =
-                getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+    val backgroundTask = object : BackgroundTask<Boolean>() {
+        override suspend fun background() {
+            contextReference.get()?.let { context ->
+                val newPlaylistVolleyQueue =
+                    getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
-            var success = true
-            val syncObject = Object()
-
-            newPlaylistVolleyQueue.add(newCreatePlaylistRequest(context, playlistName, {
-                synchronized(syncObject) {
-                    syncObject.notify()
-                }
-            }, {
-                success = false
-                synchronized(syncObject) {
-                    syncObject.notify()
-                }
-            }))
-
-            synchronized(syncObject) {
-                syncObject.wait()
-
-                return@BackgroundAsync success
+                newPlaylistVolleyQueue.add(newCreatePlaylistRequest(context, playlistName, {
+                    updateProgress(true)
+                }, {
+                    updateProgress(false)
+                }))
             }
         }
 
-        return@BackgroundAsync false
-    }, {
-        if (it == true) {
-            finishedCallback(playlistName)
-        } else {
-            errorCallback(playlistName)
+        override suspend fun publishProgress(value: Boolean) {
+            if (value) {
+                finishedCallback(playlistName)
+            } else {
+                errorCallback(playlistName)
+            }
         }
-    }).execute()
+
+    }
+
+    backgroundTask.execute()
 }
 
 fun deletePlaylistAsync(
@@ -308,52 +260,45 @@ fun deletePlaylistAsync(
 ) {
     val contextReference = WeakReference(context)
 
-    BackgroundAsync({
-        contextReference.get()?.let { context ->
-            var success = true
+    val backgroundTask = object : BackgroundTask<Boolean>() {
+        override suspend fun background() {
+            contextReference.get()?.let { context ->
+                if (deleteLocal) {
+                    val playlistDatabaseHelper = PlaylistDatabaseHelper(context)
+                    playlistDatabaseHelper.removePlaylist(playlistId)
 
-            if (deleteLocal) {
-                val playlistDatabaseHelper = PlaylistDatabaseHelper(context)
-                playlistDatabaseHelper.removePlaylist(playlistId)
+                    val manualPlaylistDatabaseHelper = ManualPlaylistDatabaseHelper(context)
+                    manualPlaylistDatabaseHelper.removePlaylist(playlistId)
+                }
 
-                val manualPlaylistDatabaseHelper = ManualPlaylistDatabaseHelper(context)
-                manualPlaylistDatabaseHelper.removePlaylist(playlistId)
-            }
+                if (deleteRemote) {
+                    val deletePlaylistVolleyQueue =
+                        getAuthorizedRequestQueue(
+                            context,
+                            context.getString(R.string.connectApiHost)
+                        )
 
-            if (deleteRemote) {
-                val deletePlaylistVolleyQueue =
-                    getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
-                val syncObject = Object()
-
-                deletePlaylistVolleyQueue.add(newDeletePlaylistRequest(context, playlistId, {
-                    synchronized(syncObject) {
-                        syncObject.notify()
-                    }
-                }, {
-                    success = false
-                    synchronized(syncObject) {
-                        syncObject.notify()
-                    }
-                }))
-
-                synchronized(syncObject) {
-                    syncObject.wait()
-
-                    return@BackgroundAsync success
+                    deletePlaylistVolleyQueue.add(newDeletePlaylistRequest(context, playlistId, {
+                        updateProgress(true)
+                    }, {
+                        updateProgress(false)
+                    }))
+                } else {
+                    updateProgress(true)
                 }
             }
-
-            return@BackgroundAsync success
         }
 
-        return@BackgroundAsync false
-    }, {
-        if (it == true) {
-            finishedCallback(playlistId)
-        } else {
-            errorCallback(playlistId)
+        override suspend fun publishProgress(value: Boolean) {
+            if (value) {
+                finishedCallback(playlistId)
+            } else {
+                errorCallback(playlistId)
+            }
         }
-    }).execute()
+    }
+
+    backgroundTask.execute()
 }
 
 fun deletePlaylistTrackAsync(
@@ -366,50 +311,43 @@ fun deletePlaylistTrackAsync(
 ) {
     val contextReference = WeakReference(context)
 
-    BackgroundAsync({
-        contextReference.get()?.let { context ->
-            SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
-                val deleteSongVolleyQueue =
-                    getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+    val backgroundTask = object : BackgroundTask<Boolean>() {
+        override suspend fun background() {
+            contextReference.get()?.let { context ->
+                SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
+                    val deleteSongVolleyQueue =
+                        getAuthorizedRequestQueue(
+                            context,
+                            context.getString(R.string.connectApiHost)
+                        )
 
-                var success = true
-                val syncObject = Object()
-
-                deleteSongVolleyQueue.add(
-                    newDeletePlaylistTrackRequest(
-                        context,
-                        playlistId,
-                        song,
-                        songDeleteIndex,
-                        {
-                            synchronized(syncObject) {
-                                syncObject.notify()
-                            }
-                        },
-                        {
-                            success = false
-                            synchronized(syncObject) {
-                                syncObject.notify()
-                            }
-                        })
-                )
-
-                synchronized(syncObject) {
-                    syncObject.wait()
-
-                    return@BackgroundAsync success
+                    deleteSongVolleyQueue.add(
+                        newDeletePlaylistTrackRequest(
+                            context,
+                            playlistId,
+                            song,
+                            songDeleteIndex,
+                            {
+                                updateProgress(true)
+                            },
+                            {
+                                updateProgress(false)
+                            })
+                    )
                 }
             }
         }
 
-        return@BackgroundAsync false
-    }, {
-        if (it == true) {
-            finishedCallback(songId, playlistId, songDeleteIndex)
-        } else {
-            errorCallback(songId, playlistId, songDeleteIndex)
+        override suspend fun publishProgress(value: Boolean) {
+            if (value) {
+                finishedCallback(songId, playlistId, songDeleteIndex)
+            } else {
+                errorCallback(songId, playlistId, songDeleteIndex)
+            }
         }
-    }).execute()
+    }
+
+    backgroundTask.execute()
 }
 
 fun loadAlbumAsync(
@@ -423,75 +361,61 @@ fun loadAlbumAsync(
 ) {
     val contextReference = WeakReference(context)
 
-    BackgroundAsync({
-        contextReference.get()?.let {
-            val albumItemDatabaseHelper =
-                AlbumItemDatabaseHelper(context, albumId)
-            val albumItems = albumItemDatabaseHelper.getAllData()
+    contextReference.get()?.let {
+        val albumItemDatabaseHelper =
+            AlbumItemDatabaseHelper(context, albumId)
+        val albumItems = albumItemDatabaseHelper.getAllData()
 
-            if (!forceReload && albumItems.isNotEmpty()) {
-                finishedCallback(forceReload, albumId, mcId, displayLoading)
-                return@BackgroundAsync false
-            } else {
-                displayLoading()
-                //continue to background task
-                return@BackgroundAsync true
-            }
-        }
-
-        return@BackgroundAsync false
-    }, {
-        contextReference.get()?.let { context ->
-            val requestQueue =
-                getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
-
-            val albumItemDatabaseHelper =
-                AlbumItemDatabaseHelper(context, albumId)
-
-            displayLoading()
-
-            var success = true
-            val syncObject = Object()
-
-            requestQueue.add(newLoadAlbumRequest(context, mcId, {
-                val jsonArray = it.getJSONArray("tracks")
-
-                albumItemDatabaseHelper.reCreateTable()
-
-                //parse every single song into list
-                for (k in (0 until jsonArray.length())) {
-                    parseAlbumSongToDB(
-                        jsonArray.getJSONObject(k),
-                        albumId,
-                        context
-                    )
-                }
-
-                synchronized(syncObject) {
-                    syncObject.notify()
-                }
-            }, {
-                success = false
-                synchronized(syncObject) {
-                    syncObject.notify()
-                }
-            }))
-            synchronized(syncObject) {
-                syncObject.wait()
-
-                return@BackgroundAsync success
-            }
-
-        }
-
-        return@BackgroundAsync false
-    }, {
-        if (it == true) {
+        if (!forceReload && albumItems.isNotEmpty()) {
             finishedCallback(forceReload, albumId, mcId, displayLoading)
         } else {
-            errorCallback(forceReload, albumId, mcId, displayLoading)
+            displayLoading()
+            //continue to background task
+
+            val backgroundTask = object : BackgroundTask<Boolean>() {
+                override suspend fun background() {
+                    contextReference.get()?.let { context ->
+                        val requestQueue =
+                            getAuthorizedRequestQueue(
+                                context,
+                                context.getString(R.string.connectApiHost)
+                            )
+
+                        displayLoading()
+
+                        requestQueue.add(newLoadAlbumRequest(context, mcId, {
+                            val jsonArray = it.getJSONArray("tracks")
+
+                            albumItemDatabaseHelper.reCreateTable()
+
+                            //parse every single song into list
+                            for (k in (0 until jsonArray.length())) {
+                                parseAlbumSongToDB(
+                                    jsonArray.getJSONObject(k),
+                                    albumId,
+                                    context
+                                )
+                            }
+
+                            updateProgress(true)
+                        }, {
+                            updateProgress(false)
+                        }))
+                    }
+                }
+
+                override suspend fun publishProgress(value: Boolean) {
+                    if (value) {
+                        finishedCallback(forceReload, albumId, mcId, displayLoading)
+                    } else {
+                        errorCallback(forceReload, albumId, mcId, displayLoading)
+                    }
+                }
+            }
+
+            backgroundTask.execute()
         }
-    }).execute()
+    }
 }
 
 fun loadAlbumListAsync(
@@ -504,63 +428,50 @@ fun loadAlbumListAsync(
 ) {
     val contextReference = WeakReference(context)
 
-    BackgroundAsync({
-        contextReference.get()?.let { context ->
-            val albumDatabaseHelper =
-                AlbumDatabaseHelper(context)
-            val albumList = albumDatabaseHelper.getAlbums(skip.toLong(), 50)
+    val albumDatabaseHelper =
+        AlbumDatabaseHelper(context)
+    val albumList = albumDatabaseHelper.getAlbums(skip.toLong(), 50)
 
-            if (!forceReload && albumList.isNotEmpty()) {
-                finishedCallback(forceReload, skip, displayLoading)
-                return@BackgroundAsync false
-            } else {
-                displayLoading()
-                return@BackgroundAsync true
+    if (!forceReload && albumList.isNotEmpty()) {
+        finishedCallback(forceReload, skip, displayLoading)
+    } else {
+        displayLoading()
+
+
+        val backgroundTask = object : BackgroundTask<Boolean>() {
+            override suspend fun background() {
+                contextReference.get()?.let { context ->
+                    val requestQueue =
+                        getAuthorizedRequestQueue(
+                            context,
+                            context.getString(R.string.connectApiHost)
+                        )
+
+                    requestQueue.add(newLoadAlbumListRequest(context, skip, {
+                        val jsonArray = it.getJSONArray("results")
+
+                        for (i in (0 until jsonArray.length())) {
+                            parseAlbumToDB(jsonArray.getJSONObject(i), context)
+                        }
+
+                        updateProgress(true)
+                    }, {
+                        updateProgress(false)
+                    }))
+                }
+            }
+
+            override suspend fun publishProgress(value: Boolean) {
+                if (value) {
+                    finishedCallback(forceReload, skip, displayLoading)
+                } else {
+                    errorCallback(forceReload, skip, displayLoading)
+                }
             }
         }
 
-        return@BackgroundAsync false
-    }, {
-        contextReference.get()?.let { context ->
-            var success = true
-            val syncObject = Object()
-
-            val requestQueue =
-                getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
-
-            requestQueue.add(newLoadAlbumListRequest(context, skip, {
-                val jsonArray = it.getJSONArray("results")
-
-                for (i in (0 until jsonArray.length())) {
-                    parseAlbumToDB(jsonArray.getJSONObject(i), context)
-                }
-
-                synchronized(syncObject) {
-                    syncObject.notify()
-                }
-            }, {
-                success = false
-                synchronized(syncObject) {
-                    syncObject.notify()
-                }
-            }))
-
-            synchronized(syncObject) {
-                syncObject.wait()
-
-                return@BackgroundAsync success
-            }
-
-        }
-
-        return@BackgroundAsync false
-    }, {
-        if (it == true) {
-            finishedCallback(forceReload, skip, displayLoading)
-        } else {
-            errorCallback(forceReload, skip, displayLoading)
-        }
-    }).execute()
+        backgroundTask.execute()
+    }
 }
 
 fun loadManualPlaylistAsync(
@@ -571,45 +482,36 @@ fun loadManualPlaylistAsync(
 ) {
     val contextReference = WeakReference(context)
 
-    BackgroundAsync({
-        contextReference.get()?.let { context ->
-            var success = true
-            val syncObject = Object()
+    val backgroundTask = object : BackgroundTask<Boolean>() {
+        override suspend fun background() {
+            contextReference.get()?.let { context ->
+                val getManualPlaylistsRequestQueue =
+                    getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
-            val getManualPlaylistsRequestQueue =
-                getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+                getManualPlaylistsRequestQueue.add(newLoadPlaylistRequest(context, playlistId, {
+                    parsePlaylistToDB(
+                        context,
+                        it,
+                        false
+                    )
 
-            getManualPlaylistsRequestQueue.add(newLoadPlaylistRequest(context, playlistId, {
-                parsePlaylistToDB(
-                    context,
-                    it,
-                    false
-                )
-
-                synchronized(syncObject) {
-                    syncObject.notify()
-                }
-            }, {
-                success = false
-                synchronized(syncObject) {
-                    syncObject.notify()
-                }
-            }))
-
-            synchronized(syncObject) {
-                syncObject.wait()
-                return@BackgroundAsync success
+                    updateProgress(true)
+                }, {
+                    updateProgress(false)
+                }))
             }
         }
 
-        return@BackgroundAsync false
-    }, {
-        if (it == true) {
-            finishedCallback()
-        } else {
-            errorCallback()
+        override suspend fun publishProgress(value: Boolean) {
+            if (value) {
+                finishedCallback()
+            } else {
+                errorCallback()
+            }
         }
-    }).execute()
+    }
+
+    backgroundTask.execute()
 }
 
 fun loadPlaylistAsync(
@@ -622,113 +524,101 @@ fun loadPlaylistAsync(
 ) {
     val contextReference = WeakReference(context)
 
-    BackgroundAsync({
-        contextReference.get()?.let { context ->
-            val playlistDatabaseHelper =
-                PlaylistDatabaseHelper(context)
-            val playlists = playlistDatabaseHelper.getAllPlaylists()
+    val playlistDatabaseHelper =
+        PlaylistDatabaseHelper(context)
+    val playlists = playlistDatabaseHelper.getAllPlaylists()
 
-            if (!forceReload && playlists.isNotEmpty()) {
-                finishedCallback(forceReload, displayLoading)
-                return@BackgroundAsync false
-            } else {
-                displayLoading()
-                return@BackgroundAsync true
-            }
-        }
-
-        return@BackgroundAsync false
-    }, {
-        contextReference.get()?.let { context ->
-            val playlistDatabaseHelper =
-                PlaylistDatabaseHelper(context)
-
-            val playlistRequestQueue =
-                getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
-
-            var success = true
-            val syncObject = Object()
-
-            playlistDatabaseHelper.reCreateTable(context, false)
-
-            playlistRequestQueue.add(newLoadPlaylistsRequest(context, {
-                try {
-                    val jsonArray = it.getJSONArray("results")
-
-                    for (i in (0 until jsonArray.length())) {
-                        parsePlaylistToDB(
+    if (!forceReload && playlists.isNotEmpty()) {
+        finishedCallback(forceReload, displayLoading)
+    } else {
+        displayLoading()
+        val backgroundTask = object : BackgroundTask<Boolean>() {
+            override suspend fun background() {
+                contextReference.get()?.let { context ->
+                    val playlistRequestQueue =
+                        getAuthorizedRequestQueue(
                             context,
-                            jsonArray.getJSONObject(i),
-                            true
+                            context.getString(R.string.connectApiHost)
                         )
-                    }
-                } catch (e: JSONException) {
 
-                }
+                    var success = true
 
-                if (loadManual) {
-                    val manualPlaylists = ManualPlaylistDatabaseHelper(context).getAllPlaylists()
+                    playlistDatabaseHelper.reCreateTable(context, false)
 
-                    //LOAD MANUAL ADDED PLAYLISTS
-                    val taskList = ArrayList<LoadManualPlaylist>()
-                    var i = 0
+                    playlistRequestQueue.add(newLoadPlaylistsRequest(context, {
+                        try {
+                            val jsonArray = it.getJSONArray("results")
 
-                    for (playlist in manualPlaylists) {
-                        taskList.add(LoadManualPlaylist(contextReference, playlist.playlistId, {
+                            for (i in (0 until jsonArray.length())) {
+                                parsePlaylistToDB(
+                                    context,
+                                    jsonArray.getJSONObject(i),
+                                    true
+                                )
+                            }
+                        } catch (e: JSONException) {
+
+                        }
+
+                        if (loadManual) {
+                            val manualPlaylists =
+                                ManualPlaylistDatabaseHelper(context).getAllPlaylists()
+
+                            //LOAD MANUAL ADDED PLAYLISTS
+                            val taskList = ArrayList<LoadManualPlaylist>()
+                            var i = 0
+
+                            for (playlist in manualPlaylists) {
+                                taskList.add(
+                                    LoadManualPlaylist(
+                                        contextReference,
+                                        playlist.playlistId,
+                                        {
+                                            try {
+                                                val task = taskList[i]
+                                                i++
+                                                task.execute()
+                                            } catch (e: IndexOutOfBoundsException) {
+                                                updateProgress(success)
+                                            }
+                                        },
+                                        {
+                                            success = false
+
+                                            updateProgress(success)
+                                        })
+                                )
+                            }
+
                             try {
                                 val task = taskList[i]
                                 i++
                                 task.execute()
                             } catch (e: IndexOutOfBoundsException) {
-                                synchronized(syncObject) {
-                                    syncObject.notify()
-                                }
+                                updateProgress(success)
                             }
-                        }, {
-                            success = false
-
-                            synchronized(syncObject) {
-                                syncObject.notify()
-                            }
-                        }))
-                    }
-
-                    try {
-                        val task = taskList[i]
-                        i++
-                        task.execute()
-                    } catch (e: IndexOutOfBoundsException) {
-                        synchronized(syncObject) {
-                            syncObject.notify()
+                        } else {
+                            updateProgress(success)
                         }
-                    }
-                } else {
-                    synchronized(syncObject) {
-                        syncObject.notify()
-                    }
+                    }, {
+                        success = false
+                        updateProgress(success)
+                    }))
                 }
-            }, {
-                success = false
-                synchronized(syncObject) {
-                    syncObject.notify()
-                }
-            }))
-
-            synchronized(syncObject) {
-                syncObject.wait()
-
-                return@BackgroundAsync success
             }
+
+            override suspend fun publishProgress(value: Boolean) {
+                if (value) {
+                    finishedCallback(forceReload, displayLoading)
+                } else {
+                    errorCallback(forceReload, displayLoading)
+                }
+            }
+
         }
 
-        return@BackgroundAsync false
-    }, {
-        if (it == true) {
-            finishedCallback(forceReload, displayLoading)
-        } else {
-            errorCallback(forceReload, displayLoading)
-        }
-    }).execute()
+        backgroundTask.execute()
+    }
 }
 
 fun loadPlaylistTracksAsync(
@@ -741,108 +631,96 @@ fun loadPlaylistTracksAsync(
 ) {
     val contextReference = WeakReference(context)
 
-    BackgroundAsync({
-        contextReference.get()?.let { context ->
-            val playlistItemDatabaseHelper =
-                PlaylistItemDatabaseHelper(
-                    context,
-                    playlistId
-                )
-            val playlistItems = playlistItemDatabaseHelper.getAllData()
+    val playlistItemDatabaseHelper =
+        PlaylistItemDatabaseHelper(
+            context,
+            playlistId
+        )
+    val playlistItems = playlistItemDatabaseHelper.getAllData()
 
-            if (!forceReload && playlistItems.isNotEmpty()) {
-                finishedCallback(forceReload, playlistId, displayLoading)
-                return@BackgroundAsync false
-            } else {
-                displayLoading()
-                return@BackgroundAsync true
-            }
-        }
+    if (!forceReload && playlistItems.isNotEmpty()) {
+        finishedCallback(forceReload, playlistId, displayLoading)
+    } else {
+        displayLoading()
+        val backgroundTask = object : BackgroundTask<Boolean>() {
+            override suspend fun background() {
+                contextReference.get()?.let { context ->
+                    val jsonObjectList = ArrayList<JSONObject?>()
 
-        return@BackgroundAsync false
-    }, {
-        contextReference.get()?.let { context ->
-            val playlistItemDatabaseHelper =
-                PlaylistItemDatabaseHelper(
-                    context,
-                    playlistId
-                )
+                    var success = true
 
-            val syncObject = Object()
+                    var skip = 0
+                    var nextEmpty = false
 
-            val jsonObjectList = ArrayList<JSONObject?>()
+                    val trackRequestQueue =
+                        newAuthorizedRequestQueue(
+                            context,
+                            context.getString(R.string.connectApiHost)
+                        ) { requestQueue ->
+                            if (!nextEmpty && success) {
+                                skip += 50
 
-            var success = true
+                                requestQueue.add(
+                                    newLoadPlaylistTracksRequest(
+                                        context,
+                                        playlistId,
+                                        skip,
+                                        {
+                                            val jsonArray = it.getJSONArray("results")
 
-            var skip = 0
-            var nextEmpty = false
+                                            for (k in (0 until jsonArray.length())) {
+                                                jsonObjectList.add(jsonArray.getJSONObject(k))
+                                            }
 
-            val trackRequestQueue =
-                newAuthorizedRequestQueue(
-                    context,
-                    context.getString(R.string.connectApiHost)
-                ) { requestQueue ->
-                    if (!nextEmpty && success) {
-                        skip += 50
+                                            nextEmpty = jsonArray.length() != 50
+                                        },
+                                        { success = false })
+                                )
+                            } else {
+                                if (success) {
+                                    playlistItemDatabaseHelper.reCreateTable()
 
-                        requestQueue.add(newLoadPlaylistTracksRequest(context, playlistId, skip, {
-                            val jsonArray = it.getJSONArray("results")
+                                    for (playlistObject in jsonObjectList) {
+                                        if (playlistObject != null) {
+                                            parsePlaylistTrackToDB(
+                                                playlistId,
+                                                playlistObject,
+                                                context
+                                            )
+                                        }
 
-                            for (k in (0 until jsonArray.length())) {
-                                jsonObjectList.add(jsonArray.getJSONObject(k))
+                                    }
+                                }
+
+                                updateProgress(success)
                             }
-
-                            nextEmpty = jsonArray.length() != 50
-                        }, { success = false }))
-                    } else {
-                        synchronized(syncObject) {
-                            syncObject.notify()
-                        }
-                    }
-                }
-
-            trackRequestQueue.add(newLoadPlaylistTracksRequest(context, playlistId, skip, {
-                val jsonArray = it.getJSONArray("results")
-
-                for (k in (0 until jsonArray.length())) {
-                    jsonObjectList.add(jsonArray.getJSONObject(k))
-                }
-
-                nextEmpty = jsonArray.length() != 50
-            }, {
-                success = false
-            }))
-
-            synchronized(syncObject) {
-                syncObject.wait()
-
-                if (success) {
-                    playlistItemDatabaseHelper.reCreateTable()
-
-                    for (playlistObject in jsonObjectList) {
-                        if (playlistObject != null) {
-                            parsePlaylistTrackToDB(
-                                playlistId,
-                                playlistObject,
-                                context
-                            )
                         }
 
-                    }
-                }
+                    trackRequestQueue.add(newLoadPlaylistTracksRequest(context, playlistId, skip, {
+                        val jsonArray = it.getJSONArray("results")
 
-                return@BackgroundAsync success
+                        for (k in (0 until jsonArray.length())) {
+                            jsonObjectList.add(jsonArray.getJSONObject(k))
+                        }
+
+                        nextEmpty = jsonArray.length() != 50
+                    }, {
+                        success = false
+                    }))
+                }
+            }
+
+            override suspend fun publishProgress(value: Boolean) {
+                if (value) {
+                    finishedCallback(forceReload, playlistId, displayLoading)
+                } else {
+                    errorCallback(forceReload, playlistId, displayLoading)
+                }
             }
         }
 
-        return@BackgroundAsync false
-    }, {
-        if (it == true) {
-            finishedCallback(forceReload, playlistId, displayLoading)
-        } else {
-            errorCallback(forceReload, playlistId, displayLoading)
-        }
-    }).execute()
+        backgroundTask.execute()
+    }
 }
 
 fun loadRelatedTracksAsync(
@@ -855,54 +733,46 @@ fun loadRelatedTracksAsync(
 
     val contextReference = WeakReference(context)
 
-    BackgroundAsync({
-        contextReference.get()?.let { context ->
-            val syncObject = Object()
+    val backgroundTask = object : BackgroundTask<ArrayList<String>?>() {
+        override suspend fun background() {
+            contextReference.get()?.let { context ->
+                var result: ArrayList<String>? = ArrayList()
 
-            var result: ArrayList<String>? = ArrayList()
+                val volleyQueue =
+                    getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
-            val volleyQueue =
-                getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+                newLoadRelatedTracksRequest(context, trackIdArray, skipMC, {
+                    try {
+                        val relatedJsonArray = it.getJSONArray("results")
 
-            newLoadRelatedTracksRequest(context, trackIdArray, skipMC, {
-                try {
-                    val relatedJsonArray = it.getJSONArray("results")
-
-                    for (i in (0 until relatedJsonArray.length())) {
-                        val trackObject = relatedJsonArray.getJSONObject(i)
-                        result?.add(trackObject.getString("id"))
+                        for (i in (0 until relatedJsonArray.length())) {
+                            val trackObject = relatedJsonArray.getJSONObject(i)
+                            result?.add(trackObject.getString("id"))
+                        }
+                    } catch (e: JSONException) {
+                        result = null
                     }
-                } catch (e: JSONException) {
-                    result = null
-                }
 
-                synchronized(syncObject) {
-                    syncObject.notify()
+                    updateProgress(result)
+                }, {
+                    updateProgress(null)
+                })?.let {
+                    volleyQueue.add(it)
                 }
-            }, {
-                result = null
-                synchronized(syncObject) {
-                    syncObject.notify()
-                }
-            })?.let {
-                volleyQueue.add(it)
-            }
-
-            synchronized(syncObject) {
-                syncObject.wait()
-
-                return@BackgroundAsync result
             }
         }
 
-        return@BackgroundAsync null
-    }, {
-        if (it != null) {
-            finishedCallback(trackIdArray, it)
-        } else {
-            errorCallback(trackIdArray)
+        override suspend fun publishProgress(value: ArrayList<String>?) {
+            if (value != null) {
+                finishedCallback(trackIdArray, value)
+            } else {
+                errorCallback(trackIdArray)
+            }
         }
-    }).execute()
+
+    }
+
+    backgroundTask.execute()
 }
 
 fun loadSongListAsync(
@@ -915,65 +785,53 @@ fun loadSongListAsync(
 ) {
     val contextReference = WeakReference(context)
 
-    BackgroundAsync({
-        contextReference.get()?.let { context ->
-            val catalogSongDatabaseHelper =
-                CatalogSongDatabaseHelper(context)
-            val songIdList = catalogSongDatabaseHelper.getSongs(skip.toLong(), 50)
+    val catalogSongDatabaseHelper =
+        CatalogSongDatabaseHelper(context)
+    val songIdList = catalogSongDatabaseHelper.getSongs(skip.toLong(), 50)
 
-            if (!forceReload && songIdList.isNotEmpty()) {
-                finishedCallback(forceReload, skip, displayLoading)
-                return@BackgroundAsync false
-            } else {
-                displayLoading()
-                return@BackgroundAsync true
+    if (!forceReload && songIdList.isNotEmpty()) {
+        finishedCallback(forceReload, skip, displayLoading)
+    } else {
+        displayLoading()
+
+        val backgroundTask = object : BackgroundTask<Boolean>() {
+            override suspend fun background() {
+                contextReference.get()?.let { context ->
+                    val requestQueue =
+                        getAuthorizedRequestQueue(
+                            context,
+                            context.getString(R.string.connectApiHost)
+                        )
+
+                    requestQueue.add(newLoadSongListRequest(context, skip, {
+                        val jsonArray = it.getJSONArray("results")
+
+                        for (i in (0 until jsonArray.length())) {
+                            parseCatalogSongToDB(
+                                jsonArray.getJSONObject(i),
+                                context
+                            )
+                        }
+
+                        updateProgress(true)
+                    }, {
+                        updateProgress(false)
+                    }))
+                }
             }
-        }
 
-        return@BackgroundAsync false
-    }, {
-        contextReference.get()?.let { context ->
-            var success = true
-            val syncObject = Object()
-
-            val requestQueue =
-                getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
-
-            requestQueue.add(newLoadSongListRequest(context, skip, {
-                val jsonArray = it.getJSONArray("results")
-
-                for (i in (0 until jsonArray.length())) {
-                    parseCatalogSongToDB(
-                        jsonArray.getJSONObject(i),
-                        context
-                    )
+            override suspend fun publishProgress(value: Boolean) {
+                if (value) {
+                    finishedCallback(forceReload, skip, displayLoading)
+                } else {
+                    errorCallback(forceReload, skip, displayLoading)
                 }
-
-                synchronized(syncObject) {
-                    syncObject.notify()
-                }
-            }, {
-                success = false
-                synchronized(syncObject) {
-                    syncObject.notify()
-                }
-            }))
-
-            synchronized(syncObject) {
-                syncObject.wait()
-
-                return@BackgroundAsync success
             }
+
         }
 
-        return@BackgroundAsync false
-    }, {
-        if (it == true) {
-            finishedCallback(forceReload, skip, displayLoading)
-        } else {
-            errorCallback(forceReload, skip, displayLoading)
-        }
-    }).execute()
+        backgroundTask.execute()
+    }
 }
 
 fun loadTitleSearchAsync(
@@ -986,55 +844,47 @@ fun loadTitleSearchAsync(
 
     val contextReference = WeakReference(context)
 
-    BackgroundAsync({
-        contextReference.get()?.let { context ->
-            var searchResults: ArrayList<CatalogItem>? = ArrayList()
+    val backgroundTask = object : BackgroundTask<ArrayList<CatalogItem>?>() {
+        override suspend fun background() {
+            contextReference.get()?.let { context ->
+                val searchResults: ArrayList<CatalogItem>? = ArrayList()
 
-            val syncObject = Object()
-            val searchQueue =
-                getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+                val searchQueue =
+                    getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
-            newSearchTrackRequest(context, searchString, skip, false, {
-                val jsonArray = it.getJSONArray("results")
+                newSearchTrackRequest(context, searchString, skip, false, {
+                    val jsonArray = it.getJSONArray("results")
 
-                val songList =
-                    parseSongSearchToSongList(context, jsonArray)
+                    val songList =
+                        parseSongSearchToSongList(context, jsonArray)
 
-                for (song in songList) {
-                    searchResults?.add(
-                        CatalogItem(
-                            song.songId
+                    for (song in songList) {
+                        searchResults?.add(
+                            CatalogItem(
+                                song.songId
+                            )
                         )
-                    )
-                }
+                    }
 
-                synchronized(syncObject) {
-                    syncObject.notify()
-                }
-            }, {
-                searchResults = null
-                synchronized(syncObject) {
-                    syncObject.notify()
-                }
-            })?.let {
-                searchQueue.add(it)
-
-                synchronized(syncObject) {
-                    syncObject.wait()
-
-                    return@BackgroundAsync searchResults
+                    updateProgress(searchResults)
+                }, {
+                    updateProgress(null)
+                })?.let {
+                    searchQueue.add(it)
                 }
             }
         }
 
-        return@BackgroundAsync null
-    }, {
-        if (it != null) {
-            finishedCallback(searchString, skip, it)
-        } else {
-            errorCallback(searchString, skip)
+        override suspend fun publishProgress(value: ArrayList<CatalogItem>?) {
+            if (value != null) {
+                finishedCallback(searchString, skip, value)
+            } else {
+                errorCallback(searchString, skip)
+            }
         }
-    }).execute()
+    }
+
+    backgroundTask.execute()
 }
 
 fun renamePlaylistAsync(
@@ -1047,45 +897,35 @@ fun renamePlaylistAsync(
 
     val contextReference = WeakReference(context)
 
-    BackgroundAsync({
-        contextReference.get()?.let { context ->
-            val newPlaylistVolleyQueue =
-                getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+    val backgroundTask = object : BackgroundTask<Boolean>() {
+        override suspend fun background() {
+            contextReference.get()?.let { context ->
+                val newPlaylistVolleyQueue =
+                    getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
-            var success = true
-            val syncObject = Object()
-
-            newPlaylistVolleyQueue.add(
-                newRenamePlaylistRequest(
-                    context,
-                    playlistId,
-                    playlistName,
-                    {
-                        synchronized(syncObject) {
-                            syncObject.notify()
-                        }
-                    },
-                    {
-                        success = false
-                        synchronized(syncObject) {
-                            syncObject.notify()
-                        }
-                    })
-            )
-
-            synchronized(syncObject) {
-                syncObject.wait()
-
-                return@BackgroundAsync success
+                newPlaylistVolleyQueue.add(
+                    newRenamePlaylistRequest(
+                        context,
+                        playlistId,
+                        playlistName,
+                        {
+                            updateProgress(true)
+                        },
+                        {
+                            updateProgress(false)
+                        })
+                )
             }
         }
 
-        return@BackgroundAsync false
-    }, {
-        if (it == true) {
-            finishedCallback(playlistName, playlistId)
-        } else {
-            errorCallback(playlistName, playlistId)
+        override suspend fun publishProgress(value: Boolean) {
+            if (value) {
+                finishedCallback(playlistName, playlistId)
+            } else {
+                errorCallback(playlistName, playlistId)
+            }
         }
-    }).execute()
+    }
+
+    backgroundTask.execute()
 }

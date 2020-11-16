@@ -16,12 +16,9 @@ class LoadManualPlaylist(
     private val playlistId: String,
     private val finishedCallback: () -> Unit,
     private val errorCallback: () -> Unit
-) : BackgroundTask() {
-    override fun background() {
+) : BackgroundTask<Boolean>() {
+    override suspend fun background() {
         contextReference.get()?.let { context ->
-            var success = true
-            val syncObject = Object()
-
             val getManualPlaylistsRequestQueue = getAuthorizedRequestQueue(
                 context,
                 context.getString(R.string.connectApiHost)
@@ -34,32 +31,15 @@ class LoadManualPlaylist(
                     false
                 )
 
-                synchronized(syncObject) {
-                    syncObject.notify()
-                }
+                updateProgress(true)
             }, {
-                success = false
-                synchronized(syncObject) {
-                    syncObject.notify()
-                }
+                updateProgress(false)
             }))
-
-            synchronized(syncObject) {
-                syncObject.wait()
-
-                updateProgress(arrayOf(success.toString()))
-            }
         }
     }
 
-    override fun publishProgress(values: Array<String>?) {
-        var success = false
-
-        values?.let {
-            success = values[0].toBoolean()
-        }
-
-        if (success) {
+    override suspend fun publishProgress(value: Boolean) {
+        if (value) {
             finishedCallback()
         } else {
             errorCallback()
