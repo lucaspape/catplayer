@@ -2,8 +2,8 @@ package de.lucaspape.monstercat.util
 
 import android.content.Context
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.database.helper.*
-import de.lucaspape.monstercat.database.objects.Song
+import de.lucaspape.monstercat.core.database.helper.*
+import de.lucaspape.monstercat.core.database.objects.Song
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject

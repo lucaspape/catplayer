@@ -3,7 +3,6 @@ package de.lucaspape.monstercat.twitch
 import android.content.Context
 import androidx.core.net.toUri
 import com.android.volley.Request
-import com.android.volley.Response
 import com.android.volley.toolbox.Volley
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.source.hls.HlsMediaSource
@@ -28,7 +27,7 @@ class Stream(private val clientId: String, private val channel: String) {
     ) {
         val accessTokenRequest = TwitchRequest(Request.Method.GET,
             context.getString(R.string.twitchApiUrl) + "channels/$channel/access_token", clientId,
-            Response.Listener { response ->
+            { response ->
                 val jsonObject = JSONObject(response)
 
                 val token = jsonObject.getString("token")
@@ -36,7 +35,7 @@ class Stream(private val clientId: String, private val channel: String) {
 
                 finished(token, sig)
             },
-            Response.ErrorListener { }
+            { }
         )
 
         val volleyQueue = Volley.newRequestQueue(context)
@@ -63,7 +62,7 @@ class Stream(private val clientId: String, private val channel: String) {
 
         val playlistRequest = TwitchRequest(Request.Method.GET,
             context.getString(R.string.twitchPlaylistUrl) + "$channel.m3u8?player=$player&token=$token&sig=$sig&allow_audio_only=$allowAudioOnly&allow_source=$allowSource&type=$type&p=$p",
-            clientId, Response.Listener { response ->
+            clientId, { response ->
                 val lines = response.lines()
 
                 for(line in lines){
@@ -75,7 +74,7 @@ class Stream(private val clientId: String, private val channel: String) {
                         break
                     }
                 }
-            }, Response.ErrorListener {
+            }, {
 
             })
 

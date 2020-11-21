@@ -18,13 +18,13 @@
         tools:ignore="GoogleAppIndexingWarning">
 
         <service
-            android:name=".music.notification.PlayerService"
+            android:name="de.lucaspape.monstercat.core.music.notification.PlayerService"
             android:enabled="true"
             android:exported="false"
             android:stopWithTask="true" />
 
         <service
-            android:name=".download.DownloadService"
+            android:name="de.lucaspape.monstercat.core.download.DownloadService"
             android:enabled="true"
             android:exported="false"
             android:stopWithTask="true" />
@@ -38,7 +38,7 @@
         </service>
 
         <receiver
-            android:name=".music.notification.NotificationIntentReceiver"
+            android:name="de.lucaspape.monstercat.core.music.notification.NotificationIntentReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="de.lucaspape.monstercat.prev" />

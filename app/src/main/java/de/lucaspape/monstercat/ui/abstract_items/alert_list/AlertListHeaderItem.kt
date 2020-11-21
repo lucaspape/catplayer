@@ -9,8 +9,8 @@ import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
 import com.squareup.picasso.Target
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.download.ImageReceiverInterface
-import de.lucaspape.monstercat.download.downloadCoverIntoImageReceiver
+import de.lucaspape.monstercat.core.download.ImageReceiverInterface
+import de.lucaspape.monstercat.core.download.downloadCoverIntoImageReceiver
 
 open class AlertListHeaderItem(private val headerText: String, private val albumId: String) :
     AbstractItem<AlertListHeaderItem.ViewHolder>() {

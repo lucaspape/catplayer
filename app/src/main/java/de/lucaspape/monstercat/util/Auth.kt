@@ -7,6 +7,7 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.widget.EditText
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.core.music.connectSid
 import de.lucaspape.monstercat.request.newCheckLoginRequest
 import de.lucaspape.monstercat.request.newLoginRequest
 import de.lucaspape.monstercat.request.newTwoFaRequest
@@ -54,7 +55,7 @@ class LoggedInStateChangedListener(val run: () -> Unit, val removeOnCalled: Bool
     val listenerId = UUID.randomUUID().toString()
 }
 
-fun getSid(context: Context): String {
+private fun getSid(context: Context): String {
     val cookieJar =
         PersistentCookieJar(SetCookieCache(), SharedPrefsCookiePersistor(context))
 
@@ -181,6 +182,9 @@ class Auth {
 
             if (userId != "null" && userId != "" && username != "null" && username != "") {
                 loggedIn = true
+
+                connectSid = getSid(context)
+
                 loginSuccess()
 
                 runCallbacks()
@@ -209,6 +213,8 @@ class Auth {
         settings.setString(context.getString(R.string.passwordSetting), "")
 
         SharedPrefsCookiePersistor(context).clear()
+        
+        connectSid = ""
 
         runCallbacks()
     }

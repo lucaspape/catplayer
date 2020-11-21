@@ -2,7 +2,6 @@ package de.lucaspape.monstercat.ui.abstract_items.content
 
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
-import android.os.AsyncTask
 import android.view.HapticFeedbackConstants
 import android.view.View
 import android.widget.ImageButton
@@ -13,15 +12,15 @@ import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
 import com.squareup.picasso.Target
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
-import de.lucaspape.monstercat.download.addDownloadSong
-import de.lucaspape.monstercat.download.downloadCoverIntoImageReceiver
+import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
+import de.lucaspape.monstercat.core.download.addDownloadSong
+import de.lucaspape.monstercat.core.download.downloadCoverIntoImageReceiver
 import de.lucaspape.monstercat.ui.handlers.addSongToPlaylist
 import de.lucaspape.monstercat.ui.handlers.deletePlaylistSong
 import de.lucaspape.monstercat.ui.handlers.openAlbum
-import de.lucaspape.monstercat.download.ImageReceiverInterface
-import de.lucaspape.monstercat.download.preDownloadCallbacks
-import de.lucaspape.monstercat.music.prioritySongQueue
+import de.lucaspape.monstercat.core.download.ImageReceiverInterface
+import de.lucaspape.monstercat.core.download.preDownloadCallbacks
+import de.lucaspape.monstercat.core.music.prioritySongQueue
 import de.lucaspape.monstercat.ui.*
 import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListHeaderItem
 import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListItem

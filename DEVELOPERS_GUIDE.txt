@@ -27,7 +27,7 @@ Please look into "java/de.lucaspape.monstercat.auth/Auth.kt"
 All content data is retrieved using ASYNC tasks. These can be found in "java/de.lucaspape.monstercat.request/async“.
 These ASYNC tasks are started by the classes HomeHandler and PlaylistHandler (in ui.handlers).
 
-All song, album and playlist data is stored in SQLite databases and can be found in the "java/de.lucaspape.monstercat.database" package.
+All song, album and playlist data is stored in SQLite databases and can be found in the "java/de.lucaspape.monstercat.core.database" package.
 
 There are also some static files: MusicPlayer.kt, Auth.kt, HandlerUtils.kt, Parser.kt, Util.kt and DownloadHandler.kt.
 The functions of these files are called from multiple classes.

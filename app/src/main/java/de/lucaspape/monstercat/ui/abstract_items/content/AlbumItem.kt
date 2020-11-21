@@ -10,12 +10,12 @@ import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
 import com.squareup.picasso.Target
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.database.helper.AlbumDatabaseHelper
-import de.lucaspape.monstercat.download.downloadCoverIntoImageReceiver
+import de.lucaspape.monstercat.core.database.helper.AlbumDatabaseHelper
+import de.lucaspape.monstercat.core.download.downloadCoverIntoImageReceiver
 import de.lucaspape.monstercat.ui.handlers.downloadAlbum
 import de.lucaspape.monstercat.ui.handlers.openAlbum
 import de.lucaspape.monstercat.ui.handlers.playAlbumNext
-import de.lucaspape.monstercat.download.ImageReceiverInterface
+import de.lucaspape.monstercat.core.download.ImageReceiverInterface
 import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListHeaderItem
 import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListItem
 import de.lucaspape.monstercat.ui.addToQueueDrawable

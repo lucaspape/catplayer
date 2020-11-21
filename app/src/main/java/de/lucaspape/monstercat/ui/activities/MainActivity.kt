@@ -20,15 +20,17 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.download.DownloadService
-import de.lucaspape.monstercat.download.hideDownloadNotification
+import de.lucaspape.monstercat.core.download.DownloadService
+import de.lucaspape.monstercat.core.download.hideDownloadNotification
 import de.lucaspape.util.BackgroundAsync
-import de.lucaspape.monstercat.music.*
-import de.lucaspape.monstercat.music.notification.updateNotification
-import de.lucaspape.monstercat.music.save.PlayerSaveState
-import de.lucaspape.monstercat.music.util.*
-import de.lucaspape.monstercat.music.util.setCover
+import de.lucaspape.monstercat.core.music.*
+import de.lucaspape.monstercat.core.music.notification.updateNotification
+import de.lucaspape.monstercat.core.music.save.PlayerSaveState
+import de.lucaspape.monstercat.core.music.util.*
+import de.lucaspape.monstercat.core.music.util.setCover
 import de.lucaspape.monstercat.request.async.checkCustomApiFeaturesAsync
+import de.lucaspape.monstercat.request.async.loadRelatedTracksAsync
+import de.lucaspape.monstercat.request.async.retrieveTrackIntoDB
 import de.lucaspape.monstercat.ui.*
 import de.lucaspape.monstercat.ui.handlers.*
 import de.lucaspape.monstercat.ui.handlers.home.HomeHandler
@@ -104,8 +106,8 @@ class MainActivity : AppCompatActivity() {
             false
         }
 
-    private fun restoreLastFragment(){
-        when(lastOpenType){
+    private fun restoreLastFragment() {
+        when (lastOpenType) {
             "playlist" -> openPlaylist(lastOpenedPlaylistId, false)
             "album" -> openHome(lastOpenedAlbumId, false)
             "playlist-list" -> openPlaylist(null, false)
@@ -141,7 +143,7 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    private fun openHome(albumMcId:String?, resetPosition:Boolean){
+    private fun openHome(albumMcId: String?, resetPosition: Boolean) {
         lastOpenFragment = "home"
 
         openFragment(
@@ -160,7 +162,7 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    private fun openPlaylist(playlistId:String?, resetPosition: Boolean){
+    private fun openPlaylist(playlistId: String?, resetPosition: Boolean) {
         lastOpenFragment = "playlist"
 
         openFragment(
@@ -468,6 +470,30 @@ class MainActivity : AppCompatActivity() {
         playButtonReference = WeakReference(playButton)
 
         seekBar.setOnTouchListener { _, _ -> true }
+
+        retrieveRelatedSongs = { context, callback ->
+            Settings.getSettings(context)
+                .getBoolean(context.getString(R.string.skipMonstercatSongsSetting))?.let {
+                    loadRelatedTracksAsync(
+                        context, playlist, it,
+                        finishedCallback = { _, relatedIdArray ->
+                            relatedSongQueue = ArrayList()
+
+                            for (songId in relatedIdArray) {
+                                relatedSongQueue.add(songId)
+                            }
+
+                            callback()
+                        },
+                        errorCallback = {
+                            //TODO handle error
+                        })
+                }
+        }
+        
+        retrieveSongIntoDB = {context, songId, callback ->
+            retrieveTrackIntoDB(context, songId, callback, {})
+        }
     }
 
     private fun registerButtonListeners() {
@@ -477,7 +503,8 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<androidx.appcompat.widget.Toolbar>(R.id.musicBar).setOnClickListener {
             startActivity(
-                Intent(applicationContext, PlayerFullscreenActivity::class.java))
+                Intent(applicationContext, PlayerFullscreenActivity::class.java)
+            )
         }
     }
 }

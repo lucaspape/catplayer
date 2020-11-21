@@ -6,7 +6,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ImageButton
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.music.util.playStream
+import de.lucaspape.monstercat.core.music.util.playStream
 import de.lucaspape.monstercat.twitch.Stream
 import de.lucaspape.monstercat.ui.handlers.Handler
 import de.lucaspape.util.CustomSpinnerClass

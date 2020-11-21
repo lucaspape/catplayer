@@ -11,10 +11,10 @@ import com.mikepenz.fastadapter.GenericItem
 import com.mikepenz.fastadapter.adapters.ItemAdapter
 import com.mikepenz.fastadapter.listeners.ClickEventHook
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.database.helper.PlaylistDatabaseHelper
-import de.lucaspape.monstercat.database.helper.PlaylistItemDatabaseHelper
-import de.lucaspape.monstercat.database.helper.SongDatabaseHelper
-import de.lucaspape.monstercat.download.addDownloadSong
+import de.lucaspape.monstercat.core.database.helper.PlaylistDatabaseHelper
+import de.lucaspape.monstercat.core.database.helper.PlaylistItemDatabaseHelper
+import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
+import de.lucaspape.monstercat.core.download.addDownloadSong
 import de.lucaspape.monstercat.request.async.loadPlaylistTracksAsync
 import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
 import de.lucaspape.monstercat.ui.abstract_items.util.HeaderTextItem

@@ -7,7 +7,7 @@ import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.StringRequest
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.database.objects.Song
+import de.lucaspape.monstercat.core.database.objects.Song
 import de.lucaspape.util.Settings
 import org.json.JSONArray
 import org.json.JSONException

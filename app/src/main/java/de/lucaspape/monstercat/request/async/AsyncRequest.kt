@@ -2,8 +2,8 @@ package de.lucaspape.monstercat.request.async
 
 import android.content.Context
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.database.helper.*
-import de.lucaspape.monstercat.database.objects.Song
+import de.lucaspape.monstercat.core.database.helper.*
+import de.lucaspape.monstercat.core.database.objects.Song
 import de.lucaspape.monstercat.request.*
 import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
 import de.lucaspape.monstercat.util.*
@@ -57,7 +57,7 @@ fun addToPlaylistAsync(
     backgroundTask.execute()
 }
 
-fun addTrackToDBAsync(
+fun retrieveTrackIntoDB(
     context: Context,
     trackId: String,
     finishedCallback: (trackId: String, song: Song) -> Unit,
