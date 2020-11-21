@@ -17,7 +17,7 @@ import de.lucaspape.monstercat.request.async.loadAlbumListAsync
 import de.lucaspape.monstercat.ui.abstract_items.content.AlbumItem
 import de.lucaspape.monstercat.ui.abstract_items.util.ProgressItem
 import de.lucaspape.monstercat.ui.activities.lastOpenType
-import de.lucaspape.monstercat.util.displaySnackBar
+import de.lucaspape.monstercat.ui.displaySnackBar
 import de.lucaspape.util.Cache
 import de.lucaspape.util.Settings
 

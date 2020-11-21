@@ -14,13 +14,15 @@ import de.lucaspape.monstercat.core.database.helper.*
 import de.lucaspape.monstercat.core.download.addDownloadSong
 import de.lucaspape.monstercat.core.music.*
 import de.lucaspape.monstercat.core.music.next
+import de.lucaspape.monstercat.core.util.parseAlbumSongToDB
+import de.lucaspape.monstercat.core.util.parseAlbumToDB
 import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListItem
 import de.lucaspape.monstercat.ui.abstract_items.util.HeaderTextItem
 import de.lucaspape.monstercat.request.async.*
+import de.lucaspape.monstercat.request.getAuthorizedRequestQueue
 import de.lucaspape.monstercat.request.newLoadAlbumRequest
+import de.lucaspape.monstercat.ui.*
 import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
-import de.lucaspape.monstercat.ui.addPlaylistDrawable
-import de.lucaspape.monstercat.ui.createPlaylistDrawable
 import de.lucaspape.monstercat.ui.handlers.home.HomeHandler
 import de.lucaspape.monstercat.util.*
 import de.lucaspape.util.BackgroundAsync

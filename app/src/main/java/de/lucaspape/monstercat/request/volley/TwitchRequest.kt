@@ -1,4 +1,4 @@
-package de.lucaspape.monstercat.request
+package de.lucaspape.monstercat.request.volley
 
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest

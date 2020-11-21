@@ -1,5 +1,6 @@
 package de.lucaspape.monstercat.core.music
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -7,6 +8,11 @@ import android.content.IntentFilter
 import android.media.AudioManager
 import android.media.session.MediaSession
 import android.support.v4.media.session.MediaSessionCompat
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.SeekBar
+import android.widget.TextView
+import androidx.appcompat.widget.Toolbar
 import com.google.android.exoplayer2.SimpleExoPlayer
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
@@ -16,6 +22,7 @@ import de.lucaspape.monstercat.core.music.notification.stopPlayerService
 import de.lucaspape.monstercat.core.music.save.PlayerSaveState
 import de.lucaspape.monstercat.core.music.util.*
 import de.lucaspape.monstercat.core.music.util.playSong
+import de.lucaspape.monstercat.request.StreamInfoUpdateAsync
 import de.lucaspape.monstercat.twitch.Stream
 import de.lucaspape.util.Settings
 import java.lang.ref.WeakReference
@@ -88,6 +95,33 @@ var retrieveRelatedSongs: (context: Context, callback: () -> Unit) -> Unit =
 
 var retrieveSongIntoDB: (context: Context, songId: String, callback: (trackId: String, song: Song) -> Unit) -> Unit =
     { _, _, _ -> }
+
+var displayInfo: (context:Context, msg:String) -> Unit = {_,_->}
+
+@SuppressLint("ClickableViewAccessibility")
+fun setupMusicPlayer(
+    currentSong: TextView,
+    coverBarImageView: ImageView,
+    musicToolBar: Toolbar,
+    playButton: ImageButton,
+    seekBar: SeekBar,
+    sRetrieveRelatedSongs: (context: Context, callback: () -> Unit) -> Unit,
+    sRetrieveSongIntoDB: (context: Context, songId: String, callback: (trackId: String, song: Song) -> Unit) -> Unit,
+    sDisplayInfo: (context:Context, msg:String) -> Unit
+) {
+    textViewReference = WeakReference(currentSong)
+    barCoverImageReference = WeakReference(coverBarImageView)
+    musicBarReference = WeakReference(musicToolBar)
+    playButtonReference = WeakReference(playButton)
+
+    seekBar.setOnTouchListener { _, _ -> true }
+
+    seekBarReference = WeakReference(seekBar)
+
+    retrieveRelatedSongs = sRetrieveRelatedSongs
+    retrieveSongIntoDB = sRetrieveSongIntoDB
+    displayInfo = sDisplayInfo
+}
 
 /**
  * Listener for audioFocusChange

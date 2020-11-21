@@ -10,8 +10,9 @@ import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.core.music.*
 import de.lucaspape.monstercat.core.music.notification.startPlayerService
 import de.lucaspape.monstercat.core.music.notification.updateNotification
+import de.lucaspape.monstercat.core.util.wifiConnected
+import de.lucaspape.monstercat.request.StreamInfoUpdateAsync
 import de.lucaspape.monstercat.twitch.Stream
-import de.lucaspape.monstercat.util.*
 import de.lucaspape.util.Settings
 import java.util.*
 import kotlin.math.log

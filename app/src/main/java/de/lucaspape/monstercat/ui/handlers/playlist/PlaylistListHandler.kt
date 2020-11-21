@@ -18,10 +18,10 @@ import de.lucaspape.monstercat.ui.abstract_items.util.HeaderTextItem
 import de.lucaspape.monstercat.ui.abstract_items.content.PlaylistItem
 import de.lucaspape.monstercat.ui.activities.lastOpenType
 import de.lucaspape.monstercat.ui.activities.lastOpenedPlaylistId
+import de.lucaspape.monstercat.ui.displaySnackBar
 import de.lucaspape.monstercat.ui.handlers.deleteDownloadedPlaylistTracks
 import de.lucaspape.monstercat.ui.handlers.downloadPlaylistAsync
 import de.lucaspape.monstercat.ui.offlineDrawable
-import de.lucaspape.monstercat.util.displaySnackBar
 import de.lucaspape.util.Cache
 import de.lucaspape.util.Settings
 

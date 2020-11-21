@@ -1,7 +1,7 @@
 package de.lucaspape.monstercat.ui.activities
 
 import android.Manifest
-import android.annotation.SuppressLint
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -28,6 +28,7 @@ import de.lucaspape.monstercat.core.music.notification.updateNotification
 import de.lucaspape.monstercat.core.music.save.PlayerSaveState
 import de.lucaspape.monstercat.core.music.util.*
 import de.lucaspape.monstercat.core.music.util.setCover
+import de.lucaspape.monstercat.core.util.downloadFile
 import de.lucaspape.monstercat.request.async.checkCustomApiFeaturesAsync
 import de.lucaspape.monstercat.request.async.loadRelatedTracksAsync
 import de.lucaspape.monstercat.request.async.retrieveTrackIntoDB
@@ -40,7 +41,6 @@ import de.lucaspape.util.Settings
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
-import java.lang.ref.WeakReference
 
 val noisyReceiver = NoisyReceiver()
 var downloadServiceIntent: Intent? = null
@@ -279,7 +279,36 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
-        setupMusicPlayer()
+        setupMusicPlayer(findViewById(R.id.songCurrentText),
+            findViewById(R.id.barCoverImage),
+            findViewById(R.id.musicBar),
+            findViewById(R.id.playButton),
+            findViewById(R.id.seekBar),
+            { context, callback ->
+                Settings.getSettings(context)
+                    .getBoolean(context.getString(R.string.skipMonstercatSongsSetting))?.let {
+                        loadRelatedTracksAsync(
+                            context, playlist, it,
+                            finishedCallback = { _, relatedIdArray ->
+                                relatedSongQueue = ArrayList()
+
+                                for (songId in relatedIdArray) {
+                                    relatedSongQueue.add(songId)
+                                }
+
+                                callback()
+                            },
+                            errorCallback = {
+                                //TODO handle error
+                            })
+                    }
+            },
+            { context, songId, callback ->
+                retrieveTrackIntoDB(context, songId, callback, {})
+            },
+            { context: Context, msg: String ->
+                displayInfo(context, msg)
+            })
 
         //create the MusicPlayer.kt mediasession
         createMediaSession(this)
@@ -450,50 +479,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         fragmentBackPressedCallback()
-    }
-
-    /**
-     * Set the correct views for the MusicPlayer.kt
-     */
-    @SuppressLint("ClickableViewAccessibility")
-    private fun setupMusicPlayer() {
-        val textView = findViewById<TextView>(R.id.songCurrentText)
-        val coverBarImageView = findViewById<ImageView>(R.id.barCoverImage)
-        val musicToolBar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.musicBar)
-        val playButton = findViewById<ImageButton>(R.id.playButton)
-        val seekBar = findViewById<SeekBar>(R.id.seekBar)
-
-        textViewReference = WeakReference(textView)
-        musicBarReference = WeakReference(musicToolBar)
-        seekBarReference = WeakReference(seekBar)
-        barCoverImageReference = WeakReference(coverBarImageView)
-        playButtonReference = WeakReference(playButton)
-
-        seekBar.setOnTouchListener { _, _ -> true }
-
-        retrieveRelatedSongs = { context, callback ->
-            Settings.getSettings(context)
-                .getBoolean(context.getString(R.string.skipMonstercatSongsSetting))?.let {
-                    loadRelatedTracksAsync(
-                        context, playlist, it,
-                        finishedCallback = { _, relatedIdArray ->
-                            relatedSongQueue = ArrayList()
-
-                            for (songId in relatedIdArray) {
-                                relatedSongQueue.add(songId)
-                            }
-
-                            callback()
-                        },
-                        errorCallback = {
-                            //TODO handle error
-                        })
-                }
-        }
-        
-        retrieveSongIntoDB = {context, songId, callback ->
-            retrieveTrackIntoDB(context, songId, callback, {})
-        }
     }
 
     private fun registerButtonListeners() {

@@ -4,7 +4,9 @@ import android.content.Context
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.core.music.connectSid
-import de.lucaspape.monstercat.util.*
+import de.lucaspape.monstercat.core.music.displayInfo
+import de.lucaspape.monstercat.core.util.downloadFile
+import de.lucaspape.monstercat.core.util.wifiConnected
 import de.lucaspape.util.BackgroundService
 import de.lucaspape.util.Settings
 import java.io.File

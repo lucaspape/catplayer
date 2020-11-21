@@ -7,10 +7,10 @@ import android.graphics.drawable.Drawable
 import com.squareup.picasso.Picasso
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.download.DownloadService.Companion.downloadTask
+import de.lucaspape.monstercat.core.util.wifiConnected
 import de.lucaspape.monstercat.ui.fallbackFile
 import de.lucaspape.monstercat.ui.fallbackFileLow
 import de.lucaspape.util.Settings
-import de.lucaspape.monstercat.util.wifiConnected
 import de.lucaspape.util.BackgroundAsync
 import java.io.File
 import java.io.FileOutputStream

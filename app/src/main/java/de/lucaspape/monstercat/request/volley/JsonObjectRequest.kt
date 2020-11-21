@@ -1,4 +1,4 @@
-package de.lucaspape.monstercat.request
+package de.lucaspape.monstercat.request.volley
 
 import com.android.volley.NetworkResponse
 import com.android.volley.ParseError

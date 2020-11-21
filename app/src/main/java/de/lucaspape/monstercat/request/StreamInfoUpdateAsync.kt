@@ -1,12 +1,14 @@
-package de.lucaspape.monstercat.core.music.util
+package de.lucaspape.monstercat.request
 
 import android.content.Context
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.core.music.notification.updateNotification
-import de.lucaspape.monstercat.request.newLiveInfoRequest
-import de.lucaspape.monstercat.util.getAuthorizedRequestQueue
-import de.lucaspape.monstercat.util.parseSongToDB
+import de.lucaspape.monstercat.core.music.util.artist
+import de.lucaspape.monstercat.core.music.util.setCover
+import de.lucaspape.monstercat.core.music.util.setCustomCover
+import de.lucaspape.monstercat.core.music.util.title
+import de.lucaspape.monstercat.core.util.parseSongToDB
 import de.lucaspape.util.BackgroundService
 import de.lucaspape.util.Settings
 import org.json.JSONException

@@ -3,8 +3,8 @@ package de.lucaspape.monstercat.request.async
 import android.content.Context
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.request.newLoadPlaylistRequest
-import de.lucaspape.monstercat.util.getAuthorizedRequestQueue
-import de.lucaspape.monstercat.util.parsePlaylistToDB
+import de.lucaspape.monstercat.core.util.parsePlaylistToDB
+import de.lucaspape.monstercat.request.getAuthorizedRequestQueue
 import de.lucaspape.util.BackgroundTask
 
 /**

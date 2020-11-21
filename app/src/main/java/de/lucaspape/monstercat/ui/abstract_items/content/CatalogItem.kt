@@ -25,7 +25,6 @@ import de.lucaspape.monstercat.ui.*
 import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListHeaderItem
 import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListItem
 import de.lucaspape.util.BackgroundAsync
-import de.lucaspape.monstercat.util.displayAlertDialogList
 
 open class CatalogItem(
     val songId: String

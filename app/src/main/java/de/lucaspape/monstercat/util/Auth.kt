@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.widget.EditText
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.music.connectSid
+import de.lucaspape.monstercat.request.getAuthorizedRequestQueue
 import de.lucaspape.monstercat.request.newCheckLoginRequest
 import de.lucaspape.monstercat.request.newLoginRequest
 import de.lucaspape.monstercat.request.newTwoFaRequest

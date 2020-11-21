@@ -25,10 +25,10 @@ import de.lucaspape.monstercat.request.async.loadAlbumAsync
 import de.lucaspape.monstercat.request.async.loadSongListAsync
 import de.lucaspape.monstercat.ui.activities.lastOpenType
 import de.lucaspape.monstercat.ui.activities.lastOpenedAlbumId
+import de.lucaspape.monstercat.ui.displaySnackBar
 import de.lucaspape.monstercat.ui.handlers.loadAlbumTracks
 import de.lucaspape.monstercat.ui.handlers.playSongsFromCatalogDbAsync
 import de.lucaspape.monstercat.ui.handlers.playSongsFromViewDataAsync
-import de.lucaspape.monstercat.util.displaySnackBar
 import de.lucaspape.util.Cache
 import de.lucaspape.util.Settings
 import java.io.File
