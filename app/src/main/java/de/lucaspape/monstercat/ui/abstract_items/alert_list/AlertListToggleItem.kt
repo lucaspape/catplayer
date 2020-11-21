@@ -2,8 +2,8 @@ package de.lucaspape.monstercat.ui.abstract_items.alert_list
 
 import android.view.View
 import android.widget.ImageView
-import android.widget.Switch
 import androidx.core.net.toUri
+import com.google.android.material.switchmaterial.SwitchMaterial
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
 import de.lucaspape.monstercat.R
@@ -21,7 +21,7 @@ class AlertListToggleItem(val itemText:String, val itemDrawable:String?, val ena
     }
 
     class ViewHolder(view:View): FastAdapter.ViewHolder<AlertListToggleItem>(view){
-        val alertItemSwitch: Switch = view.findViewById(R.id.alertItemSwitch)
+        val alertItemSwitch: SwitchMaterial = view.findViewById(R.id.alertItemSwitch)
         private val alertItemImage: ImageView = view.findViewById(R.id.alertItemImage)
 
         override fun bindView(item: AlertListToggleItem, payloads: List<Any>) {
