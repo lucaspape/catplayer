@@ -4,12 +4,11 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.ui.activities.MainActivity
+import de.lucaspape.monstercat.core.music.openMainActivityIntent
 
 private const val downloadNotificationID = 2
 
@@ -21,10 +20,9 @@ internal fun showDownloadNotification(
     context: Context
 ) {
     createDownloadNotificationChannel(context)
-
-    val openActivityIntent = Intent(context, MainActivity::class.java)
+    
     val openActivityPendingIntent =
-        PendingIntent.getActivity(context, 0, openActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        PendingIntent.getActivity(context, 0, openMainActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
     val notificationBuilder = NotificationCompat.Builder(
         context,

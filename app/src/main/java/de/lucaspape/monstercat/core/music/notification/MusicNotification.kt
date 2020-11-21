@@ -11,7 +11,6 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
-import de.lucaspape.monstercat.ui.activities.MainActivity
 import de.lucaspape.monstercat.core.music.*
 import java.lang.IllegalArgumentException
 
@@ -125,12 +124,11 @@ internal fun createPlayerNotification(
         R.drawable.ic_close_black_24dp,
         CLOSE_ACTION, closePendingIntent
     ).build()
-
-    val openActivityIntent = Intent(context, MainActivity::class.java)
+    
     val openActivityPendingIntent = PendingIntent.getActivity(
         context,
         0,
-        openActivityIntent,
+        openMainActivityIntent,
         PendingIntent.FLAG_UPDATE_CURRENT
     )
 

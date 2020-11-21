@@ -98,6 +98,8 @@ var retrieveSongIntoDB: (context: Context, songId: String, callback: (trackId: S
 
 var displayInfo: (context:Context, msg:String) -> Unit = {_,_->}
 
+var openMainActivityIntent = Intent()
+
 var liveSongId = ""
 var fallbackTitle = ""
 var fallbackArtist = ""
@@ -114,7 +116,8 @@ fun setupMusicPlayer(
     sRetrieveRelatedSongs: (context: Context, callback: () -> Unit) -> Unit,
     sRetrieveSongIntoDB: (context: Context, songId: String, callback: (trackId: String, song: Song) -> Unit) -> Unit,
     sDisplayInfo: (context:Context, msg:String) -> Unit,
-    sStreamInfoUpdateAsync: BackgroundService
+    sStreamInfoUpdateAsync: BackgroundService,
+    sOpenMainActivityIntent: Intent
 ) {
     textViewReference = WeakReference(currentSong)
     barCoverImageReference = WeakReference(coverBarImageView)
@@ -129,6 +132,7 @@ fun setupMusicPlayer(
     retrieveSongIntoDB = sRetrieveSongIntoDB
     displayInfo = sDisplayInfo
     streamInfoUpdateAsync = sStreamInfoUpdateAsync
+    openMainActivityIntent = sOpenMainActivityIntent
 }
 
 /**

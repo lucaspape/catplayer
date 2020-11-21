@@ -310,7 +310,8 @@ class MainActivity : AppCompatActivity() {
             },
             { context: Context, msg: String ->
                 displayInfo(context, msg)
-            }, StreamInfoUpdateAsync(this))
+            }, StreamInfoUpdateAsync(this),
+            Intent(this, MainActivity::class.java))
 
         //create the MusicPlayer.kt mediasession
         createMediaSession(this)
