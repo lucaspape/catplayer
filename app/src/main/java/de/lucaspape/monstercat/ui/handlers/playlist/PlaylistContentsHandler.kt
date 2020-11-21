@@ -23,7 +23,7 @@ import de.lucaspape.monstercat.ui.activities.lastOpenedPlaylistId
 import de.lucaspape.monstercat.ui.displaySnackBar
 import de.lucaspape.monstercat.ui.handlers.playSongsFromViewDataAsync
 import de.lucaspape.util.Cache
-import de.lucaspape.util.Settings
+import de.lucaspape.monstercat.core.util.Settings
 import java.io.File
 
 class PlaylistContentsHandler(private val playlistId: String) : PlaylistHandlerInterface {

@@ -19,7 +19,7 @@ import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
 import de.lucaspape.monstercat.ui.abstract_items.util.HeaderTextItem
 import de.lucaspape.monstercat.ui.abstract_items.util.ProgressItem
 import de.lucaspape.monstercat.ui.displaySnackBar
-import de.lucaspape.util.Settings
+import de.lucaspape.monstercat.core.util.Settings
 import java.io.File
 import kotlin.collections.ArrayList
 

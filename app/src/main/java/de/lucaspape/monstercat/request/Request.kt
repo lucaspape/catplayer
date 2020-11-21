@@ -8,8 +8,7 @@ import com.android.volley.VolleyError
 import com.android.volley.toolbox.StringRequest
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.objects.Song
-import de.lucaspape.monstercat.request.volley.JsonObjectRequest
-import de.lucaspape.util.Settings
+import de.lucaspape.monstercat.core.util.Settings
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject

@@ -10,8 +10,7 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.music.*
 import de.lucaspape.monstercat.core.music.notification.startPlayerService
 import de.lucaspape.monstercat.core.music.notification.updateNotification
-import de.lucaspape.monstercat.request.StreamInfoUpdateAsync
-import de.lucaspape.util.Settings
+import de.lucaspape.monstercat.core.util.Settings
 import java.lang.ref.WeakReference
 import java.util.*
 
@@ -83,11 +82,11 @@ fun getStreamPlayerListener(context: Context): Player.EventListener {
 
                 setCover(
                     context,
-                    StreamInfoUpdateAsync.liveSongId
+                    liveSongId
                 ) { bitmap ->
                     updateNotification(
                         context,
-                        StreamInfoUpdateAsync.liveSongId,
+                        liveSongId,
                         bitmap
                     )
                 }

@@ -3,35 +3,20 @@ package de.lucaspape.monstercat.request
 import android.content.Context
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
+import de.lucaspape.monstercat.core.music.*
 import de.lucaspape.monstercat.core.music.notification.updateNotification
 import de.lucaspape.monstercat.core.music.util.artist
 import de.lucaspape.monstercat.core.music.util.setCover
 import de.lucaspape.monstercat.core.music.util.setCustomCover
 import de.lucaspape.monstercat.core.music.util.title
 import de.lucaspape.monstercat.core.util.parseSongToDB
-import de.lucaspape.util.BackgroundService
-import de.lucaspape.util.Settings
+import de.lucaspape.monstercat.core.music.util.BackgroundService
+import de.lucaspape.monstercat.core.util.Settings
 import org.json.JSONException
 
 class StreamInfoUpdateAsync(
     private val context: Context
 ) : BackgroundService(500) {
-    companion object {
-        @JvmStatic
-        var liveSongId = ""
-
-        @JvmStatic
-        var fallbackTitle = ""
-
-        @JvmStatic
-        var fallbackArtist = ""
-
-        @JvmStatic
-        var fallbackVersion = ""
-
-        @JvmStatic
-        var fallbackCoverUrl = ""
-    }
 
     override fun background(): Boolean {
         val settings = Settings.getSettings(context)

@@ -23,7 +23,7 @@ import de.lucaspape.monstercat.ui.handlers.deleteDownloadedPlaylistTracks
 import de.lucaspape.monstercat.ui.handlers.downloadPlaylistAsync
 import de.lucaspape.monstercat.ui.offlineDrawable
 import de.lucaspape.util.Cache
-import de.lucaspape.util.Settings
+import de.lucaspape.monstercat.core.util.Settings
 
 class PlaylistListHandler(private val loadPlaylist: (playlistId: String) -> Unit) :
     PlaylistHandlerInterface {

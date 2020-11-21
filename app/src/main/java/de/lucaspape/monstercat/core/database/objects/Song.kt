@@ -14,7 +14,7 @@ import de.lucaspape.monstercat.core.util.wifiConnected
 import de.lucaspape.monstercat.ui.downloadDrawable
 import de.lucaspape.monstercat.ui.emptyDrawable
 import de.lucaspape.monstercat.ui.offlineDrawable
-import de.lucaspape.util.Settings
+import de.lucaspape.monstercat.core.util.Settings
 import java.io.File
 
 data class Song(

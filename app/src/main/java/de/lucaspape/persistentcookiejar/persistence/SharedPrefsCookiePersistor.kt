@@ -3,7 +3,7 @@ package de.lucaspape.persistentcookiejar.persistence
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
-import de.lucaspape.util.Settings
+import de.lucaspape.monstercat.core.util.Settings
 import okhttp3.Cookie
 import java.util.*
 

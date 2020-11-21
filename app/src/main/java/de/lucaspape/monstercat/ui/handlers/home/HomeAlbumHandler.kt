@@ -19,7 +19,7 @@ import de.lucaspape.monstercat.ui.abstract_items.util.ProgressItem
 import de.lucaspape.monstercat.ui.activities.lastOpenType
 import de.lucaspape.monstercat.ui.displaySnackBar
 import de.lucaspape.util.Cache
-import de.lucaspape.util.Settings
+import de.lucaspape.monstercat.core.util.Settings
 
 class HomeAlbumHandler(private val onSingleAlbumLoad: (albumId: String, albumMcId: String) -> Unit) :
     HomeHandlerInterface {

@@ -7,9 +7,8 @@ import de.lucaspape.monstercat.core.database.objects.Song
 import de.lucaspape.monstercat.core.util.*
 import de.lucaspape.monstercat.request.*
 import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
-import de.lucaspape.monstercat.util.*
 import de.lucaspape.util.BackgroundTask
-import de.lucaspape.util.Settings
+import de.lucaspape.monstercat.core.util.Settings
 import org.json.JSONException
 import org.json.JSONObject
 import java.lang.IndexOutOfBoundsException

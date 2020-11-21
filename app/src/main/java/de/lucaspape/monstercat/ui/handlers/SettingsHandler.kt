@@ -37,7 +37,7 @@ import de.lucaspape.monstercat.ui.displayAlertDialogToggleList
 import de.lucaspape.monstercat.ui.displayInfo
 import de.lucaspape.monstercat.ui.displaySnackBar
 import de.lucaspape.monstercat.util.*
-import de.lucaspape.util.Settings
+import de.lucaspape.monstercat.core.util.Settings
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject

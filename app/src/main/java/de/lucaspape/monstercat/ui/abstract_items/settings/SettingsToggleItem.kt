@@ -6,7 +6,7 @@ import com.google.android.material.switchmaterial.SwitchMaterial
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
 import de.lucaspape.monstercat.R
-import de.lucaspape.util.Settings
+import de.lucaspape.monstercat.core.util.Settings
 
 class SettingsToggleItem(
     val setting: String,

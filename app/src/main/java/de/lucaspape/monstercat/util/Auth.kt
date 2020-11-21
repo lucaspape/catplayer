@@ -15,7 +15,7 @@ import de.lucaspape.monstercat.request.newTwoFaRequest
 import de.lucaspape.persistentcookiejar.PersistentCookieJar
 import de.lucaspape.persistentcookiejar.cache.SetCookieCache
 import de.lucaspape.persistentcookiejar.persistence.SharedPrefsCookiePersistor
-import de.lucaspape.util.Settings
+import de.lucaspape.monstercat.core.util.Settings
 import okhttp3.HttpUrl
 import org.json.JSONException
 import java.util.*

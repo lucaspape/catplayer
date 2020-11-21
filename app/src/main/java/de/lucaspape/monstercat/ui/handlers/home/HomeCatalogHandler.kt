@@ -30,7 +30,7 @@ import de.lucaspape.monstercat.ui.handlers.loadAlbumTracks
 import de.lucaspape.monstercat.ui.handlers.playSongsFromCatalogDbAsync
 import de.lucaspape.monstercat.ui.handlers.playSongsFromViewDataAsync
 import de.lucaspape.util.Cache
-import de.lucaspape.util.Settings
+import de.lucaspape.monstercat.core.util.Settings
 import java.io.File
 
 class HomeCatalogHandler(

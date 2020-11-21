@@ -10,7 +10,7 @@ import de.lucaspape.monstercat.core.download.DownloadService.Companion.downloadT
 import de.lucaspape.monstercat.core.util.wifiConnected
 import de.lucaspape.monstercat.ui.fallbackFile
 import de.lucaspape.monstercat.ui.fallbackFileLow
-import de.lucaspape.util.Settings
+import de.lucaspape.monstercat.core.util.Settings
 import de.lucaspape.util.BackgroundAsync
 import java.io.File
 import java.io.FileOutputStream

@@ -29,6 +29,7 @@ import de.lucaspape.monstercat.core.music.save.PlayerSaveState
 import de.lucaspape.monstercat.core.music.util.*
 import de.lucaspape.monstercat.core.music.util.setCover
 import de.lucaspape.monstercat.core.util.downloadFile
+import de.lucaspape.monstercat.request.StreamInfoUpdateAsync
 import de.lucaspape.monstercat.request.async.checkCustomApiFeaturesAsync
 import de.lucaspape.monstercat.request.async.loadRelatedTracksAsync
 import de.lucaspape.monstercat.request.async.retrieveTrackIntoDB
@@ -37,7 +38,7 @@ import de.lucaspape.monstercat.ui.handlers.*
 import de.lucaspape.monstercat.ui.handlers.home.HomeHandler
 import de.lucaspape.monstercat.ui.handlers.playlist.PlaylistHandler
 import de.lucaspape.monstercat.util.*
-import de.lucaspape.util.Settings
+import de.lucaspape.monstercat.core.util.Settings
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
@@ -308,7 +309,7 @@ class MainActivity : AppCompatActivity() {
             },
             { context: Context, msg: String ->
                 displayInfo(context, msg)
-            })
+            }, StreamInfoUpdateAsync(this))
 
         //create the MusicPlayer.kt mediasession
         createMediaSession(this)

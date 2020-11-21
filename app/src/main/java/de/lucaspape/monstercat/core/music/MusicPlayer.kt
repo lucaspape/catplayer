@@ -22,9 +22,9 @@ import de.lucaspape.monstercat.core.music.notification.stopPlayerService
 import de.lucaspape.monstercat.core.music.save.PlayerSaveState
 import de.lucaspape.monstercat.core.music.util.*
 import de.lucaspape.monstercat.core.music.util.playSong
-import de.lucaspape.monstercat.request.StreamInfoUpdateAsync
-import de.lucaspape.monstercat.twitch.Stream
-import de.lucaspape.util.Settings
+import de.lucaspape.monstercat.core.twitch.Stream
+import de.lucaspape.monstercat.core.music.util.BackgroundService
+import de.lucaspape.monstercat.core.util.Settings
 import java.lang.ref.WeakReference
 import kotlin.random.Random
 
@@ -86,7 +86,7 @@ var mediaSession: MediaSessionCompat? = null
 private var sessionCreated = false
 
 //updater which updates information about playing livestream (title, artist, coverImage)
-internal var streamInfoUpdateAsync: StreamInfoUpdateAsync? = null
+internal var streamInfoUpdateAsync: BackgroundService? = null
 
 var connectSid = ""
 
@@ -98,6 +98,12 @@ var retrieveSongIntoDB: (context: Context, songId: String, callback: (trackId: S
 
 var displayInfo: (context:Context, msg:String) -> Unit = {_,_->}
 
+var liveSongId = ""
+var fallbackTitle = ""
+var fallbackArtist = ""
+var fallbackVersion = ""
+var fallbackCoverUrl = ""
+
 @SuppressLint("ClickableViewAccessibility")
 fun setupMusicPlayer(
     currentSong: TextView,
@@ -107,7 +113,8 @@ fun setupMusicPlayer(
     seekBar: SeekBar,
     sRetrieveRelatedSongs: (context: Context, callback: () -> Unit) -> Unit,
     sRetrieveSongIntoDB: (context: Context, songId: String, callback: (trackId: String, song: Song) -> Unit) -> Unit,
-    sDisplayInfo: (context:Context, msg:String) -> Unit
+    sDisplayInfo: (context:Context, msg:String) -> Unit,
+    sStreamInfoUpdateAsync: BackgroundService
 ) {
     textViewReference = WeakReference(currentSong)
     barCoverImageReference = WeakReference(coverBarImageView)
@@ -121,6 +128,7 @@ fun setupMusicPlayer(
     retrieveRelatedSongs = sRetrieveRelatedSongs
     retrieveSongIntoDB = sRetrieveSongIntoDB
     displayInfo = sDisplayInfo
+    streamInfoUpdateAsync = sStreamInfoUpdateAsync
 }
 
 /**
@@ -509,7 +517,7 @@ val currentSongId: String
     get() {
         return when {
             streamInfoUpdateAsync?.active == true -> {
-                StreamInfoUpdateAsync.liveSongId
+                liveSongId
             }
             playlist.size > playlistIndex && playlistIndex >= 0 -> {
                 playlist[playlistIndex]

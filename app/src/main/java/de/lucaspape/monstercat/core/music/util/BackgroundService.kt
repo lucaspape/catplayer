@@ -1,4 +1,4 @@
-package de.lucaspape.util
+package de.lucaspape.monstercat.core.music.util
 
 import kotlinx.coroutines.*
 
