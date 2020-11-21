@@ -27,7 +27,13 @@ internal var downloadedSongs = 0
 
 internal val bitmapCache = HashMap<String, SoftReference<Bitmap?>>()
 
+internal val preDownloadCallbacks = HashMap<String, ()->Unit>()
+
 fun addDownloadSong(context: Context, songId: String, downloadFinished: () -> Unit) {
+    preDownloadCallbacks[songId]?.let {
+        it()
+    }
+
     downloadList.add(SoftReference(DownloadObject(songId, downloadFinished)))
 
     if (downloadTask?.active != true) {

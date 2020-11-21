@@ -31,6 +31,7 @@ const val DRAWABLE_URI = "android.resource://de.lucaspape.monstercat/drawable"
 
 var offlineDrawable = "$DRAWABLE_URI/ic_offline_pin_24dp"
 var downloadDrawable = "$DRAWABLE_URI/ic_file_download_24dp"
+var downloadingDrawable = "$DRAWABLE_URI/ic_baseline_sync_24"
 var addToQueueDrawable = "$DRAWABLE_URI/ic_playlist_play_24"
 var shareDrawable = "$DRAWABLE_URI/drawable/ic_share_24dp"
 var openInAppDrawable = "$DRAWABLE_URI/ic_open_in_new_24dp"
@@ -50,6 +51,7 @@ private const val offlineDrawableBlack =
     "$DRAWABLE_URI/ic_offline_pin_black_24dp"
 private const val downloadDrawableBlack =
     "$DRAWABLE_URI/ic_file_download_black_24dp"
+private const val downloadingDrawableBlack = "$DRAWABLE_URI/ic_baseline_sync_black_24"
 private const val addToQueueDrawableBlack =
     "$DRAWABLE_URI/ic_playlist_play_black_24"
 private const val shareDrawableBlack =
@@ -81,6 +83,7 @@ private const val offlineDrawableWhite =
     "$DRAWABLE_URI/ic_offline_pin_white_24dp"
 private const val downloadDrawableWhite =
     "$DRAWABLE_URI/ic_file_download_white_24dp"
+private const val downloadingDrawableWhite = "$DRAWABLE_URI/ic_baseline_sync_white_24"
 private const val addToQueueDrawableWhite =
     "$DRAWABLE_URI/ic_playlist_play_white_24"
 private const val shareDrawableWhite =
@@ -113,6 +116,7 @@ fun switchDrawablesToWhite() {
         offlineDrawableWhite
     downloadDrawable =
         downloadDrawableWhite
+    downloadingDrawable = downloadingDrawableWhite
     addToQueueDrawable =
         addToQueueDrawableWhite
     shareDrawable =
@@ -145,6 +149,7 @@ fun switchDrawablesToBlack() {
         offlineDrawableBlack
     downloadDrawable =
         downloadDrawableBlack
+    downloadingDrawable = downloadingDrawableBlack
     addToQueueDrawable =
         addToQueueDrawableBlack
     shareDrawable =

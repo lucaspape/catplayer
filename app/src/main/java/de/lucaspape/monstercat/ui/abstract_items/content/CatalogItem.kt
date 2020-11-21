@@ -20,6 +20,7 @@ import de.lucaspape.monstercat.ui.handlers.addSongToPlaylist
 import de.lucaspape.monstercat.ui.handlers.deletePlaylistSong
 import de.lucaspape.monstercat.ui.handlers.openAlbum
 import de.lucaspape.monstercat.download.ImageReceiverInterface
+import de.lucaspape.monstercat.download.preDownloadCallbacks
 import de.lucaspape.monstercat.music.prioritySongQueue
 import de.lucaspape.monstercat.ui.*
 import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListHeaderItem
@@ -231,6 +232,10 @@ open class CatalogItem(
                     downloadDrawable.toUri()
 
                 titleDownloadButton.setImageURI(downloadStatus)
+                
+                preDownloadCallbacks[song.songId] = {
+                    titleDownloadButton.setImageURI(downloadingDrawable.toUri())
+                }
 
                 BackgroundAsync({
                     downloadStatus = song.downloadStatus
