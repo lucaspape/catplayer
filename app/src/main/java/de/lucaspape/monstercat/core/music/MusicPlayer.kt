@@ -1,6 +1,5 @@
 package de.lucaspape.monstercat.core.music
 
-import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -8,11 +7,6 @@ import android.content.IntentFilter
 import android.media.AudioManager
 import android.media.session.MediaSession
 import android.support.v4.media.session.MediaSessionCompat
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.SeekBar
-import android.widget.TextView
-import androidx.appcompat.widget.Toolbar
 import com.google.android.exoplayer2.SimpleExoPlayer
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
@@ -106,28 +100,13 @@ var fallbackArtist = ""
 var fallbackVersion = ""
 var fallbackCoverUrl = ""
 
-@SuppressLint("ClickableViewAccessibility")
 fun setupMusicPlayer(
-    currentSong: TextView,
-    coverBarImageView: ImageView,
-    musicToolBar: Toolbar,
-    playButton: ImageButton,
-    seekBar: SeekBar,
     sRetrieveRelatedSongs: (context: Context, callback: () -> Unit) -> Unit,
     sRetrieveSongIntoDB: (context: Context, songId: String, callback: (trackId: String, song: Song) -> Unit) -> Unit,
     sDisplayInfo: (context:Context, msg:String) -> Unit,
     sStreamInfoUpdateAsync: BackgroundService,
     sOpenMainActivityIntent: Intent
 ) {
-    textViewReference = WeakReference(currentSong)
-    barCoverImageReference = WeakReference(coverBarImageView)
-    musicBarReference = WeakReference(musicToolBar)
-    playButtonReference = WeakReference(playButton)
-
-    seekBar.setOnTouchListener { _, _ -> true }
-
-    seekBarReference = WeakReference(seekBar)
-
     retrieveRelatedSongs = sRetrieveRelatedSongs
     retrieveSongIntoDB = sRetrieveSongIntoDB
     displayInfo = sDisplayInfo

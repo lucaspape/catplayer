@@ -7,12 +7,7 @@ import android.media.MediaMetadata
 import android.media.session.PlaybackState
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.SeekBar
-import android.widget.TextView
 import androidx.core.graphics.drawable.toBitmap
-import androidx.core.net.toUri
 import com.squareup.picasso.Target
 import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.core.download.downloadCoverIntoImageReceiver
@@ -20,233 +15,81 @@ import de.lucaspape.monstercat.core.download.ImageReceiverInterface
 import de.lucaspape.monstercat.core.download.downloadArtistImageIntoImageReceiver
 import de.lucaspape.monstercat.core.download.downloadImageUrlIntoImageReceiver
 import de.lucaspape.monstercat.core.music.*
-import de.lucaspape.monstercat.ui.pauseButtonDrawable
-import de.lucaspape.monstercat.ui.playButtonDrawable
 import java.lang.RuntimeException
-import java.lang.ref.WeakReference
 
-var textViewReference: WeakReference<TextView>? = null
-    set(newTextView) {
-        val titleWithArtist = "$title - $artist"
-        newTextView?.get()?.text = titleWithArtist
-
-        field = newTextView
-    }
-
-var seekBarReference: WeakReference<SeekBar>? = null
-    set(newSeekBar) {
-        newSeekBar?.get()?.progress = currentPosition
-
-        newSeekBar?.get()?.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                if (fromUser)
-                    exoPlayer?.seekTo(progress.toLong())
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar) {
-            }
-
-            override fun onStopTrackingTouch(seekBar: SeekBar) {
-            }
-        })
-
-        field = newSeekBar
-    }
-
-var barCoverImageReference: WeakReference<ImageView>? = null
-    set(newImageView) {
-        newImageView?.get()?.setImageDrawable(barCoverImageReference?.get()?.drawable)
-
-        field = newImageView
-    }
-
-var musicBarReference: WeakReference<androidx.appcompat.widget.Toolbar>? = null
-
-var playButtonReference: WeakReference<ImageButton>? = null
-    set(newPlayButton) {
-        field = newPlayButton
-
-        exoPlayer?.isPlaying?.let { isPlaying ->
-            playing = isPlaying
-        }
-    }
-
-var fullscreenTitleReference: WeakReference<TextView>? = null
-    set(newTitleTextView) {
-        newTitleTextView?.get()?.text = title
-
-        field = newTitleTextView
-    }
-
-var fullscreenArtistReference: WeakReference<TextView>? = null
-    set(newArtistTextView) {
-        newArtistTextView?.get()?.text = artist
-
-        field = newArtistTextView
-    }
-
-var fullscreenSeekBarReference: WeakReference<SeekBar>? = null
-    set(newSeekBar) {
-        newSeekBar?.get()?.progress = currentPosition
-
-        newSeekBar?.get()?.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                if (fromUser)
-                    exoPlayer?.seekTo(progress.toLong())
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar) {
-            }
-
-            override fun onStopTrackingTouch(seekBar: SeekBar) {
-            }
-        })
-
-        field = newSeekBar
-    }
-
-var fullscreenCoverReference: WeakReference<ImageView>? = null
-    set(newImageView) {
-        newImageView?.get()?.setImageDrawable(barCoverImageReference?.get()?.drawable)
-
-        field = newImageView
-    }
-
-var fullscreenPlayButtonReference: WeakReference<ImageButton>? = null
-    set(newPlayButton) {
-        field = newPlayButton
-
-        exoPlayer?.isPlaying?.let { isPlaying ->
-            playing = isPlaying
-        }
-    }
-
-var fullscreenArtistImageViewReference: WeakReference<ImageView>? = null
-    set(newImageView) {
-        newImageView?.get()?.setImageDrawable(fullscreenArtistImageViewReference?.get()?.drawable)
-
-        field = newImageView
-    }
-
-var fullscreenSongTimePassedTextReference: WeakReference<TextView>? = null
-    set(newTextView) {
-        newTextView?.get()?.text = fullscreenSongTimePassedTextReference?.get()?.text
-
-        field = newTextView
-    }
-
-var fullscreenSongTimeMaxTextReference: WeakReference<TextView>? = null
-    set(newTextView) {
-        newTextView?.get()?.text = fullscreenSongTimeMaxTextReference?.get()?.text
-
-        field = newTextView
-    }
+var titleChangedCallback = {}
+var artistChangedCallback = {}
+var currentPositionChangedCallback = {}
+var durationChangedCallback = {}
+var coverBitmapChangedCallback = {}
+var coverDrawableChangedCallback = {}
+var playingChangedCallback = {}
+var artistBitmapChangedCallback = {}
+var artistDrawableChangedCallback = {}
+var setTagCallback = { _: Target -> }
 
 var title = ""
     set(newString) {
-        val titleWithArtist = "$newString - $artist"
-
-        textViewReference?.get()?.text = titleWithArtist
-        fullscreenTitleReference?.get()?.text = newString
         field = newString
+
+        titleChangedCallback()
     }
 
 var artist = ""
     set(newString) {
-        val titleWithArtist = "$title - $newString"
-        textViewReference?.get()?.text = titleWithArtist
-
-        fullscreenArtistReference?.get()?.text = newString
-
         field = newString
+
+        artistChangedCallback()
     }
 
 var currentPosition = 0
     set(newInt) {
-        seekBarReference?.get()?.progress = newInt
-        fullscreenSeekBarReference?.get()?.progress = newInt
-
-        val minutes = newInt / 60000
-        val seconds = (newInt % 60000) / 1000
-
-        val text = if (seconds < 10) {
-            "$minutes:0$seconds"
-        } else {
-            "$minutes:$seconds"
-        }
-
-        fullscreenSongTimePassedTextReference?.get()?.text = text
-
         field = newInt
+
+        currentPositionChangedCallback()
     }
 
 var duration = 0
     set(newInt) {
-        seekBarReference?.get()?.max = newInt
-        fullscreenSeekBarReference?.get()?.max = newInt
-
-        val minutes = newInt / 60000
-        val seconds = (newInt % 60000) / 1000
-
-        val text = if (seconds < 10) {
-            "$minutes:0$seconds"
-        } else {
-            "$minutes:$seconds"
-        }
-
-        fullscreenSongTimeMaxTextReference?.get()?.text = text
-
         field = newInt
 
         setSongMetadata()
+
+        durationChangedCallback()
     }
 
 var coverBitmap: Bitmap? = null
     set(newBitmap) {
-        barCoverImageReference?.get()?.setImageBitmap(newBitmap)
-        fullscreenCoverReference?.get()?.setImageBitmap(newBitmap)
-
         field = newBitmap
 
         setSongMetadata()
+
+        coverBitmapChangedCallback()
     }
 
 var coverDrawable: Drawable? = null
     set(newDrawable) {
-        barCoverImageReference?.get()?.setImageDrawable(newDrawable)
-        fullscreenCoverReference?.get()?.setImageDrawable(newDrawable)
-
         field = newDrawable
+
+        coverDrawableChangedCallback()
     }
 
 var artistBitmap: Bitmap? = null
     set(newBitmap) {
-        fullscreenArtistImageViewReference?.get()?.setImageBitmap(newBitmap)
-
         field = newBitmap
+        artistBitmapChangedCallback()
     }
 
 var artistDrawable: Drawable? = null
     set(newDrawable) {
-        fullscreenArtistImageViewReference?.get()?.setImageDrawable(newDrawable)
-
         field = newDrawable
+        artistDrawableChangedCallback()
     }
 
 var playing = false
     set(newBoolean) {
-        if (newBoolean) {
-            playButtonReference?.get()?.setImageURI(pauseButtonDrawable.toUri())
-
-            fullscreenPlayButtonReference?.get()?.setImageURI(pauseButtonDrawable.toUri())
-
-        } else {
-            playButtonReference?.get()?.setImageURI(playButtonDrawable.toUri())
-            fullscreenPlayButtonReference?.get()?.setImageURI(playButtonDrawable.toUri())
-        }
-
-
         field = newBoolean
+        playingChangedCallback()
     }
 
 internal fun setCover(context: Context, songId: String, callback: (bitmap: Bitmap) -> Unit) {
@@ -288,13 +131,7 @@ internal fun setCover(
         }
 
         override fun setTag(target: Target) {
-            fullscreenCoverReference?.get()?.let {
-                it.tag = target
-            }
-
-            barCoverImageReference?.get()?.let {
-                it.tag = target
-            }
+            setTagCallback(target)
         }
     }, albumId, false)
 
@@ -345,13 +182,7 @@ internal fun setCustomCover(
         }
 
         override fun setTag(target: Target) {
-            fullscreenCoverReference?.get()?.let {
-                it.tag = target
-            }
-
-            barCoverImageReference?.get()?.let {
-                it.tag = target
-            }
+            setTagCallback(target)
         }
     }, false, coverId, coverUrl)
 }
@@ -387,7 +218,7 @@ internal fun setPlayerState(progress: Long) {
  * Set song metadata
  */
 private fun setSongMetadata() {
-    try{
+    try {
         val mediaMetadata = MediaMetadataCompat.Builder()
         mediaMetadata.putString(MediaMetadata.METADATA_KEY_ARTIST, artist)
         mediaMetadata.putString(MediaMetadata.METADATA_KEY_TITLE, title)
@@ -399,7 +230,7 @@ private fun setSongMetadata() {
         }
 
         mediaSession?.setMetadata(mediaMetadata.build())
-    }catch(e:RuntimeException){
+    } catch (e: RuntimeException) {
         println("Failed to set song metadata.")
     }
 }

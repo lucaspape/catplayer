@@ -2,33 +2,111 @@ package de.lucaspape.monstercat.ui.handlers
 
 import android.view.View
 import android.widget.*
+import androidx.core.net.toUri
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.music.*
 import de.lucaspape.monstercat.core.music.util.*
 import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
-import java.lang.ref.WeakReference
+import de.lucaspape.monstercat.ui.pauseButtonDrawable
+import de.lucaspape.monstercat.ui.playButtonDrawable
 
 class FullscreenPlayerHandler(
     private val onSearch: (searchString: String?) -> Unit,
     private val closeFullscreen: () -> Unit
 ) : Handler {
-    private fun setupMusicPlayer(view: View) {
+
+    private fun bindPlayerUICallbacks(view: View) {
         val titleTextView = view.findViewById<TextView>(R.id.fullscreenTitle)
         val artistTextView = view.findViewById<TextView>(R.id.fullscreenArtist)
-        val coverBarImageView = view.findViewById<ImageView>(R.id.fullscreenAlbumImage)
+        val seekbar = view.findViewById<SeekBar>(R.id.fullscreenSeekBar)
+        val barCoverImage = view.findViewById<ImageView>(R.id.fullscreenAlbumImage)
         val playButton = view.findViewById<ImageButton>(R.id.fullScreenPlay)
-        val seekBar = view.findViewById<SeekBar>(R.id.fullscreenSeekBar)
-        val fullscreenSongTimePassed = view.findViewById<TextView>(R.id.songTimePassed)
-        val fullscreenSongTimeMax = view.findViewById<TextView>(R.id.songTimeMax)
 
-        //setup musicPlayer
-        fullscreenTitleReference = WeakReference(titleTextView)
-        fullscreenArtistReference = WeakReference(artistTextView)
-        fullscreenSeekBarReference = WeakReference(seekBar)
-        fullscreenCoverReference = WeakReference(coverBarImageView)
-        fullscreenPlayButtonReference = WeakReference(playButton)
-        fullscreenSongTimePassedTextReference = WeakReference(fullscreenSongTimePassed)
-        fullscreenSongTimeMaxTextReference = WeakReference(fullscreenSongTimeMax)
+        val songTimePassed = view.findViewById<TextView>(R.id.songTimePassed)
+        val songTimeMax = view.findViewById<TextView>(R.id.songTimeMax)
+
+        titleChangedCallback = {
+            titleTextView.text = title
+        }
+
+        titleTextView.text = title
+        artistTextView.text = artist
+
+        artistChangedCallback = {
+            artistTextView.text = artist
+        }
+
+        seekbar.progress = currentPosition
+
+        seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                if (fromUser)
+                    exoPlayer?.seekTo(progress.toLong())
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
+            }
+        })
+
+        currentPositionChangedCallback = {
+            seekbar.progress = currentPosition
+
+            val minutes = currentPosition / 60000
+            val seconds = (currentPosition % 60000) / 1000
+
+            val text = if (seconds < 10) {
+                "$minutes:0$seconds"
+            } else {
+                "$minutes:$seconds"
+            }
+
+            songTimePassed.text = text
+        }
+
+        durationChangedCallback = {
+            seekbar.max = duration
+
+            val minutes = duration / 60000
+            val seconds = (duration % 60000) / 1000
+
+            val text = if (seconds < 10) {
+                "$minutes:0$seconds"
+            } else {
+                "$minutes:$seconds"
+            }
+
+            songTimeMax.text = text
+        }
+
+        barCoverImage.setImageBitmap(coverBitmap)
+
+        playingChangedCallback = {
+            if (playing) {
+                playButton.setImageURI(pauseButtonDrawable.toUri())
+
+            } else {
+                playButton.setImageURI(playButtonDrawable.toUri())
+            }
+        }
+
+        exoPlayer?.isPlaying?.let { isPlaying ->
+            playing = isPlaying
+        }
+
+        coverBitmapChangedCallback = {
+            barCoverImage.setImageBitmap(coverBitmap)
+        }
+
+        coverDrawableChangedCallback = {
+            barCoverImage.setImageDrawable(coverDrawable)
+        }
+
+        setTagCallback = { target ->
+            barCoverImage.tag = target
+        }
     }
 
     private fun registerListeners(view: View) {
@@ -131,7 +209,7 @@ class FullscreenPlayerHandler(
     override val layout: Int = R.layout.activity_player_fullscreen
 
     override fun onCreate(view: View) {
-        setupMusicPlayer(view)
+        bindPlayerUICallbacks(view)
         registerListeners(view)
     }
 }

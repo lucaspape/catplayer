@@ -1,6 +1,7 @@
 package de.lucaspape.monstercat.ui.activities
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -17,6 +18,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import de.lucaspape.monstercat.R
@@ -281,11 +283,9 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
-        setupMusicPlayer(findViewById(R.id.songCurrentText),
-            findViewById(R.id.barCoverImage),
-            findViewById(R.id.musicBar),
-            findViewById(R.id.playButton),
-            findViewById(R.id.seekBar),
+        bindPlayerUICallbacks()
+
+        setupMusicPlayer(
             { context, callback ->
                 Settings.getSettings(context)
                     .getBoolean(context.getString(R.string.skipMonstercatSongsSetting))?.let {
@@ -311,7 +311,8 @@ class MainActivity : AppCompatActivity() {
             { context: Context, msg: String ->
                 displayInfo(context, msg)
             }, StreamInfoUpdateAsync(this),
-            Intent(this, MainActivity::class.java))
+            Intent(this, MainActivity::class.java)
+        )
 
         //create the MusicPlayer.kt mediasession
         createMediaSession(this)
@@ -493,6 +494,76 @@ class MainActivity : AppCompatActivity() {
             startActivity(
                 Intent(applicationContext, PlayerFullscreenActivity::class.java)
             )
+        }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    fun bindPlayerUICallbacks() {
+        val titleTextView = findViewById<TextView>(R.id.songCurrentText)
+        val seekbar = findViewById<SeekBar>(R.id.seekBar)
+        val barCoverImage = findViewById<ImageView>(R.id.barCoverImage)
+        val playButton = findViewById<ImageButton>(R.id.playButton)
+
+        titleChangedCallback = {
+            val titleWithArtist = "${de.lucaspape.monstercat.core.music.util.title} - $artist"
+            titleTextView.text = titleWithArtist
+        }
+
+        val titleWithArtist = "${de.lucaspape.monstercat.core.music.util.title} - $artist"
+        titleTextView.text = titleWithArtist
+
+        artistChangedCallback = titleChangedCallback
+
+        seekbar.progress = currentPosition
+
+        seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                if (fromUser)
+                    exoPlayer?.seekTo(progress.toLong())
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
+            }
+        })
+
+        seekbar.setOnTouchListener { _, _ -> true }
+
+        currentPositionChangedCallback = {
+            seekbar.progress = currentPosition
+        }
+
+        durationChangedCallback = {
+            seekbar.max = duration
+        }
+
+        barCoverImage.setImageBitmap(coverBitmap)
+
+        playingChangedCallback = {
+            if (playing) {
+                playButton.setImageURI(pauseButtonDrawable.toUri())
+
+            } else {
+                playButton.setImageURI(playButtonDrawable.toUri())
+            }
+        }
+
+        exoPlayer?.isPlaying?.let { isPlaying ->
+            playing = isPlaying
+        }
+
+        coverBitmapChangedCallback = {
+            barCoverImage.setImageBitmap(coverBitmap)
+        }
+
+        coverDrawableChangedCallback = {
+            barCoverImage.setImageDrawable(coverDrawable)
+        }
+
+        setTagCallback = { target ->
+            barCoverImage.tag = target
         }
     }
 }
