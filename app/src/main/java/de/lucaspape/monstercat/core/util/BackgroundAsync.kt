@@ -1,4 +1,4 @@
-package de.lucaspape.util
+package de.lucaspape.monstercat.core.util
 
 import kotlinx.coroutines.*
 

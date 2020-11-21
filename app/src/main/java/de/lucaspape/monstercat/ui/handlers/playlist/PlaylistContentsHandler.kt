@@ -148,7 +148,7 @@ class PlaylistContentsHandler(private val playlistId: String) : PlaylistHandlerI
                     when {
                         File(song.downloadLocation).exists() -> {
                             File(song.downloadLocation).delete()
-                            titleDownloadButton.setImageURI(song.downloadStatus)
+                            titleDownloadButton.setImageURI(CatalogItem.getSongDownloadStatus(song))
                         }
                         else -> {
                             addDownloadSong(
@@ -156,7 +156,7 @@ class PlaylistContentsHandler(private val playlistId: String) : PlaylistHandlerI
                                 item.songId
                             ) {
                                 titleDownloadButton.setImageURI(
-                                    song.downloadStatus
+                                    CatalogItem.getSongDownloadStatus(song)
                                 )
                             }
                         }

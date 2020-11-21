@@ -24,7 +24,7 @@ import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListItem
 import de.lucaspape.monstercat.ui.handlers.*
 import de.lucaspape.monstercat.ui.handlers.deletePlaylist
 import de.lucaspape.monstercat.ui.handlers.renamePlaylist
-import de.lucaspape.util.BackgroundAsync
+import de.lucaspape.monstercat.core.util.BackgroundAsync
 import java.io.File
 
 open class PlaylistItem(

@@ -1,14 +1,16 @@
 package de.lucaspape.monstercat.ui
 
 import android.content.Context
+import de.lucaspape.monstercat.core.download.fallbackFile
+import de.lucaspape.monstercat.core.download.fallbackFileLow
 import java.io.File
 
 /**
  * Yes this is kinda ugly but it works so i dont give a shit
  */
 
-var fallbackFile = File("")
-var fallbackFileLow = File("")
+//var fallbackFile = File("")
+//var fallbackFileLow = File("")
 
 var fallbackBlackFile = File("")
 var fallbackBlackFileLow = File("")

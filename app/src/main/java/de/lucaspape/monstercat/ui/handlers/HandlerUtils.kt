@@ -25,7 +25,7 @@ import de.lucaspape.monstercat.ui.*
 import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
 import de.lucaspape.monstercat.ui.handlers.home.HomeHandler
 import de.lucaspape.monstercat.util.*
-import de.lucaspape.util.BackgroundAsync
+import de.lucaspape.monstercat.core.util.BackgroundAsync
 import java.io.File
 import java.lang.IndexOutOfBoundsException
 import java.util.*

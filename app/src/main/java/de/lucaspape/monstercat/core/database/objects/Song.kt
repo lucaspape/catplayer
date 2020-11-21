@@ -11,9 +11,6 @@ import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.util.wifiConnected
-import de.lucaspape.monstercat.ui.downloadDrawable
-import de.lucaspape.monstercat.ui.emptyDrawable
-import de.lucaspape.monstercat.ui.offlineDrawable
 import de.lucaspape.monstercat.core.util.Settings
 import java.io.File
 
@@ -127,21 +124,8 @@ data class Song(
             context.getString(R.string.trackContentUrl) + albumId + "/track-stream/" + songId
         }
 
-    private val downloaded: Boolean
+    val downloaded: Boolean
         get() = File(downloadLocation).exists()
-
-    val downloadStatus: Uri
-        get() = when {
-            downloaded -> {
-                offlineDrawable.toUri()
-            }
-            isDownloadable -> {
-                downloadDrawable.toUri()
-            }
-            else -> {
-                emptyDrawable.toUri()
-            }
-        }
 
     val url: String
         get() = if (downloaded) {

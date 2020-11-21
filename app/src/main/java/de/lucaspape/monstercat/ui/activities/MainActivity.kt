@@ -21,8 +21,10 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.download.DownloadService
+import de.lucaspape.monstercat.core.download.fallbackFile
+import de.lucaspape.monstercat.core.download.fallbackFileLow
 import de.lucaspape.monstercat.core.download.hideDownloadNotification
-import de.lucaspape.util.BackgroundAsync
+import de.lucaspape.monstercat.core.util.BackgroundAsync
 import de.lucaspape.monstercat.core.music.*
 import de.lucaspape.monstercat.core.music.notification.updateNotification
 import de.lucaspape.monstercat.core.music.save.PlayerSaveState
@@ -43,7 +45,6 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 
-val noisyReceiver = NoisyReceiver()
 var downloadServiceIntent: Intent? = null
 
 var lastOpenedAlbumId = ""

@@ -2,6 +2,7 @@ package de.lucaspape.monstercat.ui.abstract_items.content
 
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.view.HapticFeedbackConstants
 import android.view.View
 import android.widget.ImageButton
@@ -13,6 +14,7 @@ import com.mikepenz.fastadapter.items.AbstractItem
 import com.squareup.picasso.Target
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
+import de.lucaspape.monstercat.core.database.objects.Song
 import de.lucaspape.monstercat.core.download.addDownloadSong
 import de.lucaspape.monstercat.core.download.downloadCoverIntoImageReceiver
 import de.lucaspape.monstercat.ui.handlers.addSongToPlaylist
@@ -24,13 +26,27 @@ import de.lucaspape.monstercat.core.music.prioritySongQueue
 import de.lucaspape.monstercat.ui.*
 import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListHeaderItem
 import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListItem
-import de.lucaspape.util.BackgroundAsync
 
 open class CatalogItem(
     val songId: String
 ) : AbstractItem<CatalogItem.ViewHolder>() {
 
     companion object {
+        @JvmStatic
+        fun getSongDownloadStatus(song:Song):Uri{
+            return when {
+                song.downloaded -> {
+                    offlineDrawable.toUri()
+                }
+                song.isDownloadable -> {
+                    downloadDrawable.toUri()
+                }
+                else -> {
+                    emptyDrawable.toUri()
+                }
+            }
+        }
+        
         @JvmStatic
         fun showContextMenu(
             view: View,
@@ -225,21 +241,12 @@ open class CatalogItem(
                         coverImageView.tag = target
                     }
                 }, song.albumId, true)
-
-                var downloadStatus =
-                    downloadDrawable.toUri()
-
-                titleDownloadButton.setImageURI(downloadStatus)
+                
+                titleDownloadButton.setImageURI(getSongDownloadStatus(song))
                 
                 preDownloadCallbacks[song.songId] = {
                     titleDownloadButton.setImageURI(downloadingDrawable.toUri())
                 }
-
-                BackgroundAsync({
-                    downloadStatus = song.downloadStatus
-                }, {
-                    titleDownloadButton.setImageURI(downloadStatus)
-                }).execute()
             }
         }
 

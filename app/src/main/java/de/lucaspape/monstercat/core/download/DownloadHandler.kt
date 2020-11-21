@@ -8,10 +8,8 @@ import com.squareup.picasso.Picasso
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.download.DownloadService.Companion.downloadTask
 import de.lucaspape.monstercat.core.util.wifiConnected
-import de.lucaspape.monstercat.ui.fallbackFile
-import de.lucaspape.monstercat.ui.fallbackFileLow
 import de.lucaspape.monstercat.core.util.Settings
-import de.lucaspape.util.BackgroundAsync
+import de.lucaspape.monstercat.core.util.BackgroundAsync
 import java.io.File
 import java.io.FileOutputStream
 import java.lang.Exception
@@ -28,6 +26,9 @@ internal var downloadedSongs = 0
 internal val bitmapCache = HashMap<String, SoftReference<Bitmap?>>()
 
 internal val preDownloadCallbacks = HashMap<String, ()->Unit>()
+
+var fallbackFile = File("")
+var fallbackFileLow = File("")
 
 fun addDownloadSong(context: Context, songId: String, downloadFinished: () -> Unit) {
     preDownloadCallbacks[songId]?.let {

@@ -5,11 +5,12 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.media.AudioManager
 import android.os.IBinder
-import de.lucaspape.monstercat.ui.activities.noisyReceiver
 import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.core.music.*
 import de.lucaspape.monstercat.core.music.util.setCover
 import java.lang.IllegalArgumentException
+
+val noisyReceiver = NoisyReceiver()
 
 class PlayerService : Service() {
     override fun onBind(intent: Intent?): IBinder? {

@@ -201,7 +201,7 @@ class SearchHandler(
                     when {
                         File(song.downloadLocation).exists() -> {
                             File(song.downloadLocation).delete()
-                            titleDownloadButton.setImageURI(song.downloadStatus)
+                            titleDownloadButton.setImageURI(CatalogItem.getSongDownloadStatus(song))
                         }
                         else -> {
                             addDownloadSong(
@@ -209,7 +209,7 @@ class SearchHandler(
                                 item.songId
                             ) {
                                 titleDownloadButton.setImageURI(
-                                    song.downloadStatus
+                                    CatalogItem.getSongDownloadStatus(song)
                                 )
                             }
                         }
