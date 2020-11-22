@@ -1,7 +1,6 @@
 package de.lucaspape.monstercat.ui.abstract_items.settings
 
 import android.view.View
-import android.widget.Switch
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
@@ -12,7 +11,7 @@ class SettingsToggleItem(
     val setting: String,
     val trueValue: Any,
     val itemText: String,
-    val onSwitchChange: (setting: String, value: Boolean, switch: Switch) -> Boolean
+    val onSwitchChange: (setting: String, value: Boolean, switch: SwitchMaterial) -> Boolean
 ) : AbstractItem<SettingsToggleItem.ViewHolder>() {
     override val type: Int = 120
 

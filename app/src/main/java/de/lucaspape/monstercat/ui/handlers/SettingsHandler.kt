@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.switchmaterial.SwitchMaterial
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.GenericItem
 import com.mikepenz.fastadapter.adapters.ItemAdapter
@@ -122,7 +123,7 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
                 fastAdapter: FastAdapter<GenericItem>,
                 item: GenericItem
             ) {
-                if (item is SettingsToggleItem && v is Switch) {
+                if (item is SettingsToggleItem && v is SwitchMaterial) {
                     v.isChecked = item.onSwitchChange(item.setting, v.isChecked, v)
                 } else if (item is SettingsButtonItem && v is Button) {
                     item.onClick()
@@ -150,7 +151,7 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
             )
         )
 
-        val changeSetting: (setting: String, value: Boolean, switch: Switch) -> Boolean =
+        val changeSetting: (setting: String, value: Boolean, switch: SwitchMaterial) -> Boolean =
             { setting, value, _ ->
                 settings.setBoolean(setting, value)
                 value
@@ -193,7 +194,7 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
             )
         )
 
-        val changeSetting: (setting: String, value: Boolean, switch: Switch) -> Boolean =
+        val changeSetting: (setting: String, value: Boolean, switch: SwitchMaterial) -> Boolean =
             { setting, value, _ ->
                 settings.setBoolean(setting, value)
                 value
@@ -461,7 +462,7 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
             )
         )
 
-        val changeSetting: (setting: String, value: Boolean, switch: Switch) -> Boolean =
+        val changeSetting: (setting: String, value: Boolean, switch: SwitchMaterial) -> Boolean =
             { setting, value, _ ->
                 settings.setBoolean(setting, value)
                 value
