@@ -6,12 +6,12 @@ import android.graphics.drawable.ColorDrawable
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.Switch
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.switchmaterial.SwitchMaterial
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.GenericItem
 import com.mikepenz.fastadapter.adapters.ItemAdapter
@@ -98,7 +98,7 @@ fun displayAlertDialogToggleList(
             fastAdapter: FastAdapter<AlertListToggleItem>,
             item: AlertListToggleItem
         ) {
-            if(v is Switch){
+            if(v is SwitchMaterial){
                 val index = position + indexOffset
 
                 if (index >= 0) {
