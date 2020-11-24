@@ -94,13 +94,14 @@ class Settings(private val context: Context) {
         val defaultDownloadType = "mp3_320"
         val defaultPrimaryCoverResolution = 512
         val defaultSecondaryCoverResolution = 128
-        val defaultStreamOverMobile = false
+        val defaultStreamOverMobile = true
         val defaultDownloadOverMobile = false
-        val defaultDownloadCoversMobile = false
+        val defaultDownloadCoversMobile = true
         val defaultCrossfadeTime = 0
         val defaultSaveCoverImagesToCache = true
         val defaultVolume = 1.0f
         val defaultCustomApiBaseUrl = "https://api.lucaspape.de/monstercat/"
+        val defaultSkipSongsFromMonstercat = true
 
         if (getString(context.getString(R.string.downloadTypeSetting)) == null || overwrite) {
             setString(context.getString(R.string.downloadTypeSetting), defaultDownloadType)
@@ -158,6 +159,10 @@ class Settings(private val context: Context) {
 
         if(getString(context.getString(R.string.customApiBaseUrlSetting)) == null || overwrite){
             setString(context.getString(R.string.customApiBaseUrlSetting), defaultCustomApiBaseUrl)
+        }
+
+        if(getString(context.getString(R.string.skipMonstercatSongsSetting)) == null || overwrite){
+            setBoolean(context.getString(R.string.skipMonstercatSongsSetting), defaultSkipSongsFromMonstercat)
         }
     }
 }
