@@ -7,6 +7,7 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.widget.EditText
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.core.music.cid
 import de.lucaspape.monstercat.core.music.connectSid
 import de.lucaspape.monstercat.request.getAuthorizedRequestQueue
 import de.lucaspape.monstercat.request.newCheckLoginRequest
@@ -73,6 +74,25 @@ private fun getSid(context: Context): String {
     }
 
     return sid
+}
+
+private fun getCid(context: Context): String{
+    val cookieJar =
+        PersistentCookieJar(SetCookieCache(), SharedPrefsCookiePersistor(context))
+
+    val cookies = cookieJar.loadForRequest(
+        HttpUrl.Builder().scheme("https").host("connect.monstercat.com").build()
+    )
+
+    var cid = ""
+
+    for (cookie in cookies) {
+        if (cookie.name == "cid") {
+            cid = cookie.value
+        }
+    }
+
+    return cid
 }
 
 /**
@@ -185,6 +205,7 @@ class Auth {
                 loggedIn = true
 
                 connectSid = getSid(context)
+                cid = getCid(context)
 
                 loginSuccess()
 

@@ -37,7 +37,7 @@ internal fun prepareSong(
         SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
             if (song.playbackAllowed(context)
             ) {
-                val mediaSource = song.getMediaSource(connectSid)
+                val mediaSource = song.getMediaSource(connectSid, cid)
 
                 if (mediaSource != null) {
                     preparedExoPlayer?.setMediaSource(mediaSource)
@@ -56,7 +56,7 @@ internal fun prepareSong(
         }
 
         loadSongIntoDB(context, songId) { _, song ->
-            val mediaSource = song.getMediaSource(connectSid)
+            val mediaSource = song.getMediaSource(connectSid, cid)
 
             if (mediaSource != null) {
                 preparedExoPlayer?.setMediaSource(mediaSource)

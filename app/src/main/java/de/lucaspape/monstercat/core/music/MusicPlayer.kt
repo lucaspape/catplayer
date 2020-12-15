@@ -83,6 +83,7 @@ private var sessionCreated = false
 internal var streamInfoUpdateAsync: BackgroundService? = null
 
 var connectSid = ""
+var cid = ""
 
 var retrieveRelatedSongs: (context: Context, callback: () -> Unit) -> Unit =
     { _, _ -> }

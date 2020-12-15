@@ -134,12 +134,12 @@ data class Song(
             streamUrl
         }
     
-    fun getMediaSource(sid:String):MediaSource?{
+    fun getMediaSource(sid:String, cid:String):MediaSource?{
         return if (downloaded) {
             fileToMediaSource(downloadLocation)
         } else {
             if (isStreamable) {
-                urlToMediaSource(streamUrl, sid)
+                urlToMediaSource(streamUrl, sid, cid)
             } else {
                 null
             }
@@ -172,7 +172,7 @@ data class Song(
         ).createMediaSource(MediaItem.fromUri(Uri.parse("file://$fileLocation")))
     }
 
-    private fun urlToMediaSource(url: String, sid:String): ProgressiveMediaSource {
+    private fun urlToMediaSource(url: String, sid:String, cid:String): ProgressiveMediaSource {
         val httpSourceFactory =
             DefaultHttpDataSourceFactory(
                 Util.getUserAgent(
@@ -181,7 +181,7 @@ data class Song(
                 )
             )
 
-        httpSourceFactory.defaultRequestProperties.set("Cookie", "connect.sid=$sid")
+        httpSourceFactory.defaultRequestProperties.set("Cookie", "connect.sid=$sid;cid=$cid")
 
         return ProgressiveMediaSource.Factory(httpSourceFactory)
             .createMediaSource(MediaItem.fromUri(url.toUri()))

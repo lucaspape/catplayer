@@ -3,6 +3,7 @@ package de.lucaspape.monstercat.core.download
 import android.content.Context
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
+import de.lucaspape.monstercat.core.music.cid
 import de.lucaspape.monstercat.core.music.connectSid
 import de.lucaspape.monstercat.core.music.displayInfo
 import de.lucaspape.monstercat.core.util.downloadFile
@@ -39,7 +40,8 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                                         currentDownloadSong.downloadLocation,
                                         currentDownloadSong.downloadUrl,
                                         context.cacheDir.toString(),
-                                        connectSid
+                                        connectSid,
+                                        cid
                                     ) { max, current ->
                                         updateProgress(
                                             arrayOf(

@@ -23,7 +23,8 @@ fun downloadFile(
     destination: String,
     source: String,
     tempDir: String,
-    sid: String?,
+    sid: String,
+    cid: String,
     progressUpdate: (max: Int, current: Int) -> Unit
 ) {
     val destinationFile = File(destination)
@@ -31,7 +32,7 @@ fun downloadFile(
 
     try {
         val urlConnection = URL(source).openConnection()
-        urlConnection.setRequestProperty("Cookie", "connect.sid=$sid")
+        urlConnection.setRequestProperty("Cookie", "connect.sid=$sid;cid=$cid")
         urlConnection.connect()
 
         val lengthOfFile = urlConnection.contentLength

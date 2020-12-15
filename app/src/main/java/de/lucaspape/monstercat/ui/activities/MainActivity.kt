@@ -374,6 +374,7 @@ class MainActivity : AppCompatActivity() {
                     fallbackBlackFile.absolutePath,
                     getString(R.string.fallbackCoverBlackUrl),
                     cacheDir.toString(),
+                    "",
                     ""
                 ) { _, _ ->
                 }
@@ -396,6 +397,7 @@ class MainActivity : AppCompatActivity() {
                     fallbackWhiteFile.absolutePath,
                     getString(R.string.fallbackCoverUrl),
                     cacheDir.toString(),
+                    "",
                     ""
                 ) { _, _ ->
                 }
