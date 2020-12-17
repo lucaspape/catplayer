@@ -180,8 +180,18 @@ data class Song(
                     context.getString(R.string.applicationName)
                 )
             )
+        
+        var cookie = ""
 
-        httpSourceFactory.defaultRequestProperties.set("Cookie", "connect.sid=$sid;cid=$cid")
+        if(cid != ""){
+            cookie += "cid=$cid"
+        }
+
+        if(sid != ""){
+            cookie += ";connect.sid=$sid"
+        }
+
+        httpSourceFactory.defaultRequestProperties.set("Cookie", cookie)
 
         return ProgressiveMediaSource.Factory(httpSourceFactory)
             .createMediaSource(MediaItem.fromUri(url.toUri()))
