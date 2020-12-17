@@ -251,10 +251,7 @@ internal fun resume(context: Context) {
     if (streamInfoUpdateAsync?.active == true) {
         playStream(
             context,
-            Stream(
-                context.getString(R.string.twitchClientID),
-                context.getString(R.string.twitchChannel)
-            )
+            Stream()
         )
     } else {
         val intentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)

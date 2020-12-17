@@ -13,6 +13,7 @@ import de.lucaspape.monstercat.core.music.notification.updateNotification
 import de.lucaspape.monstercat.core.util.wifiConnected
 import de.lucaspape.monstercat.core.twitch.Stream
 import de.lucaspape.monstercat.core.util.Settings
+import de.lucaspape.monstercat.request.StreamInfoUpdateAsync
 import java.util.*
 import kotlin.math.log
 
@@ -192,6 +193,7 @@ fun playStream(context: Context, stream: Stream) {
     if (requestAudioFocus(context) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
         //only play stream if allowed
         if (wifiConnected(context) == true || settings.getBoolean(context.getString(R.string.streamOverMobileSetting)) == true) {
+            streamInfoUpdateAsync = StreamInfoUpdateAsync(context)
             streamInfoUpdateAsync?.execute()
 
             stream.getMediaSource(context) { mediaSource ->
