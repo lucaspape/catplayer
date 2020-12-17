@@ -37,9 +37,11 @@ abstract class BackgroundService(private val delay:Long) {
     }
     
     fun updateProgress(values: Array<String>?) {
-        scope.launch {
-            withContext(Dispatchers.Main) {
-                publishProgress(values)
+        if(!stopped){
+            scope.launch {
+                withContext(Dispatchers.Main) {
+                    publishProgress(values)
+                }
             }
         }
     }

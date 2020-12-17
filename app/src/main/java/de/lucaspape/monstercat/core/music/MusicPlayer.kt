@@ -81,6 +81,10 @@ private var sessionCreated = false
 
 //updater which updates information about playing livestream (title, artist, coverImage)
 internal var streamInfoUpdateAsync: BackgroundService? = null
+    set(value) {
+        field?.cancel()
+        field = value
+    }
 
 var connectSid = ""
 var cid = ""
