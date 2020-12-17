@@ -21,8 +21,6 @@ abstract class BackgroundService(private val delay:Long) {
     abstract fun publishProgress(values: Array<String>?)
 
     fun execute() {
-        stopped = false
-
         scope.launch {
             withContext(Dispatchers.Default) {
                 while (!stopped) {
