@@ -162,6 +162,7 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
                 view.context.getString(R.string.streamOverMobileSetting),
                 true,
                 view.context.getString(R.string.allowStreamMobile),
+                null,
                 changeSetting
             )
         )
@@ -170,6 +171,7 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
                 view.context.getString(R.string.downloadOverMobileSetting),
                 true,
                 view.context.getString(R.string.allowDownloadMobile),
+                null,
                 changeSetting
             )
         )
@@ -178,6 +180,7 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
                 view.context.getString(R.string.downloadCoversOverMobileSetting),
                 true,
                 view.context.getString(R.string.allowCoverDownloadMobile),
+                null,
                 changeSetting
             )
         )
@@ -205,6 +208,7 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
                 view.context.getString(R.string.disableAudioFocusSetting),
                 true,
                 view.context.getString(R.string.disableAudioFocusSwitch),
+                null,
                 changeSetting
             )
         )
@@ -214,6 +218,7 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
                 view.context.getString(R.string.blockNonCreatorFriendlySetting),
                 true,
                 view.context.getString(R.string.dontPlayNotCreatorFriendly),
+                null,
                 changeSetting
             )
         )
@@ -223,6 +228,7 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
                 view.context.getString(R.string.skipMonstercatSongsSetting),
                 true,
                 view.context.getString(R.string.skipSongsMonstercat),
+                null,
                 changeSetting
             )
         )
@@ -231,7 +237,8 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
             SettingsToggleItem(
                 view.context.getString(R.string.playRelatedSetting),
                 true,
-                view.context.getString(R.string.playRelatedAfter)
+                view.context.getString(R.string.playRelatedAfter),
+                view.context.getString(R.string.customApiSupportsPlayingRelatedSongsSetting)
             ) { setting, value, _ ->
                 playRelatedSongsAfterPlaylistFinished = value
                 settings.setBoolean(setting, value)
@@ -473,16 +480,17 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
                 context.getString(R.string.saveCoverImagesToCacheSetting),
                 true,
                 context.getString(R.string.saveCoverImagesToCache),
+                null,
                 changeSetting
             )
         )
-
 
         itemAdapter.add(
             SettingsToggleItem(
                 context.getString(R.string.liveInfoSetting),
                 true,
                 context.getString(R.string.loadLiveInfo),
+                view.context.getString(R.string.customApiSupportsLoadingLiveInfoSetting),
                 changeSetting
             )
         )
@@ -493,7 +501,8 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
                 SettingsToggleItem(
                     context.getString(R.string.darkThemeSetting),
                     true,
-                    context.getString(R.string.darkThemeSwitch)
+                    context.getString(R.string.darkThemeSwitch),
+                    null
                 ) { setting, value, _ ->
                     settings.setBoolean(setting, value)
 
@@ -511,7 +520,8 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
             SettingsToggleItem(
                 context.getString(R.string.downloadTypeSetting),
                 "flac",
-                context.getString(R.string.downloadFlacInsteadMp3)
+                context.getString(R.string.downloadFlacInsteadMp3),
+                null
             ) { setting, value, _ ->
                 if (value) {
                     settings.setString(setting, "flac")
@@ -522,12 +532,12 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
                 return@SettingsToggleItem value
             })
 
-
         itemAdapter.add(
             SettingsToggleItem(
                 context.getString(R.string.useCustomApiSetting),
                 true,
-                context.getString(R.string.useCustomApi)
+                context.getString(R.string.useCustomApi),
+                context.getString(R.string.customApiSupportsV1Setting)
             ) { setting, value, switch ->
                 if (value) {
                     //check for custom api features

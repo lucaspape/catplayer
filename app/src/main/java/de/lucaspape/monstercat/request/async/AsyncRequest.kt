@@ -154,16 +154,11 @@ fun checkCustomApiFeaturesAsync(
                     val apiVersionsArray = it.getJSONArray("api_versions")
 
                     for (i in (0 until apiVersionsArray.length())) {
-                        if (apiVersionsArray.getString(i) == "v1") {
-                            settings.setBoolean(
-                                context.getString(R.string.customApiSupportsV1Setting),
-                                true
-                            )
-                        } else if (apiVersionsArray.getString(i) == "v2") {
-                            settings.setBoolean(
-                                context.getString(R.string.customApiSupportsV2Setting),
-                                true
-                            )
+                        when(apiVersionsArray.getString(i)){
+                            "v1" -> settings.setBoolean(context.getString(R.string.customApiSupportsV1Setting), true)
+                            "v2" -> settings.setBoolean(context.getString(R.string.customApiSupportsV2Setting), true)
+                            "liveinfo" -> settings.setBoolean(context.getString(R.string.customApiSupportsLoadingLiveInfoSetting),true)
+                            "related_songs" -> settings.setBoolean(context.getString(R.string.customApiSupportsPlayingRelatedSongsSetting),true)
                         }
                     }
 

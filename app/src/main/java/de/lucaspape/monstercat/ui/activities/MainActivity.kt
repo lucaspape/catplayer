@@ -209,11 +209,9 @@ class MainActivity : AppCompatActivity() {
         //adjust theme
         changeTheme()
 
-        val settings = Settings.getSettings(this)
+        checkCustomApiFeaturesAsync(this, {}, {})
 
-        if (settings.getString(getString(R.string.customApiSupportsV1Setting)) == null) {
-            checkCustomApiFeaturesAsync(this, {}, {})
-        }
+        val settings = Settings.getSettings(this)
 
         //check for app version, if changed reset player state
         if (settings.getString(getString(R.string.appVersionSetting)) != packageManager.getPackageInfo(

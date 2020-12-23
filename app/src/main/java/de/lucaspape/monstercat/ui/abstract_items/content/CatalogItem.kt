@@ -36,34 +36,22 @@ open class CatalogItem(
 
     companion object {
         @JvmStatic
-        fun getSongDownloadStatus(song:Song):Uri{
-            if(song.inEarlyAccess){
+        fun getSongDownloadStatus(song: Song): Uri {
+            if (song.inEarlyAccess) {
                 return when {
-                    song.downloaded -> {
-                        offlineDrawableBlack.toUri()
-                    }
-                    song.isDownloadable -> {
-                        downloadDrawableBlack.toUri()
-                    }
-                    else -> {
-                        emptyDrawable.toUri()
-                    }
+                    song.downloaded -> offlineDrawableBlack.toUri()
+                    song.isDownloadable -> downloadDrawableBlack.toUri()
+                    else -> emptyDrawable.toUri()
                 }
-            }else{
-             return when {
-                song.downloaded -> {
-                    offlineDrawable.toUri()
+            } else {
+                return when {
+                    song.downloaded -> offlineDrawable.toUri()
+                    song.isDownloadable -> downloadDrawable.toUri()
+                    else -> emptyDrawable.toUri()
                 }
-                song.isDownloadable -> {
-                    downloadDrawable.toUri()
-                }
-                else -> {
-                    emptyDrawable.toUri()
-                }
-            }
             }
         }
-        
+
         @JvmStatic
         fun showContextMenu(
             view: View,
@@ -235,7 +223,7 @@ open class CatalogItem(
             val song = songDatabaseHelper.getSong(context, item.songId)
 
             song?.let {
-                if(song.inEarlyAccess){
+                if (song.inEarlyAccess) {
                     layout.setBackgroundColor(ContextCompat.getColor(context, R.color.gold))
                     titleDownloadButton.setImageURI(downloadDrawableBlack.toUri())
                     titleMenuButton.setImageURI(moreButtonDrawableBlack.toUri())
@@ -269,11 +257,11 @@ open class CatalogItem(
                 }, song.albumId, true)
 
                 titleDownloadButton.setImageURI(getSongDownloadStatus(song))
-                
+
                 preDownloadCallbacks[song.songId] = {
-                    if(song.inEarlyAccess){
+                    if (song.inEarlyAccess) {
                         titleDownloadButton.setImageURI(downloadingDrawableBlack.toUri())
-                    }else{
+                    } else {
                         titleDownloadButton.setImageURI(downloadingDrawable.toUri())
                     }
                 }

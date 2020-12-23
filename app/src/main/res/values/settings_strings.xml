@@ -29,4 +29,6 @@
     <string name="liveInfoSetting" translatable="false">liveInfo</string>
     <string name="enabledPushNotificationTopicsSetting" translatable="false">enabledPushNotificationTopics</string>
     <string name="blockNonCreatorFriendlySetting" translatable="false">blockNonCreatorFriendly</string>
+    <string name="customApiSupportsPlayingRelatedSongsSetting" translatable="false">customApiSupportsPlayingRelatedSongs</string>
+    <string name="customApiSupportsLoadingLiveInfoSetting" translatable="false">customApiSupportsLoadingLiveInfo</string>
 </resources>
