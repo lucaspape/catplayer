@@ -49,11 +49,11 @@ var addPlaylistDrawable = "$DRAWABLE_URI/ic_playlist_add_24"
 var backButtonDrawable = "$DRAWABLE_URI/ic_arrow_back_24"
 const val emptyDrawable = "$DRAWABLE_URI/ic_empty_24dp"
 
-private const val offlineDrawableBlack =
+const val offlineDrawableBlack =
     "$DRAWABLE_URI/ic_offline_pin_black_24dp"
-private const val downloadDrawableBlack =
+const val downloadDrawableBlack =
     "$DRAWABLE_URI/ic_file_download_black_24dp"
-private const val downloadingDrawableBlack = "$DRAWABLE_URI/ic_baseline_sync_black_24"
+const val downloadingDrawableBlack = "$DRAWABLE_URI/ic_baseline_sync_black_24"
 private const val addToQueueDrawableBlack =
     "$DRAWABLE_URI/ic_playlist_play_black_24"
 private const val shareDrawableBlack =
@@ -80,6 +80,7 @@ private const val addPlaylistDrawableBlack =
     "$DRAWABLE_URI/ic_playlist_add_black_24"
 private const val backButtonDrawableBlack =
     "$DRAWABLE_URI/ic_arrow_back_black_24dp"
+const val moreButtonDrawableBlack = "$DRAWABLE_URI/ic_more_vert_black_24dp"
 
 private const val offlineDrawableWhite =
     "$DRAWABLE_URI/ic_offline_pin_white_24dp"

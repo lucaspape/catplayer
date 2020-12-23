@@ -8,7 +8,10 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import com.google.android.material.card.MaterialCardView
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
 import com.squareup.picasso.Target
@@ -34,7 +37,20 @@ open class CatalogItem(
     companion object {
         @JvmStatic
         fun getSongDownloadStatus(song:Song):Uri{
-            return when {
+            if(song.inEarlyAccess){
+                return when {
+                    song.downloaded -> {
+                        offlineDrawableBlack.toUri()
+                    }
+                    song.isDownloadable -> {
+                        downloadDrawableBlack.toUri()
+                    }
+                    else -> {
+                        emptyDrawable.toUri()
+                    }
+                }
+            }else{
+             return when {
                 song.downloaded -> {
                     offlineDrawable.toUri()
                 }
@@ -44,6 +60,7 @@ open class CatalogItem(
                 else -> {
                     emptyDrawable.toUri()
                 }
+            }
             }
         }
         
@@ -202,6 +219,7 @@ open class CatalogItem(
     }
 
     class ViewHolder(view: View) : FastAdapter.ViewHolder<CatalogItem>(view) {
+        private val layout: ConstraintLayout = view.findViewById(R.id.layout)
         private val titleTextView: TextView = view.findViewById(R.id.title)
         private val artistTextView: TextView = view.findViewById(R.id.artist)
         val titleMenuButton: ImageButton = view.findViewById(R.id.titleMenuButton)
@@ -217,6 +235,14 @@ open class CatalogItem(
             val song = songDatabaseHelper.getSong(context, item.songId)
 
             song?.let {
+                if(song.inEarlyAccess){
+                    layout.setBackgroundColor(ContextCompat.getColor(context, R.color.gold))
+                    titleDownloadButton.setImageURI(downloadDrawableBlack.toUri())
+                    titleMenuButton.setImageURI(moreButtonDrawableBlack.toUri())
+                    titleTextView.setTextColor(ContextCompat.getColor(context, R.color.black))
+                    artistTextView.setTextColor(ContextCompat.getColor(context, R.color.black))
+                }
+
                 albumId = song.albumId
 
                 val shownTitle = "${song.title} ${song.version}"
@@ -241,11 +267,15 @@ open class CatalogItem(
                         coverImageView.tag = target
                     }
                 }, song.albumId, true)
-                
+
                 titleDownloadButton.setImageURI(getSongDownloadStatus(song))
                 
                 preDownloadCallbacks[song.songId] = {
-                    titleDownloadButton.setImageURI(downloadingDrawable.toUri())
+                    if(song.inEarlyAccess){
+                        titleDownloadButton.setImageURI(downloadingDrawableBlack.toUri())
+                    }else{
+                        titleDownloadButton.setImageURI(downloadingDrawable.toUri())
+                    }
                 }
             }
         }
