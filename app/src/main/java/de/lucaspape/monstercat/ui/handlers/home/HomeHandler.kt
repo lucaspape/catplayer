@@ -10,6 +10,7 @@ import de.lucaspape.monstercat.core.twitch.Stream
 import de.lucaspape.monstercat.ui.handlers.Handler
 import de.lucaspape.util.CustomSpinnerClass
 import de.lucaspape.monstercat.core.util.Settings
+import de.lucaspape.monstercat.ui.activities.handlerName
 import de.lucaspape.monstercat.ui.handlers.RecyclerViewHandler
 
 class HomeHandler(
@@ -52,6 +53,8 @@ class HomeHandler(
     }
 
     private fun catalogView(view: View) {
+        handlerName = "home"
+
         homeHandlerObject?.saveRecyclerViewPosition(view.context)
 
         homeHandlerObject = HomeCatalogHandler("catalog")
@@ -63,6 +66,8 @@ class HomeHandler(
     }
 
     private fun openAlbum(view: View, albumId: String?, albumMcId: String) {
+        handlerName = "home-album-content"
+
         homeHandlerObject?.saveRecyclerViewPosition(view.context)
         homeHandlerObject =
             HomeCatalogAlbumHandler(
@@ -76,6 +81,8 @@ class HomeHandler(
     }
 
     private fun albumView(view: View) {
+        handlerName = "home"
+
         homeHandlerObject?.saveRecyclerViewPosition(view.context)
         homeHandlerObject =
             HomeAlbumHandler { albumId, albumMcId ->

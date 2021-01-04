@@ -49,6 +49,8 @@ import java.io.FileOutputStream
 
 var downloadServiceIntent: Intent? = null
 
+var handlerName = ""
+
 /**
  * Main activity
  */
@@ -68,12 +70,20 @@ class MainActivity : AppCompatActivity() {
         BottomNavigationView.OnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_home -> {
-                    openHome(null, false)
+                    if(handlerName == "home"){
+                        openHome(null, true)
+                    }else{
+                        openHome(null, false)
+                    }
 
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.navigation_playlist -> {
-                    openPlaylist(null, false)
+                    if(handlerName == "playlist"){
+                        openPlaylist(null, true)
+                    }else{
+                        openPlaylist(null, false)
+                    }
 
                     return@OnNavigationItemSelectedListener true
                 }

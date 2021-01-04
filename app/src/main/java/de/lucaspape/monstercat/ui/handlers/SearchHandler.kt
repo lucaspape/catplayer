@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.SearchView
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.request.async.loadTitleSearchAsync
+import de.lucaspape.monstercat.ui.activities.handlerName
 import de.lucaspape.monstercat.ui.handlers.home.HomeCatalogHandler
 import kotlin.collections.ArrayList
 
@@ -23,6 +24,7 @@ class SearchHandler(
     }
 
     override fun onCreate(view: View) {
+        handlerName = "search"
         registerListeners(view)
 
         val searchView = view.findViewById<SearchView>(R.id.searchInput)

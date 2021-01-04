@@ -4,6 +4,7 @@ import android.view.View
 import android.widget.ImageButton
 import de.lucaspape.monstercat.ui.handlers.Handler
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.ui.activities.handlerName
 import de.lucaspape.monstercat.ui.handlers.createPlaylist
 import de.lucaspape.monstercat.ui.handlers.RecyclerViewHandler
 
@@ -30,6 +31,7 @@ class PlaylistHandler(
     }
 
     override fun onCreate(view: View) {
+        handlerName = "playlist"
         registerListeners(view)
 
         if (playlistId != null) {

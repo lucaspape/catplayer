@@ -39,6 +39,7 @@ import de.lucaspape.monstercat.ui.displayInfo
 import de.lucaspape.monstercat.ui.displaySnackBar
 import de.lucaspape.monstercat.util.*
 import de.lucaspape.monstercat.core.util.Settings
+import de.lucaspape.monstercat.ui.activities.handlerName
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -51,6 +52,7 @@ import kotlin.math.log
  */
 class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
     override fun onCreate(view: View) {
+        handlerName = "settings"
         setupRecyclerView(view)
 
         //spacer
