@@ -1,7 +1,6 @@
 package de.lucaspape.monstercat.ui.handlers.home
 
 import android.content.Context
-import android.view.View
 import com.mikepenz.fastadapter.GenericItem
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.AlbumDatabaseHelper
@@ -14,7 +13,7 @@ import de.lucaspape.monstercat.ui.handlers.loadAlbumTracks
 import de.lucaspape.monstercat.ui.handlers.playSongsFromViewDataAsync
 
 class HomeCatalogAlbumHandler(private val albumId: String?,
-                              private val albumMcId: String): HomeCatalogHandler()  {
+                              private val albumMcId: String): HomeCatalogHandler("album-$albumMcId")  {
 
     override fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val fistItem = viewData[itemIndex]
@@ -56,10 +55,6 @@ class HomeCatalogAlbumHandler(private val albumId: String?,
                     }
 
                     callback(idList)
-
-                    AlbumDatabaseHelper(context).getAlbum(album.albumId)?.let {
-                        addHeader(it.title)
-                    }
                 }
 
                 val album = albumDatabaseHelper.getAlbumFromMcId(albumMcId)
@@ -91,10 +86,6 @@ class HomeCatalogAlbumHandler(private val albumId: String?,
                     }
 
                     callback(idList)
-
-                    AlbumDatabaseHelper(context).getAlbum(albumId)?.let {
-                        addHeader(it.title)
-                    }
                 }, { _, _, _, _ ->
                     errorCallback()
                 })
@@ -102,8 +93,15 @@ class HomeCatalogAlbumHandler(private val albumId: String?,
         }else{
             callback(ArrayList())
         }
-        //lastOpenType = "album"
-      //  lastOpenedAlbumId = albumMcId
+    }
 
+    override fun getHeader(context: Context): String? {
+        albumId?.let {
+            AlbumDatabaseHelper(context).getAlbum(albumId)?.let {
+                return it.title
+            }
+        }
+
+        return null
     }
 }

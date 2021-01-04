@@ -15,7 +15,7 @@ import de.lucaspape.monstercat.ui.offlineDrawable
 import de.lucaspape.monstercat.ui.handlers.RecyclerViewHandler
 
 class PlaylistListHandler(private val loadPlaylist: (playlistId: String) -> Unit) :
-    RecyclerViewHandler("playlist-list-view") {
+    RecyclerViewHandler("playlist-list") {
 
     override fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val item = viewData[itemIndex]
@@ -94,13 +94,15 @@ class PlaylistListHandler(private val loadPlaylist: (playlistId: String) -> Unit
                 }
 
                 callback(idList)
-
-                addHeader(context.getString(R.string.yourPlaylists))
             }, { _, _ ->
                 errorCallback()
             })
         }else{
             callback(ArrayList())
         }
+    }
+
+    override fun getHeader(context: Context): String {
+        return context.getString(R.string.yourPlaylists)
     }
 }

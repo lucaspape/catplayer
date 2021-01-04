@@ -11,7 +11,7 @@ import kotlin.collections.ArrayList
 class SearchHandler(
     private var search: String?,
     private val closeSearch: () -> Unit
-) : Handler, HomeCatalogHandler() {
+) : Handler, HomeCatalogHandler("search") {
     override val layout: Int = R.layout.fragment_search
 
     override fun onBackPressed(view: View) {
@@ -69,7 +69,7 @@ class SearchHandler(
     ) {
         search?.let{
             displayLoading()
-            
+
             loadTitleSearchAsync(
                 context,
                 it,

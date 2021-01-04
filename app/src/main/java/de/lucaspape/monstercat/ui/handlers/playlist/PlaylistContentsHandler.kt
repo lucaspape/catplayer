@@ -6,7 +6,7 @@ import de.lucaspape.monstercat.core.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.request.async.loadPlaylistTracksAsync
 import de.lucaspape.monstercat.ui.handlers.home.HomeCatalogHandler
 
-class PlaylistContentsHandler(private val playlistId: String) : HomeCatalogHandler() {
+class PlaylistContentsHandler(private val playlistId: String) : HomeCatalogHandler("playlist-$playlistId") {
     override fun load(
         context: Context,
         forceReload: Boolean,
@@ -37,15 +37,19 @@ class PlaylistContentsHandler(private val playlistId: String) : HomeCatalogHandl
 
                     callback(idList)
 
-                    PlaylistDatabaseHelper(context).getPlaylist(playlistId)?.playlistName?.let {
-                        addHeader(it)
-                    }
-
                 }, errorCallback = { _, _, _ ->
                     errorCallback()
                 })
         }else{
             callback(ArrayList())
         }
+    }
+
+    override fun getHeader(context: Context): String? {
+        PlaylistDatabaseHelper(context).getPlaylist(playlistId)?.playlistName?.let {
+            return it
+        }
+
+        return null
     }
 }

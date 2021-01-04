@@ -54,7 +54,7 @@ class HomeHandler(
     private fun catalogView(view: View) {
         homeHandlerObject?.saveRecyclerViewPosition(view.context)
 
-        homeHandlerObject = HomeCatalogHandler()
+        homeHandlerObject = HomeCatalogHandler("catalog")
 
         if (resetPosition)
             homeHandlerObject?.resetRecyclerViewSavedPosition(view.context)

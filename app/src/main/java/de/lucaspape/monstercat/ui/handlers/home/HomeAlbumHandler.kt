@@ -11,7 +11,7 @@ import de.lucaspape.monstercat.ui.abstract_items.content.AlbumItem
 import de.lucaspape.monstercat.ui.handlers.RecyclerViewHandler
 
 class HomeAlbumHandler(private val onSingleAlbumLoad: (albumId: String, albumMcId: String) -> Unit) :
-    RecyclerViewHandler("album-view") {
+    RecyclerViewHandler("album-list") {
 
     override fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val albumDatabaseHelper = AlbumDatabaseHelper(context)
@@ -79,5 +79,9 @@ class HomeAlbumHandler(private val onSingleAlbumLoad: (albumId: String, albumMcI
         }, { _, _, _ ->
             errorCallback()
         })
+    }
+
+    override fun getHeader(context: Context): String? {
+        return null
     }
 }

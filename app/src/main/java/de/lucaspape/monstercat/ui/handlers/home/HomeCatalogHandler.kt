@@ -15,7 +15,7 @@ import de.lucaspape.monstercat.core.util.Settings
 import de.lucaspape.monstercat.ui.handlers.RecyclerViewHandler
 import java.io.File
 
-open class HomeCatalogHandler: RecyclerViewHandler("catalog-view") {
+open class HomeCatalogHandler(cacheId:String): RecyclerViewHandler(cacheId) {
 
     override fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val fistItem = viewData[itemIndex]
@@ -100,5 +100,9 @@ open class HomeCatalogHandler: RecyclerViewHandler("catalog-view") {
         }, errorCallback = { _, _, _ ->
             errorCallback()
         })
+    }
+
+    override fun getHeader(context: Context): String? {
+        return null
     }
 }

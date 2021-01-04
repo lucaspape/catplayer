@@ -26,6 +26,7 @@ abstract class RecyclerViewHandler(private val cacheId:String) {
     abstract fun onDownloadButtonClick(context: Context, item:GenericItem, downloadImageButton:ImageButton)
     abstract fun idToAbstractItem(view:View, id:String):GenericItem
     abstract fun load(context:Context, forceReload: Boolean, skip:Int, displayLoading:()->Unit, callback:(itemIdList:ArrayList<String>)->Unit, errorCallback:()->Unit)
+    abstract fun getHeader(context: Context):String?
 
     private var recyclerView: RecyclerView? = null
     private var itemAdapter = ItemAdapter<GenericItem>()
@@ -129,7 +130,7 @@ abstract class RecyclerViewHandler(private val cacheId:String) {
         })
     }
 
-    fun addHeader(headerText: String) {
+    private fun addHeader(headerText: String) {
         headerAdapter.add(
             HeaderTextItem(
                 headerText
@@ -150,7 +151,7 @@ abstract class RecyclerViewHandler(private val cacheId:String) {
         }
 
         cacheList.add(id)
-        //cache.set(cacheId, cacheList)
+        cache.set(cacheId, cacheList)
     }
 
     private fun addItemFromCache(item:GenericItem){
@@ -174,6 +175,10 @@ abstract class RecyclerViewHandler(private val cacheId:String) {
 
                 for(id in idList){
                     addItem(idToAbstractItem(view, id), id)
+                }
+
+                getHeader(view.context)?.let {
+                    addHeader(it)
                 }
 
                 /**
@@ -209,6 +214,10 @@ abstract class RecyclerViewHandler(private val cacheId:String) {
 
             for (id in cache) {
                 addItemFromCache(idToAbstractItem(view, id))
+            }
+
+            getHeader(view.context)?.let {
+                addHeader(it)
             }
 
             /**
