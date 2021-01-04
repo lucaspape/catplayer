@@ -49,13 +49,6 @@ import java.io.FileOutputStream
 
 var downloadServiceIntent: Intent? = null
 
-var lastOpenedAlbumId = ""
-var lastOpenedPlaylistId = ""
-
-var lastOpenType = ""
-
-var lastOpenFragment = ""
-
 /**
  * Main activity
  */
@@ -75,34 +68,12 @@ class MainActivity : AppCompatActivity() {
         BottomNavigationView.OnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_home -> {
-                    when {
-                        lastOpenFragment == "home" -> {
-                            openHome(null, true)
-                        }
-                        lastOpenedAlbumId != "" -> {
-                            lastOpenType = "album"
-                            restoreLastFragment()
-                        }
-                        else -> {
-                            openHome(null, false)
-                        }
-                    }
+                    openHome(null, false)
 
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.navigation_playlist -> {
-                    when {
-                        lastOpenFragment == "playlist" -> {
-                            openPlaylist(null, true)
-                        }
-                        lastOpenedPlaylistId != "" -> {
-                            lastOpenType = "playlist"
-                            restoreLastFragment()
-                        }
-                        else -> {
-                            openPlaylist(null, false)
-                        }
-                    }
+                    openPlaylist(null, false)
 
                     return@OnNavigationItemSelectedListener true
                 }
@@ -110,46 +81,29 @@ class MainActivity : AppCompatActivity() {
             false
         }
 
-    private fun restoreLastFragment() {
-        when (lastOpenType) {
-            "playlist" -> openPlaylist(lastOpenedPlaylistId, false)
-            "album" -> openHome(lastOpenedAlbumId, false)
-            "playlist-list" -> openPlaylist(null, false)
-            "catalog-list" -> openHome(null, false)
-            "album-list" -> openHome(null, false)
-            else -> openHome(null, false)
-        }
-    }
-
     private fun search(searchString: String?) {
-        lastOpenFragment = "search"
-
         openFragment(
             de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
                 SearchHandler(
                     searchString
                 ) {
-                    restoreLastFragment()
+                    openHome(null, false)
                 }
             )
         )
     }
 
     private fun openSettings() {
-        lastOpenFragment = "settings"
-
         openFragment(
             de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
                 SettingsHandler {
-                    restoreLastFragment()
+                    openHome(null, false)
                 }
             )
         )
     }
 
     private fun openHome(albumMcId: String?, resetPosition: Boolean) {
-        lastOpenFragment = "home"
-
         openFragment(
             de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
                 HomeHandler(
@@ -167,8 +121,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openPlaylist(playlistId: String?, resetPosition: Boolean) {
-        lastOpenFragment = "playlist"
-
         openFragment(
             de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
                 PlaylistHandler(
@@ -275,7 +227,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             else -> {
-                restoreLastFragment()
+                openHome(null, false)
             }
         }
 

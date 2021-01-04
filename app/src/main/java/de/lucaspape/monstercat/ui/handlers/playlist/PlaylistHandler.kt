@@ -1,17 +1,11 @@
 package de.lucaspape.monstercat.ui.handlers.playlist
 
-import android.content.Context
 import android.view.View
 import android.widget.ImageButton
 import de.lucaspape.monstercat.ui.handlers.Handler
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.ui.handlers.createPlaylist
-
-interface PlaylistHandlerInterface {
-    fun saveRecyclerViewPosition(context: Context)
-    fun onCreate(view: View)
-    fun resetRecyclerViewSavedPosition(context: Context)
-}
+import de.lucaspape.monstercat.ui.handlers.RecyclerViewHandler
 
 class PlaylistHandler(
     private val playlistId: String?,
@@ -19,7 +13,7 @@ class PlaylistHandler(
     private var returnToHome: () -> Unit
 ) : Handler {
     override val layout: Int = R.layout.fragment_playlist
-    private var playlistHandlerObject: PlaylistHandlerInterface? = null
+    private var playlistHandlerObject: RecyclerViewHandler? = null
 
     private var lastOpen = ""
 

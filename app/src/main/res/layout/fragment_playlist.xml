@@ -13,7 +13,7 @@
         android:layout_marginTop="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.442"
-        app:layout_constraintStart_toStartOf="@+id/playlistSwipeRefresh"
+        app:layout_constraintStart_toStartOf="@+id/swipeRefresh"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageButton
@@ -27,7 +27,7 @@
     </androidx.appcompat.widget.Toolbar>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/playlistSwipeRefresh"
+        android:id="@+id/swipeRefresh"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
@@ -40,7 +40,7 @@
         app:layout_constraintTop_toBottomOf="@+id/playlistToolbar">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/playlistView"
+            android:id="@+id/recyclerView"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:contentDescription="@string/playlistView"

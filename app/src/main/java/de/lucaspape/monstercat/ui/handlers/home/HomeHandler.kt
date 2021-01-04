@@ -1,6 +1,5 @@
 package de.lucaspape.monstercat.ui.handlers.home
 
-import android.content.Context
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -11,12 +10,7 @@ import de.lucaspape.monstercat.core.twitch.Stream
 import de.lucaspape.monstercat.ui.handlers.Handler
 import de.lucaspape.util.CustomSpinnerClass
 import de.lucaspape.monstercat.core.util.Settings
-
-interface HomeHandlerInterface {
-    fun saveRecyclerViewPosition(context: Context)
-    fun onCreate(view: View)
-    fun resetRecyclerViewSavedPosition(context: Context)
-}
+import de.lucaspape.monstercat.ui.handlers.RecyclerViewHandler
 
 class HomeHandler(
     private val onSearch: (searchString: String?) -> Unit,
@@ -31,7 +25,7 @@ class HomeHandler(
         var addSongsTaskId = ""
     }
 
-    private var homeHandlerObject: HomeHandlerInterface? = null
+    private var homeHandlerObject: RecyclerViewHandler? = null
     override val layout: Int = R.layout.fragment_home
 
     override fun onBackPressed(view: View) {
@@ -60,11 +54,7 @@ class HomeHandler(
     private fun catalogView(view: View) {
         homeHandlerObject?.saveRecyclerViewPosition(view.context)
 
-        homeHandlerObject =
-            HomeCatalogHandler(
-                null,
-                null
-            )
+        homeHandlerObject = HomeCatalogHandler()
 
         if (resetPosition)
             homeHandlerObject?.resetRecyclerViewSavedPosition(view.context)
@@ -75,7 +65,7 @@ class HomeHandler(
     private fun openAlbum(view: View, albumId: String?, albumMcId: String) {
         homeHandlerObject?.saveRecyclerViewPosition(view.context)
         homeHandlerObject =
-            HomeCatalogHandler(
+            HomeCatalogAlbumHandler(
                 albumId,
                 albumMcId
             )
