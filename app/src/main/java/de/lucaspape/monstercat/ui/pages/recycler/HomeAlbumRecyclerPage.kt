@@ -5,6 +5,7 @@ import android.content.res.Configuration
 import android.view.View
 import android.widget.ImageButton
 import com.mikepenz.fastadapter.GenericItem
+import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.AlbumDatabaseHelper
 import de.lucaspape.monstercat.request.async.loadAlbumListAsync
 import de.lucaspape.monstercat.ui.abstract_items.content.AlbumItem
@@ -60,7 +61,7 @@ class HomeAlbumRecyclerPage(private val onSingleAlbumLoad: (albumId: String, alb
         skip: Int,
         displayLoading: () -> Unit,
         callback: (itemIdList: ArrayList<String>) -> Unit,
-        errorCallback: () -> Unit
+        errorCallback: (errorMessage: String) -> Unit
     ) {
         loadAlbumListAsync(context, forceReload, skip, displayLoading, { _, _, _ ->
             val albumDatabaseHelper =
@@ -77,7 +78,7 @@ class HomeAlbumRecyclerPage(private val onSingleAlbumLoad: (albumId: String, alb
             callback(idList)
 
         }, { _, _, _ ->
-            errorCallback()
+            errorCallback(context.getString(R.string.errorLoadingAlbumList))
         })
     }
 

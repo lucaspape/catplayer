@@ -45,7 +45,7 @@ class HomeCatalogAlbumRecyclerPage(private val albumId: String?,
         skip: Int,
         displayLoading: () -> Unit,
         callback: (itemIdList: ArrayList<String>) -> Unit,
-        errorCallback: () -> Unit
+        errorCallback: (errorMessage: String) -> Unit
     ) {
         if(skip == 0){
             if (albumId == null) {
@@ -76,7 +76,9 @@ class HomeCatalogAlbumRecyclerPage(private val albumId: String?,
                                 finished(album)
                             }
                         },
-                        errorCallback = errorCallback
+                        errorCallback = {
+                            errorCallback(context.getString(R.string.errorLoadingAlbum))
+                        }
                     )
                 } else {
                     finished(album)
@@ -96,7 +98,7 @@ class HomeCatalogAlbumRecyclerPage(private val albumId: String?,
 
                     callback(idList)
                 }, { _, _, _, _ ->
-                    errorCallback()
+                    errorCallback(context.getString(R.string.errorLoadingAlbumList))
                 })
             }
         }else{

@@ -25,9 +25,8 @@ abstract class RecyclerViewPage(private val cacheId:String) {
     abstract fun onMenuButtonClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int)
     abstract fun onDownloadButtonClick(context: Context, item:GenericItem, downloadImageButton:ImageButton)
     abstract fun idToAbstractItem(view:View, id:String):GenericItem
-    abstract fun load(context:Context, forceReload: Boolean, skip:Int, displayLoading:()->Unit, callback:(itemIdList:ArrayList<String>)->Unit, errorCallback:()->Unit)
+    abstract fun load(context:Context, forceReload: Boolean, skip:Int, displayLoading:()->Unit, callback:(itemIdList:ArrayList<String>)->Unit, errorCallback:(errorMessage:String)->Unit)
     abstract fun getHeader(context: Context):String?
-    abstract fun clearDatabase(context:Context)
 
     private var recyclerView: RecyclerView? = null
     private var itemAdapter = ItemAdapter<GenericItem>()
@@ -40,6 +39,10 @@ abstract class RecyclerViewPage(private val cacheId:String) {
 
     open fun onCreate(view: View){
         loadInit(view, false)
+    }
+
+    open fun clearDatabase(context:Context){
+
     }
 
     private fun setupRecyclerView(view: View){
@@ -200,12 +203,12 @@ abstract class RecyclerViewPage(private val cacheId:String) {
 
                 swipeRefreshLayout.isRefreshing = false
 
-            }, errorCallback = {
+            }, errorCallback = { errorMessage ->
                 swipeRefreshLayout.isRefreshing = false
 
                 displaySnackBar(
                     view,
-                    view.context.getString(R.string.errorLoadingSongList),
+                    errorMessage,
                     view.context.getString(R.string.retry)
                 ) {
                     loadInit(view, forceReload)
@@ -255,12 +258,12 @@ abstract class RecyclerViewPage(private val cacheId:String) {
 
                 footerAdapter.clear()
 
-            }, errorCallback = {
+            }, errorCallback = { errorMessage ->
                 footerAdapter.clear()
 
                 displaySnackBar(
                     view,
-                    view.context.getString(R.string.errorLoadingSongList),
+                    errorMessage,
                     view.context.getString(R.string.retry)
                 ) {
                     loadNext(view, currentPage)

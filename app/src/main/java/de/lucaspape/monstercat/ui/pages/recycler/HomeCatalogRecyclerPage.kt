@@ -84,7 +84,7 @@ open class HomeCatalogRecyclerPage(cacheId:String): RecyclerViewPage(cacheId) {
         skip: Int,
         displayLoading: () -> Unit,
         callback: (itemIdList: ArrayList<String>) -> Unit,
-        errorCallback: () -> Unit
+        errorCallback: (errorMessage: String) -> Unit
     ) {
         loadSongListAsync(context, forceReload, skip, displayLoading, finishedCallback = { _, _, _ ->
             val catalogSongDatabaseHelper = CatalogSongDatabaseHelper(context)
@@ -98,7 +98,7 @@ open class HomeCatalogRecyclerPage(cacheId:String): RecyclerViewPage(cacheId) {
 
             callback(songIdList)
         }, errorCallback = { _, _, _ ->
-            errorCallback()
+            errorCallback(context.getString(R.string.errorLoadingSongList))
         })
     }
 

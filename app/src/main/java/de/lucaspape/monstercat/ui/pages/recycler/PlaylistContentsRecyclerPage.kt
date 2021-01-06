@@ -3,6 +3,7 @@ package de.lucaspape.monstercat.ui.pages.recycler
 import android.content.Context
 import android.view.View
 import com.mikepenz.fastadapter.GenericItem
+import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.request.async.loadPlaylistTracksAsync
@@ -27,7 +28,7 @@ class PlaylistContentsRecyclerPage(private val playlistId: String) : HomeCatalog
         skip: Int,
         displayLoading: () -> Unit,
         callback: (itemIdList: ArrayList<String>) -> Unit,
-        errorCallback: () -> Unit
+        errorCallback: (errorMessage: String) -> Unit
     ) {
         if(skip == 0){
             loadPlaylistTracksAsync(
@@ -52,7 +53,7 @@ class PlaylistContentsRecyclerPage(private val playlistId: String) : HomeCatalog
                     callback(idList)
 
                 }, errorCallback = { _, _, _ ->
-                    errorCallback()
+                    errorCallback(context.getString(R.string.errorLoadingPlaylistTracks))
                 })
         }else{
             callback(ArrayList())

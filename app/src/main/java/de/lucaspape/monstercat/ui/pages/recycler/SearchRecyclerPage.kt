@@ -67,7 +67,7 @@ class SearchRecyclerPage(
         skip: Int,
         displayLoading: () -> Unit,
         callback: (itemIdList: ArrayList<String>) -> Unit,
-        errorCallback: () -> Unit
+        errorCallback: (errorMessage: String) -> Unit
     ) {
         search?.let{
             displayLoading()
@@ -84,12 +84,8 @@ class SearchRecyclerPage(
 
                     callback(idList)
                 }, errorCallback = { _, _ ->
-                    errorCallback()
+                    errorCallback(context.getString(R.string.errorLoadingSearch))
                 })
         }
-    }
-
-    override fun clearDatabase(context: Context) {
-
     }
 }

@@ -79,7 +79,7 @@ class PlaylistListRecyclerPage(private val loadPlaylist: (playlistId: String) ->
         skip: Int,
         displayLoading: () -> Unit,
         callback: (itemIdList: ArrayList<String>) -> Unit,
-        errorCallback: () -> Unit
+        errorCallback: (errorMessage: String) -> Unit
     ) {
         if(skip == 0){
             loadPlaylistAsync(context, forceReload, true, displayLoading, { _, _ ->
@@ -95,7 +95,7 @@ class PlaylistListRecyclerPage(private val loadPlaylist: (playlistId: String) ->
 
                 callback(idList)
             }, { _, _ ->
-                errorCallback()
+                errorCallback(context.getString(R.string.errorLoadingPlaylists))
             })
         }else{
             callback(ArrayList())
