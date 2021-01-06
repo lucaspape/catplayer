@@ -1,4 +1,4 @@
-package de.lucaspape.monstercat.ui.handlers.playlist
+package de.lucaspape.monstercat.ui.pages.recycler
 
 import android.content.Context
 import android.view.View
@@ -9,13 +9,13 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.request.async.loadPlaylistAsync
 import de.lucaspape.monstercat.ui.abstract_items.content.PlaylistItem
-import de.lucaspape.monstercat.ui.handlers.deleteDownloadedPlaylistTracks
-import de.lucaspape.monstercat.ui.handlers.downloadPlaylistAsync
 import de.lucaspape.monstercat.ui.offlineDrawable
-import de.lucaspape.monstercat.ui.handlers.RecyclerViewHandler
+import de.lucaspape.monstercat.ui.pages.util.deleteDownloadedPlaylistTracks
+import de.lucaspape.monstercat.ui.pages.util.downloadPlaylistAsync
+import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
 
-class PlaylistListHandler(private val loadPlaylist: (playlistId: String) -> Unit) :
-    RecyclerViewHandler("playlist-list") {
+class PlaylistListRecyclerPage(private val loadPlaylist: (playlistId: String) -> Unit) :
+    RecyclerViewPage("playlist-list") {
 
     override fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val item = viewData[itemIndex]

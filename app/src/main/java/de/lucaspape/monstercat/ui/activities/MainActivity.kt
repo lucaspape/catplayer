@@ -38,18 +38,19 @@ import de.lucaspape.monstercat.request.async.checkCustomApiFeaturesAsync
 import de.lucaspape.monstercat.request.async.loadRelatedTracksAsync
 import de.lucaspape.monstercat.request.async.retrieveTrackIntoDB
 import de.lucaspape.monstercat.ui.*
-import de.lucaspape.monstercat.ui.handlers.*
-import de.lucaspape.monstercat.ui.handlers.home.HomeHandler
-import de.lucaspape.monstercat.ui.handlers.playlist.PlaylistHandler
+import de.lucaspape.monstercat.ui.pages.HomePage
+import de.lucaspape.monstercat.ui.pages.PlaylistPage
 import de.lucaspape.monstercat.util.*
 import de.lucaspape.monstercat.core.util.Settings
+import de.lucaspape.monstercat.ui.pages.recycler.SearchRecyclerPage
+import de.lucaspape.monstercat.ui.pages.SettingsPage
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 
 var downloadServiceIntent: Intent? = null
 
-var handlerName = ""
+var pageName = ""
 
 /**
  * Main activity
@@ -61,7 +62,7 @@ class MainActivity : AppCompatActivity() {
     var fragmentBackPressedCallback: () -> Unit = {
         val fragment = currentFragment
 
-        if (fragment is de.lucaspape.monstercat.ui.fragments.Fragment) {
+        if (fragment is de.lucaspape.monstercat.ui.Fragment) {
             fragment.onBackPressed()
         }
     }
@@ -70,7 +71,7 @@ class MainActivity : AppCompatActivity() {
         BottomNavigationView.OnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_home -> {
-                    if(handlerName == "home"){
+                    if(pageName == "home"){
                         openHome(null, true)
                     }else{
                         openHome(null, false)
@@ -79,7 +80,7 @@ class MainActivity : AppCompatActivity() {
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.navigation_playlist -> {
-                    if(handlerName == "playlist"){
+                    if(pageName == "playlist"){
                         openPlaylist(null, true)
                     }else{
                         openPlaylist(null, false)
@@ -93,8 +94,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun search(searchString: String?) {
         openFragment(
-            de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
-                SearchHandler(
+            de.lucaspape.monstercat.ui.Fragment.newInstance(
+                SearchRecyclerPage(
                     searchString
                 ) {
                     openHome(null, false)
@@ -105,8 +106,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun openSettings() {
         openFragment(
-            de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
-                SettingsHandler {
+            de.lucaspape.monstercat.ui.Fragment.newInstance(
+                SettingsPage {
                     openHome(null, false)
                 }
             )
@@ -115,8 +116,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun openHome(albumMcId: String?, resetPosition: Boolean) {
         openFragment(
-            de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
-                HomeHandler(
+            de.lucaspape.monstercat.ui.Fragment.newInstance(
+                HomePage(
                     { searchString ->
                         search(
                             searchString
@@ -132,8 +133,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun openPlaylist(playlistId: String?, resetPosition: Boolean) {
         openFragment(
-            de.lucaspape.monstercat.ui.fragments.Fragment.newInstance(
-                PlaylistHandler(
+            de.lucaspape.monstercat.ui.Fragment.newInstance(
+                PlaylistPage(
                     playlistId,
                     resetPosition
                 ) {

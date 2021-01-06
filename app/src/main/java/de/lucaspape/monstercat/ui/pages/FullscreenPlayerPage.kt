@@ -1,4 +1,4 @@
-package de.lucaspape.monstercat.ui.handlers
+package de.lucaspape.monstercat.ui.pages
 
 import android.view.View
 import android.widget.*
@@ -7,13 +7,14 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.music.*
 import de.lucaspape.monstercat.core.music.util.*
 import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
+import de.lucaspape.monstercat.ui.pages.util.Page
 import de.lucaspape.monstercat.ui.pauseButtonDrawable
 import de.lucaspape.monstercat.ui.playButtonDrawable
 
-class FullscreenPlayerHandler(
+class FullscreenPlayerPage(
     private val onSearch: (searchString: String?) -> Unit,
     private val closeFullscreen: () -> Unit
-) : Handler {
+) : Page {
 
     private fun bindPlayerUICallbacks(view: View) {
         val titleTextView = view.findViewById<TextView>(R.id.fullscreenTitle)

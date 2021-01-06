@@ -1,4 +1,4 @@
-package de.lucaspape.monstercat.ui.handlers
+package de.lucaspape.monstercat.ui.pages
 
 import android.content.Context
 import android.content.DialogInterface
@@ -39,7 +39,8 @@ import de.lucaspape.monstercat.ui.displayInfo
 import de.lucaspape.monstercat.ui.displaySnackBar
 import de.lucaspape.monstercat.util.*
 import de.lucaspape.monstercat.core.util.Settings
-import de.lucaspape.monstercat.ui.activities.handlerName
+import de.lucaspape.monstercat.ui.activities.pageName
+import de.lucaspape.monstercat.ui.pages.util.Page
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -50,9 +51,9 @@ import kotlin.math.log
 /**
  * SettingsActivity
  */
-class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
+class SettingsPage(private val closeSettings: () -> Unit) : Page {
     override fun onCreate(view: View) {
-        handlerName = "settings"
+        pageName = "settings"
         setupRecyclerView(view)
 
         //spacer
@@ -260,7 +261,7 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
                 val alertDialogBuilder = AlertDialog.Builder(view.context)
                     .setTitle(view.context.getString(R.string.resetDatabase))
                     .setMessage(view.context.getString(R.string.resetDatabaseQuestion))
-                    .setPositiveButton(android.R.string.yes) { _, _ ->
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
                         AlbumDatabaseHelper(view.context).reCreateTable(view.context, true)
                         CatalogSongDatabaseHelper(view.context).reCreateTable()
                         PlaylistDatabaseHelper(view.context).reCreateTable(view.context, true)
@@ -278,7 +279,7 @@ class SettingsHandler(private val closeSettings: () -> Unit) : Handler {
 
                         Runtime.getRuntime().exit(0)
                     }
-                    .setNegativeButton(android.R.string.no, null)
+                    .setNegativeButton(android.R.string.cancel, null)
 
                 val dialog = alertDialogBuilder.create()
                 dialog.show()

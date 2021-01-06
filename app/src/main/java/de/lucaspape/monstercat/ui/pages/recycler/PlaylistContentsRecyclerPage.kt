@@ -1,4 +1,4 @@
-package de.lucaspape.monstercat.ui.handlers.playlist
+package de.lucaspape.monstercat.ui.pages.recycler
 
 import android.content.Context
 import android.view.View
@@ -7,9 +7,8 @@ import de.lucaspape.monstercat.core.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.request.async.loadPlaylistTracksAsync
 import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
-import de.lucaspape.monstercat.ui.handlers.home.HomeCatalogHandler
 
-class PlaylistContentsHandler(private val playlistId: String) : HomeCatalogHandler("playlist-$playlistId") {
+class PlaylistContentsRecyclerPage(private val playlistId: String) : HomeCatalogRecyclerPage("playlist-$playlistId") {
     override fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val idList = ArrayList<String>()
 

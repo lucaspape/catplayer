@@ -1,4 +1,4 @@
-package de.lucaspape.monstercat.ui.handlers.home
+package de.lucaspape.monstercat.ui.pages.recycler
 
 import android.content.Context
 import android.view.View
@@ -10,12 +10,12 @@ import de.lucaspape.monstercat.core.database.helper.CatalogSongDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.core.download.addDownloadSong
 import de.lucaspape.monstercat.request.async.loadSongListAsync
-import de.lucaspape.monstercat.ui.handlers.playSongsFromCatalogDbAsync
 import de.lucaspape.monstercat.core.util.Settings
-import de.lucaspape.monstercat.ui.handlers.RecyclerViewHandler
+import de.lucaspape.monstercat.ui.pages.util.playSongsFromCatalogDbAsync
+import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
 import java.io.File
 
-open class HomeCatalogHandler(cacheId:String): RecyclerViewHandler(cacheId) {
+open class HomeCatalogRecyclerPage(cacheId:String): RecyclerViewPage(cacheId) {
 
     override fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val fistItem = viewData[itemIndex]

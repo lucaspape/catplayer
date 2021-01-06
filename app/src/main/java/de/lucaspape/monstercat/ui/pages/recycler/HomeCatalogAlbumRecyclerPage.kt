@@ -1,4 +1,4 @@
-package de.lucaspape.monstercat.ui.handlers.home
+package de.lucaspape.monstercat.ui.pages.recycler
 
 import android.content.Context
 import com.mikepenz.fastadapter.GenericItem
@@ -9,11 +9,11 @@ import de.lucaspape.monstercat.core.database.objects.Album
 import de.lucaspape.monstercat.core.util.Settings
 import de.lucaspape.monstercat.request.async.loadAlbumAsync
 import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
-import de.lucaspape.monstercat.ui.handlers.loadAlbumTracks
-import de.lucaspape.monstercat.ui.handlers.playSongsFromViewDataAsync
+import de.lucaspape.monstercat.ui.pages.util.loadAlbumTracks
+import de.lucaspape.monstercat.ui.pages.util.playSongsFromViewDataAsync
 
-class HomeCatalogAlbumHandler(private val albumId: String?,
-                              private val albumMcId: String): HomeCatalogHandler("album-$albumMcId")  {
+class HomeCatalogAlbumRecyclerPage(private val albumId: String?,
+                                   private val albumMcId: String): HomeCatalogRecyclerPage("album-$albumMcId")  {
 
     override fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val fistItem = viewData[itemIndex]
@@ -76,7 +76,8 @@ class HomeCatalogAlbumHandler(private val albumId: String?,
                                 finished(album)
                             }
                         },
-                        errorCallback = errorCallback)
+                        errorCallback = errorCallback
+                    )
                 } else {
                     finished(album)
                 }

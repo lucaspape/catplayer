@@ -1,4 +1,4 @@
-package de.lucaspape.monstercat.ui.handlers.home
+package de.lucaspape.monstercat.ui.pages
 
 import android.view.View
 import android.widget.AdapterView
@@ -7,26 +7,29 @@ import android.widget.ImageButton
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.music.util.playStream
 import de.lucaspape.monstercat.core.twitch.Stream
-import de.lucaspape.monstercat.ui.handlers.Handler
+import de.lucaspape.monstercat.ui.pages.util.Page
 import de.lucaspape.util.CustomSpinnerClass
 import de.lucaspape.monstercat.core.util.Settings
-import de.lucaspape.monstercat.ui.activities.handlerName
-import de.lucaspape.monstercat.ui.handlers.RecyclerViewHandler
+import de.lucaspape.monstercat.ui.activities.pageName
+import de.lucaspape.monstercat.ui.pages.recycler.HomeAlbumRecyclerPage
+import de.lucaspape.monstercat.ui.pages.recycler.HomeCatalogAlbumRecyclerPage
+import de.lucaspape.monstercat.ui.pages.recycler.HomeCatalogRecyclerPage
+import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
 
-class HomeHandler(
+class HomePage(
     private val onSearch: (searchString: String?) -> Unit,
     private val openSettings: () -> Unit,
     private var albumMcId: String?,
     private val resetPosition: Boolean
 ) :
-    Handler {
+    Page {
 
     companion object {
         @JvmStatic
         var addSongsTaskId = ""
     }
 
-    private var homeHandlerObject: RecyclerViewHandler? = null
+    private var homePageObject: RecyclerViewPage? = null
     override val layout: Int = R.layout.fragment_home
 
     override fun onBackPressed(view: View) {
@@ -34,7 +37,7 @@ class HomeHandler(
     }
 
     override fun onPause(view: View) {
-        homeHandlerObject?.saveRecyclerViewPosition(view.context)
+        homePageObject?.saveRecyclerViewPosition(view.context)
     }
 
     override fun onCreate(view: View) {
@@ -53,46 +56,46 @@ class HomeHandler(
     }
 
     private fun catalogView(view: View) {
-        handlerName = "home"
+        pageName = "home"
 
-        homeHandlerObject?.saveRecyclerViewPosition(view.context)
+        homePageObject?.saveRecyclerViewPosition(view.context)
 
-        homeHandlerObject = HomeCatalogHandler("catalog")
+        homePageObject = HomeCatalogRecyclerPage("catalog")
 
         if (resetPosition)
-            homeHandlerObject?.resetRecyclerViewSavedPosition(view.context)
+            homePageObject?.resetRecyclerViewSavedPosition(view.context)
 
-        homeHandlerObject?.onCreate(view)
+        homePageObject?.onCreate(view)
     }
 
     private fun openAlbum(view: View, albumId: String?, albumMcId: String) {
-        handlerName = "home-album-content"
+        pageName = "home-album-content"
 
-        homeHandlerObject?.saveRecyclerViewPosition(view.context)
-        homeHandlerObject =
-            HomeCatalogAlbumHandler(
+        homePageObject?.saveRecyclerViewPosition(view.context)
+        homePageObject =
+            HomeCatalogAlbumRecyclerPage(
                 albumId,
                 albumMcId
             )
         if (resetPosition)
-            homeHandlerObject?.resetRecyclerViewSavedPosition(view.context)
+            homePageObject?.resetRecyclerViewSavedPosition(view.context)
 
-        homeHandlerObject?.onCreate(view)
+        homePageObject?.onCreate(view)
     }
 
     private fun albumView(view: View) {
-        handlerName = "home"
+        pageName = "home"
 
-        homeHandlerObject?.saveRecyclerViewPosition(view.context)
-        homeHandlerObject =
-            HomeAlbumHandler { albumId, albumMcId ->
+        homePageObject?.saveRecyclerViewPosition(view.context)
+        homePageObject =
+            HomeAlbumRecyclerPage { albumId, albumMcId ->
                 openAlbum(view, albumId, albumMcId)
             }
 
         if (resetPosition)
-            homeHandlerObject?.resetRecyclerViewSavedPosition(view.context)
+            homePageObject?.resetRecyclerViewSavedPosition(view.context)
 
-        homeHandlerObject?.onCreate(view)
+        homePageObject?.onCreate(view)
     }
 
     /**

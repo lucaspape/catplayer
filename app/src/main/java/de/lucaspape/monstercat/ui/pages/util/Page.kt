@@ -1,8 +1,8 @@
-package de.lucaspape.monstercat.ui.handlers
+package de.lucaspape.monstercat.ui.pages.util
 
 import android.view.View
 
-interface Handler {
+interface Page {
     val layout:Int
 
     fun onBackPressed(view: View)

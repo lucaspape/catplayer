@@ -1,18 +1,18 @@
-package de.lucaspape.monstercat.ui.handlers
+package de.lucaspape.monstercat.ui.pages.recycler
 
 import android.content.Context
 import android.view.View
 import android.widget.SearchView
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.request.async.loadTitleSearchAsync
-import de.lucaspape.monstercat.ui.activities.handlerName
-import de.lucaspape.monstercat.ui.handlers.home.HomeCatalogHandler
+import de.lucaspape.monstercat.ui.activities.pageName
+import de.lucaspape.monstercat.ui.pages.util.Page
 import kotlin.collections.ArrayList
 
-class SearchHandler(
+class SearchRecyclerPage(
     private var search: String?,
     private val closeSearch: () -> Unit
-) : Handler, HomeCatalogHandler("search") {
+) : Page, HomeCatalogRecyclerPage("search") {
     override val layout: Int = R.layout.fragment_search
 
     override fun onBackPressed(view: View) {
@@ -24,7 +24,7 @@ class SearchHandler(
     }
 
     override fun onCreate(view: View) {
-        handlerName = "search"
+        pageName = "search"
         registerListeners(view)
 
         val searchView = view.findViewById<SearchView>(R.id.searchInput)

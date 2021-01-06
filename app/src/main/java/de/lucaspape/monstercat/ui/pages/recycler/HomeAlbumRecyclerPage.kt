@@ -1,4 +1,4 @@
-package de.lucaspape.monstercat.ui.handlers.home
+package de.lucaspape.monstercat.ui.pages.recycler
 
 import android.content.Context
 import android.content.res.Configuration
@@ -8,10 +8,10 @@ import com.mikepenz.fastadapter.GenericItem
 import de.lucaspape.monstercat.core.database.helper.AlbumDatabaseHelper
 import de.lucaspape.monstercat.request.async.loadAlbumListAsync
 import de.lucaspape.monstercat.ui.abstract_items.content.AlbumItem
-import de.lucaspape.monstercat.ui.handlers.RecyclerViewHandler
+import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
 
-class HomeAlbumHandler(private val onSingleAlbumLoad: (albumId: String, albumMcId: String) -> Unit) :
-    RecyclerViewHandler("album-list") {
+class HomeAlbumRecyclerPage(private val onSingleAlbumLoad: (albumId: String, albumMcId: String) -> Unit) :
+    RecyclerViewPage("album-list") {
 
     override fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val albumDatabaseHelper = AlbumDatabaseHelper(context)

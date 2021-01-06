@@ -21,10 +21,15 @@ import de.lucaspape.monstercat.core.download.downloadCoverIntoImageReceiver
 import de.lucaspape.monstercat.ui.*
 import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListHeaderItem
 import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListItem
-import de.lucaspape.monstercat.ui.handlers.*
-import de.lucaspape.monstercat.ui.handlers.deletePlaylist
-import de.lucaspape.monstercat.ui.handlers.renamePlaylist
 import de.lucaspape.monstercat.core.util.BackgroundAsync
+import de.lucaspape.monstercat.ui.pages.*
+import de.lucaspape.monstercat.ui.pages.util.*
+import de.lucaspape.monstercat.ui.pages.util.deletePlaylist
+import de.lucaspape.monstercat.ui.pages.util.downloadPlaylistAsync
+import de.lucaspape.monstercat.ui.pages.util.openPlaylist
+import de.lucaspape.monstercat.ui.pages.util.playPlaylistNextAsync
+import de.lucaspape.monstercat.ui.pages.util.renamePlaylist
+import de.lucaspape.monstercat.ui.pages.util.togglePlaylistPublicStateAsync
 import java.io.File
 
 open class PlaylistItem(
@@ -102,7 +107,10 @@ open class PlaylistItem(
                             ) {}
                         }
                         view.context.getString(R.string.addToQueue) -> {
-                            playPlaylistNextAsync(view.context, id)
+                            playPlaylistNextAsync(
+                                view.context,
+                                id
+                            )
                         }
                         view.context.getString(R.string.delete) -> {
                             deletePlaylist(view, id)
@@ -111,19 +119,33 @@ open class PlaylistItem(
                             renamePlaylist(view, id)
                         }
                         view.context.getString(R.string.makePlaylistPrivate) -> {
-                            togglePlaylistPublicStateAsync(view, id)
+                            togglePlaylistPublicStateAsync(
+                                view,
+                                id
+                            )
                         }
 
                         view.context.getString(R.string.makePlaylistPublic) -> {
-                            togglePlaylistPublicStateAsync(view, id)
+                            togglePlaylistPublicStateAsync(
+                                view,
+                                id
+                            )
                         }
 
                         view.context.getString(R.string.sharePlaylist) -> {
-                            openPlaylist(view.context, id, true)
+                            openPlaylist(
+                                view.context,
+                                id,
+                                true
+                            )
                         }
 
                         view.context.getString(R.string.openPlaylistInApp) -> {
-                            openPlaylist(view.context, id, false)
+                            openPlaylist(
+                                view.context,
+                                id,
+                                false
+                            )
                         }
                     }
                 }

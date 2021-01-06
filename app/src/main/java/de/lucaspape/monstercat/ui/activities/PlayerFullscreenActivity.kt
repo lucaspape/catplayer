@@ -3,11 +3,11 @@ package de.lucaspape.monstercat.ui.activities
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import de.lucaspape.monstercat.ui.handlers.FullscreenPlayerHandler
+import de.lucaspape.monstercat.ui.pages.FullscreenPlayerPage
 
 class PlayerFullscreenActivity : AppCompatActivity() {
 
-    private val fullscreenPlayerHandler = FullscreenPlayerHandler({ search ->
+    private val fullscreenPlayerPage = FullscreenPlayerPage({ search ->
         val intent = Intent(this, MainActivity::class.java)
         intent.putExtra("search", search)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -21,14 +21,14 @@ class PlayerFullscreenActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(fullscreenPlayerHandler.layout)
+        setContentView(fullscreenPlayerPage.layout)
 
-        fullscreenPlayerHandler.onCreate(window.decorView.rootView)
+        fullscreenPlayerPage.onCreate(window.decorView.rootView)
     }
 
     override fun onBackPressed() {
         super.onBackPressed()
 
-        fullscreenPlayerHandler.onBackPressed(window.decorView.rootView)
+        fullscreenPlayerPage.onBackPressed(window.decorView.rootView)
     }
 }

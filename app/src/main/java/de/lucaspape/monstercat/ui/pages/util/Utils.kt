@@ -1,4 +1,4 @@
-package de.lucaspape.monstercat.ui.handlers
+package de.lucaspape.monstercat.ui.pages.util
 
 import android.content.Context
 import android.content.DialogInterface
@@ -23,9 +23,9 @@ import de.lucaspape.monstercat.request.getAuthorizedRequestQueue
 import de.lucaspape.monstercat.request.newLoadAlbumRequest
 import de.lucaspape.monstercat.ui.*
 import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
-import de.lucaspape.monstercat.ui.handlers.home.HomeHandler
 import de.lucaspape.monstercat.util.*
 import de.lucaspape.monstercat.core.util.BackgroundAsync
+import de.lucaspape.monstercat.ui.pages.HomePage.Companion.addSongsTaskId
 import java.io.File
 import java.lang.IndexOutOfBoundsException
 import java.util.*
@@ -65,21 +65,25 @@ fun loadAlbumTracks(
  * Play an entire album after the current song
  */
 internal fun playAlbumNext(view: View, mcID: String) {
-    loadAlbumTracks(view.context, mcID, finishedCallback = { idArray ->
-        prioritySongQueue.add(idArray[0])
+    loadAlbumTracks(
+        view.context,
+        mcID,
+        finishedCallback = { idArray ->
+            prioritySongQueue.add(idArray[0])
 
-        for (i in (1 until idArray.size)) {
-            prioritySongQueue.add(idArray[i])
-        }
-    }, errorCallback = {
-        displaySnackBar(
-            view,
-            view.context.getString(R.string.errorRetrieveAlbumData),
-            view.context.getString(R.string.retry)
-        ) {
-            playAlbumNext(view, mcID)
-        }
-    })
+            for (i in (1 until idArray.size)) {
+                prioritySongQueue.add(idArray[i])
+            }
+        },
+        errorCallback = {
+            displaySnackBar(
+                view,
+                view.context.getString(R.string.errorRetrieveAlbumData),
+                view.context.getString(R.string.retry)
+            ) {
+                playAlbumNext(view, mcID)
+            }
+        })
 }
 
 internal fun playPlaylistNextAsync(context: Context, playlistId: String) {
@@ -129,7 +133,11 @@ internal fun downloadPlaylistAsync(view: View, playlistId: String, downloadFinis
             view.context.getString(R.string.errorRetrievePlaylist),
             view.context.getString(R.string.retry)
         ) {
-            downloadPlaylistAsync(view, playlistId, downloadFinished)
+            downloadPlaylistAsync(
+                view,
+                playlistId,
+                downloadFinished
+            )
         }
     })
 }
@@ -180,22 +188,26 @@ internal fun deleteDownloadedPlaylistTracks(
  * Download an entire album
  */
 internal fun downloadAlbum(view: View, mcID: String) {
-    loadAlbumTracks(view.context, mcID, finishedCallback = { idArray ->
-        val databaseHelper = SongDatabaseHelper(view.context)
+    loadAlbumTracks(
+        view.context,
+        mcID,
+        finishedCallback = { idArray ->
+            val databaseHelper = SongDatabaseHelper(view.context)
 
-        for (id in idArray) {
-            val song = databaseHelper.getSong(view.context, id)
-            song?.songId?.let { addDownloadSong(view.context, it) {} }
-        }
-    }, errorCallback = {
-        displaySnackBar(
-            view,
-            view.context.getString(R.string.errorRetrieveAlbumData),
-            view.context.getString(R.string.retry)
-        ) {
-            downloadAlbum(view, mcID)
-        }
-    })
+            for (id in idArray) {
+                val song = databaseHelper.getSong(view.context, id)
+                song?.songId?.let { addDownloadSong(view.context, it) {} }
+            }
+        },
+        errorCallback = {
+            displaySnackBar(
+                view,
+                view.context.getString(R.string.errorRetrieveAlbumData),
+                view.context.getString(R.string.retry)
+            ) {
+                downloadAlbum(view, mcID)
+            }
+        })
 }
 
 /**
@@ -241,7 +253,11 @@ internal fun addSongToPlaylist(view: View, songId: String) {
                     alertListItems
                 ) { position, _ ->
                     playlistIds[position]?.let { playlistId ->
-                        addSongToPlaylistAsync(view, playlistId, songId)
+                        addSongToPlaylistAsync(
+                            view,
+                            playlistId,
+                            songId
+                        )
                     }
                 }
 
@@ -255,7 +271,10 @@ internal fun addSongToPlaylist(view: View, songId: String) {
                 view.context.getString(R.string.errorRetrievePlaylist),
                 view.context.getString(R.string.retry)
             ) {
-                addSongToPlaylist(view, songId)
+                addSongToPlaylist(
+                    view,
+                    songId
+                )
             }
         })
 }
@@ -269,7 +288,11 @@ private fun addSongToPlaylistAsync(view: View, playlistId: String, songId: Strin
             view.context.getString(R.string.errorRetrievePlaylist),
             view.context.getString(R.string.retry)
         ) {
-            addSongToPlaylistAsync(view, playlistId, songId)
+            addSongToPlaylistAsync(
+                view,
+                playlistId,
+                songId
+            )
         }
     })
 }
@@ -292,7 +315,11 @@ internal fun renamePlaylist(view: View, playlistId: String) {
 
             setPositiveButton(context.getString(R.string.ok)) { _, _ ->
                 val playlistName = playlistNameEditText.text.toString()
-                renamePlaylistAsync(view, playlistId, playlistName)
+                renamePlaylistAsync(
+                    view,
+                    playlistId,
+                    playlistName
+                )
             }
 
             setView(playlistNameInputLayout)
@@ -327,7 +354,11 @@ private fun renamePlaylistAsync(view: View, playlistId: String, playlistName: St
                     view.context.getString(R.string.renamePlaylistError),
                     view.context.getString(R.string.retry)
                 ) {
-                    renamePlaylistAsync(view, playlistName, playlistId)
+                    renamePlaylistAsync(
+                        view,
+                        playlistName,
+                        playlistId
+                    )
                 }
             })
 }
@@ -352,7 +383,10 @@ internal fun togglePlaylistPublicStateAsync(view: View, playlistId: String) {
                 view.context.getString(R.string.playlistStateChangeError),
                 view.context.getString(R.string.retry)
             ) {
-                togglePlaylistPublicStateAsync(view, playlistId)
+                togglePlaylistPublicStateAsync(
+                    view,
+                    playlistId
+                )
             }
         })
     }
@@ -407,9 +441,15 @@ internal fun createPlaylist(view: View) {
                     val playlistName = playlistNameEditText.text.toString()
 
                     if (addPlaylist) {
-                        addPlaylist(view, playlistName)
+                        addPlaylist(
+                            view,
+                            playlistName
+                        )
                     } else {
-                        createPlaylistAsync(view, playlistName)
+                        createPlaylistAsync(
+                            view,
+                            playlistName
+                        )
                     }
                 }
 
@@ -447,7 +487,10 @@ private fun createPlaylistAsync(view: View, playlistName: String) {
             view.context.getString(R.string.errorCreatingPlaylist),
             view.context.getString(R.string.retry)
         ) {
-            createPlaylistAsync(view, playlistName)
+            createPlaylistAsync(
+                view,
+                playlistName
+            )
         }
     })
 }
@@ -460,10 +503,18 @@ internal fun deletePlaylist(view: View, playlistId: String) {
     val alertDialogBuilder = MaterialAlertDialogBuilder(context)
     alertDialogBuilder.setTitle(context.getString(R.string.deletePlaylistMsg))
     alertDialogBuilder.setPositiveButton(context.getString(R.string.yes)) { _, _ ->
-        deletePlaylistAsync(view, playlistId, true)
+        deletePlaylistAsync(
+            view,
+            playlistId,
+            true
+        )
     }
     alertDialogBuilder.setNegativeButton(context.getString(R.string.no)) { _, _ ->
-        deletePlaylistAsync(view, playlistId, false)
+        deletePlaylistAsync(
+            view,
+            playlistId,
+            false
+        )
     }
 
     val dialog = alertDialogBuilder.create()
@@ -494,7 +545,11 @@ private fun deletePlaylistAsync(view: View, playlistId: String, force: Boolean) 
                     view.context.getString(R.string.errorDeletingPlaylist),
                     view.context.getString(R.string.retry)
                 ) {
-                    deletePlaylistAsync(view, playlistId, true)
+                    deletePlaylistAsync(
+                        view,
+                        playlistId,
+                        true
+                    )
                 }
             })
         }
@@ -530,7 +585,13 @@ internal fun deletePlaylistSong(
                 view.context.getString(R.string.errorRemovingSongFromPlaylist),
                 view.context.getString(R.string.retry)
             ) {
-                deletePlaylistSong(view, songId, playlistId, index, playlistMax)
+                deletePlaylistSong(
+                    view,
+                    songId,
+                    playlistId,
+                    index,
+                    playlistMax
+                )
             }
         })
     }
@@ -600,7 +661,11 @@ internal fun openAlbum(view: View, albumMcId: String, share: Boolean) {
             context.getString(R.string.errorRetrieveAlbumData),
             context.getString(R.string.retry)
         ) {
-            openAlbum(view, albumMcId, share)
+            openAlbum(
+                view,
+                albumMcId,
+                share
+            )
         }
     }))
 }
@@ -630,7 +695,7 @@ internal fun playSongsFromCatalogDbAsync(
     skipMonstercatSongs: Boolean,
     firstSongId: String
 ) {
-    HomeHandler.addSongsTaskId = ""
+    addSongsTaskId = ""
 
     clearPlaylist()
     clearQueue()
@@ -645,7 +710,7 @@ internal fun playSongsFromCatalogDbAsync(
 
     BackgroundAsync({
         val id = UUID.randomUUID().toString()
-        HomeHandler.addSongsTaskId = id
+        addSongsTaskId = id
 
         catalogSongDatabaseHelper.getIndexFromSongId(firstSongId)?.toLong()
             ?.let { skip ->
@@ -662,14 +727,14 @@ internal fun playSongsFromCatalogDbAsync(
                                 catalogSong.songId
                             )
                         if (!song?.artist.equals("monstercat", true)) {
-                            if (id == HomeHandler.addSongsTaskId) {
+                            if (id == addSongsTaskId) {
                                 songQueue.add(catalogSong.songId)
                             } else {
                                 break
                             }
                         }
                     } else {
-                        if (id == HomeHandler.addSongsTaskId) {
+                        if (id == addSongsTaskId) {
                             songQueue.add(catalogSong.songId)
                         } else {
                             break
@@ -687,7 +752,7 @@ internal fun playSongsFromViewDataAsync(
     catalogViewData: ArrayList<CatalogItem>,
     itemIndex: Int
 ) {
-    HomeHandler.addSongsTaskId = ""
+    addSongsTaskId = ""
 
     clearPlaylist()
     clearQueue()
@@ -699,7 +764,7 @@ internal fun playSongsFromViewDataAsync(
     //add visible next songs
     BackgroundAsync({
         val id = UUID.randomUUID().toString()
-        HomeHandler.addSongsTaskId = id
+        addSongsTaskId = id
 
         val songDatabaseHelper = SongDatabaseHelper(context)
 
@@ -713,14 +778,14 @@ internal fun playSongsFromViewDataAsync(
                         )
 
                     if (!song?.artist.equals("monstercat", true)) {
-                        if (id == HomeHandler.addSongsTaskId) {
+                        if (id == addSongsTaskId) {
                             songQueue.add(catalogViewData[i].songId)
                         } else {
                             break
                         }
                     }
                 } else {
-                    if (id == HomeHandler.addSongsTaskId) {
+                    if (id == addSongsTaskId) {
                         songQueue.add(catalogViewData[i].songId)
                     } else {
                         break

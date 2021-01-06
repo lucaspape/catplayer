@@ -1,20 +1,22 @@
-package de.lucaspape.monstercat.ui.handlers.playlist
+package de.lucaspape.monstercat.ui.pages
 
 import android.view.View
 import android.widget.ImageButton
-import de.lucaspape.monstercat.ui.handlers.Handler
+import de.lucaspape.monstercat.ui.pages.util.Page
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.ui.activities.handlerName
-import de.lucaspape.monstercat.ui.handlers.createPlaylist
-import de.lucaspape.monstercat.ui.handlers.RecyclerViewHandler
+import de.lucaspape.monstercat.ui.activities.pageName
+import de.lucaspape.monstercat.ui.pages.recycler.PlaylistContentsRecyclerPage
+import de.lucaspape.monstercat.ui.pages.recycler.PlaylistListRecyclerPage
+import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
+import de.lucaspape.monstercat.ui.pages.util.createPlaylist
 
-class PlaylistHandler(
+class PlaylistPage(
     private val playlistId: String?,
     private val resetPosition: Boolean,
     private var returnToHome: () -> Unit
-) : Handler {
+) : Page {
     override val layout: Int = R.layout.fragment_playlist
-    private var playlistHandlerObject: RecyclerViewHandler? = null
+    private var playlistPageObject: RecyclerViewPage? = null
 
     private var lastOpen = ""
 
@@ -27,11 +29,11 @@ class PlaylistHandler(
     }
 
     override fun onPause(view: View) {
-        playlistHandlerObject?.saveRecyclerViewPosition(view.context)
+        playlistPageObject?.saveRecyclerViewPosition(view.context)
     }
 
     override fun onCreate(view: View) {
-        handlerName = "playlist"
+        pageName = "playlist"
         registerListeners(view)
 
         if (playlistId != null) {
@@ -42,28 +44,28 @@ class PlaylistHandler(
     }
 
     private fun playlistListView(view: View) {
-        playlistHandlerObject?.saveRecyclerViewPosition(view.context)
+        playlistPageObject?.saveRecyclerViewPosition(view.context)
 
-        playlistHandlerObject = PlaylistListHandler { playlistId ->
+        playlistPageObject = PlaylistListRecyclerPage { playlistId ->
             playlistContentView(view, playlistId)
         }
 
-        playlistHandlerObject?.onCreate(view)
+        playlistPageObject?.onCreate(view)
 
         if (resetPosition)
-            playlistHandlerObject?.resetRecyclerViewSavedPosition(view.context)
+            playlistPageObject?.resetRecyclerViewSavedPosition(view.context)
 
         lastOpen = "playlistList"
     }
 
     private fun playlistContentView(view: View, playlistId: String) {
-        playlistHandlerObject?.saveRecyclerViewPosition(view.context)
+        playlistPageObject?.saveRecyclerViewPosition(view.context)
 
-        playlistHandlerObject = PlaylistContentsHandler(playlistId)
-        playlistHandlerObject?.onCreate(view)
+        playlistPageObject = PlaylistContentsRecyclerPage(playlistId)
+        playlistPageObject?.onCreate(view)
 
         if (resetPosition)
-            playlistHandlerObject?.resetRecyclerViewSavedPosition(view.context)
+            playlistPageObject?.resetRecyclerViewSavedPosition(view.context)
 
         lastOpen = "playlistContents"
     }

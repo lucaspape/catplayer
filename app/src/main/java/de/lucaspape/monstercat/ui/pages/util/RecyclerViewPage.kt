@@ -1,4 +1,4 @@
-package de.lucaspape.monstercat.ui.handlers
+package de.lucaspape.monstercat.ui.pages.util
 
 import android.content.Context
 import android.view.View
@@ -19,7 +19,7 @@ import de.lucaspape.monstercat.ui.abstract_items.util.ProgressItem
 import de.lucaspape.monstercat.ui.displaySnackBar
 import de.lucaspape.util.Cache
 
-abstract class RecyclerViewHandler(private val cacheId:String) {
+abstract class RecyclerViewPage(private val cacheId:String) {
     abstract fun onItemClick(context: Context, viewData:ArrayList<GenericItem>, itemIndex:Int)
     abstract fun onItemLongClick(view: View, viewData:ArrayList<GenericItem>, itemIndex:Int)
     abstract fun onMenuButtonClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int)

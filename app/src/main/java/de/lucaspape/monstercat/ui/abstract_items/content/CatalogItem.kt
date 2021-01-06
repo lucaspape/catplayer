@@ -20,9 +20,9 @@ import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.core.database.objects.Song
 import de.lucaspape.monstercat.core.download.addDownloadSong
 import de.lucaspape.monstercat.core.download.downloadCoverIntoImageReceiver
-import de.lucaspape.monstercat.ui.handlers.addSongToPlaylist
-import de.lucaspape.monstercat.ui.handlers.deletePlaylistSong
-import de.lucaspape.monstercat.ui.handlers.openAlbum
+import de.lucaspape.monstercat.ui.pages.util.addSongToPlaylist
+import de.lucaspape.monstercat.ui.pages.util.deletePlaylistSong
+import de.lucaspape.monstercat.ui.pages.util.openAlbum
 import de.lucaspape.monstercat.core.download.ImageReceiverInterface
 import de.lucaspape.monstercat.core.download.preDownloadCallbacks
 import de.lucaspape.monstercat.core.music.prioritySongQueue
