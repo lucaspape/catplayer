@@ -7,7 +7,7 @@ import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
 import de.lucaspape.monstercat.R
 
-class SettingsProfileItem(val username:String, val onLogout:() -> Unit) :
+class SettingsProfileItem(val username: String, val onLogout: () -> Unit) :
     AbstractItem<SettingsProfileItem.ViewHolder>() {
     override val type: Int = 130
 

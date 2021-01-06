@@ -48,6 +48,7 @@ var createPlaylistDrawable = "$DRAWABLE_URI/ic_add_24dp"
 var addPlaylistDrawable = "$DRAWABLE_URI/ic_playlist_add_24"
 var backButtonDrawable = "$DRAWABLE_URI/ic_arrow_back_24"
 const val emptyDrawable = "$DRAWABLE_URI/ic_empty_24dp"
+var moreButtonDrawable = "$DRAWABLE_URI/ic_more_vert_24dp"
 
 const val offlineDrawableBlack =
     "$DRAWABLE_URI/ic_offline_pin_black_24dp"
@@ -113,6 +114,7 @@ private const val addPlaylistDrawableWhite =
     "$DRAWABLE_URI/ic_playlist_add_white_24"
 private const val backButtonDrawableWhite =
     "$DRAWABLE_URI/ic_arrow_back_white_24"
+private const val moreButtonDrawableWhite = "$DRAWABLE_URI/ic_more_vert_white_24dp"
 
 fun switchDrawablesToWhite() {
     offlineDrawable =
@@ -145,6 +147,7 @@ fun switchDrawablesToWhite() {
     addPlaylistDrawable =
         addPlaylistDrawableWhite
     backButtonDrawable = backButtonDrawableWhite
+    moreButtonDrawable = moreButtonDrawableWhite
 }
 
 fun switchDrawablesToBlack() {
@@ -178,4 +181,5 @@ fun switchDrawablesToBlack() {
     addPlaylistDrawable =
         addPlaylistDrawableBlack
     backButtonDrawable = backButtonDrawableBlack
+    moreButtonDrawable = moreButtonDrawableBlack
 }

@@ -12,7 +12,7 @@ class Fragment() : Fragment() {
 
     private var page: Page? = null
 
-    constructor(page: Page): this(){
+    constructor(page: Page) : this() {
         this.page = page
     }
 
@@ -47,7 +47,7 @@ class Fragment() : Fragment() {
         }
     }
 
-    fun onBackPressed(){
+    fun onBackPressed() {
         view?.let {
             page?.onBackPressed(it)
         }

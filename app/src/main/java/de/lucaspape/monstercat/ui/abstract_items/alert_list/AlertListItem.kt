@@ -8,7 +8,8 @@ import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
 import de.lucaspape.monstercat.R
 
-class AlertListItem(val itemText:String, val itemDrawable:String?): AbstractItem<AlertListItem.ViewHolder>() {
+class AlertListItem(val itemText: String, val itemDrawable: String?) :
+    AbstractItem<AlertListItem.ViewHolder>() {
     override val type: Int = 105
 
     override val layoutRes: Int
@@ -20,7 +21,7 @@ class AlertListItem(val itemText:String, val itemDrawable:String?): AbstractItem
         )
     }
 
-    class ViewHolder(view:View): FastAdapter.ViewHolder<AlertListItem>(view){
+    class ViewHolder(view: View) : FastAdapter.ViewHolder<AlertListItem>(view) {
         private val alertItemText: TextView = view.findViewById(R.id.alertItemText)
         private val alertItemImage: ImageView = view.findViewById(R.id.alertItemImage)
 

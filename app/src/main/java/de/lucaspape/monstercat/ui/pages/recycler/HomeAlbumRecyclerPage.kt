@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.Configuration
 import android.view.View
 import android.widget.ImageButton
+import android.widget.LinearLayout
 import com.mikepenz.fastadapter.GenericItem
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.AlbumDatabaseHelper
@@ -19,7 +20,7 @@ class HomeAlbumRecyclerPage(private val onSingleAlbumLoad: (albumId: String, alb
 
         val albumItem = viewData[itemIndex]
 
-        if(albumItem is AlbumItem){
+        if (albumItem is AlbumItem) {
             albumDatabaseHelper.getAlbum(albumItem.albumId)?.mcID?.let { mcID ->
                 onSingleAlbumLoad(albumItem.albumId, mcID)
             }
@@ -31,7 +32,7 @@ class HomeAlbumRecyclerPage(private val onSingleAlbumLoad: (albumId: String, alb
         val albumMcIdList = ArrayList<String>()
 
         for (item in viewData) {
-            if(item is AlbumItem){
+            if (item is AlbumItem) {
                 albumDatabaseHelper.getAlbum(item.albumId)?.mcID?.let { mcID ->
                     albumMcIdList.add(mcID)
                 }
@@ -51,8 +52,11 @@ class HomeAlbumRecyclerPage(private val onSingleAlbumLoad: (albumId: String, alb
     ) {
     }
 
-    override fun idToAbstractItem(view:View, id: String): GenericItem {
-        return AlbumItem(id, (view.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE))
+    override fun idToAbstractItem(view: View, id: String): GenericItem {
+        return AlbumItem(
+            id,
+            (view.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
+        )
     }
 
     override fun load(
@@ -88,5 +92,13 @@ class HomeAlbumRecyclerPage(private val onSingleAlbumLoad: (albumId: String, alb
 
     override fun clearDatabase(context: Context) {
         AlbumDatabaseHelper(context).reCreateTable(context, false)
+    }
+
+    override fun getOrientation(view: View): Int {
+        return if(view.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE){
+            LinearLayout.HORIZONTAL
+        }else{
+            LinearLayout.VERTICAL
+        }
     }
 }

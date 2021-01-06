@@ -9,12 +9,13 @@ import de.lucaspape.monstercat.core.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.request.async.loadPlaylistTracksAsync
 import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
 
-class PlaylistContentsRecyclerPage(private val playlistId: String) : HomeCatalogRecyclerPage("playlist-$playlistId") {
+class PlaylistContentsRecyclerPage(private val playlistId: String) :
+    HomeCatalogRecyclerPage("playlist-$playlistId") {
     override fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val idList = ArrayList<String>()
 
         for (item in viewData) {
-            if(item is CatalogItem){
+            if (item is CatalogItem) {
                 idList.add(item.songId)
             }
         }
@@ -30,12 +31,11 @@ class PlaylistContentsRecyclerPage(private val playlistId: String) : HomeCatalog
         callback: (itemIdList: ArrayList<String>) -> Unit,
         errorCallback: (errorMessage: String) -> Unit
     ) {
-        if(skip == 0){
+        if (skip == 0) {
             loadPlaylistTracksAsync(
                 context,
                 forceReload,
-                playlistId, displayLoading
-                , finishedCallback = { _, _, _ ->
+                playlistId, displayLoading, finishedCallback = { _, _, _ ->
                     val playlistItemDatabaseHelper =
                         PlaylistItemDatabaseHelper(
                             context,
@@ -55,7 +55,7 @@ class PlaylistContentsRecyclerPage(private val playlistId: String) : HomeCatalog
                 }, errorCallback = { _, _, _ ->
                     errorCallback(context.getString(R.string.errorLoadingPlaylistTracks))
                 })
-        }else{
+        } else {
             callback(ArrayList())
         }
     }

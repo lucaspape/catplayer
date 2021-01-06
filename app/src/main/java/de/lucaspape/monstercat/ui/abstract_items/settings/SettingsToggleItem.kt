@@ -11,7 +11,7 @@ class SettingsToggleItem(
     val setting: String,
     val trueValue: Any,
     val itemText: String,
-    val requiredApiFeature:String?,
+    val requiredApiFeature: String?,
     val onSwitchChange: (setting: String, value: Boolean, switch: SwitchMaterial) -> Boolean
 ) : AbstractItem<SettingsToggleItem.ViewHolder>() {
     override val type: Int = 120
@@ -32,10 +32,12 @@ class SettingsToggleItem(
         override fun bindView(item: SettingsToggleItem, payloads: List<Any>) {
             alertItemSwitch.text = item.itemText
 
-            if(item.requiredApiFeature != null && Settings.getSettings(context).getBoolean(item.requiredApiFeature) != true){
+            if (item.requiredApiFeature != null && Settings.getSettings(context)
+                    .getBoolean(item.requiredApiFeature) != true
+            ) {
                 alertItemSwitch.isEnabled = false
                 item.onSwitchChange(item.setting, false, alertItemSwitch)
-            }else{
+            } else {
                 alertItemSwitch.isEnabled = true
             }
 

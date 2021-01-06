@@ -8,7 +8,8 @@ import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
 import de.lucaspape.monstercat.R
 
-class AlertListToggleItem(val itemText:String, val itemDrawable:String?, val enabled:Boolean): AbstractItem<AlertListToggleItem.ViewHolder>() {
+class AlertListToggleItem(val itemText: String, val itemDrawable: String?, val enabled: Boolean) :
+    AbstractItem<AlertListToggleItem.ViewHolder>() {
     override val type: Int = 110
 
     override val layoutRes: Int
@@ -20,7 +21,7 @@ class AlertListToggleItem(val itemText:String, val itemDrawable:String?, val ena
         )
     }
 
-    class ViewHolder(view:View): FastAdapter.ViewHolder<AlertListToggleItem>(view){
+    class ViewHolder(view: View) : FastAdapter.ViewHolder<AlertListToggleItem>(view) {
         val alertItemSwitch: SwitchMaterial = view.findViewById(R.id.alertItemSwitch)
         private val alertItemImage: ImageView = view.findViewById(R.id.alertItemImage)
 

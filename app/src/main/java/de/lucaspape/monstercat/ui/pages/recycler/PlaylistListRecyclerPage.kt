@@ -20,7 +20,7 @@ class PlaylistListRecyclerPage(private val loadPlaylist: (playlistId: String) ->
     override fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val item = viewData[itemIndex]
 
-        if(item is PlaylistItem){
+        if (item is PlaylistItem) {
             loadPlaylist(item.playlistId)
         }
     }
@@ -29,7 +29,7 @@ class PlaylistListRecyclerPage(private val loadPlaylist: (playlistId: String) ->
         val idList = ArrayList<String>()
 
         for (item in viewData) {
-            if(item is PlaylistItem){
+            if (item is PlaylistItem) {
                 idList.add(item.playlistId)
             }
         }
@@ -46,7 +46,7 @@ class PlaylistListRecyclerPage(private val loadPlaylist: (playlistId: String) ->
         item: GenericItem,
         downloadImageButton: ImageButton
     ) {
-        if(item is PlaylistItem){
+        if (item is PlaylistItem) {
             if (item.getDownloadStatus(context) == offlineDrawable) {
                 deleteDownloadedPlaylistTracks(
                     context,
@@ -81,7 +81,7 @@ class PlaylistListRecyclerPage(private val loadPlaylist: (playlistId: String) ->
         callback: (itemIdList: ArrayList<String>) -> Unit,
         errorCallback: (errorMessage: String) -> Unit
     ) {
-        if(skip == 0){
+        if (skip == 0) {
             loadPlaylistAsync(context, forceReload, true, displayLoading, { _, _ ->
                 val playlistDatabaseHelper =
                     PlaylistDatabaseHelper(context)
@@ -97,7 +97,7 @@ class PlaylistListRecyclerPage(private val loadPlaylist: (playlistId: String) ->
             }, { _, _ ->
                 errorCallback(context.getString(R.string.errorLoadingPlaylists))
             })
-        }else{
+        } else {
             callback(ArrayList())
         }
     }

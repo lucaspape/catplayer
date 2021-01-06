@@ -6,7 +6,8 @@ import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
 import de.lucaspape.monstercat.R
 
-open class HeaderTextItem(private val headerText:String): AbstractItem<HeaderTextItem.ViewHolder>(){
+open class HeaderTextItem(private val headerText: String) :
+    AbstractItem<HeaderTextItem.ViewHolder>() {
     override val type: Int = 104
 
     override val layoutRes: Int

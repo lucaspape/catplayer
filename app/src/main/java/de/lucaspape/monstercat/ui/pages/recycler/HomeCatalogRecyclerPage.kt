@@ -15,12 +15,12 @@ import de.lucaspape.monstercat.ui.pages.util.playSongsFromCatalogDbAsync
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
 import java.io.File
 
-open class HomeCatalogRecyclerPage(cacheId:String): RecyclerViewPage(cacheId) {
+open class HomeCatalogRecyclerPage(cacheId: String) : RecyclerViewPage(cacheId) {
 
     override fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val fistItem = viewData[itemIndex]
 
-        if(fistItem is CatalogItem){
+        if (fistItem is CatalogItem) {
             val skipMonstercatSongs =
                 Settings(context).getBoolean(context.getString(R.string.skipMonstercatSongsSetting)) == true
 
@@ -32,11 +32,11 @@ open class HomeCatalogRecyclerPage(cacheId:String): RecyclerViewPage(cacheId) {
         }
     }
 
-    override fun onItemLongClick(view:View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
+    override fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val idList = ArrayList<String>()
 
         for (item in viewData) {
-            if(item is CatalogItem){
+            if (item is CatalogItem) {
                 idList.add(item.songId)
             }
         }
@@ -48,8 +48,12 @@ open class HomeCatalogRecyclerPage(cacheId:String): RecyclerViewPage(cacheId) {
         onItemLongClick(view, viewData, itemIndex)
     }
 
-    override fun onDownloadButtonClick(context: Context, item: GenericItem, downloadImageButton:ImageButton) {
-        if(item is CatalogItem){
+    override fun onDownloadButtonClick(
+        context: Context,
+        item: GenericItem,
+        downloadImageButton: ImageButton
+    ) {
+        if (item is CatalogItem) {
             val songDatabaseHelper = SongDatabaseHelper(context)
             val song = songDatabaseHelper.getSong(context, item.songId)
 
@@ -74,7 +78,7 @@ open class HomeCatalogRecyclerPage(cacheId:String): RecyclerViewPage(cacheId) {
         }
     }
 
-    override fun idToAbstractItem(view:View, id: String): GenericItem {
+    override fun idToAbstractItem(view: View, id: String): GenericItem {
         return CatalogItem(id)
     }
 
@@ -86,20 +90,26 @@ open class HomeCatalogRecyclerPage(cacheId:String): RecyclerViewPage(cacheId) {
         callback: (itemIdList: ArrayList<String>) -> Unit,
         errorCallback: (errorMessage: String) -> Unit
     ) {
-        loadSongListAsync(context, forceReload, skip, displayLoading, finishedCallback = { _, _, _ ->
-            val catalogSongDatabaseHelper = CatalogSongDatabaseHelper(context)
+        loadSongListAsync(
+            context,
+            forceReload,
+            skip,
+            displayLoading,
+            finishedCallback = { _, _, _ ->
+                val catalogSongDatabaseHelper = CatalogSongDatabaseHelper(context)
 
-            val songList = catalogSongDatabaseHelper.getSongs(skip.toLong(), 50)
-            val songIdList = ArrayList<String>()
+                val songList = catalogSongDatabaseHelper.getSongs(skip.toLong(), 50)
+                val songIdList = ArrayList<String>()
 
-            for (song in songList) {
-                songIdList.add(song.songId)
-            }
+                for (song in songList) {
+                    songIdList.add(song.songId)
+                }
 
-            callback(songIdList)
-        }, errorCallback = { _, _, _ ->
-            errorCallback(context.getString(R.string.errorLoadingSongList))
-        })
+                callback(songIdList)
+            },
+            errorCallback = { _, _, _ ->
+                errorCallback(context.getString(R.string.errorLoadingSongList))
+            })
     }
 
     override fun getHeader(context: Context): String? {

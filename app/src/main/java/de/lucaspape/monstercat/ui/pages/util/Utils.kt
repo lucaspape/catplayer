@@ -116,7 +116,7 @@ internal fun playPlaylistNextAsync(context: Context, playlistId: String) {
  * Download an entire playlist
  */
 internal fun downloadPlaylistAsync(view: View, playlistId: String, downloadFinished: () -> Unit) {
-    loadPlaylistTracksAsync(view.context, true, playlistId, {} , {_,_,_->
+    loadPlaylistTracksAsync(view.context, true, playlistId, {}, { _, _, _ ->
         val playlistItemDatabaseHelper =
             PlaylistItemDatabaseHelper(view.context, playlistId)
         val playlistItemList = playlistItemDatabaseHelper.getAllData()
@@ -127,7 +127,7 @@ internal fun downloadPlaylistAsync(view: View, playlistId: String, downloadFinis
 
             song?.songId?.let { addDownloadSong(view.context, it, downloadFinished) }
         }
-    }, {_,_,_->
+    }, { _, _, _ ->
         displaySnackBar(
             view,
             view.context.getString(R.string.errorRetrievePlaylist),
@@ -342,25 +342,25 @@ internal fun renamePlaylist(view: View, playlistId: String) {
 }
 
 private fun renamePlaylistAsync(view: View, playlistId: String, playlistName: String) {
-        renamePlaylistAsync(view.context,
-            playlistId,
-            playlistName,
-            finishedCallback = { _, _ ->
-                displaySnackBar(view, view.context.getString(R.string.playlistRenamedMsg), null) {}
-            },
-            errorCallback = { _, _ ->
-                displaySnackBar(
+    renamePlaylistAsync(view.context,
+        playlistId,
+        playlistName,
+        finishedCallback = { _, _ ->
+            displaySnackBar(view, view.context.getString(R.string.playlistRenamedMsg), null) {}
+        },
+        errorCallback = { _, _ ->
+            displaySnackBar(
+                view,
+                view.context.getString(R.string.renamePlaylistError),
+                view.context.getString(R.string.retry)
+            ) {
+                renamePlaylistAsync(
                     view,
-                    view.context.getString(R.string.renamePlaylistError),
-                    view.context.getString(R.string.retry)
-                ) {
-                    renamePlaylistAsync(
-                        view,
-                        playlistName,
-                        playlistId
-                    )
-                }
-            })
+                    playlistName,
+                    playlistId
+                )
+            }
+        })
 }
 
 internal fun togglePlaylistPublicStateAsync(view: View, playlistId: String) {
@@ -635,8 +635,10 @@ internal fun openAlbum(view: View, albumMcId: String, share: Boolean) {
             context.getString(R.string.pickApp)
         }
 
-        displayAlertDialogList(context,
-            HeaderTextItem(title), itemArray) { position, _ ->
+        displayAlertDialogList(
+            context,
+            HeaderTextItem(title), itemArray
+        ) { position, _ ->
             urlArray[position].let { url ->
                 if (share) {
                     val sendIntent = Intent().apply {

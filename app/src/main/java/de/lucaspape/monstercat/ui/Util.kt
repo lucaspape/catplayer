@@ -3,10 +3,13 @@ package de.lucaspape.monstercat.ui
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
+import androidx.annotation.AttrRes
+import androidx.annotation.ColorInt
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -47,8 +50,8 @@ fun displayAlertDialogToggleList(
     context: Context,
     headerItem: GenericItem?,
     listItems: Array<AlertListToggleItem>,
-    onToggle: (position:Int, item: AlertListToggleItem, enabled: Boolean) -> Unit
-){
+    onToggle: (position: Int, item: AlertListToggleItem, enabled: Boolean) -> Unit
+) {
     val alertDialogBuilder = MaterialAlertDialogBuilder(context, R.style.DialogSlideAnim)
 
     val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
@@ -98,7 +101,7 @@ fun displayAlertDialogToggleList(
             fastAdapter: FastAdapter<AlertListToggleItem>,
             item: AlertListToggleItem
         ) {
-            if(v is SwitchMaterial){
+            if (v is SwitchMaterial) {
                 val index = position + indexOffset
 
                 if (index >= 0) {
@@ -161,4 +164,14 @@ fun displayAlertDialogList(
 
         false
     }
+}
+
+@ColorInt
+fun Context.getColorFromAttr(
+    @AttrRes attrColor: Int,
+    typedValue: TypedValue = TypedValue(),
+    resolveRefs: Boolean = true
+): Int {
+    theme.resolveAttribute(attrColor, typedValue, resolveRefs)
+    return typedValue.data
 }

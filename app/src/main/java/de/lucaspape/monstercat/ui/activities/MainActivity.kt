@@ -71,18 +71,18 @@ class MainActivity : AppCompatActivity() {
         BottomNavigationView.OnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_home -> {
-                    if(pageName == "home"){
+                    if (pageName == "home") {
                         openHome(null, true)
-                    }else{
+                    } else {
                         openHome(null, false)
                     }
 
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.navigation_playlist -> {
-                    if(pageName == "playlist"){
+                    if (pageName == "playlist") {
                         openPlaylist(null, true)
-                    }else{
+                    } else {
                         openPlaylist(null, false)
                     }
 

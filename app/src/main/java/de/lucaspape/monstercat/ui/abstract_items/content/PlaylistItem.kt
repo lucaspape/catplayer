@@ -75,14 +75,14 @@ open class PlaylistItem(
                     )
                 )
 
-                if(playlist.public){
+                if (playlist.public) {
                     itemList.add(
                         AlertListItem(
                             view.context.getString(R.string.makePlaylistPrivate),
                             playlistPrivateDrawable
                         )
                     )
-                }else{
+                } else {
                     itemList.add(
                         AlertListItem(
                             view.context.getString(R.string.makePlaylistPublic),

@@ -1,8 +1,11 @@
 package de.lucaspape.monstercat.ui.pages.util
 
+import android.annotation.SuppressLint
 import android.content.Context
+
 import android.view.View
 import android.widget.ImageButton
+import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -19,14 +22,27 @@ import de.lucaspape.monstercat.ui.abstract_items.util.ProgressItem
 import de.lucaspape.monstercat.ui.displaySnackBar
 import de.lucaspape.util.Cache
 
-abstract class RecyclerViewPage(private val cacheId:String) {
-    abstract fun onItemClick(context: Context, viewData:ArrayList<GenericItem>, itemIndex:Int)
-    abstract fun onItemLongClick(view: View, viewData:ArrayList<GenericItem>, itemIndex:Int)
+abstract class RecyclerViewPage(private val cacheId: String) {
+    abstract fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int)
+    abstract fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int)
     abstract fun onMenuButtonClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int)
-    abstract fun onDownloadButtonClick(context: Context, item:GenericItem, downloadImageButton:ImageButton)
-    abstract fun idToAbstractItem(view:View, id:String):GenericItem
-    abstract fun load(context:Context, forceReload: Boolean, skip:Int, displayLoading:()->Unit, callback:(itemIdList:ArrayList<String>)->Unit, errorCallback:(errorMessage:String)->Unit)
-    abstract fun getHeader(context: Context):String?
+    abstract fun onDownloadButtonClick(
+        context: Context,
+        item: GenericItem,
+        downloadImageButton: ImageButton
+    )
+
+    abstract fun idToAbstractItem(view: View, id: String): GenericItem
+    abstract fun load(
+        context: Context,
+        forceReload: Boolean,
+        skip: Int,
+        displayLoading: () -> Unit,
+        callback: (itemIdList: ArrayList<String>) -> Unit,
+        errorCallback: (errorMessage: String) -> Unit
+    )
+
+    abstract fun getHeader(context: Context): String?
 
     private var recyclerView: RecyclerView? = null
     private var itemAdapter = ItemAdapter<GenericItem>()
@@ -37,15 +53,20 @@ abstract class RecyclerViewPage(private val cacheId:String) {
 
     private var itemHeaderOffset = 0
 
-    open fun onCreate(view: View){
+    open fun onCreate(view: View) {
         loadInit(view, false)
     }
 
-    open fun clearDatabase(context:Context){
+    open fun clearDatabase(context: Context) {
 
     }
 
-    private fun setupRecyclerView(view: View){
+    open fun getOrientation(view:View): Int {
+        return LinearLayout.VERTICAL
+    }
+
+    @SuppressLint("WrongConstant")
+    private fun setupRecyclerView(view: View) {
         recyclerView = view.findViewById(R.id.recyclerView)
 
         itemAdapter = ItemAdapter()
@@ -60,7 +81,7 @@ abstract class RecyclerViewPage(private val cacheId:String) {
             FastAdapter.with(listOf(headerAdapter, itemAdapter, footerAdapter))
 
         recyclerView?.layoutManager =
-            LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
+            LinearLayoutManager(view.context, getOrientation(view), false)
 
         recyclerView?.adapter = fastAdapter
 
@@ -143,7 +164,7 @@ abstract class RecyclerViewPage(private val cacheId:String) {
         itemHeaderOffset += -1
     }
 
-    private fun addItem(item:GenericItem, id:String) {
+    private fun addItem(item: GenericItem, id: String) {
         viewData.add(item)
         itemAdapter.add(item)
 
@@ -158,12 +179,12 @@ abstract class RecyclerViewPage(private val cacheId:String) {
         cache.set(cacheId, cacheList)
     }
 
-    private fun addItemFromCache(item:GenericItem){
+    private fun addItemFromCache(item: GenericItem) {
         viewData.add(item)
         itemAdapter.add(item)
     }
 
-    fun loadInit(view:View, forceReload:Boolean){
+    fun loadInit(view: View, forceReload: Boolean) {
         val cache = Cache().get<ArrayList<String>>(cacheId)
 
         val swipeRefreshLayout =
@@ -178,7 +199,7 @@ abstract class RecyclerViewPage(private val cacheId:String) {
             }, callback = { idList ->
                 setupRecyclerView(view)
 
-                for(id in idList){
+                for (id in idList) {
                     addItem(idToAbstractItem(view, id), id)
                 }
 
@@ -246,29 +267,35 @@ abstract class RecyclerViewPage(private val cacheId:String) {
         }
     }
 
-    private fun loadNext(view: View, currentPage:Int){
+    private fun loadNext(view: View, currentPage: Int) {
         recyclerView?.post {
             footerAdapter.clear()
             footerAdapter.add(ProgressItem())
 
-            load(view.context, false, (currentPage * 50), displayLoading = {}, callback = { idList ->
-                for(id in idList){
-                    addItem(idToAbstractItem(view, id), id)
-                }
+            load(
+                view.context,
+                false,
+                (currentPage * 50),
+                displayLoading = {},
+                callback = { idList ->
+                    for (id in idList) {
+                        addItem(idToAbstractItem(view, id), id)
+                    }
 
-                footerAdapter.clear()
+                    footerAdapter.clear()
 
-            }, errorCallback = { errorMessage ->
-                footerAdapter.clear()
+                },
+                errorCallback = { errorMessage ->
+                    footerAdapter.clear()
 
-                displaySnackBar(
-                    view,
-                    errorMessage,
-                    view.context.getString(R.string.retry)
-                ) {
-                    loadNext(view, currentPage)
-                }
-            })
+                    displaySnackBar(
+                        view,
+                        errorMessage,
+                        view.context.getString(R.string.retry)
+                    ) {
+                        loadNext(view, currentPage)
+                    }
+                })
         }
     }
 

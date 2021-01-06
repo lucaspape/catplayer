@@ -69,7 +69,7 @@ class SearchRecyclerPage(
         callback: (itemIdList: ArrayList<String>) -> Unit,
         errorCallback: (errorMessage: String) -> Unit
     ) {
-        search?.let{
+        search?.let {
             displayLoading()
 
             loadTitleSearchAsync(

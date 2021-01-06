@@ -1,13 +1,17 @@
 package de.lucaspape.monstercat.ui.abstract_items.content
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.util.TypedValue
 import android.view.HapticFeedbackConstants
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.AttrRes
+import androidx.annotation.ColorInt
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
@@ -229,6 +233,12 @@ open class CatalogItem(
                     titleMenuButton.setImageURI(moreButtonDrawableBlack.toUri())
                     titleTextView.setTextColor(ContextCompat.getColor(context, R.color.black))
                     artistTextView.setTextColor(ContextCompat.getColor(context, R.color.black))
+                } else {
+                    layout.setBackgroundColor(context.getColorFromAttr(R.attr.cardForegroundColor))
+                    titleDownloadButton.setImageURI(downloadDrawable.toUri())
+                    titleMenuButton.setImageURI(moreButtonDrawable.toUri())
+                    titleTextView.setTextColor(context.getColorFromAttr(R.attr.colorOnSurface))
+                    artistTextView.setTextColor(context.getColorFromAttr(R.attr.colorOnSurface))
                 }
 
                 albumId = song.albumId

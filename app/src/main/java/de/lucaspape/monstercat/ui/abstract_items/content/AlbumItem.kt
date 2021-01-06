@@ -22,7 +22,7 @@ import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListItem
 
 open class AlbumItem(
     val albumId: String,
-    val horizontal: Boolean
+    horizontal: Boolean
 ) : AbstractItem<AlbumItem.ViewHolder>() {
 
     companion object {
