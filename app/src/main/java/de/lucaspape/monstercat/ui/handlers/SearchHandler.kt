@@ -88,4 +88,8 @@ class SearchHandler(
                 })
         }
     }
+
+    override fun clearDatabase(context: Context) {
+
+    }
 }

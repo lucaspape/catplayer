@@ -22,10 +22,18 @@ class HomeCatalogAlbumHandler(private val albumId: String?,
             val skipMonstercatSongs =
                 Settings(context).getBoolean(context.getString(R.string.skipMonstercatSongsSetting)) == true
 
+            val catalogViewData = ArrayList<CatalogItem>()
+
+            for(item in viewData){
+                if(item is CatalogItem){
+                    catalogViewData.add(item)
+                }
+            }
+
             playSongsFromViewDataAsync(
                 context,
                 skipMonstercatSongs,
-                viewData as ArrayList<CatalogItem>,
+                catalogViewData,
                 itemIndex
             )
         }
@@ -103,5 +111,11 @@ class HomeCatalogAlbumHandler(private val albumId: String?,
         }
 
         return null
+    }
+
+    override fun clearDatabase(context: Context) {
+        albumId?.let{
+            AlbumItemDatabaseHelper(context, it).reCreateTable()
+        }
     }
 }

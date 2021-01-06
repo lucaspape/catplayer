@@ -27,6 +27,7 @@ abstract class RecyclerViewHandler(private val cacheId:String) {
     abstract fun idToAbstractItem(view:View, id:String):GenericItem
     abstract fun load(context:Context, forceReload: Boolean, skip:Int, displayLoading:()->Unit, callback:(itemIdList:ArrayList<String>)->Unit, errorCallback:()->Unit)
     abstract fun getHeader(context: Context):String?
+    abstract fun clearDatabase(context:Context)
 
     private var recyclerView: RecyclerView? = null
     private var itemAdapter = ItemAdapter<GenericItem>()
@@ -167,6 +168,7 @@ abstract class RecyclerViewHandler(private val cacheId:String) {
 
         if (cache.isNullOrEmpty() || forceReload) {
             Cache().set(cacheId, null)
+            clearDatabase(view.context)
 
             load(view.context, forceReload, 0, displayLoading = {
                 swipeRefreshLayout.isRefreshing = true

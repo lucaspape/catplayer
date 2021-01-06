@@ -105,4 +105,8 @@ class PlaylistListHandler(private val loadPlaylist: (playlistId: String) -> Unit
     override fun getHeader(context: Context): String {
         return context.getString(R.string.yourPlaylists)
     }
+
+    override fun clearDatabase(context: Context) {
+        PlaylistDatabaseHelper(context).reCreateTable(context, false)
+    }
 }

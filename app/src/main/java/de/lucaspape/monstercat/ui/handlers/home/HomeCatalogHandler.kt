@@ -105,4 +105,8 @@ open class HomeCatalogHandler(cacheId:String): RecyclerViewHandler(cacheId) {
     override fun getHeader(context: Context): String? {
         return null
     }
+
+    override fun clearDatabase(context: Context) {
+        CatalogSongDatabaseHelper(context).reCreateTable()
+    }
 }

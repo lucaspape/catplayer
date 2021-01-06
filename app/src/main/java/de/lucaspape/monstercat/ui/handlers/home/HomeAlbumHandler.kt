@@ -84,4 +84,8 @@ class HomeAlbumHandler(private val onSingleAlbumLoad: (albumId: String, albumMcI
     override fun getHeader(context: Context): String? {
         return null
     }
+
+    override fun clearDatabase(context: Context) {
+        AlbumDatabaseHelper(context).reCreateTable(context, false)
+    }
 }
