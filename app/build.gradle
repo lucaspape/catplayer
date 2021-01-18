@@ -1,6 +1,5 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.google.gms.google-services'
 
 android {
@@ -9,7 +8,7 @@ android {
         jvmTarget = "1.8"
     }
     compileSdkVersion 30
-    buildToolsVersion "30.0.2"
+    buildToolsVersion "30.0.3"
     defaultConfig {
         applicationId "de.lucaspape.monstercat"
         minSdkVersion 24
@@ -55,8 +54,8 @@ dependencies {
     implementation "com.mikepenz:fastadapter-extensions-scroll:5.0.0"
     implementation 'com.squareup.picasso:picasso:2.71828'
 
-    implementation 'com.squareup.okhttp3:okhttp:4.6.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.9.0'
 
-    implementation 'com.google.firebase:firebase-analytics:18.0.0'
+    implementation 'com.google.firebase:firebase-analytics:18.0.1'
     implementation 'com.google.firebase:firebase-messaging:21.0.1'
 }
