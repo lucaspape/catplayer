@@ -13,8 +13,8 @@ android {
         applicationId "de.lucaspape.monstercat"
         minSdkVersion 24
         targetSdkVersion 30
-        versionCode 14300
-        versionName "1.4.3"
+        versionCode 14400
+        versionName "1.4.4"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -48,7 +48,7 @@ dependencies {
 
     //exoplayer
     implementation fileTree(dir: 'src/main/libs/exoplayer', include: ['*.aar'])
-    api 'com.google.guava:guava:24.1-jre'
+    api 'com.google.guava:guava:30.1-jre'
 
     implementation "com.mikepenz:fastadapter:5.0.0"
     implementation "com.mikepenz:fastadapter-extensions-scroll:5.0.0"
