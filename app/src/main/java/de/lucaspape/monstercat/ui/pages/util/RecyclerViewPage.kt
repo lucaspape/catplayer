@@ -22,7 +22,7 @@ import de.lucaspape.monstercat.ui.abstract_items.util.ProgressItem
 import de.lucaspape.monstercat.ui.displaySnackBar
 import de.lucaspape.util.Cache
 
-abstract class RecyclerViewPage(private val cacheId: String) {
+abstract class RecyclerViewPage(var cacheId: String) {
     abstract fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int)
     abstract fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int)
     abstract fun onMenuButtonClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int)
@@ -192,7 +192,9 @@ abstract class RecyclerViewPage(private val cacheId: String) {
 
         if (cache.isNullOrEmpty() || forceReload) {
             Cache().set(cacheId, null)
-            clearDatabase(view.context)
+
+            if(forceReload)
+                clearDatabase(view.context)
 
             load(view.context, forceReload, 0, displayLoading = {
                 swipeRefreshLayout.isRefreshing = true

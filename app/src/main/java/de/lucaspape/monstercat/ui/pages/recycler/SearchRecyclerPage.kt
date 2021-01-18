@@ -12,7 +12,7 @@ import kotlin.collections.ArrayList
 class SearchRecyclerPage(
     private var search: String?,
     private val closeSearch: () -> Unit
-) : Page, HomeCatalogRecyclerPage("search") {
+) : Page, HomeCatalogRecyclerPage("search-$search") {
     override val layout: Int = R.layout.fragment_search
 
     override fun onBackPressed(view: View) {
@@ -31,6 +31,7 @@ class SearchRecyclerPage(
         searchView.onActionViewExpanded()
 
         search?.let {
+            searchView.setQuery(search, false)
             loadInit(view, false)
         }
     }
@@ -53,6 +54,7 @@ class SearchRecyclerPage(
             override fun onQueryTextSubmit(query: String?): Boolean {
                 query?.let {
                     search = it
+                    cacheId = "search-$search"
                     loadInit(view, false)
                 }
 
