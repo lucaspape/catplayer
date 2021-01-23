@@ -42,7 +42,7 @@ class PlaylistContentsRecyclerPage(private val playlistId: String) :
                             playlistId
                         )
 
-                    val playlistItems = playlistItemDatabaseHelper.getAllData()
+                    val playlistItems = playlistItemDatabaseHelper.getAllData(true)
 
                     val idList = ArrayList<String>()
 

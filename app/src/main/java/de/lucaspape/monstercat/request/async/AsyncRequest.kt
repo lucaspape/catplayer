@@ -3,6 +3,7 @@ package de.lucaspape.monstercat.request.async
 import android.content.Context
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.*
+import de.lucaspape.monstercat.core.database.objects.Mood
 import de.lucaspape.monstercat.core.database.objects.Song
 import de.lucaspape.monstercat.core.util.*
 import de.lucaspape.monstercat.request.*
@@ -581,7 +582,7 @@ fun loadPlaylistTracksAsync(
             context,
             playlistId
         )
-    val playlistItems = playlistItemDatabaseHelper.getAllData()
+    val playlistItems = playlistItemDatabaseHelper.getAllData(true)
 
     if (!forceReload && playlistItems.isNotEmpty()) {
         finishedCallback(forceReload, playlistId, displayLoading)
@@ -828,4 +829,109 @@ fun renamePlaylistAsync(
     }
 
     backgroundTask.execute()
+}
+
+fun loadMoodsAsync(context: Context, finishedCallback: (results: ArrayList<Mood>) -> Unit, errorCallback: () -> Unit){
+    val backgroundTask = object : BackgroundTask<ArrayList<Mood>?>() {
+        override suspend fun background() {
+            val moodResults: ArrayList<Mood>? = ArrayList()
+
+            val queue =
+                getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+
+            newLoadMoodsRequest(context, {
+                val moodDatabaseHelper = MoodDatabaseHelper(context)
+
+                val moods = it.keys()
+
+                for(mood in moods){
+                    val moodObject = it.getJSONObject(mood)
+                    moodDatabaseHelper.insertMood(mood, moodObject.getString("image"), moodObject.getString("name"))
+
+                    moodDatabaseHelper.getMood(mood)?.let {
+                        moodResults?.add(it)
+                    }
+                }
+
+                updateProgress(moodResults)
+            }, {
+                updateProgress(null)
+            }).let {
+                queue.add(it)
+            }
+        }
+
+        override suspend fun publishProgress(value: ArrayList<Mood>?) {
+            if (value != null) {
+                finishedCallback(value)
+            } else {
+                errorCallback()
+            }
+        }
+    }
+
+    backgroundTask.execute()
+}
+
+fun loadMoodAsync(context: Context, forceReload: Boolean, moodId:String, skip:Int, limit:Int, displayLoading: () -> Unit, finishedCallback: (moodId:String) -> Unit, errorCallback: () -> Unit){
+    val playlistItemDatabaseHelper =
+        PlaylistItemDatabaseHelper(
+            context,
+            moodId
+        )
+    val playlistItems = playlistItemDatabaseHelper.getAllData(true)
+
+    if (!forceReload && playlistItems.isNotEmpty()) {
+        finishedCallback(moodId)
+    } else {
+        val backgroundTask = object : BackgroundTask<Boolean?>() {
+            override suspend fun background() {
+                val queue =
+                    getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+
+                val jsonObjectList = ArrayList<JSONObject?>()
+
+                queue.add(
+                    newLoadMoodRequest(
+                        context,
+                        moodId,
+                        skip,
+                        limit,
+                        {
+                            val jsonArray = it.getJSONArray("results")
+
+                            for (k in (0 until jsonArray.length())) {
+                                jsonObjectList.add(jsonArray.getJSONObject(k))
+                            }
+
+                            playlistItemDatabaseHelper.reCreateTable()
+
+                            for (playlistObject in jsonObjectList) {
+                                if (playlistObject != null) {
+                                    parsePlaylistTrackToDB(
+                                        moodId,
+                                        playlistObject,
+                                        context
+                                    )
+                                }
+
+                            }
+
+                            updateProgress(true)
+                        },
+                        { updateProgress(false) })
+                )
+            }
+
+            override suspend fun publishProgress(value: Boolean?) {
+                if (value == true) {
+                    finishedCallback(moodId)
+                } else {
+                    errorCallback()
+                }
+            }
+        }
+
+        backgroundTask.execute()
+    }
 }

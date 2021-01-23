@@ -80,15 +80,21 @@ class PlaylistItemDatabaseHelper(context: Context, var playlistId: String) :
         return id
     }
 
-    fun getAllData(): List<PlaylistItem> {
+    fun getAllData(ascending:Boolean): List<PlaylistItem> {
         val playlistItems: ArrayList<PlaylistItem> = ArrayList()
+
+        val sort = if(ascending){
+            "ASC"
+        }else{
+            "DESC"
+        }
 
         val selectQuery = "SELECT * FROM " + PlaylistItem(
             playlistId,
             0,
             ""
         ).TABLE_NAME + " ORDER BY " +
-                PlaylistItem.COLUMN_ID + " ASC"
+                PlaylistItem.COLUMN_ID + " $sort"
 
         val db = writableDatabase
         val cursor = db.rawQuery(selectQuery, null)

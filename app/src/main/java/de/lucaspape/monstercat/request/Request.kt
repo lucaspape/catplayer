@@ -617,3 +617,36 @@ fun newCustomApiFeatureRequest(
         Response.ErrorListener(errorCallback)
     )
 }
+
+fun newLoadMoodsRequest(context: Context, callback: (response: JSONObject) -> Unit, errorCallback: (error: VolleyError?) -> Unit):StringRequest{
+    val requestUrl = "https://connect.monstercat.com/v2/catalog/moods"
+
+    return StringRequest(
+        Request.Method.GET, requestUrl,
+        {
+            try {
+                callback(JSONObject(it))
+            } catch (e: JSONException) {
+                errorCallback(null)
+            }
+
+        }, Response.ErrorListener(errorCallback)
+    )
+}
+
+fun newLoadMoodRequest(context: Context, moodId:String, skip: Int,
+                       limit: Int, callback: (response: JSONObject) -> Unit, errorCallback: (error: VolleyError?) -> Unit):StringRequest{
+    val requestUrl = "https://connect.monstercat.com/v2/catalog/mood/$moodId?raw=%7B%7D&limit=$limit&skip=$skip&offset=0&search=&sort=-date&nogold=false&onlyReleased=true"
+
+    return StringRequest(
+        Request.Method.GET, requestUrl,
+        {
+            try {
+                callback(JSONObject(it))
+            } catch (e: JSONException) {
+                errorCallback(null)
+            }
+
+        }, Response.ErrorListener(errorCallback)
+    )
+}

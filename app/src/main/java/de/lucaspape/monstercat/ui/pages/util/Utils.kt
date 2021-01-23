@@ -90,7 +90,7 @@ internal fun playPlaylistNextAsync(context: Context, playlistId: String) {
     loadPlaylistTracksAsync(context, true, playlistId, {}, { _, _, _ ->
         val playlistItemDatabaseHelper =
             PlaylistItemDatabaseHelper(context, playlistId)
-        val playlistItemList = playlistItemDatabaseHelper.getAllData().reversed()
+        val playlistItemList = playlistItemDatabaseHelper.getAllData(true).reversed()
 
         val songDatabaseHelper = SongDatabaseHelper(context)
 
@@ -119,7 +119,7 @@ internal fun downloadPlaylistAsync(view: View, playlistId: String, downloadFinis
     loadPlaylistTracksAsync(view.context, true, playlistId, {}, { _, _, _ ->
         val playlistItemDatabaseHelper =
             PlaylistItemDatabaseHelper(view.context, playlistId)
-        val playlistItemList = playlistItemDatabaseHelper.getAllData()
+        val playlistItemList = playlistItemDatabaseHelper.getAllData(true)
 
         for (playlistItem in playlistItemList) {
             val songDatabaseHelper = SongDatabaseHelper(view.context)
@@ -154,7 +154,7 @@ internal fun deleteDownloadedPlaylistTracks(
     alertDialogBuilder.setTitle(context.getString(R.string.deletePlaylistDownloadedTracksMsg))
     alertDialogBuilder.setPositiveButton(context.getString(R.string.yes)) { _, _ ->
         val playlistItemDatabaseHelper = PlaylistItemDatabaseHelper(context, playlistId)
-        val playlistItemList = playlistItemDatabaseHelper.getAllData()
+        val playlistItemList = playlistItemDatabaseHelper.getAllData(true)
 
         val songDatabaseHelper = SongDatabaseHelper(context)
 

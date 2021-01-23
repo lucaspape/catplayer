@@ -1,21 +1,16 @@
 package de.lucaspape.monstercat.ui.abstract_items.content
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.util.TypedValue
 import android.view.HapticFeedbackConstants
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.annotation.AttrRes
-import androidx.annotation.ColorInt
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
-import com.google.android.material.card.MaterialCardView
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
 import com.squareup.picasso.Target
@@ -41,14 +36,14 @@ open class CatalogItem(
     companion object {
         @JvmStatic
         fun getSongDownloadStatus(song: Song): Uri {
-            if (song.inEarlyAccess) {
-                return when {
+            return if (song.inEarlyAccess) {
+                when {
                     song.downloaded -> offlineDrawableBlack.toUri()
                     song.isDownloadable -> downloadDrawableBlack.toUri()
                     else -> emptyDrawable.toUri()
                 }
             } else {
-                return when {
+                when {
                     song.downloaded -> offlineDrawable.toUri()
                     song.isDownloadable -> downloadDrawable.toUri()
                     else -> emptyDrawable.toUri()

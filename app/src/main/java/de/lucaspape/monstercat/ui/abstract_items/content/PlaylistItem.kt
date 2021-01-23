@@ -22,8 +22,6 @@ import de.lucaspape.monstercat.ui.*
 import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListHeaderItem
 import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListItem
 import de.lucaspape.monstercat.core.util.BackgroundAsync
-import de.lucaspape.monstercat.ui.pages.*
-import de.lucaspape.monstercat.ui.pages.util.*
 import de.lucaspape.monstercat.ui.pages.util.deletePlaylist
 import de.lucaspape.monstercat.ui.pages.util.downloadPlaylistAsync
 import de.lucaspape.monstercat.ui.pages.util.openPlaylist
@@ -155,7 +153,7 @@ open class PlaylistItem(
 
     fun getDownloadStatus(context: Context): String {
         val playlistTracks =
-            PlaylistItemDatabaseHelper(context, playlistId).getAllData()
+            PlaylistItemDatabaseHelper(context, playlistId).getAllData(true)
 
         var downloaded = true
 

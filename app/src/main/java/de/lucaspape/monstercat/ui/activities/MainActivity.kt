@@ -42,6 +42,7 @@ import de.lucaspape.monstercat.ui.pages.HomePage
 import de.lucaspape.monstercat.ui.pages.PlaylistPage
 import de.lucaspape.monstercat.util.*
 import de.lucaspape.monstercat.core.util.Settings
+import de.lucaspape.monstercat.ui.pages.ExplorePage
 import de.lucaspape.monstercat.ui.pages.recycler.SearchRecyclerPage
 import de.lucaspape.monstercat.ui.pages.SettingsPage
 import java.io.File
@@ -70,6 +71,15 @@ class MainActivity : AppCompatActivity() {
     private val onNavigationItemSelectedListener =
         BottomNavigationView.OnNavigationItemSelectedListener { item ->
             when (item.itemId) {
+                R.id.navigation_explore -> {
+                    if (pageName == "explore") {
+                        openExplore(true)
+                    } else {
+                        openExplore(false)
+                    }
+
+                    return@OnNavigationItemSelectedListener true
+                }
                 R.id.navigation_home -> {
                     if (pageName == "home") {
                         openHome(null, true)
@@ -110,6 +120,22 @@ class MainActivity : AppCompatActivity() {
                 SettingsPage {
                     openHome(null, false)
                 }
+            )
+        )
+    }
+
+    private fun openExplore(resetPosition: Boolean){
+        openFragment(
+            de.lucaspape.monstercat.ui.Fragment.newInstance(
+                ExplorePage(
+                    { searchString ->
+                        search(
+                            searchString
+                        )
+                    },
+                    { openSettings() },
+                    resetPosition
+                )
             )
         )
     }
@@ -306,6 +332,8 @@ class MainActivity : AppCompatActivity() {
 
         //show privacy policy
         showPrivacyPolicy()
+
+        findViewById<BottomNavigationView>(R.id.nav_view).selectedItemId = R.id.navigation_home
     }
 
     override fun onDestroy() {

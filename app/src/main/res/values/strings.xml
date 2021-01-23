@@ -149,4 +149,5 @@
     <string name="dontPlayNotCreatorFriendly">Don\'t play non-creator-friendly songs</string>
     <string name="notOnline">Not Online!</string>
     <string name="logout">Logout</string>
+    <string name="title_explore">Explore</string>
 </resources>
