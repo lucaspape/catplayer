@@ -16,11 +16,14 @@ import de.lucaspape.monstercat.request.async.loadGenresAsync
 import de.lucaspape.monstercat.request.async.loadGreatestHitsAsync
 import de.lucaspape.monstercat.request.async.loadMoodsAsync
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
-import de.lucaspape.monstercat.ui.pages.util.playSongsFromCatalogDbAsync
 import de.lucaspape.monstercat.ui.pages.util.playSongsFromViewDataAsync
 import java.io.File
 
-class ExploreItem(val typeName: String, val openMood: (moodId: String) -> Unit, val openGenre: (genreId: String)->Unit) :
+class ExploreItem(
+    val typeName: String,
+    val openMood: (moodId: String) -> Unit,
+    val openGenre: (genreId: String) -> Unit
+) :
     AbstractItem<ExploreItem.ViewHolder>() {
     override val type: Int = 152
 
@@ -39,43 +42,61 @@ class ExploreItem(val typeName: String, val openMood: (moodId: String) -> Unit, 
 
         override fun bindView(item: ExploreItem, payloads: List<Any>) {
             recyclerViewList = object : RecyclerViewPage(null) {
-                override fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
-                    val fistItem = viewData[itemIndex]
-
-                    if (fistItem is CatalogItem) {
-                        val skipMonstercatSongs =
-                            Settings(context).getBoolean(context.getString(R.string.skipMonstercatSongsSetting)) == true
-
-                        val catalogViewData = ArrayList<CatalogItem>()
-
-                        for (item in viewData) {
-                            if (item is CatalogItem) {
-                                catalogViewData.add(item)
-                            }
+                override fun onItemClick(
+                    context: Context,
+                    viewData: ArrayList<GenericItem>,
+                    itemIndex: Int
+                ) {
+                    when (val clickedItem = viewData[itemIndex]) {
+                        is MoodItem -> {
+                            item.openMood(clickedItem.moodId)
                         }
+                        is GenreItem -> {
+                            item.openGenre(clickedItem.genreId)
+                        }
+                        is CatalogItem -> {
+                            val skipMonstercatSongs =
+                                Settings(context).getBoolean(context.getString(R.string.skipMonstercatSongsSetting)) == true
 
-                        playSongsFromViewDataAsync(
-                            context,
-                            skipMonstercatSongs,
-                            catalogViewData,
-                            itemIndex
-                        )
+                            val catalogViewData = ArrayList<CatalogItem>()
+
+                            for (catalogItem in viewData) {
+                                if (catalogItem is CatalogItem) {
+                                    catalogViewData.add(catalogItem)
+                                }
+                            }
+
+                            playSongsFromViewDataAsync(
+                                context,
+                                skipMonstercatSongs,
+                                catalogViewData,
+                                itemIndex
+                            )
+                        }
                     }
                 }
 
-                override fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
+                override fun onItemLongClick(
+                    view: View,
+                    viewData: ArrayList<GenericItem>,
+                    itemIndex: Int
+                ) {
                     val idList = ArrayList<String>()
 
-                    for (item in viewData) {
-                        if (item is CatalogItem) {
-                            idList.add(item.songId)
+                    for (catalogItem in viewData) {
+                        if (catalogItem is CatalogItem) {
+                            idList.add(catalogItem.songId)
                         }
                     }
 
                     CatalogItem.showContextMenu(view, idList, itemIndex)
                 }
 
-                override fun onMenuButtonClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
+                override fun onMenuButtonClick(
+                    view: View,
+                    viewData: ArrayList<GenericItem>,
+                    itemIndex: Int
+                ) {
                     onItemLongClick(view, viewData, itemIndex)
                 }
 
@@ -92,7 +113,11 @@ class ExploreItem(val typeName: String, val openMood: (moodId: String) -> Unit, 
                             when {
                                 File(song.downloadLocation).exists() -> {
                                     File(song.downloadLocation).delete()
-                                    downloadImageButton.setImageURI(CatalogItem.getSongDownloadStatus(song))
+                                    downloadImageButton.setImageURI(
+                                        CatalogItem.getSongDownloadStatus(
+                                            song
+                                        )
+                                    )
                                 }
                                 else -> {
                                     addDownloadSong(
@@ -113,12 +138,16 @@ class ExploreItem(val typeName: String, val openMood: (moodId: String) -> Unit, 
                     view: View,
                     id: String
                 ): GenericItem {
-                    return if (item.typeName == "mood") {
-                        MoodItem(id)
-                    } else if( item.typeName == "genre"){
-                        GenreItem(id)
-                    }else{
-                        CatalogItem(id)
+                    return when (item.typeName) {
+                        "mood" -> {
+                            MoodItem(id)
+                        }
+                        "genre" -> {
+                            GenreItem(id)
+                        }
+                        else -> {
+                            CatalogItem(id)
+                        }
                     }
                 }
 
@@ -128,9 +157,9 @@ class ExploreItem(val typeName: String, val openMood: (moodId: String) -> Unit, 
 
                 override val pageSize: Int = 100
                 override fun getOrientation(view: View): Int {
-                    return if(item.typeName == "greatest-hits"){
+                    return if (item.typeName == "greatest-hits") {
                         LinearLayout.VERTICAL
-                    }else{
+                    } else {
                         LinearLayout.HORIZONTAL
                     }
                 }
@@ -145,50 +174,68 @@ class ExploreItem(val typeName: String, val openMood: (moodId: String) -> Unit, 
                 ) {
                     when (item.typeName) {
                         "mood" -> {
-                            loadMoodsAsync(context, forceReload, displayLoading = {}, finishedCallback = { results ->
-                                if (skip == 0) {
-                                    val idArray = ArrayList<String>()
+                            loadMoodsAsync(
+                                context,
+                                forceReload,
+                                displayLoading = {},
+                                finishedCallback = { results ->
+                                    if (skip == 0) {
+                                        val idArray = ArrayList<String>()
 
-                                    for (mood in results) {
-                                        idArray.add(mood.moodId)
+                                        for (mood in results) {
+                                            idArray.add(mood.moodId)
+                                        }
+
+                                        callback(idArray)
+                                    } else {
+                                        callback(ArrayList())
                                     }
-
-                                    callback(idArray)
-                                } else {
-                                    callback(ArrayList())
-                                }
-                            }, errorCallback = {})
+                                },
+                                errorCallback = {})
                         }
                         "genre" -> {
-                            loadGenresAsync(context, forceReload, displayLoading = {}, finishedCallback = { results ->
-                                if (skip == 0) {
-                                    val idArray = ArrayList<String>()
+                            loadGenresAsync(
+                                context,
+                                forceReload,
+                                displayLoading = {},
+                                finishedCallback = { results ->
+                                    if (skip == 0) {
+                                        val idArray = ArrayList<String>()
 
-                                    for (genre in results) {
-                                        idArray.add(genre.genreId)
+                                        for (genre in results) {
+                                            idArray.add(genre.genreId)
+                                        }
+
+                                        callback(idArray)
+                                    } else {
+                                        callback(ArrayList())
                                     }
-
-                                    callback(idArray)
-                                } else {
-                                    callback(ArrayList())
-                                }
-                            }, errorCallback = {})
+                                },
+                                errorCallback = {})
                         }
                         "greatest-hits" -> {
-                            if(skip == 0){
-                                loadGreatestHitsAsync(context, forceReload, skip,100, displayLoading = {}, finishedCallback = {
-                                    val idArray = ArrayList<String>()
+                            if (skip == 0) {
+                                loadGreatestHitsAsync(
+                                    context,
+                                    forceReload,
+                                    skip,
+                                    100,
+                                    displayLoading = {},
+                                    finishedCallback = {
+                                        val idArray = ArrayList<String>()
 
-                                    val playlistItemDatabaseHelper = PlaylistItemDatabaseHelper(context, "greatest-hits")
-                                    val items = playlistItemDatabaseHelper.getAllData(true)
+                                        val playlistItemDatabaseHelper =
+                                            PlaylistItemDatabaseHelper(context, "greatest-hits")
+                                        val items = playlistItemDatabaseHelper.getAllData(true)
 
-                                    for (playlistItem in items) {
-                                        idArray.add(playlistItem.songId)
-                                    }
+                                        for (playlistItem in items) {
+                                            idArray.add(playlistItem.songId)
+                                        }
 
-                                    callback(idArray)
-                                }, errorCallback = {})
-                            }else{
+                                        callback(idArray)
+                                    },
+                                    errorCallback = {})
+                            } else {
                                 callback(ArrayList())
                             }
                         }

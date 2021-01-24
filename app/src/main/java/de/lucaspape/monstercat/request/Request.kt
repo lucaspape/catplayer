@@ -662,9 +662,12 @@ fun newLoadMoodRequest(
     )
 }
 
-fun newLoadFiltersRequest(context: Context, callback: (response: JSONObject) -> Unit, errorCallback: (error: VolleyError?) -> Unit):StringRequest{
-    val requestUrl =
-        "https://connect.monstercat.com/v2/catalog/filters"
+fun newLoadFiltersRequest(
+    context: Context,
+    callback: (response: JSONObject) -> Unit,
+    errorCallback: (error: VolleyError?) -> Unit
+): StringRequest {
+    val requestUrl = context.getString(R.string.filtersUrl)
 
     return StringRequest(
         Request.Method.GET, requestUrl,
@@ -679,12 +682,16 @@ fun newLoadFiltersRequest(context: Context, callback: (response: JSONObject) -> 
     )
 }
 
-fun newLoadGenreRequest(context: Context,
-                        genreName: String,
-                        skip: Int,
-                        limit: Int, callback: (response: JSONObject) -> Unit, errorCallback: (error: VolleyError?) -> Unit):StringRequest{
+fun newLoadGenreRequest(
+    context: Context,
+    genreName: String,
+    skip: Int,
+    limit: Int,
+    callback: (response: JSONObject) -> Unit,
+    errorCallback: (error: VolleyError?) -> Unit
+): StringRequest {
     val requestUrl =
-        "https://connect.monstercat.com/v2/catalog/browse?raw=%7B%7D&limit=$limit&skip=$skip&offset=0&search=&sort=-date&nogold=false&onlyReleased=true&types[]=Single&types[]=EP&types[]=Album&genres[]=$genreName"
+        context.getString(R.string.loadSongsUrl) + "?raw=%7B%7D&limit=$limit&skip=$skip&offset=0&search=&sort=-date&nogold=false&onlyReleased=true&types[]=Single&types[]=EP&types[]=Album&genres[]=$genreName"
 
     return StringRequest(
         Request.Method.GET, requestUrl,
@@ -699,8 +706,15 @@ fun newLoadGenreRequest(context: Context,
     )
 }
 
-fun newLoadGreatestHitsRequest(context: Context, skip:Int, limit:Int, callback: (response: JSONObject) -> Unit, errorCallback: (error: VolleyError?) -> Unit):StringRequest{
-    val requestUrl = "https://connect.monstercat.com/v2/playlist/991334fb-ca5e-48c6-bc73-cb83c364357d/catalog?raw=%7B%7D&limit=$limit&skip=$skip&offset=0&search=&sort=-date&nogold=false&onlyReleased=true"
+fun newLoadGreatestHitsRequest(
+    context: Context,
+    skip: Int,
+    limit: Int,
+    callback: (response: JSONObject) -> Unit,
+    errorCallback: (error: VolleyError?) -> Unit
+): StringRequest {
+    val requestUrl =
+        context.getString(R.string.playlistUrl) + "991334fb-ca5e-48c6-bc73-cb83c364357d/catalog?raw=%7B%7D&limit=$limit&skip=$skip&offset=0&search=&sort=-date&nogold=false&onlyReleased=true"
 
     return StringRequest(
         Request.Method.GET, requestUrl,

@@ -61,7 +61,7 @@ abstract class RecyclerViewPage(var cacheId: String?) {
 
     }
 
-    open fun getOrientation(view:View): Int {
+    open fun getOrientation(view: View): Int {
         return LinearLayout.VERTICAL
     }
 
@@ -169,7 +169,7 @@ abstract class RecyclerViewPage(var cacheId: String?) {
         itemAdapter.add(item)
 
         val cacheId = cacheId
-        if(cacheId != null){
+        if (cacheId != null) {
             val cache = Cache()
             var cacheList = cache.get<ArrayList<String>>(cacheId)
 
@@ -190,9 +190,9 @@ abstract class RecyclerViewPage(var cacheId: String?) {
     fun loadInit(view: View, forceReload: Boolean) {
         val cacheId = cacheId
 
-        val cache = if(cacheId != null) {
+        val cache = if (cacheId != null) {
             Cache().get<ArrayList<String>>(cacheId)
-        }else{
+        } else {
             null
         }
 
@@ -200,10 +200,10 @@ abstract class RecyclerViewPage(var cacheId: String?) {
             view.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
 
         if (cache.isNullOrEmpty() || forceReload) {
-            if(cacheId != null)
+            if (cacheId != null)
                 Cache().set(cacheId, null)
 
-            if(forceReload)
+            if (forceReload)
                 clearDatabase(view.context)
 
             load(view.context, forceReload, 0, displayLoading = {

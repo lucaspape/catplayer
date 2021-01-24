@@ -29,4 +29,7 @@
 
     <string name="moodsUrl" translatable="false">https://connect.monstercat.com/v2/catalog/moods/</string>
     <string name="moodUrl" translatable="false">https://connect.monstercat.com/v2/catalog/mood/</string>
+
+    <string name="filtersUrl" translatable="false">https://connect.monstercat.com/v2/catalog/filters</string>
+
 </resources>

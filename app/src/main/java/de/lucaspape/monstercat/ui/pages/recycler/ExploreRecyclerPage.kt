@@ -17,7 +17,11 @@ import de.lucaspape.monstercat.ui.pages.util.playSongsFromCatalogDbAsync
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
 import java.io.File
 
-open class ExploreRecyclerPage(cacheId: String, val openMood: (moodId:String) -> Unit, val openGenre: (genreId:String) -> Unit) : RecyclerViewPage(null) {
+open class ExploreRecyclerPage(
+    cacheId: String,
+    val openMood: (moodId: String) -> Unit,
+    val openGenre: (genreId: String) -> Unit
+) : RecyclerViewPage(cacheId) {
 
     override fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val fistItem = viewData[itemIndex]
@@ -81,9 +85,9 @@ open class ExploreRecyclerPage(cacheId: String, val openMood: (moodId:String) ->
     }
 
     override fun idToAbstractItem(view: View, id: String): GenericItem {
-        return if(id.contains("separator-")){
+        return if (id.contains("separator-")) {
             HeaderTextItem(id.replace("separator-", ""))
-        }else{
+        } else {
             ExploreItem(id.replace("item-", ""), openMood, openGenre)
         }
     }
@@ -96,7 +100,7 @@ open class ExploreRecyclerPage(cacheId: String, val openMood: (moodId:String) ->
         callback: (itemIdList: ArrayList<String>) -> Unit,
         errorCallback: (errorMessage: String) -> Unit
     ) {
-        if(skip == 0){
+        if (skip == 0) {
             val idArray = ArrayList<String>()
 
             idArray.add("separator-Moods")
@@ -109,7 +113,7 @@ open class ExploreRecyclerPage(cacheId: String, val openMood: (moodId:String) ->
             idArray.add("item-greatest-hits")
 
             callback(idArray)
-        }else{
+        } else {
             callback(ArrayList())
         }
     }
