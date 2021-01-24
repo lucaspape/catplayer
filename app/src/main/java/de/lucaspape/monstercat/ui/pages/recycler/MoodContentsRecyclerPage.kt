@@ -1,16 +1,13 @@
 package de.lucaspape.monstercat.ui.pages.recycler
 
 import android.content.Context
-import android.view.View
-import com.mikepenz.fastadapter.GenericItem
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.MoodDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.request.async.loadMoodAsync
-import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
 
 class MoodContentsRecyclerPage(private val moodId: String) :
-    HomeCatalogRecyclerPage() {
+    PlaylistContentsRecyclerPage(moodId) {
 
     override val id = "mood-$moodId"
 
@@ -55,9 +52,5 @@ class MoodContentsRecyclerPage(private val moodId: String) :
         }
 
         return null
-    }
-
-    override fun clearDatabase(context: Context) {
-        PlaylistItemDatabaseHelper(context, moodId).reCreateTable()
     }
 }
