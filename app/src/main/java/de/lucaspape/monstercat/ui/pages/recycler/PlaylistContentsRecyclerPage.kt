@@ -6,11 +6,39 @@ import com.mikepenz.fastadapter.GenericItem
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.PlaylistItemDatabaseHelper
+import de.lucaspape.monstercat.core.util.Settings
 import de.lucaspape.monstercat.request.async.loadPlaylistTracksAsync
 import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
+import de.lucaspape.monstercat.ui.pages.util.playSongsFromCatalogDbAsync
+import de.lucaspape.monstercat.ui.pages.util.playSongsFromViewDataAsync
 
 class PlaylistContentsRecyclerPage(private val playlistId: String) :
     HomeCatalogRecyclerPage("playlist-$playlistId") {
+
+    override fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
+        val fistItem = viewData[itemIndex]
+
+        if (fistItem is CatalogItem) {
+            val skipMonstercatSongs =
+                Settings(context).getBoolean(context.getString(R.string.skipMonstercatSongsSetting)) == true
+
+            val catalogViewData = ArrayList<CatalogItem>()
+
+            for (item in viewData) {
+                if (item is CatalogItem) {
+                    catalogViewData.add(item)
+                }
+            }
+
+            playSongsFromViewDataAsync(
+                context,
+                skipMonstercatSongs,
+                catalogViewData,
+                itemIndex
+            )
+        }
+    }
+
     override fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val idList = ArrayList<String>()
 

@@ -207,7 +207,7 @@ abstract class RecyclerViewPage(var cacheId: String?) {
                 clearDatabase(view.context)
 
             load(view.context, forceReload, 0, displayLoading = {
-                swipeRefreshLayout.isRefreshing = true
+                swipeRefreshLayout?.isRefreshing = true
             }, callback = { idList ->
                 setupRecyclerView(view)
 
@@ -230,14 +230,14 @@ abstract class RecyclerViewPage(var cacheId: String?) {
                 })
 
                 //refresh
-                swipeRefreshLayout.setOnRefreshListener {
+                swipeRefreshLayout?.setOnRefreshListener {
                     loadInit(view, true)
                 }
 
-                swipeRefreshLayout.isRefreshing = false
+                swipeRefreshLayout?.isRefreshing = false
 
             }, errorCallback = { errorMessage ->
-                swipeRefreshLayout.isRefreshing = false
+                swipeRefreshLayout?.isRefreshing = false
 
                 displaySnackBar(
                     view,
@@ -269,11 +269,11 @@ abstract class RecyclerViewPage(var cacheId: String?) {
             })
 
             //refresh
-            swipeRefreshLayout.setOnRefreshListener {
+            swipeRefreshLayout?.setOnRefreshListener {
                 loadInit(view, true)
             }
 
-            swipeRefreshLayout.isRefreshing = false
+            swipeRefreshLayout?.isRefreshing = false
 
             restoreRecyclerViewPosition(view.context)
         }

@@ -698,3 +698,19 @@ fun newLoadGenreRequest(context: Context,
         }, Response.ErrorListener(errorCallback)
     )
 }
+
+fun newLoadGreatestHitsRequest(context: Context, skip:Int, limit:Int, callback: (response: JSONObject) -> Unit, errorCallback: (error: VolleyError?) -> Unit):StringRequest{
+    val requestUrl = "https://connect.monstercat.com/v2/playlist/991334fb-ca5e-48c6-bc73-cb83c364357d/catalog?raw=%7B%7D&limit=$limit&skip=$skip&offset=0&search=&sort=-date&nogold=false&onlyReleased=true"
+
+    return StringRequest(
+        Request.Method.GET, requestUrl,
+        {
+            try {
+                callback(JSONObject(it))
+            } catch (e: JSONException) {
+                errorCallback(null)
+            }
+
+        }, Response.ErrorListener(errorCallback)
+    )
+}

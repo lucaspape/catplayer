@@ -1109,3 +1109,75 @@ fun loadGenreAsync(
         backgroundTask.execute()
     }
 }
+
+fun loadGreatestHitsAsync(
+    context: Context,
+    forceReload: Boolean,
+    skip: Int,
+    limit: Int,
+    displayLoading: () -> Unit,
+    finishedCallback: () -> Unit,
+    errorCallback: () -> Unit
+) {
+    val playlistItemDatabaseHelper =
+        PlaylistItemDatabaseHelper(
+            context,
+            "greatest-hits"
+        )
+    val playlistItems = playlistItemDatabaseHelper.getAllData(true)
+
+    if (!forceReload && playlistItems.isNotEmpty()) {
+        finishedCallback()
+    } else {
+        displayLoading()
+
+        val backgroundTask = object : BackgroundTask<Boolean?>() {
+            override suspend fun background() {
+                val queue =
+                    getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+
+                val jsonObjectList = ArrayList<JSONObject?>()
+
+                queue.add(
+                    newLoadGreatestHitsRequest(
+                        context,
+                        skip,
+                        limit,
+                        {
+                            val jsonArray = it.getJSONArray("results")
+
+                            for (k in (0 until jsonArray.length())) {
+                                jsonObjectList.add(jsonArray.getJSONObject(k))
+                            }
+
+                            playlistItemDatabaseHelper.reCreateTable()
+
+                            for (playlistObject in jsonObjectList) {
+                                if (playlistObject != null) {
+                                    parsePlaylistTrackToDB(
+                                        "greatest-hits",
+                                        playlistObject,
+                                        context
+                                    )
+                                }
+
+                            }
+
+                            updateProgress(true)
+                        },
+                        { updateProgress(false) })
+                )
+            }
+
+            override suspend fun publishProgress(value: Boolean?) {
+                if (value == true) {
+                    finishedCallback()
+                } else {
+                    errorCallback()
+                }
+            }
+        }
+
+        backgroundTask.execute()
+    }
+}

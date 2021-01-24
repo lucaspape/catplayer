@@ -105,6 +105,9 @@ open class ExploreRecyclerPage(cacheId: String, val openMood: (moodId:String) ->
             idArray.add("separator-Genres")
             idArray.add("item-genre")
 
+            idArray.add("separator-Greatest Hits")
+            idArray.add("item-greatest-hits")
+
             callback(idArray)
         }else{
             callback(ArrayList())
