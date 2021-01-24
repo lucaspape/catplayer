@@ -23,78 +23,9 @@ import java.io.File
 open class ExploreRecyclerPage(
     val openMood: (moodId: String) -> Unit,
     val openGenre: (genreId: String) -> Unit
-) : RecyclerViewPage() {
+) : HomeCatalogRecyclerPage() {
 
     override val id = "explore"
-
-    override suspend fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
-        super.onItemClick(context, viewData, itemIndex)
-
-        val fistItem = viewData[itemIndex]
-
-        if (fistItem is CatalogItem) {
-            val skipMonstercatSongs =
-                Settings(context).getBoolean(context.getString(R.string.skipMonstercatSongsSetting)) == true
-
-            withContext(Dispatchers.Main){
-                playSongsFromCatalogDbAsync(
-                    context,
-                    skipMonstercatSongs,
-                    fistItem.songId
-                )
-            }
-        }
-    }
-
-    override suspend fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
-        super.onItemLongClick(view, viewData, itemIndex)
-
-        val idList = ArrayList<String>()
-
-        for (item in viewData) {
-            if (item is CatalogItem) {
-                idList.add(item.songId)
-            }
-        }
-
-        withContext(Dispatchers.Main){
-            CatalogItem.showContextMenu(view, idList, itemIndex)
-        }
-    }
-
-    override suspend fun onMenuButtonClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
-        onItemLongClick(view, viewData, itemIndex)
-    }
-
-    override suspend fun onDownloadButtonClick(
-        context: Context,
-        item: GenericItem,
-        downloadImageButton: ImageButton
-    ) {
-        if (item is CatalogItem) {
-            val songDatabaseHelper = SongDatabaseHelper(context)
-            val song = songDatabaseHelper.getSong(context, item.songId)
-
-            song?.let {
-                when {
-                    File(song.downloadLocation).exists() -> {
-                        File(song.downloadLocation).delete()
-                        downloadImageButton.setImageURI(CatalogItem.getSongDownloadStatus(song))
-                    }
-                    else -> {
-                        addDownloadSong(
-                            context,
-                            item.songId
-                        ) {
-                            downloadImageButton.setImageURI(
-                                CatalogItem.getSongDownloadStatus(song)
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
 
     override suspend fun idToAbstractItem(view: View, id: String): GenericItem {
         return if (id.contains("separator-")) {

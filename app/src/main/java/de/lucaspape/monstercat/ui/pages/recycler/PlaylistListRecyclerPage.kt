@@ -59,23 +59,25 @@ class PlaylistListRecyclerPage(private val loadPlaylist: (playlistId: String) ->
         downloadImageButton: ImageButton
     ) {
         if (item is PlaylistItem) {
-            if (item.getDownloadStatus(context) == offlineDrawable) {
-                deleteDownloadedPlaylistTracks(
-                    context,
-                    item.playlistId
-                ) {
-                    downloadImageButton.setImageURI(
-                        item.getDownloadStatus(context).toUri()
-                    )
-                }
-            } else {
-                downloadPlaylistAsync(
-                    downloadImageButton,
-                    item.playlistId
-                ) {
-                    downloadImageButton.setImageURI(
-                        item.getDownloadStatus(context).toUri()
-                    )
+            withContext(Dispatchers.Main){
+                if (item.getDownloadStatus(context) == offlineDrawable) {
+                    deleteDownloadedPlaylistTracks(
+                        context,
+                        item.playlistId
+                    ) {
+                        downloadImageButton.setImageURI(
+                            item.getDownloadStatus(context).toUri()
+                        )
+                    }
+                } else {
+                    downloadPlaylistAsync(
+                        downloadImageButton,
+                        item.playlistId
+                    ) {
+                        downloadImageButton.setImageURI(
+                            item.getDownloadStatus(context).toUri()
+                        )
+                    }
                 }
             }
         }

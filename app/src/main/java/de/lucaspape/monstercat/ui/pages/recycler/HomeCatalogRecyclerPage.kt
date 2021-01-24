@@ -69,20 +69,23 @@ open class HomeCatalogRecyclerPage : RecyclerViewPage() {
             val songDatabaseHelper = SongDatabaseHelper(context)
             val song = songDatabaseHelper.getSong(context, item.songId)
 
-            song?.let {
-                when {
-                    File(song.downloadLocation).exists() -> {
-                        File(song.downloadLocation).delete()
-                        downloadImageButton.setImageURI(CatalogItem.getSongDownloadStatus(song))
-                    }
-                    else -> {
-                        addDownloadSong(
-                            context,
-                            item.songId
-                        ) {
-                            downloadImageButton.setImageURI(
-                                CatalogItem.getSongDownloadStatus(song)
-                            )
+            withContext(Dispatchers.Main){
+                song?.let {
+                    when {
+                        File(song.downloadLocation).exists() -> {
+                            File(song.downloadLocation).delete()
+
+                            downloadImageButton.setImageURI(CatalogItem.getSongDownloadStatus(song))
+                        }
+                        else -> {
+                            addDownloadSong(
+                                context,
+                                item.songId
+                            ) {
+                                downloadImageButton.setImageURI(
+                                    CatalogItem.getSongDownloadStatus(song)
+                                )
+                            }
                         }
                     }
                 }
