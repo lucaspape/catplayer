@@ -12,7 +12,7 @@ class BackgroundAsync<T>(
     private val finished: (result: T?) -> Unit
 ) {
 
-    private val scope = CoroutineScope(Dispatchers.Main)
+    private val scope = CoroutineScope(Dispatchers.Default)
 
     constructor(background: () -> T?, finished: (result: T?) -> Unit) : this(
         { true },

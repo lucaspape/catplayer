@@ -8,6 +8,7 @@ import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.GenreDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.MoodDatabaseHelper
+import de.lucaspape.monstercat.core.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.core.download.addDownloadSong
 import de.lucaspape.monstercat.core.util.Settings
@@ -130,5 +131,6 @@ open class ExploreRecyclerPage(
     override fun clearDatabase(context: Context) {
         MoodDatabaseHelper(context).reCreateTable()
         GenreDatabaseHelper(context).reCreateTable()
+        PlaylistItemDatabaseHelper(context, "greatest-hits").reCreateTable()
     }
 }
