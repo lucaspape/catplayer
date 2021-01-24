@@ -47,8 +47,6 @@ This custom API is open source and available [here](https://github.com/lucaspape
 If you want to participate in the beta test you can download it from the google play store [here](https://play.google.com/apps/testing/de.lucaspape.monstercat "Test Android-App").
 The beta is open but currently limited to 1000 participants.
 
-If you want to do apple iOS alpha testing (warning: there are essentially no features) hmu with an E-Mail and I can send you an invite: admin@lucaspape.de
-
 ## Additional information
 Disclamer: this is not an official app from monstercat.com!
 I am not responsible in any way for the content displayed in this app!
