@@ -12,7 +12,9 @@
     <string name="downloadTypeSetting" translatable="false">downloadType</string>
     <string name="skipMonstercatSongsSetting" translatable="false">skipMonstercatSongs</string>
     <string name="crossfadeTimeSetting" translatable="false">crossfadeTime</string>
+    <string name="downloadStreamSetting" translatable="false">downloadStream</string>
     <string name="albumViewSelectedSetting" translatable="false">albumViewSelected</string>
+    <string name="albumViewSetting" translatable="false">albumView</string>
     <string name="privacyPolicySetting" translatable="false">privacypolicy</string>
     <string name="appVersionSetting" translatable="false">app-version</string>
     <string name="useCustomApiSetting" translatable="false">useCustomApi</string>

@@ -10,8 +10,10 @@ import com.mikepenz.fastadapter.items.AbstractItem
 import com.squareup.picasso.Target
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.GenreDatabaseHelper
+import de.lucaspape.monstercat.core.database.helper.MoodDatabaseHelper
 import de.lucaspape.monstercat.core.download.ImageReceiverInterface
 import de.lucaspape.monstercat.core.download.downloadCoverIntoImageReceiver
+import de.lucaspape.monstercat.core.download.downloadImageUrlIntoImageReceiver
 
 open class GenreItem(
     val genreId: String

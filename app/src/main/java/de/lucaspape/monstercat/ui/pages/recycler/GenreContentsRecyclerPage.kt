@@ -44,11 +44,11 @@ class GenreContentsRecyclerPage(private val genreId: String) :
             loadGenreAsync(
                 context,
                 forceReload,
-                it, skip, 100, displayLoading, finishedCallback = { id ->
+                it, skip, 100, displayLoading, finishedCallback = {
                     val playlistItemDatabaseHelper =
                         PlaylistItemDatabaseHelper(
                             context,
-                            id
+                            it
                         )
 
                     val playlistItems = playlistItemDatabaseHelper.getAllData(false)
