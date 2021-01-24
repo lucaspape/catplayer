@@ -5,26 +5,14 @@ import android.view.View
 import android.widget.SearchView
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.request.async.loadTitleSearchAsync
-import de.lucaspape.monstercat.ui.activities.pageName
 import de.lucaspape.monstercat.ui.pages.util.Page
 import kotlin.collections.ArrayList
 
 class SearchRecyclerPage(
     private var search: String?,
     private val closeSearch: () -> Unit
-) : Page, HomeCatalogRecyclerPage() {
-    override val layout: Int = R.layout.fragment_search
-
-    override fun onBackPressed(view: View) {
-        closeSearch()
-    }
-
-    override fun onPause(view: View) {
-
-    }
-
+) : HomeCatalogRecyclerPage() {
     override fun onCreate(view: View) {
-        pageName = "search"
         registerListeners(view)
 
         val searchView = view.findViewById<SearchView>(R.id.searchInput)

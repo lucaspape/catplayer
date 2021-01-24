@@ -19,7 +19,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
-import androidx.fragment.app.Fragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.download.DownloadService
@@ -38,63 +37,42 @@ import de.lucaspape.monstercat.request.async.checkCustomApiFeaturesAsync
 import de.lucaspape.monstercat.request.async.loadRelatedTracksAsync
 import de.lucaspape.monstercat.request.async.retrieveTrackIntoDB
 import de.lucaspape.monstercat.ui.*
-import de.lucaspape.monstercat.ui.pages.HomePage
-import de.lucaspape.monstercat.ui.pages.PlaylistPage
 import de.lucaspape.monstercat.util.*
 import de.lucaspape.monstercat.core.util.Settings
-import de.lucaspape.monstercat.ui.pages.ExplorePage
-import de.lucaspape.monstercat.ui.pages.recycler.SearchRecyclerPage
-import de.lucaspape.monstercat.ui.pages.SettingsPage
+import de.lucaspape.monstercat.ui.pages.*
+import de.lucaspape.monstercat.ui.pages.util.Page
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 
 var downloadServiceIntent: Intent? = null
 
-var pageName = ""
-
 /**
  * Main activity
  */
 class MainActivity : AppCompatActivity() {
-    private var currentFragment: Fragment? = null
+    var currentPage: Page? = null
 
     //callback function for back pressed
-    var fragmentBackPressedCallback: () -> Unit = {
-        val fragment = currentFragment
-
-        if (fragment is de.lucaspape.monstercat.ui.Fragment) {
-            fragment.onBackPressed()
-        }
+    var pageBackPressedCallback: () -> Unit = {
+        currentPage?.onBackPressed()
     }
 
     private val onNavigationItemSelectedListener =
         BottomNavigationView.OnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_explore -> {
-                    if (pageName == "explore") {
-                        openExplore(true)
-                    } else {
-                        openExplore(false)
-                    }
+                    openExplore(currentPage?.pageName == ExplorePage.explorePageName)
 
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.navigation_home -> {
-                    if (pageName == "home") {
-                        openHome(null, true)
-                    } else {
-                        openHome(null, false)
-                    }
+                    openHome(null, currentPage?.pageName == HomePage.homePageName)
 
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.navigation_playlist -> {
-                    if (pageName == "playlist") {
-                        openPlaylist(null, true)
-                    } else {
-                        openPlaylist(null, false)
-                    }
+                    openPlaylist(null, currentPage?.pageName == PlaylistPage.playlistPageName)
 
                     return@OnNavigationItemSelectedListener true
                 }
@@ -103,78 +81,71 @@ class MainActivity : AppCompatActivity() {
         }
 
     private fun search(searchString: String?) {
-        openFragment(
-            de.lucaspape.monstercat.ui.Fragment.newInstance(
-                SearchRecyclerPage(
-                    searchString
-                ) {
-                    openHome(null, false)
-                }
-            )
+        openPage(
+            SearchPage(
+                searchString
+            ) {
+                openHome(null, false)
+            }
         )
     }
 
     private fun openSettings() {
-        openFragment(
-            de.lucaspape.monstercat.ui.Fragment.newInstance(
-                SettingsPage {
-                    openHome(null, false)
-                }
-            )
+        openPage(
+            SettingsPage {
+                openHome(null, false)
+            }
+
         )
     }
 
-    private fun openExplore(resetPosition: Boolean){
-        openFragment(
-            de.lucaspape.monstercat.ui.Fragment.newInstance(
-                ExplorePage(
-                    { searchString ->
-                        search(
-                            searchString
-                        )
-                    },
-                    { openSettings() },
-                    resetPosition
-                )
+    private fun openExplore(resetPosition: Boolean) {
+        openPage(
+            ExplorePage(
+                { searchString ->
+                    search(
+                        searchString
+                    )
+                },
+                { openSettings() },
+                resetPosition
             )
         )
     }
 
     private fun openHome(albumMcId: String?, resetPosition: Boolean) {
-        openFragment(
-            de.lucaspape.monstercat.ui.Fragment.newInstance(
-                HomePage(
-                    { searchString ->
-                        search(
-                            searchString
-                        )
-                    },
-                    { openSettings() },
-                    albumMcId,
-                    resetPosition
-                )
+        openPage(
+            HomePage(
+                { searchString ->
+                    search(
+                        searchString
+                    )
+                },
+                { openSettings() },
+                albumMcId,
+                resetPosition
+
             )
         )
     }
 
     private fun openPlaylist(playlistId: String?, resetPosition: Boolean) {
-        openFragment(
-            de.lucaspape.monstercat.ui.Fragment.newInstance(
-                PlaylistPage(
-                    playlistId,
-                    resetPosition
-                ) {
-                    openHome(null, false)
-                }
-            )
+        openPage(
+            PlaylistPage(
+                playlistId,
+                resetPosition
+            ) {
+                openHome(null, false)
+            }
+
         )
     }
 
-    private fun openFragment(fragment: Fragment) {
-        currentFragment = fragment
+    private fun openPage(page: Page) {
+        currentPage = page
 
         val transaction = supportFragmentManager.beginTransaction()
-        transaction.replace(R.id.container, fragment)
+        transaction.replace(R.id.container, page)
         transaction.addToBackStack(null)
         transaction.commit()
     }
@@ -342,7 +313,7 @@ class MainActivity : AppCompatActivity() {
         //if app closed
         hideDownloadNotification(this)
 
-        fragmentBackPressedCallback = {}
+        pageBackPressedCallback = {}
 
         PlayerSaveState.saveMusicPlayerState(this)
 
@@ -473,7 +444,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        fragmentBackPressedCallback()
+        pageBackPressedCallback()
     }
 
     private fun registerButtonListeners() {

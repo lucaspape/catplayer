@@ -4,7 +4,6 @@ import android.view.View
 import android.widget.ImageButton
 import de.lucaspape.monstercat.ui.pages.util.Page
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.ui.activities.pageName
 import de.lucaspape.monstercat.ui.pages.recycler.PlaylistContentsRecyclerPage
 import de.lucaspape.monstercat.ui.pages.recycler.PlaylistListRecyclerPage
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
@@ -14,7 +13,11 @@ class PlaylistPage(
     private val playlistId: String?,
     private val resetPosition: Boolean,
     private var returnToHome: () -> Unit
-) : Page {
+) : Page() {
+    companion object{
+        @JvmStatic val playlistPageName = "playlist"
+    }
+
     override val layout: Int = R.layout.fragment_playlist
     private var playlistPageObject: RecyclerViewPage? = null
 
@@ -33,7 +36,6 @@ class PlaylistPage(
     }
 
     override fun onCreate(view: View) {
-        pageName = "playlist"
         registerListeners(view)
 
         if (playlistId != null) {
@@ -42,6 +44,8 @@ class PlaylistPage(
             playlistListView(view)
         }
     }
+
+    override val pageName: String = playlistPageName
 
     private fun playlistListView(view: View) {
         playlistPageObject?.saveRecyclerViewPosition(view.context)

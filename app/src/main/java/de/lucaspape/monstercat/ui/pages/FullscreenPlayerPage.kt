@@ -14,7 +14,11 @@ import de.lucaspape.monstercat.ui.playButtonDrawable
 class FullscreenPlayerPage(
     private val onSearch: (searchString: String?) -> Unit,
     private val closeFullscreen: () -> Unit
-) : Page {
+) : Page() {
+
+    companion object{
+        @JvmStatic val fullscreenPlayerPageName = "fullscreen-player"
+    }
 
     private fun bindPlayerUICallbacks(view: View) {
         val titleTextView = view.findViewById<TextView>(R.id.fullscreenTitle)
@@ -213,4 +217,6 @@ class FullscreenPlayerPage(
         bindPlayerUICallbacks(view)
         registerListeners(view)
     }
+
+    override val pageName: String = fullscreenPlayerPageName
 }

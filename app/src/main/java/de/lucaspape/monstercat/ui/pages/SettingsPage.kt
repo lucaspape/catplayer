@@ -39,7 +39,6 @@ import de.lucaspape.monstercat.ui.displayInfo
 import de.lucaspape.monstercat.ui.displaySnackBar
 import de.lucaspape.monstercat.util.*
 import de.lucaspape.monstercat.core.util.Settings
-import de.lucaspape.monstercat.ui.activities.pageName
 import de.lucaspape.monstercat.ui.pages.util.Page
 import org.json.JSONArray
 import org.json.JSONException
@@ -51,9 +50,12 @@ import kotlin.math.log
 /**
  * SettingsActivity
  */
-class SettingsPage(private val closeSettings: () -> Unit) : Page {
+class SettingsPage(private val closeSettings: () -> Unit) : Page() {
+    companion object{
+        @JvmStatic val settingsPageName = "settings"
+    }
+
     override fun onCreate(view: View) {
-        pageName = "settings"
         setupRecyclerView(view)
 
         //spacer
@@ -75,6 +77,8 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page {
             onCreate(view)
         }, true))
     }
+
+    override val pageName: String = settingsPageName
 
     override val layout: Int = R.layout.fragment_settings
 

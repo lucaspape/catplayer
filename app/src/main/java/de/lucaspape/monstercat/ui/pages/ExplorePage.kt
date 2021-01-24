@@ -6,7 +6,6 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.music.util.playStream
 import de.lucaspape.monstercat.core.twitch.Stream
 import de.lucaspape.monstercat.ui.pages.util.Page
-import de.lucaspape.monstercat.ui.activities.pageName
 import de.lucaspape.monstercat.ui.pages.recycler.*
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
 
@@ -14,8 +13,11 @@ class ExplorePage(
     private val onSearch: (searchString: String?) -> Unit,
     private val openSettings: () -> Unit,
     private val resetPosition: Boolean
-) :
-    Page {
+) : Page() {
+
+    companion object{
+        @JvmStatic val explorePageName = "explore"
+    }
 
     private var explorePageObject: RecyclerViewPage? = null
     override val layout: Int = R.layout.fragment_explore
@@ -34,9 +36,9 @@ class ExplorePage(
         exploreView(view)
     }
 
-    private fun exploreView(view: View) {
-        pageName = "explore"
+    override val pageName: String = explorePageName
 
+    private fun exploreView(view: View) {
         explorePageObject?.saveRecyclerViewPosition(view.context)
 
         explorePageObject = ExploreRecyclerPage(openMood = { moodId ->
@@ -50,8 +52,6 @@ class ExplorePage(
     }
 
     private fun moodView(view: View, moodId: String) {
-        pageName = "explore"
-
         explorePageObject?.saveRecyclerViewPosition(view.context)
 
         explorePageObject = MoodContentsRecyclerPage(moodId)
@@ -63,8 +63,6 @@ class ExplorePage(
     }
 
     private fun genreView(view: View, genreId: String) {
-        pageName = "explore"
-
         explorePageObject?.saveRecyclerViewPosition(view.context)
 
         explorePageObject = GenreContentsRecyclerPage(genreId)

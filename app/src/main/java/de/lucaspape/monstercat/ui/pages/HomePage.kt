@@ -10,7 +10,6 @@ import de.lucaspape.monstercat.core.twitch.Stream
 import de.lucaspape.monstercat.ui.pages.util.Page
 import de.lucaspape.util.CustomSpinnerClass
 import de.lucaspape.monstercat.core.util.Settings
-import de.lucaspape.monstercat.ui.activities.pageName
 import de.lucaspape.monstercat.ui.pages.recycler.HomeAlbumRecyclerPage
 import de.lucaspape.monstercat.ui.pages.recycler.HomeCatalogAlbumRecyclerPage
 import de.lucaspape.monstercat.ui.pages.recycler.HomeCatalogRecyclerPage
@@ -22,11 +21,14 @@ class HomePage(
     private var albumMcId: String?,
     private val resetPosition: Boolean
 ) :
-    Page {
+    Page() {
 
     companion object {
         @JvmStatic
         var addSongsTaskId = ""
+
+        @JvmStatic
+        val homePageName = "home"
     }
 
     private var homePageObject: RecyclerViewPage? = null
@@ -55,9 +57,9 @@ class HomePage(
         }
     }
 
-    private fun catalogView(view: View) {
-        pageName = "home"
+    override val pageName: String = homePageName
 
+    private fun catalogView(view: View) {
         homePageObject?.saveRecyclerViewPosition(view.context)
 
         homePageObject = HomeCatalogRecyclerPage()
@@ -69,8 +71,6 @@ class HomePage(
     }
 
     private fun openAlbum(view: View, albumId: String?, albumMcId: String) {
-        pageName = "home-album-content"
-
         homePageObject?.saveRecyclerViewPosition(view.context)
         homePageObject =
             HomeCatalogAlbumRecyclerPage(
@@ -84,8 +84,6 @@ class HomePage(
     }
 
     private fun albumView(view: View) {
-        pageName = "home"
-
         homePageObject?.saveRecyclerViewPosition(view.context)
         homePageObject =
             HomeAlbumRecyclerPage { albumId, albumMcId ->
