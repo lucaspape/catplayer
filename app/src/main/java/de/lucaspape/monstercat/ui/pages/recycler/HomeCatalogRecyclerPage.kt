@@ -78,11 +78,11 @@ open class HomeCatalogRecyclerPage() : RecyclerViewPage() {
         }
     }
 
-    override fun idToAbstractItem(view: View, id: String): GenericItem {
+    override suspend fun idToAbstractItem(view: View, id: String): GenericItem {
         return CatalogItem(id)
     }
 
-    override fun load(
+    override suspend fun load(
         context: Context,
         forceReload: Boolean,
         skip: Int,

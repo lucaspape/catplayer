@@ -5,10 +5,8 @@ import android.view.View
 import com.mikepenz.fastadapter.GenericItem
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.GenreDatabaseHelper
-import de.lucaspape.monstercat.core.database.helper.MoodDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.request.async.loadGenreAsync
-import de.lucaspape.monstercat.request.async.loadMoodAsync
 import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
 
 class GenreContentsRecyclerPage(private val genreId: String) :
@@ -25,7 +23,7 @@ class GenreContentsRecyclerPage(private val genreId: String) :
 
     override val pageSize = 100
 
-    override fun load(
+    override suspend fun load(
         context: Context,
         forceReload: Boolean,
         skip: Int,

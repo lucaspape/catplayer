@@ -41,7 +41,7 @@ class HomeCatalogAlbumRecyclerPage(
         }
     }
 
-    override fun load(
+    override suspend fun load(
         context: Context,
         forceReload: Boolean,
         skip: Int,

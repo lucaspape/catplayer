@@ -6,6 +6,7 @@ import android.widget.SearchView
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.request.async.loadTitleSearchAsync
 import de.lucaspape.monstercat.ui.pages.util.Page
+import kotlinx.coroutines.launch
 import kotlin.collections.ArrayList
 
 class SearchRecyclerPage(
@@ -20,7 +21,10 @@ class SearchRecyclerPage(
 
         search?.let {
             searchView.setQuery(search, false)
-            loadInit(view, false)
+
+            scope.launch {
+                loadInit(view, false)
+            }
         }
     }
 
@@ -42,7 +46,10 @@ class SearchRecyclerPage(
             override fun onQueryTextSubmit(query: String?): Boolean {
                 query?.let {
                     search = it
-                    loadInit(view, false)
+
+                    scope.launch {
+                        loadInit(view, false)
+                    }
                 }
 
                 return false
@@ -50,7 +57,7 @@ class SearchRecyclerPage(
         })
     }
 
-    override fun load(
+    override suspend fun load(
         context: Context,
         forceReload: Boolean,
         skip: Int,

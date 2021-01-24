@@ -134,7 +134,7 @@ class ExploreItem(
                     }
                 }
 
-                override fun idToAbstractItem(
+                override suspend fun idToAbstractItem(
                     view: View,
                     id: String
                 ): GenericItem {
@@ -164,7 +164,7 @@ class ExploreItem(
                     }
                 }
 
-                override fun load(
+                override suspend fun load(
                     context: Context,
                     forceReload: Boolean,
                     skip: Int,

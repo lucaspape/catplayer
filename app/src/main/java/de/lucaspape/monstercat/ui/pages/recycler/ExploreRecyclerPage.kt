@@ -83,7 +83,7 @@ open class ExploreRecyclerPage(
         }
     }
 
-    override fun idToAbstractItem(view: View, id: String): GenericItem {
+    override suspend fun idToAbstractItem(view: View, id: String): GenericItem {
         return if (id.contains("separator-")) {
             HeaderTextItem(id.replace("separator-", ""))
         } else {
@@ -91,7 +91,7 @@ open class ExploreRecyclerPage(
         }
     }
 
-    override fun load(
+    override suspend fun load(
         context: Context,
         forceReload: Boolean,
         skip: Int,

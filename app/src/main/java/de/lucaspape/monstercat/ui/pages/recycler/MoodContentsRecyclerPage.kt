@@ -23,7 +23,7 @@ class MoodContentsRecyclerPage(private val moodId: String) :
 
     override val pageSize = 100
 
-    override fun load(
+    override suspend fun load(
         context: Context,
         forceReload: Boolean,
         skip: Int,

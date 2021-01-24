@@ -69,11 +69,11 @@ class PlaylistListRecyclerPage(private val loadPlaylist: (playlistId: String) ->
         }
     }
 
-    override fun idToAbstractItem(view: View, id: String): GenericItem {
+    override suspend fun idToAbstractItem(view: View, id: String): GenericItem {
         return PlaylistItem(id)
     }
 
-    override fun load(
+    override suspend fun load(
         context: Context,
         forceReload: Boolean,
         skip: Int,

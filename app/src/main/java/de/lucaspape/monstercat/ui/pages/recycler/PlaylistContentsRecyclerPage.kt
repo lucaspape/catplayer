@@ -51,7 +51,7 @@ class PlaylistContentsRecyclerPage(private val playlistId: String) :
         CatalogItem.showContextMenuPlaylist(view, idList, itemIndex, playlistId)
     }
 
-    override fun load(
+    override suspend fun load(
         context: Context,
         forceReload: Boolean,
         skip: Int,

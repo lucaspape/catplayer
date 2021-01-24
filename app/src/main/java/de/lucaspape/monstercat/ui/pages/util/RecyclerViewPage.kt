@@ -20,10 +20,16 @@ import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
 import de.lucaspape.monstercat.ui.abstract_items.util.HeaderTextItem
 import de.lucaspape.monstercat.ui.abstract_items.util.ProgressItem
 import de.lucaspape.monstercat.ui.displaySnackBar
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 import kotlin.collections.ArrayList
 
-abstract class RecyclerViewPage() {
+abstract class RecyclerViewPage {
+    val scope = CoroutineScope(Dispatchers.Main)
+
     abstract fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int)
     abstract fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int)
     abstract fun onMenuButtonClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int)
@@ -33,8 +39,8 @@ abstract class RecyclerViewPage() {
         downloadImageButton: ImageButton
     )
 
-    abstract fun idToAbstractItem(view: View, id: String): GenericItem
-    abstract fun load(
+    abstract suspend fun idToAbstractItem(view: View, id: String): GenericItem
+    abstract suspend fun load(
         context: Context,
         forceReload: Boolean,
         skip: Int,
@@ -55,7 +61,9 @@ abstract class RecyclerViewPage() {
     private var itemHeaderOffset = 0
 
     open fun onCreate(view: View) {
-        loadInit(view, false)
+        scope.launch {
+            loadInit(view, false)
+        }
     }
 
     open fun clearDatabase(context: Context) {
@@ -158,57 +166,66 @@ abstract class RecyclerViewPage() {
         })
     }
 
-    private fun addHeader(headerText: String) {
-        headerAdapter.add(
-            HeaderTextItem(
-                headerText
+    private suspend fun addHeader(headerText: String) {
+        withContext(Dispatchers.Main){
+            headerAdapter.add(
+                HeaderTextItem(
+                    headerText
+                )
             )
-        )
-        itemHeaderOffset += -1
+            itemHeaderOffset += -1
+        }
     }
 
-    private fun addItem(item: GenericItem) {
-        viewData.add(item)
-        itemAdapter.add(item)
+    private suspend fun addItem(item: GenericItem) {
+        withContext(Dispatchers.Main){
+            viewData.add(item)
+            itemAdapter.add(item)
+        }
     }
 
-    fun loadInit(view: View, forceReload: Boolean) {
+    suspend fun loadInit(view: View, forceReload: Boolean) {
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
 
         if (forceReload)
             clearDatabase(view.context)
 
-
         load(view.context, forceReload, 0, displayLoading = {
             swipeRefreshLayout?.isRefreshing = true
         }, callback = { idList ->
             setupRecyclerView(view)
 
-            for (id in idList) {
-                addItem(idToAbstractItem(view, id))
-            }
-
-            getHeader(view.context)?.let {
-                addHeader(it)
-            }
-
-            /**
-             * On scroll down (load next)
-             */
-            recyclerView?.addOnScrollListener(object :
-                EndlessRecyclerOnScrollListener(footerAdapter) {
-                override fun onLoadMore(currentPage: Int) {
-                    loadNext(view, currentPage)
+            scope.launch {
+                for (id in idList) {
+                    addItem(idToAbstractItem(view, id))
                 }
-            })
 
-            //refresh
-            swipeRefreshLayout?.setOnRefreshListener {
-                loadInit(view, true)
+                getHeader(view.context)?.let {
+                    addHeader(it)
+                }
+
+                withContext(Dispatchers.Main){
+                    /**
+                     * On scroll down (load next)
+                     */
+                    recyclerView?.addOnScrollListener(object :
+                        EndlessRecyclerOnScrollListener(footerAdapter) {
+                        override fun onLoadMore(currentPage: Int) {
+                            loadNext(view, currentPage)
+                        }
+                    })
+
+                    //refresh
+                    swipeRefreshLayout?.setOnRefreshListener {
+                        scope.launch {
+                            loadInit(view, true)
+                        }
+                    }
+
+                    swipeRefreshLayout?.isRefreshing = false
+                }
             }
-
-            swipeRefreshLayout?.isRefreshing = false
 
         }, errorCallback = { errorMessage ->
             swipeRefreshLayout?.isRefreshing = false
@@ -218,7 +235,9 @@ abstract class RecyclerViewPage() {
                 errorMessage,
                 view.context.getString(R.string.retry)
             ) {
-                loadInit(view, forceReload)
+                scope.launch {
+                    loadInit(view, forceReload)
+                }
             }
         })
     }
@@ -230,30 +249,35 @@ abstract class RecyclerViewPage() {
             footerAdapter.clear()
             footerAdapter.add(ProgressItem())
 
-            load(
-                view.context,
-                false,
-                (currentPage * pageSize),
-                displayLoading = {},
-                callback = { idList ->
-                    for (id in idList) {
-                        addItem(idToAbstractItem(view, id))
-                    }
+            scope.launch {
+                load(
+                    view.context,
+                    false,
+                    (currentPage * pageSize),
+                    displayLoading = {},
+                    callback = { idList ->
+                        scope.launch {
+                            for (id in idList) {
+                                addItem(idToAbstractItem(view, id))
+                            }
 
-                    footerAdapter.clear()
+                            withContext(Dispatchers.Main){
+                                footerAdapter.clear()
+                            }
+                        }
+                    },
+                    errorCallback = { errorMessage ->
+                        footerAdapter.clear()
 
-                },
-                errorCallback = { errorMessage ->
-                    footerAdapter.clear()
-
-                    displaySnackBar(
-                        view,
-                        errorMessage,
-                        view.context.getString(R.string.retry)
-                    ) {
-                        loadNext(view, currentPage)
-                    }
-                })
+                        displaySnackBar(
+                            view,
+                            errorMessage,
+                            view.context.getString(R.string.retry)
+                        ) {
+                            loadNext(view, currentPage)
+                        }
+                    })
+            }
         }
     }
 

@@ -52,14 +52,14 @@ class HomeAlbumRecyclerPage(private val onSingleAlbumLoad: (albumId: String, alb
     ) {
     }
 
-    override fun idToAbstractItem(view: View, id: String): GenericItem {
+    override suspend fun idToAbstractItem(view: View, id: String): GenericItem {
         return AlbumItem(
             id,
             (view.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
         )
     }
 
-    override fun load(
+    override suspend fun load(
         context: Context,
         forceReload: Boolean,
         skip: Int,
