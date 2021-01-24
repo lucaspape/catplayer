@@ -26,7 +26,7 @@ class StreamInfoUpdateAsync(
                 val songId =
                     parseSongToDB(it.getJSONObject("track"), context)
 
-                if (songId != liveSongId && songId != null) {
+                if (songId != liveSongId) {
                     liveSongId = songId
 
                     updateProgress(null)

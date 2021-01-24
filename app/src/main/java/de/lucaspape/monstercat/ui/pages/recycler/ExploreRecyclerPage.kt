@@ -1,26 +1,23 @@
 package de.lucaspape.monstercat.ui.pages.recycler
 
 import android.content.Context
-import android.content.res.Configuration
 import android.view.View
 import android.widget.ImageButton
-import android.widget.LinearLayout
 import com.mikepenz.fastadapter.GenericItem
 import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.core.database.helper.CatalogSongDatabaseHelper
+import de.lucaspape.monstercat.core.database.helper.GenreDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.MoodDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.core.download.addDownloadSong
 import de.lucaspape.monstercat.core.util.Settings
-import de.lucaspape.monstercat.request.async.loadMoodsAsync
 import de.lucaspape.monstercat.ui.abstract_items.content.ExploreItem
 import de.lucaspape.monstercat.ui.abstract_items.util.HeaderTextItem
 import de.lucaspape.monstercat.ui.pages.util.playSongsFromCatalogDbAsync
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
 import java.io.File
 
-open class ExploreRecyclerPage(cacheId: String, val openMood: (moodId:String) -> Unit) : RecyclerViewPage(cacheId) {
+open class ExploreRecyclerPage(cacheId: String, val openMood: (moodId:String) -> Unit, val openGenre: (genreId:String) -> Unit) : RecyclerViewPage(null) {
 
     override fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val fistItem = viewData[itemIndex]
@@ -87,7 +84,7 @@ open class ExploreRecyclerPage(cacheId: String, val openMood: (moodId:String) ->
         return if(id.contains("separator-")){
             HeaderTextItem(id.replace("separator-", ""))
         }else{
-            ExploreItem(id.replace("item-", ""), openMood)
+            ExploreItem(id.replace("item-", ""), openMood, openGenre)
         }
     }
 
@@ -101,9 +98,12 @@ open class ExploreRecyclerPage(cacheId: String, val openMood: (moodId:String) ->
     ) {
         if(skip == 0){
             val idArray = ArrayList<String>()
-            idArray.add("separator-Moods")
 
+            idArray.add("separator-Moods")
             idArray.add("item-mood")
+
+            idArray.add("separator-Genres")
+            idArray.add("item-genre")
 
             callback(idArray)
         }else{
@@ -117,5 +117,6 @@ open class ExploreRecyclerPage(cacheId: String, val openMood: (moodId:String) ->
 
     override fun clearDatabase(context: Context) {
         MoodDatabaseHelper(context).reCreateTable()
+        GenreDatabaseHelper(context).reCreateTable()
     }
 }

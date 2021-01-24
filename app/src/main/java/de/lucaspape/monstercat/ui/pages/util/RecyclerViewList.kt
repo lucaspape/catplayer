@@ -18,7 +18,7 @@ import de.lucaspape.monstercat.ui.abstract_items.util.ProgressItem
 import de.lucaspape.monstercat.ui.displaySnackBar
 import de.lucaspape.util.Cache
 
-abstract class RecyclerViewList(var cacheId: String) {
+abstract class RecyclerViewList(var cacheId: String?) {
     abstract fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int)
     abstract fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int)
 
@@ -48,7 +48,7 @@ abstract class RecyclerViewList(var cacheId: String) {
 
     }
 
-    private fun getOrientation(view:View): Int {
+    open fun getOrientation(view:View): Int {
         return LinearLayout.HORIZONTAL
     }
 
@@ -98,28 +98,22 @@ abstract class RecyclerViewList(var cacheId: String) {
         }
     }
 
-    private fun addHeader(headerText: String) {
-        headerAdapter.add(
-            HeaderTextItem(
-                headerText
-            )
-        )
-        itemHeaderOffset += -1
-    }
-
     private fun addItem(item: GenericItem, id: String) {
         viewData.add(item)
         itemAdapter.add(item)
 
-        val cache = Cache()
-        var cacheList = cache.get<ArrayList<String>>(cacheId)
+        val cacheId = cacheId
+        if(cacheId != null){
+            val cache = Cache()
+            var cacheList = cache.get<ArrayList<String>>(cacheId)
 
-        if (cacheList == null) {
-            cacheList = ArrayList()
+            if (cacheList == null) {
+                cacheList = ArrayList()
+            }
+
+            cacheList.add(id)
+            cache.set(cacheId, cacheList)
         }
-
-        cacheList.add(id)
-        cache.set(cacheId, cacheList)
     }
 
     private fun addItemFromCache(item: GenericItem) {
@@ -128,10 +122,17 @@ abstract class RecyclerViewList(var cacheId: String) {
     }
 
     fun loadInit(view: View, forceReload: Boolean) {
-        val cache = Cache().get<ArrayList<String>>(cacheId)
+        val cacheId = cacheId
+
+        val cache = if(cacheId != null) {
+            Cache().get<ArrayList<String>>(cacheId)
+        }else{
+            null
+        }
 
         if (cache.isNullOrEmpty() || forceReload) {
-            Cache().set(cacheId, null)
+            if(cacheId != null)
+                Cache().set(cacheId, null)
 
             if(forceReload)
                 clearDatabase(view.context)
@@ -183,6 +184,8 @@ abstract class RecyclerViewList(var cacheId: String) {
         }
     }
 
+    open val pageSize = 50
+
     private fun loadNext(view: View, currentPage: Int) {
         recyclerView?.post {
             footerAdapter.clear()
@@ -191,7 +194,7 @@ abstract class RecyclerViewList(var cacheId: String) {
             load(
                 view.context,
                 false,
-                (currentPage * 50),
+                (currentPage * pageSize),
                 callback = { idList ->
                     for (id in idList) {
                         addItem(idToAbstractItem(view, id), id)

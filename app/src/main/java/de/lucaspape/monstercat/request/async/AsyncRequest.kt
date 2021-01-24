@@ -3,6 +3,7 @@ package de.lucaspape.monstercat.request.async
 import android.content.Context
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.*
+import de.lucaspape.monstercat.core.database.objects.Genre
 import de.lucaspape.monstercat.core.database.objects.Mood
 import de.lucaspape.monstercat.core.database.objects.Song
 import de.lucaspape.monstercat.core.util.*
@@ -13,6 +14,8 @@ import de.lucaspape.monstercat.core.util.Settings
 import org.json.JSONException
 import org.json.JSONObject
 import java.lang.IndexOutOfBoundsException
+import java.util.*
+import kotlin.collections.ArrayList
 
 fun addToPlaylistAsync(
     context: Context,
@@ -155,11 +158,23 @@ fun checkCustomApiFeaturesAsync(
                     val apiVersionsArray = it.getJSONArray("api_versions")
 
                     for (i in (0 until apiVersionsArray.length())) {
-                        when(apiVersionsArray.getString(i)){
-                            "v1" -> settings.setBoolean(context.getString(R.string.customApiSupportsV1Setting), true)
-                            "v2" -> settings.setBoolean(context.getString(R.string.customApiSupportsV2Setting), true)
-                            "liveinfo" -> settings.setBoolean(context.getString(R.string.customApiSupportsLoadingLiveInfoSetting),true)
-                            "related_songs" -> settings.setBoolean(context.getString(R.string.customApiSupportsPlayingRelatedSongsSetting),true)
+                        when (apiVersionsArray.getString(i)) {
+                            "v1" -> settings.setBoolean(
+                                context.getString(R.string.customApiSupportsV1Setting),
+                                true
+                            )
+                            "v2" -> settings.setBoolean(
+                                context.getString(R.string.customApiSupportsV2Setting),
+                                true
+                            )
+                            "liveinfo" -> settings.setBoolean(
+                                context.getString(R.string.customApiSupportsLoadingLiveInfoSetting),
+                                true
+                            )
+                            "related_songs" -> settings.setBoolean(
+                                context.getString(R.string.customApiSupportsPlayingRelatedSongsSetting),
+                                true
+                            )
                         }
                     }
 
@@ -754,7 +769,7 @@ fun loadTitleSearchAsync(
 ) {
     val backgroundTask = object : BackgroundTask<ArrayList<CatalogItem>?>() {
         override suspend fun background() {
-            val searchResults: ArrayList<CatalogItem>? = ArrayList()
+            val searchResults: ArrayList<CatalogItem> = ArrayList()
 
             val searchQueue =
                 getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
@@ -766,7 +781,7 @@ fun loadTitleSearchAsync(
                     parseSongSearchToSongList(context, jsonArray)
 
                 for (song in songList) {
-                    searchResults?.add(
+                    searchResults.add(
                         CatalogItem(
                             song.songId
                         )
@@ -831,49 +846,68 @@ fun renamePlaylistAsync(
     backgroundTask.execute()
 }
 
-fun loadMoodsAsync(context: Context, finishedCallback: (results: ArrayList<Mood>) -> Unit, errorCallback: () -> Unit){
-    val backgroundTask = object : BackgroundTask<ArrayList<Mood>?>() {
-        override suspend fun background() {
-            val moodResults: ArrayList<Mood>? = ArrayList()
+fun loadMoodsAsync(
+    context: Context,
+    forceReload: Boolean,
+    displayLoading: () -> Unit,
+    finishedCallback: (results: ArrayList<Mood>) -> Unit,
+    errorCallback: () -> Unit
+) {
+    val moodDatabaseHelper = MoodDatabaseHelper(context)
+    val moods = moodDatabaseHelper.getAllMoods() as ArrayList<Mood>
 
-            val queue =
-                getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+    if (!forceReload && moods.isNotEmpty()) {
+        finishedCallback(moods)
+    } else {
+        displayLoading()
 
-            newLoadMoodsRequest(context, {
-                val moodDatabaseHelper = MoodDatabaseHelper(context)
+        val backgroundTask = object : BackgroundTask<ArrayList<Mood>?>() {
+            override suspend fun background() {
+                val queue =
+                    getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
-                val moods = it.keys()
+                moodDatabaseHelper.reCreateTable()
 
-                for(mood in moods){
-                    val moodObject = it.getJSONObject(mood)
-                    moodDatabaseHelper.insertMood(mood, moodObject.getString("image"), moodObject.getString("name"))
+                newLoadMoodsRequest(context, { jsonObject ->
+                    val moodIds = jsonObject.keys()
 
-                    moodDatabaseHelper.getMood(mood)?.let {
-                        moodResults?.add(it)
+                    for (moodId in moodIds) {
+                        parseMoodIntoDB(context, moodId, jsonObject.getJSONObject(moodId))?.let {
+                            moods.add(it)
+                        }
                     }
+
+                    updateProgress(moods)
+                }, {
+                    updateProgress(null)
+                }).let {
+                    queue.add(it)
                 }
+            }
 
-                updateProgress(moodResults)
-            }, {
-                updateProgress(null)
-            }).let {
-                queue.add(it)
+            override suspend fun publishProgress(value: ArrayList<Mood>?) {
+                if (value != null) {
+                    finishedCallback(value)
+                } else {
+                    errorCallback()
+                }
             }
         }
 
-        override suspend fun publishProgress(value: ArrayList<Mood>?) {
-            if (value != null) {
-                finishedCallback(value)
-            } else {
-                errorCallback()
-            }
-        }
+        backgroundTask.execute()
     }
-
-    backgroundTask.execute()
 }
 
-fun loadMoodAsync(context: Context, forceReload: Boolean, moodId:String, skip:Int, limit:Int, displayLoading: () -> Unit, finishedCallback: (moodId:String) -> Unit, errorCallback: () -> Unit){
+fun loadMoodAsync(
+    context: Context,
+    forceReload: Boolean,
+    moodId: String,
+    skip: Int,
+    limit: Int,
+    displayLoading: () -> Unit,
+    finishedCallback: (moodId: String) -> Unit,
+    errorCallback: () -> Unit
+) {
     val playlistItemDatabaseHelper =
         PlaylistItemDatabaseHelper(
             context,
@@ -884,6 +918,8 @@ fun loadMoodAsync(context: Context, forceReload: Boolean, moodId:String, skip:In
     if (!forceReload && playlistItems.isNotEmpty()) {
         finishedCallback(moodId)
     } else {
+        displayLoading()
+
         val backgroundTask = object : BackgroundTask<Boolean?>() {
             override suspend fun background() {
                 val queue =
@@ -926,6 +962,144 @@ fun loadMoodAsync(context: Context, forceReload: Boolean, moodId:String, skip:In
             override suspend fun publishProgress(value: Boolean?) {
                 if (value == true) {
                     finishedCallback(moodId)
+                } else {
+                    errorCallback()
+                }
+            }
+        }
+
+        backgroundTask.execute()
+    }
+}
+
+fun loadGenresAsync(
+    context: Context,
+    forceReload: Boolean, displayLoading: () -> Unit,
+    finishedCallback: (results: ArrayList<Genre>) -> Unit,
+    errorCallback: () -> Unit
+) {
+
+    val genreDatabaseHelper =
+        GenreDatabaseHelper(
+            context
+        )
+
+    val genres = genreDatabaseHelper.getAllGenres() as ArrayList<Genre>
+
+    if (!forceReload && genres.isNotEmpty()) {
+        finishedCallback(genres)
+    } else {
+        displayLoading()
+
+        val backgroundTask = object : BackgroundTask<ArrayList<Genre>?>() {
+            override suspend fun background() {
+                val queue =
+                    getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+
+                genreDatabaseHelper.reCreateTable()
+
+                queue.add(
+                    newLoadFiltersRequest(
+                        context,
+                        {
+                            val jsonArray = it.getJSONArray("genres")
+
+                            for (k in (0 until jsonArray.length())) {
+                                val genreId = UUID.randomUUID().toString()
+
+                                genreDatabaseHelper.insertGenre(
+                                    genreId,
+                                    jsonArray.getString(k)
+                                )
+
+                                genreDatabaseHelper.getGenre(genreId)?.let { genre ->
+                                    genres.add(genre)
+                                }
+                            }
+
+                            updateProgress(genres)
+                        },
+                        { updateProgress(null) })
+                )
+            }
+
+            override suspend fun publishProgress(value: ArrayList<Genre>?) {
+                if (value != null) {
+                    finishedCallback(value)
+                } else {
+                    errorCallback()
+                }
+            }
+        }
+
+        backgroundTask.execute()
+    }
+}
+
+fun loadGenreAsync(
+    context: Context,
+    forceReload: Boolean,
+    genreName: String,
+    skip: Int,
+    limit: Int,
+    displayLoading: () -> Unit,
+    finishedCallback: (genreName: String) -> Unit,
+    errorCallback: () -> Unit
+) {
+    val playlistItemDatabaseHelper =
+        PlaylistItemDatabaseHelper(
+            context,
+            genreName
+        )
+    val playlistItems = playlistItemDatabaseHelper.getAllData(true)
+
+    if (!forceReload && playlistItems.isNotEmpty()) {
+        finishedCallback(genreName)
+    } else {
+        displayLoading()
+
+        val backgroundTask = object : BackgroundTask<Boolean?>() {
+            override suspend fun background() {
+                val queue =
+                    getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+
+                val jsonObjectList = ArrayList<JSONObject?>()
+
+                queue.add(
+                    newLoadGenreRequest(
+                        context,
+                        genreName,
+                        skip,
+                        limit,
+                        {
+                            val jsonArray = it.getJSONArray("results")
+
+                            for (k in (0 until jsonArray.length())) {
+                                jsonObjectList.add(jsonArray.getJSONObject(k))
+                            }
+
+                            playlistItemDatabaseHelper.reCreateTable()
+
+                            for (playlistObject in jsonObjectList) {
+                                if (playlistObject != null) {
+                                    parsePlaylistTrackToDB(
+                                        genreName,
+                                        playlistObject,
+                                        context
+                                    )
+                                }
+
+                            }
+
+                            updateProgress(true)
+                        },
+                        { updateProgress(false) })
+                )
+            }
+
+            override suspend fun publishProgress(value: Boolean?) {
+                if (value == true) {
+                    finishedCallback(genreName)
                 } else {
                     errorCallback()
                 }

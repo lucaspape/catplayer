@@ -49,9 +49,7 @@ fun loadAlbumTracks(
 
         AlbumDatabaseHelper(context).getAlbumFromMcId(mcID)?.let { album ->
             for (i in (0 until jsonArray.length())) {
-                parseAlbumSongToDB(jsonArray.getJSONObject(i), album.albumId, context)?.let { id ->
-                    idArray.add(id)
-                }
+                idArray.add(parseAlbumSongToDB(jsonArray.getJSONObject(i), album.albumId, context))
             }
         }
 

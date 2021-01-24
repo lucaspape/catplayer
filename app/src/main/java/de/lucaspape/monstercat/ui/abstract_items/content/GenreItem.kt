@@ -9,15 +9,17 @@ import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
 import com.squareup.picasso.Target
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.core.database.helper.GenreDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.MoodDatabaseHelper
 import de.lucaspape.monstercat.core.download.ImageReceiverInterface
+import de.lucaspape.monstercat.core.download.downloadCoverIntoImageReceiver
 import de.lucaspape.monstercat.core.download.downloadImageUrlIntoImageReceiver
 
-open class MoodItem(
-    val moodId: String
-) : AbstractItem<MoodItem.ViewHolder>() {
+open class GenreItem(
+    val genreId: String
+) : AbstractItem<GenreItem.ViewHolder>() {
 
-    override val type: Int = 187
+    override val type: Int = 190
 
     override val layoutRes = R.layout.list_album_horizontal
 
@@ -27,33 +29,33 @@ open class MoodItem(
         )
     }
 
-    class ViewHolder(view: View) : FastAdapter.ViewHolder<MoodItem>(view) {
+    class ViewHolder(view: View) : FastAdapter.ViewHolder<GenreItem>(view) {
         private val titleTextView: TextView = view.findViewById(R.id.albumTitle)
         private val artistTextView: TextView = view.findViewById(R.id.albumArtist)
         private val coverImageView: ImageView = view.findViewById(R.id.cover)
         private val context = view.context
 
-        private var moodId = ""
+        private var genreId = ""
 
-        override fun bindView(item: MoodItem, payloads: List<Any>) {
-            val moodDatabaseHelper = MoodDatabaseHelper(context)
+        override fun bindView(item: GenreItem, payloads: List<Any>) {
+            val genreDatabaseHelper = GenreDatabaseHelper(context)
 
-            val mood = moodDatabaseHelper.getMood(item.moodId)
+            val genre = genreDatabaseHelper.getGenre(item.genreId)
 
-            mood?.let {
-                moodId = mood.moodId
+            genre?.let {
+                genreId = genre.genreId
 
-                titleTextView.text = mood.name
+                titleTextView.text = genre.name
 
-                downloadImageUrlIntoImageReceiver(context, object : ImageReceiverInterface {
+                downloadCoverIntoImageReceiver(context, object : ImageReceiverInterface {
                     override fun setBitmap(id: String, bitmap: Bitmap?) {
-                        if (id == moodId) {
+                        if (id == "") {
                             coverImageView.setImageBitmap(bitmap)
                         }
                     }
 
                     override fun setDrawable(id: String, drawable: Drawable?) {
-                        if (id == moodId) {
+                        if (id == "") {
                             coverImageView.setImageDrawable(drawable)
                         }
                     }
@@ -61,11 +63,11 @@ open class MoodItem(
                     override fun setTag(target: Target) {
                         coverImageView.tag = target
                     }
-                }, false, mood.moodId, mood.coverUrl)
+                }, "", false)
             }
         }
 
-        override fun unbindView(item: MoodItem) {
+        override fun unbindView(item: GenreItem) {
             titleTextView.text = null
             artistTextView.text = null
             coverImageView.setImageURI(null)

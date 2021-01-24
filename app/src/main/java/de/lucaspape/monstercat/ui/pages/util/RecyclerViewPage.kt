@@ -22,7 +22,7 @@ import de.lucaspape.monstercat.ui.abstract_items.util.ProgressItem
 import de.lucaspape.monstercat.ui.displaySnackBar
 import de.lucaspape.util.Cache
 
-abstract class RecyclerViewPage(var cacheId: String) {
+abstract class RecyclerViewPage(var cacheId: String?) {
     abstract fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int)
     abstract fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int)
     abstract fun onMenuButtonClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int)
@@ -168,15 +168,18 @@ abstract class RecyclerViewPage(var cacheId: String) {
         viewData.add(item)
         itemAdapter.add(item)
 
-        val cache = Cache()
-        var cacheList = cache.get<ArrayList<String>>(cacheId)
+        val cacheId = cacheId
+        if(cacheId != null){
+            val cache = Cache()
+            var cacheList = cache.get<ArrayList<String>>(cacheId)
 
-        if (cacheList == null) {
-            cacheList = ArrayList()
+            if (cacheList == null) {
+                cacheList = ArrayList()
+            }
+
+            cacheList.add(id)
+            cache.set(cacheId, cacheList)
         }
-
-        cacheList.add(id)
-        cache.set(cacheId, cacheList)
     }
 
     private fun addItemFromCache(item: GenericItem) {
@@ -185,13 +188,20 @@ abstract class RecyclerViewPage(var cacheId: String) {
     }
 
     fun loadInit(view: View, forceReload: Boolean) {
-        val cache = Cache().get<ArrayList<String>>(cacheId)
+        val cacheId = cacheId
+
+        val cache = if(cacheId != null) {
+            Cache().get<ArrayList<String>>(cacheId)
+        }else{
+            null
+        }
 
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
 
         if (cache.isNullOrEmpty() || forceReload) {
-            Cache().set(cacheId, null)
+            if(cacheId != null)
+                Cache().set(cacheId, null)
 
             if(forceReload)
                 clearDatabase(view.context)

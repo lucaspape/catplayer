@@ -39,9 +39,9 @@ class ExplorePage(
 
         explorePageObject?.saveRecyclerViewPosition(view.context)
 
-        explorePageObject = ExploreRecyclerPage("explore", openMood = {moodId ->
+        explorePageObject = ExploreRecyclerPage("explore", openMood = { moodId ->
             moodView(view, moodId)
-        })
+        }, openGenre = { genreId -> genreView(view, genreId) })
 
         if (resetPosition)
             explorePageObject?.resetRecyclerViewSavedPosition(view.context)
@@ -49,12 +49,25 @@ class ExplorePage(
         explorePageObject?.onCreate(view)
     }
 
-    private fun moodView(view:View, moodId:String){
+    private fun moodView(view: View, moodId: String) {
         pageName = "explore"
 
         explorePageObject?.saveRecyclerViewPosition(view.context)
 
         explorePageObject = MoodContentsRecyclerPage(moodId)
+
+        if (resetPosition)
+            explorePageObject?.resetRecyclerViewSavedPosition(view.context)
+
+        explorePageObject?.onCreate(view)
+    }
+
+    private fun genreView(view: View, genreId: String) {
+        pageName = "explore"
+
+        explorePageObject?.saveRecyclerViewPosition(view.context)
+
+        explorePageObject = GenreContentsRecyclerPage(genreId)
 
         if (resetPosition)
             explorePageObject?.resetRecyclerViewSavedPosition(view.context)

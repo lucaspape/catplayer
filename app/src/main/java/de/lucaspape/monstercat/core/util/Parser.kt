@@ -3,6 +3,7 @@ package de.lucaspape.monstercat.core.util
 import android.content.Context
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.*
+import de.lucaspape.monstercat.core.database.objects.Mood
 import de.lucaspape.monstercat.core.database.objects.Song
 import org.json.JSONArray
 import org.json.JSONException
@@ -18,7 +19,7 @@ fun parseSongSearchToSongList(context: Context, jsonArray: JSONArray): ArrayList
 
         val songId = parseSongToDB(jsonObject, context)
 
-        songId?.let { it ->
+        songId.let { it ->
             val databaseHelper = SongDatabaseHelper(context)
             databaseHelper.getSong(context, it)?.let {
                 songList.add(it)
@@ -29,7 +30,7 @@ fun parseSongSearchToSongList(context: Context, jsonArray: JSONArray): ArrayList
     return songList
 }
 
-fun parseSongToDB(jsonObject: JSONObject, context: Context): String? {
+fun parseSongToDB(jsonObject: JSONObject, context: Context): String {
     var id = ""
     var albumId = ""
     var albumMcId = ""
@@ -49,13 +50,13 @@ fun parseSongToDB(jsonObject: JSONObject, context: Context): String? {
         title = jsonObject.getString("title")
         artist = jsonObject.getString("artistsTitle")
 
-        try{
+        try {
             try {
                 artistId = jsonObject.getJSONArray("artists").getJSONObject(0).getString("id")
-            }catch (e: IndexOutOfBoundsException){
+            } catch (e: IndexOutOfBoundsException) {
 
             }
-        }catch (e: JSONException){
+        } catch (e: JSONException) {
 
         }
 
@@ -63,12 +64,12 @@ fun parseSongToDB(jsonObject: JSONObject, context: Context): String? {
         version = jsonObject.getString("version")
         id = jsonObject.getString("id")
 
-        try{
+        try {
             downloadable = jsonObject.getBoolean("downloadable")
             streamable = jsonObject.getBoolean("streamable")
             inEarlyAccess = jsonObject.getBoolean("inEarlyAccess")
             creatorFriendly = jsonObject.getBoolean("creatorFriendly")
-        }catch (e: JSONException){
+        } catch (e: JSONException) {
 
         }
     } catch (e: InvocationTargetException) {
@@ -102,28 +103,22 @@ fun parseCatalogSongToDB(jsonObject: JSONObject, context: Context): Long? {
 
     val catalogSongDatabaseHelper = CatalogSongDatabaseHelper(context)
 
-    songId?.let {
-        return if (catalogSongDatabaseHelper.getCatalogSong(it) == null) {
-            catalogSongDatabaseHelper.insertSong(it)
-        } else {
-            catalogSongDatabaseHelper.getCatalogSong(it)?.id?.toLong()
-        }
+    return if (catalogSongDatabaseHelper.getCatalogSong(songId) == null) {
+        catalogSongDatabaseHelper.insertSong(songId)
+    } else {
+        catalogSongDatabaseHelper.getCatalogSong(songId)?.id?.toLong()
     }
-
-    return null
 }
 
-fun parseAlbumSongToDB(jsonObject: JSONObject, sAlbumId: String, context: Context): String? {
+fun parseAlbumSongToDB(jsonObject: JSONObject, sAlbumId: String, context: Context): String {
     val songId = parseSongToDB(jsonObject, context)
 
     val albumItemDatabaseHelper = AlbumItemDatabaseHelper(context, sAlbumId)
 
-    songId?.let {
-        if (albumItemDatabaseHelper.getItemFromSongId(it) == null) {
-            albumItemDatabaseHelper.insertSongId(it)
-        } else {
-            albumItemDatabaseHelper.getItemFromSongId(it)?.id
-        }
+    if (albumItemDatabaseHelper.getItemFromSongId(songId) == null) {
+        albumItemDatabaseHelper.insertSongId(songId)
+    } else {
+        albumItemDatabaseHelper.getItemFromSongId(songId)?.id
     }
 
     return songId
@@ -144,7 +139,7 @@ fun parseAlbumToDB(jsonObject: JSONObject, context: Context): Long? {
     }
 }
 
-fun parsePlaylistToDB(context: Context, jsonObject: JSONObject, ownPlaylist:Boolean): Long? {
+fun parsePlaylistToDB(context: Context, jsonObject: JSONObject, ownPlaylist: Boolean): Long? {
     val playlistName = jsonObject.getString("name") as String
     val playlistId = jsonObject.getString("id") as String
     val public = jsonObject.getBoolean("public")
@@ -164,7 +159,7 @@ fun parsePlaylistTrackToDB(
 ): Long? {
     val title = jsonObject.getString("title")
 
-    if (title != "null") {
+    return if (title != "null") {
         val songId = parseSongToDB(jsonObject, context)
 
         val databaseHelper = PlaylistItemDatabaseHelper(
@@ -172,12 +167,20 @@ fun parsePlaylistTrackToDB(
             playlistId
         )
 
-        songId?.let {
-            return databaseHelper.insertSongId(it)
-        }
-
-        return null
+        databaseHelper.insertSongId(songId)
     } else {
-        return null
+        null
     }
+}
+
+fun parseMoodIntoDB(context: Context, moodId: String, jsonObject: JSONObject): Mood? {
+    val moodDatabaseHelper = MoodDatabaseHelper(context)
+
+    moodDatabaseHelper.insertMood(
+        moodId,
+        jsonObject.getString("image"),
+        jsonObject.getString("name")
+    )
+
+    return moodDatabaseHelper.getMood(moodId)
 }

@@ -5,10 +5,8 @@ import android.view.View
 import com.mikepenz.fastadapter.GenericItem
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.MoodDatabaseHelper
-import de.lucaspape.monstercat.core.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.request.async.loadMoodAsync
-import de.lucaspape.monstercat.request.async.loadPlaylistTracksAsync
 import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
 
 class MoodContentsRecyclerPage(private val moodId: String) :
@@ -21,8 +19,6 @@ class MoodContentsRecyclerPage(private val moodId: String) :
                 idList.add(item.songId)
             }
         }
-
-        //CatalogItem.showContextMenuPlaylist(view, idList, itemIndex, playlistId)
     }
 
     override val pageSize = 100
