@@ -47,6 +47,7 @@ import java.io.FileOutputStream
 
 var downloadServiceIntent: Intent? = null
 var currentPage: Page? = null
+var firstStart = true
 
 /**
  * Main activity
@@ -279,6 +280,10 @@ class MainActivity : AppCompatActivity() {
 
         //create the MusicPlayer.kt mediasession
         createMediaSession(this)
+
+        if(firstStart)
+            findViewById<BottomNavigationView>(R.id.nav_view).selectedItemId = R.id.navigation_home
+            firstStart = false
 
         findViewById<BottomNavigationView>(R.id.nav_view).setOnNavigationItemSelectedListener(
             onNavigationItemSelectedListener

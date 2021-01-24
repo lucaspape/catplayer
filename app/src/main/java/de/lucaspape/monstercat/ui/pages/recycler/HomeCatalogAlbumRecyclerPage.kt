@@ -22,6 +22,8 @@ class HomeCatalogAlbumRecyclerPage(
     override val id = "album-$albumId"
 
     override suspend fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
+        super.onItemClick(context, viewData, itemIndex)
+
         val fistItem = viewData[itemIndex]
 
         if (fistItem is CatalogItem) {

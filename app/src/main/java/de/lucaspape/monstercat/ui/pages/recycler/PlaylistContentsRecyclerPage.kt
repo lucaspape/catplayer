@@ -20,6 +20,8 @@ class PlaylistContentsRecyclerPage(private val playlistId: String) :
     override val id = "playlist-$playlistId"
 
     override suspend fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
+        super.onItemClick(context, viewData, itemIndex)
+
         val fistItem = viewData[itemIndex]
 
         if (fistItem is CatalogItem) {
@@ -46,6 +48,8 @@ class PlaylistContentsRecyclerPage(private val playlistId: String) :
     }
 
     override suspend fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
+        super.onItemLongClick(view, viewData, itemIndex)
+
         val idList = ArrayList<String>()
 
         for (item in viewData) {

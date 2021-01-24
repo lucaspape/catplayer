@@ -15,6 +15,8 @@ class GenreContentsRecyclerPage(private val genreId: String) :
     override val id = "genre-$genreId"
 
     override suspend fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
+        super.onItemLongClick(view, viewData, itemIndex)
+
         val idList = ArrayList<String>()
 
         for (item in viewData) {

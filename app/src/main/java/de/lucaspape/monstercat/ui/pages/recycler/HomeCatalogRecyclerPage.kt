@@ -22,6 +22,8 @@ open class HomeCatalogRecyclerPage : RecyclerViewPage() {
     override val id = "catalog"
 
     override suspend fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
+        super.onItemClick(context, viewData, itemIndex)
+
         val fistItem = viewData[itemIndex]
 
         if (fistItem is CatalogItem) {
@@ -39,6 +41,8 @@ open class HomeCatalogRecyclerPage : RecyclerViewPage() {
     }
 
     override suspend fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
+        super.onItemLongClick(view, viewData, itemIndex)
+
         val idList = ArrayList<String>()
 
         for (item in viewData) {

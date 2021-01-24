@@ -20,6 +20,8 @@ class HomeAlbumRecyclerPage(private val onSingleAlbumLoad: (albumId: String, alb
     override val id = "albums"
 
     override suspend fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
+        super.onItemClick(context, viewData, itemIndex)
+
         val albumDatabaseHelper = AlbumDatabaseHelper(context)
 
         val albumItem = viewData[itemIndex]
@@ -34,6 +36,8 @@ class HomeAlbumRecyclerPage(private val onSingleAlbumLoad: (albumId: String, alb
     }
 
     override suspend fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
+        super.onItemLongClick(view, viewData, itemIndex)
+
         val albumDatabaseHelper = AlbumDatabaseHelper(view.context)
         val albumMcIdList = ArrayList<String>()
 

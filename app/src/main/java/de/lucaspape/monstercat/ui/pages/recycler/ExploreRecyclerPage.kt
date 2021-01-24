@@ -28,6 +28,8 @@ open class ExploreRecyclerPage(
     override val id = "explore"
 
     override suspend fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
+        super.onItemClick(context, viewData, itemIndex)
+
         val fistItem = viewData[itemIndex]
 
         if (fistItem is CatalogItem) {
@@ -45,6 +47,8 @@ open class ExploreRecyclerPage(
     }
 
     override suspend fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
+        super.onItemLongClick(view, viewData, itemIndex)
+
         val idList = ArrayList<String>()
 
         for (item in viewData) {

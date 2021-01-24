@@ -49,6 +49,8 @@ class ExploreItem(
                     viewData: ArrayList<GenericItem>,
                     itemIndex: Int
                 ) {
+                    super.onItemClick(context, viewData, itemIndex)
+
                     when (val clickedItem = viewData[itemIndex]) {
                         is MoodItem -> {
                             withContext(Dispatchers.Main){
@@ -89,16 +91,20 @@ class ExploreItem(
                     viewData: ArrayList<GenericItem>,
                     itemIndex: Int
                 ) {
-                    val idList = ArrayList<String>()
+                    super.onItemLongClick(view, viewData, itemIndex)
 
-                    for (catalogItem in viewData) {
-                        if (catalogItem is CatalogItem) {
-                            idList.add(catalogItem.songId)
+                    if(viewData[itemIndex] is CatalogItem){
+                        val idList = ArrayList<String>()
+
+                        for (catalogItem in viewData) {
+                            if (catalogItem is CatalogItem) {
+                                idList.add(catalogItem.songId)
+                            }
                         }
-                    }
 
-                    withContext(Dispatchers.Main){
-                        CatalogItem.showContextMenu(view, idList, itemIndex)
+                        withContext(Dispatchers.Main){
+                            CatalogItem.showContextMenu(view, idList, itemIndex)
+                        }
                     }
                 }
 

@@ -6,6 +6,7 @@ import android.content.Context
 import android.view.View
 import android.widget.ImageButton
 import android.widget.LinearLayout
+import androidx.annotation.CallSuper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -30,8 +31,22 @@ import kotlin.collections.ArrayList
 abstract class RecyclerViewPage {
     val scope = CoroutineScope(Dispatchers.Default)
 
-    abstract suspend fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int)
-    abstract suspend fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int)
+    private var lastClick:Long = 0
+
+    private val blockClick:Boolean
+        get() {
+            return System.currentTimeMillis() - lastClick < 300
+        }
+
+    @CallSuper
+    open suspend fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int){
+        lastClick = System.currentTimeMillis()
+    }
+
+    @CallSuper
+    open suspend fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int){
+        lastClick = System.currentTimeMillis()
+    }
     abstract suspend fun onMenuButtonClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int)
     abstract suspend fun onDownloadButtonClick(
         context: Context,
@@ -103,7 +118,8 @@ abstract class RecyclerViewPage {
                     val itemIndex = position + itemHeaderOffset
 
                     if (itemIndex >= 0 && itemIndex < viewData.size) {
-                        onItemClick(view.context, viewData, itemIndex)
+                        if(!blockClick)
+                            onItemClick(view.context, viewData, itemIndex)
                     }
                 }
 
@@ -118,8 +134,8 @@ abstract class RecyclerViewPage {
                     val itemIndex = position + itemHeaderOffset
 
                     if (itemIndex >= 0 && itemIndex < viewData.size) {
-                        onItemLongClick(view, viewData, itemIndex)
-
+                        if(!blockClick)
+                            onItemLongClick(view, viewData, itemIndex)
                     }
                 }
 
