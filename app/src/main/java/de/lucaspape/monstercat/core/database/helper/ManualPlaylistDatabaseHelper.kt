@@ -78,8 +78,7 @@ class ManualPlaylistDatabaseHelper(context: Context) :
 
             cursor?.moveToFirst()
 
-            try {
-
+            return try {
                 val playlist = ManualPlaylist(
                     cursor.getInt(cursor.getColumnIndex(ManualPlaylist.COLUMN_ID)),
                     cursor.getString(cursor.getColumnIndex(ManualPlaylist.COLUMN_PLAYLIST_ID))
@@ -87,11 +86,11 @@ class ManualPlaylistDatabaseHelper(context: Context) :
 
                 cursor.close()
 
-                return playlist
+                playlist
             } catch (e: IndexOutOfBoundsException) {
                 cursor.close()
                 db.close()
-                return null
+                null
             }
 
         } catch (e: SQLiteException) {
@@ -127,7 +126,11 @@ class ManualPlaylistDatabaseHelper(context: Context) :
 
     fun removePlaylist(playlistId: String) {
         val db = writableDatabase
-        db.delete(ManualPlaylist.TABLE_NAME, ManualPlaylist.COLUMN_PLAYLIST_ID + "=?", arrayOf(playlistId))
+        db.delete(
+            ManualPlaylist.TABLE_NAME,
+            ManualPlaylist.COLUMN_PLAYLIST_ID + "=?",
+            arrayOf(playlistId)
+        )
         db.close()
     }
 }

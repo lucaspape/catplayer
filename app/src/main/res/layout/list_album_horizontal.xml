@@ -8,7 +8,6 @@
     android:orientation="horizontal">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/list_album_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 

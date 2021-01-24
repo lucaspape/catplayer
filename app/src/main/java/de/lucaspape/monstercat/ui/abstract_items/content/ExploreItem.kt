@@ -40,7 +40,7 @@ class ExploreItem(
 
     class ViewHolder(private val view: View) : FastAdapter.ViewHolder<ExploreItem>(view) {
 
-        var recyclerViewList: RecyclerViewPage? = null
+        private var recyclerViewList: RecyclerViewPage? = null
 
         override fun bindView(item: ExploreItem, payloads: List<Any>) {
             recyclerViewList = object : RecyclerViewPage() {
