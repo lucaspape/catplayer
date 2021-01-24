@@ -17,6 +17,8 @@ import kotlinx.coroutines.withContext
 class HomeAlbumRecyclerPage(private val onSingleAlbumLoad: (albumId: String, albumMcId: String) -> Unit) :
     RecyclerViewPage() {
 
+    override val id = "albums"
+
     override suspend fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val albumDatabaseHelper = AlbumDatabaseHelper(context)
 

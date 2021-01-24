@@ -46,13 +46,12 @@ import java.io.FileNotFoundException
 import java.io.FileOutputStream
 
 var downloadServiceIntent: Intent? = null
+var currentPage: Page? = null
 
 /**
  * Main activity
  */
 class MainActivity : AppCompatActivity() {
-    var currentPage: Page? = null
-
     //callback function for back pressed
     var pageBackPressedCallback: () -> Unit = {
         currentPage?.onBackPressed()
@@ -235,7 +234,13 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             else -> {
-                openHome(null, false)
+                val currentPage = currentPage
+
+                if(currentPage == null){
+                    openHome(null, false)
+                }else{
+                    openPage(currentPage)
+                }
             }
         }
 
@@ -303,8 +308,6 @@ class MainActivity : AppCompatActivity() {
 
         //show privacy policy
         showPrivacyPolicy()
-
-        findViewById<BottomNavigationView>(R.id.nav_view).selectedItemId = R.id.navigation_home
     }
 
     override fun onDestroy() {

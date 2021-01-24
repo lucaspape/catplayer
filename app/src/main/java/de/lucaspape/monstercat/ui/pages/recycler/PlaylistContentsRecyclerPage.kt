@@ -17,6 +17,8 @@ import kotlinx.coroutines.withContext
 class PlaylistContentsRecyclerPage(private val playlistId: String) :
     HomeCatalogRecyclerPage() {
 
+    override val id = "playlist-$playlistId"
+
     override suspend fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val fistItem = viewData[itemIndex]
 

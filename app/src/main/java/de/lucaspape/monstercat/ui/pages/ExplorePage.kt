@@ -15,6 +15,8 @@ class ExplorePage(
     private val resetPosition: Boolean
 ) : Page() {
 
+    constructor() : this({},{},false)
+
     companion object{
         @JvmStatic val explorePageName = "explore"
     }

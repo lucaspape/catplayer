@@ -238,6 +238,8 @@ abstract class RecyclerViewPage {
                     }
 
                     swipeRefreshLayout?.isRefreshing = false
+
+                    restoreRecyclerViewPosition(view.context)
                 }
             }
 

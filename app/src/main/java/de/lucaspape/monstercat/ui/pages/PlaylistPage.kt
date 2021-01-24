@@ -14,6 +14,8 @@ class PlaylistPage(
     private val resetPosition: Boolean,
     private var returnToHome: () -> Unit
 ) : Page() {
+    constructor() : this(null,false,{})
+
     companion object{
         @JvmStatic val playlistPageName = "playlist"
     }

@@ -12,6 +12,7 @@ class SearchRecyclerPage(
     private var search: String?,
     private val closeSearch: () -> Unit
 ) : HomeCatalogRecyclerPage() {
+
     override fun onCreate(view: View) {
         registerListeners(view)
 

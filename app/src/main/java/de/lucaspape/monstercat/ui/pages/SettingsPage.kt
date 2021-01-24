@@ -51,6 +51,8 @@ import kotlin.math.log
  * SettingsActivity
  */
 class SettingsPage(private val closeSettings: () -> Unit) : Page() {
+    constructor() : this({})
+
     companion object{
         @JvmStatic val settingsPageName = "settings"
     }

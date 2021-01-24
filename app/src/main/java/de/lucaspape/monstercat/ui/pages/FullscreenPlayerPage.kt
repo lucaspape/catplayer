@@ -16,6 +16,8 @@ class FullscreenPlayerPage(
     private val closeFullscreen: () -> Unit
 ) : Page() {
 
+    constructor() : this({},{})
+
     companion object{
         @JvmStatic val fullscreenPlayerPageName = "fullscreen-player"
     }

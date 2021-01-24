@@ -17,7 +17,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 
-open class HomeCatalogRecyclerPage() : RecyclerViewPage() {
+open class HomeCatalogRecyclerPage : RecyclerViewPage() {
+
+    override val id = "catalog"
 
     override suspend fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val fistItem = viewData[itemIndex]

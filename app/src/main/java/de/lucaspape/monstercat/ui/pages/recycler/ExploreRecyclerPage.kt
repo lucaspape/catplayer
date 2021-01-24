@@ -25,6 +25,8 @@ open class ExploreRecyclerPage(
     val openGenre: (genreId: String) -> Unit
 ) : RecyclerViewPage() {
 
+    override val id = "explore"
+
     override suspend fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val fistItem = viewData[itemIndex]
 

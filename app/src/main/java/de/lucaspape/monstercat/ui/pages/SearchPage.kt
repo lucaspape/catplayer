@@ -10,6 +10,8 @@ class SearchPage(
     private var search: String?,
     private val closeSearch: () -> Unit
 ) : Page() {
+    constructor() : this(null,{})
+
     companion object{
         @JvmStatic val searchPageName = "search"
     }

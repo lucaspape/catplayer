@@ -23,6 +23,8 @@ class HomePage(
 ) :
     Page() {
 
+    constructor() : this({},{},null,false)
+
     companion object {
         @JvmStatic
         var addSongsTaskId = ""

@@ -11,6 +11,9 @@ import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
 
 class GenreContentsRecyclerPage(private val genreId: String) :
     HomeCatalogRecyclerPage() {
+
+    override val id = "genre-$genreId"
+
     override suspend fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val idList = ArrayList<String>()
 
