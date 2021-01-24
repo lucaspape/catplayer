@@ -51,8 +51,10 @@ open class HomeCatalogRecyclerPage : RecyclerViewPage() {
             }
         }
 
-        withContext(Dispatchers.Main){
-            CatalogItem.showContextMenu(view, idList, itemIndex)
+        if(idList.size > 0){
+            withContext(Dispatchers.Main){
+                CatalogItem.showContextMenu(view, idList, itemIndex)
+            }
         }
     }
 
@@ -125,10 +127,6 @@ open class HomeCatalogRecyclerPage : RecyclerViewPage() {
             errorCallback = { _, _, _ ->
                 errorCallback(context.getString(R.string.errorLoadingSongList))
             })
-    }
-
-    override fun getHeader(context: Context): String? {
-        return null
     }
 
     override fun clearDatabase(context: Context) {

@@ -54,16 +54,6 @@ class HomeAlbumRecyclerPage(private val onSingleAlbumLoad: (albumId: String, alb
         }
     }
 
-    override suspend fun onMenuButtonClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
-    }
-
-    override suspend fun onDownloadButtonClick(
-        context: Context,
-        item: GenericItem,
-        downloadImageButton: ImageButton
-    ) {
-    }
-
     override suspend fun idToAbstractItem(view: View, id: String): GenericItem {
         return AlbumItem(
             id,
@@ -96,10 +86,6 @@ class HomeAlbumRecyclerPage(private val onSingleAlbumLoad: (albumId: String, alb
         }, { _, _, _ ->
             errorCallback(context.getString(R.string.errorLoadingAlbumList))
         })
-    }
-
-    override fun getHeader(context: Context): String? {
-        return null
     }
 
     override fun clearDatabase(context: Context) {

@@ -1,32 +1,15 @@
 package de.lucaspape.monstercat.ui.pages.recycler
 
 import android.content.Context
-import android.view.View
-import com.mikepenz.fastadapter.GenericItem
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.GenreDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.request.async.loadGenreAsync
-import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
 
 class GenreContentsRecyclerPage(private val genreId: String) :
     HomeCatalogRecyclerPage() {
 
     override val id = "genre-$genreId"
-
-    override suspend fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
-        super.onItemLongClick(view, viewData, itemIndex)
-
-        val idList = ArrayList<String>()
-
-        for (item in viewData) {
-            if (item is CatalogItem) {
-                idList.add(item.songId)
-            }
-        }
-
-        //TODO
-    }
 
     override val pageSize = 100
 

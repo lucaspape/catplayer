@@ -2,15 +2,12 @@ package de.lucaspape.monstercat.ui.abstract_items.content
 
 import android.content.Context
 import android.view.View
-import android.widget.ImageButton
 import android.widget.LinearLayout
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.GenericItem
 import com.mikepenz.fastadapter.items.AbstractItem
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.PlaylistItemDatabaseHelper
-import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
-import de.lucaspape.monstercat.core.download.addDownloadSong
 import de.lucaspape.monstercat.core.util.Settings
 import de.lucaspape.monstercat.request.async.loadGenresAsync
 import de.lucaspape.monstercat.request.async.loadGreatestHitsAsync
@@ -20,7 +17,6 @@ import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
 import de.lucaspape.monstercat.ui.pages.util.playSongsFromViewDataAsync
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.File
 
 class ExploreItem(
     val typeName: String,
@@ -101,10 +97,6 @@ class ExploreItem(
                             CatalogItem(id)
                         }
                     }
-                }
-
-                override fun getHeader(context: Context): String? {
-                    return null
                 }
 
                 override val pageSize: Int = 100

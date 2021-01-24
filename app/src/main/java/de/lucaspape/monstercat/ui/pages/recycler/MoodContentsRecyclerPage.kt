@@ -14,20 +14,6 @@ class MoodContentsRecyclerPage(private val moodId: String) :
 
     override val id = "mood-$moodId"
 
-    override suspend fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
-        super.onItemLongClick(view, viewData, itemIndex)
-
-        val idList = ArrayList<String>()
-
-        for (item in viewData) {
-            if (item is CatalogItem) {
-                idList.add(item.songId)
-            }
-        }
-
-        //TODO
-    }
-
     override val pageSize = 100
 
     override suspend fun load(

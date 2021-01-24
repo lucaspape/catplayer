@@ -2,23 +2,12 @@ package de.lucaspape.monstercat.ui.pages.recycler
 
 import android.content.Context
 import android.view.View
-import android.widget.ImageButton
 import com.mikepenz.fastadapter.GenericItem
-import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
-import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.GenreDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.MoodDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.PlaylistItemDatabaseHelper
-import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
-import de.lucaspape.monstercat.core.download.addDownloadSong
-import de.lucaspape.monstercat.core.util.Settings
 import de.lucaspape.monstercat.ui.abstract_items.content.ExploreItem
 import de.lucaspape.monstercat.ui.abstract_items.util.HeaderTextItem
-import de.lucaspape.monstercat.ui.pages.util.playSongsFromCatalogDbAsync
-import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import java.io.File
 
 open class ExploreRecyclerPage(
     val openMood: (moodId: String) -> Unit,
@@ -59,10 +48,6 @@ open class ExploreRecyclerPage(
         } else {
             callback(ArrayList())
         }
-    }
-
-    override fun getHeader(context: Context): String? {
-        return null
     }
 
     override fun clearDatabase(context: Context) {

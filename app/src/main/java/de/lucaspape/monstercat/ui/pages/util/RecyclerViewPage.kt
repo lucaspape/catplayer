@@ -47,12 +47,12 @@ abstract class RecyclerViewPage {
     open suspend fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int){
         lastClick = System.currentTimeMillis()
     }
-    abstract suspend fun onMenuButtonClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int)
-    abstract suspend fun onDownloadButtonClick(
+    open suspend fun onMenuButtonClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int){}
+    open suspend fun onDownloadButtonClick(
         context: Context,
         item: GenericItem,
         downloadImageButton: ImageButton
-    )
+    ){}
 
     abstract suspend fun idToAbstractItem(view: View, id: String): GenericItem
     abstract suspend fun load(
@@ -64,7 +64,9 @@ abstract class RecyclerViewPage {
         errorCallback: (errorMessage: String) -> Unit
     )
 
-    abstract fun getHeader(context: Context): String?
+    open fun getHeader(context: Context): String?{
+        return null
+    }
 
     private var recyclerView: RecyclerView? = null
     private var itemAdapter = ItemAdapter<GenericItem>()
