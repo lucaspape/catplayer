@@ -5,7 +5,6 @@ import android.view.View
 import android.widget.SearchView
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.request.async.loadTitleSearchAsync
-import kotlinx.coroutines.launch
 import kotlin.collections.ArrayList
 
 class SearchRecyclerPage(
@@ -22,9 +21,7 @@ class SearchRecyclerPage(
         search?.let {
             searchView.setQuery(search, false)
 
-            scope.launch {
-                loadInit(view, false)
-            }
+            super.onCreate(view)
         }
     }
 
@@ -47,9 +44,7 @@ class SearchRecyclerPage(
                 query?.let {
                     search = it
 
-                    scope.launch {
-                        loadInit(view, false)
-                    }
+                    onCreate(view)
                 }
 
                 return false

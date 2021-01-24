@@ -29,7 +29,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 abstract class RecyclerViewPage {
-    val scope = CoroutineScope(Dispatchers.Default)
+    private val scope = CoroutineScope(Dispatchers.Default)
 
     private var lastClick:Long = 0
 
@@ -210,12 +210,13 @@ abstract class RecyclerViewPage {
         }
     }
 
-    suspend fun loadInit(view: View, forceReload: Boolean) {
+    private suspend fun loadInit(view: View, forceReload: Boolean) {
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
 
         if (forceReload)
             clearDatabase(view.context)
+            resetRecyclerViewSavedPosition(view.context)
 
         load(view.context, forceReload, 0, displayLoading = {
             scope.launch {
