@@ -3,6 +3,7 @@ package de.lucaspape.monstercat.core.download
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import com.squareup.picasso.Picasso
 import de.lucaspape.monstercat.R
@@ -74,6 +75,10 @@ internal fun downloadImageUrlIntoImageReceiver(
             Drawable.createFromPath(fallbackFileLow.absolutePath)
         }
 
+        if (placeholder != null) {
+            imageReceiver.setBitmap(imageId, (placeholder as BitmapDrawable).bitmap)
+        }
+
         val cacheFile = File(context.cacheDir.toString() + "/$imageId-$resolution.webp")
 
         if (cacheFile.exists()) {
@@ -88,11 +93,10 @@ internal fun downloadImageUrlIntoImageReceiver(
             if (wifiConnected(context) == true || settings.getBoolean(context.getString(R.string.downloadCoversOverMobileSetting)) == true) {
                 val picassoTarget = object : com.squareup.picasso.Target {
                     override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
-                        imageReceiver.setDrawable(imageId, placeHolderDrawable)
                     }
 
                     override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                        imageReceiver.setDrawable(imageId, errorDrawable)
+
                     }
 
                     override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
@@ -111,21 +115,10 @@ internal fun downloadImageUrlIntoImageReceiver(
                     }
                 }
 
-                if (placeholder != null) {
-                    Picasso.get()
-                        .load("$url?image_width=$resolution")
-                        .error(placeholder)
-                        .placeholder(placeholder)
-                        .into(picassoTarget)
-                    imageReceiver.setTag(picassoTarget)
-                } else {
-                    Picasso.get()
-                        .load("$url?image_width=$resolution")
-                        .into(picassoTarget)
-                    imageReceiver.setTag(picassoTarget)
-                }
-            } else {
-                imageReceiver.setDrawable(imageId, placeholder)
+                Picasso.get()
+                    .load("$url?image_width=$resolution")
+                    .into(picassoTarget)
+                imageReceiver.setTag(picassoTarget)
             }
         }
     }
