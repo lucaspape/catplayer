@@ -7,7 +7,7 @@ import de.lucaspape.monstercat.core.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.request.async.loadGenreAsync
 
 class GenreContentsRecyclerPage(private val genreId: String) :
-    HomeCatalogRecyclerPage() {
+    PlaylistContentsRecyclerPage(genreId) {
 
     override val id = "genre-$genreId"
 
@@ -56,9 +56,5 @@ class GenreContentsRecyclerPage(private val genreId: String) :
         }
 
         return null
-    }
-
-    override fun clearDatabase(context: Context) {
-        PlaylistItemDatabaseHelper(context, genreId).reCreateTable()
     }
 }

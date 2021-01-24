@@ -14,7 +14,7 @@ import de.lucaspape.monstercat.ui.pages.util.playSongsFromViewDataAsync
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class PlaylistContentsRecyclerPage(private val playlistId: String) :
+open class PlaylistContentsRecyclerPage(private val playlistId: String) :
     HomeCatalogRecyclerPage() {
 
     override val id = "playlist-$playlistId"
