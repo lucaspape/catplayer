@@ -23,10 +23,6 @@
     <string name="shareReleaseUrl" translatable="false">https://www.monstercat.com/release</string>
     <string name="playlistShareUrl" translatable="false">https://www.monstercat.com/playlist/</string>
 
-    <string name="twitchPlaylistUrl" translatable="false">https://usher.ttvnw.net/api/channel/hls/</string>
-    <string name="twitchApiUrl" translatable="false">https://api.twitch.tv/</string>
-    <string name="twitchChannel" translatable="false">monstercat</string>
-
     <string name="moodsUrl" translatable="false">https://connect.monstercat.com/v2/catalog/moods/</string>
     <string name="moodUrl" translatable="false">https://connect.monstercat.com/v2/catalog/mood/</string>
 

@@ -46,13 +46,14 @@ import java.io.FileNotFoundException
 import java.io.FileOutputStream
 
 var downloadServiceIntent: Intent? = null
-var currentPage: Page? = null
 var firstStart = true
 
 /**
  * Main activity
  */
 class MainActivity : AppCompatActivity() {
+    private var currentPage: Page? = null
+
     //callback function for back pressed
     var pageBackPressedCallback: () -> Unit = {
         currentPage?.onBackPressed()

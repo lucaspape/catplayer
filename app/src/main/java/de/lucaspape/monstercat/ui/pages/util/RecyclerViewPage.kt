@@ -214,9 +214,10 @@ abstract class RecyclerViewPage {
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
 
-        if (forceReload)
+        if (forceReload){
             clearDatabase(view.context)
             resetRecyclerViewSavedPosition(view.context)
+        }
 
         load(view.context, forceReload, 0, displayLoading = {
             scope.launch {
