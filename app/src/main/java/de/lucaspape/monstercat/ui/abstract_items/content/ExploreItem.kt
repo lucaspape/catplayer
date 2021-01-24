@@ -17,6 +17,8 @@ import de.lucaspape.monstercat.request.async.loadGreatestHitsAsync
 import de.lucaspape.monstercat.request.async.loadMoodsAsync
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
 import de.lucaspape.monstercat.ui.pages.util.playSongsFromViewDataAsync
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 
 class ExploreItem(
@@ -49,10 +51,14 @@ class ExploreItem(
                 ) {
                     when (val clickedItem = viewData[itemIndex]) {
                         is MoodItem -> {
-                            item.openMood(clickedItem.moodId)
+                            withContext(Dispatchers.Main){
+                                item.openMood(clickedItem.moodId)
+                            }
                         }
                         is GenreItem -> {
-                            item.openGenre(clickedItem.genreId)
+                            withContext(Dispatchers.Main){
+                                item.openGenre(clickedItem.genreId)
+                            }
                         }
                         is CatalogItem -> {
                             val skipMonstercatSongs =
@@ -66,12 +72,14 @@ class ExploreItem(
                                 }
                             }
 
-                            playSongsFromViewDataAsync(
-                                context,
-                                skipMonstercatSongs,
-                                catalogViewData,
-                                itemIndex
-                            )
+                            withContext(Dispatchers.Main){
+                                playSongsFromViewDataAsync(
+                                    context,
+                                    skipMonstercatSongs,
+                                    catalogViewData,
+                                    itemIndex
+                                )
+                            }
                         }
                     }
                 }
@@ -89,7 +97,9 @@ class ExploreItem(
                         }
                     }
 
-                    CatalogItem.showContextMenu(view, idList, itemIndex)
+                    withContext(Dispatchers.Main){
+                        CatalogItem.showContextMenu(view, idList, itemIndex)
+                    }
                 }
 
                 override suspend fun onMenuButtonClick(
