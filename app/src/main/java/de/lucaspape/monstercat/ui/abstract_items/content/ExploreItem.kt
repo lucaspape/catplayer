@@ -42,7 +42,7 @@ class ExploreItem(
 
         override fun bindView(item: ExploreItem, payloads: List<Any>) {
             recyclerViewList = object : RecyclerViewPage() {
-                override fun onItemClick(
+                override suspend fun onItemClick(
                     context: Context,
                     viewData: ArrayList<GenericItem>,
                     itemIndex: Int
@@ -76,7 +76,7 @@ class ExploreItem(
                     }
                 }
 
-                override fun onItemLongClick(
+                override suspend fun onItemLongClick(
                     view: View,
                     viewData: ArrayList<GenericItem>,
                     itemIndex: Int
@@ -92,7 +92,7 @@ class ExploreItem(
                     CatalogItem.showContextMenu(view, idList, itemIndex)
                 }
 
-                override fun onMenuButtonClick(
+                override suspend fun onMenuButtonClick(
                     view: View,
                     viewData: ArrayList<GenericItem>,
                     itemIndex: Int
@@ -100,7 +100,7 @@ class ExploreItem(
                     onItemLongClick(view, viewData, itemIndex)
                 }
 
-                override fun onDownloadButtonClick(
+                override suspend fun onDownloadButtonClick(
                     context: Context,
                     item: GenericItem,
                     downloadImageButton: ImageButton

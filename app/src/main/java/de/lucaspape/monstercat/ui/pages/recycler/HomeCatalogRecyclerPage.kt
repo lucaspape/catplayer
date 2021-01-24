@@ -13,26 +13,30 @@ import de.lucaspape.monstercat.request.async.loadSongListAsync
 import de.lucaspape.monstercat.core.util.Settings
 import de.lucaspape.monstercat.ui.pages.util.playSongsFromCatalogDbAsync
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 
 open class HomeCatalogRecyclerPage() : RecyclerViewPage() {
 
-    override fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
+    override suspend fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val fistItem = viewData[itemIndex]
 
         if (fistItem is CatalogItem) {
             val skipMonstercatSongs =
                 Settings(context).getBoolean(context.getString(R.string.skipMonstercatSongsSetting)) == true
 
-            playSongsFromCatalogDbAsync(
-                context,
-                skipMonstercatSongs,
-                fistItem.songId
-            )
+            withContext(Dispatchers.Main){
+                playSongsFromCatalogDbAsync(
+                    context,
+                    skipMonstercatSongs,
+                    fistItem.songId
+                )
+            }
         }
     }
 
-    override fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
+    override suspend fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val idList = ArrayList<String>()
 
         for (item in viewData) {
@@ -41,14 +45,16 @@ open class HomeCatalogRecyclerPage() : RecyclerViewPage() {
             }
         }
 
-        CatalogItem.showContextMenu(view, idList, itemIndex)
+        withContext(Dispatchers.Main){
+            CatalogItem.showContextMenu(view, idList, itemIndex)
+        }
     }
 
-    override fun onMenuButtonClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
+    override suspend fun onMenuButtonClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         onItemLongClick(view, viewData, itemIndex)
     }
 
-    override fun onDownloadButtonClick(
+    override suspend fun onDownloadButtonClick(
         context: Context,
         item: GenericItem,
         downloadImageButton: ImageButton

@@ -11,7 +11,7 @@ import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
 
 class MoodContentsRecyclerPage(private val moodId: String) :
     HomeCatalogRecyclerPage() {
-    override fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
+    override suspend fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val idList = ArrayList<String>()
 
         for (item in viewData) {
@@ -19,6 +19,8 @@ class MoodContentsRecyclerPage(private val moodId: String) :
                 idList.add(item.songId)
             }
         }
+
+        //TODO
     }
 
     override val pageSize = 100

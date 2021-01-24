@@ -11,23 +11,27 @@ import de.lucaspape.monstercat.core.database.helper.AlbumDatabaseHelper
 import de.lucaspape.monstercat.request.async.loadAlbumListAsync
 import de.lucaspape.monstercat.ui.abstract_items.content.AlbumItem
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class HomeAlbumRecyclerPage(private val onSingleAlbumLoad: (albumId: String, albumMcId: String) -> Unit) :
     RecyclerViewPage() {
 
-    override fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
+    override suspend fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val albumDatabaseHelper = AlbumDatabaseHelper(context)
 
         val albumItem = viewData[itemIndex]
 
         if (albumItem is AlbumItem) {
             albumDatabaseHelper.getAlbum(albumItem.albumId)?.mcID?.let { mcID ->
-                onSingleAlbumLoad(albumItem.albumId, mcID)
+                withContext(Dispatchers.Main){
+                    onSingleAlbumLoad(albumItem.albumId, mcID)
+                }
             }
         }
     }
 
-    override fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
+    override suspend fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val albumDatabaseHelper = AlbumDatabaseHelper(view.context)
         val albumMcIdList = ArrayList<String>()
 
@@ -39,13 +43,15 @@ class HomeAlbumRecyclerPage(private val onSingleAlbumLoad: (albumId: String, alb
             }
         }
 
-        AlbumItem.showContextMenu(view, albumMcIdList, itemIndex)
+        withContext(Dispatchers.Main){
+            AlbumItem.showContextMenu(view, albumMcIdList, itemIndex)
+        }
     }
 
-    override fun onMenuButtonClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
+    override suspend fun onMenuButtonClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
     }
 
-    override fun onDownloadButtonClick(
+    override suspend fun onDownloadButtonClick(
         context: Context,
         item: GenericItem,
         downloadImageButton: ImageButton

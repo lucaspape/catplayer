@@ -13,19 +13,23 @@ import de.lucaspape.monstercat.ui.offlineDrawable
 import de.lucaspape.monstercat.ui.pages.util.deleteDownloadedPlaylistTracks
 import de.lucaspape.monstercat.ui.pages.util.downloadPlaylistAsync
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class PlaylistListRecyclerPage(private val loadPlaylist: (playlistId: String) -> Unit) :
     RecyclerViewPage() {
 
-    override fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
+    override suspend fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val item = viewData[itemIndex]
 
         if (item is PlaylistItem) {
-            loadPlaylist(item.playlistId)
+            withContext(Dispatchers.Main){
+                loadPlaylist(item.playlistId)
+            }
         }
     }
 
-    override fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
+    override suspend fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val idList = ArrayList<String>()
 
         for (item in viewData) {
@@ -34,14 +38,16 @@ class PlaylistListRecyclerPage(private val loadPlaylist: (playlistId: String) ->
             }
         }
 
-        PlaylistItem.showContextMenu(view, idList, itemIndex)
+        withContext(Dispatchers.Main){
+            PlaylistItem.showContextMenu(view, idList, itemIndex)
+        }
     }
 
-    override fun onMenuButtonClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
+    override suspend fun onMenuButtonClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         onItemLongClick(view, viewData, itemIndex)
     }
 
-    override fun onDownloadButtonClick(
+    override suspend fun onDownloadButtonClick(
         context: Context,
         item: GenericItem,
         downloadImageButton: ImageButton

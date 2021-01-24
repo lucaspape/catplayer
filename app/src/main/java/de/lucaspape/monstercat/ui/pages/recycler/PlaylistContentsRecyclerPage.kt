@@ -11,11 +11,13 @@ import de.lucaspape.monstercat.request.async.loadPlaylistTracksAsync
 import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
 import de.lucaspape.monstercat.ui.pages.util.playSongsFromCatalogDbAsync
 import de.lucaspape.monstercat.ui.pages.util.playSongsFromViewDataAsync
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class PlaylistContentsRecyclerPage(private val playlistId: String) :
     HomeCatalogRecyclerPage() {
 
-    override fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
+    override suspend fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val fistItem = viewData[itemIndex]
 
         if (fistItem is CatalogItem) {
@@ -30,16 +32,18 @@ class PlaylistContentsRecyclerPage(private val playlistId: String) :
                 }
             }
 
-            playSongsFromViewDataAsync(
-                context,
-                skipMonstercatSongs,
-                catalogViewData,
-                itemIndex
-            )
+            withContext(Dispatchers.Main){
+                playSongsFromViewDataAsync(
+                    context,
+                    skipMonstercatSongs,
+                    catalogViewData,
+                    itemIndex
+                )
+            }
         }
     }
 
-    override fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
+    override suspend fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val idList = ArrayList<String>()
 
         for (item in viewData) {
@@ -48,7 +52,9 @@ class PlaylistContentsRecyclerPage(private val playlistId: String) :
             }
         }
 
-        CatalogItem.showContextMenuPlaylist(view, idList, itemIndex, playlistId)
+        withContext(Dispatchers.Main){
+            CatalogItem.showContextMenuPlaylist(view, idList, itemIndex, playlistId)
+        }
     }
 
     override suspend fun load(

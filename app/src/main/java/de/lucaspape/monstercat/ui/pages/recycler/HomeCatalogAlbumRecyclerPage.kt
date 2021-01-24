@@ -11,13 +11,15 @@ import de.lucaspape.monstercat.request.async.loadAlbumAsync
 import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
 import de.lucaspape.monstercat.ui.pages.util.loadAlbumTracks
 import de.lucaspape.monstercat.ui.pages.util.playSongsFromViewDataAsync
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class HomeCatalogAlbumRecyclerPage(
     private val albumId: String?,
     private val albumMcId: String
 ) : HomeCatalogRecyclerPage() {
 
-    override fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
+    override suspend fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val fistItem = viewData[itemIndex]
 
         if (fistItem is CatalogItem) {
@@ -32,12 +34,14 @@ class HomeCatalogAlbumRecyclerPage(
                 }
             }
 
-            playSongsFromViewDataAsync(
-                context,
-                skipMonstercatSongs,
-                catalogViewData,
-                itemIndex
-            )
+            withContext(Dispatchers.Main){
+                playSongsFromViewDataAsync(
+                    context,
+                    skipMonstercatSongs,
+                    catalogViewData,
+                    itemIndex
+                )
+            }
         }
     }
 

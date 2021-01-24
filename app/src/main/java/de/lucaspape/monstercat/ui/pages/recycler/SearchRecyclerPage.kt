@@ -5,7 +5,6 @@ import android.view.View
 import android.widget.SearchView
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.request.async.loadTitleSearchAsync
-import de.lucaspape.monstercat.ui.pages.util.Page
 import kotlinx.coroutines.launch
 import kotlin.collections.ArrayList
 

@@ -28,12 +28,12 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 abstract class RecyclerViewPage {
-    val scope = CoroutineScope(Dispatchers.Main)
+    val scope = CoroutineScope(Dispatchers.Default)
 
-    abstract fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int)
-    abstract fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int)
-    abstract fun onMenuButtonClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int)
-    abstract fun onDownloadButtonClick(
+    abstract suspend fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int)
+    abstract suspend fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int)
+    abstract suspend fun onMenuButtonClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int)
+    abstract suspend fun onDownloadButtonClick(
         context: Context,
         item: GenericItem,
         downloadImageButton: ImageButton
@@ -77,93 +77,103 @@ abstract class RecyclerViewPage {
     open val id = UUID.randomUUID().toString()
 
     @SuppressLint("WrongConstant")
-    private fun setupRecyclerView(view: View) {
-        recyclerView = view.findViewById(R.id.recyclerView)
+    private suspend fun setupRecyclerView(view: View) {
+        withContext(Dispatchers.Main){
+            recyclerView = view.findViewById(R.id.recyclerView)
 
-        itemAdapter = ItemAdapter()
-        headerAdapter = ItemAdapter()
-        footerAdapter = ItemAdapter()
+            itemAdapter = ItemAdapter()
+            headerAdapter = ItemAdapter()
+            footerAdapter = ItemAdapter()
 
-        itemHeaderOffset = 0
+            itemHeaderOffset = 0
 
-        viewData = ArrayList()
+            viewData = ArrayList()
 
-        val fastAdapter: FastAdapter<GenericItem> =
-            FastAdapter.with(listOf(headerAdapter, itemAdapter, footerAdapter))
+            val fastAdapter: FastAdapter<GenericItem> =
+                FastAdapter.with(listOf(headerAdapter, itemAdapter, footerAdapter))
 
-        recyclerView?.layoutManager =
-            LinearLayoutManager(view.context, getOrientation(view), false)
+            recyclerView?.layoutManager =
+                LinearLayoutManager(view.context, getOrientation(view), false)
 
-        recyclerView?.adapter = fastAdapter
+            recyclerView?.adapter = fastAdapter
 
-        //OnClick
-        fastAdapter.onClickListener = { _, _, _, position ->
-            val itemIndex = position + itemHeaderOffset
+            //OnClick
+            fastAdapter.onClickListener = { _, _, _, position ->
+                scope.launch {
+                    val itemIndex = position + itemHeaderOffset
 
-            if (itemIndex >= 0 && itemIndex < viewData.size) {
-                onItemClick(view.context, viewData, itemIndex)
-            }
-
-            false
-        }
-
-        /**
-         * On long click
-         */
-        fastAdapter.onLongClickListener = { _, _, _, position ->
-            val itemIndex = position + itemHeaderOffset
-
-            if (itemIndex >= 0 && itemIndex < viewData.size) {
-                onItemLongClick(view, viewData, itemIndex)
-
-            }
-
-            false
-        }
-
-        /**
-         * On menu button click
-         */
-        fastAdapter.addEventHook(object : ClickEventHook<CatalogItem>() {
-            override fun onBind(viewHolder: RecyclerView.ViewHolder): View? {
-                return if (viewHolder is CatalogItem.ViewHolder) {
-                    viewHolder.titleMenuButton
-                } else null
-            }
-
-            override fun onClick(
-                v: View,
-                position: Int,
-                fastAdapter: FastAdapter<CatalogItem>,
-                item: CatalogItem
-            ) {
-                val itemIndex = position + itemHeaderOffset
-
-                if (itemIndex >= 0 && itemIndex < viewData.size) {
-                    onMenuButtonClick(view, viewData, itemIndex)
+                    if (itemIndex >= 0 && itemIndex < viewData.size) {
+                        onItemClick(view.context, viewData, itemIndex)
+                    }
                 }
-            }
-        })
 
-        /**
-         * On download button click
-         */
-        fastAdapter.addEventHook(object : ClickEventHook<CatalogItem>() {
-            override fun onBind(viewHolder: RecyclerView.ViewHolder): View? {
-                return if (viewHolder is CatalogItem.ViewHolder) {
-                    viewHolder.titleDownloadButton
-                } else null
+                false
             }
 
-            override fun onClick(
-                v: View,
-                position: Int,
-                fastAdapter: FastAdapter<CatalogItem>,
-                item: CatalogItem
-            ) {
-                onDownloadButtonClick(view.context, item, v as ImageButton)
+            /**
+             * On long click
+             */
+            fastAdapter.onLongClickListener = { _, _, _, position ->
+                scope.launch {
+                    val itemIndex = position + itemHeaderOffset
+
+                    if (itemIndex >= 0 && itemIndex < viewData.size) {
+                        onItemLongClick(view, viewData, itemIndex)
+
+                    }
+                }
+
+                false
             }
-        })
+
+            /**
+             * On menu button click
+             */
+            fastAdapter.addEventHook(object : ClickEventHook<CatalogItem>() {
+                override fun onBind(viewHolder: RecyclerView.ViewHolder): View? {
+                    return if (viewHolder is CatalogItem.ViewHolder) {
+                        viewHolder.titleMenuButton
+                    } else null
+                }
+
+                override fun onClick(
+                    v: View,
+                    position: Int,
+                    fastAdapter: FastAdapter<CatalogItem>,
+                    item: CatalogItem
+                ) {
+                    scope.launch {
+                        val itemIndex = position + itemHeaderOffset
+
+                        if (itemIndex >= 0 && itemIndex < viewData.size) {
+                            onMenuButtonClick(view, viewData, itemIndex)
+                        }
+                    }
+                }
+            })
+
+            /**
+             * On download button click
+             */
+            fastAdapter.addEventHook(object : ClickEventHook<CatalogItem>() {
+                override fun onBind(viewHolder: RecyclerView.ViewHolder): View? {
+                    return if (viewHolder is CatalogItem.ViewHolder) {
+                        viewHolder.titleDownloadButton
+                    } else null
+                }
+
+                override fun onClick(
+                    v: View,
+                    position: Int,
+                    fastAdapter: FastAdapter<CatalogItem>,
+                    item: CatalogItem
+                ) {
+                    scope.launch {
+                        onDownloadButtonClick(view.context, item, v as ImageButton)
+                    }
+                }
+            })
+        }
     }
 
     private suspend fun addHeader(headerText: String) {
@@ -192,11 +202,15 @@ abstract class RecyclerViewPage {
             clearDatabase(view.context)
 
         load(view.context, forceReload, 0, displayLoading = {
-            swipeRefreshLayout?.isRefreshing = true
-        }, callback = { idList ->
-            setupRecyclerView(view)
-
             scope.launch {
+                withContext(Dispatchers.Main){
+                    swipeRefreshLayout?.isRefreshing = true
+                }
+            }
+        }, callback = { idList ->
+            scope.launch {
+                setupRecyclerView(view)
+
                 for (id in idList) {
                     addItem(idToAbstractItem(view, id))
                 }
