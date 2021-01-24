@@ -64,7 +64,7 @@ fun newSearchTrackRequest(
                 return null
             }
         } else {
-            context.getString(R.string.loadSongsUrl) + "?term=$term&limit=50&skip=" + skip.toString() + "&fields=&search=$term"
+            context.getString(R.string.loadSongsUrl) + "?raw={}&limit=50&skip=$skip&offset=0&search=$term&sort=-date&nogold=false&onlyReleased=true&types[]=Single&types[]=EP&types[]=Album"
         }
 
     return StringRequest(
