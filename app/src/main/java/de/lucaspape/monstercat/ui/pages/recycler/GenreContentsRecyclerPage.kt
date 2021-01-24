@@ -12,7 +12,7 @@ import de.lucaspape.monstercat.request.async.loadMoodAsync
 import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
 
 class GenreContentsRecyclerPage(private val genreId: String) :
-    HomeCatalogRecyclerPage("genre-$genreId") {
+    HomeCatalogRecyclerPage() {
     override fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val idList = ArrayList<String>()
 

@@ -20,9 +20,10 @@ import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
 import de.lucaspape.monstercat.ui.abstract_items.util.HeaderTextItem
 import de.lucaspape.monstercat.ui.abstract_items.util.ProgressItem
 import de.lucaspape.monstercat.ui.displaySnackBar
-import de.lucaspape.util.Cache
+import java.util.*
+import kotlin.collections.ArrayList
 
-abstract class RecyclerViewPage(var cacheId: String?) {
+abstract class RecyclerViewPage() {
     abstract fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int)
     abstract fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int)
     abstract fun onMenuButtonClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int)
@@ -64,6 +65,8 @@ abstract class RecyclerViewPage(var cacheId: String?) {
     open fun getOrientation(view: View): Int {
         return LinearLayout.VERTICAL
     }
+
+    open val id = UUID.randomUUID().toString()
 
     @SuppressLint("WrongConstant")
     private fun setupRecyclerView(view: View) {
@@ -164,94 +167,26 @@ abstract class RecyclerViewPage(var cacheId: String?) {
         itemHeaderOffset += -1
     }
 
-    private fun addItem(item: GenericItem, id: String) {
-        viewData.add(item)
-        itemAdapter.add(item)
-
-        val cacheId = cacheId
-        if (cacheId != null) {
-            val cache = Cache()
-            var cacheList = cache.get<ArrayList<String>>(cacheId)
-
-            if (cacheList == null) {
-                cacheList = ArrayList()
-            }
-
-            cacheList.add(id)
-            cache.set(cacheId, cacheList)
-        }
-    }
-
-    private fun addItemFromCache(item: GenericItem) {
+    private fun addItem(item: GenericItem) {
         viewData.add(item)
         itemAdapter.add(item)
     }
 
     fun loadInit(view: View, forceReload: Boolean) {
-        val cacheId = cacheId
-
-        val cache = if (cacheId != null) {
-            Cache().get<ArrayList<String>>(cacheId)
-        } else {
-            null
-        }
-
         val swipeRefreshLayout =
             view.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
 
-        if (cache.isNullOrEmpty() || forceReload) {
-            if (cacheId != null)
-                Cache().set(cacheId, null)
+        if (forceReload)
+            clearDatabase(view.context)
 
-            if (forceReload)
-                clearDatabase(view.context)
 
-            load(view.context, forceReload, 0, displayLoading = {
-                swipeRefreshLayout?.isRefreshing = true
-            }, callback = { idList ->
-                setupRecyclerView(view)
-
-                for (id in idList) {
-                    addItem(idToAbstractItem(view, id), id)
-                }
-
-                getHeader(view.context)?.let {
-                    addHeader(it)
-                }
-
-                /**
-                 * On scroll down (load next)
-                 */
-                recyclerView?.addOnScrollListener(object :
-                    EndlessRecyclerOnScrollListener(footerAdapter) {
-                    override fun onLoadMore(currentPage: Int) {
-                        loadNext(view, currentPage)
-                    }
-                })
-
-                //refresh
-                swipeRefreshLayout?.setOnRefreshListener {
-                    loadInit(view, true)
-                }
-
-                swipeRefreshLayout?.isRefreshing = false
-
-            }, errorCallback = { errorMessage ->
-                swipeRefreshLayout?.isRefreshing = false
-
-                displaySnackBar(
-                    view,
-                    errorMessage,
-                    view.context.getString(R.string.retry)
-                ) {
-                    loadInit(view, forceReload)
-                }
-            })
-        } else {
+        load(view.context, forceReload, 0, displayLoading = {
+            swipeRefreshLayout?.isRefreshing = true
+        }, callback = { idList ->
             setupRecyclerView(view)
 
-            for (id in cache) {
-                addItemFromCache(idToAbstractItem(view, id))
+            for (id in idList) {
+                addItem(idToAbstractItem(view, id))
             }
 
             getHeader(view.context)?.let {
@@ -275,8 +210,17 @@ abstract class RecyclerViewPage(var cacheId: String?) {
 
             swipeRefreshLayout?.isRefreshing = false
 
-            restoreRecyclerViewPosition(view.context)
-        }
+        }, errorCallback = { errorMessage ->
+            swipeRefreshLayout?.isRefreshing = false
+
+            displaySnackBar(
+                view,
+                errorMessage,
+                view.context.getString(R.string.retry)
+            ) {
+                loadInit(view, forceReload)
+            }
+        })
     }
 
     open val pageSize = 50
@@ -293,7 +237,7 @@ abstract class RecyclerViewPage(var cacheId: String?) {
                 displayLoading = {},
                 callback = { idList ->
                     for (id in idList) {
-                        addItem(idToAbstractItem(view, id), id)
+                        addItem(idToAbstractItem(view, id))
                     }
 
                     footerAdapter.clear()
@@ -315,15 +259,15 @@ abstract class RecyclerViewPage(var cacheId: String?) {
 
     fun resetRecyclerViewSavedPosition(context: Context) {
         val settings = Settings.getSettings(context)
-        settings.setInt("$cacheId-positionIndex", 0)
-        settings.setInt("$cacheId-topView", 0)
+        settings.setInt("$id-positionIndex", 0)
+        settings.setInt("$id-topView", 0)
     }
 
     private fun restoreRecyclerViewPosition(context: Context) {
         recyclerView?.let {
             val settings = Settings.getSettings(context)
-            settings.getInt("$cacheId-positionIndex")?.let { positionIndex ->
-                settings.getInt("$cacheId-topView")?.let { topView ->
+            settings.getInt("$id-positionIndex")?.let { positionIndex ->
+                settings.getInt("$id-topView")?.let { topView ->
                     val layoutManager = it.layoutManager as LinearLayoutManager
                     layoutManager.scrollToPositionWithOffset(positionIndex, topView)
                 }
@@ -342,8 +286,8 @@ abstract class RecyclerViewPage(var cacheId: String?) {
                 val topView = sView.top - sView.paddingTop
 
                 val settings = Settings.getSettings(context)
-                settings.setInt("$cacheId-positionIndex", positionIndex)
-                settings.setInt("$cacheId-topView", topView)
+                settings.setInt("$id-positionIndex", positionIndex)
+                settings.setInt("$id-topView", topView)
             }
         }
     }

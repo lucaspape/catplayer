@@ -15,7 +15,7 @@ import de.lucaspape.monstercat.ui.pages.util.playSongsFromViewDataAsync
 class HomeCatalogAlbumRecyclerPage(
     private val albumId: String?,
     private val albumMcId: String
-) : HomeCatalogRecyclerPage("album-$albumMcId") {
+) : HomeCatalogRecyclerPage() {
 
     override fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val fistItem = viewData[itemIndex]

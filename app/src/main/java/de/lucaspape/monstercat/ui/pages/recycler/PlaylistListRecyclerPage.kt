@@ -15,7 +15,7 @@ import de.lucaspape.monstercat.ui.pages.util.downloadPlaylistAsync
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
 
 class PlaylistListRecyclerPage(private val loadPlaylist: (playlistId: String) -> Unit) :
-    RecyclerViewPage("playlist-list") {
+    RecyclerViewPage() {
 
     override fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val item = viewData[itemIndex]

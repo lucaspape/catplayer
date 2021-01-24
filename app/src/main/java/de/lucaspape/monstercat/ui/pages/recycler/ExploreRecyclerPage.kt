@@ -18,10 +18,9 @@ import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
 import java.io.File
 
 open class ExploreRecyclerPage(
-    cacheId: String,
     val openMood: (moodId: String) -> Unit,
     val openGenre: (genreId: String) -> Unit
-) : RecyclerViewPage(cacheId) {
+) : RecyclerViewPage() {
 
     override fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val fistItem = viewData[itemIndex]

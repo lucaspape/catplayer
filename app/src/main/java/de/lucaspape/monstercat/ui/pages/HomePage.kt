@@ -60,7 +60,7 @@ class HomePage(
 
         homePageObject?.saveRecyclerViewPosition(view.context)
 
-        homePageObject = HomeCatalogRecyclerPage("catalog")
+        homePageObject = HomeCatalogRecyclerPage()
 
         if (resetPosition)
             homePageObject?.resetRecyclerViewSavedPosition(view.context)

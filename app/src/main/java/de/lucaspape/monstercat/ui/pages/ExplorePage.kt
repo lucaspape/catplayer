@@ -39,7 +39,7 @@ class ExplorePage(
 
         explorePageObject?.saveRecyclerViewPosition(view.context)
 
-        explorePageObject = ExploreRecyclerPage("explore", openMood = { moodId ->
+        explorePageObject = ExploreRecyclerPage(openMood = { moodId ->
             moodView(view, moodId)
         }, openGenre = { genreId -> genreView(view, genreId) })
 

@@ -13,7 +13,7 @@ import de.lucaspape.monstercat.ui.abstract_items.content.AlbumItem
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
 
 class HomeAlbumRecyclerPage(private val onSingleAlbumLoad: (albumId: String, albumMcId: String) -> Unit) :
-    RecyclerViewPage("album-list") {
+    RecyclerViewPage() {
 
     override fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val albumDatabaseHelper = AlbumDatabaseHelper(context)

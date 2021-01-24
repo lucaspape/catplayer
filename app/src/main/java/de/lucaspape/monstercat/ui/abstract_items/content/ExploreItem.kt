@@ -41,7 +41,7 @@ class ExploreItem(
         var recyclerViewList: RecyclerViewPage? = null
 
         override fun bindView(item: ExploreItem, payloads: List<Any>) {
-            recyclerViewList = object : RecyclerViewPage(null) {
+            recyclerViewList = object : RecyclerViewPage() {
                 override fun onItemClick(
                     context: Context,
                     viewData: ArrayList<GenericItem>,

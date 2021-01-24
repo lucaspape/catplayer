@@ -10,7 +10,7 @@ import de.lucaspape.monstercat.request.async.loadMoodAsync
 import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
 
 class MoodContentsRecyclerPage(private val moodId: String) :
-    HomeCatalogRecyclerPage("mood-$moodId") {
+    HomeCatalogRecyclerPage() {
     override fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val idList = ArrayList<String>()
 

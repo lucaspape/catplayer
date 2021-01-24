@@ -15,7 +15,7 @@ import de.lucaspape.monstercat.ui.pages.util.playSongsFromCatalogDbAsync
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
 import java.io.File
 
-open class HomeCatalogRecyclerPage(cacheId: String) : RecyclerViewPage(cacheId) {
+open class HomeCatalogRecyclerPage() : RecyclerViewPage() {
 
     override fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         val fistItem = viewData[itemIndex]
