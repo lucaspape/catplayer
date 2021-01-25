@@ -7,8 +7,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
@@ -21,17 +19,12 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.core.download.DownloadService
-import de.lucaspape.monstercat.core.download.fallbackFile
-import de.lucaspape.monstercat.core.download.fallbackFileLow
-import de.lucaspape.monstercat.core.download.hideDownloadNotification
-import de.lucaspape.monstercat.core.util.BackgroundAsync
+import de.lucaspape.monstercat.core.download.*
 import de.lucaspape.monstercat.core.music.*
 import de.lucaspape.monstercat.core.music.notification.updateNotification
 import de.lucaspape.monstercat.core.music.save.PlayerSaveState
 import de.lucaspape.monstercat.core.music.util.*
 import de.lucaspape.monstercat.core.music.util.setCover
-import de.lucaspape.monstercat.core.util.downloadFile
 import de.lucaspape.monstercat.request.StreamInfoUpdateAsync
 import de.lucaspape.monstercat.request.async.checkCustomApiFeaturesAsync
 import de.lucaspape.monstercat.request.async.loadRelatedTracksAsync
@@ -43,156 +36,89 @@ import de.lucaspape.monstercat.ui.pages.*
 import de.lucaspape.monstercat.ui.pages.util.Page
 import java.io.File
 import java.io.FileNotFoundException
-import java.io.FileOutputStream
 
 var downloadServiceIntent: Intent? = null
-var firstStart = true
+var lastOpenPage:String? = null
 
 /**
  * Main activity
  */
 class MainActivity : AppCompatActivity() {
     private var currentPage: Page? = null
+        set(value) {
+            lastOpenPage = value?.pageName
+            field = value
+        }
 
     //callback function for back pressed
     var pageBackPressedCallback: () -> Unit = {
         currentPage?.onBackPressed()
     }
 
-    private val onNavigationItemSelectedListener =
-        BottomNavigationView.OnNavigationItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.navigation_explore -> {
-                    openExplore(currentPage?.pageName == ExplorePage.explorePageName)
-
-                    return@OnNavigationItemSelectedListener true
-                }
-                R.id.navigation_home -> {
-                    openHome(null, currentPage?.pageName == HomePage.homePageName)
-
-                    return@OnNavigationItemSelectedListener true
-                }
-                R.id.navigation_playlist -> {
-                    openPlaylist(null, currentPage?.pageName == PlaylistPage.playlistPageName)
-
-                    return@OnNavigationItemSelectedListener true
-                }
-            }
-            false
-        }
-
-    private fun search(searchString: String?) {
-        openPage(
-            SearchPage(
-                searchString
-            ) {
-                openHome(null, false)
-            }
-        )
-    }
-
-    private fun openSettings() {
-        openPage(
-            SettingsPage {
-                openHome(null, false)
-            }
-
-        )
-    }
-
-    private fun openExplore(resetPosition: Boolean) {
-        openPage(
-            ExplorePage(
-                { searchString ->
-                    search(
-                        searchString
-                    )
-                },
-                { openSettings() },
-                resetPosition
-            )
-        )
-    }
-
-    private fun openHome(albumMcId: String?, resetPosition: Boolean) {
-        openPage(
-            HomePage(
-                { searchString ->
-                    search(
-                        searchString
-                    )
-                },
-                { openSettings() },
-                albumMcId,
-                resetPosition
-
-            )
-        )
-    }
-
-    private fun openPlaylist(playlistId: String?, resetPosition: Boolean) {
-        openPage(
-            PlaylistPage(
-                playlistId,
-                resetPosition
-            ) {
-                openHome(null, false)
-            }
-
-        )
-    }
-
-    private fun openPage(page: Page) {
-        currentPage = page
-
-        val transaction = supportFragmentManager.beginTransaction()
-        transaction.replace(R.id.container, page)
-        transaction.addToBackStack(null)
-        transaction.commit()
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        //set files for fallback covers
         setFallbackCoverFiles(this)
 
-        //check for internet
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET)
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-            displayInfo(this, getString(R.string.noInternetAccessError))
-        }
+        checkPermissions()
 
-        //download fallback covers
-        downloadFallbackCoverImages()
+        downloadFallbackCoverImagesAsync(this) { changeTheme() }
 
-        //adjust theme
         changeTheme()
 
         checkCustomApiFeaturesAsync(this, {}, {})
 
         val settings = Settings.getSettings(this)
 
-        //check for app version, if changed reset player state
         if (settings.getString(getString(R.string.appVersionSetting)) != packageManager.getPackageInfo(
                 packageName,
                 0
             ).versionName
         ) {
-            try {
-                File("$cacheDir/player_state.obj").delete()
-            } catch (e: FileNotFoundException) {
-
-            }
-
-            settings.setString(
-                getString(R.string.appVersionSetting),
-                packageManager.getPackageInfo(packageName, 0).versionName
-            )
+            onUpgrade()
         }
 
         applyPlayerSettings(this)
+
+        login()
+
+        setContentView(R.layout.activity_main)
+
+        registerListeners()
+
+        if(!openFirstPage()){
+            val lastOpenPage = lastOpenPage
+
+            if(lastOpenPage != null){
+                when (lastOpenPage) {
+                    HomePage.homePageName -> findViewById<BottomNavigationView>(R.id.nav_view).selectedItemId = R.id.navigation_home
+                    PlaylistPage.playlistPageName -> findViewById<BottomNavigationView>(R.id.nav_view).selectedItemId = R.id.navigation_playlist
+                    ExplorePage.explorePageName -> findViewById<BottomNavigationView>(R.id.nav_view).selectedItemId = R.id.navigation_explore
+                    else -> findViewById<BottomNavigationView>(R.id.nav_view).selectedItemId = R.id.navigation_home
+                }
+            }else{
+                findViewById<BottomNavigationView>(R.id.nav_view).selectedItemId = R.id.navigation_home
+            }
+        }
+
+        setupPlayer()
+
+        startDownloadService()
+
+        showPrivacyPolicy()
+    }
+
+    private fun checkPermissions() {
+        //check for internet
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            displayInfo(this, getString(R.string.noInternetAccessError))
+        }
+    }
+
+    private fun login() {
+        val settings = Settings.getSettings(this)
 
         //login
         if (!loggedIn) {
@@ -217,14 +143,18 @@ class MainActivity : AppCompatActivity() {
                 }
             })
         }
+    }
 
+    private fun openFirstPage():Boolean {
         val intentExtras = intent.extras
         val path = intent.data?.path
 
         //check for extras in intent (open search on startup, open album or playlist on startup using links)
         when {
             intentExtras?.get("search") != null -> {
-                search(intentExtras["search"] as String)
+                openSearch(intentExtras["search"] as String)
+
+                return true
             }
             path != null -> {
                 val id = path.substring(path.lastIndexOf("/") + 1, path.length)
@@ -234,20 +164,31 @@ class MainActivity : AppCompatActivity() {
                     path.contains("playlist") -> openPlaylist(id, false)
                     else -> openHome(null, false)
                 }
+
+                return true
             }
             else -> {
-                val currentPage = currentPage
-
-                if(currentPage == null){
-                    openHome(null, false)
-                }else{
-                    openPage(currentPage)
-                }
+                return false
             }
         }
+    }
 
-        setContentView(R.layout.activity_main)
+    private fun onUpgrade() {
+        val settings = Settings.getSettings(this)
 
+        try {
+            File("$cacheDir/player_state.obj").delete()
+        } catch (e: FileNotFoundException) {
+
+        }
+
+        settings.setString(
+            getString(R.string.appVersionSetting),
+            packageManager.getPackageInfo(packageName, 0).versionName
+        )
+    }
+
+    private fun setupPlayer() {
         bindPlayerUICallbacks()
 
         setupMusicPlayer(
@@ -282,16 +223,6 @@ class MainActivity : AppCompatActivity() {
         //create the MusicPlayer.kt mediasession
         createMediaSession(this)
 
-        if(firstStart)
-            findViewById<BottomNavigationView>(R.id.nav_view).selectedItemId = R.id.navigation_home
-            firstStart = false
-
-        findViewById<BottomNavigationView>(R.id.nav_view).setOnNavigationItemSelectedListener(
-            onNavigationItemSelectedListener
-        )
-
-        registerButtonListeners()
-
         //update notification after restart of activity (screen orientation change etc)
         if (exoPlayer?.isPlaying == true) {
             setCover(
@@ -305,15 +236,14 @@ class MainActivity : AppCompatActivity() {
                 )
             }
         }
+    }
 
+    private fun startDownloadService() {
         //start download service
         if (DownloadService.downloadTask?.active == true) {
             downloadServiceIntent = Intent(this, DownloadService::class.java)
             startService(downloadServiceIntent)
         }
-
-        //show privacy policy
-        showPrivacyPolicy()
     }
 
     override fun onDestroy() {
@@ -334,54 +264,6 @@ class MainActivity : AppCompatActivity() {
         super.onPause()
 
         PlayerSaveState.saveMusicPlayerState(this)
-    }
-
-    private fun downloadFallbackCoverImages() {
-        if (!fallbackBlackFile.exists() || !fallbackBlackFileLow.exists()) {
-            BackgroundAsync({
-                downloadFile(
-                    fallbackBlackFile.absolutePath,
-                    getString(R.string.fallbackCoverBlackUrl),
-                    cacheDir.toString(),
-                    "",
-                    ""
-                ) { _, _ ->
-                }
-            }, {
-                FileOutputStream(fallbackBlackFileLow).use { out ->
-                    val originalBitmap = BitmapFactory.decodeFile(fallbackBlackFile.absolutePath)
-                    originalBitmap?.let {
-                        Bitmap.createScaledBitmap(it, 128, 128, false)
-                            .compress(Bitmap.CompressFormat.JPEG, 100, out)
-                    }
-                }
-
-                changeTheme()
-            }).execute()
-        }
-
-        if (!fallbackWhiteFile.exists() || !fallbackWhiteFileLow.exists()) {
-            BackgroundAsync({
-                downloadFile(
-                    fallbackWhiteFile.absolutePath,
-                    getString(R.string.fallbackCoverUrl),
-                    cacheDir.toString(),
-                    "",
-                    ""
-                ) { _, _ ->
-                }
-            }, {
-                FileOutputStream(fallbackWhiteFileLow).use { out ->
-                    val originalBitmap = BitmapFactory.decodeFile(fallbackWhiteFile.absolutePath)
-                    originalBitmap?.let {
-                        Bitmap.createScaledBitmap(it, 128, 128, false)
-                            .compress(Bitmap.CompressFormat.JPEG, 100, out)
-                    }
-                }
-
-                changeTheme()
-            }).execute()
-        }
     }
 
     private fun changeTheme() {
@@ -456,7 +338,7 @@ class MainActivity : AppCompatActivity() {
         pageBackPressedCallback()
     }
 
-    private fun registerButtonListeners() {
+    private fun registerListeners() {
         findViewById<ImageButton>(R.id.playButton).setOnClickListener {
             toggleMusic(this)
         }
@@ -466,6 +348,28 @@ class MainActivity : AppCompatActivity() {
                 Intent(applicationContext, PlayerFullscreenActivity::class.java)
             )
         }
+
+        findViewById<BottomNavigationView>(R.id.nav_view).setOnNavigationItemSelectedListener(
+            BottomNavigationView.OnNavigationItemSelectedListener { item ->
+                when (item.itemId) {
+                    R.id.navigation_explore -> {
+                        openExplore(currentPage?.pageName == ExplorePage.explorePageName)
+
+                        return@OnNavigationItemSelectedListener true
+                    }
+                    R.id.navigation_home -> {
+                        openHome(null, currentPage?.pageName == HomePage.homePageName)
+
+                        return@OnNavigationItemSelectedListener true
+                    }
+                    R.id.navigation_playlist -> {
+                        openPlaylist(null, currentPage?.pageName == PlaylistPage.playlistPageName)
+
+                        return@OnNavigationItemSelectedListener true
+                    }
+                }
+                false
+            })
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -536,5 +440,75 @@ class MainActivity : AppCompatActivity() {
         setTagCallback = { target ->
             barCoverImage.tag = target
         }
+    }
+
+    private fun openPage(page: Page) {
+        currentPage = page
+
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.container, page)
+        transaction.addToBackStack(null)
+        transaction.commit()
+    }
+
+    private fun openSearch(searchString: String?) {
+        openPage(
+            SearchPage(
+                searchString
+            ) {
+                openHome(null, false)
+            }
+        )
+    }
+
+    private fun openSettings() {
+        openPage(
+            SettingsPage {
+                openHome(null, false)
+            }
+
+        )
+    }
+
+    private fun openExplore(resetPosition: Boolean) {
+        openPage(
+            ExplorePage(
+                { searchString ->
+                    openSearch(
+                        searchString
+                    )
+                },
+                { openSettings() },
+                resetPosition
+            )
+        )
+    }
+
+    private fun openHome(albumMcId: String?, resetPosition: Boolean) {
+        openPage(
+            HomePage(
+                { searchString ->
+                    openSearch(
+                        searchString
+                    )
+                },
+                { openSettings() },
+                albumMcId,
+                resetPosition
+
+            )
+        )
+    }
+
+    private fun openPlaylist(playlistId: String?, resetPosition: Boolean) {
+        openPage(
+            PlaylistPage(
+                playlistId,
+                resetPosition
+            ) {
+                openHome(null, false)
+            }
+
+        )
     }
 }

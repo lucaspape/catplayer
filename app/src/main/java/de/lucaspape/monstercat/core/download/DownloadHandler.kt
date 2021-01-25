@@ -11,6 +11,11 @@ import de.lucaspape.monstercat.core.download.DownloadService.Companion.downloadT
 import de.lucaspape.monstercat.core.util.wifiConnected
 import de.lucaspape.monstercat.core.util.Settings
 import de.lucaspape.monstercat.core.util.BackgroundAsync
+import de.lucaspape.monstercat.core.util.downloadFile
+import de.lucaspape.monstercat.ui.fallbackBlackFile
+import de.lucaspape.monstercat.ui.fallbackBlackFileLow
+import de.lucaspape.monstercat.ui.fallbackWhiteFile
+import de.lucaspape.monstercat.ui.fallbackWhiteFileLow
 import java.io.File
 import java.io.FileOutputStream
 import java.lang.Exception
@@ -169,4 +174,52 @@ fun downloadCoverIntoImageReceiver(
         albumId,
         url
     )
+}
+
+fun downloadFallbackCoverImagesAsync(context: Context, callback:() -> Unit) {
+    if (!fallbackBlackFile.exists() || !fallbackBlackFileLow.exists()) {
+        BackgroundAsync({
+            downloadFile(
+                fallbackBlackFile.absolutePath,
+                context.getString(R.string.fallbackCoverBlackUrl),
+                context.cacheDir.toString(),
+                "",
+                ""
+            ) { _, _ ->
+            }
+        }, {
+            FileOutputStream(fallbackBlackFileLow).use { out ->
+                val originalBitmap = BitmapFactory.decodeFile(fallbackBlackFile.absolutePath)
+                originalBitmap?.let {
+                    Bitmap.createScaledBitmap(it, 128, 128, false)
+                        .compress(Bitmap.CompressFormat.JPEG, 100, out)
+                }
+            }
+
+            callback()
+        }).execute()
+    }
+
+    if (!fallbackWhiteFile.exists() || !fallbackWhiteFileLow.exists()) {
+        BackgroundAsync({
+            downloadFile(
+                fallbackWhiteFile.absolutePath,
+                context.getString(R.string.fallbackCoverUrl),
+                context.cacheDir.toString(),
+                "",
+                ""
+            ) { _, _ ->
+            }
+        }, {
+            FileOutputStream(fallbackWhiteFileLow).use { out ->
+                val originalBitmap = BitmapFactory.decodeFile(fallbackWhiteFile.absolutePath)
+                originalBitmap?.let {
+                    Bitmap.createScaledBitmap(it, 128, 128, false)
+                        .compress(Bitmap.CompressFormat.JPEG, 100, out)
+                }
+            }
+
+            callback()
+        }).execute()
+    }
 }
