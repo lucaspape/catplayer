@@ -21,6 +21,8 @@ class PlaylistListRecyclerPage(private val loadPlaylist: (playlistId: String) ->
 
     override val id = "playlists"
 
+    private var currentPlaylistId = ""
+
     override suspend fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         super.onItemClick(context, viewData, itemIndex)
 
@@ -28,6 +30,8 @@ class PlaylistListRecyclerPage(private val loadPlaylist: (playlistId: String) ->
 
         if (item is PlaylistItem) {
             withContext(Dispatchers.Main){
+                currentPlaylistId = item.playlistId
+
                 loadPlaylist(item.playlistId)
             }
         }
@@ -122,5 +126,28 @@ class PlaylistListRecyclerPage(private val loadPlaylist: (playlistId: String) ->
 
     override fun clearDatabase(context: Context) {
         PlaylistDatabaseHelper(context).reCreateTable(context, false)
+    }
+
+    override fun restore(data: HashMap<String, String>?): Boolean {
+        return if (data != null) {
+            val playlistId = data["playlistId"]
+
+            if (!playlistId.isNullOrBlank()) {
+                loadPlaylist(playlistId)
+                true
+            } else {
+                false
+            }
+        } else {
+            false
+        }
+    }
+
+    override fun save(): HashMap<String, String> {
+        val hashMap = HashMap<String, String>()
+
+        hashMap["playlistId"] = currentPlaylistId
+
+        return hashMap
     }
 }

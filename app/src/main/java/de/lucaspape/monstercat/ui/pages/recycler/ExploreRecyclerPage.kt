@@ -16,11 +16,24 @@ open class ExploreRecyclerPage(
 
     override val id = "explore"
 
+    private var currentMoodId = ""
+    private var currentGenreId = ""
+
     override suspend fun idToAbstractItem(view: View, id: String): GenericItem {
         return if (id.contains("separator-")) {
             HeaderTextItem(id.replace("separator-", ""))
         } else {
-            ExploreItem(id.replace("item-", ""), openMood, openGenre)
+            ExploreItem(id.replace("item-", ""), {
+                currentMoodId = it
+                currentGenreId = ""
+
+                openMood(it)
+            }, {
+                currentMoodId = ""
+                currentGenreId = it
+
+                openGenre(it)
+            })
         }
     }
 
@@ -54,5 +67,33 @@ open class ExploreRecyclerPage(
         MoodDatabaseHelper(context).reCreateTable()
         GenreDatabaseHelper(context).reCreateTable()
         PlaylistItemDatabaseHelper(context, "greatest-hits").reCreateTable()
+    }
+
+    override fun restore(data: HashMap<String, String>?): Boolean {
+        if (data != null) {
+            val moodId = data["moodId"]
+            val genreId = data["genreId"]
+
+            return if (!moodId.isNullOrBlank()) {
+                openMood(moodId)
+                true
+            } else if (!genreId.isNullOrBlank()) {
+                openGenre(genreId)
+                true
+            } else {
+                false
+            }
+        } else {
+            return false
+        }
+    }
+
+    override fun save(): HashMap<String, String> {
+        val hashMap = HashMap<String, String>()
+
+        hashMap["moodId"] = currentMoodId
+        hashMap["genreId"] = currentGenreId
+
+        return hashMap
     }
 }

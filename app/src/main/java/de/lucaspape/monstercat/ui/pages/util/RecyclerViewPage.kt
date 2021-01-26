@@ -27,8 +27,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 abstract class RecyclerViewPage {
+    companion object{
+        @JvmStatic private val saveData = HashMap<String, HashMap<String, String>>()
+    }
+
     private val scope = CoroutineScope(Dispatchers.Default)
 
     private var lastClick:Long = 0
@@ -64,6 +69,14 @@ abstract class RecyclerViewPage {
         errorCallback: (errorMessage: String) -> Unit
     )
 
+    open fun restore(data: HashMap<String, String>?):Boolean{
+        return false
+    }
+
+    open fun save(): HashMap<String, String>{
+        return HashMap()
+    }
+
     open fun getHeader(context: Context): String?{
         return null
     }
@@ -78,8 +91,10 @@ abstract class RecyclerViewPage {
     private var itemHeaderOffset = 0
 
     open fun onCreate(view: View) {
-        scope.launch {
-            loadInit(view, false)
+        if(!restore(saveData[id])){
+            scope.launch {
+                loadInit(view, false)
+            }
         }
     }
 
@@ -317,10 +332,16 @@ abstract class RecyclerViewPage {
         }
     }
 
+    fun resetSaveData(){
+        saveData[id] = HashMap()
+    }
+
     fun resetRecyclerViewSavedPosition(context: Context) {
         val settings = Settings.getSettings(context)
         settings.setInt("$id-positionIndex", 0)
         settings.setInt("$id-topView", 0)
+
+        resetSaveData()
     }
 
     private fun restoreRecyclerViewPosition(context: Context) {
@@ -350,5 +371,7 @@ abstract class RecyclerViewPage {
                 settings.setInt("$id-topView", topView)
             }
         }
+
+        saveData[id] = save()
     }
 }

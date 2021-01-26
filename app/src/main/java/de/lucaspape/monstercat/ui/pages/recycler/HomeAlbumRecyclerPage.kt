@@ -3,7 +3,6 @@ package de.lucaspape.monstercat.ui.pages.recycler
 import android.content.Context
 import android.content.res.Configuration
 import android.view.View
-import android.widget.ImageButton
 import android.widget.LinearLayout
 import com.mikepenz.fastadapter.GenericItem
 import de.lucaspape.monstercat.R
@@ -19,6 +18,9 @@ class HomeAlbumRecyclerPage(private val onSingleAlbumLoad: (albumId: String, alb
 
     override val id = "albums"
 
+    private var currentAlbumId = ""
+    private var currentAlbumMcId = ""
+
     override suspend fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
         super.onItemClick(context, viewData, itemIndex)
 
@@ -29,6 +31,9 @@ class HomeAlbumRecyclerPage(private val onSingleAlbumLoad: (albumId: String, alb
         if (albumItem is AlbumItem) {
             albumDatabaseHelper.getAlbum(albumItem.albumId)?.mcID?.let { mcID ->
                 withContext(Dispatchers.Main){
+                    currentAlbumId = albumItem.albumId
+                    currentAlbumMcId = mcID
+
                     onSingleAlbumLoad(albumItem.albumId, mcID)
                 }
             }
@@ -98,5 +103,30 @@ class HomeAlbumRecyclerPage(private val onSingleAlbumLoad: (albumId: String, alb
         }else{
             LinearLayout.VERTICAL
         }
+    }
+
+    override fun restore(data: HashMap<String, String>?): Boolean {
+        return if (data != null) {
+            val albumId = data["albumId"]
+            val albumMcId = data["albumMcId"]
+
+            if (!albumId.isNullOrBlank() && ! albumMcId.isNullOrBlank()) {
+                onSingleAlbumLoad(albumId, albumMcId)
+                true
+            } else {
+                false
+            }
+        } else {
+            false
+        }
+    }
+
+    override fun save(): HashMap<String, String> {
+        val hashMap = HashMap<String, String>()
+
+        hashMap["albumId"] = currentAlbumId
+        hashMap["albumMcId"] = currentAlbumMcId
+
+        return hashMap
     }
 }
