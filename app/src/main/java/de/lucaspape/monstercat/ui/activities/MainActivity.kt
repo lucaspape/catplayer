@@ -456,7 +456,7 @@ class MainActivity : AppCompatActivity() {
             SearchPage(
                 searchString
             ) {
-                openHome(null, false)
+                findViewById<BottomNavigationView>(R.id.nav_view).selectedItemId = R.id.navigation_home
             }
         )
     }
@@ -464,7 +464,7 @@ class MainActivity : AppCompatActivity() {
     private fun openSettings() {
         openPage(
             SettingsPage {
-                openHome(null, false)
+                findViewById<BottomNavigationView>(R.id.nav_view).selectedItemId = R.id.navigation_home
             }
 
         )
@@ -479,7 +479,10 @@ class MainActivity : AppCompatActivity() {
                     )
                 },
                 { openSettings() },
-                resetPosition
+                resetPosition,
+                {
+                    findViewById<BottomNavigationView>(R.id.nav_view).selectedItemId = R.id.navigation_home
+                }
             )
         )
     }
@@ -506,7 +509,7 @@ class MainActivity : AppCompatActivity() {
                 playlistId,
                 resetPosition
             ) {
-                openHome(null, false)
+                findViewById<BottomNavigationView>(R.id.nav_view).selectedItemId = R.id.navigation_home
             }
 
         )

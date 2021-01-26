@@ -34,6 +34,8 @@ class HomeAlbumRecyclerPage(private val onSingleAlbumLoad: (albumId: String, alb
                     currentAlbumId = albumItem.albumId
                     currentAlbumMcId = mcID
 
+                    saveData()
+
                     onSingleAlbumLoad(albumItem.albumId, mcID)
                 }
             }

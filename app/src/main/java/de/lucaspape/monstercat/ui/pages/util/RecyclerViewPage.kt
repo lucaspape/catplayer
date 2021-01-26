@@ -336,12 +336,14 @@ abstract class RecyclerViewPage {
         saveData[id] = HashMap()
     }
 
+    fun saveData(){
+        saveData[id] = save()
+    }
+
     fun resetRecyclerViewSavedPosition(context: Context) {
         val settings = Settings.getSettings(context)
         settings.setInt("$id-positionIndex", 0)
         settings.setInt("$id-topView", 0)
-
-        resetSaveData()
     }
 
     private fun restoreRecyclerViewPosition(context: Context) {
@@ -371,7 +373,5 @@ abstract class RecyclerViewPage {
                 settings.setInt("$id-topView", topView)
             }
         }
-
-        saveData[id] = save()
     }
 }

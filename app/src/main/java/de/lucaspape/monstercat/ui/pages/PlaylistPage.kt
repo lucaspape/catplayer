@@ -23,13 +23,16 @@ class PlaylistPage(
     override val layout: Int = R.layout.fragment_playlist
     private var playlistPageObject: RecyclerViewPage? = null
 
-    private var lastOpen = ""
+    private var currentView = ""
+
+    private var resetData = false
 
     override fun onBackPressed(view: View) {
-        if (lastOpen == "playlistContents") {
-            playlistListView(view)
-        } else {
+        if(currentView == "list"){
             returnToHome()
+        }else{
+            resetData = true
+            playlistListView(view)
         }
     }
 
@@ -50,30 +53,43 @@ class PlaylistPage(
     override val pageName: String = playlistPageName
 
     private fun playlistListView(view: View) {
+        currentView = "list"
+
         playlistPageObject?.saveRecyclerViewPosition(view.context)
 
         playlistPageObject = PlaylistListRecyclerPage { playlistId ->
             playlistContentView(view, playlistId)
         }
 
-        playlistPageObject?.onCreate(view)
-
-        if (resetPosition)
+        if (resetPosition){
             playlistPageObject?.resetRecyclerViewSavedPosition(view.context)
+            playlistPageObject?.resetSaveData()
+        }
 
-        lastOpen = "playlistList"
+        if(resetData){
+            playlistPageObject?.resetSaveData()
+        }
+
+        playlistPageObject?.onCreate(view)
     }
 
     private fun playlistContentView(view: View, playlistId: String) {
+        currentView = "playlist"
+
         playlistPageObject?.saveRecyclerViewPosition(view.context)
 
         playlistPageObject = PlaylistContentsRecyclerPage(playlistId)
-        playlistPageObject?.onCreate(view)
 
-        if (resetPosition)
+        if (resetPosition){
             playlistPageObject?.resetRecyclerViewSavedPosition(view.context)
+            playlistPageObject?.resetSaveData()
+        }
 
-        lastOpen = "playlistContents"
+        if(resetData){
+            playlistPageObject?.resetSaveData()
+        }
+
+        playlistPageObject?.onCreate(view)
     }
 
     private fun registerListeners(view: View) {

@@ -36,8 +36,17 @@ class HomePage(
     private var homePageObject: RecyclerViewPage? = null
     override val layout: Int = R.layout.fragment_home
 
+    private var resetData = false
+
     override fun onBackPressed(view: View) {
-        onCreate(view)
+        resetData = true
+        setupSpinner(view)
+
+        if (!registerListeners(view)){
+            catalogView(view)
+        }else{
+            albumView(view)
+        }
     }
 
     override fun onPause(view: View) {
@@ -66,8 +75,10 @@ class HomePage(
 
         homePageObject = HomeCatalogRecyclerPage()
 
-        if (resetPosition)
+        if (resetPosition){
             homePageObject?.resetRecyclerViewSavedPosition(view.context)
+            homePageObject?.resetSaveData()
+        }
 
         homePageObject?.onCreate(view)
     }
@@ -79,8 +90,14 @@ class HomePage(
                 albumId,
                 albumMcId
             )
-        if (resetPosition)
+        if (resetPosition){
             homePageObject?.resetRecyclerViewSavedPosition(view.context)
+            homePageObject?.resetSaveData()
+        }
+
+        if(resetData){
+            homePageObject?.resetSaveData()
+        }
 
         homePageObject?.onCreate(view)
     }
@@ -92,8 +109,14 @@ class HomePage(
                 openAlbum(view, albumId, albumMcId)
             }
 
-        if (resetPosition)
+        if (resetPosition){
             homePageObject?.resetRecyclerViewSavedPosition(view.context)
+            homePageObject?.resetSaveData()
+        }
+
+        if(resetData){
+            homePageObject?.resetSaveData()
+        }
 
         homePageObject?.onCreate(view)
     }

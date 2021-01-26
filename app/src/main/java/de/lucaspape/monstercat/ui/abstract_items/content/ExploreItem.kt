@@ -40,6 +40,8 @@ class ExploreItem(
 
         override fun bindView(item: ExploreItem, payloads: List<Any>) {
             recyclerViewList = object : HomeCatalogRecyclerPage() {
+                override val id = "explore-${item.typeName}"
+
                 override suspend fun onItemClick(
                     context: Context,
                     viewData: ArrayList<GenericItem>,

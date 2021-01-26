@@ -27,10 +27,14 @@ open class ExploreRecyclerPage(
                 currentMoodId = it
                 currentGenreId = ""
 
+                saveData()
+
                 openMood(it)
             }, {
                 currentMoodId = ""
                 currentGenreId = it
+
+                saveData()
 
                 openGenre(it)
             })

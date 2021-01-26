@@ -12,10 +12,11 @@ import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
 class ExplorePage(
     private val onSearch: (searchString: String?) -> Unit,
     private val openSettings: () -> Unit,
-    private val resetPosition: Boolean
+    private val resetPosition: Boolean,
+    private var returnToHome: () -> Unit
 ) : Page() {
 
-    constructor() : this({},{},false)
+    constructor() : this({},{},false, {})
 
     companion object{
         @JvmStatic val explorePageName = "explore"
@@ -24,8 +25,17 @@ class ExplorePage(
     private var explorePageObject: RecyclerViewPage? = null
     override val layout: Int = R.layout.fragment_explore
 
+    private var currentView = ""
+
+    private var resetData = false
+
     override fun onBackPressed(view: View) {
-        onCreate(view)
+        if(currentView == "explore"){
+            returnToHome()
+        }else{
+            resetData = true
+            exploreView(view)
+        }
     }
 
     override fun onPause(view: View) {
@@ -41,36 +51,60 @@ class ExplorePage(
     override val pageName: String = explorePageName
 
     private fun exploreView(view: View) {
+        currentView = "explore"
+
         explorePageObject?.saveRecyclerViewPosition(view.context)
 
         explorePageObject = ExploreRecyclerPage(openMood = { moodId ->
             moodView(view, moodId)
         }, openGenre = { genreId -> genreView(view, genreId) })
 
-        if (resetPosition)
+        if (resetPosition){
             explorePageObject?.resetRecyclerViewSavedPosition(view.context)
+            explorePageObject?.resetSaveData()
+        }
+
+        if(resetData){
+            explorePageObject?.resetSaveData()
+        }
 
         explorePageObject?.onCreate(view)
     }
 
     private fun moodView(view: View, moodId: String) {
+        currentView = "mood"
+
         explorePageObject?.saveRecyclerViewPosition(view.context)
 
         explorePageObject = MoodContentsRecyclerPage(moodId)
 
-        if (resetPosition)
+        if (resetPosition){
             explorePageObject?.resetRecyclerViewSavedPosition(view.context)
+            explorePageObject?.resetSaveData()
+        }
+
+        if(resetData){
+            explorePageObject?.resetSaveData()
+        }
 
         explorePageObject?.onCreate(view)
     }
 
     private fun genreView(view: View, genreId: String) {
+        currentView = "genre"
+
         explorePageObject?.saveRecyclerViewPosition(view.context)
 
         explorePageObject = GenreContentsRecyclerPage(genreId)
 
-        if (resetPosition)
+        if (resetPosition){
             explorePageObject?.resetRecyclerViewSavedPosition(view.context)
+            explorePageObject?.resetSaveData()
+        }
+
+        if(resetData){
+            explorePageObject?.resetSaveData()
+        }
 
         explorePageObject?.onCreate(view)
     }

@@ -32,6 +32,8 @@ class PlaylistListRecyclerPage(private val loadPlaylist: (playlistId: String) ->
             withContext(Dispatchers.Main){
                 currentPlaylistId = item.playlistId
 
+                saveData()
+
                 loadPlaylist(item.playlistId)
             }
         }
