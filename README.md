@@ -52,4 +52,6 @@ Disclamer: this is not an official app from monstercat.com!
 I am not responsible in any way for the content displayed in this app!
 Monstercat is a trademark from Monstercat inc.
 Google Play and the Google Play logo are trademarks of Google LLC.
-
+   
+   
+<a href="https://www.buymeacoffee.com/lucaspape" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
