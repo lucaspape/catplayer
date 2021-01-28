@@ -23,7 +23,7 @@ fun newAddToPlaylistRequest(
     val settings = Settings.getSettings(context)
 
     val addToPlaylistUrl =
-        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(
+        if (settings.getBoolean(context.getString(R.string.useCustomApiForEverythingSetting)) == true && settings.getBoolean(
                 context.getString(R.string.customApiSupportsV2Setting)
             ) == true
         ) {
@@ -56,7 +56,7 @@ fun newSearchTrackRequest(
     val settings = Settings.getSettings(context)
 
     val searchUrl =
-        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true || forceCustomApi
+        if (settings.getBoolean(context.getString(R.string.useCustomApiForSearchSetting)) == true || forceCustomApi
         ) {
             if (settings.getBoolean(context.getString(R.string.customApiSupportsV1Setting)) == true) {
                 settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v1/catalog/search?term=$term&limit=50&skip=" + skip.toString()
@@ -92,7 +92,7 @@ fun newChangePlaylistPublicStateRequest(
     val settings = Settings.getSettings(context)
 
     val playlistPatchUrl =
-        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(
+        if (settings.getBoolean(context.getString(R.string.useCustomApiForEverythingSetting)) == true && settings.getBoolean(
                 context.getString(R.string.customApiSupportsV2Setting)
             ) == true
         ) {
@@ -121,7 +121,7 @@ fun newCreatePlaylistRequest(
     val settings = Settings.getSettings(context)
 
     val playlistPostUrl =
-        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(
+        if (settings.getBoolean(context.getString(R.string.useCustomApiForEverythingSetting)) == true && settings.getBoolean(
                 context.getString(R.string.customApiSupportsV2Setting)
             ) == true
         ) {
@@ -152,7 +152,7 @@ fun newDeletePlaylistRequest(
     val settings = Settings.getSettings(context)
 
     val deletePlaylistUrl =
-        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(
+        if (settings.getBoolean(context.getString(R.string.useCustomApiForEverythingSetting)) == true && settings.getBoolean(
                 context.getString(R.string.customApiSupportsV2Setting)
             ) == true
         ) {
@@ -179,7 +179,7 @@ fun newDeletePlaylistTrackRequest(
     val settings = Settings.getSettings(context)
 
     val deleteTrackFromPlaylistUrl =
-        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(
+        if (settings.getBoolean(context.getString(R.string.useCustomApiForEverythingSetting)) == true && settings.getBoolean(
                 context.getString(R.string.customApiSupportsV2Setting)
             ) == true
         ) {
@@ -211,7 +211,7 @@ fun newLoadAlbumRequest(
     val settings = Settings.getSettings(context)
 
     val requestUrl =
-        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(
+        if (settings.getBoolean(context.getString(R.string.useCustomApiForCatalogAndAlbumViewSetting)) == true && settings.getBoolean(
                 context.getString(R.string.customApiSupportsV1Setting)
             ) == true
         ) {
@@ -241,7 +241,7 @@ fun newLoadAlbumListRequest(
     val settings = Settings.getSettings(context)
 
     val requestUrl =
-        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(
+        if (settings.getBoolean(context.getString(R.string.useCustomApiForCatalogAndAlbumViewSetting)) == true && settings.getBoolean(
                 context.getString(R.string.customApiSupportsV1Setting)
             ) == true
         ) {
@@ -272,7 +272,7 @@ fun newLoadPlaylistRequest(
     val settings = Settings.getSettings(context)
 
     val playlistUrl =
-        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(
+        if (settings.getBoolean(context.getString(R.string.useCustomApiForEverythingSetting)) == true && settings.getBoolean(
                 context.getString(R.string.customApiSupportsV2Setting)
             ) == true
         ) {
@@ -306,7 +306,7 @@ fun newLoadPlaylistTracksRequest(
     val settings = Settings.getSettings(context)
 
     val playlistTrackUrl =
-        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(
+        if (settings.getBoolean(context.getString(R.string.useCustomApiForEverythingSetting)) == true && settings.getBoolean(
                 context.getString(R.string.customApiSupportsV2Setting)
             ) == true
         ) {
@@ -396,7 +396,7 @@ fun newLoadSongListRequest(
     val settings = Settings.getSettings(context)
 
     val requestUrl =
-        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(
+        if (settings.getBoolean(context.getString(R.string.useCustomApiForCatalogAndAlbumViewSetting)) == true && settings.getBoolean(
                 context.getString(R.string.customApiSupportsV1Setting)
             ) == true
         ) {
@@ -428,7 +428,7 @@ fun newRenamePlaylistRequest(
     val settings = Settings.getSettings(context)
 
     val playlistPatchUrl =
-        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(
+        if (settings.getBoolean(context.getString(R.string.useCustomApiForEverythingSetting)) == true && settings.getBoolean(
                 context.getString(R.string.customApiSupportsV2Setting)
             ) == true
         ) {
@@ -456,7 +456,7 @@ fun newLoadPlaylistsRequest(
     val settings = Settings.getSettings(context)
 
     val playlistUrl =
-        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(
+        if (settings.getBoolean(context.getString(R.string.useCustomApiForEverythingSetting)) == true && settings.getBoolean(
                 context.getString(R.string.customApiSupportsV2Setting)
             ) == true
         ) {
@@ -524,7 +524,7 @@ fun newLoginRequest(
     val settings = Settings.getSettings(context)
 
     val loginUrl =
-        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(
+        if (settings.getBoolean(context.getString(R.string.useCustomApiForEverythingSetting)) == true && settings.getBoolean(
                 context.getString(R.string.customApiSupportsV2Setting)
             ) == true
         ) {
@@ -551,7 +551,7 @@ fun newTwoFaRequest(
     val settings = Settings.getSettings(context)
 
     val twoFaUrl =
-        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(
+        if (settings.getBoolean(context.getString(R.string.useCustomApiForEverythingSetting)) == true && settings.getBoolean(
                 context.getString(R.string.customApiSupportsV2Setting)
             ) == true
         ) {
@@ -576,7 +576,7 @@ fun newCheckLoginRequest(
     val settings = Settings.getSettings(context)
 
     val sessionUrl =
-        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(
+        if (settings.getBoolean(context.getString(R.string.useCustomApiForEverythingSetting)) == true && settings.getBoolean(
                 context.getString(R.string.customApiSupportsV2Setting)
             ) == true
         ) {

@@ -160,7 +160,7 @@ fun downloadCoverIntoImageReceiver(
     val settings = Settings.getSettings(context)
 
     val url =
-        if (settings.getBoolean(context.getString(R.string.useCustomApiSetting)) == true && settings.getBoolean(context.getString(R.string.customApiSupportsV1Setting)) == true
+        if (settings.getBoolean(context.getString(R.string.useCustomApiForCoverImagesSetting)) == true && settings.getBoolean(context.getString(R.string.customApiSupportsV1Setting)) == true
         ) {
             settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v1/release/" + albumId + "/cover"
         } else {

@@ -103,7 +103,7 @@
     <string name="playlistStateChangeError">Error changing playlist state</string>
     <string name="sharePlaylist">Share playlist</string>
     <string name="openPlaylistInApp">Open playlist in browser</string>
-    <string name="useCustomApi">Use custom API for catalog-view, album-view, cover images and search</string>
+    <string name="useCustomApi">Use custom API for catalog-view and album-view</string>
     <string name="playRelatedAfter">Play related songs after playback finished (uses custom API)</string>
     <string name="saveCoverImagesToCache">Save cover images to cache</string>
     <string name="volume">Volume</string>
@@ -124,4 +124,8 @@
     <string name="notOnline">Not Online!</string>
     <string name="logout">Logout</string>
     <string name="title_explore">Explore</string>
+
+    <string name="useCustomApiForEverything">Replace everything with custom API</string>
+    <string name="useCustomApiForCoverImages">Faster cover images download (uses custom API)</string>
+    <string name="useCustomApiForSearch">Advanced search (uses custom API)</string>
 </resources>

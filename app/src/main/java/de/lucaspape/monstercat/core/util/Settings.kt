@@ -102,6 +102,9 @@ class Settings(private val context: Context) {
         val defaultVolume = 1.0f
         val defaultCustomApiBaseUrl = "https://api.lucaspape.de/monstercat/"
         val defaultSkipSongsFromMonstercat = true
+        val defaultUseCustomApiForRelatedSongs = true
+        val defaultUseCustomApiForCoverImages = true
+        val defaultUseCustomApiForSearch = true
 
         if (getString(context.getString(R.string.downloadTypeSetting)) == null || overwrite) {
             setString(context.getString(R.string.downloadTypeSetting), defaultDownloadType)
@@ -157,12 +160,36 @@ class Settings(private val context: Context) {
             setFloat(context.getString(R.string.volumeSetting), defaultVolume)
         }
 
-        if(getString(context.getString(R.string.customApiBaseUrlSetting)) == null || overwrite){
+        if (getString(context.getString(R.string.customApiBaseUrlSetting)) == null || overwrite) {
             setString(context.getString(R.string.customApiBaseUrlSetting), defaultCustomApiBaseUrl)
         }
 
-        if(getString(context.getString(R.string.skipMonstercatSongsSetting)) == null || overwrite){
-            setBoolean(context.getString(R.string.skipMonstercatSongsSetting), defaultSkipSongsFromMonstercat)
+        if (getString(context.getString(R.string.skipMonstercatSongsSetting)) == null || overwrite) {
+            setBoolean(
+                context.getString(R.string.skipMonstercatSongsSetting),
+                defaultSkipSongsFromMonstercat
+            )
+        }
+
+        if (getString(context.getString(R.string.useCustomApiForCoverImagesSetting)) == null || overwrite) {
+            setBoolean(
+                context.getString(R.string.useCustomApiForCoverImagesSetting),
+                defaultUseCustomApiForCoverImages
+            )
+        }
+
+        if (getString(context.getString(R.string.playRelatedSetting)) == null || overwrite) {
+            setBoolean(
+                context.getString(R.string.playRelatedSetting),
+                defaultUseCustomApiForRelatedSongs
+            )
+        }
+
+        if (getString(context.getString(R.string.useCustomApiForSearchSetting)) == null || overwrite) {
+            setBoolean(
+                context.getString(R.string.useCustomApiForSearchSetting),
+                defaultUseCustomApiForSearch
+            )
         }
     }
 }

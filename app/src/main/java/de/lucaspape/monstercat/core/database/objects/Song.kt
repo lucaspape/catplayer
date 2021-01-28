@@ -98,7 +98,7 @@ data class Song(
 
     val downloadUrl: String
         get() = if (Settings.getSettings(context)
-                .getBoolean(context.getString(R.string.useCustomApiSetting)) == true && Settings.getSettings(
+                .getBoolean(context.getString(R.string.useCustomApiForEverythingSetting)) == true && Settings.getSettings(
                 context
             ).getBoolean(context.getString(R.string.customApiSupportsV1Setting)) == true
         ) {
@@ -114,7 +114,7 @@ data class Song(
 
     private val streamUrl: String
         get() = if (Settings.getSettings(context)
-                .getBoolean(context.getString(R.string.useCustomApiSetting)) == true && Settings.getSettings(
+                .getBoolean(context.getString(R.string.useCustomApiForEverythingSetting)) == true && Settings.getSettings(
                 context
             ).getBoolean(context.getString(R.string.customApiSupportsV1Setting)) == true
         ) {

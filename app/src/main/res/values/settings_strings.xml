@@ -15,7 +15,7 @@
     <string name="albumViewSelectedSetting" translatable="false">albumViewSelected</string>
     <string name="privacyPolicySetting" translatable="false">privacypolicy</string>
     <string name="appVersionSetting" translatable="false">app-version</string>
-    <string name="useCustomApiSetting" translatable="false">useCustomApi</string>
+    <string name="useCustomApiForCatalogAndAlbumViewSetting" translatable="false">useCustomApi</string>
     <string name="playRelatedSetting" translatable="false">playRelated</string>
     <string name="saveCoverImagesToCacheSetting" translatable="false">saveCoverImagesToCache</string>
     <string name="volumeSetting" translatable="false">volumeSetting</string>
@@ -29,4 +29,7 @@
     <string name="blockNonCreatorFriendlySetting" translatable="false">blockNonCreatorFriendly</string>
     <string name="customApiSupportsPlayingRelatedSongsSetting" translatable="false">customApiSupportsPlayingRelatedSongs</string>
     <string name="customApiSupportsLoadingLiveInfoSetting" translatable="false">customApiSupportsLoadingLiveInfo</string>
+    <string name="useCustomApiForSearchSetting" translatable="false">useCustomApiForSearch</string>
+    <string name="useCustomApiForCoverImagesSetting" translatable="false">useCustomApiForCoverImages</string>
+    <string name="useCustomApiForEverythingSetting" translatable="false">useCustomApiForEverything</string>
 </resources>

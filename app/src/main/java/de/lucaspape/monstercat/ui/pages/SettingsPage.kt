@@ -53,8 +53,9 @@ import kotlin.math.log
 class SettingsPage(private val closeSettings: () -> Unit) : Page() {
     constructor() : this({})
 
-    companion object{
-        @JvmStatic val settingsPageName = "settings"
+    companion object {
+        @JvmStatic
+        val settingsPageName = "settings"
     }
 
     override fun onCreate(view: View) {
@@ -70,7 +71,7 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page() {
         addLogin(view)
         addPlaybackSettings(view)
         addDataSettings(view)
-        addSwitches(view)
+        addAdvancedSettings(view)
         addPushNotificationSettingsButton(view)
         addCustomApiButton(view)
         addResetDatabaseButton(view)
@@ -406,7 +407,7 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page() {
                         )
 
                         settings.setBoolean(
-                            view.context.getString(R.string.useCustomApiSetting),
+                            view.context.getString(R.string.useCustomApiForCatalogAndAlbumViewSetting),
                             false
                         )
 
@@ -468,7 +469,7 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page() {
         }
     }
 
-    private fun addSwitches(view: View) {
+    private fun addAdvancedSettings(view: View) {
         val context = view.context
         val settings = Settings.getSettings(context)
 
@@ -543,10 +544,37 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page() {
 
         itemAdapter.add(
             SettingsToggleItem(
-                context.getString(R.string.useCustomApiSetting),
+                context.getString(R.string.useCustomApiForCoverImagesSetting),
+                true,
+                context.getString(R.string.useCustomApiForCoverImages),
+                context.getString(R.string.customApiSupportsV1Setting), changeSetting
+            )
+        )
+
+        itemAdapter.add(
+            SettingsToggleItem(
+                context.getString(R.string.useCustomApiForSearchSetting),
+                true,
+                context.getString(R.string.useCustomApiForSearch),
+                context.getString(R.string.customApiSupportsV1Setting), changeSetting
+            )
+        )
+
+        itemAdapter.add(
+            SettingsToggleItem(
+                context.getString(R.string.useCustomApiForCatalogAndAlbumViewSetting),
                 true,
                 context.getString(R.string.useCustomApi),
-                context.getString(R.string.customApiSupportsV1Setting)
+                context.getString(R.string.customApiSupportsV1Setting), changeSetting
+            )
+        )
+
+        itemAdapter.add(
+            SettingsToggleItem(
+                context.getString(R.string.useCustomApiForEverythingSetting),
+                true,
+                context.getString(R.string.useCustomApiForEverything),
+                context.getString(R.string.customApiSupportsV2Setting)
             ) { setting, value, switch ->
                 if (value) {
                     //check for custom api features
@@ -577,8 +605,6 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page() {
                     false
                 }
             })
-
-
     }
 
     private fun addCoverResolutionSeekBar(view: View) {
