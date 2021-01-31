@@ -95,7 +95,7 @@ class MoodDatabaseHelper(context: Context) :
         }
     }
 
-    fun getAllMoods(): List<Mood> {
+    fun getAllMoods(): ArrayList<Mood> {
         val moods: ArrayList<Mood> = ArrayList()
 
         val selectQuery = "SELECT * FROM " + Mood.TABLE_NAME + " ORDER BY " +

@@ -854,10 +854,10 @@ fun loadMoodsAsync(
     errorCallback: () -> Unit
 ) {
     val moodDatabaseHelper = MoodDatabaseHelper(context)
-    val moods = moodDatabaseHelper.getAllMoods() as ArrayList<Mood>
+    val moods = moodDatabaseHelper.getAllMoods()
 
     if (!forceReload && moods.isNotEmpty()) {
-        finishedCallback(moods)
+        finishedCallback(moods.reversed() as ArrayList<Mood>)
     } else {
         displayLoading()
 
@@ -984,10 +984,10 @@ fun loadGenresAsync(
             context
         )
 
-    val genres = genreDatabaseHelper.getAllGenres().reversed() as ArrayList<Genre>
+    val genres = genreDatabaseHelper.getAllGenres()
 
     if (!forceReload && genres.isNotEmpty()) {
-        finishedCallback(genres)
+        finishedCallback(genres.reversed() as ArrayList<Genre>)
     } else {
         displayLoading()
 

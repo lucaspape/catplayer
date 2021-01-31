@@ -92,7 +92,7 @@ class GenreDatabaseHelper(context: Context) :
         }
     }
 
-    fun getAllGenres(): List<Genre> {
+    fun getAllGenres(): ArrayList<Genre> {
         val moods: ArrayList<Genre> = ArrayList()
 
         val selectQuery = "SELECT * FROM " + Genre.TABLE_NAME + " ORDER BY " +
