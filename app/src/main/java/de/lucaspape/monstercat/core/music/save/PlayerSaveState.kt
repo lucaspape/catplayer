@@ -87,32 +87,30 @@ data class PlayerSaveState(
 
         @JvmStatic
         fun saveMusicPlayerState(context: Context) {
-            if (streamInfoUpdateAsync?.active == true) {
-                val objectOutputStream =
-                    ObjectOutputStream(FileOutputStream(File(context.cacheDir.toString() + "/player_state.obj")))
+            val objectOutputStream =
+                ObjectOutputStream(FileOutputStream(File(context.cacheDir.toString() + "/player_state.obj")))
 
-                val playerSaveState =
-                    PlayerSaveState(
-                        loop,
-                        loopSingle,
-                        shuffle,
-                        crossfade,
-                        playlist,
-                        playlistIndex,
-                        nextRandom,
-                        songQueue,
-                        prioritySongQueue,
-                        exoPlayer?.currentPosition,
-                        exoPlayer?.duration
-                    )
+            val playerSaveState =
+                PlayerSaveState(
+                    loop,
+                    loopSingle,
+                    shuffle,
+                    crossfade,
+                    playlist,
+                    playlistIndex,
+                    nextRandom,
+                    songQueue,
+                    prioritySongQueue,
+                    exoPlayer?.currentPosition,
+                    exoPlayer?.duration
+                )
 
-                try {
-                    objectOutputStream.writeObject(playerSaveState)
-                    objectOutputStream.flush()
-                    objectOutputStream.close()
-                } catch (e: ConcurrentModificationException) {
+            try {
+                objectOutputStream.writeObject(playerSaveState)
+                objectOutputStream.flush()
+                objectOutputStream.close()
+            } catch (e: ConcurrentModificationException) {
 
-                }
             }
         }
     }

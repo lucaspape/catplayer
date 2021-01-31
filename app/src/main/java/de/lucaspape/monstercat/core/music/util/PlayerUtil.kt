@@ -68,33 +68,6 @@ fun abandonAudioFocus(context: Context) {
 
 var currentListenerId = ""
 
-fun getStreamPlayerListener(context: Context): Player.EventListener {
-    val id = UUID.randomUUID().toString()
-    currentListenerId = id
-
-    return object : Player.EventListener {
-        @Override
-        override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-            if (currentListenerId == id) {
-                exoPlayer?.isPlaying?.let { isPlaying ->
-                    playing = isPlaying
-                }
-
-                setCover(
-                    context,
-                    liveSongId
-                ) { bitmap ->
-                    updateNotification(
-                        context,
-                        liveSongId,
-                        bitmap
-                    )
-                }
-            }
-        }
-    }
-}
-
 fun getPlayerListener(context: Context, songId: String): Player.EventListener {
     val id = UUID.randomUUID().toString()
     currentListenerId = id

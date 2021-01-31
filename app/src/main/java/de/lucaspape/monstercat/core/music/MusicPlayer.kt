@@ -16,7 +16,6 @@ import de.lucaspape.monstercat.core.music.notification.stopPlayerService
 import de.lucaspape.monstercat.core.music.save.PlayerSaveState
 import de.lucaspape.monstercat.core.music.util.*
 import de.lucaspape.monstercat.core.music.util.playSong
-import de.lucaspape.monstercat.core.twitch.Stream
 import de.lucaspape.monstercat.core.music.util.BackgroundService
 import de.lucaspape.monstercat.core.util.Settings
 import java.lang.ref.WeakReference
@@ -79,13 +78,6 @@ var mediaSession: MediaSessionCompat? = null
 
 private var sessionCreated = false
 
-//updater which updates information about playing livestream (title, artist, coverImage)
-internal var streamInfoUpdateAsync: BackgroundService? = null
-    set(value) {
-        field?.cancel()
-        field = value
-    }
-
 var connectSid = ""
 var cid = ""
 
@@ -99,7 +91,6 @@ var displayInfo: (context:Context, msg:String) -> Unit = {_,_->}
 
 var openMainActivityIntent = Intent()
 
-var liveSongId = ""
 var fallbackTitle = ""
 var fallbackArtist = ""
 var fallbackVersion = ""
@@ -109,13 +100,11 @@ fun setupMusicPlayer(
     sRetrieveRelatedSongs: (context: Context, callback: () -> Unit) -> Unit,
     sRetrieveSongIntoDB: (context: Context, songId: String, callback: (trackId: String, song: Song) -> Unit) -> Unit,
     sDisplayInfo: (context:Context, msg:String) -> Unit,
-    sStreamInfoUpdateAsync: BackgroundService,
     sOpenMainActivityIntent: Intent
 ) {
     retrieveRelatedSongs = sRetrieveRelatedSongs
     retrieveSongIntoDB = sRetrieveSongIntoDB
     displayInfo = sDisplayInfo
-    streamInfoUpdateAsync = sStreamInfoUpdateAsync
     openMainActivityIntent = sOpenMainActivityIntent
 }
 
@@ -251,30 +240,22 @@ internal fun pause(context: Context) {
 internal fun resume(context: Context) {
     startPlayerService(context, currentSongId)
 
-    //check if should resume livestream or song
-    if (streamInfoUpdateAsync?.active == true) {
-        playStream(
-            context,
-            Stream()
-        )
-    } else {
-        val intentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
+    val intentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
 
-        context.registerReceiver(
-            NoisyReceiver(),
-            intentFilter
-        )
+    context.registerReceiver(
+        NoisyReceiver(),
+        intentFilter
+    )
 
-        playSong(
-            context, currentSongId,
-            showNotification = true,
-            requestAudioFocus = true,
-            playWhenReady = true,
-            progress = currentPosition.toLong()
-        )
+    playSong(
+        context, currentSongId,
+        showNotification = true,
+        requestAudioFocus = true,
+        playWhenReady = true,
+        progress = currentPosition.toLong()
+    )
 
-        PlayerSaveState.saveMusicPlayerState(context)
-    }
+    PlayerSaveState.saveMusicPlayerState(context)
 }
 
 /**
@@ -501,9 +482,6 @@ val nextSongId: String
 val currentSongId: String
     get() {
         return when {
-            streamInfoUpdateAsync?.active == true -> {
-                liveSongId
-            }
             playlist.size > playlistIndex && playlistIndex >= 0 -> {
                 playlist[playlistIndex]
             }

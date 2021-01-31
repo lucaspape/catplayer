@@ -25,7 +25,6 @@ import de.lucaspape.monstercat.core.music.notification.updateNotification
 import de.lucaspape.monstercat.core.music.save.PlayerSaveState
 import de.lucaspape.monstercat.core.music.util.*
 import de.lucaspape.monstercat.core.music.util.setCover
-import de.lucaspape.monstercat.request.StreamInfoUpdateAsync
 import de.lucaspape.monstercat.request.async.checkCustomApiFeaturesAsync
 import de.lucaspape.monstercat.request.async.loadRelatedTracksAsync
 import de.lucaspape.monstercat.request.async.retrieveTrackIntoDB
@@ -38,7 +37,7 @@ import java.io.File
 import java.io.FileNotFoundException
 
 var downloadServiceIntent: Intent? = null
-var lastOpenPage:String? = null
+var lastOpenPage: String? = null
 
 /**
  * Main activity
@@ -86,18 +85,23 @@ class MainActivity : AppCompatActivity() {
 
         registerListeners()
 
-        if(!openFirstPage()){
+        if (!openFirstPage()) {
             val lastOpenPage = lastOpenPage
 
-            if(lastOpenPage != null){
+            if (lastOpenPage != null) {
                 when (lastOpenPage) {
-                    HomePage.homePageName -> findViewById<BottomNavigationView>(R.id.nav_view).selectedItemId = R.id.navigation_home
-                    PlaylistPage.playlistPageName -> findViewById<BottomNavigationView>(R.id.nav_view).selectedItemId = R.id.navigation_playlist
-                    ExplorePage.explorePageName -> findViewById<BottomNavigationView>(R.id.nav_view).selectedItemId = R.id.navigation_explore
-                    else -> findViewById<BottomNavigationView>(R.id.nav_view).selectedItemId = R.id.navigation_home
+                    HomePage.homePageName -> findViewById<BottomNavigationView>(R.id.nav_view).selectedItemId =
+                        R.id.navigation_home
+                    PlaylistPage.playlistPageName -> findViewById<BottomNavigationView>(R.id.nav_view).selectedItemId =
+                        R.id.navigation_playlist
+                    ExplorePage.explorePageName -> findViewById<BottomNavigationView>(R.id.nav_view).selectedItemId =
+                        R.id.navigation_explore
+                    else -> findViewById<BottomNavigationView>(R.id.nav_view).selectedItemId =
+                        R.id.navigation_home
                 }
-            }else{
-                findViewById<BottomNavigationView>(R.id.nav_view).selectedItemId = R.id.navigation_home
+            } else {
+                findViewById<BottomNavigationView>(R.id.nav_view).selectedItemId =
+                    R.id.navigation_home
             }
         }
 
@@ -145,7 +149,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun openFirstPage():Boolean {
+    private fun openFirstPage(): Boolean {
         val intentExtras = intent.extras
         val path = intent.data?.path
 
@@ -216,7 +220,7 @@ class MainActivity : AppCompatActivity() {
             },
             { context: Context, msg: String ->
                 displayInfo(context, msg)
-            }, StreamInfoUpdateAsync(this),
+            },
             Intent(this, MainActivity::class.java)
         )
 
@@ -456,7 +460,8 @@ class MainActivity : AppCompatActivity() {
             SearchPage(
                 searchString
             ) {
-                findViewById<BottomNavigationView>(R.id.nav_view).selectedItemId = R.id.navigation_home
+                findViewById<BottomNavigationView>(R.id.nav_view).selectedItemId =
+                    R.id.navigation_home
             }
         )
     }
@@ -464,7 +469,8 @@ class MainActivity : AppCompatActivity() {
     private fun openSettings() {
         openPage(
             SettingsPage {
-                findViewById<BottomNavigationView>(R.id.nav_view).selectedItemId = R.id.navigation_home
+                findViewById<BottomNavigationView>(R.id.nav_view).selectedItemId =
+                    R.id.navigation_home
             }
 
         )
@@ -481,7 +487,8 @@ class MainActivity : AppCompatActivity() {
                 { openSettings() },
                 resetPosition,
                 {
-                    findViewById<BottomNavigationView>(R.id.nav_view).selectedItemId = R.id.navigation_home
+                    findViewById<BottomNavigationView>(R.id.nav_view).selectedItemId =
+                        R.id.navigation_home
                 }
             )
         )
@@ -509,7 +516,8 @@ class MainActivity : AppCompatActivity() {
                 playlistId,
                 resetPosition
             ) {
-                findViewById<BottomNavigationView>(R.id.nav_view).selectedItemId = R.id.navigation_home
+                findViewById<BottomNavigationView>(R.id.nav_view).selectedItemId =
+                    R.id.navigation_home
             }
 
         )

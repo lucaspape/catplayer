@@ -3,8 +3,6 @@ package de.lucaspape.monstercat.ui.pages
 import android.view.View
 import android.widget.ImageButton
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.core.music.util.playStream
-import de.lucaspape.monstercat.core.twitch.Stream
 import de.lucaspape.monstercat.ui.pages.util.Page
 import de.lucaspape.monstercat.ui.pages.recycler.*
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
@@ -116,14 +114,6 @@ class ExplorePage(
         //settings button
         view.findViewById<ImageButton>(R.id.settingsButton).setOnClickListener {
             openSettings()
-        }
-
-        //livestream button
-        view.findViewById<ImageButton>(R.id.liveButton).setOnClickListener {
-            playStream(
-                view.context,
-                Stream()
-            )
         }
 
         view.findViewById<ImageButton>(R.id.searchButton).setOnClickListener {

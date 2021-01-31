@@ -5,8 +5,6 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ImageButton
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.core.music.util.playStream
-import de.lucaspape.monstercat.core.twitch.Stream
 import de.lucaspape.monstercat.ui.pages.util.Page
 import de.lucaspape.util.CustomSpinnerClass
 import de.lucaspape.monstercat.core.util.Settings
@@ -212,14 +210,6 @@ class HomePage(
         //settings button
         view.findViewById<ImageButton>(R.id.settingsButton).setOnClickListener {
             openSettings()
-        }
-
-        //livestream button
-        view.findViewById<ImageButton>(R.id.liveButton).setOnClickListener {
-            playStream(
-                view.context,
-                Stream()
-            )
         }
 
         view.findViewById<ImageButton>(R.id.searchButton).setOnClickListener {

@@ -8,12 +8,7 @@ import com.google.android.exoplayer2.SimpleExoPlayer
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.core.music.*
-import de.lucaspape.monstercat.core.music.notification.startPlayerService
 import de.lucaspape.monstercat.core.music.notification.updateNotification
-import de.lucaspape.monstercat.core.util.wifiConnected
-import de.lucaspape.monstercat.core.twitch.Stream
-import de.lucaspape.monstercat.core.util.Settings
-import de.lucaspape.monstercat.request.StreamInfoUpdateAsync
 import java.util.*
 import kotlin.math.log
 
@@ -78,9 +73,6 @@ internal fun playSong(
     playWhenReady: Boolean,
     progress: Long?
 ) {
-    //cancel stream info updater if running
-    streamInfoUpdateAsync?.cancel()
-
     //request audio focus if enabled
     val audioFocus = if (requestAudioFocus) {
         requestAudioFocus(context)
@@ -166,48 +158,6 @@ internal fun playSong(
             }
         } else {
             preparingDone()
-        }
-    }
-}
-
-fun playStream(context: Context, stream: Stream) {
-    streamInfoUpdateAsync?.cancel()
-
-    val settings = Settings.getSettings(context)
-
-    startPlayerService(context, "")
-
-    //new exoplayer
-    exoPlayer = SimpleExoPlayer.Builder(context).build()
-    exoPlayer?.audioAttributes =
-        getAudioAttributes()
-
-    //for play/pause button change and if song ended
-    exoPlayer?.addListener(
-        getStreamPlayerListener(
-            context
-        )
-    )
-
-    //request audio focus
-    if (requestAudioFocus(context) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-        //only play stream if allowed
-        if (wifiConnected(context) == true || settings.getBoolean(context.getString(R.string.streamOverMobileSetting)) == true) {
-            streamInfoUpdateAsync = StreamInfoUpdateAsync(context)
-            streamInfoUpdateAsync?.execute()
-
-            stream.getMediaSource(context) { mediaSource ->
-                exoPlayer?.setMediaSource(mediaSource)
-                exoPlayer?.prepare()
-
-                exoPlayer?.playWhenReady = true
-
-                currentSeekBarUpdateHandlerId = ""
-
-                duration = 0
-                currentPosition = 0
-                setPlayerState(0.toLong())
-            }
         }
     }
 }
