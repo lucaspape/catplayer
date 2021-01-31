@@ -691,7 +691,12 @@ fun newLoadGenreRequest(
     errorCallback: (error: VolleyError?) -> Unit
 ): StringRequest {
     val requestUrl =
-        context.getString(R.string.loadSongsUrl) + "?raw=%7B%7D&limit=$limit&skip=$skip&offset=0&search=&sort=-date&nogold=false&onlyReleased=true&types[]=Single&types[]=EP&types[]=Album&genres[]=$genreName"
+        context.getString(R.string.loadSongsUrl) + "?raw=%7B%7D&limit=$limit&skip=$skip&offset=0&search=&sort=-date&nogold=false&onlyReleased=true&types[]=Single&types[]=EP&types[]=Album&genres[]=${
+            genreName.replace(
+                " ",
+                "+"
+            ).replace("&", "%26")
+        }"
 
     return StringRequest(
         Request.Method.GET, requestUrl,

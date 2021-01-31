@@ -19,48 +19,12 @@ open class PlaylistContentsRecyclerPage(private val playlistId: String) :
 
     override val id = "playlist-$playlistId"
 
-    override suspend fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
-        super.onItemClick(context, viewData, itemIndex)
-
-        val fistItem = viewData[itemIndex]
-
-        if (fistItem is CatalogItem) {
-            val skipMonstercatSongs =
-                Settings(context).getBoolean(context.getString(R.string.skipMonstercatSongsSetting)) == true
-
-            val catalogViewData = ArrayList<CatalogItem>()
-
-            for (item in viewData) {
-                if (item is CatalogItem) {
-                    catalogViewData.add(item)
-                }
-            }
-
-            withContext(Dispatchers.Main){
-                playSongsFromViewDataAsync(
-                    context,
-                    skipMonstercatSongs,
-                    catalogViewData,
-                    itemIndex
-                )
-            }
-        }
-    }
-
-    override suspend fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
-        super.onItemLongClick(view, viewData, itemIndex)
-
-        val idList = ArrayList<String>()
-
-        for (item in viewData) {
-            if (item is CatalogItem) {
-                idList.add(item.songId)
-            }
-        }
-
-        withContext(Dispatchers.Main){
-            CatalogItem.showContextMenuPlaylist(view, idList, itemIndex, playlistId)
-        }
+    override fun showContextMenu(
+        view: View,
+        data: ArrayList<String>,
+        listViewPosition: Int,
+    ) {
+        CatalogItem.showContextMenuPlaylist(view, data, listViewPosition, playlistId)
     }
 
     override suspend fun load(

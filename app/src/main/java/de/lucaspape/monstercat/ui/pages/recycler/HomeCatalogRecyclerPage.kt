@@ -13,6 +13,7 @@ import de.lucaspape.monstercat.request.async.loadSongListAsync
 import de.lucaspape.monstercat.core.util.Settings
 import de.lucaspape.monstercat.ui.pages.util.playSongsFromCatalogDbAsync
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
+import de.lucaspape.monstercat.ui.pages.util.playSongsFromViewDataAsync
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -21,7 +22,11 @@ open class HomeCatalogRecyclerPage : RecyclerViewPage() {
 
     override val id = "catalog"
 
-    override suspend fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
+    override suspend fun onItemClick(
+        context: Context,
+        viewData: ArrayList<GenericItem>,
+        itemIndex: Int
+    ) {
         super.onItemClick(context, viewData, itemIndex)
 
         val fistItem = viewData[itemIndex]
@@ -30,17 +35,46 @@ open class HomeCatalogRecyclerPage : RecyclerViewPage() {
             val skipMonstercatSongs =
                 Settings(context).getBoolean(context.getString(R.string.skipMonstercatSongsSetting)) == true
 
-            withContext(Dispatchers.Main){
-                playSongsFromCatalogDbAsync(
-                    context,
-                    skipMonstercatSongs,
-                    fistItem.songId
-                )
+            withContext(Dispatchers.Main) {
+                if(id == "catalog"){
+                    playSongsFromCatalogDbAsync(
+                        context,
+                        skipMonstercatSongs,
+                        fistItem.songId
+                    )
+                }else if (!id.contains("explore")){
+                    val catalogViewData = ArrayList<CatalogItem>()
+
+                    for (item in viewData) {
+                        if (item is CatalogItem) {
+                            catalogViewData.add(item)
+                        }
+                    }
+
+                    playSongsFromViewDataAsync(
+                        context,
+                        skipMonstercatSongs,
+                        catalogViewData,
+                        itemIndex
+                    )
+                }
             }
         }
     }
 
-    override suspend fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
+    open fun showContextMenu(
+        view: View,
+        data: ArrayList<String>,
+        listViewPosition: Int
+    ) {
+        CatalogItem.showContextMenu(view, data, listViewPosition)
+    }
+
+    override suspend fun onItemLongClick(
+        view: View,
+        viewData: ArrayList<GenericItem>,
+        itemIndex: Int
+    ) {
         super.onItemLongClick(view, viewData, itemIndex)
 
         val idList = ArrayList<String>()
@@ -51,14 +85,18 @@ open class HomeCatalogRecyclerPage : RecyclerViewPage() {
             }
         }
 
-        if(idList.size > 0){
-            withContext(Dispatchers.Main){
-                CatalogItem.showContextMenu(view, idList, itemIndex)
+        if (idList.size > 0) {
+            withContext(Dispatchers.Main) {
+                showContextMenu(view, idList, itemIndex)
             }
         }
     }
 
-    override suspend fun onMenuButtonClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
+    override suspend fun onMenuButtonClick(
+        view: View,
+        viewData: ArrayList<GenericItem>,
+        itemIndex: Int
+    ) {
         onItemLongClick(view, viewData, itemIndex)
     }
 
@@ -71,7 +109,7 @@ open class HomeCatalogRecyclerPage : RecyclerViewPage() {
             val songDatabaseHelper = SongDatabaseHelper(context)
             val song = songDatabaseHelper.getSong(context, item.songId)
 
-            withContext(Dispatchers.Main){
+            withContext(Dispatchers.Main) {
                 song?.let {
                     when {
                         File(song.downloadLocation).exists() -> {

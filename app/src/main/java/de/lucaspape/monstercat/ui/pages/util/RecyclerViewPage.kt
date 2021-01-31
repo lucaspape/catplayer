@@ -18,6 +18,7 @@ import com.mikepenz.fastadapter.scroll.EndlessRecyclerOnScrollListener
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.util.Settings
 import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
+import de.lucaspape.monstercat.ui.abstract_items.content.PlaylistItem
 import de.lucaspape.monstercat.ui.abstract_items.util.HeaderTextItem
 import de.lucaspape.monstercat.ui.abstract_items.util.ProgressItem
 import de.lucaspape.monstercat.ui.displaySnackBar
@@ -162,9 +163,11 @@ abstract class RecyclerViewPage {
             /**
              * On menu button click
              */
-            fastAdapter.addEventHook(object : ClickEventHook<CatalogItem>() {
+            fastAdapter.addEventHook(object : ClickEventHook<GenericItem>() {
                 override fun onBind(viewHolder: RecyclerView.ViewHolder): View? {
                     return if (viewHolder is CatalogItem.ViewHolder) {
+                        viewHolder.titleMenuButton
+                    } else if (viewHolder is PlaylistItem.ViewHolder){
                         viewHolder.titleMenuButton
                     } else null
                 }
@@ -172,8 +175,8 @@ abstract class RecyclerViewPage {
                 override fun onClick(
                     v: View,
                     position: Int,
-                    fastAdapter: FastAdapter<CatalogItem>,
-                    item: CatalogItem
+                    fastAdapter: FastAdapter<GenericItem>,
+                    item: GenericItem
                 ) {
                     scope.launch {
                         val itemIndex = position + itemHeaderOffset
@@ -188,9 +191,11 @@ abstract class RecyclerViewPage {
             /**
              * On download button click
              */
-            fastAdapter.addEventHook(object : ClickEventHook<CatalogItem>() {
+            fastAdapter.addEventHook(object : ClickEventHook<GenericItem>() {
                 override fun onBind(viewHolder: RecyclerView.ViewHolder): View? {
                     return if (viewHolder is CatalogItem.ViewHolder) {
+                        viewHolder.titleDownloadButton
+                    } else if (viewHolder is PlaylistItem.ViewHolder){
                         viewHolder.titleDownloadButton
                     } else null
                 }
@@ -198,8 +203,8 @@ abstract class RecyclerViewPage {
                 override fun onClick(
                     v: View,
                     position: Int,
-                    fastAdapter: FastAdapter<CatalogItem>,
-                    item: CatalogItem
+                    fastAdapter: FastAdapter<GenericItem>,
+                    item: GenericItem
                 ) {
                     scope.launch {
                         onDownloadButtonClick(view.context, item, v as ImageButton)

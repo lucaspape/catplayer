@@ -984,7 +984,7 @@ fun loadGenresAsync(
             context
         )
 
-    val genres = genreDatabaseHelper.getAllGenres() as ArrayList<Genre>
+    val genres = genreDatabaseHelper.getAllGenres().reversed() as ArrayList<Genre>
 
     if (!forceReload && genres.isNotEmpty()) {
         finishedCallback(genres)

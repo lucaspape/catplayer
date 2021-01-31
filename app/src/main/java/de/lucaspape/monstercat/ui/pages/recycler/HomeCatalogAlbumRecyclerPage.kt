@@ -21,34 +21,6 @@ class HomeCatalogAlbumRecyclerPage(
 
     override val id = "album-$albumId"
 
-    override suspend fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
-        super.onItemClick(context, viewData, itemIndex)
-
-        val fistItem = viewData[itemIndex]
-
-        if (fistItem is CatalogItem) {
-            val skipMonstercatSongs =
-                Settings(context).getBoolean(context.getString(R.string.skipMonstercatSongsSetting)) == true
-
-            val catalogViewData = ArrayList<CatalogItem>()
-
-            for (item in viewData) {
-                if (item is CatalogItem) {
-                    catalogViewData.add(item)
-                }
-            }
-
-            withContext(Dispatchers.Main){
-                playSongsFromViewDataAsync(
-                    context,
-                    skipMonstercatSongs,
-                    catalogViewData,
-                    itemIndex
-                )
-            }
-        }
-    }
-
     override suspend fun load(
         context: Context,
         forceReload: Boolean,

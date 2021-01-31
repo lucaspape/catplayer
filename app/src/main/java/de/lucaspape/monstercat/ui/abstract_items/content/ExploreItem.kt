@@ -51,12 +51,12 @@ class ExploreItem(
 
                     when (val clickedItem = viewData[itemIndex]) {
                         is MoodItem -> {
-                            withContext(Dispatchers.Main){
+                            withContext(Dispatchers.Main) {
                                 item.openMood(clickedItem.moodId)
                             }
                         }
                         is GenreItem -> {
-                            withContext(Dispatchers.Main){
+                            withContext(Dispatchers.Main) {
                                 item.openGenre(clickedItem.genreId)
                             }
                         }
@@ -72,7 +72,7 @@ class ExploreItem(
                                 }
                             }
 
-                            withContext(Dispatchers.Main){
+                            withContext(Dispatchers.Main) {
                                 playSongsFromViewDataAsync(
                                     context,
                                     skipMonstercatSongs,
@@ -118,14 +118,15 @@ class ExploreItem(
                     callback: (itemIdList: ArrayList<String>) -> Unit,
                     errorCallback: (errorMessage: String) -> Unit
                 ) {
-                    when (item.typeName) {
-                        "mood" -> {
-                            loadMoodsAsync(
-                                context,
-                                forceReload,
-                                displayLoading = {},
-                                finishedCallback = { results ->
-                                    if (skip == 0) {
+                    if (skip == 0) {
+                        when (item.typeName) {
+                            "mood" -> {
+                                loadMoodsAsync(
+                                    context,
+                                    forceReload,
+                                    displayLoading = {},
+                                    finishedCallback = { results ->
+
                                         val idArray = ArrayList<String>()
 
                                         for (mood in results) {
@@ -133,19 +134,16 @@ class ExploreItem(
                                         }
 
                                         callback(idArray)
-                                    } else {
-                                        callback(ArrayList())
-                                    }
-                                },
-                                errorCallback = {})
-                        }
-                        "genre" -> {
-                            loadGenresAsync(
-                                context,
-                                forceReload,
-                                displayLoading = {},
-                                finishedCallback = { results ->
-                                    if (skip == 0) {
+                                    },
+                                    errorCallback = {})
+
+                            }
+                            "genre" -> {
+                                loadGenresAsync(
+                                    context,
+                                    forceReload,
+                                    displayLoading = {},
+                                    finishedCallback = { results ->
                                         val idArray = ArrayList<String>()
 
                                         for (genre in results) {
@@ -153,14 +151,11 @@ class ExploreItem(
                                         }
 
                                         callback(idArray)
-                                    } else {
-                                        callback(ArrayList())
-                                    }
-                                },
-                                errorCallback = {})
-                        }
-                        "greatest-hits" -> {
-                            if (skip == 0) {
+                                    },
+                                    errorCallback = {})
+
+                            }
+                            "greatest-hits" -> {
                                 loadGreatestHitsAsync(
                                     context,
                                     forceReload,
@@ -181,10 +176,10 @@ class ExploreItem(
                                         callback(idArray)
                                     },
                                     errorCallback = {})
-                            } else {
-                                callback(ArrayList())
                             }
                         }
+                    } else {
+                        callback(ArrayList())
                     }
                 }
             }
