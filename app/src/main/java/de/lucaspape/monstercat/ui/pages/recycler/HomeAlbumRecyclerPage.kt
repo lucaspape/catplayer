@@ -7,7 +7,7 @@ import android.widget.LinearLayout
 import com.mikepenz.fastadapter.GenericItem
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.AlbumDatabaseHelper
-import de.lucaspape.monstercat.request.async.loadAlbumListAsync
+import de.lucaspape.monstercat.request.async.loadAlbumList
 import de.lucaspape.monstercat.ui.abstract_items.content.AlbumItem
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
 import kotlinx.coroutines.Dispatchers
@@ -76,7 +76,7 @@ class HomeAlbumRecyclerPage(private val onSingleAlbumLoad: (albumId: String, alb
         callback: (itemIdList: ArrayList<String>) -> Unit,
         errorCallback: (errorMessage: String) -> Unit
     ) {
-        loadAlbumListAsync(context, forceReload, skip, displayLoading, { _, _, _ ->
+        loadAlbumList(context, forceReload, skip, displayLoading, {
             val albumDatabaseHelper =
                 AlbumDatabaseHelper(context)
             val albumList =
@@ -90,7 +90,7 @@ class HomeAlbumRecyclerPage(private val onSingleAlbumLoad: (albumId: String, alb
 
             callback(idList)
 
-        }, { _, _, _ ->
+        }, {
             errorCallback(context.getString(R.string.errorLoadingAlbumList))
         })
     }

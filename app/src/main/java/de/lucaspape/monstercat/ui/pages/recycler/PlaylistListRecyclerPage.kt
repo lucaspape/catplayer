@@ -7,7 +7,7 @@ import androidx.core.net.toUri
 import com.mikepenz.fastadapter.GenericItem
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.PlaylistDatabaseHelper
-import de.lucaspape.monstercat.request.async.loadPlaylistAsync
+import de.lucaspape.monstercat.request.async.loadPlaylists
 import de.lucaspape.monstercat.ui.abstract_items.content.PlaylistItem
 import de.lucaspape.monstercat.ui.offlineDrawable
 import de.lucaspape.monstercat.ui.pages.util.deleteDownloadedPlaylistTracks
@@ -102,7 +102,7 @@ class PlaylistListRecyclerPage(private val loadPlaylist: (playlistId: String) ->
         errorCallback: (errorMessage: String) -> Unit
     ) {
         if (skip == 0) {
-            loadPlaylistAsync(context, forceReload, true, displayLoading, { _, _ ->
+            loadPlaylists(context, forceReload, true, displayLoading, {
                 val playlistDatabaseHelper =
                     PlaylistDatabaseHelper(context)
                 val playlists = playlistDatabaseHelper.getAllPlaylists()
@@ -114,7 +114,7 @@ class PlaylistListRecyclerPage(private val loadPlaylist: (playlistId: String) ->
                 }
 
                 callback(idList)
-            }, { _, _ ->
+            }, {
                 errorCallback(context.getString(R.string.errorLoadingPlaylists))
             })
         } else {

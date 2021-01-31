@@ -19,20 +19,20 @@ private const val NEXT_ACTION = "de.lucaspape.monstercat.next"
 private const val PREV_ACTION = "de.lucaspape.monstercat.prev"
 private const val CLOSE_ACTION = "de.lucaspape.monstercat.close"
 
-internal const val musicNotificationID = 1
+const val musicNotificationID = 1
 
 private var lastButtonPress: Long = 0
 
 private var playerServiceIntent: Intent? = null
 
-internal var serviceRunning = false
+var serviceRunning = false
 
 private var prevReceiver: BroadcastReceiver? = null
 private var playPauseReceiver: BroadcastReceiver? = null
 private var nextReceiver: BroadcastReceiver? = null
 private var closeReceiver: BroadcastReceiver? = null
 
-internal fun createPlayerNotification(
+fun createPlayerNotification(
     context: Context,
     title: String,
     version: String,
@@ -170,7 +170,7 @@ class NotificationIntentReceiver : BroadcastReceiver() {
 /**
  * Show notification
  */
-internal fun startPlayerService(
+fun startPlayerService(
     context: Context,
     songId: String?
 ) {
@@ -231,7 +231,7 @@ fun updateNotification(
     )
 }
 
-internal fun createNotificationChannel(context: Context) {
+fun createNotificationChannel(context: Context) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         val channelName = context.getString(R.string.musicNotificationChannelId)
         val channelDescription = context.getString(R.string.musicNotificationDescription)

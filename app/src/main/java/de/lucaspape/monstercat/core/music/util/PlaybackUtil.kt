@@ -18,7 +18,7 @@ var exoPlayerSongId = ""
 //songId of song which is prepared in nextExoPlayer
 var preparedExoPlayerSongId = ""
 
-internal fun prepareSong(
+fun prepareSong(
     context: Context,
     songId: String,
     callback: () -> Unit,
@@ -51,7 +51,7 @@ internal fun prepareSong(
             }
         }
 
-        loadSongIntoDB(context, songId) { _, song ->
+        loadSongIntoDB(context, songId) { song ->
             val mediaSource = song.getMediaSource(connectSid, cid)
 
             if (mediaSource != null) {
@@ -65,7 +65,7 @@ internal fun prepareSong(
     }
 }
 
-internal fun playSong(
+fun playSong(
     context: Context,
     songId: String,
     showNotification: Boolean,
@@ -165,7 +165,7 @@ internal fun playSong(
 private var seekBarUpdateHandler = Handler(Looper.getMainLooper())
 private var currentSeekBarUpdateHandlerId = ""
 
-internal fun runSeekBarUpdate(context: Context, prepareNext: Boolean, crossFade: Boolean) {
+fun runSeekBarUpdate(context: Context, prepareNext: Boolean, crossFade: Boolean) {
     val id = UUID.randomUUID().toString()
     currentSeekBarUpdateHandlerId = id
 

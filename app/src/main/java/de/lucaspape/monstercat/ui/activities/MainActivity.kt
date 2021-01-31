@@ -25,19 +25,24 @@ import de.lucaspape.monstercat.core.music.notification.updateNotification
 import de.lucaspape.monstercat.core.music.save.PlayerSaveState
 import de.lucaspape.monstercat.core.music.util.*
 import de.lucaspape.monstercat.core.music.util.setCover
-import de.lucaspape.monstercat.request.async.checkCustomApiFeaturesAsync
-import de.lucaspape.monstercat.request.async.loadRelatedTracksAsync
 import de.lucaspape.monstercat.request.async.retrieveTrackIntoDB
 import de.lucaspape.monstercat.ui.*
 import de.lucaspape.monstercat.util.*
 import de.lucaspape.monstercat.core.util.Settings
+import de.lucaspape.monstercat.request.async.checkCustomApiFeatures
+import de.lucaspape.monstercat.request.async.loadRelatedTracks
 import de.lucaspape.monstercat.ui.pages.*
 import de.lucaspape.monstercat.ui.pages.util.Page
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileNotFoundException
 
 var downloadServiceIntent: Intent? = null
 var lastOpenPage: String? = null
+
+val genericScope = CoroutineScope(Dispatchers.Default)
 
 /**
  * Main activity
@@ -65,7 +70,9 @@ class MainActivity : AppCompatActivity() {
 
         changeTheme()
 
-        checkCustomApiFeaturesAsync(this, {}, {})
+        genericScope.launch {
+            checkCustomApiFeatures(applicationContext, {}, {})
+        }
 
         val settings = Settings.getSettings(this)
 
@@ -199,24 +206,30 @@ class MainActivity : AppCompatActivity() {
             { context, callback ->
                 Settings.getSettings(context)
                     .getBoolean(context.getString(R.string.skipMonstercatSongsSetting))?.let {
-                        loadRelatedTracksAsync(
-                            context, playlist, it,
-                            finishedCallback = { _, relatedIdArray ->
-                                relatedSongQueue = ArrayList()
+                        genericScope.launch {
+                            loadRelatedTracks(
+                                context, playlist, it,
+                                finishedCallback = { relatedIdArray ->
+                                    relatedIdArray?.let {
+                                        relatedSongQueue = ArrayList()
 
-                                for (songId in relatedIdArray) {
-                                    relatedSongQueue.add(songId)
-                                }
+                                        for (songId in relatedIdArray) {
+                                            relatedSongQueue.add(songId)
+                                        }
 
-                                callback()
-                            },
-                            errorCallback = {
-                                //TODO handle error
-                            })
+                                        callback()
+                                    }
+                                },
+                                errorCallback = {
+                                    //TODO handle error
+                                })
+                        }
                     }
             },
             { context, songId, callback ->
-                retrieveTrackIntoDB(context, songId, callback, {})
+                genericScope.launch {
+                    retrieveTrackIntoDB(context, songId, callback, {})
+                }
             },
             { context: Context, msg: String ->
                 displayInfo(context, msg)

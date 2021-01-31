@@ -25,13 +25,13 @@ import java.lang.ref.WeakReference
 //TODO cancel downloads
 
 //this lists contain the urls that should be downloaded
-internal val downloadList = ArrayList<SoftReference<DownloadObject>>()
+val downloadList = ArrayList<SoftReference<DownloadObject>>()
 
-internal var downloadedSongs = 0
+var downloadedSongs = 0
 
-internal val bitmapCache = HashMap<String, SoftReference<Bitmap?>>()
+val bitmapCache = HashMap<String, SoftReference<Bitmap?>>()
 
-internal val preDownloadCallbacks = HashMap<String, ()->Unit>()
+val preDownloadCallbacks = HashMap<String, ()->Unit>()
 
 var fallbackFile = File("")
 var fallbackFileLow = File("")
@@ -49,7 +49,7 @@ fun addDownloadSong(context: Context, songId: String, downloadFinished: () -> Un
     }
 }
 
-internal fun downloadImageUrlIntoImageReceiver(
+fun downloadImageUrlIntoImageReceiver(
     context: Context,
     imageReceiver: ImageReceiverInterface,
     lowRes: Boolean,

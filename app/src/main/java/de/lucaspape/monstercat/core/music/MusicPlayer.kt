@@ -22,7 +22,7 @@ import kotlin.random.Random
 
 //main exoPlayer
 var exoPlayer: SimpleExoPlayer? = null
-    internal set(value) {
+    set(value) {
         field?.playWhenReady = false
         field?.release()
         field?.stop()
@@ -32,7 +32,7 @@ var exoPlayer: SimpleExoPlayer? = null
 
 //secondary exoPlayer -> allows crossFade and gapless playback
 var preparedExoPlayer: SimpleExoPlayer? = null
-    internal set(value) {
+    set(value) {
         preparedExoPlayer?.playWhenReady = false
 
         field = value
@@ -40,24 +40,21 @@ var preparedExoPlayer: SimpleExoPlayer? = null
 
 //queue for songs
 var songQueue = ArrayList<String>()
-    internal set
 
 //priority queue for songs (will always be played back first)
 var prioritySongQueue = ArrayList<String>()
-    internal set
 
 var relatedSongQueue = ArrayList<String>()
-    internal set
 
 var loadedRelatedHash = 0
 
 //playlist, contains playback history
-internal var playlist = ArrayList<String>()
-internal var playlistIndex = 0
+var playlist = ArrayList<String>()
+var playlistIndex = 0
 
 //nextRandom needs to be prepared before next playing to allow crossfade
-internal var nextRandom = -1
-internal var nextRelatedRandom = -1
+var nextRandom = -1
+var nextRelatedRandom = -1
 
 //playback control vars
 var loop = false
@@ -73,7 +70,6 @@ var volume: Float = 1.0f
 var playRelatedSongsAfterPlaylistFinished = false
 
 var mediaSession: MediaSessionCompat? = null
-    internal set
 
 private var sessionCreated = false
 
@@ -83,17 +79,17 @@ var cid = ""
 var retrieveRelatedSongs: (context: Context, callback: () -> Unit) -> Unit =
     { _, _ -> }
 
-var retrieveSongIntoDB: (context: Context, songId: String, callback: (trackId: String, song: Song) -> Unit) -> Unit =
+var retrieveSongIntoDB: (context: Context, songId: String, callback: (song: Song?) -> Unit) -> Unit =
     { _, _, _ -> }
 
-var displayInfo: (context:Context, msg:String) -> Unit = {_,_->}
+var displayInfo: (context: Context, msg: String) -> Unit = { _, _ -> }
 
 var openMainActivityIntent = Intent()
 
 fun setupMusicPlayer(
     sRetrieveRelatedSongs: (context: Context, callback: () -> Unit) -> Unit,
-    sRetrieveSongIntoDB: (context: Context, songId: String, callback: (trackId: String, song: Song) -> Unit) -> Unit,
-    sDisplayInfo: (context:Context, msg:String) -> Unit,
+    sRetrieveSongIntoDB: (context: Context, songId: String, callback: (song: Song?) -> Unit) -> Unit,
+    sDisplayInfo: (context: Context, msg: String) -> Unit,
     sOpenMainActivityIntent: Intent
 ) {
     retrieveRelatedSongs = sRetrieveRelatedSongs
@@ -190,7 +186,7 @@ fun applyPlayerSettings(context: Context) {
 /**
  * Play next song
  */
-internal fun next(context: Context) {
+fun next(context: Context) {
     playSong(
         context, nextSong(context),
         showNotification = true,
@@ -205,7 +201,7 @@ internal fun next(context: Context) {
 /**
  * Play previous song
  */
-internal fun previous(context: Context) {
+fun previous(context: Context) {
     playSong(
         context, previousSong(),
         showNotification = true,
@@ -220,7 +216,7 @@ internal fun previous(context: Context) {
 /**
  * Pause playback
  */
-internal fun pause(context: Context) {
+fun pause(context: Context) {
     exoPlayer?.playWhenReady = false
 
     abandonAudioFocus(context)
@@ -231,7 +227,7 @@ internal fun pause(context: Context) {
 /**
  * Resume playback
  */
-internal fun resume(context: Context) {
+fun resume(context: Context) {
     startPlayerService(context, currentSongId)
 
     val intentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
@@ -255,7 +251,7 @@ internal fun resume(context: Context) {
 /**
  * Toggle playback (play/pause)
  */
-internal fun toggleMusic(context: Context) {
+fun toggleMusic(context: Context) {
     if (exoPlayer?.isPlaying == true) {
         pause(context)
     } else {
@@ -266,7 +262,7 @@ internal fun toggleMusic(context: Context) {
 /**
  * Stop playback
  */
-internal fun stop(context: Context) {
+fun stop(context: Context) {
     if (exoPlayer?.isPlaying == true) {
 
         title = ""
@@ -542,7 +538,7 @@ fun loadRelatedSongs(context: Context, callback: () -> Unit) {
 fun loadSongIntoDB(
     context: Context,
     songId: String,
-    callback: (trackId: String, song: Song) -> Unit
+    callback: (song: Song) -> Unit
 ) {
-    retrieveSongIntoDB(context, songId, callback)
+    retrieveSongIntoDB(context, songId) { it?.let { callback(it) } }
 }

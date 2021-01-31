@@ -4,7 +4,7 @@ import android.content.Context
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.GenreDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.PlaylistItemDatabaseHelper
-import de.lucaspape.monstercat.request.async.loadGenreAsync
+import de.lucaspape.monstercat.request.async.loadGenre
 
 class GenreContentsRecyclerPage(private val genreId: String) :
     PlaylistContentsRecyclerPage(genreId) {
@@ -24,10 +24,10 @@ class GenreContentsRecyclerPage(private val genreId: String) :
         val genreName = GenreDatabaseHelper(context).getGenre(genreId)?.name
 
         genreName?.let{
-            loadGenreAsync(
+            loadGenre(
                 context,
                 forceReload,
-                it, skip, 100, displayLoading, finishedCallback = { id->
+                it, skip, 100, displayLoading, finishedCallback = {
                     val playlistItemDatabaseHelper =
                         PlaylistItemDatabaseHelper(
                             context,

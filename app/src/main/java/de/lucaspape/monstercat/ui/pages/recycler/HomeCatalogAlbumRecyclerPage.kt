@@ -1,18 +1,12 @@
 package de.lucaspape.monstercat.ui.pages.recycler
 
 import android.content.Context
-import com.mikepenz.fastadapter.GenericItem
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.AlbumDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.AlbumItemDatabaseHelper
 import de.lucaspape.monstercat.core.database.objects.Album
-import de.lucaspape.monstercat.core.util.Settings
-import de.lucaspape.monstercat.request.async.loadAlbumAsync
-import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
+import de.lucaspape.monstercat.request.async.loadAlbum
 import de.lucaspape.monstercat.ui.pages.util.loadAlbumTracks
-import de.lucaspape.monstercat.ui.pages.util.playSongsFromViewDataAsync
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 class HomeCatalogAlbumRecyclerPage(
     private val albumId: String?,
@@ -66,13 +60,13 @@ class HomeCatalogAlbumRecyclerPage(
                     finished(album)
                 }
             } else {
-                loadAlbumAsync(
+                loadAlbum(
                     context,
                     forceReload,
                     albumId,
                     albumMcId,
                     displayLoading,
-                    { _, _, _, _ ->
+                    {
                         val albumItemDatabaseHelper =
                             AlbumItemDatabaseHelper(context, albumId)
 
@@ -86,7 +80,7 @@ class HomeCatalogAlbumRecyclerPage(
 
                         callback(idList)
                     },
-                    { _, _, _, _ ->
+                    {
                         errorCallback(context.getString(R.string.errorLoadingAlbumList))
                     })
             }

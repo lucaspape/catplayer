@@ -27,7 +27,7 @@ data class PlayerSaveState(
         private const val serialVersionUID = 158352511676231
 
         @JvmStatic
-        internal var restored = false
+        var restored = false
 
         @JvmStatic
         fun restoreMusicPlayerState(context: Context, force: Boolean) {

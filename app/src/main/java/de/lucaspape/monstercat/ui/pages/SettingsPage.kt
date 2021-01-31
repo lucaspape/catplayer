@@ -29,7 +29,6 @@ import de.lucaspape.monstercat.core.music.playRelatedSongsAfterPlaylistFinished
 import de.lucaspape.monstercat.core.music.volume
 import de.lucaspape.monstercat.push.subscribeToChannel
 import de.lucaspape.monstercat.push.unsubscribeFromChannel
-import de.lucaspape.monstercat.request.async.checkCustomApiFeaturesAsync
 import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListToggleItem
 import de.lucaspape.monstercat.ui.abstract_items.settings.*
 import de.lucaspape.monstercat.ui.abstract_items.util.HeaderTextItem
@@ -39,7 +38,10 @@ import de.lucaspape.monstercat.ui.displayInfo
 import de.lucaspape.monstercat.ui.displaySnackBar
 import de.lucaspape.monstercat.util.*
 import de.lucaspape.monstercat.core.util.Settings
+import de.lucaspape.monstercat.request.async.checkCustomApiFeatures
+import de.lucaspape.monstercat.ui.activities.genericScope
 import de.lucaspape.monstercat.ui.pages.util.Page
+import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -579,25 +581,27 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page() {
                 if (value) {
                     //check for custom api features
 
-                    checkCustomApiFeaturesAsync(context, {
-                        switch.isChecked = true
-                        settings.setBoolean(setting, true)
-                        displaySnackBar(
-                            view,
-                            context.getString(R.string.customApiEnabledMsg),
-                            null
-                        ) {}
+                    genericScope.launch {
+                        checkCustomApiFeatures(context, {
+                            switch.isChecked = true
+                            settings.setBoolean(setting, true)
+                            displaySnackBar(
+                                view,
+                                context.getString(R.string.customApiEnabledMsg),
+                                null
+                            ) {}
 
-                    }, {
-                        switch.isChecked = false
-                        settings.setBoolean(setting, false)
-                        displaySnackBar(
-                            view,
-                            context.getString(R.string.customApiEnableError),
-                            null
-                        ) {}
+                        }, {
+                            switch.isChecked = false
+                            settings.setBoolean(setting, false)
+                            displaySnackBar(
+                                view,
+                                context.getString(R.string.customApiEnableError),
+                                null
+                            ) {}
 
-                    })
+                        })
+                    }
 
                     true
                 } else {

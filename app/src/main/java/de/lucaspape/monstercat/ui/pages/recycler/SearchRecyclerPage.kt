@@ -4,7 +4,7 @@ import android.content.Context
 import android.view.View
 import android.widget.SearchView
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.request.async.loadTitleSearchAsync
+import de.lucaspape.monstercat.request.async.loadTitleSearch
 import kotlin.collections.ArrayList
 
 class SearchRecyclerPage(
@@ -63,10 +63,10 @@ class SearchRecyclerPage(
         search?.let {
             displayLoading()
 
-            loadTitleSearchAsync(
+            loadTitleSearch(
                 context,
                 it,
-                skip, finishedCallback = { _, _, searchResults ->
+                skip, finishedCallback = { searchResults ->
                     val idList = ArrayList<String>()
 
                     for (result in searchResults) {
@@ -74,7 +74,7 @@ class SearchRecyclerPage(
                     }
 
                     callback(idList)
-                }, errorCallback = { _, _ ->
+                }, errorCallback = {
                     errorCallback(context.getString(R.string.errorLoadingSearch))
                 })
         }

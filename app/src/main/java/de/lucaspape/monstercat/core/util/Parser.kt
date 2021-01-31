@@ -70,7 +70,6 @@ fun parseSongToDB(jsonObject: JSONObject, context: Context): String {
             inEarlyAccess = jsonObject.getBoolean("inEarlyAccess")
             creatorFriendly = jsonObject.getBoolean("creatorFriendly")
         } catch (e: JSONException) {
-
         }
     } catch (e: InvocationTargetException) {
     }

@@ -4,7 +4,7 @@ import android.content.Context
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.MoodDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.PlaylistItemDatabaseHelper
-import de.lucaspape.monstercat.request.async.loadMoodAsync
+import de.lucaspape.monstercat.request.async.loadMood
 
 class MoodContentsRecyclerPage(private val moodId: String) :
     PlaylistContentsRecyclerPage(moodId) {
@@ -21,7 +21,7 @@ class MoodContentsRecyclerPage(private val moodId: String) :
         callback: (itemIdList: ArrayList<String>) -> Unit,
         errorCallback: (errorMessage: String) -> Unit
     ) {
-        loadMoodAsync(
+        loadMood(
             context,
             forceReload,
             moodId, skip, 100, displayLoading, finishedCallback = {

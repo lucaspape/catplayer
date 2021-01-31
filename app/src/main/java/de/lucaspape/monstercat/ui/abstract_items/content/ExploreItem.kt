@@ -9,9 +9,9 @@ import com.mikepenz.fastadapter.items.AbstractItem
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.core.util.Settings
-import de.lucaspape.monstercat.request.async.loadGenresAsync
-import de.lucaspape.monstercat.request.async.loadGreatestHitsAsync
-import de.lucaspape.monstercat.request.async.loadMoodsAsync
+import de.lucaspape.monstercat.request.async.loadGenres
+import de.lucaspape.monstercat.request.async.loadGreatestHits
+import de.lucaspape.monstercat.request.async.loadMoods
 import de.lucaspape.monstercat.ui.pages.recycler.HomeCatalogRecyclerPage
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
 import de.lucaspape.monstercat.ui.pages.util.playSongsFromViewDataAsync
@@ -121,7 +121,7 @@ class ExploreItem(
                     if (skip == 0) {
                         when (item.typeName) {
                             "mood" -> {
-                                loadMoodsAsync(
+                                loadMoods(
                                     context,
                                     forceReload,
                                     displayLoading = {},
@@ -139,7 +139,7 @@ class ExploreItem(
 
                             }
                             "genre" -> {
-                                loadGenresAsync(
+                                loadGenres(
                                     context,
                                     forceReload,
                                     displayLoading = {},
@@ -156,7 +156,7 @@ class ExploreItem(
 
                             }
                             "greatest-hits" -> {
-                                loadGreatestHitsAsync(
+                                loadGreatestHits(
                                     context,
                                     forceReload,
                                     skip,

@@ -92,13 +92,13 @@ var playing = false
         playingChangedCallback()
     }
 
-internal fun setCover(context: Context, songId: String, callback: (bitmap: Bitmap) -> Unit) {
+fun setCover(context: Context, songId: String, callback: (bitmap: Bitmap) -> Unit) {
     SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
         setCover(context, song.albumId, song.artistId, callback)
     }
 }
 
-internal fun setCover(
+fun setCover(
     context: Context,
     albumId: String,
     artistId: String,
@@ -153,44 +153,10 @@ internal fun setCover(
     }, artistId)
 }
 
-internal fun setCustomCover(
-    context: Context,
-    coverId: String,
-    coverUrl: String,
-    callback: (bitmap: Bitmap) -> Unit
-) {
-    downloadImageUrlIntoImageReceiver(context, object :
-        ImageReceiverInterface {
-        override fun setBitmap(id: String, bitmap: Bitmap?) {
-            if (id == coverId) {
-                coverBitmap = bitmap
-
-                bitmap?.let {
-                    callback(it)
-                }
-            }
-        }
-
-        override fun setDrawable(id: String, drawable: Drawable?) {
-            if (id == coverId) {
-                coverDrawable = drawable
-
-                drawable?.toBitmap()?.let {
-                    callback(it)
-                }
-            }
-        }
-
-        override fun setTag(target: Target) {
-            setTagCallback(target)
-        }
-    }, false, coverId, coverUrl)
-}
-
 /**
  * SetPlayerState
  */
-internal fun setPlayerState(progress: Long) {
+fun setPlayerState(progress: Long) {
     val stateBuilder = PlaybackStateCompat.Builder()
 
     val state: Int = if (exoPlayer?.isPlaying == true) {

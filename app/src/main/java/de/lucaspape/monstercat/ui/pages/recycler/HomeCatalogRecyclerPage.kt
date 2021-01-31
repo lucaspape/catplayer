@@ -9,8 +9,8 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.CatalogSongDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.core.download.addDownloadSong
-import de.lucaspape.monstercat.request.async.loadSongListAsync
 import de.lucaspape.monstercat.core.util.Settings
+import de.lucaspape.monstercat.request.async.loadSongList
 import de.lucaspape.monstercat.ui.pages.util.playSongsFromCatalogDbAsync
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
 import de.lucaspape.monstercat.ui.pages.util.playSongsFromViewDataAsync
@@ -145,12 +145,12 @@ open class HomeCatalogRecyclerPage : RecyclerViewPage() {
         callback: (itemIdList: ArrayList<String>) -> Unit,
         errorCallback: (errorMessage: String) -> Unit
     ) {
-        loadSongListAsync(
+        loadSongList(
             context,
             forceReload,
             skip,
             displayLoading,
-            finishedCallback = { _, _, _ ->
+            finishedCallback = {
                 val catalogSongDatabaseHelper = CatalogSongDatabaseHelper(context)
 
                 val songList = catalogSongDatabaseHelper.getSongs(skip.toLong(), 50)
@@ -162,7 +162,7 @@ open class HomeCatalogRecyclerPage : RecyclerViewPage() {
 
                 callback(songIdList)
             },
-            errorCallback = { _, _, _ ->
+            errorCallback = {
                 errorCallback(context.getString(R.string.errorLoadingSongList))
             })
     }

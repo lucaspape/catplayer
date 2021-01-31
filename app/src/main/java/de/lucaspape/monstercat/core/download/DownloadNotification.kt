@@ -12,7 +12,7 @@ import de.lucaspape.monstercat.core.music.openMainActivityIntent
 
 private const val downloadNotificationID = 2
 
-internal fun showDownloadNotification(
+fun showDownloadNotification(
     shownTitle: String,
     progress: Int,
     max: Int,

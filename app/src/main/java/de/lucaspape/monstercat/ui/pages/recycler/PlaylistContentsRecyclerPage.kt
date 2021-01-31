@@ -2,17 +2,11 @@ package de.lucaspape.monstercat.ui.pages.recycler
 
 import android.content.Context
 import android.view.View
-import com.mikepenz.fastadapter.GenericItem
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.PlaylistItemDatabaseHelper
-import de.lucaspape.monstercat.core.util.Settings
-import de.lucaspape.monstercat.request.async.loadPlaylistTracksAsync
+import de.lucaspape.monstercat.request.async.loadPlaylistTracks
 import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
-import de.lucaspape.monstercat.ui.pages.util.playSongsFromCatalogDbAsync
-import de.lucaspape.monstercat.ui.pages.util.playSongsFromViewDataAsync
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 open class PlaylistContentsRecyclerPage(private val playlistId: String) :
     HomeCatalogRecyclerPage() {
@@ -36,10 +30,10 @@ open class PlaylistContentsRecyclerPage(private val playlistId: String) :
         errorCallback: (errorMessage: String) -> Unit
     ) {
         if (skip == 0) {
-            loadPlaylistTracksAsync(
+            loadPlaylistTracks(
                 context,
                 forceReload,
-                playlistId, displayLoading, finishedCallback = { _, _, _ ->
+                playlistId, displayLoading, finishedCallback = {
                     val playlistItemDatabaseHelper =
                         PlaylistItemDatabaseHelper(
                             context,
@@ -56,7 +50,7 @@ open class PlaylistContentsRecyclerPage(private val playlistId: String) :
 
                     callback(idList)
 
-                }, errorCallback = { _, _, _ ->
+                }, errorCallback = {
                     errorCallback(context.getString(R.string.errorLoadingPlaylistTracks))
                 })
         } else {
