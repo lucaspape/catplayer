@@ -24,7 +24,7 @@ You can also download the [github release](https://github.com/lucaspape/catplaye
  - FLAC download support
  - Crossfade
 
-<img src="https://github.com/lucaspape/catplayer/raw/master/playstore_res/screenshots/20210126/Screenshot_2021-01-26-14-33-13-618_de.lucaspape.monstercat.jpg" width="40%">  <img src="https://github.com/lucaspape/catplayer/raw/master/playstore_res/screenshots/20210126/Screenshot_2021-01-26-14-34-24-367_de.lucaspape.monstercat.jpg" width="40%">
+<img src="https://raw.githubusercontent.com/lucaspape/catplayer/master/playstore_res/screenshots/20210131/Screenshot_2021-01-31-16-19-52-859_de.lucaspape.monstercat.jpg" width="40%">  <img src="https://raw.githubusercontent.com/lucaspape/catplayer/master/playstore_res/screenshots/20210131/Screenshot_2021-01-31-16-21-05-479_de.lucaspape.monstercat.jpg" width="40%">
 
 All album images seen in these screenshots are Copyright Monstercat.
 
