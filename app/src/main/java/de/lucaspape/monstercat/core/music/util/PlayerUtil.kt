@@ -36,9 +36,11 @@ fun requestAudioFocus(context: Context): Int {
             val audioFocusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
                 .setAudioAttributes(audioAttributes)
                 .setAcceptsDelayedFocusGain(false)
-                .setOnAudioFocusChangeListener(AudioFocusChangeListener.getAudioFocusChangeListener(
-                    WeakReference(context)
-                ))
+                .setOnAudioFocusChangeListener(
+                    AudioFocusChangeListener.getAudioFocusChangeListener(
+                        WeakReference(context)
+                    )
+                )
                 .build()
 
             val audioManager =

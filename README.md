@@ -21,7 +21,6 @@ You can also download the [github release](https://github.com/lucaspape/catplaye
  - Search songs
  - Search for artist by tapping on text in fullscreen-view
  - Dark Mode (Android 9 or higher)
- - Live Radio from Twitch
  - FLAC download support
  - Crossfade
 

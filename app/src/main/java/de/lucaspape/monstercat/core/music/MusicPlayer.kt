@@ -16,7 +16,6 @@ import de.lucaspape.monstercat.core.music.notification.stopPlayerService
 import de.lucaspape.monstercat.core.music.save.PlayerSaveState
 import de.lucaspape.monstercat.core.music.util.*
 import de.lucaspape.monstercat.core.music.util.playSong
-import de.lucaspape.monstercat.core.music.util.BackgroundService
 import de.lucaspape.monstercat.core.util.Settings
 import java.lang.ref.WeakReference
 import kotlin.random.Random
@@ -90,11 +89,6 @@ var retrieveSongIntoDB: (context: Context, songId: String, callback: (trackId: S
 var displayInfo: (context:Context, msg:String) -> Unit = {_,_->}
 
 var openMainActivityIntent = Intent()
-
-var fallbackTitle = ""
-var fallbackArtist = ""
-var fallbackVersion = ""
-var fallbackCoverUrl = ""
 
 fun setupMusicPlayer(
     sRetrieveRelatedSongs: (context: Context, callback: () -> Unit) -> Unit,
