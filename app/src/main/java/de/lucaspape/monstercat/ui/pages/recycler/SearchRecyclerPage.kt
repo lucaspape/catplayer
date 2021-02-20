@@ -52,12 +52,14 @@ class SearchRecyclerPage(
         callback: (itemIdList: ArrayList<String>) -> Unit,
         errorCallback: (errorMessage: String) -> Unit
     ) {
-        search?.let {
+        val search = search
+
+        if(search != null){
             displayLoading()
 
             loadTitleSearch(
                 context,
-                it,
+                search,
                 skip, finishedCallback = { searchResults ->
                     val idList = ArrayList<String>()
 
@@ -69,6 +71,8 @@ class SearchRecyclerPage(
                 }, errorCallback = {
                     errorCallback(context.getString(R.string.errorLoadingSearch))
                 })
+        }else{
+            callback(ArrayList())
         }
     }
 }

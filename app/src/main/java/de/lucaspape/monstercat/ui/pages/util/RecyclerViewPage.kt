@@ -14,6 +14,7 @@ import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.GenericItem
 import com.mikepenz.fastadapter.adapters.ItemAdapter
 import com.mikepenz.fastadapter.listeners.ClickEventHook
+import com.mikepenz.fastadapter.scroll.EndlessRecyclerOnScrollListener
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.util.Settings
 import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
@@ -21,7 +22,6 @@ import de.lucaspape.monstercat.ui.abstract_items.content.PlaylistItem
 import de.lucaspape.monstercat.ui.abstract_items.util.HeaderTextItem
 import de.lucaspape.monstercat.ui.abstract_items.util.ProgressItem
 import de.lucaspape.monstercat.ui.displaySnackBar
-import de.lucaspape.monstercat.ui.pages.util.scroll.EndlessRecyclerOnScrollListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -239,7 +239,7 @@ abstract class RecyclerViewPage {
         }
     }
     
-    var scrollListener:EndlessRecyclerOnScrollListener? = null
+    var scrollListener: EndlessRecyclerOnScrollListener? = null
 
     var currentLoaderId = ""
     
@@ -283,9 +283,9 @@ abstract class RecyclerViewPage {
 
                             scrollListener = object :
                                 EndlessRecyclerOnScrollListener(footerAdapter) {
-                                override fun onLoadMore(currentPage: Int, callback:()->Unit) {
+                                override fun onLoadMore(currentPage: Int) {
                                     scrollListener?.disable()
-                                    loadNext(view, callback)
+                                    loadNext(view)
                                 }
                             }
 
@@ -328,7 +328,7 @@ abstract class RecyclerViewPage {
         }
     }
 
-    private fun loadNext(view: View, scrollCallback:()->Unit) {
+    private fun loadNext(view: View) {
         val id = UUID.randomUUID().toString()
 
         if(currentLoaderId.isEmpty()) {
@@ -353,7 +353,7 @@ abstract class RecyclerViewPage {
 
                                     withContext(Dispatchers.Main){
                                         footerAdapter.clear()
-                                        scrollCallback()
+
                                         scrollListener?.enable()
 
                                         currentLoaderId = ""
@@ -369,7 +369,7 @@ abstract class RecyclerViewPage {
                                 errorMessage,
                                 view.context.getString(R.string.retry)
                             ) {
-                                loadNext(view, scrollCallback)
+                                loadNext(view)
                             }
 
                             currentLoaderId = ""
