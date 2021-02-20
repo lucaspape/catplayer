@@ -23,14 +23,9 @@ class SongDatabaseHelper(context: Context) :
 
         @JvmStatic
         private val DATABASE_NAME = "songs_db"
-
-        @JvmStatic
-        private var songDatabaseCache = HashMap<String, WeakReference<Song?>?>()
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        songDatabaseCache = HashMap()
-
         db?.execSQL("DROP TABLE IF EXISTS " + Song.TABLE_NAME)
         onCreate(db)
     }
@@ -86,75 +81,67 @@ class SongDatabaseHelper(context: Context) :
             db.close()
         }
 
-        songDatabaseCache[songId] = null
-
         return songId
     }
 
     fun getSong(context: Context, songId: String): Song? {
-        if(songDatabaseCache[songId]?.get() == null){
-            val db = readableDatabase
-            val cursor: Cursor
+        val db = readableDatabase
+        val cursor: Cursor
+
+        try {
+            cursor = db.query(
+                Song.TABLE_NAME, arrayOf(
+                    Song.COLUMN_SONG_ID,
+                    Song.COLUMN_TITLE,
+                    Song.COLUMN_VERSION,
+                    Song.COLUMN_ALBUM_ID,
+                    Song.COLUMN_ALBUM_MC_ID,
+                    Song.COLUMN_ARTIST,
+                    Song.COLUMN_ARTIST_ID,
+                    Song.COLUMN_COVER_URL,
+                    Song.COLUMN_DOWNLOADABLE,
+                    Song.COLUMN_STREAMABLE,
+                    Song.COLUMN_INEARLYACCESS,
+                    Song.COLUMN_CREATOR_FRIENDLY
+                ),
+                Song.COLUMN_SONG_ID + "=?",
+                arrayOf(songId), null, null, null, null
+            )
+
+            cursor?.moveToFirst()
 
             try {
-                cursor = db.query(
-                    Song.TABLE_NAME, arrayOf(
-                        Song.COLUMN_SONG_ID,
-                        Song.COLUMN_TITLE,
-                        Song.COLUMN_VERSION,
-                        Song.COLUMN_ALBUM_ID,
-                        Song.COLUMN_ALBUM_MC_ID,
-                        Song.COLUMN_ARTIST,
-                        Song.COLUMN_ARTIST_ID,
-                        Song.COLUMN_COVER_URL,
-                        Song.COLUMN_DOWNLOADABLE,
-                        Song.COLUMN_STREAMABLE,
-                        Song.COLUMN_INEARLYACCESS,
-                        Song.COLUMN_CREATOR_FRIENDLY
-                    ),
-                    Song.COLUMN_SONG_ID + "=?",
-                    arrayOf(songId), null, null, null, null
+                val song = Song(
+                    context,
+                    cursor.getString(cursor.getColumnIndex(Song.COLUMN_SONG_ID)),
+                    cursor.getString(cursor.getColumnIndex(Song.COLUMN_TITLE)),
+                    cursor.getString(cursor.getColumnIndex(Song.COLUMN_VERSION)),
+                    cursor.getString(cursor.getColumnIndex(Song.COLUMN_ALBUM_ID)),
+                    cursor.getString(cursor.getColumnIndex(Song.COLUMN_ALBUM_MC_ID)),
+                    cursor.getString(cursor.getColumnIndex(Song.COLUMN_ARTIST)),
+                    cursor.getString(cursor.getColumnIndex(Song.COLUMN_ARTIST_ID)),
+                    cursor.getString(cursor.getColumnIndex(Song.COLUMN_COVER_URL)),
+                    cursor.getString(cursor.getColumnIndex(Song.COLUMN_DOWNLOADABLE))!!
+                        .toBoolean(),
+                    cursor.getString(cursor.getColumnIndex(Song.COLUMN_STREAMABLE))!!
+                        .toBoolean(),
+                    cursor.getString(cursor.getColumnIndex(Song.COLUMN_INEARLYACCESS))!!
+                        .toBoolean(),
+                    cursor.getString(cursor.getColumnIndex(Song.COLUMN_CREATOR_FRIENDLY))!!
+                        .toBoolean()
                 )
 
-                cursor?.moveToFirst()
+                cursor.close()
 
-                try {
-                    val song = Song(
-                        context,
-                        cursor.getString(cursor.getColumnIndex(Song.COLUMN_SONG_ID)),
-                        cursor.getString(cursor.getColumnIndex(Song.COLUMN_TITLE)),
-                        cursor.getString(cursor.getColumnIndex(Song.COLUMN_VERSION)),
-                        cursor.getString(cursor.getColumnIndex(Song.COLUMN_ALBUM_ID)),
-                        cursor.getString(cursor.getColumnIndex(Song.COLUMN_ALBUM_MC_ID)),
-                        cursor.getString(cursor.getColumnIndex(Song.COLUMN_ARTIST)),
-                        cursor.getString(cursor.getColumnIndex(Song.COLUMN_ARTIST_ID)),
-                        cursor.getString(cursor.getColumnIndex(Song.COLUMN_COVER_URL)),
-                        cursor.getString(cursor.getColumnIndex(Song.COLUMN_DOWNLOADABLE))!!
-                            .toBoolean(),
-                        cursor.getString(cursor.getColumnIndex(Song.COLUMN_STREAMABLE))!!
-                            .toBoolean(),
-                        cursor.getString(cursor.getColumnIndex(Song.COLUMN_INEARLYACCESS))!!
-                            .toBoolean(),
-                        cursor.getString(cursor.getColumnIndex(Song.COLUMN_CREATOR_FRIENDLY))!!
-                            .toBoolean()
-                    )
-
-                    cursor.close()
-
-                    songDatabaseCache[songId] = WeakReference(song)
-
-                    return song
-                } catch (e: IndexOutOfBoundsException) {
-                    cursor.close()
-                    db.close()
-                    return null
-                }
-
-            } catch (e: SQLiteException) {
+                return song
+            } catch (e: IndexOutOfBoundsException) {
+                cursor.close()
+                db.close()
                 return null
             }
-        }else{
-            return songDatabaseCache[songId]?.get()
+
+        } catch (e: SQLiteException) {
+            return null
         }
     }
 }

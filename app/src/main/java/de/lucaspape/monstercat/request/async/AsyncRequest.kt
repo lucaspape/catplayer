@@ -9,7 +9,6 @@ import de.lucaspape.monstercat.core.database.objects.Song
 import de.lucaspape.monstercat.core.util.*
 import de.lucaspape.monstercat.request.*
 import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
-import de.lucaspape.util.BackgroundTask
 import de.lucaspape.monstercat.core.util.Settings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -259,8 +258,8 @@ suspend fun loadAlbum(
 ) {
     withContext(Dispatchers.Default) {
         val albumItemDatabaseHelper =
-            AlbumItemDatabaseHelper(context, albumId)
-        val albumItems = albumItemDatabaseHelper.getAllData()
+            ItemDatabaseHelper(context, albumId)
+        val albumItems = albumItemDatabaseHelper.getAllData(false)
 
         if (!forceReload && albumItems.isNotEmpty()) {
             finishedCallback()
@@ -459,7 +458,7 @@ suspend fun loadPlaylistTracks(
 ) {
     withContext(Dispatchers.Default) {
         val playlistItemDatabaseHelper =
-            PlaylistItemDatabaseHelper(
+            ItemDatabaseHelper(
                 context,
                 playlistId
             )
@@ -557,8 +556,8 @@ suspend fun loadSongList(
     errorCallback: () -> Unit
 ) {
     val catalogSongDatabaseHelper =
-        CatalogSongDatabaseHelper(context)
-    val songIdList = catalogSongDatabaseHelper.getSongs(skip.toLong(), 50)
+        ItemDatabaseHelper(context, "catalog")
+    val songIdList = catalogSongDatabaseHelper.getItems(skip.toLong(), 50)
 
     if (!forceReload && songIdList.isNotEmpty()) {
         finishedCallback()
@@ -720,7 +719,7 @@ suspend fun loadMood(
 ) {
     withContext(Dispatchers.Default) {
         val playlistItemDatabaseHelper =
-            PlaylistItemDatabaseHelper(
+            ItemDatabaseHelper(
                 context,
                 moodId
             )
@@ -843,7 +842,7 @@ suspend fun loadGenre(
 ) {
     withContext(Dispatchers.Default) {
         val playlistItemDatabaseHelper =
-            PlaylistItemDatabaseHelper(
+            ItemDatabaseHelper(
                 context,
                 genreName
             )
@@ -909,7 +908,7 @@ suspend fun loadGreatestHits(
 ) {
     withContext(Dispatchers.Default) {
         val playlistItemDatabaseHelper =
-            PlaylistItemDatabaseHelper(
+            ItemDatabaseHelper(
                 context,
                 "greatest-hits"
             )

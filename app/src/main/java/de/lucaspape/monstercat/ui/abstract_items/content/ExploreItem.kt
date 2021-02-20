@@ -7,7 +7,7 @@ import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.GenericItem
 import com.mikepenz.fastadapter.items.AbstractItem
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.core.database.helper.PlaylistItemDatabaseHelper
+import de.lucaspape.monstercat.core.database.helper.ItemDatabaseHelper
 import de.lucaspape.monstercat.core.util.Settings
 import de.lucaspape.monstercat.request.async.loadGenres
 import de.lucaspape.monstercat.request.async.loadGreatestHits
@@ -100,8 +100,7 @@ class ExploreItem(
                         }
                     }
                 }
-
-                override val pageSize: Int = 100
+                
                 override fun getOrientation(view: View): Int {
                     return if (item.typeName == "greatest-hits") {
                         LinearLayout.VERTICAL
@@ -166,7 +165,7 @@ class ExploreItem(
                                         val idArray = ArrayList<String>()
 
                                         val playlistItemDatabaseHelper =
-                                            PlaylistItemDatabaseHelper(context, "greatest-hits")
+                                            ItemDatabaseHelper(context, "greatest-hits")
                                         val items = playlistItemDatabaseHelper.getAllData(true)
 
                                         for (playlistItem in items) {

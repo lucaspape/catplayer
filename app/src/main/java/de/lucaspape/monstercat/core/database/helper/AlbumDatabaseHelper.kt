@@ -37,7 +37,7 @@ class AlbumDatabaseHelper(context: Context) :
             val albums = getAllAlbums()
 
             for (album in albums) {
-                val albumItemDatabaseHelper = AlbumItemDatabaseHelper(context, album.albumId)
+                val albumItemDatabaseHelper = ItemDatabaseHelper(context, album.albumId)
                 albumItemDatabaseHelper.reCreateTable()
             }
         }

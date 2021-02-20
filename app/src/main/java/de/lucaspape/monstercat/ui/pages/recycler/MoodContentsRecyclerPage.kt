@@ -2,16 +2,14 @@ package de.lucaspape.monstercat.ui.pages.recycler
 
 import android.content.Context
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.core.database.helper.ItemDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.MoodDatabaseHelper
-import de.lucaspape.monstercat.core.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.request.async.loadMood
 
 class MoodContentsRecyclerPage(private val moodId: String) :
     PlaylistContentsRecyclerPage(moodId) {
 
     override val id = "mood-$moodId"
-
-    override val pageSize = 100
 
     override suspend fun load(
         context: Context,
@@ -26,7 +24,7 @@ class MoodContentsRecyclerPage(private val moodId: String) :
             forceReload,
             moodId, skip, 100, displayLoading, finishedCallback = {
                 val playlistItemDatabaseHelper =
-                    PlaylistItemDatabaseHelper(
+                    ItemDatabaseHelper(
                         context,
                         moodId
                     )

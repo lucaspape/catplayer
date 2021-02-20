@@ -13,8 +13,8 @@ import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
 import com.squareup.picasso.Target
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.core.database.helper.ItemDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.PlaylistDatabaseHelper
-import de.lucaspape.monstercat.core.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.core.download.ImageReceiverInterface
 import de.lucaspape.monstercat.core.download.downloadCoverIntoImageReceiver
@@ -153,7 +153,7 @@ open class PlaylistItem(
 
     fun getDownloadStatus(context: Context): String {
         val playlistTracks =
-            PlaylistItemDatabaseHelper(context, playlistId).getAllData(true)
+            ItemDatabaseHelper(context, playlistId).getAllData(true)
 
         var downloaded = true
 

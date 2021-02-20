@@ -3,7 +3,7 @@ package de.lucaspape.monstercat.ui.pages.recycler
 import android.content.Context
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.AlbumDatabaseHelper
-import de.lucaspape.monstercat.core.database.helper.AlbumItemDatabaseHelper
+import de.lucaspape.monstercat.core.database.helper.ItemDatabaseHelper
 import de.lucaspape.monstercat.core.database.objects.Album
 import de.lucaspape.monstercat.request.async.loadAlbum
 import de.lucaspape.monstercat.ui.pages.util.loadAlbumTracks
@@ -29,8 +29,8 @@ class HomeCatalogAlbumRecyclerPage(
 
                 val finished: (album: Album) -> Unit = { album ->
                     val albumItemDatabaseHelper =
-                        AlbumItemDatabaseHelper(context, album.albumId)
-                    val albumItemList = albumItemDatabaseHelper.getAllData()
+                        ItemDatabaseHelper(context, album.albumId)
+                    val albumItemList = albumItemDatabaseHelper.getAllData(false)
 
                     val idList = ArrayList<String>()
 
@@ -68,9 +68,9 @@ class HomeCatalogAlbumRecyclerPage(
                     displayLoading,
                     {
                         val albumItemDatabaseHelper =
-                            AlbumItemDatabaseHelper(context, albumId)
+                            ItemDatabaseHelper(context, albumId)
 
-                        val albumItemList = albumItemDatabaseHelper.getAllData()
+                        val albumItemList = albumItemDatabaseHelper.getAllData(true)
 
                         val idList = ArrayList<String>()
 
@@ -101,7 +101,7 @@ class HomeCatalogAlbumRecyclerPage(
 
     override fun clearDatabase(context: Context) {
         albumId?.let {
-            AlbumItemDatabaseHelper(context, it).reCreateTable()
+            ItemDatabaseHelper(context, it).reCreateTable()
         }
     }
 }

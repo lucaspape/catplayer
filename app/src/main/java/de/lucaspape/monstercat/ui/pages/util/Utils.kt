@@ -93,7 +93,7 @@ fun playPlaylistNextAsync(context: Context, playlistId: String) {
     scope.launch {
         loadPlaylistTracks(context, true, playlistId, {}, {
             val playlistItemDatabaseHelper =
-                PlaylistItemDatabaseHelper(context, playlistId)
+                ItemDatabaseHelper(context, playlistId)
             val playlistItemList = playlistItemDatabaseHelper.getAllData(true).reversed()
 
             val songDatabaseHelper = SongDatabaseHelper(context)
@@ -124,7 +124,7 @@ fun downloadPlaylistAsync(view: View, playlistId: String, downloadFinished: () -
     scope.launch {
         loadPlaylistTracks(view.context, true, playlistId, {}, {
             val playlistItemDatabaseHelper =
-                PlaylistItemDatabaseHelper(view.context, playlistId)
+                ItemDatabaseHelper(view.context, playlistId)
             val playlistItemList = playlistItemDatabaseHelper.getAllData(true)
 
             for (playlistItem in playlistItemList) {
@@ -160,7 +160,7 @@ fun deleteDownloadedPlaylistTracks(
     val alertDialogBuilder = MaterialAlertDialogBuilder(context)
     alertDialogBuilder.setTitle(context.getString(R.string.deletePlaylistDownloadedTracksMsg))
     alertDialogBuilder.setPositiveButton(context.getString(R.string.yes)) { _, _ ->
-        val playlistItemDatabaseHelper = PlaylistItemDatabaseHelper(context, playlistId)
+        val playlistItemDatabaseHelper = ItemDatabaseHelper(context, playlistId)
         val playlistItemList = playlistItemDatabaseHelper.getAllData(true)
 
         val songDatabaseHelper = SongDatabaseHelper(context)
@@ -729,15 +729,15 @@ fun playSongsFromCatalogDbAsync(
 
     //add next songs from database
     val songDatabaseHelper = SongDatabaseHelper(context)
-    val catalogSongDatabaseHelper = CatalogSongDatabaseHelper(context)
+    val catalogSongDatabaseHelper = ItemDatabaseHelper(context, "catalog")
 
     BackgroundAsync({
         val id = UUID.randomUUID().toString()
         addSongsTaskId = id
 
-        catalogSongDatabaseHelper.getIndexFromSongId(firstSongId)?.toLong()
+        catalogSongDatabaseHelper.getIndexFromSongId(firstSongId)
             ?.let { skip ->
-                val nextSongs = catalogSongDatabaseHelper.getSongs(skip)
+                val nextSongs = catalogSongDatabaseHelper.getItems(skip)
 
                 nextSongs.reverse()
 

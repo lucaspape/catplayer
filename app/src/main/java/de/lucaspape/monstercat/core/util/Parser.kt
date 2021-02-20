@@ -100,19 +100,19 @@ fun parseSongToDB(jsonObject: JSONObject, context: Context): String {
 fun parseCatalogSongToDB(jsonObject: JSONObject, context: Context): Long? {
     val songId = parseSongToDB(jsonObject, context)
 
-    val catalogSongDatabaseHelper = CatalogSongDatabaseHelper(context)
+    val catalogSongDatabaseHelper = ItemDatabaseHelper(context, "catalog")
 
-    return if (catalogSongDatabaseHelper.getCatalogSong(songId) == null) {
-        catalogSongDatabaseHelper.insertSong(songId)
+    return if (catalogSongDatabaseHelper.getItemFromSongId(songId) == null) {
+        catalogSongDatabaseHelper.insertSongId(songId)
     } else {
-        catalogSongDatabaseHelper.getCatalogSong(songId)?.id?.toLong()
+        catalogSongDatabaseHelper.getItemFromSongId(songId)?.id?.toLong()
     }
 }
 
 fun parseAlbumSongToDB(jsonObject: JSONObject, sAlbumId: String, context: Context): String {
     val songId = parseSongToDB(jsonObject, context)
 
-    val albumItemDatabaseHelper = AlbumItemDatabaseHelper(context, sAlbumId)
+    val albumItemDatabaseHelper = ItemDatabaseHelper(context, sAlbumId)
 
     if (albumItemDatabaseHelper.getItemFromSongId(songId) == null) {
         albumItemDatabaseHelper.insertSongId(songId)
@@ -161,7 +161,7 @@ fun parsePlaylistTrackToDB(
     return if (title != "null") {
         val songId = parseSongToDB(jsonObject, context)
 
-        val databaseHelper = PlaylistItemDatabaseHelper(
+        val databaseHelper = ItemDatabaseHelper(
             context,
             playlistId
         )

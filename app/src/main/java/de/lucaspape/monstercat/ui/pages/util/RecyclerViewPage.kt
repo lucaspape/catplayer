@@ -304,8 +304,6 @@ abstract class RecyclerViewPage {
         })
     }
 
-    open val pageSize = 50
-
     private fun loadNext(view: View, currentPage: Int) {
         recyclerView?.post {
             footerAdapter.clear()
@@ -315,7 +313,7 @@ abstract class RecyclerViewPage {
                 load(
                     view.context,
                     false,
-                    (currentPage * pageSize),
+                    viewData.size,
                     displayLoading = {},
                     callback = { idList ->
                         scope.launch {

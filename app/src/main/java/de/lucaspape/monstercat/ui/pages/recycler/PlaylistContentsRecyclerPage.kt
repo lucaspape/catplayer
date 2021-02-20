@@ -3,8 +3,8 @@ package de.lucaspape.monstercat.ui.pages.recycler
 import android.content.Context
 import android.view.View
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.core.database.helper.ItemDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.PlaylistDatabaseHelper
-import de.lucaspape.monstercat.core.database.helper.PlaylistItemDatabaseHelper
 import de.lucaspape.monstercat.request.async.loadPlaylistTracks
 import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
 
@@ -35,7 +35,7 @@ open class PlaylistContentsRecyclerPage(private val playlistId: String) :
                 forceReload,
                 playlistId, displayLoading, finishedCallback = {
                     val playlistItemDatabaseHelper =
-                        PlaylistItemDatabaseHelper(
+                        ItemDatabaseHelper(
                             context,
                             playlistId
                         )
@@ -67,6 +67,6 @@ open class PlaylistContentsRecyclerPage(private val playlistId: String) :
     }
 
     override fun clearDatabase(context: Context) {
-        PlaylistItemDatabaseHelper(context, playlistId).reCreateTable()
+        ItemDatabaseHelper(context, playlistId).reCreateTable()
     }
 }

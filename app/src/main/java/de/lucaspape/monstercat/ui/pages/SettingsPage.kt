@@ -21,7 +21,7 @@ import com.mikepenz.fastadapter.adapters.ItemAdapter
 import com.mikepenz.fastadapter.listeners.ClickEventHook
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.AlbumDatabaseHelper
-import de.lucaspape.monstercat.core.database.helper.CatalogSongDatabaseHelper
+import de.lucaspape.monstercat.core.database.helper.ItemDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.ManualPlaylistDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.core.music.crossfade
@@ -272,7 +272,7 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page() {
                     .setMessage(view.context.getString(R.string.resetDatabaseQuestion))
                     .setPositiveButton(android.R.string.ok) { _, _ ->
                         AlbumDatabaseHelper(view.context).reCreateTable(view.context, true)
-                        CatalogSongDatabaseHelper(view.context).reCreateTable()
+                        ItemDatabaseHelper(view.context, "catalog").reCreateTable()
                         PlaylistDatabaseHelper(view.context).reCreateTable(view.context, true)
                         ManualPlaylistDatabaseHelper(view.context).reCreateTable(view.context, true)
 

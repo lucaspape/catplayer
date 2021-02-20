@@ -6,7 +6,7 @@ import android.widget.ImageButton
 import com.mikepenz.fastadapter.GenericItem
 import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.core.database.helper.CatalogSongDatabaseHelper
+import de.lucaspape.monstercat.core.database.helper.ItemDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.core.download.addDownloadSong
 import de.lucaspape.monstercat.core.util.Settings
@@ -151,9 +151,9 @@ open class HomeCatalogRecyclerPage : RecyclerViewPage() {
             skip,
             displayLoading,
             finishedCallback = {
-                val catalogSongDatabaseHelper = CatalogSongDatabaseHelper(context)
+                val catalogSongDatabaseHelper = ItemDatabaseHelper(context, "catalog")
 
-                val songList = catalogSongDatabaseHelper.getSongs(skip.toLong(), 50)
+                val songList = catalogSongDatabaseHelper.getItems(skip.toLong(), 50)
                 val songIdList = ArrayList<String>()
 
                 for (song in songList) {
@@ -168,6 +168,6 @@ open class HomeCatalogRecyclerPage : RecyclerViewPage() {
     }
 
     override fun clearDatabase(context: Context) {
-        CatalogSongDatabaseHelper(context).reCreateTable()
+        ItemDatabaseHelper(context, "catalog").reCreateTable()
     }
 }

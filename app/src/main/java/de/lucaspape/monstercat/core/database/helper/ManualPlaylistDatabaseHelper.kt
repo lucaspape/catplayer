@@ -38,7 +38,7 @@ class ManualPlaylistDatabaseHelper(context: Context) :
 
             for (playlist in allPlaylists) {
                 val playlistItemDatabaseHelper =
-                    PlaylistItemDatabaseHelper(context, playlist.playlistId)
+                    ItemDatabaseHelper(context, playlist.playlistId)
                 playlistItemDatabaseHelper.reCreateTable()
             }
         }
