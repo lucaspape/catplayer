@@ -605,7 +605,7 @@ suspend fun loadTitleSearch(
         val searchQueue =
             getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
-        newSearchTrackRequest(context, searchString, skip, false, {
+        val searchTrackRequest = newSearchTrackRequest(context, searchString, skip, false, {
             val jsonArray = it.getJSONArray("results")
 
             val songList =
@@ -622,10 +622,15 @@ suspend fun loadTitleSearch(
             finishedCallback(searchResults)
         }, {
             errorCallback()
-        })?.let {
-            searchQueue.add(it)
+        })
+
+        if (searchTrackRequest != null) {
+            searchQueue.add(searchTrackRequest)
+        } else {
+            errorCallback()
         }
     }
+
 }
 
 suspend fun renamePlaylist(

@@ -69,6 +69,10 @@ abstract class RecyclerViewPage {
         callback: (itemIdList: ArrayList<String>) -> Unit,
         errorCallback: (errorMessage: String) -> Unit
     )
+    
+    open fun registerListeners(view:View){
+
+    }
 
     open fun restore(data: HashMap<String, String>?):Boolean{
         return false
@@ -91,8 +95,10 @@ abstract class RecyclerViewPage {
 
     private var itemHeaderOffset = 0
 
-    open fun onCreate(view: View) {
+    fun onCreate(view: View) {
         if(!restore(saveData[id])){
+            registerListeners(view)
+
             scope.launch {
                 loadInit(view, false)
             }

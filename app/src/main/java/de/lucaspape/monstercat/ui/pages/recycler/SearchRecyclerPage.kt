@@ -12,22 +12,11 @@ class SearchRecyclerPage(
     private val closeSearch: () -> Unit
 ) : HomeCatalogRecyclerPage() {
 
-    override fun onCreate(view: View) {
-        registerListeners(view)
-
-        val searchView = view.findViewById<SearchView>(R.id.searchInput)
-        searchView.onActionViewExpanded()
-
-        search?.let {
-            searchView.setQuery(search, false)
-
-            super.onCreate(view)
-        }
-    }
-
-    private fun registerListeners(view: View) {
+    override fun registerListeners(view: View) {
         //search
         val searchInput = view.findViewById<SearchView>(R.id.searchInput)
+
+        searchInput.onActionViewExpanded()
 
         searchInput.setOnCloseListener {
             closeSearch()
@@ -43,13 +32,16 @@ class SearchRecyclerPage(
             override fun onQueryTextSubmit(query: String?): Boolean {
                 query?.let {
                     search = it
-
                     onCreate(view)
                 }
 
                 return false
             }
         })
+
+        search?.let {
+            searchInput.setQuery(search, false)
+        }
     }
 
     override suspend fun load(

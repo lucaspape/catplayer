@@ -36,6 +36,7 @@ import de.lucaspape.monstercat.ui.pages.util.Page
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileNotFoundException
 
@@ -71,7 +72,9 @@ class MainActivity : AppCompatActivity() {
         changeTheme()
 
         genericScope.launch {
-            checkCustomApiFeatures(applicationContext, {}, {})
+            withContext(Dispatchers.Main) {
+                checkCustomApiFeatures(this@MainActivity, {}, {})
+            }
         }
 
         val settings = Settings.getSettings(this)
