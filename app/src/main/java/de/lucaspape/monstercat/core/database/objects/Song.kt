@@ -7,7 +7,7 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.android.exoplayer2.util.Util
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.util.wifiConnected
@@ -133,8 +133,8 @@ data class Song(
         } else {
             streamUrl
         }
-    
-    fun getMediaSource(sid:String, cid:String):MediaSource?{
+
+    fun getMediaSource(sid: String, cid: String): MediaSource? {
         return if (downloaded) {
             fileToMediaSource(downloadLocation)
         } else {
@@ -155,11 +155,11 @@ data class Song(
         val blockNonCreatorFriendlySetting = Settings.getSettings(context)
             .getBoolean(context.getString(R.string.blockNonCreatorFriendlySetting))
 
-        return if(!networkAllowed){
+        return if (!networkAllowed) {
             false
-        }else if(creatorFriendly){
+        } else if (creatorFriendly) {
             true
-        }else blockNonCreatorFriendlySetting == false || blockNonCreatorFriendlySetting == null
+        } else blockNonCreatorFriendlySetting == false || blockNonCreatorFriendlySetting == null
     }
 
     private fun fileToMediaSource(fileLocation: String): ProgressiveMediaSource {
@@ -172,26 +172,30 @@ data class Song(
         ).createMediaSource(MediaItem.fromUri(Uri.parse("file://$fileLocation")))
     }
 
-    private fun urlToMediaSource(url: String, sid:String, cid:String): ProgressiveMediaSource {
+    private fun urlToMediaSource(url: String, sid: String, cid: String): ProgressiveMediaSource {
         val httpSourceFactory =
-            DefaultHttpDataSourceFactory(
-                Util.getUserAgent(
-                    context,
-                    context.getString(R.string.applicationName)
-                )
+            DefaultHttpDataSource.Factory()
+
+        httpSourceFactory.setUserAgent(
+            Util.getUserAgent(
+                context,
+                context.getString(R.string.applicationName)
             )
-        
+        )
+
         var cookie = ""
 
-        if(cid != ""){
+        if (cid != "") {
             cookie += "cid=$cid"
         }
 
-        if(sid != ""){
+        if (sid != "") {
             cookie += ";connect.sid=$sid"
         }
 
-        httpSourceFactory.defaultRequestProperties.set("Cookie", cookie)
+        if(cookie.isNotEmpty()){
+            httpSourceFactory.setDefaultRequestProperties(mapOf(cookie to "Cookie"))
+        }
 
         return ProgressiveMediaSource.Factory(httpSourceFactory)
             .createMediaSource(MediaItem.fromUri(url.toUri()))

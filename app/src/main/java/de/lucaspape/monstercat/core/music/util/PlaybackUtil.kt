@@ -27,8 +27,7 @@ fun prepareSong(
     if (preparedExoPlayerSongId != songId) {
         //new exoplayer
         preparedExoPlayer = SimpleExoPlayer.Builder(context).build()
-        preparedExoPlayer?.audioAttributes =
-            getAudioAttributes()
+        preparedExoPlayer?.setAudioAttributes(getAudioAttributes(), false)
 
         SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
             if (song.playbackAllowed(context)
