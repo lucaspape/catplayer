@@ -27,13 +27,8 @@ import de.lucaspape.monstercat.core.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.core.music.crossfade
 import de.lucaspape.monstercat.core.music.playRelatedSongsAfterPlaylistFinished
 import de.lucaspape.monstercat.core.music.volume
-import de.lucaspape.monstercat.push.subscribeToChannel
-import de.lucaspape.monstercat.push.unsubscribeFromChannel
-import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListToggleItem
 import de.lucaspape.monstercat.ui.abstract_items.settings.*
-import de.lucaspape.monstercat.ui.abstract_items.util.HeaderTextItem
 import de.lucaspape.monstercat.ui.activities.MainActivity
-import de.lucaspape.monstercat.ui.displayAlertDialogToggleList
 import de.lucaspape.monstercat.ui.displayInfo
 import de.lucaspape.monstercat.ui.displaySnackBar
 import de.lucaspape.monstercat.util.*
@@ -42,9 +37,6 @@ import de.lucaspape.monstercat.request.async.checkCustomApiFeatures
 import de.lucaspape.monstercat.ui.activities.genericScope
 import de.lucaspape.monstercat.ui.pages.util.Page
 import kotlinx.coroutines.launch
-import org.json.JSONArray
-import org.json.JSONException
-import org.json.JSONObject
 import java.io.File
 import java.io.FileNotFoundException
 import kotlin.math.log
@@ -74,7 +66,6 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page() {
         addPlaybackSettings(view)
         addDataSettings(view)
         addAdvancedSettings(view)
-        addPushNotificationSettingsButton(view)
         addCustomApiButton(view)
         addResetDatabaseButton(view)
 
@@ -301,80 +292,6 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page() {
 
                 val negativeButton = dialog.getButton(DialogInterface.BUTTON_NEGATIVE)
                 negativeButton.setTextColor(typedValue.data)
-            })
-    }
-
-    private fun addPushNotificationSettingsButton(view: View) {
-        itemAdapter.add(
-            SettingsButtonItem(
-                view.context.getString(R.string.pushNotifications)
-            ) {
-                val settings = Settings.getSettings(view.context)
-
-                val notificationTopics =
-                    JSONArray((view.context.getString(R.string.defaultNotificationTopics)))
-
-                var notificationTopicsEnabled = JSONObject()
-
-                settings.getString(view.context.getString(R.string.enabledPushNotificationTopicsSetting))
-                    ?.let {
-                        notificationTopicsEnabled = JSONObject(it)
-                    }
-
-                val pushNotificationsDescriptionArray =
-                    Array(notificationTopics.length()) {
-                        AlertListToggleItem(
-                            "",
-                            "",
-                            false
-                        )
-                    }
-                val pushNotificationsTopicNameArray = Array(notificationTopics.length()) { "" }
-
-                for (i in (0 until notificationTopics.length())) {
-                    val jsonObject = notificationTopics.getJSONObject(i)
-
-                    val enabled = try {
-                        notificationTopicsEnabled.getBoolean(jsonObject.getString("topicname"))
-                    } catch (e: JSONException) {
-                        false
-                    }
-
-                    pushNotificationsDescriptionArray[i] =
-                        AlertListToggleItem(
-                            jsonObject.getString("description"),
-                            "",
-                            enabled
-                        )
-                    pushNotificationsTopicNameArray[i] = jsonObject.getString("topicname")
-                }
-
-                displayAlertDialogToggleList(
-                    view.context,
-                    HeaderTextItem(
-                        view.context.getString(R.string.pushNotifications)
-                    ),
-                    pushNotificationsDescriptionArray
-                ) { position, _, enabled ->
-                    if (enabled) {
-                        subscribeToChannel(view.context, pushNotificationsTopicNameArray[position])
-                    } else {
-                        unsubscribeFromChannel(
-                            view.context,
-                            pushNotificationsTopicNameArray[position]
-                        )
-                    }
-
-                    notificationTopicsEnabled.put(
-                        pushNotificationsTopicNameArray[position],
-                        enabled
-                    )
-
-                    settings.setString(
-                        view.context.getString(R.string.enabledPushNotificationTopicsSetting),
-                        notificationTopicsEnabled.toString()
-                    )
-                }
             })
     }
 
