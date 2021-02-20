@@ -28,4 +28,5 @@
 
     <string name="filtersUrl" translatable="false">https://connect.monstercat.com/v2/catalog/filters</string>
 
+    <string name="greatestHitsPlaylistId" translatable="false">991334fb-ca5e-48c6-bc73-cb83c364357d</string>
 </resources>

@@ -497,17 +497,6 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page() {
             )
         )
 
-        itemAdapter.add(
-            SettingsToggleItem(
-                context.getString(R.string.liveInfoSetting),
-                true,
-                context.getString(R.string.loadLiveInfo),
-                view.context.getString(R.string.customApiSupportsLoadingLiveInfoSetting),
-                changeSetting
-            )
-        )
-
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             itemAdapter.add(
                 SettingsToggleItem(

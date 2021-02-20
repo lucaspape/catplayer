@@ -481,38 +481,6 @@ fun newLoadPlaylistsRequest(
     )
 }
 
-fun newLiveInfoRequest(
-    context: Context,
-    callback: (response: JSONObject) -> Unit,
-    errorCallback: (error: VolleyError?) -> Unit
-): StringRequest? {
-    val settings = Settings.getSettings(context)
-
-    val requestUrl =
-        if (settings.getBoolean(context.getString(R.string.liveInfoSetting)) == true && settings.getBoolean(
-                context.getString(R.string.customApiSupportsV1Setting)
-            ) == true
-        ) {
-            settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v1/liveinfo"
-        } else {
-            return null
-        }
-
-    return StringRequest(
-        Request.Method.GET,
-        requestUrl,
-        {
-            try {
-                callback(JSONObject(it))
-            } catch (e: JSONException) {
-                errorCallback(null)
-            }
-
-        },
-        Response.ErrorListener(errorCallback)
-    )
-}
-
 fun newLoginRequest(
     context: Context,
     username: String,
@@ -722,7 +690,7 @@ fun newLoadGreatestHitsRequest(
     errorCallback: (error: VolleyError?) -> Unit
 ): StringRequest {
     val requestUrl =
-        context.getString(R.string.playlistUrl) + "991334fb-ca5e-48c6-bc73-cb83c364357d/catalog?raw=%7B%7D&limit=$limit&skip=$skip&offset=0&search=&sort=-date&nogold=false&onlyReleased=true"
+        context.getString(R.string.playlistUrl) + context.getString(R.string.greatestHitsPlaylistId) + "/catalog?raw=%7B%7D&limit=$limit&skip=$skip&offset=0&search=&sort=-date&nogold=false&onlyReleased=true"
 
     return StringRequest(
         Request.Method.GET, requestUrl,
