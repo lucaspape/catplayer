@@ -52,7 +52,7 @@ fun parseSongToDB(jsonObject: JSONObject, context: Context): String {
 
         try {
             try {
-                artistId = jsonObject.getJSONArray("artists").getJSONObject(0).getString("id")
+              //  artistId = jsonObject.getJSONArray("artists").getJSONObject(0).getString("id")
             } catch (e: IndexOutOfBoundsException) {
 
             }
@@ -61,7 +61,7 @@ fun parseSongToDB(jsonObject: JSONObject, context: Context): String {
         }
 
         coverUrl = context.getString(R.string.trackContentUrl) + "$albumId/cover"
-        version = jsonObject.getString("version")
+       // version = jsonObject.getString("version")
         id = jsonObject.getString("id")
 
         try {
@@ -101,12 +101,8 @@ fun parseCatalogSongToDB(jsonObject: JSONObject, context: Context): Long? {
     val songId = parseSongToDB(jsonObject, context)
 
     val catalogSongDatabaseHelper = ItemDatabaseHelper(context, "catalog")
-
-    return if (catalogSongDatabaseHelper.getItemFromSongId(songId) == null) {
-        catalogSongDatabaseHelper.insertSongId(songId)
-    } else {
-        catalogSongDatabaseHelper.getItemFromSongId(songId)?.id?.toLong()
-    }
+    
+    return catalogSongDatabaseHelper.insertSongId(songId)
 }
 
 fun parseAlbumSongToDB(jsonObject: JSONObject, sAlbumId: String, context: Context): String {

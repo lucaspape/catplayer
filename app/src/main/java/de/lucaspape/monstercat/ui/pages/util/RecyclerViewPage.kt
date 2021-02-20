@@ -14,7 +14,6 @@ import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.GenericItem
 import com.mikepenz.fastadapter.adapters.ItemAdapter
 import com.mikepenz.fastadapter.listeners.ClickEventHook
-import com.mikepenz.fastadapter.scroll.EndlessRecyclerOnScrollListener
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.util.Settings
 import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
@@ -22,6 +21,7 @@ import de.lucaspape.monstercat.ui.abstract_items.content.PlaylistItem
 import de.lucaspape.monstercat.ui.abstract_items.util.HeaderTextItem
 import de.lucaspape.monstercat.ui.abstract_items.util.ProgressItem
 import de.lucaspape.monstercat.ui.displaySnackBar
+import de.lucaspape.monstercat.ui.pages.util.scroll.EndlessRecyclerOnScrollListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -114,6 +114,8 @@ abstract class RecyclerViewPage {
     }
 
     open val id = UUID.randomUUID().toString()
+    
+    var fastAdapter:FastAdapter<GenericItem>? = null
 
     @SuppressLint("WrongConstant")
     private suspend fun setupRecyclerView(view: View) {
@@ -128,8 +130,7 @@ abstract class RecyclerViewPage {
 
             viewData = ArrayList()
 
-            val fastAdapter: FastAdapter<GenericItem> =
-                FastAdapter.with(listOf(headerAdapter, itemAdapter, footerAdapter))
+            fastAdapter = FastAdapter.with(listOf(headerAdapter, itemAdapter, footerAdapter))
 
             recyclerView?.layoutManager =
                 LinearLayoutManager(view.context, getOrientation(view), false)
@@ -137,7 +138,7 @@ abstract class RecyclerViewPage {
             recyclerView?.adapter = fastAdapter
 
             //OnClick
-            fastAdapter.onClickListener = { _, _, _, position ->
+            fastAdapter?.onClickListener = { _, _, _, position ->
                 scope.launch {
                     val itemIndex = position + itemHeaderOffset
 
@@ -153,7 +154,7 @@ abstract class RecyclerViewPage {
             /**
              * On long click
              */
-            fastAdapter.onLongClickListener = { _, _, _, position ->
+            fastAdapter?.onLongClickListener = { _, _, _, position ->
                 scope.launch {
                     val itemIndex = position + itemHeaderOffset
 
@@ -169,7 +170,7 @@ abstract class RecyclerViewPage {
             /**
              * On menu button click
              */
-            fastAdapter.addEventHook(object : ClickEventHook<GenericItem>() {
+            fastAdapter?.addEventHook(object : ClickEventHook<GenericItem>() {
                 override fun onBind(viewHolder: RecyclerView.ViewHolder): View? {
                     return if (viewHolder is CatalogItem.ViewHolder) {
                         viewHolder.titleMenuButton
@@ -197,7 +198,7 @@ abstract class RecyclerViewPage {
             /**
              * On download button click
              */
-            fastAdapter.addEventHook(object : ClickEventHook<GenericItem>() {
+            fastAdapter?.addEventHook(object : ClickEventHook<GenericItem>() {
                 override fun onBind(viewHolder: RecyclerView.ViewHolder): View? {
                     return if (viewHolder is CatalogItem.ViewHolder) {
                         viewHolder.titleDownloadButton
@@ -237,106 +238,143 @@ abstract class RecyclerViewPage {
             itemAdapter.add(item)
         }
     }
+    
+    var scrollListener:EndlessRecyclerOnScrollListener? = null
 
+    var currentLoaderId = ""
+    
     private suspend fun loadInit(view: View, forceReload: Boolean) {
-        val swipeRefreshLayout =
-            view.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
+        val id = UUID.randomUUID().toString()
+        
+        if(currentLoaderId.isEmpty()){
+            currentLoaderId = id
 
-        if (forceReload){
-            clearDatabase(view.context)
-            resetRecyclerViewSavedPosition(view.context)
-        }
+            val swipeRefreshLayout =
+                view.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
 
-        load(view.context, forceReload, 0, displayLoading = {
-            scope.launch {
-                withContext(Dispatchers.Main){
-                    swipeRefreshLayout?.isRefreshing = true
-                }
+            if (forceReload){
+                clearDatabase(view.context)
+                resetRecyclerViewSavedPosition(view.context)
             }
-        }, callback = { idList ->
-            scope.launch {
-                setupRecyclerView(view)
 
-                for (id in idList) {
-                    addItem(idToAbstractItem(view, id))
+            load(view.context, forceReload, 0, displayLoading = {
+                scope.launch {
+                    withContext(Dispatchers.Main){
+                        swipeRefreshLayout?.isRefreshing = true
+                    }
                 }
+            }, callback = { idList ->
+                scope.launch {
+                    if(currentLoaderId == id){
+                        setupRecyclerView(view)
 
-                getHeader(view.context)?.let {
-                    addHeader(it)
-                }
-
-                withContext(Dispatchers.Main){
-                    /**
-                     * On scroll down (load next)
-                     */
-                    recyclerView?.addOnScrollListener(object :
-                        EndlessRecyclerOnScrollListener(footerAdapter) {
-                        override fun onLoadMore(currentPage: Int) {
-                            loadNext(view, currentPage)
+                        for (itemId in idList) {
+                            addItem(idToAbstractItem(view, itemId))
                         }
-                    })
 
-                    //refresh
-                    swipeRefreshLayout?.setOnRefreshListener {
-                        scope.launch {
-                            loadInit(view, true)
+                        getHeader(view.context)?.let {
+                            addHeader(it)
+                        }
+
+                        withContext(Dispatchers.Main){
+                            /**
+                             * On scroll down (load next)
+                             */
+
+                            scrollListener = object :
+                                EndlessRecyclerOnScrollListener(footerAdapter) {
+                                override fun onLoadMore(currentPage: Int, callback:()->Unit) {
+                                    scrollListener?.disable()
+                                    loadNext(view, callback)
+                                }
+                            }
+
+                            scrollListener?.let {
+                                recyclerView?.addOnScrollListener(it)
+                            }
+
+                            //refresh
+                            swipeRefreshLayout?.setOnRefreshListener {
+                                scope.launch {
+                                    loadInit(view, true)
+                                }
+                            }
+
+                            swipeRefreshLayout?.isRefreshing = false
+
+                            restoreRecyclerViewPosition(view.context)
+
+                            currentLoaderId = ""
                         }
                     }
-
-                    swipeRefreshLayout?.isRefreshing = false
-
-                    restoreRecyclerViewPosition(view.context)
                 }
-            }
 
-        }, errorCallback = { errorMessage ->
-            swipeRefreshLayout?.isRefreshing = false
+            }, errorCallback = { errorMessage ->
+                swipeRefreshLayout?.isRefreshing = false
 
-            displaySnackBar(
-                view,
-                errorMessage,
-                view.context.getString(R.string.retry)
-            ) {
-                scope.launch {
-                    loadInit(view, forceReload)
+                displaySnackBar(
+                    view,
+                    errorMessage,
+                    view.context.getString(R.string.retry)
+                ) {
+                    scope.launch {
+                        loadInit(view, forceReload)
+                    }
                 }
-            }
-        })
+
+                currentLoaderId = ""
+            })
+            
+        }
     }
 
-    private fun loadNext(view: View, currentPage: Int) {
-        recyclerView?.post {
-            footerAdapter.clear()
-            footerAdapter.add(ProgressItem())
+    private fun loadNext(view: View, scrollCallback:()->Unit) {
+        val id = UUID.randomUUID().toString()
 
-            scope.launch {
-                load(
-                    view.context,
-                    false,
-                    viewData.size,
-                    displayLoading = {},
-                    callback = { idList ->
-                        scope.launch {
-                            for (id in idList) {
-                                addItem(idToAbstractItem(view, id))
+        if(currentLoaderId.isEmpty()) {
+            currentLoaderId = id
+
+            recyclerView?.post {
+                footerAdapter.clear()
+                footerAdapter.add(ProgressItem())
+
+                scope.launch {
+                    load(
+                        view.context,
+                        false,
+                        viewData.size,
+                        displayLoading = {},
+                        callback = { idList ->
+                            scope.launch {
+                                if(currentLoaderId == id){
+                                    for (itemId in idList) {
+                                        addItem(idToAbstractItem(view, itemId))
+                                    }
+
+                                    withContext(Dispatchers.Main){
+                                        footerAdapter.clear()
+                                        scrollCallback()
+                                        scrollListener?.enable()
+
+                                        currentLoaderId = ""
+                                    }
+                                }
+                            }
+                        },
+                        errorCallback = { errorMessage ->
+                            footerAdapter.clear()
+
+                            displaySnackBar(
+                                view,
+                                errorMessage,
+                                view.context.getString(R.string.retry)
+                            ) {
+                                loadNext(view, scrollCallback)
                             }
 
-                            withContext(Dispatchers.Main){
-                                footerAdapter.clear()
-                            }
-                        }
-                    },
-                    errorCallback = { errorMessage ->
-                        footerAdapter.clear()
-
-                        displaySnackBar(
-                            view,
-                            errorMessage,
-                            view.context.getString(R.string.retry)
-                        ) {
-                            loadNext(view, currentPage)
-                        }
-                    })
+                            currentLoaderId = ""
+                        })
+                }
             }
         }
     }

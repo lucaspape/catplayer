@@ -577,10 +577,12 @@ suspend fun loadSongList(
                 val jsonArray = it.getJSONArray("results")
 
                 for (i in (0 until jsonArray.length())) {
-                    parseCatalogSongToDB(
+                    val id = parseCatalogSongToDB(
                         jsonArray.getJSONObject(i),
                         context
                     )
+
+                    println("")
                 }
 
                 finishedCallback()
