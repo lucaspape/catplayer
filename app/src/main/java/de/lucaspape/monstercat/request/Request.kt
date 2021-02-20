@@ -55,6 +55,8 @@ fun newSearchTrackRequest(
 ): StringRequest? {
     val settings = Settings.getSettings(context)
 
+    var usesCustomApi = false
+    
     val searchUrl =
         if (settings.getBoolean(context.getString(R.string.useCustomApiForSearchSetting)) == true || forceCustomApi
         ) {
@@ -62,6 +64,7 @@ fun newSearchTrackRequest(
                     context.getString(R.string.customApiSupportsV1Setting)
                 ) == true
             ) {
+                usesCustomApi = true
                 settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v1/catalog/search?term=$term&limit=50&skip=" + skip.toString()
             } else {
                 return null
@@ -75,7 +78,7 @@ fun newSearchTrackRequest(
         searchUrl,
         {
             try {
-                callback(JSONObject(it))
+                callback(JSONObject(getCharacterFromUnicode(it, usesCustomApi)))
             } catch (e: JSONException) {
                 errorCallback(null)
             }
@@ -213,11 +216,14 @@ fun newLoadAlbumRequest(
 ): StringRequest {
     val settings = Settings.getSettings(context)
 
+    var usesCustomApi = false
+
     val requestUrl =
         if (settings.getBoolean(context.getString(R.string.useCustomApiForCatalogAndAlbumViewSetting)) == true && settings.getBoolean(
                 context.getString(R.string.customApiSupportsV1Setting)
             ) == true
         ) {
+            usesCustomApi = true
             settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v1/catalog/release/$mcID"
         } else {
             context.getString(R.string.loadAlbumSongsUrl) + "/$mcID"
@@ -227,7 +233,7 @@ fun newLoadAlbumRequest(
         Request.Method.GET, requestUrl,
         {
             try {
-                callback(JSONObject(it))
+                callback(JSONObject(getCharacterFromUnicode(it, usesCustomApi)))
             } catch (e: JSONException) {
                 errorCallback(null)
             }
@@ -243,11 +249,14 @@ fun newLoadAlbumListRequest(
 ): StringRequest {
     val settings = Settings.getSettings(context)
 
+    var usesCustomApi = false
+    
     val requestUrl =
         if (settings.getBoolean(context.getString(R.string.useCustomApiForCatalogAndAlbumViewSetting)) == true && settings.getBoolean(
                 context.getString(R.string.customApiSupportsV1Setting)
             ) == true
         ) {
+            usesCustomApi = true
             settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v1/releases?limit=50&skip=" + skip.toString()
         } else {
             context.getString(R.string.loadAlbumsUrl) + "?limit=50&skip=" + skip.toString()
@@ -257,7 +266,7 @@ fun newLoadAlbumListRequest(
         Request.Method.GET, requestUrl,
         {
             try {
-                callback(JSONObject(it))
+                callback(JSONObject(getCharacterFromUnicode(it, usesCustomApi)))
             } catch (e: JSONException) {
                 errorCallback(null)
             }
@@ -274,11 +283,14 @@ fun newLoadPlaylistRequest(
 ): StringRequest {
     val settings = Settings.getSettings(context)
 
+    var usesCustomApi = false
+
     val playlistUrl =
         if (settings.getBoolean(context.getString(R.string.useCustomApiForEverythingSetting)) == true && settings.getBoolean(
                 context.getString(R.string.customApiSupportsV2Setting)
             ) == true
         ) {
+            usesCustomApi = true
             settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v2/playlist/" + playlistId
         } else {
             context.getString(R.string.playlistUrl) + playlistId
@@ -289,7 +301,7 @@ fun newLoadPlaylistRequest(
         playlistUrl,
         {
             try {
-                callback(JSONObject(it))
+                callback(JSONObject(getCharacterFromUnicode(it, usesCustomApi)))
             } catch (e: JSONException) {
                 errorCallback(null)
             }
@@ -308,11 +320,14 @@ fun newLoadPlaylistTracksRequest(
 ): StringRequest {
     val settings = Settings.getSettings(context)
 
+    var usesCustomApi = false
+
     val playlistTrackUrl =
         if (settings.getBoolean(context.getString(R.string.useCustomApiForEverythingSetting)) == true && settings.getBoolean(
                 context.getString(R.string.customApiSupportsV2Setting)
             ) == true
         ) {
+            usesCustomApi = true
             settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v2/playlist/" + playlistId + "/catalog?skip=" + skip.toString() + "&limit=$limit"
         } else {
             context.getString(R.string.playlistTrackUrl) + playlistId + "/catalog?skip=" + skip.toString() + "&limit=$limit"
@@ -320,7 +335,7 @@ fun newLoadPlaylistTracksRequest(
 
     return StringRequest(Request.Method.GET, playlistTrackUrl, {
         try {
-            callback(JSONObject(it))
+            callback(JSONObject(getCharacterFromUnicode(it, usesCustomApi)))
         } catch (e: JSONException) {
             errorCallback(null)
         }
@@ -398,11 +413,14 @@ fun newLoadSongListRequest(
 ): StringRequest {
     val settings = Settings.getSettings(context)
 
+    var usesCustomApi = false
+
     val requestUrl =
         if (settings.getBoolean(context.getString(R.string.useCustomApiForCatalogAndAlbumViewSetting)) == true && settings.getBoolean(
                 context.getString(R.string.customApiSupportsV1Setting)
             ) == true
         ) {
+            usesCustomApi = true
             settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v1/catalog/?limit=50&skip=" + skip.toString()
         } else {
             context.getString(R.string.loadSongsUrl) + "?limit=50&skip=" + skip.toString()
@@ -412,7 +430,7 @@ fun newLoadSongListRequest(
         Request.Method.GET, requestUrl,
         {
             try {
-                callback(JSONObject(it))
+                callback(JSONObject(getCharacterFromUnicode(it, usesCustomApi)))
             } catch (e: JSONException) {
                 errorCallback(null)
             }
@@ -458,11 +476,14 @@ fun newLoadPlaylistsRequest(
 ): StringRequest {
     val settings = Settings.getSettings(context)
 
+    var usesCustomApi = false
+
     val playlistUrl =
         if (settings.getBoolean(context.getString(R.string.useCustomApiForEverythingSetting)) == true && settings.getBoolean(
                 context.getString(R.string.customApiSupportsV2Setting)
             ) == true
         ) {
+            usesCustomApi = true
             settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v2/playlists"
         } else {
             context.getString(R.string.playlistsUrl)
@@ -472,7 +493,7 @@ fun newLoadPlaylistsRequest(
         Request.Method.GET, playlistUrl,
         {
             try {
-                callback(JSONObject(it))
+                callback(JSONObject(getCharacterFromUnicode(it, usesCustomApi)))
             } catch (e: JSONException) {
                 errorCallback(null)
             }
@@ -546,11 +567,14 @@ fun newCheckLoginRequest(
 ): StringRequest {
     val settings = Settings.getSettings(context)
 
+    var usesCustomApi = false
+
     val sessionUrl =
         if (settings.getBoolean(context.getString(R.string.useCustomApiForEverythingSetting)) == true && settings.getBoolean(
                 context.getString(R.string.customApiSupportsV2Setting)
             ) == true
         ) {
+            usesCustomApi = true
             settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v2/session"
         } else {
             context.getString(R.string.sessionUrl)
@@ -560,7 +584,7 @@ fun newCheckLoginRequest(
         Request.Method.GET, sessionUrl,
         {
             try {
-                callback(JSONObject(it))
+                callback(JSONObject(getCharacterFromUnicode(it, usesCustomApi)))
             } catch (e: JSONException) {
                 errorCallback(null)
             }
@@ -580,7 +604,7 @@ fun newCustomApiFeatureRequest(
             .getString(context.getString(R.string.customApiBaseUrlSetting)) + "features",
         {
             try {
-                callback(JSONObject(it))
+                callback(JSONObject(getCharacterFromUnicode(it, true)))
             } catch (e: JSONException) {
                 errorCallback(null)
             }
@@ -600,7 +624,7 @@ fun newLoadMoodsRequest(
         Request.Method.GET, requestUrl,
         {
             try {
-                callback(JSONObject(it))
+                callback(JSONObject(getCharacterFromUnicode(it, false)))
             } catch (e: JSONException) {
                 errorCallback(null)
             }
@@ -624,7 +648,7 @@ fun newLoadMoodRequest(
         Request.Method.GET, requestUrl,
         {
             try {
-                callback(JSONObject(it))
+                callback(JSONObject(getCharacterFromUnicode(it, false)))
             } catch (e: JSONException) {
                 errorCallback(null)
             }
@@ -644,7 +668,7 @@ fun newLoadFiltersRequest(
         Request.Method.GET, requestUrl,
         {
             try {
-                callback(JSONObject(it))
+                callback(JSONObject(getCharacterFromUnicode(it, false)))
             } catch (e: JSONException) {
                 errorCallback(null)
             }
@@ -673,7 +697,7 @@ fun newLoadGenreRequest(
         Request.Method.GET, requestUrl,
         {
             try {
-                callback(JSONObject(it))
+                callback(JSONObject(getCharacterFromUnicode(it, false)))
             } catch (e: JSONException) {
                 errorCallback(null)
             }
@@ -696,11 +720,21 @@ fun newLoadGreatestHitsRequest(
         Request.Method.GET, requestUrl,
         {
             try {
-                callback(JSONObject(it))
+                callback(JSONObject(getCharacterFromUnicode(it, false)))
             } catch (e: JSONException) {
                 errorCallback(null)
             }
 
         }, Response.ErrorListener(errorCallback)
     )
+}
+
+//custom api doesnt have this problem, umlauts are shown wrong
+fun getCharacterFromUnicode(unicodeChar:String, customApi:Boolean):String{
+    return if(!customApi){
+        val utf8 = unicodeChar.toByteArray(charset("ISO-8859-1"))
+        String(utf8, charset("UTF-8"))
+    }else{
+        unicodeChar
+    }
 }
