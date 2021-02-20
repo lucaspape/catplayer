@@ -1,7 +1,6 @@
 package de.lucaspape.monstercat.core.music.util
 
 import android.content.Context
-import android.media.AudioManager
 import android.os.Handler
 import android.os.Looper
 import com.google.android.exoplayer2.SimpleExoPlayer
@@ -9,6 +8,7 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.core.music.*
 import de.lucaspape.monstercat.core.music.notification.updateNotification
+import de.lucaspape.monstercat.core.util.Settings
 import java.util.*
 import kotlin.math.log
 
@@ -68,96 +68,93 @@ fun playSong(
     context: Context,
     songId: String,
     showNotification: Boolean,
-    requestAudioFocus: Boolean,
     playWhenReady: Boolean,
     progress: Long?
 ) {
-    //request audio focus if enabled
-    val audioFocus = if (requestAudioFocus) {
-        requestAudioFocus(context)
-    } else {
-        AudioManager.AUDIOFOCUS_REQUEST_GRANTED
-    }
+    //preparingDone callback, see below
+    val preparingDone = {
+        if (exoPlayerSongId != songId || (exoPlayerSongId == songId && preparedExoPlayer?.isPlaying == true)) {
+            //prepared player to main player handover
+            exoPlayer =
+                preparedExoPlayer
 
-    if (audioFocus == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-        //preparingDone callback, see below
-        val preparingDone = {
-            if (exoPlayerSongId != songId || (exoPlayerSongId == songId && preparedExoPlayer?.isPlaying == true)) {
-                //prepared player to main player handover
-                exoPlayer =
-                    preparedExoPlayer
+            exoPlayerSongId = songId
+        }
 
-                exoPlayerSongId = songId
-            }
+        val settings = Settings.getSettings(context)
 
-            //set volume
-            exoPlayer?.audioComponent?.volume = volume
+        val disableAudioFocus = settings.getBoolean(context.getString(R.string.disableAudioFocusSetting))
+        val audioFocus = disableAudioFocus == false || disableAudioFocus == null
 
-            //set progress if not null (for session recovering)
-            if (progress != null) {
-                exoPlayer?.seekTo(progress)
-            } else if (exoPlayer?.isPlaying == false) {
-                exoPlayer?.seekTo(0)
-            }
+        exoPlayer?.setAudioAttributes(getAudioAttributes(), audioFocus)
 
-            //reset prepared
-            preparedExoPlayer = SimpleExoPlayer.Builder(context).build()
-            preparedExoPlayerSongId = ""
+        //set volume
+        exoPlayer?.audioComponent?.volume = volume
 
-            //enable playback
-            exoPlayer?.playWhenReady = playWhenReady
+        //set progress if not null (for session recovering)
+        if (progress != null) {
+            exoPlayer?.seekTo(progress)
+        } else if (exoPlayer?.isPlaying == false) {
+            exoPlayer?.seekTo(0)
+        }
 
-            //for play/pause button change and if song ended
-            exoPlayer?.addListener(
-                getPlayerListener(
-                    context,
-                    songId
-                )
+        //reset prepared
+        preparedExoPlayer = SimpleExoPlayer.Builder(context).build()
+        preparedExoPlayerSongId = ""
+
+        //enable playback
+        exoPlayer?.playWhenReady = playWhenReady
+
+        //for play/pause button change and if song ended
+        exoPlayer?.addListener(
+            getPlayerListener(
+                context,
+                songId
             )
+        )
 
-            //show title, artist, cover
-            SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
-                //set title/artist
-                title = "${song.title} ${song.version}"
-                artist = song.artist
+        //show title, artist, cover
+        SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
+            //set title/artist
+            title = "${song.title} ${song.version}"
+            artist = song.artist
 
-                //start seekbar updater
-                runSeekBarUpdate(context, prepareNext = true, crossFade = true)
+            //start seekbar updater
+            runSeekBarUpdate(context, prepareNext = true, crossFade = true)
 
-                //set cover
-                setCover(
-                    context,
-                    song.albumId,
-                    song.artistId
-                ) {
-                    //show notification
-                    if (showNotification) {
-                        updateNotification(
-                            context,
-                            song.title,
-                            song.version,
-                            song.artist,
-                            it
-                        )
-                    }
+            //set cover
+            setCover(
+                context,
+                song.albumId,
+                song.artistId
+            ) {
+                //show notification
+                if (showNotification) {
+                    updateNotification(
+                        context,
+                        song.title,
+                        song.version,
+                        song.artist,
+                        it
+                    )
                 }
             }
         }
+    }
 
-        if (exoPlayerSongId != songId) {
-            //check if player needs to be prepared
-            if (preparedExoPlayerSongId != songId) {
-                prepareSong(context, songId, {
-                    preparingDone()
-                }, {
-                    displayInfo(context, context.getString(R.string.errorPlaybackNotAllowed))
-                })
-            } else {
+    if (exoPlayerSongId != songId) {
+        //check if player needs to be prepared
+        if (preparedExoPlayerSongId != songId) {
+            prepareSong(context, songId, {
                 preparingDone()
-            }
+            }, {
+                displayInfo(context, context.getString(R.string.errorPlaybackNotAllowed))
+            })
         } else {
             preparingDone()
         }
+    } else {
+        preparingDone()
     }
 }
 

@@ -58,7 +58,6 @@ data class PlayerSaveState(
                                     playSong(
                                         context, currentSongId,
                                         showNotification = false,
-                                        requestAudioFocus = false,
                                         playWhenReady = false,
                                         progress = progress
                                     )

@@ -190,7 +190,6 @@ fun next(context: Context) {
     playSong(
         context, nextSong(context),
         showNotification = true,
-        requestAudioFocus = true,
         playWhenReady = true,
         progress = null
     )
@@ -205,7 +204,6 @@ fun previous(context: Context) {
     playSong(
         context, previousSong(),
         showNotification = true,
-        requestAudioFocus = true,
         playWhenReady = true,
         progress = null
     )
@@ -218,8 +216,6 @@ fun previous(context: Context) {
  */
 fun pause(context: Context) {
     exoPlayer?.playWhenReady = false
-
-    abandonAudioFocus(context)
 
     PlayerSaveState.saveMusicPlayerState(context)
 }
@@ -240,7 +236,6 @@ fun resume(context: Context) {
     playSong(
         context, currentSongId,
         showNotification = true,
-        requestAudioFocus = true,
         playWhenReady = true,
         progress = currentPosition.toLong()
     )
@@ -270,7 +265,6 @@ fun stop(context: Context) {
 
         exoPlayer?.stop()
 
-        abandonAudioFocus(context)
         PlayerSaveState.saveMusicPlayerState(context)
 
     }
