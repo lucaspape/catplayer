@@ -222,8 +222,4 @@ class ItemDatabaseHelper(context: Context, var databaseId: String) :
 
         return items
     }
-
-    fun getIndexFromSongId(songId: String): Long? {
-        return getItemFromSongId(songId)?.id
-    }
 }

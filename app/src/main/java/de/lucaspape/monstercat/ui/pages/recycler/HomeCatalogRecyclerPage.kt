@@ -11,7 +11,6 @@ import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.core.download.addDownloadSong
 import de.lucaspape.monstercat.core.util.Settings
 import de.lucaspape.monstercat.request.async.loadSongList
-import de.lucaspape.monstercat.ui.pages.util.playSongsFromCatalogDbAsync
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
 import de.lucaspape.monstercat.ui.pages.util.playSongsFromViewDataAsync
 import kotlinx.coroutines.Dispatchers
@@ -36,13 +35,7 @@ open class HomeCatalogRecyclerPage : RecyclerViewPage() {
                 Settings(context).getBoolean(context.getString(R.string.skipMonstercatSongsSetting)) == true
 
             withContext(Dispatchers.Main) {
-                if(id == "catalog"){
-                    playSongsFromCatalogDbAsync(
-                        context,
-                        skipMonstercatSongs,
-                        fistItem.songId
-                    )
-                }else if (!id.contains("explore")){
+                if (!id.contains("explore")){
                     val catalogViewData = ArrayList<CatalogItem>()
 
                     for (item in viewData) {

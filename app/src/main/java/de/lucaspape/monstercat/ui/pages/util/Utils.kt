@@ -713,62 +713,6 @@ fun openPlaylist(context: Context, playlistId: String, share: Boolean) {
     }
 }
 
-fun playSongsFromCatalogDbAsync(
-    context: Context,
-    skipMonstercatSongs: Boolean,
-    firstSongId: String
-) {
-    addSongsTaskId = ""
-
-    clearPlaylist()
-    clearQueue()
-
-    songQueue.add(firstSongId)
-    skipPreviousInPlaylist()
-    next(context)
-
-    //add next songs from database
-    val songDatabaseHelper = SongDatabaseHelper(context)
-    val catalogSongDatabaseHelper = ItemDatabaseHelper(context, "catalog")
-
-    BackgroundAsync({
-        val id = UUID.randomUUID().toString()
-        addSongsTaskId = id
-
-        catalogSongDatabaseHelper.getIndexFromSongId(firstSongId)
-            ?.let { skip ->
-                val nextSongs = catalogSongDatabaseHelper.getItems(skip)
-
-                nextSongs.reverse()
-
-                for (catalogSong in nextSongs) {
-
-                    if (skipMonstercatSongs) {
-                        val song =
-                            songDatabaseHelper.getSong(
-                                context,
-                                catalogSong.songId
-                            )
-                        if (!song?.artist.equals("monstercat", true)) {
-                            if (id == addSongsTaskId) {
-                                songQueue.add(catalogSong.songId)
-                            } else {
-                                break
-                            }
-                        }
-                    } else {
-                        if (id == addSongsTaskId) {
-                            songQueue.add(catalogSong.songId)
-                        } else {
-                            break
-                        }
-                    }
-
-                }
-            }
-    }, {}).execute()
-}
-
 fun playSongsFromViewDataAsync(
     context: Context,
     skipMonstercatSongs: Boolean,
