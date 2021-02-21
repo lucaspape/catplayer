@@ -25,7 +25,7 @@ class GenreContentsRecyclerPage(private val genreId: String) :
             loadGenre(
                 context,
                 forceReload,
-                it, skip, 100, displayLoading, finishedCallback = {
+                it, id, skip, 100, displayLoading, finishedCallback = {
                     val playlistItemDatabaseHelper =
                         ItemDatabaseHelper(
                             context,

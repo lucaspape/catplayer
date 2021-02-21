@@ -352,7 +352,7 @@ class MainActivity : AppCompatActivity() {
         if(value == null){
             value = true
         }
-        
+
         if(value){
             finish()
         }

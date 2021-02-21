@@ -834,6 +834,7 @@ suspend fun loadGenre(
     context: Context,
     forceReload: Boolean,
     genreName: String,
+    genreId: String,
     skip: Int,
     limit: Int,
     displayLoading: () -> Unit,
@@ -881,7 +882,7 @@ suspend fun loadGenre(
                         for (playlistObject in jsonObjectList) {
                             if (playlistObject != null) {
                                 parsePlaylistTrackToDB(
-                                    genreName,
+                                    genreId,
                                     playlistObject,
                                     context
                                 )
