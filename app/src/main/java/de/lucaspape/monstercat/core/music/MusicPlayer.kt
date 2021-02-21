@@ -27,6 +27,8 @@ var exoPlayer: SimpleExoPlayer? = null
         field?.release()
         field?.stop()
 
+        currentSeekBarUpdateHandlerId = ""
+
         field = value
     }
 

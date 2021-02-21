@@ -195,7 +195,7 @@ fun playStream(
 }
 
 private var seekBarUpdateHandler = Handler(Looper.getMainLooper())
-private var currentSeekBarUpdateHandlerId = ""
+var currentSeekBarUpdateHandlerId = ""
 
 fun runSeekBarUpdate(context: Context, prepareNext: Boolean, crossFade: Boolean) {
     val id = UUID.randomUUID().toString()
