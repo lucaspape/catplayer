@@ -24,7 +24,7 @@ android {
         }
     }
 
-    flavorDimensions "dimemsion"
+    flavorDimensions "dimension"
 
     sourceSets {
         playstore {
@@ -38,11 +38,11 @@ android {
 
     productFlavors{
         playstore {
-            dimension "dimemsion"
+            dimension "dimension"
         }
 
         github {
-            dimension "dimemsion"
+            dimension "dimension"
         }
     }
     

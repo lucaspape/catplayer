@@ -10,6 +10,10 @@ import de.lucaspape.monstercat.core.database.helper.StreamDatabaseHelper
 import de.lucaspape.monstercat.core.music.*
 import de.lucaspape.monstercat.core.music.notification.updateNotification
 import de.lucaspape.monstercat.core.util.Settings
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 import kotlin.math.log
 
@@ -18,6 +22,8 @@ var exoPlayerSongId = ""
 
 //songId of song which is prepared in nextExoPlayer
 var preparedExoPlayerSongId = ""
+
+private val scope = CoroutineScope(Dispatchers.Default)
 
 fun prepareSong(
     context: Context,
@@ -54,15 +60,20 @@ fun prepareSong(
         }else if(song != null && stream != null){
             if (song.playbackAllowed(context)
             ) {
-                stream.getMediaSource(context) { mediaSource ->
+                scope.launch {
+                    stream.getMediaSource(context) { mediaSource ->
 
-                    preparedExoPlayer?.setMediaSource(mediaSource)
-                    preparedExoPlayer?.prepare()
-                    preparedExoPlayerSongId = stream.name
+                        scope.launch {
+                            withContext(Dispatchers.Main){
+                                preparedExoPlayer?.setMediaSource(mediaSource)
+                                preparedExoPlayer?.prepare()
+                                preparedExoPlayerSongId = stream.name
 
-                    callback()
+                                callback()
+                            }
+                        }
+                    }
                 }
-
             } else {
                 notAllowedCallback()
             }

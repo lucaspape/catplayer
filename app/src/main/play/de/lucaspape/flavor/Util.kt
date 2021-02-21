@@ -1,5 +1,6 @@
 package de.lucaspape.flavor
 
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
@@ -38,4 +39,9 @@ fun playYoutubeLivestream(view: View, streamName: String) {
         val negativeButton = dialog.getButton(DialogInterface.BUTTON_NEGATIVE)
         negativeButton.setTextColor(typedValue.data)
     }
+}
+
+//fake function
+fun getYoutubeLivestreamUrl(context: Context, name:String, callback:(streamUrl:String)->Unit){
+    
 }

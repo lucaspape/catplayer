@@ -1,5 +1,6 @@
 package de.lucaspape.flavor
 
+import android.content.Context
 import android.view.View
 import com.github.kiulian.downloader.YoutubeDownloader
 import de.lucaspape.monstercat.core.database.helper.StreamDatabaseHelper
@@ -8,8 +9,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 suspend fun playYoutubeLivestream(view: View, streamName: String){
+    withContext(Dispatchers.Main){
+        playStream(view.context, streamName)
+    }
+}
+
+suspend fun getYoutubeLivestreamUrl(context: Context, streamName: String, callback:(streamUrl:String)->Unit){
     withContext(Dispatchers.Default){
-        val streamDatabaseHelper = StreamDatabaseHelper(view.context)
+        val streamDatabaseHelper = StreamDatabaseHelper(context)
         val stream = streamDatabaseHelper.getStream(streamName)
 
         stream?.let {
@@ -18,14 +25,7 @@ suspend fun playYoutubeLivestream(view: View, streamName: String){
             val youtubeDownloader = YoutubeDownloader()
             val video = youtubeDownloader.getVideo(videoId)
 
-            val url = video.details().liveUrl()
-
-            streamDatabaseHelper.deleteStream(streamName)
-            streamDatabaseHelper.insertStream(url, "", streamName)
-
-            withContext(Dispatchers.Main){
-                playStream(view.context, streamName)
-            }
+            callback(video.details().liveUrl())
         }
     }
 }
