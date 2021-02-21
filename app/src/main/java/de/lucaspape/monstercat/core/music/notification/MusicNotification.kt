@@ -124,7 +124,7 @@ fun createPlayerNotification(
         R.drawable.ic_close_black_24dp,
         CLOSE_ACTION, closePendingIntent
     ).build()
-    
+
     val openActivityPendingIntent = PendingIntent.getActivity(
         context,
         0,
@@ -205,12 +205,8 @@ fun stopPlayerService(context: Context) {
 }
 
 fun updateNotification(context: Context, songId: String, bitmap: Bitmap) {
-    if(songId != "stream"){
-        SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
-            updateNotification(context, song.title, song.version, song.artist, bitmap)
-        }
-    }else{
-        updateNotification(context, "Livestream", "", "Monstercat", bitmap)
+    SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
+        updateNotification(context, song.title, song.version, song.artist, bitmap)
     }
 }
 

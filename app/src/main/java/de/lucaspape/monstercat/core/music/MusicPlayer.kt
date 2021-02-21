@@ -99,38 +99,6 @@ fun setupMusicPlayer(
 }
 
 /**
- * Listener for audioFocusChange
- */
-class AudioFocusChangeListener {
-    companion object {
-        @JvmStatic
-        var audioFocusChangeListener: AudioManager.OnAudioFocusChangeListener? = null
-
-        @JvmStatic
-        fun getAudioFocusChangeListener(contextReference: WeakReference<Context>): AudioManager.OnAudioFocusChangeListener {
-            if (audioFocusChangeListener == null) {
-                audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener { focusChange ->
-                    contextReference.get()?.let { context ->
-                        when (focusChange) {
-                            AudioManager.AUDIOFOCUS_GAIN ->
-                                resume(context)
-
-                            AudioManager.AUDIOFOCUS_LOSS ->
-                                pause(context)
-
-                            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT ->
-                                pause(context)
-                        }
-                    }
-                }
-            }
-
-            return audioFocusChangeListener!!
-        }
-    }
-}
-
-/**
  * Listener for headphones disconnected
  */
 class NoisyReceiver : BroadcastReceiver() {
@@ -233,18 +201,14 @@ fun resume(context: Context) {
         intentFilter
     )
 
-    if(exoPlayerSongId != "stream"){
-        playSong(
-            context, currentSongId,
-            showNotification = true,
-            playWhenReady = true,
-            progress = currentPosition.toLong()
-        )
+    playSong(
+        context, currentSongId,
+        showNotification = true,
+        playWhenReady = true,
+        progress = currentPosition.toLong()
+    )
 
-        PlayerSaveState.saveMusicPlayerState(context)
-    }else{
-        playStream(context, showNotification = true, playWhenReady = true)
-    }
+    PlayerSaveState.saveMusicPlayerState(context)
 }
 
 /**

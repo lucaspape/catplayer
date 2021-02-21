@@ -232,7 +232,7 @@ class HomePage(
 
         view.findViewById<ImageButton>(R.id.liveButton).setOnClickListener {
             displaySnackBar(view, view.context.getString(R.string.livestreamWarning), null) {}
-            playStream(view.context, showNotification = true, playWhenReady = true)
+            playStream(view.context)
         }
 
         return albumViewSelected == true

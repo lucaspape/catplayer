@@ -43,7 +43,11 @@ fun getPlayerListener(context: Context, songId: String, crossFade:Boolean): Play
                         updateNotification(context, songId, it)
                     }
 
-                    runSeekBarUpdate(context, prepareNext = true, crossFade)
+                    if(songId != "stream"){
+                        runSeekBarUpdate(context, prepareNext = true, crossFade)
+                    }else{
+                        runSeekBarUpdate(context, prepareNext = true, false)
+                    }
                 }
             }
         }

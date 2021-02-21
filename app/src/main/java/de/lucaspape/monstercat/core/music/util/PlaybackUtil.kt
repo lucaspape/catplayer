@@ -28,37 +28,38 @@ fun prepareSong(
         //new exoplayer
         preparedExoPlayer = SimpleExoPlayer.Builder(context).build()
         preparedExoPlayer?.setAudioAttributes(getAudioAttributes(), false)
+        
+        val song = SongDatabaseHelper(context).getSong(context, songId)
 
-        SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
+        if(song != null){
             if (song.playbackAllowed(context)
             ) {
-                val mediaSource = song.getMediaSource(connectSid, cid)
+                song.getMediaSource(connectSid, cid) { mediaSource ->
+                    if (mediaSource != null) {
+                        preparedExoPlayer?.setMediaSource(mediaSource)
+                        preparedExoPlayer?.prepare()
+                        preparedExoPlayerSongId = song.songId
+                    } else {
+                        displayInfo(context, context.getString(R.string.songNotPlayableError))
+                    }
 
-                if (mediaSource != null) {
-                    preparedExoPlayer?.setMediaSource(mediaSource)
-                    preparedExoPlayer?.prepare()
-                    preparedExoPlayerSongId = song.songId
-                } else {
-                    displayInfo(context, context.getString(R.string.songNotPlayableError))
+                    callback()
                 }
 
-                callback()
-                return
             } else {
                 notAllowedCallback()
-                return
             }
-        }
-
-        loadSongIntoDB(context, songId) { song ->
-            val mediaSource = song.getMediaSource(connectSid, cid)
-
-            if (mediaSource != null) {
-                preparedExoPlayer?.setMediaSource(mediaSource)
-                preparedExoPlayer?.prepare()
-                preparedExoPlayerSongId = song.songId
-            } else {
-                displayInfo(context, context.getString(R.string.songNotPlayableError))
+        }else{
+            loadSongIntoDB(context, songId) { newSong ->
+                newSong.getMediaSource(connectSid, cid) { mediaSource ->
+                    if (mediaSource != null) {
+                        preparedExoPlayer?.setMediaSource(mediaSource)
+                        preparedExoPlayer?.prepare()
+                        preparedExoPlayerSongId = newSong.songId
+                    } else {
+                        displayInfo(context, context.getString(R.string.songNotPlayableError))
+                    }
+                }
             }
         }
     }
@@ -157,82 +158,23 @@ fun playSong(
     }
 }
 
-fun prepareStream(context: Context, callback: () -> Unit) {
-    preparedExoPlayerSongId = "stream"
-    preparedExoPlayer = SimpleExoPlayer.Builder(context).build()
-    preparedExoPlayer?.setAudioAttributes(getAudioAttributes(), false)
-
-    Stream().getMediaSource(context) {
-        preparedExoPlayer?.setMediaSource(it)
-        preparedExoPlayer?.prepare()
-
-        callback()
-    }
-}
-
 fun playStream(
-    context: Context,
-    showNotification: Boolean,
-    playWhenReady: Boolean
+    context: Context
 ) {
-    prepareStream(context) {
-        if (preparedExoPlayerSongId == "stream") {
-            exoPlayer =
-                preparedExoPlayer
+    val songDatabaseHelper = SongDatabaseHelper(context)
 
-            exoPlayerSongId = "stream"
-
-            //reset prepared
-            preparedExoPlayer = SimpleExoPlayer.Builder(context).build()
-            preparedExoPlayerSongId = ""
-
-            val settings = Settings.getSettings(context)
-
-            val disableAudioFocus =
-                settings.getBoolean(context.getString(R.string.disableAudioFocusSetting))
-            val audioFocus = disableAudioFocus == false || disableAudioFocus == null
-
-            exoPlayer?.setAudioAttributes(getAudioAttributes(), audioFocus)
-
-            //set volume
-            exoPlayer?.audioComponent?.volume = volume
-
-            //enable playback
-            exoPlayer?.playWhenReady = playWhenReady
-
-            //for play/pause button change and if song ended
-            exoPlayer?.addListener(
-                getPlayerListener(
-                    context,
-                    "stream", crossFade = false
-                )
-            )
-
-            //set title/artist
-            title = "Livestream"
-            artist = "Monstercat"
-
-            //set cover
-            setCover(
-                context,
-                "",
-                ""
-            ) {
-                //show notification
-                if (showNotification) {
-                    updateNotification(
-                        context,
-                        title,
-                        "",
-                        artist,
-                        it
-                    )
-                }
-            }
-
-            exoPlayer?.playWhenReady = playWhenReady
-        }
+    if(songDatabaseHelper.getSong(context, "stream") == null){
+        songDatabaseHelper.insertSong(context, "stream", "Livestream", "",
+            "stream", "stream", "Monstercat", "monstercat", "",
+            downloadable = false,
+            streamable = true,
+            inEarlyAccess = false,
+            creatorFriendly = false
+        )
     }
+    
+    prioritySongQueue.add("stream")
+    next(context)
 }
 
 private var seekBarUpdateHandler = Handler(Looper.getMainLooper())

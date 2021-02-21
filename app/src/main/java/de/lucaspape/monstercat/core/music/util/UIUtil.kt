@@ -93,12 +93,8 @@ var playing = false
     }
 
 fun setCover(context: Context, songId: String, callback: (bitmap: Bitmap) -> Unit) {
-    if(songId != "stream"){
-        SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
-            setCover(context, song.albumId, song.artistId, callback)
-        }
-    }else{
-        setCover(context, "", "", callback)
+    SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
+        setCover(context, song.albumId, song.artistId, callback)
     }
 }
 
