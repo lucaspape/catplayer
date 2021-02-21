@@ -49,7 +49,8 @@ fun getPlayerListener(context: Context, songId: String, crossFade:Boolean): Play
                     if(stream == null){
                         runSeekBarUpdate(context, prepareNext = true, crossFade)
                     }else{
-                        runSeekBarUpdate(context, prepareNext = true, false)
+                        duration = 0
+                        currentPosition = 0
                     }
                 }
             }
