@@ -8,10 +8,14 @@ import com.mikepenz.fastadapter.GenericItem
 import com.mikepenz.fastadapter.items.AbstractItem
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.ItemDatabaseHelper
+import de.lucaspape.monstercat.core.database.helper.StreamDatabaseHelper
+import de.lucaspape.monstercat.core.music.util.playStream
 import de.lucaspape.monstercat.core.util.Settings
 import de.lucaspape.monstercat.request.async.loadGenres
 import de.lucaspape.monstercat.request.async.loadGreatestHits
+import de.lucaspape.monstercat.request.async.loadLiveStreams
 import de.lucaspape.monstercat.request.async.loadMoods
+import de.lucaspape.monstercat.ui.displaySnackBar
 import de.lucaspape.monstercat.ui.pages.recycler.HomeCatalogRecyclerPage
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
 import de.lucaspape.monstercat.ui.pages.util.playSongsFromViewDataAsync
@@ -81,6 +85,11 @@ class ExploreItem(
                                 )
                             }
                         }
+                        is StreamItem -> {
+                            withContext(Dispatchers.Main) {
+                                playStream(context, clickedItem.streamName)
+                            }
+                        }
                     }
                 }
 
@@ -95,12 +104,15 @@ class ExploreItem(
                         "genre" -> {
                             GenreItem(id)
                         }
+                        "stream" -> {
+                            StreamItem(id)
+                        }
                         else -> {
                             CatalogItem(id)
                         }
                     }
                 }
-                
+
                 override fun getOrientation(view: View): Int {
                     return if (item.typeName == "greatest-hits") {
                         LinearLayout.VERTICAL
@@ -175,6 +187,32 @@ class ExploreItem(
                                         callback(idArray)
                                     },
                                     errorCallback = {})
+                            }
+                            "stream" -> {
+                                loadLiveStreams(
+                                    context,
+                                    forceReload,
+                                    displayLoading = {
+                                        displaySnackBar(
+                                            view,
+                                            view.context.getString(R.string.livestreamWarning),
+                                            null
+                                        ) {}
+                                    },
+                                    finishedCallback = {
+                                        val idArray = ArrayList<String>()
+
+                                        val streamDatabaseHelper = StreamDatabaseHelper(context)
+                                        val streams = streamDatabaseHelper.getAllStreams()
+
+                                        for (stream in streams) {
+                                            idArray.add(stream.name)
+                                        }
+
+                                        callback(idArray)
+                                    },
+                                    errorCallback = {
+                                    })
                             }
                         }
                     } else {

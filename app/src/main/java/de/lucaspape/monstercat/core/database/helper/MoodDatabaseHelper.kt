@@ -17,7 +17,7 @@ class MoodDatabaseHelper(context: Context) :
     ) {
     companion object {
         @JvmStatic
-        val DATABASE_VERSION = 10
+        val DATABASE_VERSION = 1000
 
         @JvmStatic
         private val DATABASE_NAME = "moods_db"

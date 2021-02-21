@@ -4,6 +4,7 @@ import android.content.Context
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.audio.AudioAttributes
+import de.lucaspape.monstercat.core.database.helper.StreamDatabaseHelper
 import de.lucaspape.monstercat.core.music.*
 import de.lucaspape.monstercat.core.music.notification.startPlayerService
 import de.lucaspape.monstercat.core.music.notification.updateNotification
@@ -42,8 +43,10 @@ fun getPlayerListener(context: Context, songId: String, crossFade:Boolean): Play
                     ) {
                         updateNotification(context, songId, it)
                     }
+                    
+                    val stream = StreamDatabaseHelper(context).getStream(songId)
 
-                    if(songId != "stream"){
+                    if(stream == null){
                         runSeekBarUpdate(context, prepareNext = true, crossFade)
                     }else{
                         runSeekBarUpdate(context, prepareNext = true, false)

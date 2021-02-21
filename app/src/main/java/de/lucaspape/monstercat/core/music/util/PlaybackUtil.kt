@@ -6,6 +6,7 @@ import android.os.Looper
 import com.google.android.exoplayer2.SimpleExoPlayer
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
+import de.lucaspape.monstercat.core.database.helper.StreamDatabaseHelper
 import de.lucaspape.monstercat.core.music.*
 import de.lucaspape.monstercat.core.music.notification.updateNotification
 import de.lucaspape.monstercat.core.util.Settings
@@ -30,8 +31,9 @@ fun prepareSong(
         preparedExoPlayer?.setAudioAttributes(getAudioAttributes(), false)
         
         val song = SongDatabaseHelper(context).getSong(context, songId)
+        val stream = StreamDatabaseHelper(context).getStream(songId)
 
-        if(song != null){
+        if(song != null && stream == null){
             if (song.playbackAllowed(context)
             ) {
                 song.getMediaSource(connectSid, cid) { mediaSource ->
@@ -42,6 +44,21 @@ fun prepareSong(
                     } else {
                         displayInfo(context, context.getString(R.string.songNotPlayableError))
                     }
+
+                    callback()
+                }
+
+            } else {
+                notAllowedCallback()
+            }
+        }else if(song != null && stream != null){
+            if (song.playbackAllowed(context)
+            ) {
+                stream.getMediaSource(context) { mediaSource ->
+
+                    preparedExoPlayer?.setMediaSource(mediaSource)
+                    preparedExoPlayer?.prepare()
+                    preparedExoPlayerSongId = stream.name
 
                     callback()
                 }
@@ -159,21 +176,10 @@ fun playSong(
 }
 
 fun playStream(
-    context: Context
+    context: Context,
+    streamName: String
 ) {
-    val songDatabaseHelper = SongDatabaseHelper(context)
-
-    if(songDatabaseHelper.getSong(context, "stream") == null){
-        songDatabaseHelper.insertSong(context, "stream", "Livestream", "",
-            "stream", "stream", "Monstercat", "monstercat",
-            downloadable = false,
-            streamable = true,
-            inEarlyAccess = false,
-            creatorFriendly = false
-        )
-    }
-    
-    prioritySongQueue.add("stream")
+    prioritySongQueue.add(streamName)
     next(context)
 }
 

@@ -230,11 +230,6 @@ class HomePage(
             onSearch(null)
         }
 
-        view.findViewById<ImageButton>(R.id.liveButton).setOnClickListener {
-            displaySnackBar(view, view.context.getString(R.string.livestreamWarning), null) {}
-            playStream(view.context)
-        }
-
         return albumViewSelected == true
     }
 }

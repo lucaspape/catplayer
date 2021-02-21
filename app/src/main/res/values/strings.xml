@@ -128,5 +128,5 @@
     <string name="useCustomApiForEverything">Replace everything with custom API</string>
     <string name="useCustomApiForCoverImages">Faster cover images download (uses custom API)</string>
     <string name="useCustomApiForSearch">Advanced search (uses custom API)</string>
-    <string name="livestreamWarning">Warning: Livestream takes a few seconds to start!</string>
+    <string name="livestreamWarning">Warning: Livestream takes a few seconds to load/start!</string>
 </resources>

@@ -737,7 +737,7 @@ fun newLoadGreatestHitsRequest(
     )
 }
 
-fun newLoadLivestreamUrlRequest(
+fun newLoadLivestreamsRequest(
     context: Context,
     callback: (response: JSONObject) -> Unit,
     errorCallback: (error: VolleyError?) -> Unit
@@ -753,7 +753,7 @@ fun newLoadLivestreamUrlRequest(
         return null
     }
 
-    return StringRequest(
+    val request =  StringRequest(
         Request.Method.GET, requestUrl,
         {
             try {
@@ -764,6 +764,11 @@ fun newLoadLivestreamUrlRequest(
 
         }, Response.ErrorListener(errorCallback)
     )
+    
+    request.retryPolicy = DefaultRetryPolicy(10000,DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+    
+    return request
 }
 
 //custom api doesnt have this problem, umlauts are shown wrong

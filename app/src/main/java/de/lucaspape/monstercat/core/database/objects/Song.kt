@@ -11,10 +11,9 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.android.exoplayer2.util.Util
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.core.database.helper.StreamDatabaseHelper
 import de.lucaspape.monstercat.core.util.wifiConnected
 import de.lucaspape.monstercat.core.util.Settings
-import de.lucaspape.monstercat.request.getAuthorizedRequestQueue
-import de.lucaspape.monstercat.request.newLoadLivestreamUrlRequest
 import java.io.File
 
 data class Song(
@@ -163,64 +162,39 @@ data class Song(
         ).createMediaSource(MediaItem.fromUri(Uri.parse("file://$fileLocation")))
     }
 
-    private fun urlToMediaSource(url: String, sid: String, cid: String, callback:(mediaSource:MediaSource)->Unit) {
-        if(songId != "stream"){
-            val httpSourceFactory =
-                DefaultHttpDataSource.Factory()
-
-            httpSourceFactory.setUserAgent(
-                Util.getUserAgent(
-                    context,
-                    context.getString(R.string.applicationName)
-                )
-            )
-
-            var cookie = ""
-
-            if (cid != "") {
-                cookie += "cid=$cid"
-            }
-
-            if (sid != "") {
-                cookie += ";connect.sid=$sid"
-            }
-
-            if(cookie.isNotEmpty()){
-                httpSourceFactory.setDefaultRequestProperties(mapOf("Cookie" to cookie))
-            }
-
-            callback(ProgressiveMediaSource.Factory(httpSourceFactory)
-                .createMediaSource(MediaItem.fromUri(url.toUri())))
-
-        }else{
-            getStreamUrl(context, {
-                callback(
-                    HlsMediaSource.Factory(
-                    DefaultDataSourceFactory(
-                        context, context.getString(R.string.livestreamUserAgent)
-                    )
-                ).createMediaSource(MediaItem.fromUri(it.toUri())))
-            }, {})
-        }
-    }
-
-    private fun getStreamUrl(
-        context: Context,
-        callback: (liveStreamUrl: String) -> Unit,
-        errorCallback: () -> Unit
+    private fun urlToMediaSource(
+        url: String,
+        sid: String,
+        cid: String,
+        callback: (mediaSource: MediaSource) -> Unit
     ) {
-        val requestQueue = getAuthorizedRequestQueue(context, context.getString(R.string.customApiBaseUrlSetting))
+        val httpSourceFactory =
+            DefaultHttpDataSource.Factory()
 
-        val loadLiveStreamRequest = newLoadLivestreamUrlRequest(context, {
-            callback(it.getString("monstercat"))
-        }, {
-            errorCallback()
-        })
+        httpSourceFactory.setUserAgent(
+            Util.getUserAgent(
+                context,
+                context.getString(R.string.applicationName)
+            )
+        )
 
-        if(loadLiveStreamRequest != null){
-            requestQueue.add(loadLiveStreamRequest)
-        }else{
-            errorCallback()
+        var cookie = ""
+
+        if (cid != "") {
+            cookie += "cid=$cid"
         }
+
+        if (sid != "") {
+            cookie += ";connect.sid=$sid"
+        }
+
+        if (cookie.isNotEmpty()) {
+            httpSourceFactory.setDefaultRequestProperties(mapOf("Cookie" to cookie))
+        }
+
+        callback(
+            ProgressiveMediaSource.Factory(httpSourceFactory)
+                .createMediaSource(MediaItem.fromUri(url.toUri()))
+        )
     }
 }

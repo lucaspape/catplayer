@@ -6,6 +6,7 @@ import com.mikepenz.fastadapter.GenericItem
 import de.lucaspape.monstercat.core.database.helper.GenreDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.ItemDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.MoodDatabaseHelper
+import de.lucaspape.monstercat.core.database.helper.StreamDatabaseHelper
 import de.lucaspape.monstercat.ui.abstract_items.content.ExploreItem
 import de.lucaspape.monstercat.ui.abstract_items.util.HeaderTextItem
 
@@ -52,6 +53,9 @@ open class ExploreRecyclerPage(
         if (skip == 0) {
             val idArray = ArrayList<String>()
 
+            idArray.add("separator-Streams")
+            idArray.add("item-stream")
+
             idArray.add("separator-Moods")
             idArray.add("item-mood")
 
@@ -71,6 +75,7 @@ open class ExploreRecyclerPage(
         MoodDatabaseHelper(context).reCreateTable()
         GenreDatabaseHelper(context).reCreateTable()
         ItemDatabaseHelper(context, "greatest-hits").reCreateTable()
+        StreamDatabaseHelper(context).reCreateTable()
     }
 
     override fun restore(data: HashMap<String, String>?): Boolean {

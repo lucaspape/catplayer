@@ -687,7 +687,7 @@ suspend fun loadMoods(
             newLoadMoodsRequest(context, { jsonObject ->
                 val moodsArray = jsonObject.getJSONObject("Moods").getJSONArray("results")
 
-                for (i in (0 until moodsArray.length())){
+                for (i in (0 until moodsArray.length())) {
                     parseMoodIntoDB(
                         context,
                         moodsArray.getJSONObject(i)
@@ -957,6 +957,71 @@ suspend fun loadGreatestHits(
                         finishedCallback()
                     },
                     { errorCallback() })
+            )
+        }
+    }
+}
+
+suspend fun loadLiveStreams(
+    context: Context,
+    forceReload: Boolean, displayLoading: () -> Unit,
+    finishedCallback: () -> Unit,
+    errorCallback: () -> Unit
+) {
+    withContext(Dispatchers.Default) {
+        val streamDatabaseHelper = StreamDatabaseHelper(context)
+
+        val streams = streamDatabaseHelper.getAllStreams()
+
+        if (!forceReload && streams.isNotEmpty()) {
+            finishedCallback()
+        } else {
+            withContext(Dispatchers.Main) {
+                displayLoading()
+            }
+
+            val queue =
+                getAuthorizedRequestQueue(
+                    context,
+                    context.getString(R.string.connectApiHost)
+                )
+
+            queue.add(
+                newLoadLivestreamsRequest(context,
+                    {
+                        val songDatabaseHelper = SongDatabaseHelper(context)
+                        val results = it.getJSONObject("results")
+                        
+                        val streamIds = results.keys()
+
+                        for (id in streamIds) {
+                            val streamObject = results.getJSONObject(id)
+
+                            val name = streamObject.getString("name")
+                            val streamUrl = streamObject.getString("url")
+
+                            streamDatabaseHelper.insertStream(streamUrl, "", name)
+                            songDatabaseHelper.insertSong(
+                                context,
+                                name,
+                                "Livestream - $name",
+                                "",
+                                "live",
+                                "live",
+                                "Monstercat",
+                                "",
+                                downloadable = false,
+                                streamable = true,
+                                inEarlyAccess = false,
+                                creatorFriendly = false
+                            )
+                        }
+
+                        finishedCallback()
+                    },
+                    {
+                        errorCallback()
+                    })
             )
         }
     }
