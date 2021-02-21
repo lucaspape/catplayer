@@ -37,7 +37,6 @@ fun parseSongToDB(jsonObject: JSONObject, context: Context): String {
     var title = ""
     var artist = ""
     var artistId = ""
-    var coverUrl = ""
     var version = ""
     var downloadable = false
     var streamable = false
@@ -60,7 +59,6 @@ fun parseSongToDB(jsonObject: JSONObject, context: Context): String {
 
         }
 
-        coverUrl = context.getString(R.string.trackContentUrl) + "$albumId/cover"
         version = jsonObject.getString("version")
         id = jsonObject.getString("id")
 
@@ -89,7 +87,6 @@ fun parseSongToDB(jsonObject: JSONObject, context: Context): String {
         albumMcId,
         artist,
         artistId,
-        coverUrl,
         downloadable,
         streamable,
         inEarlyAccess,

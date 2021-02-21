@@ -165,7 +165,7 @@ fun playStream(
 
     if(songDatabaseHelper.getSong(context, "stream") == null){
         songDatabaseHelper.insertSong(context, "stream", "Livestream", "",
-            "stream", "stream", "Monstercat", "monstercat", "",
+            "stream", "stream", "Monstercat", "monstercat",
             downloadable = false,
             streamable = true,
             inEarlyAccess = false,

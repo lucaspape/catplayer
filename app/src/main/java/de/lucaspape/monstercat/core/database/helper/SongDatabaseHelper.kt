@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
 import de.lucaspape.monstercat.core.database.objects.Song
 import java.lang.IndexOutOfBoundsException
-import java.lang.ref.WeakReference
 
 class SongDatabaseHelper(context: Context) :
     SQLiteOpenHelper(
@@ -19,7 +18,7 @@ class SongDatabaseHelper(context: Context) :
 
     companion object {
         @JvmStatic
-        val DATABASE_VERSION = 7
+        val DATABASE_VERSION = 8
 
         @JvmStatic
         private val DATABASE_NAME = "songs_db"
@@ -43,7 +42,6 @@ class SongDatabaseHelper(context: Context) :
         mcAlbumId: String,
         artist: String,
         artistId: String,
-        coverUrl: String,
         downloadable: Boolean,
         streamable: Boolean,
         inEarlyAccess: Boolean,
@@ -58,7 +56,6 @@ class SongDatabaseHelper(context: Context) :
         values.put(Song.COLUMN_ALBUM_MC_ID, mcAlbumId)
         values.put(Song.COLUMN_ARTIST, artist)
         values.put(Song.COLUMN_ARTIST_ID, artistId)
-        values.put(Song.COLUMN_COVER_URL, coverUrl)
         values.put(Song.COLUMN_DOWNLOADABLE, downloadable.toString())
         values.put(Song.COLUMN_STREAMABLE, streamable.toString())
         values.put(Song.COLUMN_INEARLYACCESS, inEarlyAccess.toString())
@@ -98,7 +95,6 @@ class SongDatabaseHelper(context: Context) :
                     Song.COLUMN_ALBUM_MC_ID,
                     Song.COLUMN_ARTIST,
                     Song.COLUMN_ARTIST_ID,
-                    Song.COLUMN_COVER_URL,
                     Song.COLUMN_DOWNLOADABLE,
                     Song.COLUMN_STREAMABLE,
                     Song.COLUMN_INEARLYACCESS,
@@ -120,7 +116,6 @@ class SongDatabaseHelper(context: Context) :
                     cursor.getString(cursor.getColumnIndex(Song.COLUMN_ALBUM_MC_ID)),
                     cursor.getString(cursor.getColumnIndex(Song.COLUMN_ARTIST)),
                     cursor.getString(cursor.getColumnIndex(Song.COLUMN_ARTIST_ID)),
-                    cursor.getString(cursor.getColumnIndex(Song.COLUMN_COVER_URL)),
                     cursor.getString(cursor.getColumnIndex(Song.COLUMN_DOWNLOADABLE))!!
                         .toBoolean(),
                     cursor.getString(cursor.getColumnIndex(Song.COLUMN_STREAMABLE))!!
