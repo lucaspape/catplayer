@@ -18,8 +18,9 @@ class SearchPage(
 
     override val layout: Int = R.layout.fragment_search
 
-    override fun onBackPressed(view: View) {
+    override fun onBackPressed(view: View):Boolean {
         closeSearch()
+        return false
     }
 
     private var searchPageObject: RecyclerViewPage? = null

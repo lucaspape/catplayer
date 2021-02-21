@@ -206,8 +206,9 @@ class FullscreenPlayerPage(
         }
     }
 
-    override fun onBackPressed(view: View) {
+    override fun onBackPressed(view: View):Boolean {
         closeFullscreen()
+        return false
     }
 
     override fun onPause(view: View) {

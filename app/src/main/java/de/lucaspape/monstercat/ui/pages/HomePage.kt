@@ -23,7 +23,7 @@ class HomePage(
 ) :
     Page() {
 
-    constructor() : this({},{},null,false)
+    constructor() : this({}, {}, null, false)
 
     companion object {
         @JvmStatic
@@ -37,15 +37,25 @@ class HomePage(
     override val layout: Int = R.layout.fragment_home
 
     private var resetData = false
+    
+    private var exitOnAppButton = true
 
-    override fun onBackPressed(view: View) {
-        resetData = true
-        setupSpinner(view)
+    override fun onBackPressed(view: View): Boolean {
+        return if(!exitOnAppButton){
+            resetData = true
+            setupSpinner(view)
 
-        if (!registerListeners(view)){
-            catalogView(view)
+            if (!registerListeners(view)) {
+                catalogView(view)
+            } else {
+                albumView(view)
+            }
+
+            exitOnAppButton = true
+            
+            false
         }else{
-            albumView(view)
+            true
         }
     }
 
@@ -75,7 +85,7 @@ class HomePage(
 
         homePageObject = HomeCatalogRecyclerPage()
 
-        if (resetPosition){
+        if (resetPosition) {
             homePageObject?.resetRecyclerViewSavedPosition(view.context)
             homePageObject?.resetSaveData()
         }
@@ -90,16 +100,18 @@ class HomePage(
                 albumId,
                 albumMcId
             )
-        if (resetPosition){
+        if (resetPosition) {
             homePageObject?.resetRecyclerViewSavedPosition(view.context)
             homePageObject?.resetSaveData()
         }
 
-        if(resetData){
+        if (resetData) {
             homePageObject?.resetSaveData()
         }
 
         homePageObject?.onCreate(view)
+
+        exitOnAppButton = false
     }
 
     private fun albumView(view: View) {
@@ -109,12 +121,12 @@ class HomePage(
                 openAlbum(view, albumId, albumMcId)
             }
 
-        if (resetPosition){
+        if (resetPosition) {
             homePageObject?.resetRecyclerViewSavedPosition(view.context)
             homePageObject?.resetSaveData()
         }
 
-        if(resetData){
+        if (resetData) {
             homePageObject?.resetSaveData()
         }
 

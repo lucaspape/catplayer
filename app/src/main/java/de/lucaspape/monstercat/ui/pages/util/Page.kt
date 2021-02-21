@@ -9,7 +9,10 @@ import androidx.fragment.app.Fragment
 abstract class Page : Fragment() {
     abstract val layout: Int
 
-    abstract fun onBackPressed(view: View)
+    open fun onBackPressed(view: View):Boolean{
+        return true
+    }
+    
     abstract fun onPause(view: View)
     abstract fun onCreate(view: View)
 
@@ -37,9 +40,11 @@ abstract class Page : Fragment() {
         }
     }
 
-    fun onBackPressed() {
+    fun onPageBackPressed():Boolean {
         view?.let {
-            onBackPressed(it)
+            return onBackPressed(it)
         }
+        
+        return true
     }
 }

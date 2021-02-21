@@ -55,11 +55,6 @@ class MainActivity : AppCompatActivity() {
             field = value
         }
 
-    //callback function for back pressed
-    var pageBackPressedCallback: () -> Unit = {
-        currentPage?.onBackPressed()
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -272,8 +267,6 @@ class MainActivity : AppCompatActivity() {
         //if app closed
         hideDownloadNotification(this)
 
-        pageBackPressedCallback = {}
-
         PlayerSaveState.saveMusicPlayerState(this)
 
         exoPlayerSongId = ""
@@ -355,7 +348,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        pageBackPressedCallback()
+        var value = currentPage?.onPageBackPressed()
+        if(value == null){
+            value = true
+        }
+        
+        if(value){
+            finish()
+        }
     }
 
     private fun registerListeners() {

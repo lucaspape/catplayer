@@ -27,13 +27,15 @@ class PlaylistPage(
 
     private var resetData = false
 
-    override fun onBackPressed(view: View) {
+    override fun onBackPressed(view: View):Boolean {
         if(currentView == "list"){
             returnToHome()
         }else{
             resetData = true
             playlistListView(view)
         }
+        
+        return false
     }
 
     override fun onPause(view: View) {

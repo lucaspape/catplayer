@@ -27,13 +27,15 @@ class ExplorePage(
 
     private var resetData = false
 
-    override fun onBackPressed(view: View) {
-        if(currentView == "explore"){
+    override fun onBackPressed(view: View):Boolean {
+         if(currentView == "explore"){
             returnToHome()
         }else{
             resetData = true
             exploreView(view)
         }
+        
+        return false
     }
 
     override fun onPause(view: View) {

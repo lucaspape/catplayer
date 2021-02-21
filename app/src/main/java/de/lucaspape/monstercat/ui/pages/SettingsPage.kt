@@ -78,8 +78,9 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page() {
 
     override val layout: Int = R.layout.fragment_settings
 
-    override fun onBackPressed(view: View) {
+    override fun onBackPressed(view: View):Boolean {
         closeSettings()
+        return false
     }
 
     override fun onPause(view: View) {
