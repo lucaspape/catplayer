@@ -95,19 +95,6 @@ class StreamDatabaseHelper(context: Context) :
         }
     }
 
-    fun deleteStream(name: String) {
-        val db = readableDatabase
-
-        try {
-            db.delete(Stream.TABLE_NAME, Stream.COLUMN_NAME + "=?",
-                arrayOf(name))
-
-            db.close()
-        } catch (e: SQLiteException) {
-
-        }
-    }
-
     fun getAllStreams(): ArrayList<Stream> {
         val streams: ArrayList<Stream> = ArrayList()
 

@@ -62,42 +62,6 @@ class ManualPlaylistDatabaseHelper(context: Context) :
         return id
     }
 
-    fun getPlaylist(playlistId: String): ManualPlaylist? {
-        val db = readableDatabase
-        val cursor: Cursor
-
-        try {
-            cursor = db.query(
-                ManualPlaylist.TABLE_NAME, arrayOf(
-                    ManualPlaylist.COLUMN_ID,
-                    ManualPlaylist.COLUMN_PLAYLIST_ID
-                ),
-                ManualPlaylist.COLUMN_PLAYLIST_ID + "=?",
-                arrayOf(playlistId), null, null, null, null
-            )
-
-            cursor?.moveToFirst()
-
-            return try {
-                val playlist = ManualPlaylist(
-                    cursor.getInt(cursor.getColumnIndex(ManualPlaylist.COLUMN_ID)),
-                    cursor.getString(cursor.getColumnIndex(ManualPlaylist.COLUMN_PLAYLIST_ID))
-                )
-
-                cursor.close()
-
-                playlist
-            } catch (e: IndexOutOfBoundsException) {
-                cursor.close()
-                db.close()
-                null
-            }
-
-        } catch (e: SQLiteException) {
-            return null
-        }
-    }
-
     fun getAllPlaylists(): List<ManualPlaylist> {
         val playlists: ArrayList<ManualPlaylist> = ArrayList()
 

@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
 import de.lucaspape.monstercat.core.database.objects.Item
 
-class ItemDatabaseHelper(context: Context, var databaseId: String) :
+class ItemDatabaseHelper(context: Context, private var databaseId: String) :
     SQLiteOpenHelper(
         context,
         DATABASE_NAME, null,

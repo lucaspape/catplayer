@@ -15,9 +15,7 @@ import de.lucaspape.monstercat.core.music.notification.startPlayerService
 import de.lucaspape.monstercat.core.music.notification.stopPlayerService
 import de.lucaspape.monstercat.core.music.save.PlayerSaveState
 import de.lucaspape.monstercat.core.music.util.*
-import de.lucaspape.monstercat.core.music.util.playSong
 import de.lucaspape.monstercat.core.util.Settings
-import java.lang.ref.WeakReference
 import kotlin.random.Random
 
 //main exoPlayer

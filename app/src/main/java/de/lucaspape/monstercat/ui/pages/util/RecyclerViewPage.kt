@@ -172,11 +172,15 @@ abstract class RecyclerViewPage {
              */
             fastAdapter?.addEventHook(object : ClickEventHook<GenericItem>() {
                 override fun onBind(viewHolder: RecyclerView.ViewHolder): View? {
-                    return if (viewHolder is CatalogItem.ViewHolder) {
-                        viewHolder.titleMenuButton
-                    } else if (viewHolder is PlaylistItem.ViewHolder){
-                        viewHolder.titleMenuButton
-                    } else null
+                    return when (viewHolder) {
+                        is CatalogItem.ViewHolder -> {
+                            viewHolder.titleMenuButton
+                        }
+                        is PlaylistItem.ViewHolder -> {
+                            viewHolder.titleMenuButton
+                        }
+                        else -> null
+                    }
                 }
 
                 override fun onClick(
@@ -200,11 +204,15 @@ abstract class RecyclerViewPage {
              */
             fastAdapter?.addEventHook(object : ClickEventHook<GenericItem>() {
                 override fun onBind(viewHolder: RecyclerView.ViewHolder): View? {
-                    return if (viewHolder is CatalogItem.ViewHolder) {
-                        viewHolder.titleDownloadButton
-                    } else if (viewHolder is PlaylistItem.ViewHolder){
-                        viewHolder.titleDownloadButton
-                    } else null
+                    return when (viewHolder) {
+                        is CatalogItem.ViewHolder -> {
+                            viewHolder.titleDownloadButton
+                        }
+                        is PlaylistItem.ViewHolder -> {
+                            viewHolder.titleDownloadButton
+                        }
+                        else -> null
+                    }
                 }
 
                 override fun onClick(
@@ -241,7 +249,7 @@ abstract class RecyclerViewPage {
     
     var scrollListener: EndlessRecyclerOnScrollListener? = null
 
-    var currentLoaderId = ""
+    private var currentLoaderId = ""
     
     private suspend fun loadInit(view: View, forceReload: Boolean) {
         val id = UUID.randomUUID().toString()

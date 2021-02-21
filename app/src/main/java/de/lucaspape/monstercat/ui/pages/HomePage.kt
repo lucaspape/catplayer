@@ -5,11 +5,9 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ImageButton
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.core.music.util.playStream
 import de.lucaspape.monstercat.ui.pages.util.Page
 import de.lucaspape.util.CustomSpinnerClass
 import de.lucaspape.monstercat.core.util.Settings
-import de.lucaspape.monstercat.ui.displaySnackBar
 import de.lucaspape.monstercat.ui.pages.recycler.HomeAlbumRecyclerPage
 import de.lucaspape.monstercat.ui.pages.recycler.HomeCatalogAlbumRecyclerPage
 import de.lucaspape.monstercat.ui.pages.recycler.HomeCatalogRecyclerPage

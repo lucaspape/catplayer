@@ -13,7 +13,6 @@ import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.core.download.downloadCoverIntoImageReceiver
 import de.lucaspape.monstercat.core.download.ImageReceiverInterface
 import de.lucaspape.monstercat.core.download.downloadArtistImageIntoImageReceiver
-import de.lucaspape.monstercat.core.download.downloadImageUrlIntoImageReceiver
 import de.lucaspape.monstercat.core.music.*
 import java.lang.RuntimeException
 

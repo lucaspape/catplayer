@@ -27,8 +27,8 @@ class SettingsSeekBarItem(
 
     class ViewHolder(val view: View) : FastAdapter.ViewHolder<SettingsSeekBarItem>(view) {
         private val seekBarLabel = view.findViewById<TextView>(R.id.seekbar_label)
-        val seekBarShownValue: TextView = view.findViewById<TextView>(R.id.seekbar_shown_value)
-        private val seekBar: SeekBar = view.findViewById<SeekBar>(R.id.settings_seekbar)
+        val seekBarShownValue: TextView = view.findViewById(R.id.seekbar_shown_value)
+        private val seekBar: SeekBar = view.findViewById(R.id.settings_seekbar)
 
         override fun bindView(item: SettingsSeekBarItem, payloads: List<Any>) {
             seekBarLabel.text = item.title

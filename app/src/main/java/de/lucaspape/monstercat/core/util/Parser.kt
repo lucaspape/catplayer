@@ -94,7 +94,7 @@ fun parseSongToDB(jsonObject: JSONObject, context: Context): String {
     )
 }
 
-fun parseCatalogSongToDB(jsonObject: JSONObject, context: Context): Long? {
+fun parseCatalogSongToDB(jsonObject: JSONObject, context: Context): Long {
     val songId = parseSongToDB(jsonObject, context)
 
     val catalogSongDatabaseHelper = ItemDatabaseHelper(context, "catalog")
