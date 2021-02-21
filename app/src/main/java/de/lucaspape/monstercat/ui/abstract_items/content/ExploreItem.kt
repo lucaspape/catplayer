@@ -19,6 +19,7 @@ import de.lucaspape.monstercat.ui.displaySnackBar
 import de.lucaspape.monstercat.ui.pages.recycler.HomeCatalogRecyclerPage
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
 import de.lucaspape.monstercat.ui.pages.util.playSongsFromViewDataAsync
+import de.lucaspape.monstercat.ui.pages.util.showOpenInYoutubeAppDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -87,7 +88,13 @@ class ExploreItem(
                         }
                         is StreamItem -> {
                             withContext(Dispatchers.Main) {
-                                playStream(context, clickedItem.streamName)
+                                val stream = StreamDatabaseHelper(context).getStream(clickedItem.streamName)
+                                
+                                if(stream?.streamUrl?.contains("youtube") == true){
+                                    showOpenInYoutubeAppDialog(view, stream.streamUrl)
+                                }else{
+                                    playStream(context, clickedItem.streamName)
+                                }
                             }
                         }
                     }
