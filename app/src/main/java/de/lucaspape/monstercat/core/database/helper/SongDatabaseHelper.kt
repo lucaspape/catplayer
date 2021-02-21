@@ -58,7 +58,7 @@ class SongDatabaseHelper(context: Context) :
         values.put(Song.COLUMN_ARTIST_ID, artistId)
         values.put(Song.COLUMN_DOWNLOADABLE, downloadable.toString())
         values.put(Song.COLUMN_STREAMABLE, streamable.toString())
-        values.put(Song.COLUMN_INEARLYACCESS, inEarlyAccess.toString())
+        values.put(Song.COLUMN_IN_EARLY_ACCESS, inEarlyAccess.toString())
         values.put(Song.COLUMN_CREATOR_FRIENDLY, creatorFriendly.toString())
 
         if (getSong(context, songId) == null) {
@@ -97,7 +97,7 @@ class SongDatabaseHelper(context: Context) :
                     Song.COLUMN_ARTIST_ID,
                     Song.COLUMN_DOWNLOADABLE,
                     Song.COLUMN_STREAMABLE,
-                    Song.COLUMN_INEARLYACCESS,
+                    Song.COLUMN_IN_EARLY_ACCESS,
                     Song.COLUMN_CREATOR_FRIENDLY
                 ),
                 Song.COLUMN_SONG_ID + "=?",
@@ -120,7 +120,7 @@ class SongDatabaseHelper(context: Context) :
                         .toBoolean(),
                     cursor.getString(cursor.getColumnIndex(Song.COLUMN_STREAMABLE))!!
                         .toBoolean(),
-                    cursor.getString(cursor.getColumnIndex(Song.COLUMN_INEARLYACCESS))!!
+                    cursor.getString(cursor.getColumnIndex(Song.COLUMN_IN_EARLY_ACCESS))!!
                         .toBoolean(),
                     cursor.getString(cursor.getColumnIndex(Song.COLUMN_CREATOR_FRIENDLY))!!
                         .toBoolean()

@@ -64,7 +64,7 @@ data class Song(
         val COLUMN_STREAMABLE = "streamable"
 
         @JvmStatic
-        val COLUMN_INEARLYACCESS = "inEarlyAccess"
+        val COLUMN_IN_EARLY_ACCESS = "inEarlyAccess"
 
         @JvmStatic
         val COLUMN_CREATOR_FRIENDLY = "creatorFriendly"
@@ -81,7 +81,7 @@ data class Song(
                     COLUMN_ARTIST_ID + " TEXT," +
                     COLUMN_DOWNLOADABLE + " TEXT," +
                     COLUMN_STREAMABLE + " TEXT," +
-                    COLUMN_INEARLYACCESS + " TEXT," +
+                    COLUMN_IN_EARLY_ACCESS + " TEXT," +
                     COLUMN_CREATOR_FRIENDLY + " TEXT" +
                     ")"
     }
