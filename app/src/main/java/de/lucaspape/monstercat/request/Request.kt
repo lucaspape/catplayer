@@ -56,7 +56,7 @@ fun newSearchTrackRequest(
     val settings = Settings.getSettings(context)
 
     var usesCustomApi = false
-    
+
     val searchUrl =
         if (settings.getBoolean(context.getString(R.string.useCustomApiForSearchSetting)) == true || forceCustomApi
         ) {
@@ -250,7 +250,7 @@ fun newLoadAlbumListRequest(
     val settings = Settings.getSettings(context)
 
     var usesCustomApi = false
-    
+
     val requestUrl =
         if (settings.getBoolean(context.getString(R.string.useCustomApiForCatalogAndAlbumViewSetting)) == true && settings.getBoolean(
                 context.getString(R.string.customApiSupportsV1Setting)
@@ -729,12 +729,41 @@ fun newLoadGreatestHitsRequest(
     )
 }
 
+fun newLoadLivestreamUrlRequest(
+    context: Context,
+    callback: (response: JSONObject) -> Unit,
+    errorCallback: (error: VolleyError?) -> Unit
+):StringRequest? {
+    val settings = Settings.getSettings(context)
+
+    val requestUrl = if (settings.getBoolean(
+            context.getString(R.string.customApiSupportsV1Setting)
+        ) == true
+    ) {
+        settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v1/streamurl"
+    } else {
+        return null
+    }
+
+    return StringRequest(
+        Request.Method.GET, requestUrl,
+        {
+            try {
+                callback(JSONObject(it))
+            } catch (e: JSONException) {
+                errorCallback(null)
+            }
+
+        }, Response.ErrorListener(errorCallback)
+    )
+}
+
 //custom api doesnt have this problem, umlauts are shown wrong
-fun getCharacterFromUnicode(unicodeChar:String, customApi:Boolean):String{
-    return if(!customApi){
+fun getCharacterFromUnicode(unicodeChar: String, customApi: Boolean): String {
+    return if (!customApi) {
         val utf8 = unicodeChar.toByteArray(charset("ISO-8859-1"))
         String(utf8, charset("UTF-8"))
-    }else{
+    } else {
         unicodeChar
     }
 }

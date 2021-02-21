@@ -43,23 +43,46 @@ class PlayerService : Service() {
 
 
         intent?.getStringExtra("songId")?.let { songId ->
-            SongDatabaseHelper(this).getSong(this, songId)?.let { song ->
-                title = song.title
-                artist = song.artist
-                version = song.version
+            if(songId != "stream"){
+                SongDatabaseHelper(this).getSong(this, songId)?.let { song ->
+                    title = song.title
+                    artist = song.artist
+                    version = song.version
+
+                    setCover(
+                        this,
+                        song.albumId,
+                        song.artistId
+                    ) {
+                        startForeground(
+                            musicNotificationID,
+                            createPlayerNotification(
+                                applicationContext,
+                                song.title,
+                                song.version,
+                                song.artist,
+                                it
+                            )
+                        )
+                    }
+                }
+            }else{
+                title = "Livestream"
+                artist = "Monstercat"
+                version = ""
 
                 setCover(
                     this,
-                    song.albumId,
-                    song.artistId
+                    "",
+                    ""
                 ) {
                     startForeground(
                         musicNotificationID,
                         createPlayerNotification(
                             applicationContext,
-                            song.title,
-                            song.version,
-                            song.artist,
+                            title,
+                            version,
+                            artist,
                             it
                         )
                     )

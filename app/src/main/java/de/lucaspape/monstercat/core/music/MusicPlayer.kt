@@ -233,14 +233,18 @@ fun resume(context: Context) {
         intentFilter
     )
 
-    playSong(
-        context, currentSongId,
-        showNotification = true,
-        playWhenReady = true,
-        progress = currentPosition.toLong()
-    )
+    if(exoPlayerSongId != "stream"){
+        playSong(
+            context, currentSongId,
+            showNotification = true,
+            playWhenReady = true,
+            progress = currentPosition.toLong()
+        )
 
-    PlayerSaveState.saveMusicPlayerState(context)
+        PlayerSaveState.saveMusicPlayerState(context)
+    }else{
+        playStream(context, showNotification = true, playWhenReady = true)
+    }
 }
 
 /**

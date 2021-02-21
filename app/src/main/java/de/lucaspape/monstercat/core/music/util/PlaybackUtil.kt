@@ -83,7 +83,8 @@ fun playSong(
 
         val settings = Settings.getSettings(context)
 
-        val disableAudioFocus = settings.getBoolean(context.getString(R.string.disableAudioFocusSetting))
+        val disableAudioFocus =
+            settings.getBoolean(context.getString(R.string.disableAudioFocusSetting))
         val audioFocus = disableAudioFocus == false || disableAudioFocus == null
 
         exoPlayer?.setAudioAttributes(getAudioAttributes(), audioFocus)
@@ -109,7 +110,8 @@ fun playSong(
         exoPlayer?.addListener(
             getPlayerListener(
                 context,
-                songId
+                songId,
+                true
             )
         )
 
@@ -118,9 +120,6 @@ fun playSong(
             //set title/artist
             title = "${song.title} ${song.version}"
             artist = song.artist
-
-            //start seekbar updater
-            runSeekBarUpdate(context, prepareNext = true, crossFade = true)
 
             //set cover
             setCover(
@@ -158,6 +157,84 @@ fun playSong(
     }
 }
 
+fun prepareStream(context: Context, callback: () -> Unit) {
+    preparedExoPlayerSongId = "stream"
+    preparedExoPlayer = SimpleExoPlayer.Builder(context).build()
+    preparedExoPlayer?.setAudioAttributes(getAudioAttributes(), false)
+
+    Stream().getMediaSource(context) {
+        preparedExoPlayer?.setMediaSource(it)
+        preparedExoPlayer?.prepare()
+
+        callback()
+    }
+}
+
+fun playStream(
+    context: Context,
+    showNotification: Boolean,
+    playWhenReady: Boolean
+) {
+    prepareStream(context) {
+        if (preparedExoPlayerSongId == "stream") {
+            exoPlayer =
+                preparedExoPlayer
+
+            exoPlayerSongId = "stream"
+
+            //reset prepared
+            preparedExoPlayer = SimpleExoPlayer.Builder(context).build()
+            preparedExoPlayerSongId = ""
+
+            val settings = Settings.getSettings(context)
+
+            val disableAudioFocus =
+                settings.getBoolean(context.getString(R.string.disableAudioFocusSetting))
+            val audioFocus = disableAudioFocus == false || disableAudioFocus == null
+
+            exoPlayer?.setAudioAttributes(getAudioAttributes(), audioFocus)
+
+            //set volume
+            exoPlayer?.audioComponent?.volume = volume
+
+            //enable playback
+            exoPlayer?.playWhenReady = playWhenReady
+
+            //for play/pause button change and if song ended
+            exoPlayer?.addListener(
+                getPlayerListener(
+                    context,
+                    "stream", crossFade = false
+                )
+            )
+
+            //set title/artist
+            title = "Livestream"
+            artist = "Monstercat"
+
+            //set cover
+            setCover(
+                context,
+                "",
+                ""
+            ) {
+                //show notification
+                if (showNotification) {
+                    updateNotification(
+                        context,
+                        title,
+                        "",
+                        artist,
+                        it
+                    )
+                }
+            }
+
+            exoPlayer?.playWhenReady = playWhenReady
+        }
+    }
+}
+
 private var seekBarUpdateHandler = Handler(Looper.getMainLooper())
 private var currentSeekBarUpdateHandlerId = ""
 
@@ -182,19 +259,19 @@ fun runSeekBarUpdate(context: Context, prepareNext: Boolean, crossFade: Boolean)
                 setPlayerState(it.toLong())
             }
 
-            val timeLeft = duration - currentPosition
+            if (crossFade) {
+                val timeLeft = duration - currentPosition
 
-            if (prepareNext) {
-                if (timeLeft < duration / 2 && exoPlayer?.isPlaying == true) {
-                    if (nextSongId != "") {
-                        prepareSong(context, nextSongId, {}, {})
-                    } else if (playRelatedSongsAfterPlaylistFinished) {
-                        loadRelatedSongs(context, playAfter = false)
+                if (prepareNext) {
+                    if (timeLeft < duration / 2 && exoPlayer?.isPlaying == true) {
+                        if (nextSongId != "") {
+                            prepareSong(context, nextSongId, {}, {})
+                        } else if (playRelatedSongsAfterPlaylistFinished) {
+                            loadRelatedSongs(context, playAfter = false)
+                        }
                     }
                 }
-            }
 
-            if (crossFade) {
                 if (timeLeft < crossfade && exoPlayer?.isPlaying == true && nextSongId == preparedExoPlayerSongId) {
                     if (timeLeft >= 1) {
                         val crossVolume = 1 - log(

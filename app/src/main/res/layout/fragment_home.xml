@@ -32,6 +32,18 @@
             tools:layout_editor_absoluteX="316dp" />
 
         <ImageButton
+            android:id="@+id/liveButton"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="end"
+            android:layout_marginStart="20dp"
+            android:background="@null"
+            android:contentDescription="@string/monstercatLivestream"
+            android:src="@drawable/ic_live_tv_24dp"
+            app:layout_constraintEnd_toEndOf="@+id/settingsButton"
+            app:layout_constraintStart_toEndOf="@+id/homeSearch" />
+
+        <ImageButton
             android:id="@+id/searchButton"
             android:layout_width="50dp"
             android:layout_height="50dp"
@@ -40,7 +52,7 @@
             android:background="@null"
             android:contentDescription="@string/homeSearchDescription"
             android:src="@drawable/ic_search_24"
-            app:layout_constraintEnd_toEndOf="@+id/settingsButton"
+            app:layout_constraintEnd_toEndOf="@+id/liveButton"
             app:layout_constraintStart_toEndOf="@+id/viewSelector" />
 
     </androidx.appcompat.widget.Toolbar>

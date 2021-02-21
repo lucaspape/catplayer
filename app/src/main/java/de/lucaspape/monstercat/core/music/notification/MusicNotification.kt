@@ -205,8 +205,12 @@ fun stopPlayerService(context: Context) {
 }
 
 fun updateNotification(context: Context, songId: String, bitmap: Bitmap) {
-    SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
-        updateNotification(context, song.title, song.version, song.artist, bitmap)
+    if(songId != "stream"){
+        SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
+            updateNotification(context, song.title, song.version, song.artist, bitmap)
+        }
+    }else{
+        updateNotification(context, "Livestream", "", "Monstercat", bitmap)
     }
 }
 

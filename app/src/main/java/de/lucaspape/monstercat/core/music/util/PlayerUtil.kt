@@ -18,7 +18,7 @@ fun getAudioAttributes(): AudioAttributes {
 
 var currentListenerId = ""
 
-fun getPlayerListener(context: Context, songId: String): Player.EventListener {
+fun getPlayerListener(context: Context, songId: String, crossFade:Boolean): Player.EventListener {
     val id = UUID.randomUUID().toString()
     currentListenerId = id
 
@@ -32,16 +32,6 @@ fun getPlayerListener(context: Context, songId: String): Player.EventListener {
 
                 startPlayerService(context, songId)
 
-                exoPlayer?.duration?.let { duration ->
-                    exoPlayer?.currentPosition?.let { currentPosition ->
-                        val timeLeft = duration - currentPosition
-
-                        if (timeLeft < crossfade && preparedExoPlayerSongId == nextSongId) {
-                            preparedExoPlayer?.playWhenReady = playWhenReady
-                        }
-                    }
-                }
-
                 if (playbackState == Player.STATE_ENDED) {
                     currentListenerId = ""
                     next(context)
@@ -53,7 +43,7 @@ fun getPlayerListener(context: Context, songId: String): Player.EventListener {
                         updateNotification(context, songId, it)
                     }
 
-                    runSeekBarUpdate(context, prepareNext = true, crossFade = true)
+                    runSeekBarUpdate(context, prepareNext = true, crossFade)
                 }
             }
         }
