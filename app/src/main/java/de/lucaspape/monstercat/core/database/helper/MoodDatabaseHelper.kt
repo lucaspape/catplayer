@@ -17,10 +17,10 @@ class MoodDatabaseHelper(context: Context) :
     ) {
     companion object {
         @JvmStatic
-        val DATABASE_VERSION = 4 * SongDatabaseHelper.DATABASE_VERSION
+        val DATABASE_VERSION = 6 * SongDatabaseHelper.DATABASE_VERSION
 
         @JvmStatic
-        private val DATABASE_NAME = "mood_db"
+        private val DATABASE_NAME = "moods_db"
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
@@ -39,12 +39,13 @@ class MoodDatabaseHelper(context: Context) :
         onCreate(db)
     }
 
-    fun insertMood(moodId: String, coverUrl:String, name:String): Long {
+    fun insertMood(moodId: String, uri:String, coverUrl:String, name:String): Long {
         val db = writableDatabase
 
         val values = ContentValues()
 
         values.put(Mood.COLUMN_MOOD_ID, moodId)
+        values.put(Mood.COLUMN_MOOD_URI, uri)
         values.put(Mood.COLUMN_COVER_URL, coverUrl)
         values.put(Mood.COLUMN_NAME, name)
 
@@ -63,6 +64,7 @@ class MoodDatabaseHelper(context: Context) :
                 Mood.TABLE_NAME, arrayOf(
                     Mood.COLUMN_ID,
                     Mood.COLUMN_MOOD_ID,
+                    Mood.COLUMN_MOOD_URI,
                     Mood.COLUMN_COVER_URL,
                     Mood.COLUMN_NAME
                 ),
@@ -77,6 +79,7 @@ class MoodDatabaseHelper(context: Context) :
                 val mood = Mood(
                     cursor.getInt(cursor.getColumnIndex(Mood.COLUMN_ID)),
                     cursor.getString(cursor.getColumnIndex(Mood.COLUMN_MOOD_ID)),
+                    cursor.getString(cursor.getColumnIndex(Mood.COLUMN_MOOD_URI)),
                     cursor.getString(cursor.getColumnIndex(Mood.COLUMN_COVER_URL)),
                     cursor.getString(cursor.getColumnIndex(Mood.COLUMN_NAME))
                 )
@@ -109,6 +112,7 @@ class MoodDatabaseHelper(context: Context) :
                 val mood = Mood(
                     cursor.getInt(cursor.getColumnIndex(Mood.COLUMN_ID)),
                     cursor.getString(cursor.getColumnIndex(Mood.COLUMN_MOOD_ID)),
+                    cursor.getString(cursor.getColumnIndex(Mood.COLUMN_MOOD_URI)),
                     cursor.getString(cursor.getColumnIndex(Mood.COLUMN_COVER_URL)),
                     cursor.getString(cursor.getColumnIndex(Mood.COLUMN_NAME))
                 )

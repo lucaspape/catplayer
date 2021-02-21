@@ -685,13 +685,12 @@ suspend fun loadMoods(
             moodDatabaseHelper.reCreateTable()
 
             newLoadMoodsRequest(context, { jsonObject ->
-                val moodIds = jsonObject.keys()
+                val moodsArray = jsonObject.getJSONObject("Moods").getJSONArray("results")
 
-                for (moodId in moodIds) {
+                for (i in (0 until moodsArray.length())){
                     parseMoodIntoDB(
                         context,
-                        moodId,
-                        jsonObject.getJSONObject(moodId)
+                        moodsArray.getJSONObject(i)
                     )?.let {
                         moods.add(it)
                     }

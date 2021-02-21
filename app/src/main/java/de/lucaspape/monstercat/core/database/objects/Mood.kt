@@ -3,6 +3,7 @@ package de.lucaspape.monstercat.core.database.objects
 data class Mood(
     val id: Int,
     val moodId: String,
+    val uri: String,
     val coverUrl:String,
     val name:String
 ) {
@@ -17,6 +18,9 @@ data class Mood(
         val COLUMN_MOOD_ID = "moodId"
 
         @JvmStatic
+        val COLUMN_MOOD_URI = "uri"
+
+        @JvmStatic
         val COLUMN_COVER_URL = "coverUrl"
 
         @JvmStatic
@@ -27,6 +31,7 @@ data class Mood(
             "CREATE TABLE " + TABLE_NAME + " (" +
                     COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                     COLUMN_MOOD_ID + " TEXT," +
+                    COLUMN_MOOD_URI + " TEXT," +
                     COLUMN_COVER_URL + " TEXT," +
                     COLUMN_NAME + " TEXT" +
                     ")"

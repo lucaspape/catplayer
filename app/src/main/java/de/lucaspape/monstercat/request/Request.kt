@@ -7,6 +7,7 @@ import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.StringRequest
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.core.database.helper.MoodDatabaseHelper
 import de.lucaspape.monstercat.core.database.objects.Song
 import de.lucaspape.monstercat.core.util.Settings
 import org.json.JSONArray
@@ -640,21 +641,28 @@ fun newLoadMoodRequest(
     limit: Int,
     callback: (response: JSONObject) -> Unit,
     errorCallback: (error: VolleyError?) -> Unit
-): StringRequest {
-    val requestUrl =
-        context.getString(R.string.moodUrl) + "$moodId?raw=%7B%7D&limit=$limit&skip=$skip&offset=0&search=&sort=-date&nogold=false&onlyReleased=true"
+): StringRequest? {
 
-    return StringRequest(
-        Request.Method.GET, requestUrl,
-        {
-            try {
-                callback(JSONObject(getCharacterFromUnicode(it, false)))
-            } catch (e: JSONException) {
-                errorCallback(null)
-            }
+    val mood = MoodDatabaseHelper(context).getMood(moodId)
 
-        }, Response.ErrorListener(errorCallback)
-    )
+    mood?.uri?.let { uri ->
+        val requestUrl =
+            context.getString(R.string.moodUrl) + "$uri?raw=%7B%7D&limit=$limit&skip=$skip&offset=0&search=&sort=-date&nogold=false&onlyReleased=true"
+
+        return StringRequest(
+            Request.Method.GET, requestUrl,
+            {
+                try {
+                    callback(JSONObject(getCharacterFromUnicode(it, false)))
+                } catch (e: JSONException) {
+                    errorCallback(null)
+                }
+
+            }, Response.ErrorListener(errorCallback)
+        )
+    }
+    
+    return null
 }
 
 fun newLoadFiltersRequest(

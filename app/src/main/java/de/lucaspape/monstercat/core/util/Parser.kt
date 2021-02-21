@@ -168,14 +168,20 @@ fun parsePlaylistTrackToDB(
     }
 }
 
-fun parseMoodIntoDB(context: Context, moodId: String, jsonObject: JSONObject): Mood? {
+fun parseMoodIntoDB(context: Context, jsonObject: JSONObject): Mood? {
     val moodDatabaseHelper = MoodDatabaseHelper(context)
+    
+    val name = jsonObject.getString("Name")
+    val id = jsonObject.getString("Id")
+    val uri = jsonObject.getString("Uri")
+    val coverUrl = "https://connect.monstercat.com/v2/mood/$id/tile"
 
     moodDatabaseHelper.insertMood(
-        moodId,
-        jsonObject.getString("image"),
-        jsonObject.getString("name")
+        id,
+        uri,
+        coverUrl,
+        name,
     )
 
-    return moodDatabaseHelper.getMood(moodId)
+    return moodDatabaseHelper.getMood(id)
 }
