@@ -39,10 +39,6 @@ data class Stream(
                     COLUMN_NAME + " TEXT" +
                     ")"
     }
-    
-    fun playbackAllowed(context: Context):Boolean{
-        return true
-    }
 
     fun getMediaSource(context: Context, callback: (mediaSource: MediaSource) -> Unit) {
         callback(

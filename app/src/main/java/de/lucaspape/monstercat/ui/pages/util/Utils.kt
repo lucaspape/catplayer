@@ -766,29 +766,3 @@ fun playSongsFromViewDataAsync(
         }
     }, {}).execute()
 }
-
-fun showOpenInYoutubeAppDialog(view: View, streamUrl: String) {
-    val context = view.context
-    val alertDialogBuilder = MaterialAlertDialogBuilder(context)
-    alertDialogBuilder.setTitle("Cannot play youtube livestream in app. Open in browser?")
-    alertDialogBuilder.setPositiveButton(context.getString(R.string.yes)) { _, _ ->
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(streamUrl))
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        context.startActivity(intent)
-    }
-    alertDialogBuilder.setNegativeButton(context.getString(R.string.no)) { _, _ ->
-
-    }
-
-    val dialog = alertDialogBuilder.create()
-    dialog.show()
-
-    val typedValue = TypedValue()
-    context.theme.resolveAttribute(R.attr.colorOnSurface, typedValue, true)
-
-    val positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE)
-    positiveButton.setTextColor(typedValue.data)
-
-    val negativeButton = dialog.getButton(DialogInterface.BUTTON_NEGATIVE)
-    negativeButton.setTextColor(typedValue.data)
-}

@@ -6,6 +6,7 @@ import android.widget.LinearLayout
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.GenericItem
 import com.mikepenz.fastadapter.items.AbstractItem
+import de.lucaspape.flavor.playYoutubeLivestream
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.ItemDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.StreamDatabaseHelper
@@ -19,7 +20,6 @@ import de.lucaspape.monstercat.ui.displaySnackBar
 import de.lucaspape.monstercat.ui.pages.recycler.HomeCatalogRecyclerPage
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
 import de.lucaspape.monstercat.ui.pages.util.playSongsFromViewDataAsync
-import de.lucaspape.monstercat.ui.pages.util.showOpenInYoutubeAppDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -91,7 +91,7 @@ class ExploreItem(
                                 val stream = StreamDatabaseHelper(context).getStream(clickedItem.streamName)
                                 
                                 if(stream?.streamUrl?.contains("youtube") == true){
-                                    showOpenInYoutubeAppDialog(view, stream.streamUrl)
+                                    playYoutubeLivestream(view, clickedItem.streamName)
                                 }else{
                                     playStream(context, clickedItem.streamName)
                                 }
