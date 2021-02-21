@@ -194,7 +194,7 @@ data class Song(
         }
 
         if(cookie.isNotEmpty()){
-            httpSourceFactory.setDefaultRequestProperties(mapOf(cookie to "Cookie"))
+            httpSourceFactory.setDefaultRequestProperties(mapOf("Cookie" to cookie))
         }
 
         return ProgressiveMediaSource.Factory(httpSourceFactory)
