@@ -22,7 +22,7 @@ fun showDownloadNotification(
     createDownloadNotificationChannel(context)
     
     val openActivityPendingIntent =
-        PendingIntent.getActivity(context, 0, openMainActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        PendingIntent.getActivity(context, 0, openMainActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT + PendingIntent.FLAG_IMMUTABLE)
 
     val notificationBuilder = NotificationCompat.Builder(
         context,

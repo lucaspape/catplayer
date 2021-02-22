@@ -56,18 +56,18 @@ fun createPlayerNotification(
     val closeIntent = Intent(CLOSE_ACTION)
 
     val prevPendingIntent =
-        PendingIntent.getBroadcast(context, 0, prevIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        PendingIntent.getBroadcast(context, 0, prevIntent, PendingIntent.FLAG_UPDATE_CURRENT + PendingIntent.FLAG_IMMUTABLE)
 
     val playPausePendingIntent = PendingIntent.getBroadcast(
         context,
         0,
         playPauseIntent,
-        PendingIntent.FLAG_UPDATE_CURRENT
+        PendingIntent.FLAG_UPDATE_CURRENT + PendingIntent.FLAG_IMMUTABLE
     )
     val nextPendingIntent =
-        PendingIntent.getBroadcast(context, 0, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        PendingIntent.getBroadcast(context, 0, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT + PendingIntent.FLAG_IMMUTABLE)
     val closePendingIntent =
-        PendingIntent.getBroadcast(context, 0, closeIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        PendingIntent.getBroadcast(context, 0, closeIntent, PendingIntent.FLAG_UPDATE_CURRENT + PendingIntent.FLAG_IMMUTABLE)
 
     try {
         context.unregisterReceiver(prevReceiver)
@@ -132,7 +132,7 @@ fun createPlayerNotification(
         context,
         0,
         openMainActivityIntent,
-        PendingIntent.FLAG_UPDATE_CURRENT
+        PendingIntent.FLAG_UPDATE_CURRENT + PendingIntent.FLAG_IMMUTABLE
     )
 
     notificationBuilder
@@ -260,7 +260,7 @@ fun showLoadingRelatedNotification(context: Context){
     createLoadingRelatedNotificationChannel(context)
 
     val openActivityPendingIntent =
-        PendingIntent.getActivity(context, 0, openMainActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        PendingIntent.getActivity(context, 0, openMainActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT + PendingIntent.FLAG_IMMUTABLE)
 
     val notificationBuilder = NotificationCompat.Builder(
         context,
