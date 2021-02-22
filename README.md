@@ -23,6 +23,7 @@ You can also download the [github release](https://github.com/lucaspape/catplaye
  - Dark Mode (Android 9 or higher)
  - FLAC download support
  - Crossfade
+ - Monstercat livestreams
 
 <img src="https://raw.githubusercontent.com/lucaspape/catplayer/master/playstore_res/screenshots/20210131/Screenshot_2021-01-31-16-19-52-859_de.lucaspape.monstercat.jpg" width="40%">  <img src="https://raw.githubusercontent.com/lucaspape/catplayer/master/playstore_res/screenshots/20210131/Screenshot_2021-01-31-16-21-05-479_de.lucaspape.monstercat.jpg" width="40%">
 
@@ -51,6 +52,3 @@ Disclamer: this is not an official app from monstercat.com!
 I am not responsible in any way for the content displayed in this app!
 Monstercat is a trademark from Monstercat inc.
 Google Play and the Google Play logo are trademarks of Google LLC.
-   
-   
-<a href="https://www.buymeacoffee.com/lucaspape" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
