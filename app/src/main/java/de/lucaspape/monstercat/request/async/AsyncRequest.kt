@@ -5,7 +5,6 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.*
 import de.lucaspape.monstercat.core.database.objects.Genre
 import de.lucaspape.monstercat.core.database.objects.Mood
-import de.lucaspape.monstercat.core.database.objects.Song
 import de.lucaspape.monstercat.core.util.*
 import de.lucaspape.monstercat.request.*
 import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
@@ -46,33 +45,6 @@ suspend fun addToPlaylist(
                     })
             )
 
-        }
-    }
-}
-
-suspend fun retrieveTrackIntoDB(
-    context: Context,
-    trackId: String,
-    finishedCallback: (song: Song?) -> Unit,
-    errorCallback: () -> Unit
-) {
-    withContext(Dispatchers.Default) {
-        val volleyQueue =
-            getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
-
-        newSearchTrackRequest(context, trackId, 0, true, {
-            val jsonArray = it.getJSONArray("results")
-
-            for (i in (0 until jsonArray.length())) {
-                parseSongToDB(jsonArray.getJSONObject(i), context)
-            }
-
-            finishedCallback(SongDatabaseHelper(context).getSong(context, trackId))
-
-        }, {
-            errorCallback()
-        })?.let {
-            volleyQueue.add(it)
         }
     }
 }
@@ -532,6 +504,12 @@ suspend fun loadRelatedTracks(
 
                 for (i in (0 until relatedJsonArray.length())) {
                     val trackObject = relatedJsonArray.getJSONObject(i)
+
+                    parseSongToDB(
+                        trackObject,
+                        context
+                    )
+
                     result?.add(trackObject.getString("id"))
                 }
             } catch (e: JSONException) {
@@ -604,7 +582,7 @@ suspend fun loadTitleSearch(
         val searchQueue =
             getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
-        val searchTrackRequest = newSearchTrackRequest(context, searchString, skip, false, {
+        val searchTrackRequest = newSearchTrackRequest(context, searchString, skip, {
             val jsonArray = it.getJSONArray("results")
 
             val songList =

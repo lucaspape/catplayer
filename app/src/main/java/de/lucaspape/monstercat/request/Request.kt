@@ -50,7 +50,6 @@ fun newSearchTrackRequest(
     context: Context,
     term: String,
     skip: Int,
-    forceCustomApi: Boolean,
     callback: (response: JSONObject) -> Unit,
     errorCallback: (error: VolleyError?) -> Unit
 ): StringRequest? {
@@ -59,7 +58,7 @@ fun newSearchTrackRequest(
     var usesCustomApi = false
 
     val searchUrl =
-        if (settings.getBoolean(context.getString(R.string.useCustomApiForSearchSetting)) == true || forceCustomApi
+        if (settings.getBoolean(context.getString(R.string.useCustomApiForSearchSetting)) == true
         ) {
             if (settings.getBoolean(
                     context.getString(R.string.customApiSupportsV1Setting)

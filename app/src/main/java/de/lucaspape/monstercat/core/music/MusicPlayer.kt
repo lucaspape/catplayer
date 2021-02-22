@@ -78,21 +78,16 @@ var cid = ""
 var retrieveRelatedSongs: (context: Context, callback: () -> Unit) -> Unit =
     { _, _ -> }
 
-var retrieveSongIntoDB: (context: Context, songId: String, callback: (song: Song?) -> Unit) -> Unit =
-    { _, _, _ -> }
-
 var displayInfo: (context: Context, msg: String) -> Unit = { _, _ -> }
 
 var openMainActivityIntent = Intent()
 
 fun setupMusicPlayer(
     sRetrieveRelatedSongs: (context: Context, callback: () -> Unit) -> Unit,
-    sRetrieveSongIntoDB: (context: Context, songId: String, callback: (song: Song?) -> Unit) -> Unit,
     sDisplayInfo: (context: Context, msg: String) -> Unit,
     sOpenMainActivityIntent: Intent
 ) {
     retrieveRelatedSongs = sRetrieveRelatedSongs
-    retrieveSongIntoDB = sRetrieveSongIntoDB
     displayInfo = sDisplayInfo
     openMainActivityIntent = sOpenMainActivityIntent
 }
@@ -496,12 +491,4 @@ fun loadRelatedSongs(context: Context, callback: () -> Unit) {
 
         retrieveRelatedSongs(context, callback)
     }
-}
-
-fun loadSongIntoDB(
-    context: Context,
-    songId: String,
-    callback: (song: Song) -> Unit
-) {
-    retrieveSongIntoDB(context, songId) { it?.let { callback(it) } }
 }

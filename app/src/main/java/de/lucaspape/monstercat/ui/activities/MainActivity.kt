@@ -25,7 +25,6 @@ import de.lucaspape.monstercat.core.music.notification.updateNotification
 import de.lucaspape.monstercat.core.music.save.PlayerSaveState
 import de.lucaspape.monstercat.core.music.util.*
 import de.lucaspape.monstercat.core.music.util.setCover
-import de.lucaspape.monstercat.request.async.retrieveTrackIntoDB
 import de.lucaspape.monstercat.ui.*
 import de.lucaspape.monstercat.util.*
 import de.lucaspape.monstercat.core.util.Settings
@@ -223,11 +222,6 @@ class MainActivity : AppCompatActivity() {
                                 })
                         }
                     }
-            },
-            { context, songId, callback ->
-                genericScope.launch {
-                    retrieveTrackIntoDB(context, songId, callback, {})
-                }
             },
             { context: Context, msg: String ->
                 displayInfo(context, msg)

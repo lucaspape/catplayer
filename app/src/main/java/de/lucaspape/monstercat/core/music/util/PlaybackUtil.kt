@@ -78,17 +78,7 @@ fun prepareSong(
                 notAllowedCallback()
             }
         }else{
-            loadSongIntoDB(context, songId) { newSong ->
-                newSong.getMediaSource(connectSid, cid) { mediaSource ->
-                    if (mediaSource != null) {
-                        preparedExoPlayer?.setMediaSource(mediaSource)
-                        preparedExoPlayer?.prepare()
-                        preparedExoPlayerSongId = newSong.songId
-                    } else {
-                        displayInfo(context, context.getString(R.string.songNotPlayableError))
-                    }
-                }
-            }
+            displayInfo(context, context.getString(R.string.songNotPlayableError))
         }
     }
 }
