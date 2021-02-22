@@ -48,7 +48,7 @@ If you want to participate in the beta test you can download it from the google 
 The beta is open but currently limited to 1000 participants.
 
 ## Additional information
-Disclamer: this is not an official app from monstercat.com!
-I am not responsible in any way for the content displayed in this app!
-Monstercat is a trademark from Monstercat inc.
-Google Play and the Google Play logo are trademarks of Google LLC.
+Disclamer: this is not an official app from monstercat.com!  
+I am not responsible in any way for the content displayed in this app!  
+Monstercat is a trademark from Monstercat inc.  
+Google Play and the Google Play logo are trademarks of Google LLC.  
