@@ -192,6 +192,7 @@ fun playStream(
 ) {
     prioritySongQueue.add(streamName)
     next(context)
+    currentSeekBarUpdateHandlerId = ""
 }
 
 private var seekBarUpdateHandler = Handler(Looper.getMainLooper())
