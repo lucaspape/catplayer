@@ -9,6 +9,7 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.core.music.*
@@ -56,6 +57,7 @@ fun createPlayerNotification(
 
     val prevPendingIntent =
         PendingIntent.getBroadcast(context, 0, prevIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+
     val playPausePendingIntent = PendingIntent.getBroadcast(
         context,
         0,
@@ -249,5 +251,54 @@ fun createNotificationChannel(context: Context) {
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(notificationChannel)
+    }
+}
+
+private const val relatedNotificationId = 3
+
+fun showLoadingRelatedNotification(context: Context){
+    createLoadingRelatedNotificationChannel(context)
+
+    val openActivityPendingIntent =
+        PendingIntent.getActivity(context, 0, openMainActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+    val notificationBuilder = NotificationCompat.Builder(
+        context,
+        context.getString(R.string.relatedNotificationChannelId)
+    )
+    notificationBuilder.setContentTitle(context.getString(R.string.loadingRelatedSongs))
+    notificationBuilder.setSmallIcon(R.drawable.ic_file_download_black_24dp)
+    notificationBuilder.priority = NotificationCompat.PRIORITY_LOW
+    notificationBuilder.setOngoing(true)
+    notificationBuilder.setContentIntent(openActivityPendingIntent)
+
+    val notificationManagerCompat = NotificationManagerCompat.from(context)
+    notificationManagerCompat.notify(relatedNotificationId, notificationBuilder.build())
+}
+
+fun hideLoadingRelatedSongsNotification(context: Context) {
+    val notificationManager =
+        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    notificationManager.cancel(relatedNotificationId)
+}
+
+fun createLoadingRelatedNotificationChannel(context: Context){
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val channelName = context.getString(R.string.relatedNotificationChannelId)
+        val channelDescription = context.getString(R.string.relatedNotificationChannelDescription)
+        val importance = NotificationManager.IMPORTANCE_LOW
+
+        val notificationChannel = NotificationChannel(
+            context.getString(R.string.relatedNotificationChannelId),
+            channelName,
+            importance
+        )
+
+        notificationChannel.description = channelDescription
+
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(notificationChannel)
+
     }
 }

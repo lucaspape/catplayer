@@ -26,6 +26,7 @@ var playingChangedCallback = {}
 var artistBitmapChangedCallback = {}
 var artistDrawableChangedCallback = {}
 var setTagCallback = { _: Target -> }
+var loadingRelatedChangedCallback = {}
 
 var title = ""
     set(newString) {
@@ -89,6 +90,12 @@ var visiblePlaying = false
     set(newBoolean) {
         field = newBoolean
         playingChangedCallback()
+    }
+
+var loadingRelatedSongs = false
+    set(newBoolean) {
+        field = newBoolean
+        loadingRelatedChangedCallback()
     }
 
 fun setCover(context: Context, songId: String, callback: (bitmap: Bitmap) -> Unit) {

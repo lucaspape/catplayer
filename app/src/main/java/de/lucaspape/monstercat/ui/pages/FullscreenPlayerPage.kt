@@ -5,6 +5,8 @@ import android.widget.*
 import androidx.core.net.toUri
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.music.*
+import de.lucaspape.monstercat.core.music.notification.hideLoadingRelatedSongsNotification
+import de.lucaspape.monstercat.core.music.notification.showLoadingRelatedNotification
 import de.lucaspape.monstercat.core.music.util.*
 import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
 import de.lucaspape.monstercat.ui.pages.util.Page
@@ -111,6 +113,14 @@ class FullscreenPlayerPage(
 
         setTagCallback = { target ->
             barCoverImage.tag = target
+        }
+
+        loadingRelatedChangedCallback = {
+            if(loadingRelatedSongs){
+                showLoadingRelatedNotification(view.context)
+            }else{
+                hideLoadingRelatedSongsNotification(view.context)
+            }
         }
     }
 

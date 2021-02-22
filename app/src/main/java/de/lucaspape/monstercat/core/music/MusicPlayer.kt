@@ -10,7 +10,6 @@ import android.support.v4.media.session.MediaSessionCompat
 import com.google.android.exoplayer2.SimpleExoPlayer
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
-import de.lucaspape.monstercat.core.database.objects.Song
 import de.lucaspape.monstercat.core.music.notification.startPlayerService
 import de.lucaspape.monstercat.core.music.notification.stopPlayerService
 import de.lucaspape.monstercat.core.music.save.PlayerSaveState
@@ -75,15 +74,15 @@ private var sessionCreated = false
 var connectSid = ""
 var cid = ""
 
-var retrieveRelatedSongs: (context: Context, callback: () -> Unit) -> Unit =
-    { _, _ -> }
+var retrieveRelatedSongs: (context: Context, callback: () -> Unit, errorCallback: () -> Unit) -> Unit =
+    { _, _, _ -> }
 
 var displayInfo: (context: Context, msg: String) -> Unit = { _, _ -> }
 
 var openMainActivityIntent = Intent()
 
 fun setupMusicPlayer(
-    sRetrieveRelatedSongs: (context: Context, callback: () -> Unit) -> Unit,
+    sRetrieveRelatedSongs: (context: Context, callback: () -> Unit, errorCallback: () -> Unit) -> Unit,
     sDisplayInfo: (context: Context, msg: String) -> Unit,
     sOpenMainActivityIntent: Intent
 ) {
@@ -486,9 +485,13 @@ fun loadRelatedSongs(context: Context, playAfter: Boolean) {
  * Fetch songs which are related to songs in playlist
  */
 fun loadRelatedSongs(context: Context, callback: () -> Unit) {
-    if (loadedRelatedHash != playlist.hashCode()) {
-        loadedRelatedHash = playlist.hashCode()
+    if (!loadingRelatedSongs && loadedRelatedHash != playlist.hashCode()) {
+        loadingRelatedSongs = true
 
-        retrieveRelatedSongs(context, callback)
+        retrieveRelatedSongs(context, {
+            loadedRelatedHash = playlist.hashCode()
+            loadingRelatedSongs = false
+            callback()
+        }, { loadingRelatedSongs = false })
     }
 }

@@ -88,8 +88,8 @@
     <string name="musicNotificationChannelId">Player Notification</string>
     <string name="musicNotificationDescription">Player Notification for Catplayer</string>
 
-    <string name="pushNotificationChannelId">Push notifications</string>
-    <string name="pushNotificationDescription">Push notifications for Catplayer</string>
+    <string name="relatedNotificationChannelId">Loading related songs notification</string>
+    <string name="relatedNotificationChannelDescription">Loading related songs can take a few seconds</string>
 
     <string name="playlistId">Playlist ID</string>
     <string name="addPlaylistId">Add playlist from Playlist ID</string>
@@ -129,4 +129,5 @@
     <string name="useCustomApiForCoverImages">Faster cover images download (uses custom API)</string>
     <string name="useCustomApiForSearch">Advanced search (uses custom API)</string>
     <string name="livestreamWarning">Warning: Livestream takes a few seconds to load/start!</string>
+    <string name="loadingRelatedSongs">Loading related songs</string>
 </resources>

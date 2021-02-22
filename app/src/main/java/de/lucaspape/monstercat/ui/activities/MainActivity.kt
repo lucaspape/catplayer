@@ -21,6 +21,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.download.*
 import de.lucaspape.monstercat.core.music.*
+import de.lucaspape.monstercat.core.music.notification.hideLoadingRelatedSongsNotification
+import de.lucaspape.monstercat.core.music.notification.showLoadingRelatedNotification
 import de.lucaspape.monstercat.core.music.notification.updateNotification
 import de.lucaspape.monstercat.core.music.save.PlayerSaveState
 import de.lucaspape.monstercat.core.music.util.*
@@ -200,7 +202,7 @@ class MainActivity : AppCompatActivity() {
         bindPlayerUICallbacks()
 
         setupMusicPlayer(
-            { context, callback ->
+            { context, callback, errorCallback ->
                 Settings.getSettings(context)
                     .getBoolean(context.getString(R.string.skipMonstercatSongsSetting))?.let {
                         genericScope.launch {
@@ -218,7 +220,7 @@ class MainActivity : AppCompatActivity() {
                                     }
                                 },
                                 errorCallback = {
-                                    //TODO handle error
+                                    errorCallback()
                                 })
                         }
                     }
@@ -451,6 +453,14 @@ class MainActivity : AppCompatActivity() {
 
         setTagCallback = { target ->
             barCoverImage.tag = target
+        }
+
+        loadingRelatedChangedCallback = {
+            if(loadingRelatedSongs){
+                showLoadingRelatedNotification(this)
+            }else{
+                hideLoadingRelatedSongsNotification(this)
+            }
         }
     }
 
