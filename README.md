@@ -36,11 +36,7 @@ This custom API is open source and available [here](https://github.com/lucaspape
 
 ## Todo
 
- - Retain position of list
- - Favorites
- - More song info
- - Browse by artist
- - Mirror playlists from spotify / public playlists
+Look at issues on github  
 
 ## Beta
 
