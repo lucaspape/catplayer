@@ -21,6 +21,7 @@ import kotlin.random.Random
 //main exoPlayer
 var exoPlayer: SimpleExoPlayer? = null
     set(value) {
+        currentListenerId = ""
         field?.playWhenReady = false
         field?.release()
         field?.stop()
@@ -182,6 +183,7 @@ fun previous(context: Context) {
  */
 fun pause(context: Context) {
     exoPlayer?.playWhenReady = false
+    visiblePlaying = false
 
     PlayerSaveState.saveMusicPlayerState(context)
 }
@@ -213,7 +215,7 @@ fun resume(context: Context) {
  * Toggle playback (play/pause)
  */
 fun toggleMusic(context: Context) {
-    if (exoPlayer?.isPlaying == true) {
+    if (visiblePlaying) {
         pause(context)
     } else {
         resume(context)
@@ -235,6 +237,7 @@ fun stop(context: Context) {
 
     }
 
+    visiblePlaying = false
     stopPlayerService(context)
 }
 

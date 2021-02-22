@@ -85,7 +85,7 @@ var artistDrawable: Drawable? = null
         artistDrawableChangedCallback()
     }
 
-var playing = false
+var visiblePlaying = false
     set(newBoolean) {
         field = newBoolean
         playingChangedCallback()

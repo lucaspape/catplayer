@@ -100,6 +100,8 @@ fun playSong(
     playWhenReady: Boolean,
     progress: Long?
 ) {
+    visiblePlaying = playWhenReady
+
     //preparingDone callback, see below
     val preparingDone = {
         if (exoPlayerSongId != songId || (exoPlayerSongId == songId && preparedExoPlayer?.isPlaying == true)) {
@@ -206,10 +208,6 @@ fun runSeekBarUpdate(context: Context, prepareNext: Boolean, crossFade: Boolean)
 
     val updateSeekBar = object : Runnable {
         override fun run() {
-            exoPlayer?.isPlaying?.let { isPlaying ->
-                playing = isPlaying
-            }
-
             exoPlayer?.duration?.toInt()?.let {
                 duration = it
             }

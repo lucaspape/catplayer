@@ -24,12 +24,9 @@ fun getPlayerListener(context: Context, songId: String, crossFade:Boolean): Play
     currentListenerId = id
 
     return object : Player.EventListener {
-        @Override
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
             if (currentListenerId == id) {
-                exoPlayer?.isPlaying?.let { isPlaying ->
-                    playing = isPlaying
-                }
+                visiblePlaying = playWhenReady
 
                 startPlayerService(context, songId)
 

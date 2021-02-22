@@ -91,7 +91,7 @@ class FullscreenPlayerPage(
         barCoverImage.setImageBitmap(coverBitmap)
 
         playingChangedCallback = {
-            if (playing) {
+            if (visiblePlaying) {
                 playButton.setImageURI(pauseButtonDrawable.toUri())
 
             } else {
@@ -99,9 +99,7 @@ class FullscreenPlayerPage(
             }
         }
 
-        exoPlayer?.isPlaying?.let { isPlaying ->
-            playing = isPlaying
-        }
+        playingChangedCallback()
 
         coverBitmapChangedCallback = {
             barCoverImage.setImageBitmap(coverBitmap)

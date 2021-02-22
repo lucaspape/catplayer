@@ -437,17 +437,15 @@ class MainActivity : AppCompatActivity() {
         barCoverImage.setImageBitmap(coverBitmap)
 
         playingChangedCallback = {
-            if (playing) {
+            if (visiblePlaying) {
                 playButton.setImageURI(pauseButtonDrawable.toUri())
 
             } else {
                 playButton.setImageURI(playButtonDrawable.toUri())
             }
         }
-
-        exoPlayer?.isPlaying?.let { isPlaying ->
-            playing = isPlaying
-        }
+        
+        playingChangedCallback()
 
         coverBitmapChangedCallback = {
             barCoverImage.setImageBitmap(coverBitmap)

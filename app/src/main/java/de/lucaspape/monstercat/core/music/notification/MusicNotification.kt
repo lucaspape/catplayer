@@ -12,6 +12,7 @@ import androidx.core.app.NotificationCompat
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.core.music.*
+import de.lucaspape.monstercat.core.music.util.visiblePlaying
 import java.lang.IllegalArgumentException
 
 private const val PLAY_PAUSE_ACTION = "de.lucaspape.monstercat.playpause"
@@ -106,7 +107,7 @@ fun createPlayerNotification(
         PREV_ACTION, prevPendingIntent
     ).build()
 
-    val playPauseIcon: Int = if (exoPlayer?.isPlaying == true) {
+    val playPauseIcon: Int = if (visiblePlaying) {
         R.drawable.ic_pause_black_24dp
     } else {
         R.drawable.ic_play_arrow_black_24dp
