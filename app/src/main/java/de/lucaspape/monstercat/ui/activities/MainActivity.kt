@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import androidx.core.view.isVisible
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.download.*
@@ -394,11 +395,20 @@ class MainActivity : AppCompatActivity() {
         val seekbar = findViewById<SeekBar>(R.id.seekBar)
         val barCoverImage = findViewById<ImageView>(R.id.barCoverImage)
         val playButton = findViewById<ImageButton>(R.id.playButton)
+        val musicBar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.musicBar)
 
         titleChangedCallback = {
             val titleWithArtist = "${de.lucaspape.monstercat.core.music.util.title} - $artist"
             titleTextView.text = titleWithArtist
+
+            musicBar.isVisible = de.lucaspape.monstercat.core.music.util.title.isNotEmpty()
+            barCoverImage.isVisible = de.lucaspape.monstercat.core.music.util.title.isNotEmpty()
+            playButton.isVisible = de.lucaspape.monstercat.core.music.util.title.isNotEmpty()
         }
+
+        musicBar.isVisible = de.lucaspape.monstercat.core.music.util.title.isNotEmpty()
+        barCoverImage.isVisible = de.lucaspape.monstercat.core.music.util.title.isNotEmpty()
+        playButton.isVisible = de.lucaspape.monstercat.core.music.util.title.isNotEmpty()
 
         val titleWithArtist = "${de.lucaspape.monstercat.core.music.util.title} - $artist"
         titleTextView.text = titleWithArtist

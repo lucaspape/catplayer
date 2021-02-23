@@ -34,6 +34,7 @@ import de.lucaspape.monstercat.ui.displaySnackBar
 import de.lucaspape.monstercat.util.*
 import de.lucaspape.monstercat.core.util.Settings
 import de.lucaspape.monstercat.request.async.checkCustomApiFeatures
+import de.lucaspape.monstercat.ui.abstract_items.util.SpacerItem
 import de.lucaspape.monstercat.ui.activities.genericScope
 import de.lucaspape.monstercat.ui.pages.util.Page
 import kotlinx.coroutines.launch
@@ -72,6 +73,8 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page() {
         loggedInStateChangedListeners.add(LoggedInStateChangedListener({
             onCreate(view)
         }, true))
+
+        itemAdapter.add(SpacerItem())
     }
 
     override val pageName: String = settingsPageName

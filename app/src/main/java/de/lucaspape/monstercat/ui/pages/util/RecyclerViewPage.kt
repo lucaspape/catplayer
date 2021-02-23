@@ -21,6 +21,7 @@ import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
 import de.lucaspape.monstercat.ui.abstract_items.content.PlaylistItem
 import de.lucaspape.monstercat.ui.abstract_items.util.HeaderTextItem
 import de.lucaspape.monstercat.ui.abstract_items.util.ProgressItem
+import de.lucaspape.monstercat.ui.abstract_items.util.SpacerItem
 import de.lucaspape.monstercat.ui.displaySnackBar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -89,7 +90,7 @@ abstract class RecyclerViewPage {
     private var recyclerView: RecyclerView? = null
     private var itemAdapter = ItemAdapter<GenericItem>()
     private var headerAdapter = ItemAdapter<HeaderTextItem>()
-    private var footerAdapter = ItemAdapter<ProgressItem>()
+    private var footerAdapter = ItemAdapter<GenericItem>()
 
     private var viewData = ArrayList<GenericItem>()
 
@@ -313,6 +314,10 @@ abstract class RecyclerViewPage {
                             restoreRecyclerViewPosition(view.context)
 
                             currentLoaderId = ""
+
+                            if(getOrientation(view) == LinearLayout.VERTICAL){
+                                footerAdapter.add(SpacerItem())
+                            }
                         }
                     }
                 }
@@ -365,6 +370,10 @@ abstract class RecyclerViewPage {
                                         scrollListener?.enable()
 
                                         currentLoaderId = ""
+
+                                        if(getOrientation(view) == LinearLayout.VERTICAL){
+                                            footerAdapter.add(SpacerItem())
+                                        }
                                     }
                                 }
                             }

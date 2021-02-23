@@ -7,7 +7,6 @@
     android:parentActivityName=".MainActivity">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:layout_marginBottom="123dp"
         android:id="@+id/settingsRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

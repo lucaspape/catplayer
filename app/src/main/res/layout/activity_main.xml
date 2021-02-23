@@ -3,10 +3,23 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.activities.MainActivity">
+    
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:id="@+id/container"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="70dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/nav_view"
@@ -24,11 +37,10 @@
         android:id="@+id/musicBar"
         android:layout_width="fill_parent"
         android:layout_height="50dp"
-        android:layout_marginBottom="78dp"
-        android:background="@drawable/toolbar_style"
+        android:background="?attr/colorOnPrimary"
         android:contentDescription="@string/musicbarDescription"
         android:gravity="bottom"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/nav_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent" />
@@ -43,10 +55,8 @@
         android:textColor="?android:attr/textColorPrimary"
         app:layout_constraintBottom_toBottomOf="@+id/musicBar"
         app:layout_constraintEnd_toStartOf="@+id/playButton"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/barCoverImage"
-        app:layout_constraintTop_toBottomOf="@+id/seekBar"
-        app:layout_constraintVertical_bias="0.527"
+        app:layout_constraintTop_toTopOf="@+id/musicBar"
         android:ellipsize="marquee"
         android:marqueeRepeatLimit="marquee_forever"
         android:scrollHorizontally="true"
@@ -68,7 +78,6 @@
         android:layout_width="35dp"
         android:layout_height="35dp"
         android:layout_marginStart="5dp"
-        android:layout_marginTop="15dp"
         android:contentDescription="@string/coverImage"
         app:layout_constraintBottom_toBottomOf="@+id/musicBar"
         app:layout_constraintStart_toStartOf="@+id/musicBar"
@@ -84,8 +93,9 @@
         android:paddingStart="0dp"
         android:paddingEnd="0dp"
         android:thumb="@null"
+        android:layout_marginBottom="41dp"
         app:layout_constraintEnd_toEndOf="@+id/musicBar"
         app:layout_constraintStart_toStartOf="@+id/musicBar"
-        app:layout_constraintTop_toTopOf="@+id/musicBar" />
+        app:layout_constraintBottom_toTopOf="@+id/nav_view" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
