@@ -3,7 +3,7 @@
     <string name="app_name">Catplayer</string>
     <string name="title_home">Home</string>
     <string name="title_playlist">Playlist</string>
-    <string name="password">Password</string>
+    <string name="password">Passwort</string>
     <string name="addaccount">Anmelden</string>
     <string name="download">Herunterladen</string>
     <string name="downloadAlbum">Album herunterladen</string>
@@ -64,7 +64,6 @@
     <string name="skipSongsMonstercat">Überspringe Lieder von Monstercat (z.b. COTW)</string>
     <string name="songNotPlayableError">Lied nicht verfügbar!</string>
     <string name="crossfade">Crossfade</string>
-    <string name="monstercatLivestream">Monstercat Livestream</string>
     <string name="songProgress">Lied Fortschritt</string>
     <string name="addToQueue">Zur Warteschlange hinzufügen</string>
     <string name="addAlbumToQueue">Füge Album zur Warteschlange hinzu</string>

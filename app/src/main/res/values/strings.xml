@@ -63,7 +63,6 @@
     <string name="skipSongsMonstercat">Skip songs from monstercat (e.g. COTW)</string>
     <string name="songNotPlayableError">Song is not available!</string>
     <string name="crossfade">Crossfade</string>
-    <string name="monstercatLivestream">Monstercat Livestream</string>
     <string name="songProgress">Song progress</string>
     <string name="addToQueue">Add to queue</string>
     <string name="addAlbumToQueue">Add album to queue</string>
