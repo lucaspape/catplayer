@@ -17,6 +17,7 @@ import de.lucaspape.monstercat.core.music.util.*
 import de.lucaspape.monstercat.core.util.Settings
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.math.log
 import kotlin.random.Random
 
 //main exoPlayer
@@ -134,7 +135,7 @@ fun applyPlayerSettings(context: Context) {
     }
 
     settings.getFloat(context.getString(R.string.volumeSetting))?.let {
-        volume = it
+        volume = 1 - log(100 - (it * 100), 100.toFloat())
     }
 
     settings.getBoolean(context.getString(R.string.playRelatedSetting))?.let {
