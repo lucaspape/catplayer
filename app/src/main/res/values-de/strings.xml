@@ -80,11 +80,11 @@
     <string name="errorLoadingSearch">Fehler beim Laden der Suche</string>
     <string name="errorLoadingPlaylists">Fehler beim Laden der Playlisten (bist du angemeldet?)</string>
     <string name="errorLoadingPlaylistTracks">Fehler beim Laden des Playlistinhalts</string>
-    <string name="downloadNotificationChannelId">Download Benachrichtigung</string>
+    <string name="downloadNotificationChannelName">Download Benachrichtigung</string>
     <string name="downloadNotificationDescription">Download Benachrichtigung für Catplayer</string>
-    <string name="musicNotificationChannelId">Player Benachrichtigung</string>
+    <string name="musicNotificationChannelName">Player Benachrichtigung</string>
     <string name="musicNotificationDescription">Player Benachrichtigung für Catplayer</string>
-    <string name="relatedNotificationChannelId">Lade ähnliche Lieder Benachrichtigung</string>
+    <string name="relatedNotificationChannelName">Lade ähnliche Lieder Benachrichtigung</string>
     <string name="relatedNotificationChannelDescription">Laden der ähnlichen Lieder kann einige Sekunden dauern</string>
     <string name="playlistId">Playlist ID</string>
     <string name="addPlaylistId">Füge Playlist mithilfe der Playlist ID hinzu</string>

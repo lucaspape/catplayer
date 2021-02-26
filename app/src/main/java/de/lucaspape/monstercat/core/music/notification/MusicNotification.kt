@@ -43,7 +43,7 @@ fun createPlayerNotification(
 ): Notification {
     val notificationBuilder = NotificationCompat.Builder(
         context,
-        context.getString(R.string.musicNotificationChannelId)
+        notificationChannelId
     )
 
     val notificationStyle = androidx.media.app.NotificationCompat.MediaStyle()
@@ -234,14 +234,16 @@ fun updateNotification(
     )
 }
 
+private const val notificationChannelId = "playerNotification"
+
 fun createNotificationChannel(context: Context) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        val channelName = context.getString(R.string.musicNotificationChannelId)
+        val channelName = context.getString(R.string.musicNotificationChannelName)
         val channelDescription = context.getString(R.string.musicNotificationDescription)
         val importance = NotificationManager.IMPORTANCE_LOW
 
         val notificationChannel = NotificationChannel(
-            context.getString(R.string.musicNotificationChannelId),
+            notificationChannelId,
             channelName,
             importance
         )
@@ -264,7 +266,7 @@ fun showLoadingRelatedNotification(context: Context){
 
     val notificationBuilder = NotificationCompat.Builder(
         context,
-        context.getString(R.string.relatedNotificationChannelId)
+        loadRelatedSongsNotificationChannelId
     )
     notificationBuilder.setContentTitle(context.getString(R.string.loadingRelatedSongs))
     notificationBuilder.setSmallIcon(R.drawable.ic_file_download_black_24dp)
@@ -282,14 +284,16 @@ fun hideLoadingRelatedSongsNotification(context: Context) {
     notificationManager.cancel(relatedNotificationId)
 }
 
+private const val loadRelatedSongsNotificationChannelId = "loadRelatedSongs"
+
 fun createLoadingRelatedNotificationChannel(context: Context){
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        val channelName = context.getString(R.string.relatedNotificationChannelId)
+        val channelName = context.getString(R.string.relatedNotificationChannelName)
         val channelDescription = context.getString(R.string.relatedNotificationChannelDescription)
         val importance = NotificationManager.IMPORTANCE_LOW
 
         val notificationChannel = NotificationChannel(
-            context.getString(R.string.relatedNotificationChannelId),
+            loadRelatedSongsNotificationChannelId,
             channelName,
             importance
         )

@@ -26,7 +26,7 @@ fun showDownloadNotification(
 
     val notificationBuilder = NotificationCompat.Builder(
         context,
-        context.getString(R.string.downloadNotificationChannelId)
+        downloadNotificationChannelId
     )
     notificationBuilder.setContentTitle(shownTitle)
     notificationBuilder.setSmallIcon(R.drawable.ic_file_download_black_24dp)
@@ -46,14 +46,16 @@ fun hideDownloadNotification(context: Context) {
     notificationManager.cancel(downloadNotificationID)
 }
 
+private const val downloadNotificationChannelId = "downloadNotification"
+
 private fun createDownloadNotificationChannel(context: Context) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        val channelName = context.getString(R.string.downloadNotificationChannelId)
+        val channelName = context.getString(R.string.downloadNotificationChannelName)
         val channelDescription = context.getString(R.string.downloadNotificationDescription)
         val importance = NotificationManager.IMPORTANCE_LOW
 
         val notificationChannel = NotificationChannel(
-            context.getString(R.string.downloadNotificationChannelId),
+            downloadNotificationChannelId,
             channelName,
             importance
         )

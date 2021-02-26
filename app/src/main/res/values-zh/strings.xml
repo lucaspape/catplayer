@@ -79,11 +79,11 @@
     <string name="errorLoadingSearch">加载搜索时出错</string>
     <string name="errorLoadingPlaylists">加载播放列表时出错（您已登录吗？）</string>
     <string name="errorLoadingPlaylistTracks">加载播放列表曲目时出错</string>
-    <string name="downloadNotificationChannelId">下载通知</string>
+    <string name="downloadNotificationChannelName">下载通知</string>
     <string name="downloadNotificationDescription">下载Catplayer的通知</string>
-    <string name="musicNotificationChannelId">玩家通知</string>
+    <string name="musicNotificationChannelName">玩家通知</string>
     <string name="musicNotificationDescription">Catplayer的播放器通知</string>
-    <string name="relatedNotificationChannelId">加载相关歌曲通知</string>
+    <string name="relatedNotificationChannelName">加载相关歌曲通知</string>
     <string name="relatedNotificationChannelDescription">加载相关歌曲可能需要几秒钟</string>
     <string name="playlistId">播放清单识别</string>
     <string name="addPlaylistId">从播放列表ID添加播放列表</string>

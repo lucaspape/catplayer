@@ -79,11 +79,11 @@
     <string name="errorLoadingSearch">Error loading search</string>
     <string name="errorLoadingPlaylists">Error loading playlists (are you logged in?)</string>
     <string name="errorLoadingPlaylistTracks">Error loading playlist tracks</string>
-    <string name="downloadNotificationChannelId">Download Notification</string>
+    <string name="downloadNotificationChannelName">Download Notification</string>
     <string name="downloadNotificationDescription">Download Notification for Catplayer</string>
-    <string name="musicNotificationChannelId">Player Notification</string>
+    <string name="musicNotificationChannelName">Player Notification</string>
     <string name="musicNotificationDescription">Player Notification for Catplayer</string>
-    <string name="relatedNotificationChannelId">Loading related songs notification</string>
+    <string name="relatedNotificationChannelName">Loading related songs notification</string>
     <string name="relatedNotificationChannelDescription">Loading related songs can take a few seconds</string>
     <string name="playlistId">Playlist ID</string>
     <string name="addPlaylistId">Add playlist from Playlist ID</string>

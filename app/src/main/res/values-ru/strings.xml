@@ -79,11 +79,11 @@
     <string name="errorLoadingSearch">Ошибка загрузки поиска</string>
     <string name="errorLoadingPlaylists">Ошибка загрузки плейлистов (вы вошли в систему?)</string>
     <string name="errorLoadingPlaylistTracks">Ошибка загрузки треков плейлиста</string>
-    <string name="downloadNotificationChannelId">Уведомление о загрузке </string>
+    <string name="downloadNotificationChannelName">Уведомление о загрузке </string>
     <string name="downloadNotificationDescription">Скачать уведомление для Catplayer</string>
-    <string name="musicNotificationChannelId">Уведомление игрока</string>
+    <string name="musicNotificationChannelName">Уведомление игрока</string>
     <string name="musicNotificationDescription">Уведомление игрока для Catplayer</string>
-    <string name="relatedNotificationChannelId">Уведомление о загрузке связанных песен</string>
+    <string name="relatedNotificationChannelName">Уведомление о загрузке связанных песен</string>
     <string name="relatedNotificationChannelDescription">Загрузка похожих песен может занять несколько секунд </string>
     <string name="playlistId">ID плейлиста</string>
     <string name="addPlaylistId">Добавить плейлист по идентификатору плейлиста</string>
