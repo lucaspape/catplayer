@@ -135,7 +135,7 @@ data class Song(
     }
 
     fun playbackAllowed(context: Context): Boolean {
-        val networkAllowed = wifiConnected(context) == true || Settings.getSettings(
+        val networkAllowed = wifiConnected(context) || Settings.getSettings(
             context
         )
             .getBoolean(context.getString(R.string.streamOverMobileSetting)) == true || downloaded

@@ -130,4 +130,5 @@
     <string name="useCustomApiForSearch">Advanced search (uses custom API)</string>
     <string name="livestreamWarning">Warning: Livestream takes a few seconds to load/start!</string>
     <string name="loadingRelatedSongs">Loading related songs</string>
+    <string name="deleteDownload">Delete download</string>
 </resources>

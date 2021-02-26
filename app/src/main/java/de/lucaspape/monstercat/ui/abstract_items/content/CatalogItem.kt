@@ -28,6 +28,7 @@ import de.lucaspape.monstercat.core.music.prioritySongQueue
 import de.lucaspape.monstercat.ui.*
 import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListHeaderItem
 import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListItem
+import java.io.File
 
 open class CatalogItem(
     val songId: String
@@ -62,23 +63,41 @@ open class CatalogItem(
             val id = contentList[listViewPosition]
 
             SongDatabaseHelper(view.context).getSong(view.context, id)?.let { song ->
-                val itemList = arrayListOf(
-                    AlertListItem(
-                        view.context.getString(R.string.download),
-                        downloadDrawable
-                    ),
+                val itemList = ArrayList<AlertListItem>()
+
+                if (song.isDownloadable) {
+                    if (song.downloaded) {
+                        AlertListItem(
+                            view.context.getString(R.string.deleteDownload),
+                            deleteDrawable
+                        )
+                    } else {
+                        AlertListItem(
+                            view.context.getString(R.string.download),
+                            downloadDrawable
+                        )
+                    }
+                }
+
+                itemList.add(
                     AlertListItem(
                         view.context.getString(R.string.addToQueue),
                         addToQueueDrawable
-                    ),
+                    )
+                )
+                itemList.add(
                     AlertListItem(
                         view.context.getString(R.string.addToPlaylist),
                         addToPlaylistDrawable
-                    ),
+                    )
+                )
+                itemList.add(
                     AlertListItem(
                         view.context.getString(R.string.shareAlbum),
                         shareDrawable
-                    ),
+                    )
+                )
+                itemList.add(
                     AlertListItem(
                         view.context.getString(R.string.openAlbumInApp),
                         openInAppDrawable
@@ -98,6 +117,7 @@ open class CatalogItem(
                             view.context,
                             song.songId
                         ) {}
+                        view.context.getString(R.string.deleteDownload) -> File(song.downloadLocation).delete()
                         view.context.getString(R.string.addToQueue) -> prioritySongQueue.add(id)
                         view.context.getString(R.string.addToPlaylist) -> addSongToPlaylist(
                             view,
@@ -127,32 +147,50 @@ open class CatalogItem(
         ) {
             view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
 
-            val itemList = arrayListOf(
-                AlertListItem(
-                    view.context.getString(R.string.download),
-                    downloadDrawable
-                ),
-                AlertListItem(
-                    view.context.getString(R.string.addToQueue),
-                    addToQueueDrawable
-                ),
-                AlertListItem(
-                    view.context.getString(R.string.delete),
-                    deleteDrawable
-                ),
-                AlertListItem(
-                    view.context.getString(R.string.shareAlbum),
-                    shareDrawable
-                ),
-                AlertListItem(
-                    view.context.getString(R.string.openAlbumInApp),
-                    openInAppDrawable
-                )
-            )
+            val itemList = ArrayList<AlertListItem>()
 
             val id = data[listViewPosition]
 
             SongDatabaseHelper(view.context).getSong(view.context, id)?.let { song ->
+                if (song.isDownloadable) {
+                    if (song.downloaded) {
+                        AlertListItem(
+                            view.context.getString(R.string.deleteDownload),
+                            deleteDrawable
+                        )
+                    } else {
+                        AlertListItem(
+                            view.context.getString(R.string.download),
+                            downloadDrawable
+                        )
+                    }
+                }
+
+                itemList.add(
+                    AlertListItem(
+                        view.context.getString(R.string.addToQueue),
+                        addToQueueDrawable
+                    )
+                )
+                itemList.add(
+                    AlertListItem(
+                        view.context.getString(R.string.delete),
+                        deleteDrawable
+                    )
+                )
+                itemList.add(
+                    AlertListItem(
+                        view.context.getString(R.string.shareAlbum),
+                        shareDrawable
+                    )
+                )
+                itemList.add(
+                    AlertListItem(
+                        view.context.getString(R.string.openAlbumInApp),
+                        openInAppDrawable
+                    )
+                )
+
                 displayAlertDialogList(
                     view.context,
                     AlertListHeaderItem(
@@ -166,6 +204,7 @@ open class CatalogItem(
                         view.context.getString(R.string.download) -> {
                             addDownloadSong(view.context, song.songId) {}
                         }
+                        view.context.getString(R.string.deleteDownload) -> File(song.downloadLocation).delete()
                         view.context.getString(R.string.addToQueue) -> {
                             prioritySongQueue.add(id)
                         }
@@ -188,8 +227,8 @@ open class CatalogItem(
                             openAlbum(view, song.mcAlbumId, false)
                         }
                     }
-                }
 
+                }
             }
         }
     }

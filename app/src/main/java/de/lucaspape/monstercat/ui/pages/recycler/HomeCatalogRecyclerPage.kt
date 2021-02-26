@@ -105,7 +105,7 @@ open class HomeCatalogRecyclerPage : RecyclerViewPage() {
             withContext(Dispatchers.Main) {
                 song?.let {
                     when {
-                        File(song.downloadLocation).exists() -> {
+                        song.downloaded -> {
                             File(song.downloadLocation).delete()
 
                             downloadImageButton.setImageURI(CatalogItem.getSongDownloadStatus(song))
