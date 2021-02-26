@@ -9,6 +9,9 @@ import de.lucaspape.monstercat.core.music.util.currentPosition
 import de.lucaspape.monstercat.core.music.util.duration
 import de.lucaspape.monstercat.core.music.util.playSong
 import java.io.*
+import java.util.*
+import kotlin.ConcurrentModificationException
+import kotlin.collections.ArrayList
 
 data class PlayerSaveState(
     val loop: Boolean,
@@ -19,7 +22,7 @@ data class PlayerSaveState(
     val playlistIndex: Int,
     val nextRandom: Int,
     val songQueue: ArrayList<String>,
-    val prioritySongQueue: ArrayList<String>,
+    val prioritySongQueue: LinkedList<String>,
     val progress: Long?,
     val duration: Long?
 ) : Serializable {

@@ -724,7 +724,8 @@ fun playSongsFromViewDataAsync(
     clearPlaylist()
     clearQueue()
 
-    songQueue.add(catalogViewData[itemIndex].songId)
+    //songQueue.add(catalogViewData[itemIndex].songId)
+    prioritySongQueue.push(catalogViewData[itemIndex].songId)
     skipPreviousInPlaylist()
     next(context)
 

@@ -15,6 +15,8 @@ import de.lucaspape.monstercat.core.music.notification.stopPlayerService
 import de.lucaspape.monstercat.core.music.save.PlayerSaveState
 import de.lucaspape.monstercat.core.music.util.*
 import de.lucaspape.monstercat.core.util.Settings
+import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.random.Random
 
 //main exoPlayer
@@ -40,7 +42,7 @@ var preparedExoPlayer: SimpleExoPlayer? = null
 var songQueue = ArrayList<String>()
 
 //priority queue for songs (will always be played back first)
-var prioritySongQueue = ArrayList<String>()
+var prioritySongQueue = LinkedList<String>()
 
 var relatedSongQueue = ArrayList<String>()
 
