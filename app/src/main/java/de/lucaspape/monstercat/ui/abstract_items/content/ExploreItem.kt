@@ -16,7 +16,6 @@ import de.lucaspape.monstercat.request.async.loadGenres
 import de.lucaspape.monstercat.request.async.loadGreatestHits
 import de.lucaspape.monstercat.request.async.loadLiveStreams
 import de.lucaspape.monstercat.request.async.loadMoods
-import de.lucaspape.monstercat.ui.displaySnackBar
 import de.lucaspape.monstercat.ui.pages.recycler.HomeCatalogRecyclerPage
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
 import de.lucaspape.monstercat.ui.pages.util.playSongsFromViewDataAsync
@@ -200,11 +199,6 @@ class ExploreItem(
                                     context,
                                     forceReload,
                                     displayLoading = {
-                                        displaySnackBar(
-                                            view,
-                                            view.context.getString(R.string.livestreamWarning),
-                                            null
-                                        ) {}
                                     },
                                     finishedCallback = {
                                         val idArray = ArrayList<String>()

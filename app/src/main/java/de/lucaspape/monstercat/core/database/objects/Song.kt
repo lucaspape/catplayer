@@ -154,7 +154,7 @@ data class Song(
         return ProgressiveMediaSource.Factory(
             DefaultDataSourceFactory(
                 context, Util.getUserAgent(
-                    context, context.getString(R.string.applicationName)
+                    context, context.getString(R.string.app_name)
                 )
             )
         ).createMediaSource(MediaItem.fromUri(Uri.parse("file://$fileLocation")))
@@ -172,7 +172,7 @@ data class Song(
         httpSourceFactory.setUserAgent(
             Util.getUserAgent(
                 context,
-                context.getString(R.string.applicationName)
+                context.getString(R.string.app_name)
             )
         )
 

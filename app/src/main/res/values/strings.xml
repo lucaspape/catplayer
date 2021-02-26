@@ -35,7 +35,6 @@
     <string name="errorNotLoggedIn">Not logged in</string>
     <string name="musicbarDescription">Currently playing</string>
     <string name="homeSearchDescription">Search song</string>
-    <string name="applicationName">Catplayer</string>
     <string name="email">Email</string>
     <string name="playlistDeletedMsg">Playlist deleted!</string>
     <string name="errorDeletingPlaylist">Could not delete playlist</string>
@@ -81,16 +80,12 @@
     <string name="errorLoadingSearch">Error loading search</string>
     <string name="errorLoadingPlaylists">Error loading playlists (are you logged in?)</string>
     <string name="errorLoadingPlaylistTracks">Error loading playlist tracks</string>
-
     <string name="downloadNotificationChannelId">Download Notification</string>
     <string name="downloadNotificationDescription">Download Notification for Catplayer</string>
-
     <string name="musicNotificationChannelId">Player Notification</string>
     <string name="musicNotificationDescription">Player Notification for Catplayer</string>
-
     <string name="relatedNotificationChannelId">Loading related songs notification</string>
     <string name="relatedNotificationChannelDescription">Loading related songs can take a few seconds</string>
-
     <string name="playlistId">Playlist ID</string>
     <string name="addPlaylistId">Add playlist from Playlist ID</string>
     <string name="renamePlaylist">Rename playlist</string>
@@ -111,10 +106,6 @@
     <string name="customApiEnableError">Could not enable custom API!</string>
     <string name="setCustomApiUrl">Set custom API URL</string>
     <string name="back">Back</string>
-    <string name="loadLiveInfo">Load liveinfo while playing livestream (uses custom API)</string>
-
-    <string name="defaultNotificationTopics">[{\"description\": \"Default push notifications\", \"topicname\": \"default\"}, {\"description\": \"Monstercat Newsletter\", \"topicname\": \"newsletter\"}]</string>
-    <string name="pushNotifications">Push notifications</string>
     <string name="accountSettings">Account Settings</string>
     <string name="playbackSettings">Playback Settings</string>
     <string name="dataSettings">Data Settings</string>
@@ -124,11 +115,9 @@
     <string name="notOnline">Not Online!</string>
     <string name="logout">Logout</string>
     <string name="title_explore">Explore</string>
-
     <string name="useCustomApiForEverything">Replace everything with custom API</string>
     <string name="useCustomApiForCoverImages">Faster cover images download (uses custom API)</string>
     <string name="useCustomApiForSearch">Advanced search (uses custom API)</string>
-    <string name="livestreamWarning">Warning: Livestream takes a few seconds to load/start!</string>
     <string name="loadingRelatedSongs">Loading related songs</string>
     <string name="deleteDownload">Delete download</string>
 </resources>
