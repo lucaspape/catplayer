@@ -1,34 +1,32 @@
 package de.lucaspape.monstercat.core.util
 
 import android.content.Context
+import android.content.SharedPreferences
 import de.lucaspape.monstercat.R
 
-class Settings(private val context: Context) {
+class Settings {
 
     companion object {
         private const val version = "1.3"
-
+        
         @JvmStatic
-        var settings: Settings? = null
+        private var sharedPreferences:SharedPreferences? = null
 
         @JvmStatic
         fun getSettings(context: Context): Settings {
-            settings?.let {
-                return it
+            if(sharedPreferences == null){
+                sharedPreferences = context.getSharedPreferences("settings", 0)
+            }
+            
+            val settings = Settings()
+
+            if (settings.getString("settings-version") != version) {
+                settings.onUpgrade(context)
+            } else {
+                settings.setDefaultSettings(context, false)
             }
 
-            val nSettings = Settings(context)
-            settings = nSettings
-
-            return nSettings
-        }
-    }
-
-    init {
-        if (getString("settings-version") != version) {
-            onUpgrade()
-        } else {
-            setDefaultSettings(false)
+            return settings
         }
     }
 
@@ -36,18 +34,16 @@ class Settings(private val context: Context) {
      * Get a setting
      */
     fun getString(key: String): String? {
-        val sharedPreferences = context.getSharedPreferences("settings", 0)
-        return sharedPreferences.getString(key, null)
+        return sharedPreferences?.getString(key, null)
     }
 
     /**
      * Save a setting
      */
     fun setString(key: String, setting: String) {
-        val sharedPreferences = context.getSharedPreferences("settings", 0)
-        val editor = sharedPreferences.edit()
-        editor.putString(key, setting)
-        editor.apply()
+        val editor = sharedPreferences?.edit()
+        editor?.putString(key, setting)
+        editor?.apply()
     }
 
     fun setBoolean(key: String, boolean: Boolean) {
@@ -82,15 +78,15 @@ class Settings(private val context: Context) {
         return null
     }
 
-    private fun onUpgrade() {
-        setDefaultSettings(true)
+    private fun onUpgrade(context: Context) {
+        setDefaultSettings(context, true)
         setString("settings-version", version)
     }
 
     /**
      * Set default
      */
-    private fun setDefaultSettings(overwrite: Boolean) {
+    private fun setDefaultSettings(context: Context, overwrite: Boolean) {
         val defaultDownloadType = "mp3_320"
         val defaultPrimaryCoverResolution = 512
         val defaultSecondaryCoverResolution = 128

@@ -66,7 +66,7 @@ class ExploreItem(
                         }
                         is CatalogItem -> {
                             val skipMonstercatSongs =
-                                Settings(context).getBoolean(context.getString(R.string.skipMonstercatSongsSetting)) == true
+                                Settings.getSettings(context).getBoolean(context.getString(R.string.skipMonstercatSongsSetting)) == true
 
                             val catalogViewData = ArrayList<CatalogItem>()
 

@@ -32,7 +32,7 @@ open class HomeCatalogRecyclerPage : RecyclerViewPage() {
 
         if (fistItem is CatalogItem) {
             val skipMonstercatSongs =
-                Settings(context).getBoolean(context.getString(R.string.skipMonstercatSongsSetting)) == true
+                Settings.getSettings(context).getBoolean(context.getString(R.string.skipMonstercatSongsSetting)) == true
 
             withContext(Dispatchers.Main) {
                 if (!id.contains("explore")){
