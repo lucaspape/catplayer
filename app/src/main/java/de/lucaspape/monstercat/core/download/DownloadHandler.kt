@@ -7,6 +7,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import com.squareup.picasso.Picasso
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.core.download.DownloadService.Companion.downloadTask
 import de.lucaspape.monstercat.core.util.wifiConnected
 import de.lucaspape.monstercat.core.util.Settings
@@ -37,15 +38,17 @@ var fallbackFile = File("")
 var fallbackFileLow = File("")
 
 fun addDownloadSong(context: Context, songId: String, downloadFinished: () -> Unit) {
-    preDownloadCallbacks[songId]?.let {
-        it()
-    }
+    if(SongDatabaseHelper(context).getSong(context, songId)?.isDownloadable == true){
+        preDownloadCallbacks[songId]?.let {
+            it()
+        }
 
-    downloadList.add(SoftReference(DownloadObject(songId, downloadFinished)))
+        downloadList.add(SoftReference(DownloadObject(songId, downloadFinished)))
 
-    if (downloadTask?.active != true) {
-        downloadTask = DownloadTask(WeakReference(context))
-        downloadTask?.execute()
+        if (downloadTask?.active != true) {
+            downloadTask = DownloadTask(WeakReference(context))
+            downloadTask?.execute()
+        }
     }
 }
 
@@ -95,7 +98,7 @@ fun downloadImageUrlIntoImageReceiver(
             }
 
         } else {
-            if (wifiConnected(context) == true || settings.getBoolean(context.getString(R.string.downloadCoversOverMobileSetting)) == true) {
+            if (wifiConnected(context) || settings.getBoolean(context.getString(R.string.downloadCoversOverMobileSetting)) == true) {
                 val picassoTarget = object : com.squareup.picasso.Target {
                     override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
                     }
