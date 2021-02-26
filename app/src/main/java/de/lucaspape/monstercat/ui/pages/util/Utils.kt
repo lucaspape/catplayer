@@ -276,7 +276,7 @@ fun addSongToPlaylist(view: View, songId: String) {
             errorCallback = {
                 displaySnackBar(
                     view,
-                    view.context.getString(R.string.errorRetrievePlaylist),
+                    view.context.getString(R.string.errorLoadingPlaylists),
                     view.context.getString(R.string.retry)
                 ) {
                     addSongToPlaylist(

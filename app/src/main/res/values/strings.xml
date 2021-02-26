@@ -79,7 +79,7 @@
     <string name="errorLoadingAlbumList">Could not load album list</string>
     <string name="errorLoadingAlbum">Error loading album</string>
     <string name="errorLoadingSearch">Error loading search</string>
-    <string name="errorLoadingPlaylists">Error loading playlists</string>
+    <string name="errorLoadingPlaylists">Error loading playlists (are you logged in?)</string>
     <string name="errorLoadingPlaylistTracks">Error loading playlist tracks</string>
 
     <string name="downloadNotificationChannelId">Download Notification</string>
