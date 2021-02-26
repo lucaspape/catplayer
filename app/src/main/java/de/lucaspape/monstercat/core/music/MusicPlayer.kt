@@ -64,8 +64,13 @@ var shuffle = false
 var crossfade = 12000
 var volume: Float = 1.0f
     set(value) {
-        exoPlayer?.audioComponent?.volume = value
-        field = value
+        if(value > 1){
+            exoPlayer?.audioComponent?.volume = 1F
+            field = 1F
+        }else{
+            exoPlayer?.audioComponent?.volume = value
+            field = value
+        }
     }
 
 var playRelatedSongsAfterPlaylistFinished = false
@@ -135,7 +140,7 @@ fun applyPlayerSettings(context: Context) {
     }
 
     settings.getFloat(context.getString(R.string.volumeSetting))?.let {
-        volume = 1 - log(100 - (it * 100), 100.toFloat())
+        volume = 1 - log(100 - (it * 100), 100F)
     }
 
     settings.getBoolean(context.getString(R.string.playRelatedSetting))?.let {

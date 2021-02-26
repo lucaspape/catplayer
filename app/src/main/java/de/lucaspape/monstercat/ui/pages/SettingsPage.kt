@@ -563,7 +563,7 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page() {
         val settings = Settings.getSettings(view.context)
 
         settings.getFloat(view.context.getString(R.string.volumeSetting))?.let { orig ->
-            volume = 1 - log(100 - (orig * 100), 100.toFloat())
+            volume = 1 - log(100 - (orig * 100), 100F)
 
             itemAdapter.add(
                 SettingsSeekBarItem(
@@ -574,13 +574,13 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page() {
                 ) { value, shownValueView ->
                     settings.setFloat(
                         view.context.getString(R.string.volumeSetting),
-                        (value.toFloat() / 100.toFloat())
+                        (value.toFloat() / 100F)
                     )
 
                     settings.getFloat(view.context.getString(R.string.volumeSetting))
                         ?.let {
                             shownValueView.text = ((it * 100).toInt()).toString()
-                            volume = 1 - log(100 - (it * 100), 100.toFloat())
+                            volume = 1 - log(100 - (it * 100), 100F)
                         }
                 })
         }
