@@ -22,7 +22,7 @@ class PlayerService : Service() {
         createMediaSession(applicationContext)
 
         //register receiver which checks if headphones unplugged
-        registerReceiver(noisyReceiver, IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY))
+        applicationContext.registerReceiver(noisyReceiver, IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY))
 
         var title = ""
         var artist = ""
@@ -77,7 +77,7 @@ class PlayerService : Service() {
         exoPlayer?.stop()
 
         try {
-            unregisterReceiver(noisyReceiver)
+            applicationContext.unregisterReceiver(noisyReceiver)
         } catch (e: IllegalArgumentException) {
 
         }

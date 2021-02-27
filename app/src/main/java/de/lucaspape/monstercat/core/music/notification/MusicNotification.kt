@@ -70,10 +70,10 @@ fun createPlayerNotification(
         PendingIntent.getBroadcast(context, 0, closeIntent, PendingIntent.FLAG_UPDATE_CURRENT + PendingIntent.FLAG_IMMUTABLE)
 
     try {
-        context.unregisterReceiver(prevReceiver)
-        context.unregisterReceiver(playPauseReceiver)
-        context.unregisterReceiver(nextReceiver)
-        context.unregisterReceiver(closeReceiver)
+        context.applicationContext.unregisterReceiver(prevReceiver)
+        context.applicationContext.unregisterReceiver(playPauseReceiver)
+        context.applicationContext.unregisterReceiver(nextReceiver)
+        context.applicationContext.unregisterReceiver(closeReceiver)
     } catch (e: IllegalArgumentException) {
 
     }
@@ -83,22 +83,22 @@ fun createPlayerNotification(
     nextReceiver = NotificationIntentReceiver()
     closeReceiver = NotificationIntentReceiver()
 
-    context.registerReceiver(
+    context.applicationContext.registerReceiver(
         prevReceiver, IntentFilter(
             PREV_ACTION
         )
     )
-    context.registerReceiver(
+    context.applicationContext.registerReceiver(
         playPauseReceiver, IntentFilter(
             PLAY_PAUSE_ACTION
         )
     )
-    context.registerReceiver(
+    context.applicationContext.registerReceiver(
         nextReceiver, IntentFilter(
             NEXT_ACTION
         )
     )
-    context.registerReceiver(
+    context.applicationContext.registerReceiver(
         closeReceiver, IntentFilter(
             CLOSE_ACTION
         )

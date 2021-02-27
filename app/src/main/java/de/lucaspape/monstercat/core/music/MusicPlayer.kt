@@ -198,7 +198,7 @@ fun resume(context: Context) {
 
     val intentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
 
-    context.registerReceiver(
+    context.applicationContext.registerReceiver(
         NoisyReceiver(),
         intentFilter
     )
