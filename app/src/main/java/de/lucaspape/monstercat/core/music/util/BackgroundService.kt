@@ -5,7 +5,7 @@ import kotlinx.coroutines.*
 /**
  * Run task in background looped until stopped
  */
-abstract class BackgroundService(private val delay:Long) {
+abstract class BackgroundService<T>(private val delay:Long) {
     private val scope = CoroutineScope(Dispatchers.Main)
 
     private var lastActive: Long = 0
@@ -18,7 +18,7 @@ abstract class BackgroundService(private val delay:Long) {
     private var stopped = false
 
     abstract fun background(): Boolean
-    abstract fun publishProgress(values: Array<String>?)
+    abstract fun publishProgress(value: T)
 
     fun execute() {
         scope.launch {
@@ -36,11 +36,11 @@ abstract class BackgroundService(private val delay:Long) {
         }
     }
     
-    fun updateProgress(values: Array<String>?) {
+    fun updateProgress(value: T) {
         if(!stopped){
             scope.launch {
                 withContext(Dispatchers.Main) {
-                    publishProgress(values)
+                    publishProgress(value)
                 }
             }
         }

@@ -12,10 +12,11 @@ import de.lucaspape.monstercat.core.music.util.BackgroundService
 import de.lucaspape.monstercat.core.util.Settings
 import java.io.File
 import java.lang.Exception
+import java.lang.IndexOutOfBoundsException
 import java.lang.ref.WeakReference
 
 class DownloadTask(private val weakReference: WeakReference<Context>) :
-    BackgroundService(500) {
+    BackgroundService<DownloadStatus>(500) {
 
     private var failedDownloads = 0
 
@@ -24,7 +25,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
             val settings = Settings.getSettings(context)
             val songDatabaseHelper = SongDatabaseHelper(context)
 
-            if (wifiConnected(context) == true || settings.getBoolean("downloadOverMobile") == true) {
+            if (wifiConnected(context) || settings.getBoolean("downloadOverMobile") == true) {
                 try {
                     downloadList[downloadedSongs].get()?.let { currentDownloadObject ->
                         val currentDownloadSong =
@@ -44,35 +45,40 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                                         cid
                                     ) { max, current ->
                                         updateProgress(
-                                            arrayOf(
-                                                "progressUpdate",
-                                                currentDownloadSong.shownTitle,
-                                                max.toString(),
-                                                current.toString(),
-                                                false.toString()
+                                            DownloadStatus(
+                                                "progressUpdate", currentDownloadSong.shownTitle,
+                                                max,
+                                                current,
+                                                false
                                             )
                                         )
                                     }
 
                                     updateProgress(
-                                        arrayOf(
+                                        DownloadStatus(
                                             "downloadFinished",
-                                            downloadedSongs.toString()
+                                            downloadedSongs.toString(), 0, 0, false
                                         )
                                     )
                                 } else {
                                     updateProgress(
-                                        arrayOf(
+                                        DownloadStatus(
                                             "alreadyDownloadedError",
-                                            currentDownloadSong.shownTitle
+                                            currentDownloadSong.shownTitle,
+                                            0,
+                                            0,
+                                            false
                                         )
                                     )
                                 }
                             } else {
                                 updateProgress(
-                                    arrayOf(
+                                    DownloadStatus(
                                         "downloadNotAllowedError",
-                                        currentDownloadSong.shownTitle
+                                        currentDownloadSong.shownTitle,
+                                        0,
+                                        0,
+                                        false
                                     )
                                 )
                             }
@@ -82,7 +88,7 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                     }
 
 
-                } catch (e: java.lang.IndexOutOfBoundsException) {
+                } catch (e: IndexOutOfBoundsException) {
                     failedDownloads++
                     hideDownloadNotification(context)
                 }
@@ -94,61 +100,53 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
         return false
     }
 
-    override fun publishProgress(values: Array<String>?) {
-        values?.let {
-            val type = values[0]
-
+    override fun publishProgress(value: DownloadStatus) {
             weakReference.get()?.let { context ->
-                when (type) {
+                when (value.type) {
                     "alreadyDownloadedError" -> {
-                        val shownTitle = values[1]
-
                         println(
                             context.getString(
                                 R.string.alreadyDownloadedMsg,
-                                shownTitle
+                                value.title
                             )
                         )
                     }
                     "downloadNotAllowedError" -> {
-                        val shownTitle = values[1]
-
                         displayInfo(
                             context,
                             context.getString(
                                 R.string.downloadNotAvailableMsg,
-                                shownTitle
+                                value.title
                             )
                         )
                     }
                     "progressUpdate" -> {
-                        val title = values[1]
-                        val max = values[2].toInt()
-                        val current = values[3].toInt()
-                        val int = values[4].toBoolean()
-
                         showDownloadNotification(
-                            title,
-                            current,
-                            max,
-                            int,
+                            value.title,
+                            value.current,
+                            value.max,
+                            value.int,
                             context
                         )
                     }
                     "downloadFinished" -> {
-                        values[1].let {
-                            val listIndex = Integer.parseInt(it)
+                        val listIndex = Integer.parseInt(value.title)
 
-                            downloadList[listIndex].get()?.let { downloadObject ->
-                                downloadObject.downloadFinished()
-                            }
-
+                        downloadList[listIndex].get()?.let { downloadObject ->
+                            downloadObject.downloadFinished()
                         }
                     }
                     else -> throw Exception("Unknown type exception")
                 }
             }
-        }
-
     }
 }
+
+//kinda shitty but better than it was before
+class DownloadStatus(
+    val type: String,
+    val title: String,
+    val max: Int,
+    val current: Int,
+    val int: Boolean
+)
