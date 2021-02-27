@@ -963,44 +963,48 @@ suspend fun loadLiveStreams(
                     context,
                     context.getString(R.string.connectApiHost)
                 )
+            
+            val request = newLoadLivestreamsRequest(context,
+                {
+                    val songDatabaseHelper = SongDatabaseHelper(context)
+                    val results = it.getJSONObject("results")
 
-            queue.add(
-                newLoadLivestreamsRequest(context,
-                    {
-                        val songDatabaseHelper = SongDatabaseHelper(context)
-                        val results = it.getJSONObject("results")
-                        
-                        val streamIds = results.keys()
+                    val streamIds = results.keys()
 
-                        for (id in streamIds) {
-                            val streamObject = results.getJSONObject(id)
+                    for (id in streamIds) {
+                        val streamObject = results.getJSONObject(id)
 
-                            val name = streamObject.getString("name")
-                            val streamUrl = streamObject.getString("url")
+                        val name = streamObject.getString("name")
+                        val streamUrl = streamObject.getString("url")
 
-                            streamDatabaseHelper.insertStream(streamUrl, "", name)
-                            songDatabaseHelper.insertSong(
-                                context,
-                                name,
-                                "Livestream - $name",
-                                "",
-                                "live",
-                                "live",
-                                "Monstercat",
-                                "",
-                                downloadable = false,
-                                streamable = true,
-                                inEarlyAccess = false,
-                                creatorFriendly = false
-                            )
-                        }
+                        streamDatabaseHelper.insertStream(streamUrl, "", name)
+                        songDatabaseHelper.insertSong(
+                            context,
+                            name,
+                            "Livestream - $name",
+                            "",
+                            "live",
+                            "live",
+                            "Monstercat",
+                            "",
+                            downloadable = false,
+                            streamable = true,
+                            inEarlyAccess = false,
+                            creatorFriendly = false
+                        )
+                    }
 
-                        finishedCallback()
-                    },
-                    {
-                        errorCallback()
-                    })
-            )
+                    finishedCallback()
+                },
+                {
+                    errorCallback()
+                })
+
+            if(request != null){
+                queue.add(request)
+            }else{
+                errorCallback()
+            }
         }
     }
 }
