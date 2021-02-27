@@ -17,7 +17,7 @@
 
         <de.lucaspape.util.CustomSpinnerClass
             android:id="@+id/viewSelector"
-            android:layout_width="160dp"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="@+id/searchButton"
             app:layout_constraintStart_toStartOf="parent"/>
