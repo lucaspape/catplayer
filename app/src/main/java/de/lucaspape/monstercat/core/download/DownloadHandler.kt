@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import androidx.collection.LruCache
 import com.squareup.picasso.Picasso
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
@@ -30,12 +31,12 @@ val downloadList = ArrayList<SoftReference<DownloadObject>>()
 
 var downloadedSongs = 0
 
-val bitmapCache = HashMap<String, SoftReference<Bitmap?>>()
-
 val preDownloadCallbacks = HashMap<String, ()->Unit>()
 
 var fallbackFile = File("")
 var fallbackFileLow = File("")
+
+private var bitmapCache: LruCache<String, Bitmap>? = null
 
 fun addDownloadSong(context: Context, songId: String, downloadFinished: () -> Unit) {
     if(SongDatabaseHelper(context).getSong(context, songId)?.isDownloadable == true){
@@ -72,7 +73,21 @@ fun downloadImageUrlIntoImageReceiver(
         saveToCache = true
     }
 
-    val cacheBitmap = bitmapCache[imageId + resolution]?.get()
+    if(bitmapCache == null){
+        val maxMemory = (Runtime.getRuntime().maxMemory() / 1024).toInt()
+        val cacheSize = maxMemory / 8
+
+        bitmapCache = object : LruCache<String, Bitmap>(cacheSize) {
+
+            override fun sizeOf(key: String, bitmap: Bitmap): Int {
+                // The cache size will be measured in kilobytes rather than
+                // number of items.
+                return bitmap.byteCount / 1024
+            }
+        }
+    }
+
+    val cacheBitmap = bitmapCache?.get(imageId + resolution)
 
     if (cacheBitmap != null) {
         imageReceiver.setBitmap(imageId, cacheBitmap)
@@ -94,7 +109,7 @@ fun downloadImageUrlIntoImageReceiver(
             imageReceiver.setBitmap(imageId, bitmap)
 
             if(saveToCache){
-                bitmapCache[imageId + resolution] = SoftReference(bitmap)
+                bitmapCache?.put(imageId + resolution, bitmap)
             }
 
         } else {
@@ -110,15 +125,16 @@ fun downloadImageUrlIntoImageReceiver(
                     override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
                         imageReceiver.setBitmap(imageId, bitmap)
 
-                        //possible that it changed by this time
-                        if (!cacheFile.exists() && saveToCache) {
-                            bitmap?.let {
+                        bitmap?.let {
+                            //possible that it changed by this time
+                            if (!cacheFile.exists() && saveToCache) {
+
                                 saveBitmapAsync(it, cacheFile)
                             }
-                        }
 
-                        if(saveToCache){
-                            bitmapCache[imageId + resolution] = SoftReference(bitmap)
+                            if(saveToCache){
+                                bitmapCache?.put(imageId + resolution, bitmap)
+                            }
                         }
                     }
                 }
