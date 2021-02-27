@@ -38,6 +38,20 @@ This custom API is open source and available [here](https://github.com/lucaspape
 
 Look at issues on github  
 
+## Languages
+
+The following translations are complete:
+
+  - English
+  - German
+
+The following translations need fact checking:
+
+  - Russian
+  - Simplified Chinese
+
+If you find translation issues please comment on the github issue [here](https://github.com/lucaspape/catplayer/issues/46).  
+
 ## Beta
 
 If you want to participate in the beta test you can download it from the google play store [here](https://play.google.com/apps/testing/de.lucaspape.monstercat "Test Android-App").
