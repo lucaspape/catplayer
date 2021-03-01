@@ -101,44 +101,49 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
     }
 
     override fun publishProgress(value: DownloadStatus) {
-            weakReference.get()?.let { context ->
-                when (value.type) {
-                    "alreadyDownloadedError" -> {
-                        println(
-                            context.getString(
-                                R.string.alreadyDownloadedMsg,
-                                value.title
-                            )
+        weakReference.get()?.let { context ->
+            when (value.type) {
+                "alreadyDownloadedError" -> {
+                    println(
+                        context.getString(
+                            R.string.alreadyDownloadedMsg,
+                            value.title
                         )
-                    }
-                    "downloadNotAllowedError" -> {
-                        displayInfo(
-                            context,
-                            context.getString(
-                                R.string.downloadNotAvailableMsg,
-                                value.title
-                            )
+                    )
+                }
+                "downloadNotAllowedError" -> {
+                    displayInfo(
+                        context,
+                        context.getString(
+                            R.string.downloadNotAvailableMsg,
+                            value.title
                         )
-                    }
-                    "progressUpdate" -> {
-                        showDownloadNotification(
-                            value.title,
-                            value.current,
-                            value.max,
-                            value.int,
-                            context
-                        )
-                    }
-                    "downloadFinished" -> {
-                        val listIndex = Integer.parseInt(value.title)
+                    )
+                }
+                "progressUpdate" -> {
+                    showDownloadNotification(
+                        value.title,
+                        value.current,
+                        value.max,
+                        value.int,
+                        context
+                    )
+                }
+                "downloadFinished" -> {
+                    val listIndex = Integer.parseInt(value.title)
 
+                    try {
                         downloadList[listIndex].get()?.let { downloadObject ->
                             downloadObject.downloadFinished()
                         }
+                    } catch (e: IndexOutOfBoundsException) {
+
                     }
-                    else -> throw Exception("Unknown type exception")
+
                 }
+                else -> throw Exception("Unknown type exception")
             }
+        }
     }
 }
 
