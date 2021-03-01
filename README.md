@@ -7,7 +7,7 @@ https://pixabay.com/illustrations/black-panther-figure-3704552/ - Black Panther 
 This android app aims to implement the Monstercat API.
 
 ## Download
-<a href='https://play.google.com/store/apps/details?id=de.lucaspape.monstercat&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img width="20%" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/></a>
+<a href='https://play.google.com/store/apps/details?id=de.lucaspape.monstercat&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img width="20%" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/></a><a href='https://appgallery.cloud.huawei.com/ag/n/app/C103885587?channelId=github&id=589d4e91e52f40ca801bc3a6e385bf24&s=B294CFFFE5F60EDC1E7992387BE001C03156BD9AE0F8377DA924416E319D1739&detailType=0&v='><img width="20%" alt='Get it on Google Play' src='https://raw.githubusercontent.com/lucaspape/catplayer/master/playstore_res/AppGalleryBadge.png'/></a>
 
 You can also download the [github release](https://github.com/lucaspape/catplayer/releases/latest).
 
