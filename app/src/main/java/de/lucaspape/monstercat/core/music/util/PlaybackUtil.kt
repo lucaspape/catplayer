@@ -35,11 +35,11 @@ fun prepareSong(
         //new exoplayer
         preparedExoPlayer = SimpleExoPlayer.Builder(context).build()
         preparedExoPlayer?.setAudioAttributes(getAudioAttributes(), false)
-        
+
         val song = SongDatabaseHelper(context).getSong(context, songId)
         val stream = StreamDatabaseHelper(context).getStream(songId)
 
-        if(song != null && stream == null){
+        if (song != null && stream == null) {
             if (song.playbackAllowed(context)
             ) {
                 song.getMediaSource(connectSid, cid) { mediaSource ->
@@ -57,14 +57,14 @@ fun prepareSong(
             } else {
                 notAllowedCallback()
             }
-        }else if(song != null && stream != null){
+        } else if (song != null && stream != null) {
             if (song.playbackAllowed(context)
             ) {
                 scope.launch {
                     stream.getMediaSource(context) { mediaSource ->
 
                         scope.launch {
-                            withContext(Dispatchers.Main){
+                            withContext(Dispatchers.Main) {
                                 preparedExoPlayer?.setMediaSource(mediaSource)
                                 preparedExoPlayer?.prepare()
                                 preparedExoPlayerSongId = stream.name
@@ -77,7 +77,7 @@ fun prepareSong(
             } else {
                 notAllowedCallback()
             }
-        }else{
+        } else {
             displayInfo(context, context.getString(R.string.songNotPlayableError))
         }
     }
@@ -240,6 +240,8 @@ fun runSeekBarUpdate(context: Context, prepareNext: Boolean, crossFade: Boolean)
                     }
 
                     preparedExoPlayer?.playWhenReady = true
+                } else if (exoPlayer?.isPlaying == false) {
+                    preparedExoPlayer?.playWhenReady = false
                 }
             }
 
