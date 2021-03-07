@@ -67,15 +67,15 @@ open class CatalogItem(
 
                 if (song.isDownloadable) {
                     if (song.downloaded) {
-                        AlertListItem(
+                        itemList.add(AlertListItem(
                             view.context.getString(R.string.deleteDownload),
                             deleteDrawable
-                        )
+                        ))
                     } else {
-                        AlertListItem(
+                        itemList.add(AlertListItem(
                             view.context.getString(R.string.download),
                             downloadDrawable
-                        )
+                        ))
                     }
                 }
 
@@ -154,15 +154,15 @@ open class CatalogItem(
             SongDatabaseHelper(view.context).getSong(view.context, id)?.let { song ->
                 if (song.isDownloadable) {
                     if (song.downloaded) {
-                        AlertListItem(
+                        itemList.add(AlertListItem(
                             view.context.getString(R.string.deleteDownload),
                             deleteDrawable
-                        )
+                        ))
                     } else {
-                        AlertListItem(
+                        itemList.add(AlertListItem(
                             view.context.getString(R.string.download),
                             downloadDrawable
-                        )
+                        ))
                     }
                 }
 
