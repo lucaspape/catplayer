@@ -499,6 +499,7 @@ fun loadRelatedSongs(context: Context, callback: () -> Unit) {
         retrieveRelatedSongs(context, {
             loadedRelatedHash = playlist.hashCode()
             loadingRelatedSongs = false
+            nextRelatedRandom = -1
             callback()
         }, { loadingRelatedSongs = false })
     }
