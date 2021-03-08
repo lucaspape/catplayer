@@ -22,7 +22,7 @@
             android:layout_height="50dp"
             android:layout_gravity="start"
             android:background="@null"
-            android:contentDescription="Queue"
+            android:contentDescription="@string/queueDescription"
             android:src="@drawable/ic_queue_music_24dp"
             app:layout_constraintEnd_toStartOf="@+id/viewSelector"
             app:layout_constraintStart_toStartOf="parent"

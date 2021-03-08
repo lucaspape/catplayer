@@ -3,6 +3,7 @@ package de.lucaspape.monstercat.ui.pages.recycler
 import android.content.Context
 import android.view.View
 import com.mikepenz.fastadapter.GenericItem
+import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.GenreDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.ItemDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.MoodDatabaseHelper
@@ -53,16 +54,16 @@ open class ExploreRecyclerPage(
         if (skip == 0) {
             val idArray = ArrayList<String>()
 
-            idArray.add("separator-Streams")
+            idArray.add("separator-${context.getString(R.string.streams)}")
             idArray.add("item-stream")
 
-            idArray.add("separator-Moods")
+            idArray.add("separator-${context.getString(R.string.moods)}")
             idArray.add("item-mood")
 
-            idArray.add("separator-Genres")
+            idArray.add("separator-${context.getString(R.string.genres)}")
             idArray.add("item-genre")
 
-            idArray.add("separator-Greatest Hits")
+            idArray.add("separator-${context.getString(R.string.greatestHits)}")
             idArray.add("item-greatest-hits")
 
             callback(idArray)

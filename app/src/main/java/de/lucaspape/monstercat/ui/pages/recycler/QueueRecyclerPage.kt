@@ -3,6 +3,7 @@ package de.lucaspape.monstercat.ui.pages.recycler
 import android.content.Context
 import android.view.View
 import com.mikepenz.fastadapter.GenericItem
+import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.music.*
 import de.lucaspape.monstercat.ui.abstract_items.content.QueueItem
 import de.lucaspape.monstercat.ui.abstract_items.util.HeaderTextItem
@@ -72,7 +73,7 @@ class QueueRecyclerPage : RecyclerViewPage() {
             var indexInQueue = 0
 
             if (prioritySongQueue.size > 0) {
-                content.add("separator-Queue")
+                content.add("separator-${context.getString(R.string.queue)}")
 
                 for (songId in prioritySongQueue) {
                     lookupTable[content.size] = "priority"
@@ -85,7 +86,7 @@ class QueueRecyclerPage : RecyclerViewPage() {
             indexInQueue = 0
 
             if (songQueue.size > 0) {
-                content.add("separator-Coming up")
+                content.add("separator-${context.getString(R.string.comingUp)}")
 
                 for (songId in songQueue) {
                     lookupTable[content.size] = "queue"
@@ -98,7 +99,7 @@ class QueueRecyclerPage : RecyclerViewPage() {
             indexInQueue = 0
 
             if (relatedSongQueue.size > 0) {
-                content.add("separator-Related songs coming up")
+                content.add("separator-${context.getString(R.string.relatedSongsComingUp)}")
 
                 for (songId in relatedSongQueue) {
                     lookupTable[content.size] = "related"

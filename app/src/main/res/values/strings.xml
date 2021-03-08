@@ -24,6 +24,7 @@
     <string name="allowDownloadMobile">Allow downloading over mobile data</string>
     <string name="allowCoverDownloadMobile">Allow cover downloads over mobile data</string>
     <string name="settingsDescription">Settings</string>
+    <string name="queueDescription">Queue</string>
     <string name="darkThemeSwitch">Enable dark theme</string>
     <string name="disableAudioFocusSwitch">Enable playback over other media apps</string>
     <string name="fullscreenAlbumImage">Album Image</string>
@@ -119,4 +120,11 @@
     <string name="useCustomApiForSearch">Advanced search (uses custom API)</string>
     <string name="loadingRelatedSongs">Loading related songs</string>
     <string name="deleteDownload">Delete download</string>
+    <string name="streams">Streams</string>
+    <string name="moods">Moods</string>
+    <string name="genres">Genres</string>
+    <string name="greatestHits">Greatest Hits</string>
+    <string name="queue">Queue</string>
+    <string name="comingUp">Coming Up</string>
+    <string name="relatedSongsComingUp">Related Songs Coming Up</string>
 </resources>
