@@ -64,10 +64,10 @@ var shuffle = false
 var crossfade = 12000
 var volume: Float = 1.0f
     set(value) {
-        if(value > 1){
+        if (value > 1) {
             exoPlayer?.audioComponent?.volume = 1F
             field = 1F
-        }else{
+        } else {
             exoPlayer?.audioComponent?.volume = value
             field = value
         }
@@ -82,7 +82,7 @@ private var sessionCreated = false
 var connectSid = ""
 var cid = ""
 
-var retrieveRelatedSongs: (context: Context, callback: (relatedSongs:ArrayList<String>) -> Unit, errorCallback: () -> Unit) -> Unit =
+var retrieveRelatedSongs: (context: Context, callback: (relatedSongs: ArrayList<String>) -> Unit, errorCallback: () -> Unit) -> Unit =
     { _, _, _ -> }
 
 var displayInfo: (context: Context, msg: String) -> Unit = { _, _ -> }
@@ -90,7 +90,7 @@ var displayInfo: (context: Context, msg: String) -> Unit = { _, _ -> }
 var openMainActivityIntent = Intent()
 
 fun setupMusicPlayer(
-    sRetrieveRelatedSongs: (context: Context, callback: (relatedSongs:ArrayList<String>) -> Unit, errorCallback: () -> Unit) -> Unit,
+    sRetrieveRelatedSongs: (context: Context, callback: (relatedSongs: ArrayList<String>) -> Unit, errorCallback: () -> Unit) -> Unit,
     sDisplayInfo: (context: Context, msg: String) -> Unit,
     sOpenMainActivityIntent: Intent
 ) {
@@ -268,7 +268,7 @@ private fun nextSong(context: Context): String {
         }
 
         //clear related because playlist change
-        relatedSongQueue = ArrayList()
+        clearRelatedSongs()
 
         return songId
     } else if (playlist.size > playlistIndex + 1) {
@@ -277,7 +277,7 @@ private fun nextSong(context: Context): String {
         playlistIndex++
 
         //clear related because playlist change
-        relatedSongQueue = ArrayList()
+        clearRelatedSongs()
 
         return songId
     } else if (songQueue.size > 0) {
@@ -305,7 +305,7 @@ private fun nextSong(context: Context): String {
         }
 
         //clear related because playlist change
-        relatedSongQueue = ArrayList()
+        clearRelatedSongs()
 
         return songId
     } else if (loop && playlist.size > 0) {
@@ -326,7 +326,7 @@ private fun nextSong(context: Context): String {
         playlistIndex = 0
 
         //clear related because playlist change
-        relatedSongQueue = ArrayList()
+        clearRelatedSongs()
 
         return songId
 
@@ -350,11 +350,12 @@ private fun nextSong(context: Context): String {
         skipPreviousInPlaylist()
 
         //prepare nextRandom
-        if (songQueue.size > 0) {
+        if (relatedSongQueue.size > 0) {
             nextRelatedRandom = Random.nextInt(relatedSongQueue.size)
         }
 
         return songId
+
     } else if (playRelatedSongsAfterPlaylistFinished) {
         loadRelatedSongs(context, playAfter = true)
 
@@ -480,6 +481,12 @@ fun skipPreviousInPlaylist() {
     playlistIndex = playlist.size - 1
 }
 
+fun clearRelatedSongs() {
+    relatedSongQueue = ArrayList()
+    nextRelatedRandom = -1
+    loadedRelatedHash = -1
+}
+
 /**
  * Fetch songs which are related to songs in playlist
  */
@@ -488,15 +495,20 @@ fun loadRelatedSongs(context: Context, playAfter: Boolean) {
         loadingRelatedSongs = true
 
         retrieveRelatedSongs(context, {
+            clearRelatedSongs()
+
             relatedSongQueue = it
             loadedRelatedHash = playlist.hashCode()
+
             loadingRelatedSongs = false
-            nextRelatedRandom = -1
 
             if (playAfter) {
                 skipPreviousInPlaylist()
                 next(context)
             }
-        }, { loadingRelatedSongs = false })
+        }, {
+            clearRelatedSongs()
+            loadingRelatedSongs = false
+        })
     }
 }
