@@ -47,11 +47,13 @@ var prioritySongQueue = LinkedList<String>()
 
 var relatedSongQueue = ArrayList<String>()
 
-var loadedRelatedHash = 0
+private var loadedRelatedHash = 0
 
 //playlist, contains playback history
 var playlist = ArrayList<String>()
 var playlistIndex = 0
+
+var history = ArrayList<String>()
 
 //nextRandom needs to be prepared before next playing to allow crossfade
 var nextRandom = -1

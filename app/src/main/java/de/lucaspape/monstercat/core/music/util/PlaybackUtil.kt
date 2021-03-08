@@ -207,6 +207,11 @@ fun runSeekBarUpdate(context: Context, prepareNext: Boolean, crossFade: Boolean)
                 setPlayerState(it.toLong())
             }
 
+            //add current song to history after 30 seconds
+            if(currentPosition > 30*1000){
+                history.add(currentSongId)
+            }
+
             if (crossFade) {
                 val timeLeft = duration - currentPosition
 

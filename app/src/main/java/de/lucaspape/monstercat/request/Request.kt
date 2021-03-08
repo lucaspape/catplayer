@@ -346,6 +346,7 @@ fun newLoadPlaylistTracksRequest(
 fun newLoadRelatedTracksRequest(
     context: Context,
     trackIdArray: List<String>,
+    excludeIdArray: List<String>,
     skipMC: Boolean,
     callback: (response: JSONObject) -> Unit,
     errorCallback: (error: VolleyError) -> Unit
@@ -367,6 +368,12 @@ fun newLoadRelatedTracksRequest(
     }
 
     for (trackId in trackIdArray) {
+        val trackObject = JSONObject()
+        trackObject.put("id", trackId)
+        excludeJsonArray.put(trackObject)
+    }
+
+    for (trackId in excludeIdArray) {
         val trackObject = JSONObject()
         trackObject.put("id", trackId)
         excludeJsonArray.put(trackObject)

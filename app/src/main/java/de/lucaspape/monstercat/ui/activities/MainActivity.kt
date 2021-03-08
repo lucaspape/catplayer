@@ -207,8 +207,14 @@ class MainActivity : AppCompatActivity() {
                 Settings.getSettings(context)
                     .getBoolean(context.getString(R.string.skipMonstercatSongsSetting))?.let {
                         genericScope.launch {
+                            val relatedTo = if(history.size > 0){
+                                history
+                            }else{
+                                playlist
+                            }
+
                             loadRelatedTracks(
-                                context, playlist, it,
+                                context, relatedTo, playlist, it,
                                 finishedCallback = { relatedIdArray ->
                                     relatedIdArray?.let {
                                         callback(relatedIdArray)
