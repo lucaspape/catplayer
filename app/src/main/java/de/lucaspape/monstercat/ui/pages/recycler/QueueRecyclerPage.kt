@@ -7,15 +7,16 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.music.*
 import de.lucaspape.monstercat.ui.abstract_items.content.QueueItem
 import de.lucaspape.monstercat.ui.abstract_items.util.HeaderTextItem
+import de.lucaspape.monstercat.ui.pages.util.Item
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
 import kotlin.collections.ArrayList
 
 class QueueRecyclerPage : RecyclerViewPage() {
-    override suspend fun idToAbstractItem(view: View, id: String): GenericItem {
-        return if (id.contains("separator-")) {
-            HeaderTextItem(id.replace("separator-", ""))
+    override suspend fun itemToAbstractItem(view: View, item: Item): GenericItem {
+        return if (item.typeId == "separator") {
+            HeaderTextItem(item.itemId)
         } else {
-            QueueItem(id.replace("item-", ""))
+            QueueItem(item.itemId)
         }
     }
 
@@ -64,20 +65,20 @@ class QueueRecyclerPage : RecyclerViewPage() {
         forceReload: Boolean,
         skip: Int,
         displayLoading: () -> Unit,
-        callback: (itemIdList: ArrayList<String>) -> Unit,
+        callback: (itemList: ArrayList<Item>) -> Unit,
         errorCallback: (errorMessage: String) -> Unit
     ) {
         if (skip == 0) {
-            val content = ArrayList<String>()
+            val content = ArrayList<Item>()
 
             var indexInQueue = 0
 
             if (prioritySongQueue.size > 0) {
-                content.add("separator-${context.getString(R.string.queue)}")
+                content.add(Item(context.getString(R.string.queue), "separator"))
 
                 for (songId in prioritySongQueue) {
                     lookupTable[content.size] = "priority"
-                    content.add("item-$songId")
+                    content.add(Item(songId, "item"))
                     indexLookupTable["priority-$songId"] = indexInQueue
                     indexInQueue++
                 }
@@ -86,11 +87,11 @@ class QueueRecyclerPage : RecyclerViewPage() {
             indexInQueue = 0
 
             if (songQueue.size > 0) {
-                content.add("separator-${context.getString(R.string.comingUp)}")
+                content.add(Item(context.getString(R.string.comingUp), "separator"))
 
                 for (songId in songQueue) {
                     lookupTable[content.size] = "queue"
-                    content.add("item-$songId")
+                    content.add(Item(songId, "item"))
                     indexLookupTable["queue-$songId"] = indexInQueue
                     indexInQueue++
                 }
@@ -99,11 +100,11 @@ class QueueRecyclerPage : RecyclerViewPage() {
             indexInQueue = 0
 
             if (relatedSongQueue.size > 0) {
-                content.add("separator-${context.getString(R.string.relatedSongsComingUp)}")
+                content.add(Item(context.getString(R.string.relatedSongsComingUp), "separator"))
 
                 for (songId in relatedSongQueue) {
                     lookupTable[content.size] = "related"
-                    content.add("item-$songId")
+                    content.add(Item(songId, "item"))
                     indexLookupTable["related-$songId"] = indexInQueue
                     indexInQueue++
                 }

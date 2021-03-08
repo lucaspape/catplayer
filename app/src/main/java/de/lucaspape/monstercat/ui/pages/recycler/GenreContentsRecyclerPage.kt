@@ -5,6 +5,7 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.GenreDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.ItemDatabaseHelper
 import de.lucaspape.monstercat.request.async.loadGenre
+import de.lucaspape.monstercat.ui.pages.util.Item
 
 class GenreContentsRecyclerPage(private val genreId: String) :
     PlaylistContentsRecyclerPage(genreId) {
@@ -16,7 +17,7 @@ class GenreContentsRecyclerPage(private val genreId: String) :
         forceReload: Boolean,
         skip: Int,
         displayLoading: () -> Unit,
-        callback: (itemIdList: ArrayList<String>) -> Unit,
+        callback: (itemList: ArrayList<Item>) -> Unit,
         errorCallback: (errorMessage: String) -> Unit
     ) {
         val genreName = GenreDatabaseHelper(context).getGenre(genreId)?.name
@@ -34,13 +35,13 @@ class GenreContentsRecyclerPage(private val genreId: String) :
 
                     val playlistItems = playlistItemDatabaseHelper.getAllData(false)
 
-                    val idList = ArrayList<String>()
+                    val itemList = ArrayList<Item>()
 
                     for (i in (playlistItems.size - 1 downTo 0)) {
-                        idList.add(playlistItems[i].songId)
+                        itemList.add(Item(playlistItems[i].songId, null))
                     }
 
-                    callback(idList)
+                    callback(itemList)
 
                 }, errorCallback = {
                     errorCallback(context.getString(R.string.errorLoadingPlaylistTracks))

@@ -10,6 +10,7 @@ import de.lucaspape.monstercat.core.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.request.async.loadPlaylists
 import de.lucaspape.monstercat.ui.abstract_items.content.PlaylistItem
 import de.lucaspape.monstercat.ui.offlineDrawable
+import de.lucaspape.monstercat.ui.pages.util.Item
 import de.lucaspape.monstercat.ui.pages.util.deleteDownloadedPlaylistTracks
 import de.lucaspape.monstercat.ui.pages.util.downloadPlaylistAsync
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
@@ -89,8 +90,8 @@ class PlaylistListRecyclerPage(private val loadPlaylist: (playlistId: String) ->
         }
     }
 
-    override suspend fun idToAbstractItem(view: View, id: String): GenericItem {
-        return PlaylistItem(id)
+    override suspend fun itemToAbstractItem(view: View, item: Item): GenericItem {
+        return PlaylistItem(item.itemId)
     }
 
     override suspend fun load(
@@ -98,7 +99,7 @@ class PlaylistListRecyclerPage(private val loadPlaylist: (playlistId: String) ->
         forceReload: Boolean,
         skip: Int,
         displayLoading: () -> Unit,
-        callback: (itemIdList: ArrayList<String>) -> Unit,
+        callback: (itemList: ArrayList<Item>) -> Unit,
         errorCallback: (errorMessage: String) -> Unit
     ) {
         if (skip == 0) {
@@ -107,13 +108,13 @@ class PlaylistListRecyclerPage(private val loadPlaylist: (playlistId: String) ->
                     PlaylistDatabaseHelper(context)
                 val playlists = playlistDatabaseHelper.getAllPlaylists()
 
-                val idList = ArrayList<String>()
+                val itemList = ArrayList<Item>()
 
                 for (playlist in playlists) {
-                    idList.add(playlist.playlistId)
+                    itemList.add(Item(playlist.playlistId, null))
                 }
 
-                callback(idList)
+                callback(itemList)
             }, {
                 errorCallback(context.getString(R.string.errorLoadingPlaylists))
             })

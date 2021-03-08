@@ -10,6 +10,7 @@ import de.lucaspape.monstercat.core.database.helper.MoodDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.StreamDatabaseHelper
 import de.lucaspape.monstercat.ui.abstract_items.content.ExploreItem
 import de.lucaspape.monstercat.ui.abstract_items.util.HeaderTextItem
+import de.lucaspape.monstercat.ui.pages.util.Item
 
 open class ExploreRecyclerPage(
     val openMood: (moodId: String) -> Unit,
@@ -21,11 +22,11 @@ open class ExploreRecyclerPage(
     private var currentMoodId = ""
     private var currentGenreId = ""
 
-    override suspend fun idToAbstractItem(view: View, id: String): GenericItem {
-        return if (id.contains("separator-")) {
-            HeaderTextItem(id.replace("separator-", ""))
+    override suspend fun itemToAbstractItem(view: View, item: Item): GenericItem {
+        return if (item.typeId == "separator") {
+            HeaderTextItem(item.itemId)
         } else {
-            ExploreItem(id.replace("item-", ""), {
+            ExploreItem(item.itemId, {
                 currentMoodId = it
                 currentGenreId = ""
 
@@ -48,25 +49,25 @@ open class ExploreRecyclerPage(
         forceReload: Boolean,
         skip: Int,
         displayLoading: () -> Unit,
-        callback: (itemIdList: ArrayList<String>) -> Unit,
+        callback: (itemList: ArrayList<Item>) -> Unit,
         errorCallback: (errorMessage: String) -> Unit
     ) {
         if (skip == 0) {
-            val idArray = ArrayList<String>()
+            val items = ArrayList<Item>()
 
-            idArray.add("separator-${context.getString(R.string.streams)}")
-            idArray.add("item-stream")
+            items.add(Item(context.getString(R.string.streams), "separator"))
+            items.add(Item("stream", "item"))
 
-            idArray.add("separator-${context.getString(R.string.moods)}")
-            idArray.add("item-mood")
+            items.add(Item(context.getString(R.string.moods), "separator"))
+            items.add(Item("mood", "item"))
 
-            idArray.add("separator-${context.getString(R.string.genres)}")
-            idArray.add("item-genre")
+            items.add(Item(context.getString(R.string.genres), "separator"))
+            items.add(Item("genre", "item"))
 
-            idArray.add("separator-${context.getString(R.string.greatestHits)}")
-            idArray.add("item-greatest-hits")
+            items.add(Item(context.getString(R.string.greatestHits), "separator"))
+            items.add(Item("greatest-hits", "item"))
 
-            callback(idArray)
+            callback(items)
         } else {
             callback(ArrayList())
         }

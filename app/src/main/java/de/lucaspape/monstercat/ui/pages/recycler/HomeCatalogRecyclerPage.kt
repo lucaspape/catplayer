@@ -11,6 +11,7 @@ import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.core.download.addDownloadSong
 import de.lucaspape.monstercat.core.util.Settings
 import de.lucaspape.monstercat.request.async.loadSongList
+import de.lucaspape.monstercat.ui.pages.util.Item
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
 import de.lucaspape.monstercat.ui.pages.util.playSongsFromViewDataAsync
 import kotlinx.coroutines.Dispatchers
@@ -126,8 +127,8 @@ open class HomeCatalogRecyclerPage : RecyclerViewPage() {
         }
     }
 
-    override suspend fun idToAbstractItem(view: View, id: String): GenericItem {
-        return CatalogItem(id)
+    override suspend fun itemToAbstractItem(view: View, item: Item): GenericItem {
+        return CatalogItem(item.itemId)
     }
 
     override suspend fun load(
@@ -135,7 +136,7 @@ open class HomeCatalogRecyclerPage : RecyclerViewPage() {
         forceReload: Boolean,
         skip: Int,
         displayLoading: () -> Unit,
-        callback: (itemIdList: ArrayList<String>) -> Unit,
+        callback: (itemList: ArrayList<Item>) -> Unit,
         errorCallback: (errorMessage: String) -> Unit
     ) {
         loadSongList(
@@ -147,13 +148,13 @@ open class HomeCatalogRecyclerPage : RecyclerViewPage() {
                 val catalogSongDatabaseHelper = ItemDatabaseHelper(context, "catalog")
 
                 val songList = catalogSongDatabaseHelper.getItems(skip.toLong(), 50)
-                val songIdList = ArrayList<String>()
+                val itemList = ArrayList<Item>()
 
                 for (song in songList) {
-                    songIdList.add(song.songId)
+                    itemList.add(Item(song.songId, null))
                 }
 
-                callback(songIdList)
+                callback(itemList)
             },
             errorCallback = {
                 errorCallback(context.getString(R.string.errorLoadingSongList))

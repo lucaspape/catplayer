@@ -6,6 +6,7 @@ import de.lucaspape.monstercat.core.database.helper.AlbumDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.ItemDatabaseHelper
 import de.lucaspape.monstercat.core.database.objects.Album
 import de.lucaspape.monstercat.request.async.loadAlbum
+import de.lucaspape.monstercat.ui.pages.util.Item
 import de.lucaspape.monstercat.ui.pages.util.loadAlbumTracks
 
 class HomeCatalogAlbumRecyclerPage(
@@ -20,7 +21,7 @@ class HomeCatalogAlbumRecyclerPage(
         forceReload: Boolean,
         skip: Int,
         displayLoading: () -> Unit,
-        callback: (itemIdList: ArrayList<String>) -> Unit,
+        callback: (itemList: ArrayList<Item>) -> Unit,
         errorCallback: (errorMessage: String) -> Unit
     ) {
         if (skip == 0) {
@@ -32,13 +33,13 @@ class HomeCatalogAlbumRecyclerPage(
                         ItemDatabaseHelper(context, album.albumId)
                     val albumItemList = albumItemDatabaseHelper.getAllData(false)
 
-                    val idList = ArrayList<String>()
+                    val itemList = ArrayList<Item>()
 
                     for (albumItem in albumItemList) {
-                        idList.add(albumItem.songId)
+                        itemList.add(Item(albumItem.songId, null))
                     }
 
-                    callback(idList)
+                    callback(itemList)
                 }
 
                 val album = albumDatabaseHelper.getAlbumFromMcId(albumMcId)
@@ -72,13 +73,13 @@ class HomeCatalogAlbumRecyclerPage(
 
                         val albumItemList = albumItemDatabaseHelper.getAllData(true)
 
-                        val idList = ArrayList<String>()
+                        val itemList = ArrayList<Item>()
 
                         for (albumItem in albumItemList) {
-                            idList.add(albumItem.songId)
+                            itemList.add(Item(albumItem.songId, null))
                         }
 
-                        callback(idList)
+                        callback(itemList)
                     },
                     {
                         errorCallback(context.getString(R.string.errorLoadingAlbumList))

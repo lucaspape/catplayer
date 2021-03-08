@@ -9,6 +9,7 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.AlbumDatabaseHelper
 import de.lucaspape.monstercat.request.async.loadAlbumList
 import de.lucaspape.monstercat.ui.abstract_items.content.AlbumItem
+import de.lucaspape.monstercat.ui.pages.util.Item
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -61,9 +62,9 @@ class HomeAlbumRecyclerPage(private val onSingleAlbumLoad: (albumId: String, alb
         }
     }
 
-    override suspend fun idToAbstractItem(view: View, id: String): GenericItem {
+    override suspend fun itemToAbstractItem(view: View, item: Item): GenericItem {
         return AlbumItem(
-            id,
+            item.itemId,
             (view.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
         )
     }
@@ -73,7 +74,7 @@ class HomeAlbumRecyclerPage(private val onSingleAlbumLoad: (albumId: String, alb
         forceReload: Boolean,
         skip: Int,
         displayLoading: () -> Unit,
-        callback: (itemIdList: ArrayList<String>) -> Unit,
+        callback: (itemList: ArrayList<Item>) -> Unit,
         errorCallback: (errorMessage: String) -> Unit
     ) {
         loadAlbumList(context, forceReload, skip, displayLoading, {
@@ -82,13 +83,13 @@ class HomeAlbumRecyclerPage(private val onSingleAlbumLoad: (albumId: String, alb
             val albumList =
                 albumDatabaseHelper.getAlbums(skip.toLong(), 50)
 
-            val idList = ArrayList<String>()
+            val itemList = ArrayList<Item>()
 
             for (album in albumList) {
-                idList.add(album.albumId)
+                itemList.add(Item(album.albumId, null))
             }
 
-            callback(idList)
+            callback(itemList)
 
         }, {
             errorCallback(context.getString(R.string.errorLoadingAlbumList))

@@ -17,6 +17,7 @@ import de.lucaspape.monstercat.request.async.loadGreatestHits
 import de.lucaspape.monstercat.request.async.loadLiveStreams
 import de.lucaspape.monstercat.request.async.loadMoods
 import de.lucaspape.monstercat.ui.pages.recycler.HomeCatalogRecyclerPage
+import de.lucaspape.monstercat.ui.pages.util.Item
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
 import de.lucaspape.monstercat.ui.pages.util.playSongsFromViewDataAsync
 import kotlinx.coroutines.Dispatchers
@@ -99,22 +100,22 @@ class ExploreItem(
                     }
                 }
 
-                override suspend fun idToAbstractItem(
+                override suspend fun itemToAbstractItem(
                     view: View,
-                    id: String
+                    item: Item
                 ): GenericItem {
-                    return when (item.typeName) {
+                    return when (item.typeId) {
                         "mood" -> {
-                            MoodItem(id)
+                            MoodItem(item.itemId)
                         }
                         "genre" -> {
-                            GenreItem(id)
+                            GenreItem(item.itemId)
                         }
                         "stream" -> {
-                            StreamItem(id)
+                            StreamItem(item.itemId)
                         }
                         else -> {
-                            CatalogItem(id)
+                            CatalogItem(item.itemId)
                         }
                     }
                 }
@@ -132,7 +133,7 @@ class ExploreItem(
                     forceReload: Boolean,
                     skip: Int,
                     displayLoading: () -> Unit,
-                    callback: (itemIdList: ArrayList<String>) -> Unit,
+                    callback: (itemList: ArrayList<Item>) -> Unit,
                     errorCallback: (errorMessage: String) -> Unit
                 ) {
                     if (skip == 0) {
@@ -144,13 +145,13 @@ class ExploreItem(
                                     displayLoading = {},
                                     finishedCallback = { results ->
 
-                                        val idArray = ArrayList<String>()
+                                        val itemArray = ArrayList<Item>()
 
                                         for (mood in results) {
-                                            idArray.add(mood.moodId)
+                                            itemArray.add(Item(mood.moodId, "mood"))
                                         }
 
-                                        callback(idArray)
+                                        callback(itemArray)
                                     },
                                     errorCallback = {})
 
@@ -161,13 +162,13 @@ class ExploreItem(
                                     forceReload,
                                     displayLoading = {},
                                     finishedCallback = { results ->
-                                        val idArray = ArrayList<String>()
+                                        val itemArray = ArrayList<Item>()
 
                                         for (genre in results) {
-                                            idArray.add(genre.genreId)
+                                            itemArray.add(Item(genre.genreId, "genre"))
                                         }
 
-                                        callback(idArray)
+                                        callback(itemArray)
                                     },
                                     errorCallback = {})
 
@@ -180,17 +181,17 @@ class ExploreItem(
                                     100,
                                     displayLoading = {},
                                     finishedCallback = {
-                                        val idArray = ArrayList<String>()
+                                        val itemArray = ArrayList<Item>()
 
                                         val playlistItemDatabaseHelper =
                                             ItemDatabaseHelper(context, "greatest-hits")
                                         val items = playlistItemDatabaseHelper.getAllData(true)
 
                                         for (playlistItem in items) {
-                                            idArray.add(playlistItem.songId)
+                                            itemArray.add(Item(playlistItem.songId, null))
                                         }
 
-                                        callback(idArray)
+                                        callback(itemArray)
                                     },
                                     errorCallback = {})
                             }
@@ -201,16 +202,16 @@ class ExploreItem(
                                     displayLoading = {
                                     },
                                     finishedCallback = {
-                                        val idArray = ArrayList<String>()
+                                        val itemArray = ArrayList<Item>()
 
                                         val streamDatabaseHelper = StreamDatabaseHelper(context)
                                         val streams = streamDatabaseHelper.getAllStreams()
 
                                         for (stream in streams) {
-                                            idArray.add(stream.name)
+                                            itemArray.add(Item(stream.name, "stream"))
                                         }
 
-                                        callback(idArray)
+                                        callback(itemArray)
                                     },
                                     errorCallback = {
                                     })

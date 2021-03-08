@@ -32,6 +32,8 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
+class Item(val itemId:String, val typeId:String?)
+
 abstract class RecyclerViewPage {
     companion object{
         @JvmStatic private val saveData = HashMap<String, HashMap<String, String>>()
@@ -62,13 +64,13 @@ abstract class RecyclerViewPage {
         downloadImageButton: ImageButton
     ){}
 
-    abstract suspend fun idToAbstractItem(view: View, id: String): GenericItem
+    abstract suspend fun itemToAbstractItem(view: View, item: Item): GenericItem
     abstract suspend fun load(
         context: Context,
         forceReload: Boolean,
         skip: Int,
         displayLoading: () -> Unit,
-        callback: (itemIdList: ArrayList<String>) -> Unit,
+        callback: (itemList: ArrayList<Item>) -> Unit,
         errorCallback: (errorMessage: String) -> Unit
     )
     
@@ -117,7 +119,7 @@ abstract class RecyclerViewPage {
 
     open val id = UUID.randomUUID().toString()
     
-    var fastAdapter:FastAdapter<GenericItem>? = null
+    private var fastAdapter:FastAdapter<GenericItem>? = null
 
     @SuppressLint("WrongConstant")
     private suspend fun setupRecyclerView(view: View) {
@@ -276,13 +278,13 @@ abstract class RecyclerViewPage {
                         swipeRefreshLayout?.isRefreshing = true
                     }
                 }
-            }, callback = { idList ->
+            }, callback = { itemList ->
                 scope.launch {
                     if(currentLoaderId == id){
                         setupRecyclerView(view)
 
-                        for (itemId in idList) {
-                            addItem(idToAbstractItem(view, itemId))
+                        for (item in itemList) {
+                            addItem(itemToAbstractItem(view, item))
                         }
 
                         getHeader(view.context)?.let {
@@ -361,11 +363,11 @@ abstract class RecyclerViewPage {
                         false,
                         viewData.size,
                         displayLoading = {},
-                        callback = { idList ->
+                        callback = { itemList ->
                             scope.launch {
                                 if(currentLoaderId == id){
-                                    for (itemId in idList) {
-                                        addItem(idToAbstractItem(view, itemId))
+                                    for (item in itemList) {
+                                        addItem(itemToAbstractItem(view, item))
                                     }
 
                                     withContext(Dispatchers.Main){

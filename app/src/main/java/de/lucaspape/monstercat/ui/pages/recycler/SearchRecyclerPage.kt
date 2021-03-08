@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.SearchView
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.request.async.loadTitleSearch
+import de.lucaspape.monstercat.ui.pages.util.Item
 import kotlin.collections.ArrayList
 
 class SearchRecyclerPage(
@@ -49,7 +50,7 @@ class SearchRecyclerPage(
         forceReload: Boolean,
         skip: Int,
         displayLoading: () -> Unit,
-        callback: (itemIdList: ArrayList<String>) -> Unit,
+        callback: (itemList: ArrayList<Item>) -> Unit,
         errorCallback: (errorMessage: String) -> Unit
     ) {
         val search = search
@@ -61,13 +62,13 @@ class SearchRecyclerPage(
                 context,
                 search,
                 skip, finishedCallback = { searchResults ->
-                    val idList = ArrayList<String>()
+                    val itemList = ArrayList<Item>()
 
                     for (result in searchResults) {
-                        idList.add(result.songId)
+                        itemList.add(Item(result.songId, null))
                     }
 
-                    callback(idList)
+                    callback(itemList)
                 }, errorCallback = {
                     errorCallback(context.getString(R.string.errorLoadingSearch))
                 })
