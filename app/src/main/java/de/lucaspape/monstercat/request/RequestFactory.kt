@@ -205,21 +205,34 @@ fun newDeletePlaylistTrackRequest(
         ) {
             settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v2/playlist/" + playlistId + "/record"
         } else {
-            context.getString(R.string.playlistUrl) + playlistId + "/record"
+            context.getString(R.string.playlistUrl) + playlistId + "/records"
         }
 
-    val deleteSongObject = JSONObject()
-    deleteSongObject.put("trackId", song.songId)
-    deleteSongObject.put("releaseId", song.albumId)
-    deleteSongObject.put("sort", deleteIndex)
+    val requestObject = JSONObject()
 
-    return JsonObjectRequest(
+    val recordsArray = JSONArray()
+
+    val recordObject = JSONObject()
+    recordObject.put("playlistId", playlistId)
+    recordObject.put("sort", deleteIndex)
+    recordObject.put("trackId", song.songId)
+    recordObject.put("releaseId", song.albumId)
+
+    recordsArray.put(recordObject)
+    requestObject.put("Records", recordsArray)
+
+    val request = JsonObjectRequest(
         Request.Method.DELETE,
         deleteTrackFromPlaylistUrl,
-        deleteSongObject,
+        requestObject,
         Response.Listener(callback),
         Response.ErrorListener(errorCallback)
     )
+
+    request.retryPolicy = DefaultRetryPolicy(10000,DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+
+    return request
 }
 
 fun newLoadAlbumRequest(
