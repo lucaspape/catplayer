@@ -10,6 +10,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -43,6 +44,8 @@ fun displaySnackBar(
     }
 }
 
+private var alertDialog: AlertDialog? = null
+
 fun displayAlertDialogList(
     context: Context,
     headerItem: GenericItem?,
@@ -56,12 +59,15 @@ fun displayAlertDialogList(
 
     alertDialogBuilder.setView(alertListLayout)
     alertDialogBuilder.setCancelable(true)
-    val dialog = alertDialogBuilder.create()
 
-    dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-    dialog.window?.setGravity(Gravity.BOTTOM)
+    alertDialog?.cancel()
 
-    dialog.show()
+    alertDialog = alertDialogBuilder.create()
+
+    alertDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+    alertDialog?.window?.setGravity(Gravity.BOTTOM)
+
+    alertDialog?.show()
 
     val recyclerView = alertListLayout.findViewById<RecyclerView>(R.id.alertDialogList)
     recyclerView.layoutManager =
@@ -90,7 +96,7 @@ fun displayAlertDialogList(
 
         if (index >= 0) {
             onItemClick(index, listItems[index])
-            dialog.hide()
+            alertDialog?.cancel()
         }
 
         false
