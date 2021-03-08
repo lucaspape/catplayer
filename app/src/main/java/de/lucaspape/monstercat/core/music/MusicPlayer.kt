@@ -285,7 +285,7 @@ private fun nextSong(context: Context): String {
 
         val queueIndex = if (shuffle && songQueue.size > 0) {
             if (nextRandom == -1) {
-                nextRandom = Random.nextInt(0, songQueue.size)
+                nextRandom = Random.nextInt(songQueue.size)
             }
 
             nextRandom
@@ -301,7 +301,7 @@ private fun nextSong(context: Context): String {
 
         //prepare nextRandom
         if (songQueue.size > 0) {
-            nextRandom = Random.nextInt(0, songQueue.size)
+            nextRandom = Random.nextInt(songQueue.size)
         }
 
         //clear related because playlist change
@@ -335,7 +335,7 @@ private fun nextSong(context: Context): String {
         //get from relatedQueue
         val queueIndex = if (shuffle && relatedSongQueue.size > 0) {
             if (nextRelatedRandom == -1) {
-                nextRelatedRandom = Random.nextInt(0, relatedSongQueue.size)
+                nextRelatedRandom = Random.nextInt(relatedSongQueue.size)
             }
 
             nextRelatedRandom
@@ -351,7 +351,7 @@ private fun nextSong(context: Context): String {
 
         //prepare nextRandom
         if (songQueue.size > 0) {
-            nextRelatedRandom = Random.nextInt(0, relatedSongQueue.size)
+            nextRelatedRandom = Random.nextInt(relatedSongQueue.size)
         }
 
         return songId
@@ -400,7 +400,7 @@ val nextSongId: String
 
             val queueIndex = if (shuffle && songQueue.size > 0) {
                 if (nextRandom == -1) {
-                    nextRandom = Random.nextInt(0, songQueue.size)
+                    nextRandom = Random.nextInt(songQueue.size)
                 }
 
                 nextRandom
@@ -417,7 +417,7 @@ val nextSongId: String
 
             val queueIndex = if (shuffle && relatedSongQueue.size > 0) {
                 if (nextRelatedRandom == -1) {
-                    nextRelatedRandom = Random.nextInt(0, relatedSongQueue.size)
+                    nextRelatedRandom = Random.nextInt(relatedSongQueue.size)
                 }
 
                 nextRelatedRandom
