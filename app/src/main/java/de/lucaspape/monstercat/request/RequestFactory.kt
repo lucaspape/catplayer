@@ -30,20 +30,34 @@ fun newAddToPlaylistRequest(
         ) {
             settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v2/playlist/" + playlistId + "/record"
         } else {
-            context.getString(R.string.playlistUrl) + playlistId + "/record"
+            context.getString(R.string.playlistUrl) + playlistId + "/add-records"
         }
 
-    val songJsonObject = JSONObject()
-    songJsonObject.put("trackId", song.songId)
-    songJsonObject.put("releaseId", song.albumId)
+    val requestObject = JSONObject()
 
-    return JsonObjectRequest(
-        Request.Method.PATCH,
+    val recordsArray = JSONArray()
+
+    val recordObject = JSONObject()
+    recordObject.put("playlistId", playlistId)
+    recordObject.put("sort", 0)
+    recordObject.put("trackId", song.songId)
+    recordObject.put("releaseId", song.albumId)
+
+    recordsArray.put(recordObject)
+    requestObject.put("Records", recordsArray)
+
+    val request = JsonObjectRequest(
+        Request.Method.POST,
         addToPlaylistUrl,
-        songJsonObject,
+        requestObject,
         Response.Listener(callback),
         Response.ErrorListener(errorCallback)
     )
+
+    request.retryPolicy = DefaultRetryPolicy(10000,DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+
+    return request
 }
 
 fun newSearchTrackRequest(
