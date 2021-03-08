@@ -13,8 +13,8 @@ android {
         applicationId "de.lucaspape.monstercat"
         minSdkVersion 24
         targetSdkVersion 30
-        versionCode 16700
-        versionName "1.6.7"
+        versionCode 16800
+        versionName "1.6.8"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     
