@@ -211,13 +211,7 @@ class MainActivity : AppCompatActivity() {
                                 context, playlist, it,
                                 finishedCallback = { relatedIdArray ->
                                     relatedIdArray?.let {
-                                        relatedSongQueue = ArrayList()
-
-                                        for (songId in relatedIdArray) {
-                                            relatedSongQueue.add(songId)
-                                        }
-
-                                        callback()
+                                        callback(relatedIdArray)
                                     }
                                 },
                                 errorCallback = {

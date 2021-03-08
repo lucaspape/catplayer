@@ -82,7 +82,7 @@ private var sessionCreated = false
 var connectSid = ""
 var cid = ""
 
-var retrieveRelatedSongs: (context: Context, callback: () -> Unit, errorCallback: () -> Unit) -> Unit =
+var retrieveRelatedSongs: (context: Context, callback: (relatedSongs:ArrayList<String>) -> Unit, errorCallback: () -> Unit) -> Unit =
     { _, _, _ -> }
 
 var displayInfo: (context: Context, msg: String) -> Unit = { _, _ -> }
@@ -90,7 +90,7 @@ var displayInfo: (context: Context, msg: String) -> Unit = { _, _ -> }
 var openMainActivityIntent = Intent()
 
 fun setupMusicPlayer(
-    sRetrieveRelatedSongs: (context: Context, callback: () -> Unit, errorCallback: () -> Unit) -> Unit,
+    sRetrieveRelatedSongs: (context: Context, callback: (relatedSongs:ArrayList<String>) -> Unit, errorCallback: () -> Unit) -> Unit,
     sDisplayInfo: (context: Context, msg: String) -> Unit,
     sOpenMainActivityIntent: Intent
 ) {
@@ -480,27 +480,23 @@ fun skipPreviousInPlaylist() {
     playlistIndex = playlist.size - 1
 }
 
-fun loadRelatedSongs(context: Context, playAfter: Boolean) {
-    loadRelatedSongs(context) {
-        if (playAfter) {
-            skipPreviousInPlaylist()
-            next(context)
-        }
-    }
-}
-
 /**
  * Fetch songs which are related to songs in playlist
  */
-fun loadRelatedSongs(context: Context, callback: () -> Unit) {
+fun loadRelatedSongs(context: Context, playAfter: Boolean) {
     if (!loadingRelatedSongs && loadedRelatedHash != playlist.hashCode()) {
         loadingRelatedSongs = true
 
         retrieveRelatedSongs(context, {
+            relatedSongQueue = it
             loadedRelatedHash = playlist.hashCode()
             loadingRelatedSongs = false
             nextRelatedRandom = -1
-            callback()
+
+            if (playAfter) {
+                skipPreviousInPlaylist()
+                next(context)
+            }
         }, { loadingRelatedSongs = false })
     }
 }
