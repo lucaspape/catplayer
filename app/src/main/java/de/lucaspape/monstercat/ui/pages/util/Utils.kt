@@ -30,6 +30,7 @@ import de.lucaspape.monstercat.ui.pages.HomePage.Companion.addSongsTaskId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.lang.IndexOutOfBoundsException
 import java.util.*
@@ -224,54 +225,58 @@ fun downloadAlbum(view: View, mcID: String) {
 fun addSongToPlaylist(view: View, songId: String) {
     scope.launch {
         loadPlaylists(view.context,
-            forceReload = true,
+            forceReload = false,
             loadManual = false,
             displayLoading = {},
             finishedCallback = {
-                val playlistDatabaseHelper =
-                    PlaylistDatabaseHelper(view.context)
-                val playlistList = playlistDatabaseHelper.getAllPlaylists()
+                scope.launch {
+                    withContext(Dispatchers.Main){
+                        val playlistDatabaseHelper =
+                            PlaylistDatabaseHelper(view.context)
+                        val playlistList = playlistDatabaseHelper.getAllPlaylists()
 
-                if (playlistList.isNotEmpty()) {
-                    val playlistNames = arrayOfNulls<String>(playlistList.size)
-                    val playlistIds = arrayOfNulls<String>(playlistList.size)
+                        if (playlistList.isNotEmpty()) {
+                            val playlistNames = arrayOfNulls<String>(playlistList.size)
+                            val playlistIds = arrayOfNulls<String>(playlistList.size)
 
-                    for (i in playlistList.indices) {
-                        playlistNames[i] = playlistList[i].playlistName
-                        playlistIds[i] = playlistList[i].playlistId
-                    }
+                            for (i in playlistList.indices) {
+                                playlistNames[i] = playlistList[i].playlistName
+                                playlistIds[i] = playlistList[i].playlistId
+                            }
 
-                    val alertListItems = ArrayList<AlertListItem>()
+                            val alertListItems = ArrayList<AlertListItem>()
 
-                    for (name in playlistNames) {
-                        name?.let {
-                            alertListItems.add(
-                                AlertListItem(
-                                    name,
-                                    ""
-                                )
-                            )
+                            for (name in playlistNames) {
+                                name?.let {
+                                    alertListItems.add(
+                                        AlertListItem(
+                                            name,
+                                            ""
+                                        )
+                                    )
+                                }
+                            }
+
+                            displayAlertDialogList(
+                                view.context,
+                                HeaderTextItem(
+                                    view.context.getString(R.string.pickPlaylistMsg)
+                                ),
+                                alertListItems
+                            ) { position, _ ->
+                                playlistIds[position]?.let { playlistId ->
+                                    addSongToPlaylistAsync(
+                                        view,
+                                        playlistId,
+                                        songId
+                                    )
+                                }
+                            }
+
+                        } else {
+                            displayInfo(view.context, view.context.getString(R.string.noPlaylistFound))
                         }
                     }
-
-                    displayAlertDialogList(
-                        view.context,
-                        HeaderTextItem(
-                            view.context.getString(R.string.pickPlaylistMsg)
-                        ),
-                        alertListItems
-                    ) { position, _ ->
-                        playlistIds[position]?.let { playlistId ->
-                            addSongToPlaylistAsync(
-                                view,
-                                playlistId,
-                                songId
-                            )
-                        }
-                    }
-
-                } else {
-                    displayInfo(view.context, view.context.getString(R.string.noPlaylistFound))
                 }
             },
             errorCallback = {
