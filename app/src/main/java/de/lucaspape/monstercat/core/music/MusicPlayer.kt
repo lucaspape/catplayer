@@ -514,3 +514,17 @@ fun loadRelatedSongs(context: Context, playAfter: Boolean) {
         })
     }
 }
+
+fun removeFromPriorityQueue(index:Int){
+    prioritySongQueue.removeAt(index)
+}
+
+fun removeFromQueue(index:Int){
+    songQueue.removeAt(index)
+    nextRandom = -1
+}
+
+fun removeFromRelatedQueue(index:Int){
+    relatedSongQueue.removeAt(index)
+    nextRelatedRandom = -1
+}

@@ -16,12 +16,13 @@ import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
 class HomePage(
     private val onSearch: (searchString: String?) -> Unit,
     private val openSettings: () -> Unit,
+    private val openQueue: () -> Unit,
     private var albumMcId: String?,
     private val resetPosition: Boolean
 ) :
     Page() {
 
-    constructor() : this({}, {}, null, false)
+    constructor() : this({}, {}, {},null, false)
 
     companion object {
         @JvmStatic
@@ -226,6 +227,10 @@ class HomePage(
 
         view.findViewById<ImageButton>(R.id.searchButton).setOnClickListener {
             onSearch(null)
+        }
+
+        view.findViewById<ImageButton>(R.id.queueButton).setOnClickListener {
+            openQueue()
         }
 
         return albumViewSelected == true

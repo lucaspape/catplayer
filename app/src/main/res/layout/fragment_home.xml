@@ -15,12 +15,24 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <ImageButton
+            android:id="@+id/queueButton"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="start"
+            android:background="@null"
+            android:contentDescription="Queue"
+            android:src="@drawable/ic_queue_music_24dp"
+            app:layout_constraintEnd_toStartOf="@+id/viewSelector"
+            app:layout_constraintStart_toStartOf="parent"
+            />
+
         <de.lucaspape.util.CustomSpinnerClass
             android:id="@+id/viewSelector"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="@+id/searchButton"
-            app:layout_constraintStart_toStartOf="parent"/>
+            app:layout_constraintEnd_toStartOf="@+id/searchButton"
+            app:layout_constraintStart_toStartOf="@+id/queueButton"/>
 
         <ImageButton
             android:id="@+id/settingsButton"

@@ -531,6 +531,7 @@ class MainActivity : AppCompatActivity() {
                     )
                 },
                 { openSettings() },
+                { openQueue() },
                 albumMcId,
                 resetPosition
 
@@ -548,6 +549,15 @@ class MainActivity : AppCompatActivity() {
                     R.id.navigation_home
             }
 
+        )
+    }
+
+    private fun openQueue() {
+        openPage(
+            QueuePage() {
+                findViewById<BottomNavigationView>(R.id.nav_view).selectedItemId =
+                    R.id.navigation_home
+            }
         )
     }
 }
