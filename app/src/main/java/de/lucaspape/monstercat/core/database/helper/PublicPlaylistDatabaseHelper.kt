@@ -131,10 +131,4 @@ class PublicPlaylistDatabaseHelper(context: Context) :
 
         return playlists
     }
-
-    fun removePlaylist(playlistId: String) {
-        val db = writableDatabase
-        db.delete(PublicPlaylist.TABLE_NAME, PublicPlaylist.COLUMN_PLAYLIST_ID + "=?", arrayOf(playlistId))
-        db.close()
-    }
 }
