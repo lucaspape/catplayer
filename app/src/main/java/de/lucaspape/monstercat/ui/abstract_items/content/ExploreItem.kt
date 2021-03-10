@@ -12,10 +12,7 @@ import de.lucaspape.monstercat.core.database.helper.ItemDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.StreamDatabaseHelper
 import de.lucaspape.monstercat.core.music.util.playStream
 import de.lucaspape.monstercat.core.util.Settings
-import de.lucaspape.monstercat.request.async.loadGenres
-import de.lucaspape.monstercat.request.async.loadGreatestHits
-import de.lucaspape.monstercat.request.async.loadLiveStreams
-import de.lucaspape.monstercat.request.async.loadMoods
+import de.lucaspape.monstercat.request.async.*
 import de.lucaspape.monstercat.ui.pages.recycler.HomeCatalogRecyclerPage
 import de.lucaspape.monstercat.ui.pages.util.Item
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
@@ -26,7 +23,8 @@ import kotlinx.coroutines.withContext
 class ExploreItem(
     val typeName: String,
     val openMood: (moodId: String) -> Unit,
-    val openGenre: (genreId: String) -> Unit
+    val openGenre: (genreId: String) -> Unit,
+    val openPublicPlaylist: (publicPlaylistid: String) -> Unit
 ) :
     AbstractItem<ExploreItem.ViewHolder>() {
     override val type: Int = 1003
@@ -97,6 +95,11 @@ class ExploreItem(
                                 }
                             }
                         }
+                        is PublicPlaylistItem -> {
+                            withContext(Dispatchers.Main){
+                                item.openPublicPlaylist(clickedItem.publicPlaylistId)
+                            }
+                        }
                     }
                 }
 
@@ -113,6 +116,9 @@ class ExploreItem(
                         }
                         "stream" -> {
                             StreamItem(item.itemId)
+                        }
+                        "public-playlist" -> {
+                            PublicPlaylistItem(item.itemId)
                         }
                         else -> {
                             CatalogItem(item.itemId)
@@ -215,6 +221,23 @@ class ExploreItem(
                                     },
                                     errorCallback = {
                                     })
+                            }
+                            "public-playlists" -> {
+                                loadPublicPlaylists(
+                                    context,
+                                    forceReload,
+                                    displayLoading = {},
+                                    finishedCallback = { results ->
+
+                                        val itemArray = ArrayList<Item>()
+
+                                        for (publicPlaylist in results) {
+                                            itemArray.add(Item(publicPlaylist.playlistId, "public-playlist"))
+                                        }
+
+                                        callback(itemArray)
+                                    },
+                                    errorCallback = {})
                             }
                         }
                     } else {

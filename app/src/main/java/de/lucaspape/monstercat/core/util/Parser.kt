@@ -4,6 +4,7 @@ import android.content.Context
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.*
 import de.lucaspape.monstercat.core.database.objects.Mood
+import de.lucaspape.monstercat.core.database.objects.PublicPlaylist
 import de.lucaspape.monstercat.core.database.objects.Song
 import org.json.JSONArray
 import org.json.JSONException
@@ -184,4 +185,18 @@ fun parseMoodIntoDB(context: Context, jsonObject: JSONObject): Mood? {
     )
 
     return moodDatabaseHelper.getMood(id)
+}
+
+fun parsePublicPlaylistIntoDB(context: Context, jsonObject: JSONObject): PublicPlaylist?{
+    val publicPlaylistDatabaseHelper = PublicPlaylistDatabaseHelper(context)
+
+    val name = jsonObject.getString("Label")
+    val id = jsonObject.getString("Link").replace("mcat://playlist:", "")
+
+    publicPlaylistDatabaseHelper.insertPlaylist(
+        id,
+        name
+    )
+
+    return publicPlaylistDatabaseHelper.getPlaylist(id)
 }

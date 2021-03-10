@@ -5,6 +5,7 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.*
 import de.lucaspape.monstercat.core.database.objects.Genre
 import de.lucaspape.monstercat.core.database.objects.Mood
+import de.lucaspape.monstercat.core.database.objects.PublicPlaylist
 import de.lucaspape.monstercat.core.util.*
 import de.lucaspape.monstercat.request.*
 import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
@@ -1006,6 +1007,54 @@ suspend fun loadLiveStreams(
                 queue.add(request)
             }else{
                 errorCallback()
+            }
+        }
+    }
+}
+
+suspend fun loadPublicPlaylists(
+    context: Context,
+    forceReload: Boolean,
+    displayLoading: () -> Unit,
+    finishedCallback: (results: ArrayList<PublicPlaylist>) -> Unit,
+    errorCallback: () -> Unit
+) {
+    withContext(Dispatchers.Default) {
+        val publicPlaylistDatabaseHelper = PublicPlaylistDatabaseHelper(context)
+        val playlists = publicPlaylistDatabaseHelper.getAllPlaylists()
+
+        if (!forceReload && playlists.isNotEmpty()) {
+            finishedCallback(playlists.reversed() as ArrayList<PublicPlaylist>)
+        } else {
+            withContext(Dispatchers.Main) {
+                displayLoading()
+            }
+
+            val queue =
+                getAuthorizedRequestQueue(
+                    context,
+                    context.getString(R.string.connectApiHost)
+                )
+
+            publicPlaylistDatabaseHelper.reCreateTable(context, false)
+
+            newLoadPublicPlaylistsRequest(context, { jsonObject ->
+                val playlistsArray = jsonObject.getJSONObject("Menu").getJSONArray("Sections").getJSONObject(0).getJSONArray("Items")
+
+                for (i in (0 until playlistsArray.length())) {
+                    parsePublicPlaylistIntoDB(
+                        context,
+                        playlistsArray.getJSONObject(i)
+                    )?.let {
+                        playlists.add(it)
+                    }
+                }
+
+                finishedCallback(playlists)
+            }, {
+                errorCallback()
+            }).let {
+                queue.add(it)
             }
         }
     }

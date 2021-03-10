@@ -14,10 +14,11 @@ class ExplorePage(
     private var returnToHome: () -> Unit
 ) : Page() {
 
-    constructor() : this({},{},false, {})
+    constructor() : this({}, {}, false, {})
 
-    companion object{
-        @JvmStatic val explorePageName = "explore"
+    companion object {
+        @JvmStatic
+        val explorePageName = "explore"
     }
 
     private var explorePageObject: RecyclerViewPage? = null
@@ -27,14 +28,14 @@ class ExplorePage(
 
     private var resetData = false
 
-    override fun onBackPressed(view: View):Boolean {
-         if(currentView == "explore"){
+    override fun onBackPressed(view: View): Boolean {
+        if (currentView == "explore") {
             returnToHome()
-        }else{
+        } else {
             resetData = true
             exploreView(view)
         }
-        
+
         return false
     }
 
@@ -55,16 +56,24 @@ class ExplorePage(
 
         explorePageObject?.saveRecyclerViewPosition(view.context)
 
-        explorePageObject = ExploreRecyclerPage(openMood = { moodId ->
-            moodView(view, moodId)
-        }, openGenre = { genreId -> genreView(view, genreId) })
+        explorePageObject = ExploreRecyclerPage(
+            openMood = { moodId ->
+                moodView(view, moodId)
+            },
+            openGenre = { genreId -> genreView(view, genreId) },
+            openPublicPlaylist = { publicPlaylistId ->
+                publicPlaylistsView(
+                    view,
+                    publicPlaylistId
+                )
+            })
 
-        if (resetPosition){
+        if (resetPosition) {
             explorePageObject?.resetRecyclerViewSavedPosition(view.context)
             explorePageObject?.resetSaveData()
         }
 
-        if(resetData){
+        if (resetData) {
             explorePageObject?.resetSaveData()
         }
 
@@ -78,12 +87,12 @@ class ExplorePage(
 
         explorePageObject = MoodContentsRecyclerPage(moodId)
 
-        if (resetPosition){
+        if (resetPosition) {
             explorePageObject?.resetRecyclerViewSavedPosition(view.context)
             explorePageObject?.resetSaveData()
         }
 
-        if(resetData){
+        if (resetData) {
             explorePageObject?.resetSaveData()
         }
 
@@ -97,12 +106,31 @@ class ExplorePage(
 
         explorePageObject = GenreContentsRecyclerPage(genreId)
 
-        if (resetPosition){
+        if (resetPosition) {
             explorePageObject?.resetRecyclerViewSavedPosition(view.context)
             explorePageObject?.resetSaveData()
         }
 
-        if(resetData){
+        if (resetData) {
+            explorePageObject?.resetSaveData()
+        }
+
+        explorePageObject?.onCreate(view)
+    }
+
+    private fun publicPlaylistsView(view: View, publicPlaylistId: String) {
+        currentView = "public-playlists"
+
+        explorePageObject?.saveRecyclerViewPosition(view.context)
+
+        explorePageObject = PublicPlaylistContentsRecyclerPage(publicPlaylistId)
+
+        if (resetPosition) {
+            explorePageObject?.resetRecyclerViewSavedPosition(view.context)
+            explorePageObject?.resetSaveData()
+        }
+
+        if (resetData) {
             explorePageObject?.resetSaveData()
         }
 

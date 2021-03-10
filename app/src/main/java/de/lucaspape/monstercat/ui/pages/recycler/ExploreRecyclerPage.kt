@@ -14,13 +14,15 @@ import de.lucaspape.monstercat.ui.pages.util.Item
 
 open class ExploreRecyclerPage(
     val openMood: (moodId: String) -> Unit,
-    val openGenre: (genreId: String) -> Unit
+    val openGenre: (genreId: String) -> Unit,
+    val openPublicPlaylist: (publicPlaylistId:String) -> Unit
 ) : HomeCatalogRecyclerPage() {
 
     override val id = "explore"
 
     private var currentMoodId = ""
     private var currentGenreId = ""
+    private var currentPublicPlaylistId = ""
 
     override suspend fun itemToAbstractItem(view: View, item: Item): GenericItem {
         return if (item.typeId == "separator") {
@@ -29,6 +31,7 @@ open class ExploreRecyclerPage(
             ExploreItem(item.itemId, {
                 currentMoodId = it
                 currentGenreId = ""
+                currentPublicPlaylistId = ""
 
                 saveData()
 
@@ -36,10 +39,19 @@ open class ExploreRecyclerPage(
             }, {
                 currentMoodId = ""
                 currentGenreId = it
+                currentPublicPlaylistId = ""
 
                 saveData()
 
                 openGenre(it)
+            }, {
+                currentMoodId = ""
+                currentGenreId = ""
+                currentPublicPlaylistId = it
+
+                saveData()
+
+                openPublicPlaylist(it)
             })
         }
     }
@@ -57,6 +69,9 @@ open class ExploreRecyclerPage(
 
             items.add(Item(context.getString(R.string.streams), "separator"))
             items.add(Item("stream", "item"))
+
+            items.add(Item("Public Playlists", "separator"))
+            items.add(Item("public-playlists", "item"))
 
             items.add(Item(context.getString(R.string.moods), "separator"))
             items.add(Item("mood", "item"))
@@ -84,12 +99,16 @@ open class ExploreRecyclerPage(
         if (data != null) {
             val moodId = data["moodId"]
             val genreId = data["genreId"]
+            val publicPlaylistId = data["publicPlaylistId"]
 
             return if (!moodId.isNullOrBlank()) {
                 openMood(moodId)
                 true
             } else if (!genreId.isNullOrBlank()) {
                 openGenre(genreId)
+                true
+            } else if(!publicPlaylistId.isNullOrBlank()){
+                openPublicPlaylist(publicPlaylistId)
                 true
             } else {
                 false
@@ -104,6 +123,7 @@ open class ExploreRecyclerPage(
 
         hashMap["moodId"] = currentMoodId
         hashMap["genreId"] = currentGenreId
+        hashMap["publicPlaylistId"] = currentPublicPlaylistId
 
         return hashMap
     }
