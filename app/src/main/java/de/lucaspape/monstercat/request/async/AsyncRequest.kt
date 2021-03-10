@@ -8,7 +8,6 @@ import de.lucaspape.monstercat.core.database.objects.Mood
 import de.lucaspape.monstercat.core.database.objects.PublicPlaylist
 import de.lucaspape.monstercat.core.util.*
 import de.lucaspape.monstercat.request.*
-import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
 import de.lucaspape.monstercat.core.util.Settings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -575,11 +574,11 @@ suspend fun loadTitleSearch(
     context: Context,
     searchString: String,
     skip: Int,
-    finishedCallback: (searchResults: ArrayList<CatalogItem>) -> Unit,
+    finishedCallback: (searchResults: ArrayList<String>) -> Unit,
     errorCallback: () -> Unit
 ) {
     withContext(Dispatchers.Default) {
-        val searchResults: ArrayList<CatalogItem> = ArrayList()
+        val searchResults: ArrayList<String> = ArrayList()
 
         val searchQueue =
             getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
@@ -592,9 +591,7 @@ suspend fun loadTitleSearch(
 
             for (song in songList) {
                 searchResults.add(
-                    CatalogItem(
-                        song.songId
-                    )
+                    song.songId
                 )
             }
 

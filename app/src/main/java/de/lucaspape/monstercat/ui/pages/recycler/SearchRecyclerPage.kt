@@ -64,8 +64,8 @@ class SearchRecyclerPage(
                 skip, finishedCallback = { searchResults ->
                     val itemList = ArrayList<Item>()
 
-                    for (result in searchResults) {
-                        itemList.add(Item(result.songId, null))
+                    for (id in searchResults) {
+                        itemList.add(Item(id, null))
                     }
 
                     callback(itemList)
