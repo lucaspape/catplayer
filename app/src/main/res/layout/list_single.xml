@@ -26,17 +26,29 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <ImageView
+            android:id="@+id/explicitImage"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginEnd="5dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/title"
+            app:layout_constraintEnd_toStartOf="@id/titleDownloadButton"/>
+
         <ImageButton
             android:id="@+id/titleDownloadButton"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginEnd="10dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginEnd="5dp"
             android:background="@null"
             android:contentDescription="@string/download"
             android:src="@drawable/ic_file_download_24dp"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/titleMenuButton"
-            app:layout_constraintStart_toEndOf="@id/title"
+            app:layout_constraintStart_toEndOf="@id/explicitImage"
             app:layout_constraintTop_toTopOf="parent" />
 
 
@@ -62,7 +74,7 @@
             android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@id/artist"
-            app:layout_constraintEnd_toStartOf="@id/titleDownloadButton"
+            app:layout_constraintEnd_toStartOf="@id/explicitImage"
             app:layout_constraintStart_toEndOf="@id/cover"
             app:layout_constraintTop_toTopOf="parent" />
 
