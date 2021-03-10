@@ -9,7 +9,7 @@ import de.lucaspape.monstercat.R
 
 class SettingsProfileItem(val username: String, val onLogout: () -> Unit) :
     AbstractItem<SettingsProfileItem.ViewHolder>() {
-    override val type: Int = 130
+    override val type: Int = 3004
 
     override val layoutRes: Int
         get() = R.layout.settings_user_profile

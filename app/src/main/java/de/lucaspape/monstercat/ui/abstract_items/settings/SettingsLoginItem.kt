@@ -10,7 +10,7 @@ import de.lucaspape.monstercat.R
 
 class SettingsLoginItem(val onLogin: (username: String, password: String) -> Unit) :
     AbstractItem<SettingsLoginItem.ViewHolder>() {
-    override val type: Int = 122
+    override val type: Int = 3003
 
     override val layoutRes: Int
         get() = R.layout.settings_login_item

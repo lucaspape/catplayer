@@ -14,7 +14,7 @@ class SettingsSeekBarItem(
     private val shownStart: Int,
     private val onChange: (value: Int, shownValueView: TextView) -> Unit
 ) : AbstractItem<SettingsSeekBarItem.ViewHolder>() {
-    override val type: Int = 125
+    override val type: Int = 3005
 
     override val layoutRes: Int
         get() = R.layout.settings_seekbar_item

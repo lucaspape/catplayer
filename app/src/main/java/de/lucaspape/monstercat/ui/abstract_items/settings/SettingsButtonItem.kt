@@ -8,7 +8,7 @@ import de.lucaspape.monstercat.R
 
 class SettingsButtonItem(private val buttonText: String, val onClick: () -> Unit) :
     AbstractItem<SettingsButtonItem.ViewHolder>() {
-    override val type: Int = 121
+    override val type: Int = 3001
 
     override val layoutRes: Int
         get() = R.layout.settings_button_item

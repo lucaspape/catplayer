@@ -15,18 +15,18 @@ import de.lucaspape.monstercat.core.util.Settings
 import java.io.File
 
 data class Song(
-    val context: Context,
+    private val context: Context,
     val songId: String,
-    val title: String,
-    val version: String,
+    private val title: String,
+    private val version: String,
     val albumId: String,
     val mcAlbumId: String,
     val artist: String,
     val artistId: String,
     val isDownloadable: Boolean,
-    val isStreamable: Boolean,
+    private val isStreamable: Boolean,
     val inEarlyAccess: Boolean,
-    val creatorFriendly: Boolean
+    private val creatorFriendly: Boolean
 ) {
 
     companion object {
@@ -83,7 +83,14 @@ data class Song(
                     ")"
     }
 
-    val shownTitle = "$title $version"
+    val shownTitle:String
+        get() {
+            return if (version.isNotEmpty()){
+                "$title ($version)"
+            }else{
+                title
+            }
+        }
 
     val downloadLocation: String
         get() = context.getExternalFilesDir(null)

@@ -17,7 +17,7 @@ open class GenreItem(
     val genreId: String
 ) : AbstractItem<GenreItem.ViewHolder>() {
 
-    override val type: Int = 190
+    override val type: Int = 1004
 
     override val layoutRes = R.layout.list_album_horizontal
 

@@ -24,30 +24,20 @@ class PlayerService : Service() {
         //register receiver which checks if headphones unplugged
         applicationContext.registerReceiver(noisyReceiver, IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY))
 
-        var title = ""
-        var artist = ""
-        var version = ""
-
         createNotificationChannel(applicationContext)
 
         startForeground(
             musicNotificationID,
             createPlayerNotification(
                 applicationContext,
-                title,
-                version,
-                artist,
+                "",
+                "",
                 null
             )
         )
 
-
         intent?.getStringExtra("songId")?.let { songId ->
             SongDatabaseHelper(this).getSong(this, songId)?.let { song ->
-                title = song.title
-                artist = song.artist
-                version = song.version
-
                 setCover(
                     this,
                     song.albumId,
@@ -57,8 +47,7 @@ class PlayerService : Service() {
                         musicNotificationID,
                         createPlayerNotification(
                             applicationContext,
-                            song.title,
-                            song.version,
+                            song.shownTitle,
                             song.artist,
                             it
                         )

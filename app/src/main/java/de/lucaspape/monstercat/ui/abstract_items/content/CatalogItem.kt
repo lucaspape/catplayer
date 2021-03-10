@@ -233,7 +233,7 @@ open class CatalogItem(
         }
     }
 
-    override val type: Int = 101
+    override val type: Int = 1002
 
     override val layoutRes: Int
         get() = R.layout.list_single
@@ -277,9 +277,7 @@ open class CatalogItem(
 
                 albumId = song.albumId
 
-                val shownTitle = "${song.title} ${song.version}"
-
-                titleTextView.text = shownTitle
+                titleTextView.text = song.shownTitle
                 artistTextView.text = song.artist
 
                 downloadCoverIntoImageReceiver(context, object : ImageReceiverInterface {

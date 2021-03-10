@@ -29,7 +29,7 @@ class ExploreItem(
     val openGenre: (genreId: String) -> Unit
 ) :
     AbstractItem<ExploreItem.ViewHolder>() {
-    override val type: Int = 152
+    override val type: Int = 1003
 
     override val layoutRes: Int
         get() = R.layout.list_explore

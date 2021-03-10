@@ -7,7 +7,7 @@ import com.mikepenz.fastadapter.items.AbstractItem
 import de.lucaspape.monstercat.R
 
 class SettingsLabelItem(private val title: String) : AbstractItem<SettingsLabelItem.ViewHolder>() {
-    override val type: Int = 126
+    override val type: Int = 3002
 
     override val layoutRes: Int
         get() = R.layout.list_text_header

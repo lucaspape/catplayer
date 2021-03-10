@@ -17,7 +17,7 @@ open class MoodItem(
     val moodId: String
 ) : AbstractItem<MoodItem.ViewHolder>() {
 
-    override val type: Int = 187
+    override val type: Int = 1005
 
     override val layoutRes = R.layout.list_album_horizontal
 

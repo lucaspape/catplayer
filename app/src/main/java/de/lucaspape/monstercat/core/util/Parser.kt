@@ -120,12 +120,12 @@ fun parseAlbumToDB(jsonObject: JSONObject, context: Context): Long? {
     val id = jsonObject.getString("id")
     val title = jsonObject.getString("title")
     val artist = jsonObject.getString("artistsTitle")
-    val coverUrl = context.getString(R.string.trackContentUrl) + "$id/cover"
+    val version = jsonObject.getString("version")
     val mcID = jsonObject.getString("catalogId")
 
     val databaseHelper = AlbumDatabaseHelper(context)
     return if (databaseHelper.getAlbum(id) == null) {
-        databaseHelper.insertAlbum(id, title, artist, coverUrl, mcID)
+        databaseHelper.insertAlbum(id, title, artist, version, mcID)
     } else {
         databaseHelper.getAlbum(id)?.id?.toLong()
     }

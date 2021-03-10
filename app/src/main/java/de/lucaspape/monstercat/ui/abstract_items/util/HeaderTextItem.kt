@@ -8,7 +8,7 @@ import de.lucaspape.monstercat.R
 
 open class HeaderTextItem(private val headerText: String) :
     AbstractItem<HeaderTextItem.ViewHolder>() {
-    override val type: Int = 104
+    override val type: Int = 4001
 
     override val layoutRes: Int
         get() = R.layout.list_text_header

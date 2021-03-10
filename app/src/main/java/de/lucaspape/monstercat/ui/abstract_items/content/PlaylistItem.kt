@@ -177,7 +177,7 @@ open class PlaylistItem(
         }
     }
 
-    override val type: Int = 102
+    override val type: Int = 1006
 
     override val layoutRes: Int
         get() = R.layout.list_single

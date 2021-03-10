@@ -14,7 +14,7 @@ class SettingsToggleItem(
     val requiredApiFeature: String?,
     val onSwitchChange: (setting: String, value: Boolean, switch: SwitchMaterial) -> Boolean
 ) : AbstractItem<SettingsToggleItem.ViewHolder>() {
-    override val type: Int = 120
+    override val type: Int = 3006
 
     override val layoutRes: Int
         get() = R.layout.settings_switch_item

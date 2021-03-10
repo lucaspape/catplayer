@@ -10,7 +10,7 @@ import de.lucaspape.monstercat.R
 
 class AlertListItem(val itemText: String, val itemDrawable: String?) :
     AbstractItem<AlertListItem.ViewHolder>() {
-    override val type: Int = 105
+    override val type: Int = 2002
 
     override val layoutRes: Int
         get() = R.layout.alert_list_item

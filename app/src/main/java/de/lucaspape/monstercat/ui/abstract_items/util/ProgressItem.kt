@@ -7,7 +7,7 @@ import com.mikepenz.fastadapter.items.AbstractItem
 import de.lucaspape.monstercat.R
 
 open class ProgressItem : AbstractItem<ProgressItem.ViewHolder>() {
-    override val type: Int = 103
+    override val type: Int = 4002
 
     override val layoutRes: Int
         get() = R.layout.list_loading

@@ -7,7 +7,7 @@ import de.lucaspape.monstercat.R
 
 open class SpacerItem() :
     AbstractItem<SpacerItem.ViewHolder>() {
-    override val type: Int = 109
+    override val type: Int = 4003
 
     override val layoutRes: Int
         get() = R.layout.list_spacer

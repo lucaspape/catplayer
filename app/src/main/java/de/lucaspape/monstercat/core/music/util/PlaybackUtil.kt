@@ -139,7 +139,7 @@ fun playSong(
         //show title, artist, cover
         SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
             //set title/artist
-            title = "${song.title} ${song.version}"
+            title = song.shownTitle
             artist = song.artist
 
             //set cover
@@ -152,8 +152,7 @@ fun playSong(
                 if (showNotification) {
                     updateNotification(
                         context,
-                        song.title,
-                        song.version,
+                        song.shownTitle,
                         song.artist,
                         it
                     )

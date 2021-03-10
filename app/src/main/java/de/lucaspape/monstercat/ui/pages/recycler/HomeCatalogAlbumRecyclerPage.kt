@@ -93,7 +93,7 @@ class HomeCatalogAlbumRecyclerPage(
     override fun getHeader(context: Context): String? {
         albumId?.let {
             AlbumDatabaseHelper(context).getAlbum(albumId)?.let {
-                return it.title
+                return it.shownTitle
             }
         }
 

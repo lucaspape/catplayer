@@ -3,9 +3,9 @@ package de.lucaspape.monstercat.core.database.objects
 data class Album(
     val id: Int,
     val albumId: String,
-    val title: String,
+    private val title: String,
     val artist: String,
-    val coverUrl: String,
+    private val version: String,
     val mcID: String
 ) {
     companion object {
@@ -25,7 +25,7 @@ data class Album(
         val COLUMN_ARTIST = "artist"
 
         @JvmStatic
-        val COLUMN_COVER_URL = "coverUrl"
+        val COLUMN_VERSION = "version"
 
         @JvmStatic
         val COLUMN_ALBUM_MCID = "albumMCID"
@@ -37,8 +37,17 @@ data class Album(
                     COLUMN_TITLE + " TEXT," +
                     COLUMN_ALBUM_ID + " TEXT," +
                     COLUMN_ARTIST + " TEXT," +
-                    COLUMN_COVER_URL + " TEXT," +
+                    COLUMN_VERSION + " TEXT," +
                     COLUMN_ALBUM_MCID + " TEXT" +
                     ")"
     }
+
+    val shownTitle:String
+        get() {
+            return if (version.isNotEmpty()){
+                "$title ($version)"
+            }else{
+                title
+            }
+        }
 }

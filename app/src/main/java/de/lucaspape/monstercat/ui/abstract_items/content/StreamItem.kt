@@ -17,7 +17,7 @@ open class StreamItem(
     val streamName: String
 ) : AbstractItem<StreamItem.ViewHolder>() {
 
-    override val type: Int = 190
+    override val type: Int = 1008
 
     override val layoutRes = R.layout.list_album_horizontal
 

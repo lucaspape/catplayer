@@ -59,7 +59,7 @@ open class AlbumItem(
                 displayAlertDialogList(
                     view.context,
                     AlertListHeaderItem(
-                        album.title,
+                        album.shownTitle,
                         album.albumId
                     ),
                     itemList
@@ -85,7 +85,7 @@ open class AlbumItem(
         }
     }
 
-    override val type: Int = 100
+    override val type: Int = 10001
 
     override val layoutRes = if (horizontal) {
         R.layout.list_album_horizontal
@@ -115,7 +115,7 @@ open class AlbumItem(
             album?.let {
                 albumId = album.albumId
 
-                titleTextView.text = album.title
+                titleTextView.text = album.shownTitle
                 artistTextView.text = album.artist
             }
 

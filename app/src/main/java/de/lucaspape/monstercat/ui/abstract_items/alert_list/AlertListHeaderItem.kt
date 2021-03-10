@@ -14,7 +14,7 @@ import de.lucaspape.monstercat.core.download.downloadCoverIntoImageReceiver
 
 open class AlertListHeaderItem(private val headerText: String, private val albumId: String) :
     AbstractItem<AlertListHeaderItem.ViewHolder>() {
-    override val type: Int = 106
+    override val type: Int = 2001
 
     override val layoutRes: Int
         get() = R.layout.alert_list_header_item

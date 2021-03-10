@@ -36,8 +36,7 @@ private var closeReceiver: BroadcastReceiver? = null
 
 fun createPlayerNotification(
     context: Context,
-    title: String,
-    version: String,
+    shownTitle: String,
     artist: String,
     bitmap: Bitmap?
 ): Notification {
@@ -141,7 +140,7 @@ fun createPlayerNotification(
         .setSmallIcon(R.drawable.ic_icon)
         .setLargeIcon(bitmap)
         .setColor(Color.LTGRAY)
-        .setContentTitle("$title $version")
+        .setContentTitle(shownTitle)
         .setContentText(artist)
         .setContentIntent(openActivityPendingIntent)
         .addAction(prevAction)
@@ -209,14 +208,13 @@ fun stopPlayerService(context: Context) {
 
 fun updateNotification(context: Context, songId: String, bitmap: Bitmap) {
     SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
-        updateNotification(context, song.title, song.version, song.artist, bitmap)
+        updateNotification(context, song.shownTitle, song.artist, bitmap)
     }
 }
 
 fun updateNotification(
     context: Context,
-    title: String,
-    version: String,
+    shownTitle: String,
     artist: String,
     bitmap: Bitmap
 ) {
@@ -226,8 +224,7 @@ fun updateNotification(
         musicNotificationID,
         createPlayerNotification(
             context,
-            title,
-            version,
+            shownTitle,
             artist,
             bitmap
         )

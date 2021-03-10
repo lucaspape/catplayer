@@ -22,7 +22,7 @@ import de.lucaspape.monstercat.ui.*
 open class QueueItem(
     val songId: String
 ) : AbstractItem<QueueItem.ViewHolder>() {
-    override val type: Int = 185
+    override val type: Int = 1007
 
     override val layoutRes: Int
         get() = R.layout.list_single
@@ -66,7 +66,7 @@ open class QueueItem(
 
                 albumId = song.albumId
 
-                val shownTitle = "${song.title} ${song.version}"
+                val shownTitle = song.shownTitle
 
                 titleTextView.text = shownTitle
                 artistTextView.text = song.artist

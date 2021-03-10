@@ -17,7 +17,7 @@ class AlbumDatabaseHelper(context: Context) :
     ) {
     companion object {
         @JvmStatic
-        val DATABASE_VERSION = 1000
+        val DATABASE_VERSION = 1001
 
         @JvmStatic
         private val DATABASE_NAME = "albums_db"
@@ -52,7 +52,7 @@ class AlbumDatabaseHelper(context: Context) :
         albumId: String,
         title: String,
         artist: String,
-        coverUrl: String,
+        version: String,
         mcID: String
     ): Long {
         val db = writableDatabase
@@ -62,7 +62,7 @@ class AlbumDatabaseHelper(context: Context) :
         values.put(Album.COLUMN_TITLE, title)
         values.put(Album.COLUMN_ALBUM_ID, albumId)
         values.put(Album.COLUMN_ARTIST, artist)
-        values.put(Album.COLUMN_COVER_URL, coverUrl)
+        values.put(Album.COLUMN_VERSION, version)
         values.put(Album.COLUMN_ALBUM_MCID, mcID)
 
         val id = db.insert(Album.TABLE_NAME, null, values)
@@ -82,7 +82,7 @@ class AlbumDatabaseHelper(context: Context) :
                     Album.COLUMN_ALBUM_ID,
                     Album.COLUMN_TITLE,
                     Album.COLUMN_ARTIST,
-                    Album.COLUMN_COVER_URL,
+                    Album.COLUMN_VERSION,
                     Album.COLUMN_ALBUM_MCID
                 ),
                 Album.COLUMN_ALBUM_MCID + "=?",
@@ -97,7 +97,7 @@ class AlbumDatabaseHelper(context: Context) :
                     cursor.getString(cursor.getColumnIndex(Album.COLUMN_ALBUM_ID)),
                     cursor.getString(cursor.getColumnIndex(Album.COLUMN_TITLE)),
                     cursor.getString(cursor.getColumnIndex(Album.COLUMN_ARTIST)),
-                    cursor.getString(cursor.getColumnIndex(Album.COLUMN_COVER_URL)),
+                    cursor.getString(cursor.getColumnIndex(Album.COLUMN_VERSION)),
                     cursor.getString(cursor.getColumnIndex(Album.COLUMN_ALBUM_MCID))
                 )
 
@@ -126,7 +126,7 @@ class AlbumDatabaseHelper(context: Context) :
                     Album.COLUMN_ALBUM_ID,
                     Album.COLUMN_TITLE,
                     Album.COLUMN_ARTIST,
-                    Album.COLUMN_COVER_URL,
+                    Album.COLUMN_VERSION,
                     Album.COLUMN_ALBUM_MCID
                 ),
                 Album.COLUMN_ALBUM_ID + "=?",
@@ -141,7 +141,7 @@ class AlbumDatabaseHelper(context: Context) :
                     cursor.getString(cursor.getColumnIndex(Album.COLUMN_ALBUM_ID)),
                     cursor.getString(cursor.getColumnIndex(Album.COLUMN_TITLE)),
                     cursor.getString(cursor.getColumnIndex(Album.COLUMN_ARTIST)),
-                    cursor.getString(cursor.getColumnIndex(Album.COLUMN_COVER_URL)),
+                    cursor.getString(cursor.getColumnIndex(Album.COLUMN_VERSION)),
                     cursor.getString(cursor.getColumnIndex(Album.COLUMN_ALBUM_MCID))
                 )
 
@@ -175,7 +175,7 @@ class AlbumDatabaseHelper(context: Context) :
                     cursor.getString(cursor.getColumnIndex(Album.COLUMN_ALBUM_ID)),
                     cursor.getString(cursor.getColumnIndex(Album.COLUMN_TITLE)),
                     cursor.getString(cursor.getColumnIndex(Album.COLUMN_ARTIST)),
-                    cursor.getString(cursor.getColumnIndex(Album.COLUMN_COVER_URL)),
+                    cursor.getString(cursor.getColumnIndex(Album.COLUMN_VERSION)),
                     cursor.getString(cursor.getColumnIndex(Album.COLUMN_ALBUM_MCID))
                 )
                 albums.add(album)
@@ -204,7 +204,7 @@ class AlbumDatabaseHelper(context: Context) :
                     cursor.getString(cursor.getColumnIndex(Album.COLUMN_ALBUM_ID)),
                     cursor.getString(cursor.getColumnIndex(Album.COLUMN_TITLE)),
                     cursor.getString(cursor.getColumnIndex(Album.COLUMN_ARTIST)),
-                    cursor.getString(cursor.getColumnIndex(Album.COLUMN_COVER_URL)),
+                    cursor.getString(cursor.getColumnIndex(Album.COLUMN_VERSION)),
                     cursor.getString(cursor.getColumnIndex(Album.COLUMN_ALBUM_MCID))
                 )
                 albums.add(album)
