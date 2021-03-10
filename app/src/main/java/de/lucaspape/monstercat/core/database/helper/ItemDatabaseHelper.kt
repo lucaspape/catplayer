@@ -6,8 +6,9 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
 import de.lucaspape.monstercat.core.database.objects.Item
+import de.lucaspape.monstercat.core.util.Settings
 
-class ItemDatabaseHelper(context: Context, private var databaseId: String) :
+class ItemDatabaseHelper(private val context: Context, private var databaseId: String) :
     SQLiteOpenHelper(
         context,
         DATABASE_NAME, null,
@@ -40,6 +41,13 @@ class ItemDatabaseHelper(context: Context, private var databaseId: String) :
                 0,
                 ""
             ).CREATE_TABLE)
+
+        val settings = Settings.getSettings(context)
+
+        if(settings.getInt("songDatabaseVersion-$databaseId") != SongDatabaseHelper.DATABASE_VERSION){
+            reCreateTable(db)
+            settings.setInt("songDatabaseVersion-$databaseId", SongDatabaseHelper.DATABASE_VERSION)
+        }
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
@@ -54,6 +62,17 @@ class ItemDatabaseHelper(context: Context, private var databaseId: String) :
     fun reCreateTable() {
         val db = writableDatabase
 
+        db?.execSQL(
+            "DROP TABLE IF EXISTS " + Item(
+                databaseId,
+                0,
+                ""
+            ).TABLE_NAME
+        )
+        onCreate(db)
+    }
+
+    fun reCreateTable(db: SQLiteDatabase?) {
         db?.execSQL(
             "DROP TABLE IF EXISTS " + Item(
                 databaseId,
@@ -157,38 +176,6 @@ class ItemDatabaseHelper(context: Context, private var databaseId: String) :
         db.close()
 
         return databaseItems
-    }
-
-    fun getItems(skip: Long): ArrayList<Item> {
-        val items: ArrayList<Item> = ArrayList()
-
-        val selectQuery = "SELECT * FROM " + Item(
-            databaseId,
-            0,
-            ""
-        ).TABLE_NAME + " ORDER BY " +
-                Item.COLUMN_ID + " ASC LIMIT $skip,-1"
-
-        val db = writableDatabase
-        val cursor = db.rawQuery(selectQuery, null)
-
-        if (cursor.moveToFirst()) {
-            do {
-                val item =
-                    Item(
-                        databaseId,
-                        cursor.getLong(cursor.getColumnIndex(Item.COLUMN_ID)),
-                        cursor.getString(cursor.getColumnIndex(Item.COLUMN_SONG_ID))
-                    )
-
-                items.add(item)
-            } while (cursor.moveToNext())
-        }
-
-        cursor.close()
-        db.close()
-
-        return items
     }
 
     fun getItems(skip: Long, limit:Long): ArrayList<Item> {
