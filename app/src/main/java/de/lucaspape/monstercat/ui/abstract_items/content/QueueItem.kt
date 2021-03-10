@@ -34,12 +34,11 @@ open class QueueItem(
     }
 
     class ViewHolder(view: View) : FastAdapter.ViewHolder<QueueItem>(view) {
-        private val layout: ConstraintLayout = view.findViewById(R.id.layout)
         private val titleTextView: TextView = view.findViewById(R.id.title)
         private val artistTextView: TextView = view.findViewById(R.id.artist)
         val titleMenuButton: ImageButton = view.findViewById(R.id.titleMenuButton)
         private val coverImageView: ImageView = view.findViewById(R.id.cover)
-        val titleDownloadButton: ImageButton =
+        private val titleDownloadButton: ImageButton =
             view.findViewById(R.id.titleDownloadButton)
         private val context = view.context
 
@@ -50,20 +49,6 @@ open class QueueItem(
             val song = songDatabaseHelper.getSong(context, item.songId)
 
             song?.let {
-                if (song.inEarlyAccess) {
-                    layout.setBackgroundColor(ContextCompat.getColor(context, R.color.gold))
-                    titleDownloadButton.setImageURI(downloadDrawableBlack.toUri())
-                    titleMenuButton.setImageURI(moreButtonDrawableBlack.toUri())
-                    titleTextView.setTextColor(ContextCompat.getColor(context, R.color.black))
-                    artistTextView.setTextColor(ContextCompat.getColor(context, R.color.black))
-                } else {
-                    layout.setBackgroundColor(context.getColorFromAttr(R.attr.cardForegroundColor))
-                    titleDownloadButton.setImageURI(downloadDrawable.toUri())
-                    titleMenuButton.setImageURI(moreButtonDrawable.toUri())
-                    titleTextView.setTextColor(context.getColorFromAttr(R.attr.colorOnSurface))
-                    artistTextView.setTextColor(context.getColorFromAttr(R.attr.colorOnSurface))
-                }
-
                 albumId = song.albumId
 
                 val shownTitle = song.shownTitle
@@ -89,7 +74,6 @@ open class QueueItem(
                     }
                 }, song.albumId, true)
 
-                //todo make delete button
                 titleMenuButton.setImageURI(deleteDrawable.toUri())
                 titleDownloadButton.setImageURI(emptyDrawable.toUri())
             }
