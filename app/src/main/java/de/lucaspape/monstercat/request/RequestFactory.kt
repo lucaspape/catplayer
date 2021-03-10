@@ -809,7 +809,7 @@ fun newLoadPublicPlaylistsRequest(
     callback: (response: JSONObject) -> Unit,
     errorCallback: (error: VolleyError?) -> Unit
 ): StringRequest {
-    val requestUrl = "https://connect.monstercat.com/v2/menu-code/official_playlists"
+    val requestUrl = context.getString(R.string.officialPlaylistsUrl)
 
     return StringRequest(
         Request.Method.GET, requestUrl,

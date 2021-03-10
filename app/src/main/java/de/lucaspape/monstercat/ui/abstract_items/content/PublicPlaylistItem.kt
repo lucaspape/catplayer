@@ -65,7 +65,7 @@ open class PublicPlaylistItem(
                     override fun setTag(target: Target) {
                         coverImageView.tag = target
                     }
-                },  false, publicPlaylistid, "https://connect.monstercat.com/v2/playlist/$publicPlaylistid/tile")
+                },  false, publicPlaylistid, context.getString(R.string.playlistUrl) + "$publicPlaylistid/tile")
             }
         }
 

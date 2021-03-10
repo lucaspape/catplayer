@@ -30,5 +30,7 @@
 
     <string name="greatestHitsPlaylistId" translatable="false">991334fb-ca5e-48c6-bc73-cb83c364357d</string>
 
+    <string name="officialPlaylistsUrl" translatable="false">https://connect.monstercat.com/v2/menu-code/official_playlists</string>
+
     <string name="livestreamUserAgent" translatable="false">Mozilla/5.0 (X11; Linux x86_64; rv:85.0) Gecko/20100101 Firefox/85.0</string>
 </resources>

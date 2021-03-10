@@ -70,7 +70,7 @@ open class ExploreRecyclerPage(
             items.add(Item(context.getString(R.string.streams), "separator"))
             items.add(Item("stream", "item"))
 
-            items.add(Item("Public Playlists", "separator"))
+            items.add(Item(context.getString(R.string.publicPlaylists), "separator"))
             items.add(Item("public-playlists", "item"))
 
             items.add(Item(context.getString(R.string.moods), "separator"))
