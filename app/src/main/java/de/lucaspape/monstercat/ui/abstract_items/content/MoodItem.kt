@@ -19,7 +19,7 @@ open class MoodItem(
 
     override val type: Int = 1005
 
-    override val layoutRes = R.layout.list_album_horizontal
+    override val layoutRes = R.layout.list_tile
 
     override fun getViewHolder(v: View): ViewHolder {
         return ViewHolder(
@@ -28,8 +28,6 @@ open class MoodItem(
     }
 
     class ViewHolder(view: View) : FastAdapter.ViewHolder<MoodItem>(view) {
-        private val titleTextView: TextView = view.findViewById(R.id.albumTitle)
-        private val artistTextView: TextView = view.findViewById(R.id.albumArtist)
         private val coverImageView: ImageView = view.findViewById(R.id.cover)
         private val context = view.context
 
@@ -42,8 +40,6 @@ open class MoodItem(
 
             mood?.let {
                 moodId = mood.moodId
-
-                titleTextView.text = mood.name
 
                 downloadImageUrlIntoImageReceiver(context, object : ImageReceiverInterface {
                     override fun setBitmap(id: String, bitmap: Bitmap?) {
@@ -66,8 +62,6 @@ open class MoodItem(
         }
 
         override fun unbindView(item: MoodItem) {
-            titleTextView.text = null
-            artistTextView.text = null
             coverImageView.setImageURI(null)
         }
     }

@@ -21,7 +21,7 @@ open class PublicPlaylistItem(
 
     override val type: Int = 1009
 
-    override val layoutRes = R.layout.list_album_horizontal
+    override val layoutRes = R.layout.list_tile
 
     override fun getViewHolder(v: View): ViewHolder {
         return ViewHolder(
@@ -30,8 +30,6 @@ open class PublicPlaylistItem(
     }
 
     class ViewHolder(view: View) : FastAdapter.ViewHolder<PublicPlaylistItem>(view) {
-        private val titleTextView: TextView = view.findViewById(R.id.albumTitle)
-        private val artistTextView: TextView = view.findViewById(R.id.albumArtist)
         private val coverImageView: ImageView = view.findViewById(R.id.cover)
         private val context = view.context
 
@@ -42,12 +40,8 @@ open class PublicPlaylistItem(
 
             val playlist = publicPlaylistDatabaseHelper.getPlaylist(item.publicPlaylistId)
 
-            //TODO cover image
-
             playlist?.let {
                 publicPlaylistid = playlist.playlistId
-
-                titleTextView.text = playlist.playlistName
 
                 downloadImageUrlIntoImageReceiver(context, object : ImageReceiverInterface {
                     override fun setBitmap(id: String, bitmap: Bitmap?) {
@@ -70,8 +64,6 @@ open class PublicPlaylistItem(
         }
 
         override fun unbindView(item: PublicPlaylistItem) {
-            titleTextView.text = null
-            artistTextView.text = null
             coverImageView.setImageURI(null)
         }
     }
