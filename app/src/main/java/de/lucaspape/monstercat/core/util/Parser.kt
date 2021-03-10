@@ -42,6 +42,7 @@ fun parseSongToDB(jsonObject: JSONObject, context: Context): String {
     var streamable = false
     var inEarlyAccess = false
     var creatorFriendly = false
+    var explicit = false
 
     try {
         albumId = jsonObject.getJSONObject("release").getString("id")
@@ -67,6 +68,7 @@ fun parseSongToDB(jsonObject: JSONObject, context: Context): String {
             streamable = jsonObject.getBoolean("streamable")
             inEarlyAccess = jsonObject.getBoolean("inEarlyAccess")
             creatorFriendly = jsonObject.getBoolean("creatorFriendly")
+            explicit = jsonObject.getBoolean("explicit")
         } catch (e: JSONException) {
         }
     } catch (e: InvocationTargetException) {
@@ -90,7 +92,8 @@ fun parseSongToDB(jsonObject: JSONObject, context: Context): String {
         downloadable,
         streamable,
         inEarlyAccess,
-        creatorFriendly
+        creatorFriendly,
+        explicit
     )
 }
 

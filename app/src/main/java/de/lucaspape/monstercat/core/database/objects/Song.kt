@@ -26,7 +26,8 @@ data class Song(
     val isDownloadable: Boolean,
     private val isStreamable: Boolean,
     val inEarlyAccess: Boolean,
-    private val creatorFriendly: Boolean
+    private val creatorFriendly: Boolean,
+    val explicit: Boolean
 ) {
 
     companion object {
@@ -67,6 +68,9 @@ data class Song(
         val COLUMN_CREATOR_FRIENDLY = "creatorFriendly"
 
         @JvmStatic
+        val COLUMN_EXPLICIT = "explicit"
+
+        @JvmStatic
         val CREATE_TABLE =
             "CREATE TABLE " + TABLE_NAME + " (" +
                     COLUMN_SONG_ID + " TEXT PRIMARY KEY," +
@@ -79,7 +83,8 @@ data class Song(
                     COLUMN_DOWNLOADABLE + " TEXT," +
                     COLUMN_STREAMABLE + " TEXT," +
                     COLUMN_IN_EARLY_ACCESS + " TEXT," +
-                    COLUMN_CREATOR_FRIENDLY + " TEXT" +
+                    COLUMN_CREATOR_FRIENDLY + " TEXT," +
+                    COLUMN_EXPLICIT + " TEXT" +
                     ")"
     }
 

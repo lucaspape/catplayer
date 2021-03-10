@@ -991,7 +991,8 @@ suspend fun loadLiveStreams(
                             downloadable = false,
                             streamable = true,
                             inEarlyAccess = false,
-                            creatorFriendly = false
+                            creatorFriendly = false,
+                            explicit = true
                         )
                     }
 

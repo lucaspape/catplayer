@@ -49,6 +49,8 @@ var addPlaylistDrawable = "$DRAWABLE_URI/ic_playlist_add_24"
 var backButtonDrawable = "$DRAWABLE_URI/ic_arrow_back_24"
 const val emptyDrawable = "$DRAWABLE_URI/ic_empty_24dp"
 var moreButtonDrawable = "$DRAWABLE_URI/ic_more_vert_24dp"
+const val pawDrawable = "$DRAWABLE_URI/gold_paw"
+const val explicitDrawable = "$DRAWABLE_URI/explicit"
 
 const val offlineDrawableBlack =
     "$DRAWABLE_URI/ic_offline_pin_black_24dp"

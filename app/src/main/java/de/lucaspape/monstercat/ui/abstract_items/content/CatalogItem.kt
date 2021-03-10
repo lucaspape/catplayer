@@ -8,8 +8,6 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
@@ -41,13 +39,13 @@ open class CatalogItem(
                 when {
                     song.downloaded -> offlineDrawableBlack.toUri()
                     song.isDownloadable -> downloadDrawableBlack.toUri()
-                    else -> emptyDrawable.toUri()
+                    else -> pawDrawable.toUri()
                 }
             } else {
                 when {
                     song.downloaded -> offlineDrawable.toUri()
                     song.isDownloadable -> downloadDrawable.toUri()
-                    else -> emptyDrawable.toUri()
+                    else -> pawDrawable.toUri()
                 }
             }
         }
@@ -245,13 +243,13 @@ open class CatalogItem(
     }
 
     class ViewHolder(view: View) : FastAdapter.ViewHolder<CatalogItem>(view) {
-        private val layout: ConstraintLayout = view.findViewById(R.id.layout)
         private val titleTextView: TextView = view.findViewById(R.id.title)
         private val artistTextView: TextView = view.findViewById(R.id.artist)
         val titleMenuButton: ImageButton = view.findViewById(R.id.titleMenuButton)
         private val coverImageView: ImageView = view.findViewById(R.id.cover)
         val titleDownloadButton: ImageButton =
             view.findViewById(R.id.titleDownloadButton)
+        private val explicitImage: ImageView = view.findViewById(R.id.explicitImage)
         private val context = view.context
 
         private var albumId = ""
@@ -261,18 +259,10 @@ open class CatalogItem(
             val song = songDatabaseHelper.getSong(context, item.songId)
 
             song?.let {
-                if (song.inEarlyAccess) {
-                    layout.setBackgroundColor(ContextCompat.getColor(context, R.color.gold))
-                    titleDownloadButton.setImageURI(downloadDrawableBlack.toUri())
-                    titleMenuButton.setImageURI(moreButtonDrawableBlack.toUri())
-                    titleTextView.setTextColor(ContextCompat.getColor(context, R.color.black))
-                    artistTextView.setTextColor(ContextCompat.getColor(context, R.color.black))
-                } else {
-                    layout.setBackgroundColor(context.getColorFromAttr(R.attr.cardForegroundColor))
-                    titleDownloadButton.setImageURI(downloadDrawable.toUri())
-                    titleMenuButton.setImageURI(moreButtonDrawable.toUri())
-                    titleTextView.setTextColor(context.getColorFromAttr(R.attr.colorOnSurface))
-                    artistTextView.setTextColor(context.getColorFromAttr(R.attr.colorOnSurface))
+                if(song.explicit){
+                    explicitImage.setImageURI(explicitDrawable.toUri())
+                }else{
+                    explicitImage.setImageURI(emptyDrawable.toUri())
                 }
 
                 albumId = song.albumId
