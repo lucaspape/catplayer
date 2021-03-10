@@ -4,10 +4,7 @@ import android.content.Context
 import android.view.View
 import com.mikepenz.fastadapter.GenericItem
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.core.database.helper.GenreDatabaseHelper
-import de.lucaspape.monstercat.core.database.helper.ItemDatabaseHelper
-import de.lucaspape.monstercat.core.database.helper.MoodDatabaseHelper
-import de.lucaspape.monstercat.core.database.helper.StreamDatabaseHelper
+import de.lucaspape.monstercat.core.database.helper.*
 import de.lucaspape.monstercat.ui.abstract_items.content.ExploreItem
 import de.lucaspape.monstercat.ui.abstract_items.util.HeaderTextItem
 import de.lucaspape.monstercat.ui.pages.util.Item
@@ -93,6 +90,7 @@ open class ExploreRecyclerPage(
         GenreDatabaseHelper(context).reCreateTable()
         ItemDatabaseHelper(context, "greatest-hits").reCreateTable()
         StreamDatabaseHelper(context).reCreateTable()
+        PublicPlaylistDatabaseHelper(context).reCreateTable(context, false)
     }
 
     override fun restore(data: HashMap<String, String>?): Boolean {
