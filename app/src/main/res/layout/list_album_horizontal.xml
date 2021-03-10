@@ -2,8 +2,8 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     style="@style/Widget.MaterialComponents.CardView"
-    android:layout_width="200dp"
-    android:layout_height="wrap_content"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
     android:layout_marginEnd="8dp"
     android:layout_margin="2dp"
     android:orientation="horizontal">
@@ -11,12 +11,12 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/list_album_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
         <ImageView
             android:layout_margin="5dp"
             android:id="@+id/cover"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
             android:contentDescription="@string/coverImage"
@@ -29,7 +29,7 @@
         <TextView
             android:layout_marginEnd="2dp"
             android:id="@+id/albumTitle"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="?attr/colorOnSurface"
             android:textSize="22sp"
@@ -40,7 +40,7 @@
 
         <TextView
             android:id="@+id/albumArtist"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="?attr/colorOnSurface"
             android:textSize="18sp"
