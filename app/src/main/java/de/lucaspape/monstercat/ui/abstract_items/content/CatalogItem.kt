@@ -45,7 +45,7 @@ open class CatalogItem(
                 when {
                     song.downloaded -> offlineDrawable.toUri()
                     song.isDownloadable -> downloadDrawable.toUri()
-                    else -> pawDrawable.toUri()
+                    else -> emptyDrawable.toUri()
                 }
             }
         }
