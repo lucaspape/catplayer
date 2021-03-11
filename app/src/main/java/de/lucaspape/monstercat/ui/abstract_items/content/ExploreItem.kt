@@ -47,7 +47,7 @@ class ExploreItem(
 
                 override suspend fun onItemClick(
                     context: Context,
-                    viewData: ArrayList<GenericItem>,
+                    viewData: List<GenericItem>,
                     itemIndex: Int
                 ) {
                     super.onItemClick(context, viewData, itemIndex)

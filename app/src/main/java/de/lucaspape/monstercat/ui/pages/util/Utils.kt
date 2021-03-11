@@ -590,7 +590,8 @@ fun deletePlaylistSong(
     songId: String,
     playlistId: String,
     index: Int,
-    playlistMax: Int
+    playlistMax: Int,
+    callback: () -> Unit
 ) {
     scope.launch {
         //for playlist sorting features
@@ -606,6 +607,8 @@ fun deletePlaylistSong(
                     view.context.getString(R.string.removedSongFromPlaylistMsg),
                     null
                 ) {}
+
+                callback()
             }, {
                 displaySnackBar(
                     view,
@@ -617,7 +620,8 @@ fun deletePlaylistSong(
                         songId,
                         playlistId,
                         index,
-                        playlistMax
+                        playlistMax,
+                        callback
                     )
                 }
             })

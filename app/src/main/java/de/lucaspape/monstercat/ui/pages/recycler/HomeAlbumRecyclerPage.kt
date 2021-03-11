@@ -22,7 +22,7 @@ class HomeAlbumRecyclerPage(private val onSingleAlbumLoad: (albumId: String, alb
     private var currentAlbumId = ""
     private var currentAlbumMcId = ""
 
-    override suspend fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
+    override suspend fun onItemClick(context: Context, viewData: List<GenericItem>, itemIndex: Int) {
         super.onItemClick(context, viewData, itemIndex)
 
         val albumDatabaseHelper = AlbumDatabaseHelper(context)
@@ -43,7 +43,7 @@ class HomeAlbumRecyclerPage(private val onSingleAlbumLoad: (albumId: String, alb
         }
     }
 
-    override suspend fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
+    override suspend fun onItemLongClick(view: View, viewData: List<GenericItem>, itemIndex: Int) {
         super.onItemLongClick(view, viewData, itemIndex)
 
         val albumDatabaseHelper = AlbumDatabaseHelper(view.context)

@@ -19,7 +19,9 @@ open class PlaylistContentsRecyclerPage(private val playlistId: String) :
         data: ArrayList<String>,
         listViewPosition: Int,
     ) {
-        CatalogItem.showContextMenuPlaylist(view, data, listViewPosition, playlistId)
+        CatalogItem.showContextMenuPlaylist(view, data, listViewPosition, playlistId) {
+            removeItem(listViewPosition+1)
+        }
     }
 
     override suspend fun load(

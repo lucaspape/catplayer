@@ -24,7 +24,7 @@ class PlaylistListRecyclerPage(private val loadPlaylist: (playlistId: String) ->
 
     private var currentPlaylistId = ""
 
-    override suspend fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int) {
+    override suspend fun onItemClick(context: Context, viewData: List<GenericItem>, itemIndex: Int) {
         super.onItemClick(context, viewData, itemIndex)
 
         val item = viewData[itemIndex]
@@ -40,7 +40,7 @@ class PlaylistListRecyclerPage(private val loadPlaylist: (playlistId: String) ->
         }
     }
 
-    override suspend fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
+    override suspend fun onItemLongClick(view: View, viewData: List<GenericItem>, itemIndex: Int) {
         super.onItemLongClick(view, viewData, itemIndex)
 
         val idList = ArrayList<String>()
@@ -55,13 +55,13 @@ class PlaylistListRecyclerPage(private val loadPlaylist: (playlistId: String) ->
             PlaylistItem.showContextMenu(view, idList, itemIndex) {
                 //idk about the +1 but it works so I really dont care
                 removeItem(itemIndex+1)
-                
+
                 clearDatabase(view.context)
             }
         }
     }
 
-    override suspend fun onMenuButtonClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int) {
+    override suspend fun onMenuButtonClick(view: View, viewData: List<GenericItem>, itemIndex: Int) {
         onItemLongClick(view, viewData, itemIndex)
     }
 

@@ -26,7 +26,7 @@ class QueueRecyclerPage : RecyclerViewPage() {
 
     override suspend fun onMenuButtonClick(
         view: View,
-        viewData: ArrayList<GenericItem>,
+        viewData: List<GenericItem>,
         itemIndex: Int
     ) {
         val item = viewData[itemIndex]

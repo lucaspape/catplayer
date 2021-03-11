@@ -24,7 +24,7 @@ open class HomeCatalogRecyclerPage : RecyclerViewPage() {
 
     override suspend fun onItemClick(
         context: Context,
-        viewData: ArrayList<GenericItem>,
+        viewData: List<GenericItem>,
         itemIndex: Int
     ) {
         super.onItemClick(context, viewData, itemIndex)
@@ -66,7 +66,7 @@ open class HomeCatalogRecyclerPage : RecyclerViewPage() {
 
     override suspend fun onItemLongClick(
         view: View,
-        viewData: ArrayList<GenericItem>,
+        viewData: List<GenericItem>,
         itemIndex: Int
     ) {
         super.onItemLongClick(view, viewData, itemIndex)
@@ -88,7 +88,7 @@ open class HomeCatalogRecyclerPage : RecyclerViewPage() {
 
     override suspend fun onMenuButtonClick(
         view: View,
-        viewData: ArrayList<GenericItem>,
+        viewData: List<GenericItem>,
         itemIndex: Int
     ) {
         onItemLongClick(view, viewData, itemIndex)

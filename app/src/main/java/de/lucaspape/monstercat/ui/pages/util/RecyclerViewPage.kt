@@ -49,15 +49,15 @@ abstract class RecyclerViewPage {
         }
 
     @CallSuper
-    open suspend fun onItemClick(context: Context, viewData: ArrayList<GenericItem>, itemIndex: Int){
+    open suspend fun onItemClick(context: Context, viewData: List<GenericItem>, itemIndex: Int){
         lastClick = System.currentTimeMillis()
     }
 
     @CallSuper
-    open suspend fun onItemLongClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int){
+    open suspend fun onItemLongClick(view: View, viewData: List<GenericItem>, itemIndex: Int){
         lastClick = System.currentTimeMillis()
     }
-    open suspend fun onMenuButtonClick(view: View, viewData: ArrayList<GenericItem>, itemIndex: Int){}
+    open suspend fun onMenuButtonClick(view: View, viewData: List<GenericItem>, itemIndex: Int){}
     open suspend fun onDownloadButtonClick(
         context: Context,
         item: GenericItem,
@@ -95,8 +95,6 @@ abstract class RecyclerViewPage {
     private var headerAdapter = ItemAdapter<HeaderTextItem>()
     private var footerAdapter = ItemAdapter<GenericItem>()
 
-    private var viewData = ArrayList<GenericItem>()
-
     private var itemHeaderOffset = 0
 
     fun onCreate(view: View) {
@@ -132,8 +130,6 @@ abstract class RecyclerViewPage {
 
             itemHeaderOffset = 0
 
-            viewData = ArrayList()
-
             fastAdapter = FastAdapter.with(listOf(headerAdapter, itemAdapter, footerAdapter))
 
             recyclerView?.layoutManager =
@@ -146,9 +142,9 @@ abstract class RecyclerViewPage {
                 scope.launch {
                     val itemIndex = position + itemHeaderOffset
 
-                    if (itemIndex >= 0 && itemIndex < viewData.size) {
+                    if (itemIndex >= 0 && itemIndex < itemAdapter.adapterItemCount) {
                         if(!blockClick)
-                            onItemClick(view.context, viewData, itemIndex)
+                            onItemClick(view.context, itemAdapter.adapterItems, itemIndex)
                     }
                 }
 
@@ -162,9 +158,9 @@ abstract class RecyclerViewPage {
                 scope.launch {
                     val itemIndex = position + itemHeaderOffset
 
-                    if (itemIndex >= 0 && itemIndex < viewData.size) {
+                    if (itemIndex >= 0 && itemIndex < itemAdapter.adapterItemCount) {
                         if(!blockClick)
-                            onItemLongClick(view, viewData, itemIndex)
+                            onItemLongClick(view, itemAdapter.adapterItems, itemIndex)
                     }
                 }
 
@@ -199,8 +195,8 @@ abstract class RecyclerViewPage {
                     scope.launch {
                         val itemIndex = position + itemHeaderOffset
 
-                        if (itemIndex >= 0 && itemIndex < viewData.size) {
-                            onMenuButtonClick(view, viewData, itemIndex)
+                        if (itemIndex >= 0 && itemIndex < itemAdapter.adapterItemCount) {
+                            onMenuButtonClick(view, itemAdapter.adapterItems, itemIndex)
                         }
                     }
                 }
@@ -249,7 +245,6 @@ abstract class RecyclerViewPage {
 
     private suspend fun addItem(item: GenericItem) {
         withContext(Dispatchers.Main){
-            viewData.add(item)
             itemAdapter.add(item)
         }
     }
@@ -257,7 +252,6 @@ abstract class RecyclerViewPage {
     fun removeItem(position:Int){
         scope.launch {
             withContext(Dispatchers.Main){
-                viewData.removeAt(position)
                 itemAdapter.remove(position)
             }
         }
@@ -370,7 +364,7 @@ abstract class RecyclerViewPage {
                     load(
                         view.context,
                         false,
-                        viewData.size,
+                        itemAdapter.adapterItemCount,
                         displayLoading = {},
                         callback = { itemList ->
                             scope.launch {
