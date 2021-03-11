@@ -253,6 +253,13 @@ abstract class RecyclerViewPage {
             itemAdapter.add(item)
         }
     }
+
+    suspend fun removeItem(position:Int){
+        withContext(Dispatchers.Main){
+            viewData.removeAt(position)
+            itemAdapter.remove(position)
+        }
+    }
     
     var scrollListener: EndlessRecyclerOnScrollListener? = null
 

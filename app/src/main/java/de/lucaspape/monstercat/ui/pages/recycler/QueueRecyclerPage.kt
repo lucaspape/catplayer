@@ -56,8 +56,12 @@ class QueueRecyclerPage : RecyclerViewPage() {
                 }
             }
 
-            saveRecyclerViewPosition(view.context)
-            onCreate(view)
+            removeItem(itemIndex)
+
+            if(shuffle){
+                saveRecyclerViewPosition(view.context)
+                onCreate(view)
+            }
         }
     }
 
