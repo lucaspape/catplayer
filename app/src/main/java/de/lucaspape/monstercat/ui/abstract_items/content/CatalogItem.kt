@@ -141,7 +141,8 @@ open class CatalogItem(
             view: View,
             data: ArrayList<String>,
             listViewPosition: Int,
-            playlistId: String
+            playlistId: String,
+            deleteCallback:()->Unit
         ) {
             view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
 
@@ -212,7 +213,8 @@ open class CatalogItem(
                                 id,
                                 playlistId,
                                 listViewPosition + 1,
-                                data.size
+                                data.size,
+                                deleteCallback
                             )
                         }
                         view.context.getString(R.string.shareAlbum) -> {
