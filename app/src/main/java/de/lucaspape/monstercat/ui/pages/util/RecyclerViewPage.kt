@@ -32,37 +32,40 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
-class Item(val itemId:String, val typeId:String?)
+class Item(val itemId: String, val typeId: String?)
 
 abstract class RecyclerViewPage {
-    companion object{
-        @JvmStatic private val saveData = HashMap<String, HashMap<String, String>>()
+    companion object {
+        @JvmStatic
+        private val saveData = HashMap<String, HashMap<String, String>>()
     }
 
     private val scope = CoroutineScope(Dispatchers.Default)
 
-    private var lastClick:Long = 0
+    private var lastClick: Long = 0
 
-    private val blockClick:Boolean
+    private val blockClick: Boolean
         get() {
             return System.currentTimeMillis() - lastClick < 300
         }
 
     @CallSuper
-    open suspend fun onItemClick(context: Context, viewData: List<GenericItem>, itemIndex: Int){
+    open suspend fun onItemClick(context: Context, viewData: List<GenericItem>, itemIndex: Int) {
         lastClick = System.currentTimeMillis()
     }
 
     @CallSuper
-    open suspend fun onItemLongClick(view: View, viewData: List<GenericItem>, itemIndex: Int){
+    open suspend fun onItemLongClick(view: View, viewData: List<GenericItem>, itemIndex: Int) {
         lastClick = System.currentTimeMillis()
     }
-    open suspend fun onMenuButtonClick(view: View, viewData: List<GenericItem>, itemIndex: Int){}
+
+    open suspend fun onMenuButtonClick(view: View, viewData: List<GenericItem>, itemIndex: Int) {}
     open suspend fun onDownloadButtonClick(
         context: Context,
         item: GenericItem,
         downloadImageButton: ImageButton
-    ){}
+    ) {
+    }
 
     abstract suspend fun itemToAbstractItem(view: View, item: Item): GenericItem
     abstract suspend fun load(
@@ -73,20 +76,20 @@ abstract class RecyclerViewPage {
         callback: (itemList: ArrayList<Item>) -> Unit,
         errorCallback: (errorMessage: String) -> Unit
     )
-    
-    open fun registerListeners(view:View){
+
+    open fun registerListeners(view: View) {
 
     }
 
-    open fun restore(data: HashMap<String, String>?):Boolean{
+    open fun restore(data: HashMap<String, String>?): Boolean {
         return false
     }
 
-    open fun save(): HashMap<String, String>{
+    open fun save(): HashMap<String, String> {
         return HashMap()
     }
 
-    open fun getHeader(context: Context): String?{
+    open fun getHeader(context: Context): String? {
         return null
     }
 
@@ -98,14 +101,24 @@ abstract class RecyclerViewPage {
     private var itemHeaderOffset = 0
 
     fun onCreate(view: View) {
-        if(!restore(saveData[id])){
+        if (!restore(saveData[id])) {
             registerListeners(view)
 
             scope.launch {
+                setupRecyclerView(view)
                 loadInit(view, false)
             }
         }
     }
+
+    fun reload(view: View) {
+        scope.launch {
+            clear()
+
+            loadInit(view, true)
+        }
+    }
+
 
     open fun clearDatabase(context: Context) {
 
@@ -116,12 +129,12 @@ abstract class RecyclerViewPage {
     }
 
     open val id = UUID.randomUUID().toString()
-    
-    private var fastAdapter:FastAdapter<GenericItem>? = null
+
+    private var fastAdapter: FastAdapter<GenericItem>? = null
 
     @SuppressLint("WrongConstant")
     private suspend fun setupRecyclerView(view: View) {
-        withContext(Dispatchers.Main){
+        withContext(Dispatchers.Main) {
             recyclerView = view.findViewById(R.id.recyclerView)
 
             itemAdapter = ItemAdapter()
@@ -143,7 +156,7 @@ abstract class RecyclerViewPage {
                     val itemIndex = position + itemHeaderOffset
 
                     if (itemIndex >= 0 && itemIndex < itemAdapter.adapterItemCount) {
-                        if(!blockClick)
+                        if (!blockClick)
                             onItemClick(view.context, itemAdapter.adapterItems, itemIndex)
                     }
                 }
@@ -159,7 +172,7 @@ abstract class RecyclerViewPage {
                     val itemIndex = position + itemHeaderOffset
 
                     if (itemIndex >= 0 && itemIndex < itemAdapter.adapterItemCount) {
-                        if(!blockClick)
+                        if (!blockClick)
                             onItemLongClick(view, itemAdapter.adapterItems, itemIndex)
                     }
                 }
@@ -233,7 +246,7 @@ abstract class RecyclerViewPage {
     }
 
     private suspend fun addHeader(headerText: String) {
-        withContext(Dispatchers.Main){
+        withContext(Dispatchers.Main) {
             headerAdapter.add(
                 HeaderTextItem(
                     headerText
@@ -244,47 +257,57 @@ abstract class RecyclerViewPage {
     }
 
     private suspend fun addItem(item: GenericItem) {
-        withContext(Dispatchers.Main){
+        withContext(Dispatchers.Main) {
             itemAdapter.add(item)
         }
     }
 
-    fun removeItem(position:Int){
+    fun removeItem(position: Int) {
         scope.launch {
-            withContext(Dispatchers.Main){
+            withContext(Dispatchers.Main) {
                 itemAdapter.remove(position)
             }
         }
     }
-    
+
     var scrollListener: EndlessRecyclerOnScrollListener? = null
 
     private var currentLoaderId = ""
-    
+
+    private suspend fun clear() {
+        withContext(Dispatchers.Main) {
+            itemAdapter.clear()
+            headerAdapter.clear()
+            footerAdapter.clear()
+
+            itemHeaderOffset = 0
+        }
+    }
+
     private suspend fun loadInit(view: View, forceReload: Boolean) {
         val id = UUID.randomUUID().toString()
-        
-        if(currentLoaderId.isEmpty()){
+
+        if (currentLoaderId.isEmpty()) {
             currentLoaderId = id
 
             val swipeRefreshLayout =
                 view.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
 
-            if (forceReload){
+            if (forceReload) {
                 clearDatabase(view.context)
                 resetRecyclerViewSavedPosition(view.context)
             }
 
             load(view.context, forceReload, 0, displayLoading = {
                 scope.launch {
-                    withContext(Dispatchers.Main){
+                    withContext(Dispatchers.Main) {
                         swipeRefreshLayout?.isRefreshing = true
                     }
                 }
             }, callback = { itemList ->
                 scope.launch {
-                    if(currentLoaderId == id){
-                        setupRecyclerView(view)
+                    if (currentLoaderId == id) {
+                        clear()
 
                         for (item in itemList) {
                             addItem(itemToAbstractItem(view, item))
@@ -294,7 +317,7 @@ abstract class RecyclerViewPage {
                             addHeader(it)
                         }
 
-                        withContext(Dispatchers.Main){
+                        withContext(Dispatchers.Main) {
                             /**
                              * On scroll down (load next)
                              */
@@ -314,7 +337,7 @@ abstract class RecyclerViewPage {
                             //refresh
                             swipeRefreshLayout?.setOnRefreshListener {
                                 scope.launch {
-                                    loadInit(view, true)
+                                    reload(view)
                                 }
                             }
 
@@ -324,7 +347,7 @@ abstract class RecyclerViewPage {
 
                             currentLoaderId = ""
 
-                            if(getOrientation(view) == LinearLayout.VERTICAL){
+                            if (getOrientation(view) == LinearLayout.VERTICAL) {
                                 footerAdapter.add(SpacerItem())
                             }
                         }
@@ -346,14 +369,14 @@ abstract class RecyclerViewPage {
 
                 currentLoaderId = ""
             })
-            
+
         }
     }
 
     private fun loadNext(view: View) {
         val id = UUID.randomUUID().toString()
 
-        if(currentLoaderId.isEmpty()) {
+        if (currentLoaderId.isEmpty()) {
             currentLoaderId = id
 
             recyclerView?.post {
@@ -368,19 +391,19 @@ abstract class RecyclerViewPage {
                         displayLoading = {},
                         callback = { itemList ->
                             scope.launch {
-                                if(currentLoaderId == id){
+                                if (currentLoaderId == id) {
                                     for (item in itemList) {
                                         addItem(itemToAbstractItem(view, item))
                                     }
 
-                                    withContext(Dispatchers.Main){
+                                    withContext(Dispatchers.Main) {
                                         footerAdapter.clear()
 
                                         scrollListener?.enable()
 
                                         currentLoaderId = ""
 
-                                        if(getOrientation(view) == LinearLayout.VERTICAL){
+                                        if (getOrientation(view) == LinearLayout.VERTICAL) {
                                             footerAdapter.add(SpacerItem())
                                         }
                                     }
@@ -405,11 +428,11 @@ abstract class RecyclerViewPage {
         }
     }
 
-    fun resetSaveData(){
+    fun resetSaveData() {
         saveData[id] = HashMap()
     }
 
-    fun saveData(){
+    fun saveData() {
         saveData[id] = save()
     }
 

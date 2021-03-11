@@ -15,7 +15,7 @@ import kotlin.random.Random
 class QueueRecyclerPage : RecyclerViewPage() {
     override fun registerListeners(view: View) {
         playlistChangedCallback = {
-            onCreate(view)
+            reload(view)
         }
     }
 
@@ -66,7 +66,7 @@ class QueueRecyclerPage : RecyclerViewPage() {
 
             if(shuffle){
                 saveRecyclerViewPosition(view.context)
-                onCreate(view)
+                reload(view)
             }
         }
     }

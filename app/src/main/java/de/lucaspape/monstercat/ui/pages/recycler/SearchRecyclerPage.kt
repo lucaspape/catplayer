@@ -33,7 +33,7 @@ class SearchRecyclerPage(
             override fun onQueryTextSubmit(query: String?): Boolean {
                 query?.let {
                     search = it
-                    onCreate(view)
+                    reload(view)
                 }
 
                 return false
