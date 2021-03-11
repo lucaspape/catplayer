@@ -52,8 +52,15 @@ private var loadedRelatedHash = 0
 //playlist, contains playback history
 var playlist = ArrayList<String>()
 var playlistIndex = 0
+    set(value) {
+        field = value
+        playlistChangedCallback()
+    }
 
+//songs that are played longer than 30 seconds are saved in here. Used for related songs
 var history = ArrayList<String>()
+
+var playlistChangedCallback:()->Unit = {}
 
 //nextRandom needs to be prepared before next playing to allow crossfade
 var nextRandom = -1

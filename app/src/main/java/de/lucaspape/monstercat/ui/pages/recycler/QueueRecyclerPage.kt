@@ -13,6 +13,12 @@ import kotlin.collections.ArrayList
 import kotlin.random.Random
 
 class QueueRecyclerPage : RecyclerViewPage() {
+    override fun registerListeners(view: View) {
+        playlistChangedCallback = {
+            onCreate(view)
+        }
+    }
+
     override suspend fun itemToAbstractItem(view: View, item: Item): GenericItem {
         return if (item.typeId == "separator") {
             HeaderTextItem(item.itemId)
