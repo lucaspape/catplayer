@@ -21,6 +21,7 @@ open class PlaylistContentsRecyclerPage(private val playlistId: String) :
     ) {
         CatalogItem.showContextMenuPlaylist(view, data, listViewPosition, playlistId) {
             removeItem(listViewPosition+1)
+            clearDatabase(view.context)
         }
     }
 

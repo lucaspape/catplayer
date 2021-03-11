@@ -301,6 +301,7 @@ private fun addSongToPlaylistAsync(view: View, playlistId: String, songId: Strin
     scope.launch {
         addToPlaylist(view.context, playlistId, songId, {
             displaySnackBar(view, view.context.getString(R.string.songAddedToPlaylistMsg), null) {}
+            ItemDatabaseHelper(view.context, playlistId).reCreateTable()
         }, {
             displaySnackBar(
                 view,
