@@ -254,10 +254,12 @@ abstract class RecyclerViewPage {
         }
     }
 
-    suspend fun removeItem(position:Int){
-        withContext(Dispatchers.Main){
-            viewData.removeAt(position)
-            itemAdapter.remove(position)
+    fun removeItem(position:Int){
+        scope.launch {
+            withContext(Dispatchers.Main){
+                viewData.removeAt(position)
+                itemAdapter.remove(position)
+            }
         }
     }
     

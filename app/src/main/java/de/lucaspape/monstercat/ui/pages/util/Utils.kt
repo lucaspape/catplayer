@@ -230,7 +230,7 @@ fun addSongToPlaylist(view: View, songId: String) {
             displayLoading = {},
             finishedCallback = {
                 scope.launch {
-                    withContext(Dispatchers.Main){
+                    withContext(Dispatchers.Main) {
                         val playlistDatabaseHelper =
                             PlaylistDatabaseHelper(view.context)
                         val playlistList = playlistDatabaseHelper.getAllPlaylists()
@@ -274,7 +274,10 @@ fun addSongToPlaylist(view: View, songId: String) {
                             }
 
                         } else {
-                            displayInfo(view.context, view.context.getString(R.string.noPlaylistFound))
+                            displayInfo(
+                                view.context,
+                                view.context.getString(R.string.noPlaylistFound)
+                            )
                         }
                     }
                 }
@@ -525,7 +528,7 @@ private fun createPlaylistAsync(view: View, playlistName: String) {
 /**
  * Delete playlist with given playlistId
  */
-fun deletePlaylist(view: View, playlistId: String) {
+fun deletePlaylist(view: View, playlistId: String, callback: () -> Unit) {
     val context = view.context
     val alertDialogBuilder = MaterialAlertDialogBuilder(context)
     alertDialogBuilder.setTitle(context.getString(R.string.deletePlaylistMsg))
@@ -533,16 +536,10 @@ fun deletePlaylist(view: View, playlistId: String) {
         deletePlaylistAsync(
             view,
             playlistId,
-            true
+            callback
         )
     }
-    alertDialogBuilder.setNegativeButton(context.getString(R.string.no)) { _, _ ->
-        deletePlaylistAsync(
-            view,
-            playlistId,
-            false
-        )
-    }
+    alertDialogBuilder.setNegativeButton(context.getString(R.string.no)) { _, _ -> }
 
     val dialog = alertDialogBuilder.create()
     dialog.show()
@@ -557,30 +554,30 @@ fun deletePlaylist(view: View, playlistId: String) {
     negativeButton.setTextColor(typedValue.data)
 }
 
-private fun deletePlaylistAsync(view: View, playlistId: String, force: Boolean) {
+private fun deletePlaylistAsync(view: View, playlistId: String, callback: () -> Unit) {
     scope.launch {
-        if (force) {
-            PlaylistDatabaseHelper(view.context).getPlaylist(playlistId)?.ownPlaylist?.let { deleteRemote ->
-                deletePlaylist(view.context, playlistId, deleteRemote, true, {
-                    displaySnackBar(
+        PlaylistDatabaseHelper(view.context).getPlaylist(playlistId)?.ownPlaylist?.let { deleteRemote ->
+            deletePlaylist(view.context, playlistId, deleteRemote, true, {
+                displaySnackBar(
+                    view,
+                    view.context.getString(R.string.playlistDeletedMsg),
+                    null
+                ) {}
+
+                callback()
+            }, {
+                displaySnackBar(
+                    view,
+                    view.context.getString(R.string.errorDeletingPlaylist),
+                    view.context.getString(R.string.retry)
+                ) {
+                    deletePlaylistAsync(
                         view,
-                        view.context.getString(R.string.playlistDeletedMsg),
-                        null
-                    ) {}
-                }, {
-                    displaySnackBar(
-                        view,
-                        view.context.getString(R.string.errorDeletingPlaylist),
-                        view.context.getString(R.string.retry)
-                    ) {
-                        deletePlaylistAsync(
-                            view,
-                            playlistId,
-                            true
-                        )
-                    }
-                })
-            }
+                        playlistId,
+                        callback
+                    )
+                }
+            })
         }
     }
 }

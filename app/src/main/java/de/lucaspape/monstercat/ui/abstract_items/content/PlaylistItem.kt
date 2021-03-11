@@ -39,7 +39,8 @@ open class PlaylistItem(
         fun showContextMenu(
             view: View,
             data: ArrayList<String>,
-            listViewPosition: Int
+            listViewPosition: Int,
+            deletePlaylistCallback:() -> Unit
         ) {
             view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
 
@@ -111,7 +112,7 @@ open class PlaylistItem(
                             )
                         }
                         view.context.getString(R.string.delete) -> {
-                            deletePlaylist(view, id)
+                            deletePlaylist(view, id, deletePlaylistCallback)
                         }
                         view.context.getString(R.string.renamePlaylist) -> {
                             renamePlaylist(view, id)

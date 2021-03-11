@@ -52,7 +52,12 @@ class PlaylistListRecyclerPage(private val loadPlaylist: (playlistId: String) ->
         }
 
         withContext(Dispatchers.Main){
-            PlaylistItem.showContextMenu(view, idList, itemIndex)
+            PlaylistItem.showContextMenu(view, idList, itemIndex) {
+                //idk about the +1 but it works so I really dont care
+                removeItem(itemIndex+1)
+                
+                clearDatabase(view.context)
+            }
         }
     }
 
