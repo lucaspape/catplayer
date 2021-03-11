@@ -59,6 +59,9 @@ var history = ArrayList<String>()
 var nextRandom = -1
 var nextRelatedRandom = -1
 
+var randomSeed = 0
+var relatedRandomSeed = 0
+
 //playback control vars
 var loop = false
 var loopSingle = false
@@ -287,7 +290,7 @@ private fun nextSong(context: Context): String {
 
         val queueIndex = if (shuffle && songQueue.size > 0) {
             if (nextRandom == -1) {
-                nextRandom = Random.nextInt(songQueue.size)
+                nextRandom = Random(randomSeed).nextInt(songQueue.size)
             }
 
             nextRandom
@@ -303,7 +306,7 @@ private fun nextSong(context: Context): String {
 
         //prepare nextRandom
         if (songQueue.size > 0) {
-            nextRandom = Random.nextInt(songQueue.size)
+            nextRandom = Random(randomSeed).nextInt(songQueue.size)
         }
 
         //clear related because playlist change
@@ -337,7 +340,7 @@ private fun nextSong(context: Context): String {
         //get from relatedQueue
         val queueIndex = if (shuffle && relatedSongQueue.size > 0) {
             if (nextRelatedRandom == -1) {
-                nextRelatedRandom = Random.nextInt(relatedSongQueue.size)
+                nextRelatedRandom = Random(relatedRandomSeed).nextInt(relatedSongQueue.size)
             }
 
             nextRelatedRandom
@@ -353,7 +356,7 @@ private fun nextSong(context: Context): String {
 
         //prepare nextRandom
         if (relatedSongQueue.size > 0) {
-            nextRelatedRandom = Random.nextInt(relatedSongQueue.size)
+            nextRelatedRandom = Random(relatedRandomSeed).nextInt(relatedSongQueue.size)
         }
 
         return songId
@@ -403,7 +406,7 @@ val nextSongId: String
 
             val queueIndex = if (shuffle && songQueue.size > 0) {
                 if (nextRandom == -1) {
-                    nextRandom = Random.nextInt(songQueue.size)
+                    nextRandom = Random(randomSeed).nextInt(songQueue.size)
                 }
 
                 nextRandom
@@ -420,7 +423,7 @@ val nextSongId: String
 
             val queueIndex = if (shuffle && relatedSongQueue.size > 0) {
                 if (nextRelatedRandom == -1) {
-                    nextRelatedRandom = Random.nextInt(relatedSongQueue.size)
+                    nextRelatedRandom = Random(relatedRandomSeed).nextInt(relatedSongQueue.size)
                 }
 
                 nextRelatedRandom
@@ -465,6 +468,7 @@ fun getCurrentAlbumId(context: Context): String {
  */
 fun clearQueue() {
     nextRandom = -1
+    randomSeed = Random.nextInt(0, 999999999)
     songQueue = ArrayList()
 }
 
@@ -485,6 +489,7 @@ fun skipPreviousInPlaylist() {
 
 fun clearRelatedSongs() {
     relatedSongQueue = ArrayList()
+    relatedRandomSeed = Random.nextInt(0, 999999999)
     nextRelatedRandom = -1
     loadedRelatedHash = -1
 }

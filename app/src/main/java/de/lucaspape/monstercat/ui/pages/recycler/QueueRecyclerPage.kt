@@ -10,6 +10,7 @@ import de.lucaspape.monstercat.ui.abstract_items.util.HeaderTextItem
 import de.lucaspape.monstercat.ui.pages.util.Item
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
 import kotlin.collections.ArrayList
+import kotlin.random.Random
 
 class QueueRecyclerPage : RecyclerViewPage() {
     override suspend fun itemToAbstractItem(view: View, item: Item): GenericItem {
@@ -71,42 +72,80 @@ class QueueRecyclerPage : RecyclerViewPage() {
         if (skip == 0) {
             val content = ArrayList<Item>()
 
-            var indexInQueue = 0
-
             if (prioritySongQueue.size > 0) {
+
                 content.add(Item(context.getString(R.string.queue), "separator"))
 
-                for (songId in prioritySongQueue) {
+                for ((indexInQueue, songId) in prioritySongQueue.withIndex()) {
                     lookupTable[content.size] = "priority"
                     content.add(Item(songId, "item"))
                     indexLookupTable["priority-$songId"] = indexInQueue
-                    indexInQueue++
                 }
             }
-
-            indexInQueue = 0
 
             if (songQueue.size > 0) {
                 content.add(Item(context.getString(R.string.comingUp), "separator"))
 
-                for (songId in songQueue) {
-                    lookupTable[content.size] = "queue"
-                    content.add(Item(songId, "item"))
-                    indexLookupTable["queue-$songId"] = indexInQueue
-                    indexInQueue++
+                if (!shuffle) {
+                    for ((indexInQueue, songId) in songQueue.withIndex()) {
+                        lookupTable[content.size] = "queue"
+                        content.add(Item(songId, "item"))
+                        indexLookupTable["queue-$songId"] = indexInQueue
+                    }
+                } else {
+                    val queue = ArrayList<String>()
+
+                    songQueue.forEach { queue.add(it) }
+
+                    var nextRandom = Random(randomSeed).nextInt(queue.size)
+
+                    while (queue.size > 0) {
+                        val songId = queue[nextRandom]
+
+                        lookupTable[content.size] = "queue"
+                        content.add(Item(songId, "item"))
+
+                        //not perfect bc double songs but better than nothin
+                        indexLookupTable["queue-$songId"] = songQueue.indexOf(songId)
+
+                        queue.removeAt(nextRandom)
+                        if (queue.size > 0) {
+                            nextRandom = Random(randomSeed).nextInt(queue.size)
+                        }
+                    }
                 }
             }
-
-            indexInQueue = 0
 
             if (relatedSongQueue.size > 0) {
                 content.add(Item(context.getString(R.string.relatedSongsComingUp), "separator"))
 
-                for (songId in relatedSongQueue) {
-                    lookupTable[content.size] = "related"
-                    content.add(Item(songId, "item"))
-                    indexLookupTable["related-$songId"] = indexInQueue
-                    indexInQueue++
+                if (!shuffle) {
+                    for ((indexInQueue, songId) in relatedSongQueue.withIndex()) {
+                        lookupTable[content.size] = "related"
+                        content.add(Item(songId, "item"))
+                        indexLookupTable["related-$songId"] = indexInQueue
+                    }
+                } else {
+                    val queue = ArrayList<String>()
+
+                    prioritySongQueue.forEach { queue.add(it) }
+
+                    var nextRandom = Random(relatedRandomSeed).nextInt(queue.size)
+
+                    while (queue.size > 0) {
+                        val songId = queue[nextRandom]
+
+                        lookupTable[content.size] = "related"
+                        content.add(Item(songId, "item"))
+
+                        //not perfect bc double songs but better than nothin
+                        indexLookupTable["related-$songId"] = prioritySongQueue.indexOf(songId)
+
+                        queue.removeAt(nextRandom)
+                        if (queue.size > 0) {
+                            nextRandom = Random(relatedRandomSeed).nextInt(queue.size)
+                        }
+                    }
                 }
             }
 
