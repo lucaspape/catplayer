@@ -6,6 +6,10 @@ labels: ''
 assignees: ''
 
 ---
+   
+
+**You dont habe to use this template. Just try to make clear what the issue is**
+   
 
 **Describe the bug**
 A clear and concise description of what the bug is.
