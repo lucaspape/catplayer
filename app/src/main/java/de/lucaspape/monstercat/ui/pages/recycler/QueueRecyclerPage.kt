@@ -82,31 +82,32 @@ class QueueRecyclerPage : RecyclerViewPage() {
         if (skip == 0) {
             val content = ArrayList<Item>()
 
-            if (prioritySongQueue.size > 0) {
+            var queue = ArrayList<String>()
+            prioritySongQueue.forEach { queue.add(it) }
 
+            if (queue.size > 0) {
                 content.add(Item(context.getString(R.string.queue), "separator"))
 
-                for ((indexInQueue, songId) in prioritySongQueue.withIndex()) {
+                for ((indexInQueue, songId) in queue.withIndex()) {
                     lookupTable[content.size] = "priority"
                     content.add(Item(songId, "item"))
                     indexLookupTable["priority-$songId"] = indexInQueue
                 }
             }
 
-            if (songQueue.size > 0) {
+            queue = ArrayList()
+            songQueue.forEach { queue.add(it) }
+
+            if (queue.size > 0) {
                 content.add(Item(context.getString(R.string.comingUp), "separator"))
 
                 if (!shuffle) {
-                    for ((indexInQueue, songId) in songQueue.withIndex()) {
+                    for ((indexInQueue, songId) in queue.withIndex()) {
                         lookupTable[content.size] = "queue"
                         content.add(Item(songId, "item"))
                         indexLookupTable["queue-$songId"] = indexInQueue
                     }
                 } else {
-                    val queue = ArrayList<String>()
-
-                    songQueue.forEach { queue.add(it) }
-
                     var nextRandom = Random(randomSeed).nextInt(queue.size)
 
                     while (queue.size > 0) {
@@ -126,20 +127,19 @@ class QueueRecyclerPage : RecyclerViewPage() {
                 }
             }
 
+            queue = ArrayList()
+            prioritySongQueue.forEach { queue.add(it) }
+
             if (relatedSongQueue.size > 0) {
                 content.add(Item(context.getString(R.string.relatedSongsComingUp), "separator"))
 
                 if (!shuffle) {
-                    for ((indexInQueue, songId) in relatedSongQueue.withIndex()) {
+                    for ((indexInQueue, songId) in queue.withIndex()) {
                         lookupTable[content.size] = "related"
                         content.add(Item(songId, "item"))
                         indexLookupTable["related-$songId"] = indexInQueue
                     }
                 } else {
-                    val queue = ArrayList<String>()
-
-                    prioritySongQueue.forEach { queue.add(it) }
-
                     var nextRandom = Random(relatedRandomSeed).nextInt(queue.size)
 
                     while (queue.size > 0) {
