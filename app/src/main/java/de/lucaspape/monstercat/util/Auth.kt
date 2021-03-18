@@ -139,7 +139,7 @@ class Auth {
         loginSuccess: () -> Unit,
         loginFailed: () -> Unit
     ) {
-        val alertDialogBuilder = AlertDialog.Builder(context)
+        val alertDialogBuilder = AlertDialog.Builder(context.applicationContext)
         alertDialogBuilder.setTitle(context.getString(R.string.twoFaCode))
 
         val layoutInflater =
