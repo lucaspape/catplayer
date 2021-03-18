@@ -2,6 +2,7 @@ package de.lucaspape.monstercat.core.database.objects
 
 import android.content.Context
 import android.net.Uri
+import android.os.Build
 import androidx.core.net.toUri
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.source.MediaSource
@@ -97,11 +98,20 @@ data class Song(
             }
         }
 
-    val downloadLocation: String
-        get() = context.getExternalFilesDir(null)
-            .toString() + "/" + artist + title + version + "." + Settings.getSettings(
-            context
-        ).getString("downloadType")
+    val downloadLocation:String
+        get() {
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                context.filesDir
+                    .toString() + "/" + artist + title + version + "." + Settings.getSettings(
+                    context
+                ).getString("downloadType")
+            }else{
+                context.getExternalFilesDir(null)
+                    .toString() + "/" + artist + title + version + "." + Settings.getSettings(
+                    context
+                ).getString("downloadType")
+            }
+        }
 
     val downloadUrl: String
         get() = if (Settings.getSettings(context)
