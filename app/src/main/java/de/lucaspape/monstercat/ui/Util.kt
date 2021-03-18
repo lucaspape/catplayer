@@ -60,8 +60,12 @@ fun displayAlertDialogList(
     alertDialogBuilder.setView(alertListLayout)
     alertDialogBuilder.setCancelable(true)
 
-    alertDialog?.cancel()
+    try {
+        alertDialog?.cancel()
+    }catch (e: IllegalArgumentException){
 
+    }
+    
     alertDialog = alertDialogBuilder.create()
 
     alertDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
