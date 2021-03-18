@@ -25,7 +25,7 @@ You can also download the [github release](https://github.com/lucaspape/catplaye
  - Crossfade
  - Monstercat livestreams
 
-<img src="https://raw.githubusercontent.com/lucaspape/catplayer/master/playstore_res/screenshots/20210319/Screenshot_20210319-004254_Catplayer.png" width="40%">  <img src="https://raw.githubusercontent.com/lucaspape/catplayer/master/playstore_res/screenshots/20210319/Screenshot_20210319-004415_Catplayer.png" width="40%">
+<img src="https://raw.githubusercontent.com/lucaspape/catplayer/master/playstore_res/screenshots/20210319/Screenshot_20210319-004254_Catplayer.png" width="40%">  <img src="https://raw.githubusercontent.com/lucaspape/catplayer/master/playstore_res/screenshots/20210319/Screenshot_20210319-004559_Catplayer.png" width="40%">
 
 All album images seen in these screenshots are Copyright Monstercat.
 
