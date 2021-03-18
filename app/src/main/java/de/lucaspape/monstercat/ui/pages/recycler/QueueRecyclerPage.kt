@@ -27,8 +27,8 @@ class QueueRecyclerPage : RecyclerViewPage() {
         }
     }
 
-    private val lookupTable = HashMap<Int, String>()
-    private val indexLookupTable = HashMap<String, Int>()
+    private var lookupTable = HashMap<Int, String>()
+    private var indexLookupTable = HashMap<String, Int>()
 
     override suspend fun onMenuButtonClick(
         view: View,
@@ -67,6 +67,92 @@ class QueueRecyclerPage : RecyclerViewPage() {
             if(shuffle){
                 saveRecyclerViewPosition(view.context)
                 reload(view)
+            }else{
+                generateLookupTable()
+            }
+        }
+    }
+
+    private fun generateLookupTable(){
+        lookupTable = HashMap()
+        indexLookupTable = HashMap()
+
+        var totalSize = 0
+
+        var queue = ArrayList<String>()
+        prioritySongQueue.forEach { queue.add(it) }
+
+        if (queue.size > 0) {
+            totalSize++
+
+            for ((indexInQueue, songId) in queue.withIndex()) {
+                lookupTable[totalSize] = "priority"
+                totalSize++
+                indexLookupTable["priority-$songId"] = indexInQueue
+            }
+        }
+
+        queue = ArrayList()
+        songQueue.forEach { queue.add(it) }
+
+        if (queue.size > 0) {
+            totalSize++
+
+            if (!shuffle) {
+                for ((indexInQueue, songId) in queue.withIndex()) {
+                    lookupTable[totalSize] = "queue"
+                    totalSize++
+                    indexLookupTable["queue-$songId"] = indexInQueue
+                }
+            } else {
+                var nextRandom = Random(randomSeed).nextInt(queue.size)
+
+                while (queue.size > 0) {
+                    val songId = queue[nextRandom]
+
+                    lookupTable[totalSize] = "queue"
+                    totalSize++
+
+                    //not perfect bc double songs but better than nothin
+                    indexLookupTable["queue-$songId"] = songQueue.indexOf(songId)
+
+                    queue.removeAt(nextRandom)
+                    if (queue.size > 0) {
+                        nextRandom = Random(randomSeed).nextInt(queue.size)
+                    }
+                }
+            }
+        }
+
+        queue = ArrayList()
+        prioritySongQueue.forEach { queue.add(it) }
+
+        if (relatedSongQueue.size > 0) {
+            totalSize++
+
+            if (!shuffle) {
+                for ((indexInQueue, songId) in queue.withIndex()) {
+                    lookupTable[totalSize] = "related"
+                    totalSize++
+                    indexLookupTable["related-$songId"] = indexInQueue
+                }
+            } else {
+                var nextRandom = Random(relatedRandomSeed).nextInt(queue.size)
+
+                while (queue.size > 0) {
+                    val songId = queue[nextRandom]
+
+                    lookupTable[totalSize] = "related"
+                    totalSize++
+
+                    //not perfect bc double songs but better than nothin
+                    indexLookupTable["related-$songId"] = prioritySongQueue.indexOf(songId)
+
+                    queue.removeAt(nextRandom)
+                    if (queue.size > 0) {
+                        nextRandom = Random(relatedRandomSeed).nextInt(queue.size)
+                    }
+                }
             }
         }
     }
@@ -88,10 +174,8 @@ class QueueRecyclerPage : RecyclerViewPage() {
             if (queue.size > 0) {
                 content.add(Item(context.getString(R.string.queue), "separator"))
 
-                for ((indexInQueue, songId) in queue.withIndex()) {
-                    lookupTable[content.size] = "priority"
+                for (songId in queue) {
                     content.add(Item(songId, "item"))
-                    indexLookupTable["priority-$songId"] = indexInQueue
                 }
             }
 
@@ -102,10 +186,8 @@ class QueueRecyclerPage : RecyclerViewPage() {
                 content.add(Item(context.getString(R.string.comingUp), "separator"))
 
                 if (!shuffle) {
-                    for ((indexInQueue, songId) in queue.withIndex()) {
-                        lookupTable[content.size] = "queue"
+                    for (songId in queue) {
                         content.add(Item(songId, "item"))
-                        indexLookupTable["queue-$songId"] = indexInQueue
                     }
                 } else {
                     var nextRandom = Random(randomSeed).nextInt(queue.size)
@@ -113,11 +195,7 @@ class QueueRecyclerPage : RecyclerViewPage() {
                     while (queue.size > 0) {
                         val songId = queue[nextRandom]
 
-                        lookupTable[content.size] = "queue"
                         content.add(Item(songId, "item"))
-
-                        //not perfect bc double songs but better than nothin
-                        indexLookupTable["queue-$songId"] = songQueue.indexOf(songId)
 
                         queue.removeAt(nextRandom)
                         if (queue.size > 0) {
@@ -134,10 +212,8 @@ class QueueRecyclerPage : RecyclerViewPage() {
                 content.add(Item(context.getString(R.string.relatedSongsComingUp), "separator"))
 
                 if (!shuffle) {
-                    for ((indexInQueue, songId) in queue.withIndex()) {
-                        lookupTable[content.size] = "related"
+                    for (songId in queue) {
                         content.add(Item(songId, "item"))
-                        indexLookupTable["related-$songId"] = indexInQueue
                     }
                 } else {
                     var nextRandom = Random(relatedRandomSeed).nextInt(queue.size)
@@ -145,11 +221,7 @@ class QueueRecyclerPage : RecyclerViewPage() {
                     while (queue.size > 0) {
                         val songId = queue[nextRandom]
 
-                        lookupTable[content.size] = "related"
                         content.add(Item(songId, "item"))
-
-                        //not perfect bc double songs but better than nothin
-                        indexLookupTable["related-$songId"] = prioritySongQueue.indexOf(songId)
 
                         queue.removeAt(nextRandom)
                         if (queue.size > 0) {
@@ -158,6 +230,8 @@ class QueueRecyclerPage : RecyclerViewPage() {
                     }
                 }
             }
+
+            generateLookupTable()
 
             callback(content)
         } else {
