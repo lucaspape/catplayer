@@ -52,7 +52,7 @@ fun displayAlertDialogList(
     listItems: ArrayList<AlertListItem>,
     onItemClick: (position: Int, item: AlertListItem) -> Unit
 ) {
-    val alertDialogBuilder = MaterialAlertDialogBuilder(context.applicationContext, R.style.DialogSlideAnim)
+    val alertDialogBuilder = MaterialAlertDialogBuilder(context, R.style.DialogSlideAnim)
 
     val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
     val alertListLayout = layoutInflater.inflate(R.layout.alert_list, null, false)

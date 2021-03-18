@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.DialogInterface
 import android.util.TypedValue
 import android.view.LayoutInflater
+import android.view.WindowManager
 import android.widget.EditText
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.music.cid
@@ -139,41 +140,45 @@ class Auth {
         loginSuccess: () -> Unit,
         loginFailed: () -> Unit
     ) {
-        val alertDialogBuilder = AlertDialog.Builder(context.applicationContext)
-        alertDialogBuilder.setTitle(context.getString(R.string.twoFaCode))
+        try {
+            val alertDialogBuilder = AlertDialog.Builder(context)
+            alertDialogBuilder.setTitle(context.getString(R.string.twoFaCode))
 
-        val layoutInflater =
-            context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val twoFAInputView = layoutInflater.inflate(R.layout.two_fa_input_layout, null)
+            val layoutInflater =
+                context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            val twoFAInputView = layoutInflater.inflate(R.layout.two_fa_input_layout, null)
 
-        alertDialogBuilder.setView(twoFAInputView)
-        alertDialogBuilder.setCancelable(false)
+            alertDialogBuilder.setView(twoFAInputView)
+            alertDialogBuilder.setCancelable(false)
 
-        alertDialogBuilder.setPositiveButton(context.getString(R.string.ok)) { _, _ ->
-            //post token to API
+            alertDialogBuilder.setPositiveButton(context.getString(R.string.ok)) { _, _ ->
+                //post token to API
 
-            val twoFAEditText = twoFAInputView.findViewById<EditText>(R.id.twoFAInput)
-            val twoFACode = twoFAEditText.text.toString()
+                val twoFAEditText = twoFAInputView.findViewById<EditText>(R.id.twoFAInput)
+                val twoFACode = twoFAEditText.text.toString()
 
-            val twoFAQueue =
-                getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+                val twoFAQueue =
+                    getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
-            twoFAQueue.add(newTwoFaRequest(context, twoFACode, {
-                //all good
-                checkLogin(context, loginSuccess, loginFailed)
-            }, {
-                //TODO show 2FA again/request new code
-            }))
+                twoFAQueue.add(newTwoFaRequest(context, twoFACode, {
+                    //all good
+                    checkLogin(context, loginSuccess, loginFailed)
+                }, {
+                    checkLogin(context, loginSuccess, loginFailed)
+                }))
+            }
+
+            val dialog = alertDialogBuilder.create()
+            dialog.show()
+
+            val typedValue = TypedValue()
+            context.theme.resolveAttribute(R.attr.colorOnSurface, typedValue, true)
+
+            val positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE)
+            positiveButton.setTextColor(typedValue.data)
+        }catch (e: WindowManager.BadTokenException){
+            checkLogin(context, loginSuccess, loginFailed)
         }
-
-        val dialog = alertDialogBuilder.create()
-        dialog.show()
-
-        val typedValue = TypedValue()
-        context.theme.resolveAttribute(R.attr.colorOnSurface, typedValue, true)
-
-        val positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE)
-        positiveButton.setTextColor(typedValue.data)
     }
 
     /**
