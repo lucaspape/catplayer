@@ -11,7 +11,6 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.ItemDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.StreamDatabaseHelper
 import de.lucaspape.monstercat.core.music.util.playStream
-import de.lucaspape.monstercat.core.util.Settings
 import de.lucaspape.monstercat.request.async.*
 import de.lucaspape.monstercat.ui.pages.recycler.HomeCatalogRecyclerPage
 import de.lucaspape.monstercat.ui.pages.util.Item
@@ -64,9 +63,6 @@ class ExploreItem(
                             }
                         }
                         is CatalogItem -> {
-                            val skipMonstercatSongs =
-                                Settings.getSettings(context).getBoolean(context.getString(R.string.skipMonstercatSongsSetting)) == true
-
                             val catalogViewData = ArrayList<CatalogItem>()
 
                             for (catalogItem in viewData) {
@@ -78,7 +74,6 @@ class ExploreItem(
                             withContext(Dispatchers.Main) {
                                 playSongsFromViewDataAsync(
                                     context,
-                                    skipMonstercatSongs,
                                     catalogViewData,
                                     itemIndex
                                 )

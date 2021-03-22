@@ -22,7 +22,7 @@ import de.lucaspape.monstercat.ui.pages.util.deletePlaylistSong
 import de.lucaspape.monstercat.ui.pages.util.openAlbum
 import de.lucaspape.monstercat.core.download.ImageReceiverInterface
 import de.lucaspape.monstercat.core.download.preDownloadCallbacks
-import de.lucaspape.monstercat.core.music.prioritySongQueue
+import de.lucaspape.monstercat.core.music.addToPriorityQueue
 import de.lucaspape.monstercat.ui.*
 import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListHeaderItem
 import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListItem
@@ -116,7 +116,7 @@ open class CatalogItem(
                             song.songId
                         ) {}
                         view.context.getString(R.string.deleteDownload) -> File(song.downloadLocation).delete()
-                        view.context.getString(R.string.addToQueue) -> prioritySongQueue.add(id)
+                        view.context.getString(R.string.addToQueue) -> addToPriorityQueue(id)
                         view.context.getString(R.string.addToPlaylist) -> addSongToPlaylist(
                             view,
                             song.songId
@@ -205,7 +205,7 @@ open class CatalogItem(
                         }
                         view.context.getString(R.string.deleteDownload) -> File(song.downloadLocation).delete()
                         view.context.getString(R.string.addToQueue) -> {
-                            prioritySongQueue.add(id)
+                            addToPriorityQueue(id)
                         }
                         view.context.getString(R.string.delete) -> {
                             deletePlaylistSong(

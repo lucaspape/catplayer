@@ -181,7 +181,7 @@ fun playStream(
     context: Context,
     streamName: String
 ) {
-    prioritySongQueue.add(streamName)
+    addToPriorityQueue(streamName)
     next(context)
     currentSeekBarUpdateHandlerId = ""
 }

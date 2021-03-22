@@ -27,7 +27,7 @@ data class Song(
     val isDownloadable: Boolean,
     private val isStreamable: Boolean,
     val inEarlyAccess: Boolean,
-    private val creatorFriendly: Boolean,
+    val creatorFriendly: Boolean,
     val explicit: Boolean
 ) {
 
@@ -157,19 +157,10 @@ data class Song(
     }
 
     fun playbackAllowed(context: Context): Boolean {
-        val networkAllowed = wifiConnected(context) || Settings.getSettings(
+        return wifiConnected(context) || Settings.getSettings(
             context
         )
             .getBoolean(context.getString(R.string.streamOverMobileSetting)) == true || downloaded
-
-        val blockNonCreatorFriendlySetting = Settings.getSettings(context)
-            .getBoolean(context.getString(R.string.blockNonCreatorFriendlySetting))
-
-        return if (!networkAllowed) {
-            false
-        } else if (creatorFriendly) {
-            true
-        } else blockNonCreatorFriendlySetting == false || blockNonCreatorFriendlySetting == null
     }
 
     private fun fileToMediaSource(fileLocation: String): ProgressiveMediaSource {

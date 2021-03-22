@@ -74,10 +74,10 @@ fun playAlbumNext(view: View, mcID: String) {
         view.context,
         mcID,
         finishedCallback = { idArray ->
-            prioritySongQueue.add(idArray[0])
+            addToPriorityQueue(idArray[0])
 
             for (i in (1 until idArray.size)) {
-                prioritySongQueue.add(idArray[i])
+                addToPriorityQueue(idArray[i])
             }
         },
         errorCallback = {
@@ -104,7 +104,7 @@ fun playPlaylistNextAsync(context: Context, playlistId: String) {
                 context,
                 playlistItemList[0].songId
             )?.songId?.let { songId ->
-                prioritySongQueue.add(songId)
+                addToPriorityQueue(songId)
             }
 
             for (i in (1 until playlistItemList.size)) {
@@ -112,7 +112,7 @@ fun playPlaylistNextAsync(context: Context, playlistId: String) {
                     context,
                     playlistItemList[i].songId
                 )?.songId?.let { songId ->
-                    prioritySongQueue.add(songId)
+                    addToPriorityQueue(songId)
                 }
             }
         }, {})
@@ -727,7 +727,6 @@ fun openPlaylist(context: Context, playlistId: String, share: Boolean) {
 
 fun playSongsFromViewDataAsync(
     context: Context,
-    skipMonstercatSongs: Boolean,
     catalogViewData: ArrayList<CatalogItem>,
     itemIndex: Int
 ) {
@@ -736,7 +735,7 @@ fun playSongsFromViewDataAsync(
     clearPlaylist()
     clearQueue()
 
-    prioritySongQueue.push(catalogViewData[itemIndex].songId)
+    pushToPriorityQueue(catalogViewData[itemIndex].songId)
     skipPreviousInPlaylist()
     next(context)
 
@@ -745,30 +744,12 @@ fun playSongsFromViewDataAsync(
         val id = UUID.randomUUID().toString()
         addSongsTaskId = id
 
-        val songDatabaseHelper = SongDatabaseHelper(context)
-
         for (i in (itemIndex + 1 until catalogViewData.size)) {
             try {
-                if (skipMonstercatSongs) {
-                    val song =
-                        songDatabaseHelper.getSong(
-                            context,
-                            catalogViewData[i].songId
-                        )
-
-                    if (!song?.artist.equals("monstercat", true)) {
-                        if (id == addSongsTaskId) {
-                            songQueue.add(catalogViewData[i].songId)
-                        } else {
-                            break
-                        }
-                    }
+                if (id == addSongsTaskId) {
+                    addToQueue(context, catalogViewData[i].songId)
                 } else {
-                    if (id == addSongsTaskId) {
-                        songQueue.add(catalogViewData[i].songId)
-                    } else {
-                        break
-                    }
+                    break
                 }
 
             } catch (e: IndexOutOfBoundsException) {

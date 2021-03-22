@@ -10,6 +10,7 @@ import android.support.v4.media.session.MediaSessionCompat
 import com.google.android.exoplayer2.SimpleExoPlayer
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
+import de.lucaspape.monstercat.core.database.objects.Song
 import de.lucaspape.monstercat.core.music.notification.startPlayerService
 import de.lucaspape.monstercat.core.music.notification.stopPlayerService
 import de.lucaspape.monstercat.core.music.save.PlayerSaveState
@@ -17,6 +18,7 @@ import de.lucaspape.monstercat.core.music.util.*
 import de.lucaspape.monstercat.core.util.Settings
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 import kotlin.math.log
 import kotlin.random.Random
 
@@ -101,6 +103,8 @@ var displayInfo: (context: Context, msg: String) -> Unit = { _, _ -> }
 
 var openMainActivityIntent = Intent()
 
+private var filters = HashMap<String, ArrayList<String>>()
+
 fun setupMusicPlayer(
     sRetrieveRelatedSongs: (context: Context, callback: (relatedSongs: ArrayList<String>) -> Unit, errorCallback: () -> Unit) -> Unit,
     sDisplayInfo: (context: Context, msg: String) -> Unit,
@@ -157,6 +161,16 @@ fun applyPlayerSettings(context: Context) {
 
     settings.getBoolean(context.getString(R.string.playRelatedSetting))?.let {
         playRelatedSongsAfterPlaylistFinished = it
+    }
+
+    filters = HashMap()
+
+    if(settings.getBoolean(context.getString(R.string.skipMonstercatSongsSetting)) == true){
+        addArtistToFilters("Monstercat")
+    }
+
+    if(settings.getBoolean(context.getString(R.string.blockNonCreatorFriendlySetting)) == true){
+        addSpecialFilter("creatorFriendly")
     }
 }
 
@@ -527,6 +541,72 @@ fun loadRelatedSongs(context: Context, playAfter: Boolean) {
     }
 }
 
+fun addToPriorityQueue(songId:String){
+    prioritySongQueue.add(songId)
+}
+
+fun pushToPriorityQueue(songId: String){
+    prioritySongQueue.push(songId)
+}
+
+fun addToQueue(context: Context, songId: String, ignoreFilters:Boolean){
+    if(ignoreFilters){
+        songQueue.add(songId)
+    }else{
+        SongDatabaseHelper(context).getSong(context, songId)?.let {
+            addToQueue(it)
+        }
+    }
+}
+
+fun addToQueue(context: Context, songId: String){
+    SongDatabaseHelper(context).getSong(context, songId)?.let {
+        addToQueue(it)
+    }
+}
+
+fun addToQueue(song:Song){
+    var filter = false
+
+    filters["artists"]?.let {
+        it.forEach { filterArtist ->
+            if(song.artist.contains(filterArtist)){
+                filter = true
+            }
+        }
+    }
+
+    filters["titles"]?.let {
+        it.forEach { filterTitle ->
+            if(song.shownTitle.contains(filterTitle)){
+                filter = true
+            }
+        }
+    }
+
+    filters["special"]?.let {
+        it.forEach { special ->
+            when(special){
+                "creatorFriendly" -> {
+                    if(!song.creatorFriendly){
+                        filter = true
+                    }
+                }
+
+                "explicit" -> {
+                    if(song.explicit){
+                        filter = true
+                    }
+                }
+            }
+        }
+    }
+
+    if(!filter){
+        songQueue.add(song.songId)
+    }
+}
+
 fun removeFromPriorityQueue(index:Int){
     prioritySongQueue.removeAt(index)
 }
@@ -539,4 +619,40 @@ fun removeFromQueue(index:Int){
 fun removeFromRelatedQueue(index:Int){
     relatedSongQueue.removeAt(index)
     nextRelatedRandom = -1
+}
+
+fun addArtistToFilters(artistName:String){
+    var artistFilters = filters["artists"]
+
+    if(artistFilters == null){
+        artistFilters = ArrayList()
+    }
+
+    artistFilters.add(artistName)
+
+    filters["artists"] = artistFilters
+}
+
+fun addTitleFilter(title:String){
+    var titleFilters = filters["titles"]
+
+    if(titleFilters == null){
+        titleFilters = ArrayList()
+    }
+
+    titleFilters.add(title)
+
+    filters["titles"] = titleFilters
+}
+
+fun addSpecialFilter(specialFilter:String){
+    var specialFilters = filters["special"]
+
+    if(specialFilters == null){
+        specialFilters = ArrayList()
+    }
+
+    specialFilters.add(specialFilter)
+
+    filters["special"] = specialFilters
 }
