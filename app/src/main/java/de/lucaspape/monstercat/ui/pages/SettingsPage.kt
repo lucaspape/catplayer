@@ -212,16 +212,6 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page() {
 
         itemAdapter.add(
             SettingsToggleItem(
-                view.context.getString(R.string.disableAudioFocusSetting),
-                true,
-                view.context.getString(R.string.disableAudioFocusSwitch),
-                null,
-                changeSetting
-            )
-        )
-
-        itemAdapter.add(
-            SettingsToggleItem(
                 view.context.getString(R.string.blockNonCreatorFriendlySetting),
                 true,
                 view.context.getString(R.string.dontPlayNotCreatorFriendly),
@@ -407,6 +397,16 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page() {
                 settings.setBoolean(setting, value)
                 value
             }
+
+        itemAdapter.add(
+            SettingsToggleItem(
+                view.context.getString(R.string.disableAudioFocusSetting),
+                true,
+                view.context.getString(R.string.disableAudioFocusSwitch),
+                null,
+                changeSetting
+            )
+        )
 
         itemAdapter.add(
             SettingsToggleItem(
