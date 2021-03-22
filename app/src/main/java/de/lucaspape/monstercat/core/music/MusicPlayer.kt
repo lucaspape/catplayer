@@ -515,11 +515,15 @@ fun clearRelatedSongs() {
     loadedRelatedHash = -1
 }
 
+var lastLoad:Long = 0
+
 /**
  * Fetch songs which are related to songs in playlist
  */
 fun loadRelatedSongs(context: Context, playAfter: Boolean) {
-    if (!loadingRelatedSongs && loadedRelatedHash != playlist.hashCode()) {
+    if (!loadingRelatedSongs && loadedRelatedHash != playlist.hashCode() && System.currentTimeMillis() - lastLoad > 5000) {
+        lastLoad = System.currentTimeMillis()
+
         loadingRelatedSongs = true
 
         retrieveRelatedSongs(context, {
