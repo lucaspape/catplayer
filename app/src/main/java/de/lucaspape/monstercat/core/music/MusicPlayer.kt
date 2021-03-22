@@ -563,7 +563,7 @@ private fun filter(song:Song):Boolean{
 
     filters["artists"]?.let {
         it.forEach { filterArtist ->
-            if(song.artist.contains(filterArtist)){
+            if(song.artist.contains(filterArtist, ignoreCase = true)){
                 filter = true
             }
         }
@@ -571,7 +571,7 @@ private fun filter(song:Song):Boolean{
 
     filters["titles"]?.let {
         it.forEach { filterTitle ->
-            if(song.shownTitle.contains(filterTitle)){
+            if(song.shownTitle.contains(filterTitle, ignoreCase = true)){
                 filter = true
             }
         }
