@@ -172,6 +172,10 @@ fun applyPlayerSettings(context: Context) {
     if(settings.getBoolean(context.getString(R.string.blockNonCreatorFriendlySetting)) == true){
         addSpecialFilter("creatorFriendly")
     }
+
+    if(settings.getBoolean(context.getString(R.string.skipExplicitSongsSetting)) == true){
+        addSpecialFilter("explicit")
+    }
 }
 
 /**

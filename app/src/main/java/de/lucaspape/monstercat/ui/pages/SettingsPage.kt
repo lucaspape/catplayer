@@ -232,6 +232,16 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page() {
 
         itemAdapter.add(
             SettingsToggleItem(
+                view.context.getString(R.string.skipExplicitSongsSetting),
+                true,
+                view.context.getString(R.string.skipExplicitSongs),
+                null,
+                changeSetting
+            )
+        )
+
+        itemAdapter.add(
+            SettingsToggleItem(
                 view.context.getString(R.string.playRelatedSetting),
                 true,
                 view.context.getString(R.string.playRelatedAfter),
