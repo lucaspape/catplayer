@@ -525,7 +525,20 @@ fun loadRelatedSongs(context: Context, playAfter: Boolean) {
         retrieveRelatedSongs(context, {
             clearRelatedSongs()
 
-            relatedSongQueue = it
+            val filteredList = ArrayList<String>()
+
+            val songDatabaseHelper = SongDatabaseHelper(context)
+
+            it.forEach { songId ->
+                songDatabaseHelper.getSong(context, songId)?.let { song ->
+                    if(!filter(song)){
+                        filteredList.add(songId)
+                    }
+                }
+            }
+
+            relatedSongQueue = filteredList
+
             loadedRelatedHash = playlist.hashCode()
 
             loadingRelatedSongs = false
@@ -541,31 +554,7 @@ fun loadRelatedSongs(context: Context, playAfter: Boolean) {
     }
 }
 
-fun addToPriorityQueue(songId:String){
-    prioritySongQueue.add(songId)
-}
-
-fun pushToPriorityQueue(songId: String){
-    prioritySongQueue.push(songId)
-}
-
-fun addToQueue(context: Context, songId: String, ignoreFilters:Boolean){
-    if(ignoreFilters){
-        songQueue.add(songId)
-    }else{
-        SongDatabaseHelper(context).getSong(context, songId)?.let {
-            addToQueue(it)
-        }
-    }
-}
-
-fun addToQueue(context: Context, songId: String){
-    SongDatabaseHelper(context).getSong(context, songId)?.let {
-        addToQueue(it)
-    }
-}
-
-fun addToQueue(song:Song){
+fun filter(song:Song):Boolean{
     var filter = false
 
     filters["artists"]?.let {
@@ -602,7 +591,35 @@ fun addToQueue(song:Song){
         }
     }
 
-    if(!filter){
+    return filter
+}
+
+fun addToPriorityQueue(songId:String){
+    prioritySongQueue.add(songId)
+}
+
+fun pushToPriorityQueue(songId: String){
+    prioritySongQueue.push(songId)
+}
+
+fun addToQueue(context: Context, songId: String, ignoreFilters:Boolean){
+    if(ignoreFilters){
+        songQueue.add(songId)
+    }else{
+        SongDatabaseHelper(context).getSong(context, songId)?.let {
+            addToQueue(it)
+        }
+    }
+}
+
+fun addToQueue(context: Context, songId: String){
+    SongDatabaseHelper(context).getSong(context, songId)?.let {
+        addToQueue(it)
+    }
+}
+
+fun addToQueue(song:Song){
+    if(!filter(song)){
         songQueue.add(song.songId)
     }
 }
