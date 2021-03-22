@@ -163,6 +163,12 @@ fun applyPlayerSettings(context: Context) {
         playRelatedSongsAfterPlaylistFinished = it
     }
 
+    applyFilterSettings(context)
+}
+
+fun applyFilterSettings(context: Context){
+    val settings = Settings.getSettings(context)
+
     filters = HashMap()
 
     if(settings.getBoolean(context.getString(R.string.skipMonstercatSongsSetting)) == true){
@@ -562,7 +568,7 @@ fun loadRelatedSongs(context: Context, playAfter: Boolean) {
     }
 }
 
-private fun filter(song:Song):Boolean{
+fun filter(song:Song):Boolean{
     var filter = false
 
     filters["artists"]?.let {

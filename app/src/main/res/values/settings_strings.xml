@@ -33,4 +33,5 @@
     <string name="useCustomApiForCoverImagesSetting" translatable="false">useCustomApiForCoverImages</string>
     <string name="useCustomApiForEverythingSetting" translatable="false">useCustomApiForEverything</string>
     <string name="skipExplicitSongsSetting" translatable="false">skipExplicitSongs</string>
+    <string name="hideToBeSkippedSetting" translatable="false">hideToBeSkipped</string>
 </resources>

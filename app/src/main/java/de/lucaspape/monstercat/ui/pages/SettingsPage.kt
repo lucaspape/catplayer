@@ -24,6 +24,7 @@ import de.lucaspape.monstercat.core.database.helper.AlbumDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.ItemDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.ManualPlaylistDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.PlaylistDatabaseHelper
+import de.lucaspape.monstercat.core.music.applyFilterSettings
 import de.lucaspape.monstercat.core.music.crossfade
 import de.lucaspape.monstercat.core.music.playRelatedSongsAfterPlaylistFinished
 import de.lucaspape.monstercat.core.music.volume
@@ -210,13 +211,20 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page() {
                 value
             }
 
+        val changeFilterSetting: (setting: String, value: Boolean, switch: SwitchMaterial) -> Boolean =
+            { setting, value, _ ->
+                settings.setBoolean(setting, value)
+                applyFilterSettings(view.context)
+                value
+            }
+
         itemAdapter.add(
             SettingsToggleItem(
                 view.context.getString(R.string.blockNonCreatorFriendlySetting),
                 true,
                 view.context.getString(R.string.dontPlayNotCreatorFriendly),
                 null,
-                changeSetting
+                changeFilterSetting
             )
         )
 
@@ -226,7 +234,7 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page() {
                 true,
                 view.context.getString(R.string.skipSongsMonstercat),
                 null,
-                changeSetting
+                changeFilterSetting
             )
         )
 
@@ -236,7 +244,17 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page() {
                 true,
                 view.context.getString(R.string.skipExplicitSongs),
                 null,
-                changeSetting
+                changeFilterSetting
+            )
+        )
+
+        itemAdapter.add(
+            SettingsToggleItem(
+                view.context.getString(R.string.hideToBeSkippedSetting),
+                true,
+                view.context.getString(R.string.hideToBeSkipped),
+                null,
+                changeFilterSetting
             )
         )
 

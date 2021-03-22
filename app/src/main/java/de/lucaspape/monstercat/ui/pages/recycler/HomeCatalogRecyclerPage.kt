@@ -9,6 +9,8 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.ItemDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.core.download.addDownloadSong
+import de.lucaspape.monstercat.core.music.filter
+import de.lucaspape.monstercat.core.util.Settings
 import de.lucaspape.monstercat.request.async.loadSongList
 import de.lucaspape.monstercat.ui.pages.util.Item
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
@@ -122,8 +124,22 @@ open class HomeCatalogRecyclerPage : RecyclerViewPage() {
         }
     }
 
-    override suspend fun itemToAbstractItem(view: View, item: Item): GenericItem {
-        return CatalogItem(item.itemId)
+    override suspend fun itemToAbstractItem(view: View, item: Item): GenericItem? {
+        val hideToBeSkipped = Settings.getSettings(view.context).getBoolean(view.context.getString(R.string.hideToBeSkippedSetting))
+
+        if(hideToBeSkipped == true){
+            val songDatabaseHelper = SongDatabaseHelper(view.context)
+
+            songDatabaseHelper.getSong(view.context, item.itemId)?.let{
+                if(!filter(it)){
+                    return CatalogItem(item.itemId)
+                }
+            }
+
+            return null
+        }else{
+            return CatalogItem(item.itemId)
+        }
     }
 
     override suspend fun load(

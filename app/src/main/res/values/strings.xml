@@ -129,4 +129,5 @@
     <string name="relatedSongsComingUp">Related Songs Coming Up</string>
     <string name="publicPlaylists">Public Playlists</string>
     <string name="skipExplicitSongs">Skip explicit songs</string>
+    <string name="hideToBeSkipped">Visually hide skip-songs</string>
 </resources>

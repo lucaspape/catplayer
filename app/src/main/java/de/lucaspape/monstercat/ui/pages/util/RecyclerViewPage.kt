@@ -67,7 +67,7 @@ abstract class RecyclerViewPage {
     ) {
     }
 
-    abstract suspend fun itemToAbstractItem(view: View, item: Item): GenericItem
+    abstract suspend fun itemToAbstractItem(view: View, item: Item): GenericItem?
     abstract suspend fun load(
         context: Context,
         forceReload: Boolean,
@@ -310,7 +310,9 @@ abstract class RecyclerViewPage {
                         clear()
 
                         for (item in itemList) {
-                            addItem(itemToAbstractItem(view, item))
+                            itemToAbstractItem(view, item)?.let {
+                                addItem(it)
+                            }
                         }
 
                         getHeader(view.context)?.let {
@@ -393,7 +395,9 @@ abstract class RecyclerViewPage {
                             scope.launch {
                                 if (currentLoaderId == id) {
                                     for (item in itemList) {
-                                        addItem(itemToAbstractItem(view, item))
+                                        itemToAbstractItem(view, item)?.let {
+                                            addItem(it)
+                                        }
                                     }
 
                                     withContext(Dispatchers.Main) {
