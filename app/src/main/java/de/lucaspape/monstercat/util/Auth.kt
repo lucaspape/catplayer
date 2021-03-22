@@ -129,6 +129,8 @@ class Auth {
             }
         }, {
             waitingForLogin = false
+
+            loginFailed()
         }))
     }
 
