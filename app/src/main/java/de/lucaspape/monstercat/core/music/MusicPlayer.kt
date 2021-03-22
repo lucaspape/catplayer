@@ -558,7 +558,7 @@ fun loadRelatedSongs(context: Context, playAfter: Boolean) {
     }
 }
 
-fun filter(song:Song):Boolean{
+private fun filter(song:Song):Boolean{
     var filter = false
 
     filters["artists"]?.let {
@@ -642,7 +642,7 @@ fun removeFromRelatedQueue(index:Int){
     nextRelatedRandom = -1
 }
 
-fun addArtistToFilters(artistName:String){
+private fun addArtistToFilters(artistName:String){
     var artistFilters = filters["artists"]
 
     if(artistFilters == null){
@@ -654,7 +654,7 @@ fun addArtistToFilters(artistName:String){
     filters["artists"] = artistFilters
 }
 
-fun addTitleFilter(title:String){
+private fun addTitleFilter(title:String){
     var titleFilters = filters["titles"]
 
     if(titleFilters == null){
@@ -666,7 +666,7 @@ fun addTitleFilter(title:String){
     filters["titles"] = titleFilters
 }
 
-fun addSpecialFilter(specialFilter:String){
+private fun addSpecialFilter(specialFilter:String){
     var specialFilters = filters["special"]
 
     if(specialFilters == null){
