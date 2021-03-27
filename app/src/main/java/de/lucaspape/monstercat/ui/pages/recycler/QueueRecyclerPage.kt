@@ -125,9 +125,9 @@ class QueueRecyclerPage : RecyclerViewPage() {
         }
 
         queue = ArrayList()
-        prioritySongQueue.forEach { queue.add(it) }
+        relatedSongQueue.forEach { queue.add(it) }
 
-        if (relatedSongQueue.size > 0) {
+        if (queue.size > 0) {
             totalSize++
 
             if (!shuffle) {
@@ -206,9 +206,9 @@ class QueueRecyclerPage : RecyclerViewPage() {
             }
 
             queue = ArrayList()
-            prioritySongQueue.forEach { queue.add(it) }
+            relatedSongQueue.forEach { queue.add(it) }
 
-            if (relatedSongQueue.size > 0) {
+            if (queue.size > 0) {
                 content.add(Item(context.getString(R.string.relatedSongsComingUp), "separator"))
 
                 if (!shuffle) {
