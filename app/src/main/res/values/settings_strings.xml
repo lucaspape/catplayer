@@ -24,11 +24,9 @@
     <string name="customApiBaseUrlSetting" translatable="false">customApiBaseUrl</string>
     <string name="customDownloadUrlSetting" translatable="false">customDownloadUrl</string>
     <string name="customStreamUrlSetting" translatable="false">customStreamUrl</string>
-    <string name="liveInfoSetting" translatable="false">liveInfo</string>
     <string name="enabledPushNotificationTopicsSetting" translatable="false">enabledPushNotificationTopics</string>
     <string name="blockNonCreatorFriendlySetting" translatable="false">blockNonCreatorFriendly</string>
     <string name="customApiSupportsPlayingRelatedSongsSetting" translatable="false">customApiSupportsPlayingRelatedSongs</string>
-    <string name="customApiSupportsLoadingLiveInfoSetting" translatable="false">customApiSupportsLoadingLiveInfo</string>
     <string name="useCustomApiForSearchSetting" translatable="false">useCustomApiForSearch</string>
     <string name="useCustomApiForCoverImagesSetting" translatable="false">useCustomApiForCoverImages</string>
     <string name="useCustomApiForEverythingSetting" translatable="false">useCustomApiForEverything</string>

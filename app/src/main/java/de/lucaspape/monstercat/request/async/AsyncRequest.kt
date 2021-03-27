@@ -86,11 +86,12 @@ suspend fun checkCustomApiFeatures(
 
         val settings = Settings.getSettings(context)
 
-        settings.setBoolean(context.getString(R.string.customApiSupportsV1Setting), false)
-        settings.setBoolean(context.getString(R.string.customApiSupportsV2Setting), false)
-
         newVolleyQueue.add(newCustomApiFeatureRequest(context, {
             try {
+                settings.setBoolean(context.getString(R.string.customApiSupportsV1Setting), false)
+                settings.setBoolean(context.getString(R.string.customApiSupportsV2Setting), false)
+                settings.setBoolean(context.getString(R.string.customApiSupportsPlayingRelatedSongsSetting), false)
+
                 val apiVersionsArray = it.getJSONArray("api_versions")
 
                 for (i in (0 until apiVersionsArray.length())) {
@@ -101,10 +102,6 @@ suspend fun checkCustomApiFeatures(
                         )
                         "v2" -> settings.setBoolean(
                             context.getString(R.string.customApiSupportsV2Setting),
-                            true
-                        )
-                        "liveinfo" -> settings.setBoolean(
-                            context.getString(R.string.customApiSupportsLoadingLiveInfoSetting),
                             true
                         )
                         "related_songs" -> settings.setBoolean(
@@ -128,6 +125,10 @@ suspend fun checkCustomApiFeatures(
                 errorCallback()
             }
         }, {
+            settings.setBoolean(context.getString(R.string.customApiSupportsV1Setting), false)
+            settings.setBoolean(context.getString(R.string.customApiSupportsV2Setting), false)
+            settings.setBoolean(context.getString(R.string.customApiSupportsPlayingRelatedSongsSetting), false)
+
             errorCallback()
         }))
     }

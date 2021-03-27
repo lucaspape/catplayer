@@ -56,7 +56,7 @@ class SearchRecyclerPage(
         val search = search
 
         if(search != null){
-            displayLoading()
+             displayLoading()
 
             loadTitleSearch(
                 context,
