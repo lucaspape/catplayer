@@ -1,0 +1,22 @@
+<resources>
+    <string name="alreadyDownloadedMsg">%1$s 已下载</string>
+    <string name="downloadNotAvailableMsg">无法下载 %1$s！</string>
+    <string name="songAddedToPlaylistMsg">歌曲已添加到播放列表</string>
+    <string name="loginSuccessfulMsg">注册成功！</string>
+    <string name="loginFailedMsg">登录失败！</string>
+    <string name="pickPlaylistMsg">选择一个播放列表：</string>
+    <string name="reviewPrivacyPolicyMsg">请在以下位置查看我们的隐私政策： %1$s</string>
+    <string name="playlistDeletedMsg">播放列表已删除！</string>
+    <string name="removedSongFromPlaylistMsg">从播放列表中删除了歌曲！</string>
+    <string name="playlistCreatedMsg">播放列表已创建！</string>
+    <string name="deletePlaylistDownloadedTracksMsg">您确定要删除此播放列表中下载的曲目吗？</string>
+    <string name="deletePlaylistMsg">您确定要删除此播放列表吗？</string>
+    <string name="playlistRenamedMsg">播放列表已重命名！</string>
+    <string name="playlistNowPublicMsg">播放列表现已公开</string>
+    <string name="playlistNowPrivateMsg">播放列表现已设为私人</string>
+    <string name="customApiEnabledMsg">自定义API已启用！</string>
+    <string name="resetDatabaseQuestion">您确定要重置数据库（需要重新启动应用程序）吗？</string>
+    <string name="pickLinkToShare">选择一个链接分享：</string>
+    <string name="pickApp">选择应用：</string>
+    <string name="loadingRelatedSongs">加载类似的歌曲</string>
+</resources>

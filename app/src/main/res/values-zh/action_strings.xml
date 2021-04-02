@@ -1,0 +1,37 @@
+<resources>
+    <string name="downloadAlbum">下载专辑</string>
+    <string name="addToPlaylist">添加到播放列表…</string>
+    <string name="ok">可以的</string>
+    <string name="allowStreamMobile">允许通过移动数据流式传输</string>
+    <string name="allowDownloadMobile">允许通过移动数据下载</string>
+    <string name="allowCoverDownloadMobile">允许通过移动数据进行封面下载</string>
+    <string name="darkThemeSwitch">启用深色主题</string>
+    <string name="disableAudioFocusSwitch">与其他媒体应用程序同时播放</string>
+    <string name="createPlaylist">建立新的播放清单</string>
+    <string name="downloadFlacInsteadMp3">下载FLAC而不是MP3</string>
+    <string name="yes">是的</string>
+    <string name="no">不</string>
+    <string name="shareAlbum">分享相册…</string>
+    <string name="openAlbumInApp">在应用中打开相册…</string>
+    <string name="skipSongsMonstercat">跳过Monstercat中的歌曲（例如COTW）</string>
+    <string name="addToQueue">添加到队列</string>
+    <string name="addAlbumToQueue">将相册添加到队列</string>
+    <string name="retry">重试</string>
+    <string name="addPlaylistId">从播放列表ID添加播放列表</string>
+    <string name="renamePlaylist">重命名播放列表</string>
+    <string name="makePlaylistPublic">公开</string>
+    <string name="makePlaylistPrivate">设为私人</string>
+    <string name="sharePlaylist">分享播放列表</string>
+    <string name="openPlaylistInApp">在浏览器中打开播放列表</string>
+    <string name="useCustomApi">使用自定义API进行目录视图和相册视图</string>
+    <string name="playRelatedAfter">播放类似歌曲后播放（使用自定义API）</string>
+    <string name="saveCoverImagesToCache">将封面图像保存到缓存</string>
+    <string name="setCustomApiUrl">设置自定义API URL</string>
+    <string name="dontPlayNotCreatorFriendly">不要播放不适合创作者的歌曲</string>
+    <string name="logout">登出</string>
+    <string name="useCustomApiForEverything">用自定义API替换所有内容</string>
+    <string name="useCustomApiForCoverImages">更快的封面图片下载（使用自定义API）</string>
+    <string name="useCustomApiForSearch">高级搜索（使用自定义API）</string>
+    <string name="deleteDownload">删除下载</string>
+    <string name="resetDatabase">重置数据库</string>
+</resources>

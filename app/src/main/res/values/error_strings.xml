@@ -1,0 +1,22 @@
+<resources>
+    <string name="errorRetrieveAlbumData">Error retrieving album data</string>
+    <string name="errorRetrievePlaylist">Error retrieving playlist</string>
+    <string name="errorNotLoggedIn">Not logged in</string>
+    <string name="errorDeletingPlaylist">Could not delete playlist</string>
+    <string name="errorRemovingSongFromPlaylist">Could not remove song from playlist!</string>
+    <string name="errorCreatingPlaylist">Could not create playlist!</string>
+    <string name="songNotPlayableError">Song is not available!</string>
+    <string name="errorLoadingSongList">Could not load song list</string>
+    <string name="errorLoadingAlbumList">Could not load album list</string>
+    <string name="errorLoadingAlbum">Error loading album</string>
+    <string name="errorLoadingSearch">Error loading search</string>
+    <string name="errorLoadingPlaylists">Error loading playlists (are you logged in?)</string>
+    <string name="errorLoadingPlaylistTracks">Error loading playlist tracks</string>
+    <string name="noInternetAccessError">No access to internet!</string>
+    <string name="renamePlaylistError">Error renaming playlist</string>
+    <string name="playlistStateChangeError">Error changing playlist state</string>
+    <string name="customApiEnableError">Could not enable custom API!</string>
+    <string name="errorPlaybackNotAllowed">Playback not allowed (check settings for playback over mobile data and playback of non creator friendly songs)</string>
+    <string name="noPlaylistFound">No playlist found</string>
+    <string name="notOnline">Not Online!</string>
+</resources>

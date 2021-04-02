@@ -1,0 +1,22 @@
+<resources>
+    <string name="alreadyDownloadedMsg">%1$s schon heruntergeladen!</string>
+    <string name="downloadNotAvailableMsg">%1$s nicht zum herunterladen verfügbar!</string>
+    <string name="songAddedToPlaylistMsg">Lied zur Playlist hinzugefügt</string>
+    <string name="loginSuccessfulMsg">Angemeldtet!</string>
+    <string name="loginFailedMsg">Anmeldung fehlgeschlagen!</string>
+    <string name="pickPlaylistMsg">Playlist auswählen:</string>
+    <string name="reviewPrivacyPolicyMsg">Bitte schaue dir unsere Datenschutz-Bestimmungen an: %1$s</string>
+    <string name="playlistDeletedMsg">Playlist gelöscht!</string>
+    <string name="removedSongFromPlaylistMsg">Lied von Playlist entfernt!</string>
+    <string name="playlistCreatedMsg">Playlist erstellt!</string>
+    <string name="deletePlaylistDownloadedTracksMsg">Bist du dir sicher dass du alle Downloads dieser Playlist löschen möchtest?</string>
+    <string name="deletePlaylistMsg">Bist du dir sicher dass du diese Playlist löschen möchtest?</string>
+    <string name="playlistRenamedMsg">Playlist umbenannt!</string>
+    <string name="playlistNowPublicMsg">Playlist ist jetzt öffentlich</string>
+    <string name="playlistNowPrivateMsg">Playlist ist jetzt privat</string>
+    <string name="customApiEnabledMsg">Custom API aktiviert!</string>
+    <string name="resetDatabaseQuestion">Bist du dir sicher dass du die Datenbank zurücksetzen möchtest (App startet sich neu)?</string>
+    <string name="pickLinkToShare">Wähle einen Link zum Teilen:</string>
+    <string name="pickApp">Wähle App:</string>
+    <string name="loadingRelatedSongs">Lade ähnliche Lieder</string>
+</resources>

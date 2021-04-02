@@ -1,0 +1,22 @@
+<resources>
+    <string name="alreadyDownloadedMsg">%1$s уже скачана!</string>
+    <string name="downloadNotAvailableMsg">%1$s nнедоступна для скачивания!</string>
+    <string name="songAddedToPlaylistMsg">Песня добавлена в плейлист</string>
+    <string name="loginSuccessfulMsg">Авторизован!</string>
+    <string name="loginFailedMsg">Ошибка входа!</string>
+    <string name="pickPlaylistMsg">Выберите плейлист:</string>
+    <string name="reviewPrivacyPolicyMsg">Пожалуйста, ознакомьтесь с нашей политикой конфиденциальности по адресу: %1$s</string>
+    <string name="playlistDeletedMsg">Плейлист удален!</string>
+    <string name="removedSongFromPlaylistMsg">Удалена песня из Плейлист!</string>
+    <string name="playlistCreatedMsg">Плейлист создан!</string>
+    <string name="deletePlaylistDownloadedTracksMsg">Вы уверены, что хотите удалить скачанные треки в этом Плейлисте?</string>
+    <string name="deletePlaylistMsg">Вы уверены, что хотите удалить этот Плейлист?</string>
+    <string name="playlistRenamedMsg">Плейлист переименован!</string>
+    <string name="playlistNowPublicMsg">Плейлист теперь общедоступен</string>
+    <string name="playlistNowPrivateMsg">Плейлист теперь приватный</string>
+    <string name="customApiEnabledMsg">Custom API включен!</string>
+    <string name="resetDatabaseQuestion">Вы уверены, что хотите сбросить базу данных (требуется перезапуск приложения)?</string>
+    <string name="pickLinkToShare">Выберите ссылку, которой хотите поделиться</string>
+    <string name="pickApp">Выберите приложение:</string>
+    <string name="loadingRelatedSongs">Загрузка похожих песен</string>
+</resources>

@@ -1,0 +1,22 @@
+<resources>
+    <string name="errorRetrieveAlbumData">检索相册数据时出错</string>
+    <string name="errorRetrievePlaylist">检索播放列表时出错</string>
+    <string name="errorNotLoggedIn">未登录</string>
+    <string name="errorDeletingPlaylist">无法删除播放列表</string>
+    <string name="errorRemovingSongFromPlaylist">无法从播放列表中删除歌曲！</string>
+    <string name="errorCreatingPlaylist">无法创建播放列表！</string>
+    <string name="songNotPlayableError">歌曲不可用！</string>
+    <string name="noInternetAccessError">无法访问互联网！</string>
+    <string name="errorLoadingSongList">无法加载歌曲列表</string>
+    <string name="errorLoadingAlbumList">无法加载相册列表</string>
+    <string name="errorLoadingAlbum">加载相册时出错</string>
+    <string name="errorLoadingSearch">加载搜索时出错</string>
+    <string name="errorLoadingPlaylists">加载播放列表时出错（您已登录吗？）</string>
+    <string name="errorLoadingPlaylistTracks">加载播放列表曲目时出错</string>
+    <string name="renamePlaylistError">重命名播放列表时出错</string>
+    <string name="playlistStateChangeError">更改播放列表状态时出错</string>
+    <string name="customApiEnableError">无法启用自定义API！</string>
+    <string name="errorPlaybackNotAllowed">不允许播放（检查设置以便通过移动数据播放和播放非创作者友好的歌曲）</string>
+    <string name="noPlaylistFound">找不到播放列表</string>
+    <string name="notOnline">不在线！</string>
+</resources>

@@ -1,0 +1,22 @@
+<resources>
+    <string name="errorRetrieveAlbumData">Не удалось получить данные альбома</string>
+    <string name="errorRetrievePlaylist">Ошибка при получении Плейлист</string>
+    <string name="errorNotLoggedIn">Вы не вошли в систему </string>
+    <string name="errorDeletingPlaylist">Не удалось удалить Плейлист</string>
+    <string name="errorRemovingSongFromPlaylist">Не удалось удалить песню из Плейлист!</string>
+    <string name="errorCreatingPlaylist">Не удалось создать Плейлист!</string>
+    <string name="songNotPlayableError">Песня недоступна!</string>
+    <string name="noInternetAccessError">Нет доступа в интернет!</string>
+    <string name="errorLoadingSongList">Не удалось загрузить список песен</string>
+    <string name="errorLoadingAlbumList">Не удалось загрузить список альбомов</string>
+    <string name="errorLoadingAlbum">Ошибка при загрузке альбома </string>
+    <string name="errorLoadingSearch">Ошибка загрузки поиска</string>
+    <string name="errorLoadingPlaylists">Ошибка загрузки плейлистов (вы вошли в систему?)</string>
+    <string name="errorLoadingPlaylistTracks">Ошибка загрузки треков плейлиста</string>
+    <string name="renamePlaylistError">Ошибка переименования плейлиста</string>
+    <string name="playlistStateChangeError">Ошибка изменения состояния списка воспроизведения</string>
+    <string name="customApiEnableError">Не удалось включить custom API! </string>
+    <string name="errorPlaybackNotAllowed">Воспроизведение запрещено (проверьте настройки для воспроизведения мобильных данных и воспроизведения не creator friendly)</string>
+    <string name="noPlaylistFound">Плейлист не найден</string>
+    <string name="notOnline">Нет соединения!</string>
+</resources>

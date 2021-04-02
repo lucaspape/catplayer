@@ -1,0 +1,37 @@
+<resources>
+    <string name="downloadAlbum">Скачать альбом</string>
+    <string name="addToPlaylist">Добавить в плейлист</string>
+    <string name="ok">OK</string>
+    <string name="allowStreamMobile">Разрешить потоковую передачу через мобильные данные</string>
+    <string name="allowDownloadMobile">Разрешить загрузку через мобильные данные</string>
+    <string name="allowCoverDownloadMobile">Разрешить загрузку обложек через мобильные данные</string>
+    <string name="darkThemeSwitch">Темная тема</string>
+    <string name="disableAudioFocusSwitch">Одновременное воспроизведение с другими мультимедийными приложениями</string>
+    <string name="createPlaylist">Создать новый Плейлист</string>
+    <string name="downloadFlacInsteadMp3">Скачать FLAC вместо MP3</string>
+    <string name="yes">да</string>
+    <string name="no">Нет</string>
+    <string name="shareAlbum">Поделиться альбомом…</string>
+    <string name="openAlbumInApp">Открыть альбом в приложении</string>
+    <string name="skipSongsMonstercat">Пропустить песни из monstercat (например, COTW)</string>
+    <string name="addToQueue">Добавить в очередь</string>
+    <string name="addAlbumToQueue">Добавить альбом в очередь</string>
+    <string name="retry">Повторять</string>
+    <string name="addPlaylistId">Добавить плейлист по идентификатору плейлиста</string>
+    <string name="renamePlaylist">Переименовать плейлист</string>
+    <string name="makePlaylistPublic">Опубликовать</string>
+    <string name="makePlaylistPrivate">Сделать частный</string>
+    <string name="sharePlaylist">Поделиться плейлистом</string>
+    <string name="openPlaylistInApp">Открыть плейлист в браузере</string>
+    <string name="useCustomApi">Используйте custom-api для просмотра каталогов и альбомов </string>
+    <string name="playRelatedAfter">Воспроизвести похожие песни после завершения воспроизведения (использует custom API)</string>
+    <string name="saveCoverImagesToCache">Сохранить изображения обложек в кеш</string>
+    <string name="setCustomApiUrl">Установить URL custom API</string>
+    <string name="dontPlayNotCreatorFriendly">Не включайте песни, не creator friendly</string>
+    <string name="logout">Выйти</string>
+    <string name="useCustomApiForEverything">Замени все на custom API</string>
+    <string name="useCustomApiForCoverImages">FБолее быстрая загрузка изображений обложек (использует custom API) </string>
+    <string name="useCustomApiForSearch">Расширенный поиск (использует custom API)</string>
+    <string name="deleteDownload">Удалить скачивание</string>
+    <string name="resetDatabase">Сбросить базу данных</string>
+</resources>

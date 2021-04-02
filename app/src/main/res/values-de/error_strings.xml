@@ -1,0 +1,22 @@
+<resources>
+    <string name="errorRetrieveAlbumData">Fehler beim Laden von Albendaten</string>
+    <string name="errorRetrievePlaylist">Fehler von laden der Playlist</string>
+    <string name="errorNotLoggedIn">Nicht angemeldet</string>
+    <string name="errorDeletingPlaylist">Fehler beim Löschen der Playlist</string>
+    <string name="errorRemovingSongFromPlaylist">Fehler beim entfernen von Playlist!</string>
+    <string name="errorCreatingPlaylist">Fehler beim Erstellen der Playlist!</string>
+    <string name="songNotPlayableError">Lied nicht verfügbar!</string>
+    <string name="noInternetAccessError">Kein Internetzugriff!</string>
+    <string name="errorLoadingSongList">Fehler beim Laden der Liedliste</string>
+    <string name="errorLoadingAlbumList">Fehler beim Laden der Albenliste</string>
+    <string name="errorLoadingAlbum">Fehler beim Laden vom Album</string>
+    <string name="errorLoadingSearch">Fehler beim Laden der Suche</string>
+    <string name="errorLoadingPlaylists">Fehler beim Laden der Playlisten (bist du angemeldet?)</string>
+    <string name="errorLoadingPlaylistTracks">Fehler beim Laden des Playlistinhalts</string>
+    <string name="renamePlaylistError">Fehler beim Umbenennen der Playlist!</string>
+    <string name="playlistStateChangeError">Fehler beim ändern des Playliststatus</string>
+    <string name="customApiEnableError">Fehler beim aktivieren der custom API!</string>
+    <string name="errorPlaybackNotAllowed">Abspielen nicht erlaubt (sieh dir deine Daten Einstellungen in den Einstellungen an)</string>
+    <string name="noPlaylistFound">Keine Playlist gefunden</string>
+    <string name="notOnline">Nicht Online!</string>
+</resources>
