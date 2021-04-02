@@ -31,7 +31,7 @@ val downloadList = ArrayList<SoftReference<DownloadObject>>()
 
 var downloadedSongs = 0
 
-val preDownloadCallbacks = HashMap<String, ()->Unit>()
+val preDownloadCallbacks = HashMap<String, () -> Unit>()
 
 var fallbackFile = File("")
 var fallbackFileLow = File("")
@@ -39,7 +39,7 @@ var fallbackFileLow = File("")
 private var bitmapCache: LruCache<String, Bitmap>? = null
 
 fun addDownloadSong(context: Context, songId: String, downloadFinished: () -> Unit) {
-    if(SongDatabaseHelper(context).getSong(context, songId)?.isDownloadable == true){
+    if (SongDatabaseHelper(context).getSong(context, songId)?.isDownloadable == true) {
         preDownloadCallbacks[songId]?.let {
             it()
         }
@@ -61,19 +61,23 @@ fun downloadImageUrlIntoImageReceiver(
     url: String
 ) {
     val settings = Settings.getSettings(context)
-    val resolution = if (!lowRes) {
+    var resolution = if (!lowRes) {
         settings.getInt(context.getString(R.string.primaryCoverResolutionSetting))
     } else {
         settings.getInt(context.getString(R.string.secondaryCoverResolutionSetting))
     }
 
+    if (resolution == null) {
+        resolution = 512
+    }
+
     var saveToCache = settings.getBoolean(context.getString(R.string.saveCoverImagesToCacheSetting))
 
-    if(saveToCache == null){
+    if (saveToCache == null) {
         saveToCache = true
     }
 
-    if(bitmapCache == null){
+    if (bitmapCache == null) {
         val maxMemory = (Runtime.getRuntime().maxMemory() / 1024).toInt()
         val cacheSize = maxMemory / 8
 
@@ -106,10 +110,21 @@ fun downloadImageUrlIntoImageReceiver(
 
         if (cacheFile.exists()) {
             val bitmap = BitmapFactory.decodeFile(cacheFile.absolutePath)
-            imageReceiver.setBitmap(imageId, bitmap)
 
-            if(saveToCache){
-                bitmapCache?.put(imageId + resolution, bitmap)
+            val scaledBitmap = if(bitmap.width != resolution || bitmap.height != resolution){
+                val tempBitmap = Bitmap.createScaledBitmap(bitmap, resolution, resolution, false)
+
+                saveBitmapAsync(tempBitmap, cacheFile)
+
+                tempBitmap
+            }else{
+                bitmap
+            }
+
+            imageReceiver.setBitmap(imageId, scaledBitmap)
+
+            if (saveToCache) {
+                bitmapCache?.put(imageId + resolution, scaledBitmap)
             }
 
         } else {
@@ -123,17 +138,24 @@ fun downloadImageUrlIntoImageReceiver(
                     }
 
                     override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                        imageReceiver.setBitmap(imageId, bitmap)
-
                         bitmap?.let {
+                            val scaledBitmap =
+                                if (bitmap.width != resolution || bitmap.height != resolution) {
+                                    Bitmap.createScaledBitmap(bitmap, resolution, resolution, false)
+                                } else {
+                                    bitmap
+                                }
+
+                            imageReceiver.setBitmap(imageId, scaledBitmap)
+
                             //possible that it changed by this time
                             if (!cacheFile.exists() && saveToCache) {
 
-                                saveBitmapAsync(it, cacheFile)
+                                saveBitmapAsync(scaledBitmap, cacheFile)
                             }
 
-                            if(saveToCache){
-                                bitmapCache?.put(imageId + resolution, bitmap)
+                            if (saveToCache) {
+                                bitmapCache?.put(imageId + resolution, scaledBitmap)
                             }
                         }
                     }
@@ -148,10 +170,14 @@ fun downloadImageUrlIntoImageReceiver(
     }
 }
 
-fun saveBitmapAsync(bitmap: Bitmap, outputFile: File){
+fun saveBitmapAsync(bitmap: Bitmap, outputFile: File) {
     BackgroundAsync {
         FileOutputStream(outputFile).use { out ->
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                bitmap.compress(Bitmap.CompressFormat.WEBP_LOSSY, 100, out)
+            } else {
+                bitmap.compress(Bitmap.CompressFormat.WEBP, 100, out)
+            }
         }
     }.execute()
 }
@@ -179,7 +205,9 @@ fun downloadCoverIntoImageReceiver(
     val settings = Settings.getSettings(context)
 
     val url =
-        if (settings.getBoolean(context.getString(R.string.useCustomApiForCoverImagesSetting)) == true && settings.getBoolean(context.getString(R.string.customApiSupportsV1Setting)) == true
+        if (settings.getBoolean(context.getString(R.string.useCustomApiForCoverImagesSetting)) == true && settings.getBoolean(
+                context.getString(R.string.customApiSupportsV1Setting)
+            ) == true
         ) {
             settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v1/release/" + albumId + "/cover"
         } else {
@@ -195,7 +223,7 @@ fun downloadCoverIntoImageReceiver(
     )
 }
 
-fun downloadFallbackCoverImagesAsync(context: Context, callback:() -> Unit) {
+fun downloadFallbackCoverImagesAsync(context: Context, callback: () -> Unit) {
     if (!fallbackBlackFile.exists() || !fallbackBlackFileLow.exists()) {
         BackgroundAsync({
             downloadFile(
@@ -207,12 +235,12 @@ fun downloadFallbackCoverImagesAsync(context: Context, callback:() -> Unit) {
             ) { _, _ ->
             }
         }, {
-            FileOutputStream(fallbackBlackFileLow).use { out ->
-                val originalBitmap = BitmapFactory.decodeFile(fallbackBlackFile.absolutePath)
-                originalBitmap?.let {
-                    Bitmap.createScaledBitmap(it, 128, 128, false)
-                        .compress(Bitmap.CompressFormat.JPEG, 100, out)
-                }
+            val originalBitmap = BitmapFactory.decodeFile(fallbackBlackFile.absolutePath)
+            originalBitmap?.let {
+                saveBitmapAsync(
+                    Bitmap.createScaledBitmap(it, 128, 128, false),
+                    fallbackBlackFileLow
+                )
             }
 
             callback()
@@ -230,12 +258,13 @@ fun downloadFallbackCoverImagesAsync(context: Context, callback:() -> Unit) {
             ) { _, _ ->
             }
         }, {
-            FileOutputStream(fallbackWhiteFileLow).use { out ->
-                val originalBitmap = BitmapFactory.decodeFile(fallbackWhiteFile.absolutePath)
-                originalBitmap?.let {
-                    Bitmap.createScaledBitmap(it, 128, 128, false)
-                        .compress(Bitmap.CompressFormat.JPEG, 100, out)
-                }
+            val originalBitmap = BitmapFactory.decodeFile(fallbackWhiteFile.absolutePath)
+            originalBitmap?.let {
+                saveBitmapAsync(
+                    Bitmap.createScaledBitmap(it, 128, 128, false),
+                    fallbackWhiteFileLow
+                )
+
             }
 
             callback()
