@@ -130,4 +130,5 @@
     <string name="publicPlaylists">Public Playlists</string>
     <string name="skipExplicitSongs">Skip explicit songs</string>
     <string name="hideToBeSkipped">Visually hide skip-songs</string>
+    <string name="openYoutubeLiveStreamInBrowser">Cannot play YouTube livestream in app. Open in browser?</string>
 </resources>

@@ -17,7 +17,7 @@ fun playYoutubeLivestream(view: View, streamName: String) {
     stream?.let {
         val context = view.context
         val alertDialogBuilder = MaterialAlertDialogBuilder(context)
-        alertDialogBuilder.setTitle("Cannot play youtube livestream in app. Open in browser?")
+        alertDialogBuilder.setTitle(view.context.getString(R.string.openYoutubeLiveStreamInBrowser))
         alertDialogBuilder.setPositiveButton(context.getString(R.string.yes)) { _, _ ->
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(stream.streamUrl))
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
