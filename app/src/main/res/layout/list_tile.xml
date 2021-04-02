@@ -17,7 +17,7 @@
             android:layout_margin="5dp"
             android:id="@+id/cover"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="200dp"
             android:adjustViewBounds="true"
             android:contentDescription="@string/coverImage"
             android:scaleType="centerCrop"
