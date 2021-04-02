@@ -159,10 +159,10 @@ open class PlaylistItem(
         var downloaded = true
 
         for (track in playlistTracks) {
-            val song = SongDatabaseHelper(context).getSong(context, track.songId)
+            val song = SongDatabaseHelper(context).getSong(track.songId)
 
             song?.let {
-                if (!File(song.downloadLocation).exists()) {
+                if (!song.downloaded(context)) {
                     downloaded = false
                 }
             }

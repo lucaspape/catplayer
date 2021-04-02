@@ -43,7 +43,7 @@ open class QueueItem(
 
         override fun bindView(item: QueueItem, payloads: List<Any>) {
             val songDatabaseHelper = SongDatabaseHelper(context)
-            val song = songDatabaseHelper.getSong(context, item.songId)
+            val song = songDatabaseHelper.getSong(item.songId)
 
             song?.let {
                 albumId = song.albumId

@@ -16,7 +16,6 @@ import de.lucaspape.monstercat.core.util.Settings
 import java.io.File
 
 data class Song(
-    private val context: Context,
     val songId: String,
     private val title: String,
     private val version: String,
@@ -89,32 +88,31 @@ data class Song(
                     ")"
     }
 
-    val shownTitle:String
+    val shownTitle: String
         get() {
-            return if (version.isNotEmpty()){
+            return if (version.isNotEmpty()) {
                 "$title ($version)"
-            }else{
+            } else {
                 title
             }
         }
 
-    val downloadLocation:String
-        get() {
-            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                context.filesDir
-                    .toString() + "/" + artist + title + version + "." + Settings.getSettings(
-                    context
-                ).getString("downloadType")
-            }else{
-                context.getExternalFilesDir(null)
-                    .toString() + "/" + artist + title + version + "." + Settings.getSettings(
-                    context
-                ).getString("downloadType")
-            }
+    fun downloadLocation(context: Context): String {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            context.filesDir
+                .toString() + "/" + artist + title + version + "." + Settings.getSettings(
+                context
+            ).getString("downloadType")
+        } else {
+            context.getExternalFilesDir(null)
+                .toString() + "/" + artist + title + version + "." + Settings.getSettings(
+                context
+            ).getString("downloadType")
         }
+    }
 
-    val downloadUrl: String
-        get() = if (Settings.getSettings(context)
+    fun downloadUrl(context: Context): String {
+        return if (Settings.getSettings(context)
                 .getBoolean(context.getString(R.string.useCustomApiForEverythingSetting)) == true && Settings.getSettings(
                 context
             ).getBoolean(context.getString(R.string.customApiSupportsV1Setting)) == true
@@ -128,9 +126,15 @@ data class Song(
                 context
             ).getString("downloadType")
         }
+    }
 
-    private val streamUrl: String
-        get() = if (Settings.getSettings(context)
+    fun deleteDownload(context: Context){
+        File(downloadLocation(context)).delete()
+    }
+
+    private fun streamUrl(context: Context): String {
+        return if (
+            Settings.getSettings(context)
                 .getBoolean(context.getString(R.string.useCustomApiForEverythingSetting)) == true && Settings.getSettings(
                 context
             ).getBoolean(context.getString(R.string.customApiSupportsV1Setting)) == true
@@ -140,16 +144,23 @@ data class Song(
         } else {
             context.getString(R.string.trackContentUrl) + albumId + "/track-stream/" + songId
         }
+    }
 
-    val downloaded: Boolean
-        get() = File(downloadLocation).exists()
+    fun downloaded(context: Context): Boolean {
+        return File(downloadLocation(context)).exists()
+    }
 
-    fun getMediaSource(sid: String, cid: String, callback: (mediaSource: MediaSource?) -> Unit) {
-        if (downloaded) {
-            callback(fileToMediaSource(downloadLocation))
+    fun getMediaSource(
+        context: Context,
+        sid: String,
+        cid: String,
+        callback: (mediaSource: MediaSource?) -> Unit
+    ) {
+        if (downloaded(context)) {
+            callback(fileToMediaSource(context, downloadLocation(context)))
         } else {
             if (isStreamable) {
-                urlToMediaSource(streamUrl, sid, cid, callback)
+                urlToMediaSource(context, streamUrl(context), sid, cid, callback)
             } else {
                 callback(null)
             }
@@ -160,10 +171,12 @@ data class Song(
         return wifiConnected(context) || Settings.getSettings(
             context
         )
-            .getBoolean(context.getString(R.string.streamOverMobileSetting)) == true || downloaded
+            .getBoolean(context.getString(R.string.streamOverMobileSetting)) == true || downloaded(
+            context
+        )
     }
 
-    private fun fileToMediaSource(fileLocation: String): ProgressiveMediaSource {
+    private fun fileToMediaSource(context: Context, fileLocation: String): ProgressiveMediaSource {
         return ProgressiveMediaSource.Factory(
             DefaultDataSourceFactory(
                 context, Util.getUserAgent(
@@ -174,6 +187,7 @@ data class Song(
     }
 
     private fun urlToMediaSource(
+        context: Context,
         url: String,
         sid: String,
         cid: String,

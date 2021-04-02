@@ -34,7 +34,6 @@ class SongDatabaseHelper(context: Context) :
     }
 
     fun insertSong(
-        context: Context,
         songId: String,
         title: String,
         version: String,
@@ -63,7 +62,7 @@ class SongDatabaseHelper(context: Context) :
         values.put(Song.COLUMN_CREATOR_FRIENDLY, creatorFriendly.toString())
         values.put(Song.COLUMN_EXPLICIT, explicit.toString())
 
-        if (getSong(context, songId) == null) {
+        if (getSong(songId) == null) {
             val db = writableDatabase
             db.insert(Song.TABLE_NAME, null, values)
 
@@ -83,7 +82,7 @@ class SongDatabaseHelper(context: Context) :
         return songId
     }
 
-    fun getSong(context: Context, songId: String): Song? {
+    fun getSong(songId: String): Song? {
         val db = readableDatabase
         val cursor: Cursor
 
@@ -111,7 +110,6 @@ class SongDatabaseHelper(context: Context) :
 
             try {
                 val song = Song(
-                    context,
                     cursor.getString(cursor.getColumnIndex(Song.COLUMN_SONG_ID)),
                     cursor.getString(cursor.getColumnIndex(Song.COLUMN_TITLE)),
                     cursor.getString(cursor.getColumnIndex(Song.COLUMN_VERSION)),

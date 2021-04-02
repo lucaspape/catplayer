@@ -98,15 +98,15 @@ open class HomeCatalogRecyclerPage : RecyclerViewPage() {
     ) {
         if (item is CatalogItem) {
             val songDatabaseHelper = SongDatabaseHelper(context)
-            val song = songDatabaseHelper.getSong(context, item.songId)
+            val song = songDatabaseHelper.getSong(item.songId)
 
             withContext(Dispatchers.Main) {
                 song?.let {
                     when {
-                        song.downloaded -> {
-                            File(song.downloadLocation).delete()
+                        song.downloaded(context) -> {
+                            song.deleteDownload(context)
 
-                            downloadImageButton.setImageURI(CatalogItem.getSongDownloadStatus(song))
+                            downloadImageButton.setImageURI(CatalogItem.getSongDownloadStatus(context, song))
                         }
                         else -> {
                             addDownloadSong(
@@ -114,7 +114,7 @@ open class HomeCatalogRecyclerPage : RecyclerViewPage() {
                                 item.songId
                             ) {
                                 downloadImageButton.setImageURI(
-                                    CatalogItem.getSongDownloadStatus(song)
+                                    CatalogItem.getSongDownloadStatus(context, song)
                                 )
                             }
                         }
@@ -130,7 +130,7 @@ open class HomeCatalogRecyclerPage : RecyclerViewPage() {
         if(hideToBeSkipped == true){
             val songDatabaseHelper = SongDatabaseHelper(view.context)
 
-            songDatabaseHelper.getSong(view.context, item.itemId)?.let{
+            songDatabaseHelper.getSong(item.itemId)?.let{
                 if(!filter(it)){
                     return CatalogItem(item.itemId)
                 }

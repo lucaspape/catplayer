@@ -1,5 +1,6 @@
 package de.lucaspape.monstercat.ui.abstract_items.content
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -34,16 +35,16 @@ open class CatalogItem(
 
     companion object {
         @JvmStatic
-        fun getSongDownloadStatus(song: Song): Uri {
+        fun getSongDownloadStatus(context:Context, song: Song): Uri {
             return if (song.inEarlyAccess) {
                 when {
-                    song.downloaded -> offlineDrawableBlack.toUri()
+                    song.downloaded(context) -> offlineDrawableBlack.toUri()
                     song.isDownloadable -> downloadDrawableBlack.toUri()
                     else -> pawDrawable.toUri()
                 }
             } else {
                 when {
-                    song.downloaded -> offlineDrawable.toUri()
+                    song.downloaded(context) -> offlineDrawable.toUri()
                     song.isDownloadable -> downloadDrawable.toUri()
                     else -> emptyDrawable.toUri()
                 }
@@ -60,11 +61,11 @@ open class CatalogItem(
 
             val id = contentList[listViewPosition]
 
-            SongDatabaseHelper(view.context).getSong(view.context, id)?.let { song ->
+            SongDatabaseHelper(view.context).getSong(id)?.let { song ->
                 val itemList = ArrayList<AlertListItem>()
 
                 if (song.isDownloadable) {
-                    if (song.downloaded) {
+                    if (song.downloaded(view.context)) {
                         itemList.add(AlertListItem(
                             view.context.getString(R.string.deleteDownload),
                             deleteDrawable
@@ -115,7 +116,7 @@ open class CatalogItem(
                             view.context,
                             song.songId
                         ) {}
-                        view.context.getString(R.string.deleteDownload) -> File(song.downloadLocation).delete()
+                        view.context.getString(R.string.deleteDownload) -> song.deleteDownload(view.context)
                         view.context.getString(R.string.addToQueue) -> addToPriorityQueue(id)
                         view.context.getString(R.string.addToPlaylist) -> addSongToPlaylist(
                             view,
@@ -150,9 +151,9 @@ open class CatalogItem(
 
             val id = data[listViewPosition]
 
-            SongDatabaseHelper(view.context).getSong(view.context, id)?.let { song ->
+            SongDatabaseHelper(view.context).getSong(id)?.let { song ->
                 if (song.isDownloadable) {
-                    if (song.downloaded) {
+                    if (song.downloaded(view.context)) {
                         itemList.add(AlertListItem(
                             view.context.getString(R.string.deleteDownload),
                             deleteDrawable
@@ -203,7 +204,7 @@ open class CatalogItem(
                         view.context.getString(R.string.download) -> {
                             addDownloadSong(view.context, song.songId) {}
                         }
-                        view.context.getString(R.string.deleteDownload) -> File(song.downloadLocation).delete()
+                        view.context.getString(R.string.deleteDownload) -> song.deleteDownload(view.context)
                         view.context.getString(R.string.addToQueue) -> {
                             addToPriorityQueue(id)
                         }
@@ -258,7 +259,7 @@ open class CatalogItem(
 
         override fun bindView(item: CatalogItem, payloads: List<Any>) {
             val songDatabaseHelper = SongDatabaseHelper(context)
-            val song = songDatabaseHelper.getSong(context, item.songId)
+            val song = songDatabaseHelper.getSong(item.songId)
 
             song?.let {
                 if(song.explicit){
@@ -290,7 +291,7 @@ open class CatalogItem(
                     }
                 }, song.albumId, true)
 
-                titleDownloadButton.setImageURI(getSongDownloadStatus(song))
+                titleDownloadButton.setImageURI(getSongDownloadStatus(context, song))
 
                 preDownloadCallbacks[song.songId] = {
                     if (song.inEarlyAccess) {

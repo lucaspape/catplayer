@@ -36,13 +36,13 @@ fun prepareSong(
         preparedExoPlayer = SimpleExoPlayer.Builder(context).build()
         preparedExoPlayer?.setAudioAttributes(getAudioAttributes(), false)
 
-        val song = SongDatabaseHelper(context).getSong(context, songId)
+        val song = SongDatabaseHelper(context).getSong(songId)
         val stream = StreamDatabaseHelper(context).getStream(songId)
 
         if (song != null && stream == null) {
             if (song.playbackAllowed(context)
             ) {
-                song.getMediaSource(connectSid, cid) { mediaSource ->
+                song.getMediaSource(context, connectSid, cid) { mediaSource ->
                     if (mediaSource != null) {
                         preparedExoPlayer?.setMediaSource(mediaSource)
                         preparedExoPlayer?.prepare()
@@ -137,7 +137,7 @@ fun playSong(
         )
 
         //show title, artist, cover
-        SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
+        SongDatabaseHelper(context).getSong(songId)?.let { song ->
             //set title/artist
             title = song.shownTitle
             artist = song.artist

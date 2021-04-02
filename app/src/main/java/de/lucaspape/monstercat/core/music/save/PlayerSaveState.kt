@@ -30,10 +30,10 @@ data class PlayerSaveState(
         private const val serialVersionUID = 158352511676231
 
         @JvmStatic
-        var restored = false
+        private var restored = false
 
         @JvmStatic
-        fun restoreMusicPlayerState(context: Context, force: Boolean) {
+        fun restore(context: Context, force: Boolean) {
             if (!restored || force) {
                 try {
                     try {
@@ -70,11 +70,11 @@ data class PlayerSaveState(
                                     duration = sDuration.toInt()
                                 }
                             } catch (e: ClassNotFoundException) {
-                                File((context.cacheDir.toString() + "/player_state.obj")).delete()
+                                delete(context)
                             }
 
                         } catch (e: TypeCastException) {
-                            File((context.cacheDir.toString() + "/player_state.obj")).delete()
+                            delete(context)
                         }
                     } catch (e: EOFException) {
 
@@ -88,7 +88,7 @@ data class PlayerSaveState(
         }
 
         @JvmStatic
-        fun saveMusicPlayerState(context: Context) {
+        fun save(context: Context) {
             val objectOutputStream =
                 ObjectOutputStream(FileOutputStream(File(context.cacheDir.toString() + "/player_state.obj")))
 
@@ -112,6 +112,15 @@ data class PlayerSaveState(
                 objectOutputStream.flush()
                 objectOutputStream.close()
             } catch (e: ConcurrentModificationException) {
+
+            }
+        }
+
+        @JvmStatic
+        fun delete(context: Context){
+            try {
+                File("${context.cacheDir}/player_state.obj").delete()
+            } catch (e: FileNotFoundException) {
 
             }
         }

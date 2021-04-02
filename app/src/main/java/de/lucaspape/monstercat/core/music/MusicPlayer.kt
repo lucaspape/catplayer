@@ -133,7 +133,7 @@ class NoisyReceiver : BroadcastReceiver() {
  */
 fun createMediaSession(context: Context) {
     if (!sessionCreated || mediaSession == null) {
-        PlayerSaveState.restoreMusicPlayerState(context, false)
+        PlayerSaveState.restore(context, false)
 
         mediaSession = MediaSessionCompat.fromMediaSession(
             context,
@@ -199,7 +199,7 @@ fun next(context: Context) {
         progress = null
     )
 
-    PlayerSaveState.saveMusicPlayerState(context)
+    PlayerSaveState.save(context)
 }
 
 /**
@@ -213,7 +213,7 @@ fun previous(context: Context) {
         progress = null
     )
 
-    PlayerSaveState.saveMusicPlayerState(context)
+    PlayerSaveState.save(context)
 }
 
 /**
@@ -223,7 +223,7 @@ fun pause(context: Context) {
     exoPlayer?.playWhenReady = false
     visiblePlaying = false
 
-    PlayerSaveState.saveMusicPlayerState(context)
+    PlayerSaveState.save(context)
 }
 
 /**
@@ -246,7 +246,7 @@ fun resume(context: Context) {
         progress = currentPosition.toLong()
     )
 
-    PlayerSaveState.saveMusicPlayerState(context)
+    PlayerSaveState.save(context)
 }
 
 /**
@@ -271,7 +271,7 @@ fun stop(context: Context) {
 
         exoPlayer?.stop()
 
-        PlayerSaveState.saveMusicPlayerState(context)
+        PlayerSaveState.save(context)
 
     }
 
@@ -487,7 +487,7 @@ val currentSongId: String
  * Get albumId of current song (needed for album cover)
  */
 fun getCurrentAlbumId(context: Context): String {
-    SongDatabaseHelper(context).getSong(context, currentSongId)?.let { song ->
+    SongDatabaseHelper(context).getSong(currentSongId)?.let { song ->
         return song.albumId
     }
 
@@ -544,7 +544,7 @@ fun loadRelatedSongs(context: Context, playAfter: Boolean) {
             val songDatabaseHelper = SongDatabaseHelper(context)
 
             it.forEach { songId ->
-                songDatabaseHelper.getSong(context, songId)?.let { song ->
+                songDatabaseHelper.getSong(songId)?.let { song ->
                     if(!filter(song)){
                         filteredList.add(songId)
                     }
@@ -620,14 +620,14 @@ fun addToQueue(context: Context, songId: String, ignoreFilters:Boolean){
     if(ignoreFilters){
         songQueue.add(songId)
     }else{
-        SongDatabaseHelper(context).getSong(context, songId)?.let {
+        SongDatabaseHelper(context).getSong(songId)?.let {
             addToQueue(it)
         }
     }
 }
 
 fun addToQueue(context: Context, songId: String){
-    SongDatabaseHelper(context).getSong(context, songId)?.let {
+    SongDatabaseHelper(context).getSong(songId)?.let {
         addToQueue(it)
     }
 }

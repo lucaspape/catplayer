@@ -39,7 +39,7 @@ var fallbackFileLow = File("")
 private var bitmapCache: LruCache<String, Bitmap>? = null
 
 fun addDownloadSong(context: Context, songId: String, downloadFinished: () -> Unit) {
-    if (SongDatabaseHelper(context).getSong(context, songId)?.isDownloadable == true) {
+    if (SongDatabaseHelper(context).getSong(songId)?.isDownloadable == true) {
         preDownloadCallbacks[songId]?.let {
             it()
         }

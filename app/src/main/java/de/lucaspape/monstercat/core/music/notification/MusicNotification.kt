@@ -207,7 +207,7 @@ fun stopPlayerService(context: Context) {
 }
 
 fun updateNotification(context: Context, songId: String, bitmap: Bitmap) {
-    SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
+    SongDatabaseHelper(context).getSong(songId)?.let { song ->
         updateNotification(context, song.shownTitle, song.artist, bitmap)
     }
 }

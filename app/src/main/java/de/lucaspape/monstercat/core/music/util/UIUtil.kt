@@ -99,7 +99,7 @@ var loadingRelatedSongs = false
     }
 
 fun setCover(context: Context, songId: String, callback: (bitmap: Bitmap) -> Unit) {
-    SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
+    SongDatabaseHelper(context).getSong(songId)?.let { song ->
         setCover(context, song.albumId, song.artistId, callback)
     }
 }

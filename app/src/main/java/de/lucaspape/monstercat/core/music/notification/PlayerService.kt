@@ -37,7 +37,7 @@ class PlayerService : Service() {
         )
 
         intent?.getStringExtra("songId")?.let { songId ->
-            SongDatabaseHelper(this).getSong(this, songId)?.let { song ->
+            SongDatabaseHelper(this).getSong(songId)?.let { song ->
                 setCover(
                     this,
                     song.albumId,

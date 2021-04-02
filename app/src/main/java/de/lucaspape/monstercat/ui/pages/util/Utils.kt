@@ -101,7 +101,6 @@ fun playPlaylistNextAsync(context: Context, playlistId: String) {
             val songDatabaseHelper = SongDatabaseHelper(context)
 
             songDatabaseHelper.getSong(
-                context,
                 playlistItemList[0].songId
             )?.songId?.let { songId ->
                 addToPriorityQueue(songId)
@@ -109,7 +108,6 @@ fun playPlaylistNextAsync(context: Context, playlistId: String) {
 
             for (i in (1 until playlistItemList.size)) {
                 songDatabaseHelper.getSong(
-                    context,
                     playlistItemList[i].songId
                 )?.songId?.let { songId ->
                     addToPriorityQueue(songId)
@@ -131,7 +129,7 @@ fun downloadPlaylistAsync(view: View, playlistId: String, downloadFinished: () -
 
             for (playlistItem in playlistItemList) {
                 val songDatabaseHelper = SongDatabaseHelper(view.context)
-                val song = songDatabaseHelper.getSong(view.context, playlistItem.songId)
+                val song = songDatabaseHelper.getSong(playlistItem.songId)
 
                 song?.songId?.let { addDownloadSong(view.context, it, downloadFinished) }
             }
@@ -168,11 +166,9 @@ fun deleteDownloadedPlaylistTracks(
         val songDatabaseHelper = SongDatabaseHelper(context)
 
         for (playlistItem in playlistItemList) {
-            val song = songDatabaseHelper.getSong(context, playlistItem.songId)
+            val song = songDatabaseHelper.getSong(playlistItem.songId)
 
-            song?.let {
-                File(song.downloadLocation).delete()
-            }
+            song?.deleteDownload(context)
         }
 
         deleteFinished()
@@ -204,7 +200,7 @@ fun downloadAlbum(view: View, mcID: String) {
             val databaseHelper = SongDatabaseHelper(view.context)
 
             for (id in idArray) {
-                val song = databaseHelper.getSong(view.context, id)
+                val song = databaseHelper.getSong(id)
                 song?.songId?.let { addDownloadSong(view.context, it) {} }
             }
         },

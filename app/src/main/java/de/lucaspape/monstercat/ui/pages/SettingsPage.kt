@@ -27,6 +27,7 @@ import de.lucaspape.monstercat.core.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.core.music.applyFilterSettings
 import de.lucaspape.monstercat.core.music.crossfade
 import de.lucaspape.monstercat.core.music.playRelatedSongsAfterPlaylistFinished
+import de.lucaspape.monstercat.core.music.save.PlayerSaveState
 import de.lucaspape.monstercat.core.music.volume
 import de.lucaspape.monstercat.ui.abstract_items.settings.*
 import de.lucaspape.monstercat.ui.activities.MainActivity
@@ -39,8 +40,6 @@ import de.lucaspape.monstercat.ui.abstract_items.util.SpacerItem
 import de.lucaspape.monstercat.ui.activities.genericScope
 import de.lucaspape.monstercat.ui.pages.util.Page
 import kotlinx.coroutines.launch
-import java.io.File
-import java.io.FileNotFoundException
 import kotlin.math.log
 
 /**
@@ -82,7 +81,7 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page() {
 
     override val layout: Int = R.layout.fragment_settings
 
-    override fun onBackPressed(view: View):Boolean {
+    override fun onBackPressed(view: View): Boolean {
         closeSettings()
         return false
     }
@@ -208,12 +207,6 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page() {
         val changeSetting: (setting: String, value: Boolean, switch: SwitchMaterial) -> Boolean =
             { setting, value, _ ->
                 settings.setBoolean(setting, value)
-                value
-            }
-
-        val changeFilterSetting: (setting: String, value: Boolean, switch: SwitchMaterial) -> Boolean =
-            { setting, value, _ ->
-                settings.setBoolean(setting, value)
                 applyFilterSettings(view.context)
                 value
             }
@@ -224,7 +217,7 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page() {
                 true,
                 view.context.getString(R.string.dontPlayNotCreatorFriendly),
                 null,
-                changeFilterSetting
+                changeSetting
             )
         )
 
@@ -234,7 +227,7 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page() {
                 true,
                 view.context.getString(R.string.skipSongsMonstercat),
                 null,
-                changeFilterSetting
+                changeSetting
             )
         )
 
@@ -244,7 +237,7 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page() {
                 true,
                 view.context.getString(R.string.skipExplicitSongs),
                 null,
-                changeFilterSetting
+                changeSetting
             )
         )
 
@@ -254,7 +247,7 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page() {
                 true,
                 view.context.getString(R.string.hideToBeSkipped),
                 null,
-                changeFilterSetting
+                changeSetting
             )
         )
 
@@ -289,11 +282,7 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page() {
                         PlaylistDatabaseHelper(view.context).reCreateTable(view.context, true)
                         ManualPlaylistDatabaseHelper(view.context).reCreateTable(view.context, true)
 
-                        try {
-                            File("${view.context.cacheDir}/player_state.obj").delete()
-                        } catch (e: FileNotFoundException) {
-
-                        }
+                        PlayerSaveState.delete(view.context)
 
                         val intent = Intent(view.context, MainActivity::class.java)
                         intent.addFlags(FLAG_ACTIVITY_NEW_TASK)

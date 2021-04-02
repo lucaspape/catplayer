@@ -39,8 +39,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
-import java.io.FileNotFoundException
 
 var downloadServiceIntent: Intent? = null
 var lastOpenPage: String? = null
@@ -187,11 +185,7 @@ class MainActivity : AppCompatActivity() {
     private fun onUpgrade() {
         val settings = Settings.getSettings(this)
 
-        try {
-            File("$cacheDir/player_state.obj").delete()
-        } catch (e: FileNotFoundException) {
-
-        }
+        PlayerSaveState.delete(this)
 
         settings.setString(
             getString(R.string.appVersionSetting),
@@ -264,7 +258,7 @@ class MainActivity : AppCompatActivity() {
         //if app closed
         hideDownloadNotification(this)
 
-        PlayerSaveState.saveMusicPlayerState(this)
+        PlayerSaveState.save(this)
 
         exoPlayerSongId = ""
         preparedExoPlayerSongId = ""
@@ -273,7 +267,7 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
 
-        PlayerSaveState.saveMusicPlayerState(this)
+        PlayerSaveState.save(this)
     }
 
     private fun changeTheme() {

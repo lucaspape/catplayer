@@ -30,16 +30,15 @@ class DownloadTask(private val weakReference: WeakReference<Context>) :
                     downloadList[downloadedSongs].get()?.let { currentDownloadObject ->
                         val currentDownloadSong =
                             songDatabaseHelper.getSong(
-                                context,
                                 currentDownloadObject.songId
                             )
 
                         currentDownloadSong?.let {
                             if (currentDownloadSong.isDownloadable) {
-                                if (!File(currentDownloadSong.downloadLocation).exists()) {
+                                if (!currentDownloadSong.downloaded(context)) {
                                     downloadFile(
-                                        currentDownloadSong.downloadLocation,
-                                        currentDownloadSong.downloadUrl,
+                                        currentDownloadSong.downloadLocation(context),
+                                        currentDownloadSong.downloadUrl(context),
                                         context.cacheDir.toString(),
                                         connectSid,
                                         cid

@@ -25,7 +25,7 @@ suspend fun addToPlaylist(
     errorCallback: () -> Unit
 ) {
     withContext(Dispatchers.Default) {
-        SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
+        SongDatabaseHelper(context).getSong(songId)?.let { song ->
             val addToPlaylistQueue =
                 getAuthorizedRequestQueue(
                     context,
@@ -196,7 +196,7 @@ suspend fun deletePlaylistTrack(
     errorCallback: () -> Unit
 ) {
     withContext(Dispatchers.Default) {
-        SongDatabaseHelper(context).getSong(context, songId)?.let { song ->
+        SongDatabaseHelper(context).getSong(songId)?.let { song ->
             val deleteSongVolleyQueue =
                 getAuthorizedRequestQueue(
                     context,
@@ -979,7 +979,6 @@ suspend fun loadLiveStreams(
 
                         streamDatabaseHelper.insertStream(streamUrl, "", name)
                         songDatabaseHelper.insertSong(
-                            context,
                             name,
                             "Livestream - $name",
                             "",
