@@ -487,12 +487,18 @@ class MainActivity : AppCompatActivity() {
 
     private fun openSettings() {
         openPage(
-            SettingsPage {
+            SettingsPage({ openFilterSettings() }) {
                 findViewById<BottomNavigationView>(R.id.nav_view).selectedItemId =
                     R.id.navigation_home
             }
 
         )
+    }
+
+    private fun openFilterSettings() {
+        openPage(FilterPage {
+            openSettings()
+        })
     }
 
     private fun openExplore(resetPosition: Boolean) {

@@ -18,6 +18,7 @@ import com.mikepenz.fastadapter.scroll.EndlessRecyclerOnScrollListener
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.util.Settings
 import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
+import de.lucaspape.monstercat.ui.abstract_items.content.FilterItem
 import de.lucaspape.monstercat.ui.abstract_items.content.PlaylistItem
 import de.lucaspape.monstercat.ui.abstract_items.content.QueueItem
 import de.lucaspape.monstercat.ui.abstract_items.util.HeaderTextItem
@@ -193,6 +194,9 @@ abstract class RecyclerViewPage {
                             viewHolder.titleMenuButton
                         }
                         is QueueItem.ViewHolder -> {
+                            viewHolder.titleMenuButton
+                        }
+                        is FilterItem.ViewHolder -> {
                             viewHolder.titleMenuButton
                         }
                         else -> null

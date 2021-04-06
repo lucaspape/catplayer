@@ -160,12 +160,9 @@ class Settings {
             setString(context.getString(R.string.customApiBaseUrlSetting), defaultCustomApiBaseUrl)
         }
 
-        if (getString(context.getString(R.string.skipMonstercatSongsSetting)) == null || overwrite) {
-            setBoolean(
-                context.getString(R.string.skipMonstercatSongsSetting),
-                defaultSkipSongsFromMonstercat
-            )
-        }
+        //TODO
+
+
 
         if (getString(context.getString(R.string.useCustomApiForCoverImagesSetting)) == null || overwrite) {
             setBoolean(

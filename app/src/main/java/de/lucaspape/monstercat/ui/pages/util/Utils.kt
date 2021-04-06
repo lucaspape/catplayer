@@ -755,3 +755,71 @@ fun playSongsFromViewDataAsync(
         }
     }, {}).execute()
 }
+
+fun addFilter(view:View, callback: () -> Unit){
+    val alertListItem = arrayListOf(
+        AlertListItem(
+            "Artist Filter",
+            emptyDrawable
+        ),
+        AlertListItem(
+            "Title Filter",
+            emptyDrawable
+        )
+    )
+
+    displayAlertDialogList(
+        view.context,
+        HeaderTextItem(""),
+        alertListItem
+    ) { _: Int, item: AlertListItem ->
+        MaterialAlertDialogBuilder(view.context).apply {
+            val artistFilter = item.itemText == "Artist Filter"
+
+            val layoutInflater =
+                context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+
+            val filterInputLayout =
+                layoutInflater.inflate(R.layout.filter_input_layout, null)
+
+            val filterEditText =
+                filterInputLayout.findViewById<EditText>(R.id.filter_input)
+
+            if (artistFilter) {
+                filterEditText.hint = "Artist"
+            }
+
+            if (artistFilter) {
+                setTitle("Add artist filter")
+            } else {
+                setTitle("Add title filter")
+            }
+
+            setPositiveButton(context.getString(R.string.ok)) { _, _ ->
+                val filter = filterEditText.text.toString()
+
+                if(artistFilter){
+                    FilterDatabaseHelper(view.context).insertFilter("artist", filter)
+                }else{
+                    FilterDatabaseHelper(view.context).insertFilter("title", filter)
+                }
+
+                callback()
+            }
+
+            setView(filterInputLayout)
+            setCancelable(true)
+        }.create().run {
+            show()
+
+            val typedValue = TypedValue()
+            context.theme.resolveAttribute(R.attr.colorOnSurface, typedValue, true)
+
+            val positiveButton = getButton(DialogInterface.BUTTON_POSITIVE)
+            positiveButton.setTextColor(typedValue.data)
+
+            val negativeButton = getButton(DialogInterface.BUTTON_NEGATIVE)
+            negativeButton.setTextColor(typedValue.data)
+        }
+    }
+}

@@ -20,10 +20,7 @@ import com.mikepenz.fastadapter.GenericItem
 import com.mikepenz.fastadapter.adapters.ItemAdapter
 import com.mikepenz.fastadapter.listeners.ClickEventHook
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.core.database.helper.AlbumDatabaseHelper
-import de.lucaspape.monstercat.core.database.helper.ItemDatabaseHelper
-import de.lucaspape.monstercat.core.database.helper.ManualPlaylistDatabaseHelper
-import de.lucaspape.monstercat.core.database.helper.PlaylistDatabaseHelper
+import de.lucaspape.monstercat.core.database.helper.*
 import de.lucaspape.monstercat.core.music.applyFilterSettings
 import de.lucaspape.monstercat.core.music.crossfade
 import de.lucaspape.monstercat.core.music.playRelatedSongsAfterPlaylistFinished
@@ -45,8 +42,11 @@ import kotlin.math.log
 /**
  * SettingsActivity
  */
-class SettingsPage(private val closeSettings: () -> Unit) : Page() {
-    constructor() : this({})
+class SettingsPage(
+    private val openFilterSettings: () -> Unit,
+    private val closeSettings: () -> Unit
+) : Page() {
+    constructor() : this({}, {})
 
     companion object {
         @JvmStatic
@@ -64,6 +64,7 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page() {
         )
 
         addLogin(view)
+
         addPlaybackSettings(view)
         addDataSettings(view)
         addAdvancedSettings(view)
@@ -131,7 +132,7 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page() {
                 item: GenericItem
             ) {
                 if (item is SettingsToggleItem && v is SwitchMaterial) {
-                    v.isChecked = item.onSwitchChange(item.setting, v.isChecked, v)
+                    v.isChecked = item.onSwitchChange(v.isChecked, v)
                 } else if (item is SettingsButtonItem && v is Button) {
                     item.onClick()
                 } else if (item is SettingsLoginItem) {
@@ -158,37 +159,55 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page() {
             )
         )
 
-        val changeSetting: (setting: String, value: Boolean, switch: SwitchMaterial) -> Boolean =
-            { setting, value, _ ->
-                settings.setBoolean(setting, value)
-                value
-            }
-
         itemAdapter.add(
             SettingsToggleItem(
-                view.context.getString(R.string.streamOverMobileSetting),
+                {
+                    settings.getBoolean(view.context.getString(R.string.streamOverMobileSetting))
+                },
                 true,
                 view.context.getString(R.string.allowStreamMobile),
                 null,
-                changeSetting
+                { value, _ ->
+                    settings.setBoolean(
+                        view.context.getString(R.string.streamOverMobileSetting),
+                        value
+                    )
+                    value
+                }
             )
         )
         itemAdapter.add(
             SettingsToggleItem(
-                view.context.getString(R.string.downloadOverMobileSetting),
+                {
+                    settings.getBoolean(view.context.getString(R.string.downloadOverMobileSetting))
+                },
                 true,
                 view.context.getString(R.string.allowDownloadMobile),
                 null,
-                changeSetting
+                { value, _ ->
+                    settings.setBoolean(
+                        view.context.getString(R.string.downloadOverMobileSetting),
+                        value
+                    )
+                    value
+                }
             )
         )
         itemAdapter.add(
             SettingsToggleItem(
-                view.context.getString(R.string.downloadCoversOverMobileSetting),
+                {
+                    settings.getString(view.context.getString(R.string.downloadCoversOverMobileSetting))
+                },
                 true,
                 view.context.getString(R.string.allowCoverDownloadMobile),
                 null,
-                changeSetting
+                { value, _ ->
+                    settings.setBoolean(
+                        view.context.getString(R.string.downloadCoversOverMobileSetting),
+                        value
+                    )
+                    value
+                }
             )
         )
 
@@ -204,62 +223,156 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page() {
             )
         )
 
-        val changeSetting: (setting: String, value: Boolean, switch: SwitchMaterial) -> Boolean =
-            { setting, value, _ ->
-                settings.setBoolean(setting, value)
+        itemAdapter.add(
+            SettingsToggleItem(
+                {
+                    var filterExists = false
+
+                    FilterDatabaseHelper(view.context).getAllFilters().forEach {
+                        if(it.filterType == "special" && it.filter == "non-creator-friendly"){
+                            filterExists = true
+                        }
+                    }
+
+                    filterExists
+                },
+                true,
+                view.context.getString(R.string.dontPlayNotCreatorFriendly),
+                null
+            ) { value, _ ->
+                if (value) {
+                    FilterDatabaseHelper(view.context).insertFilter(
+                        "special",
+                        "non-creator-friendly"
+                    )
+                } else {
+                    val removeIds = ArrayList<Int>()
+
+                    FilterDatabaseHelper(view.context).getAllFilters().forEach {
+                        if(it.filterType == "special" && it.filter == "non-creator-friendly"){
+                            removeIds.add(it.id)
+                        }
+                    }
+
+                    removeIds.forEach {
+                        FilterDatabaseHelper(view.context).removeFilter(it)
+                    }
+                }
+
+                applyFilterSettings(view.context)
+
+                value
+            }
+        )
+
+        itemAdapter.add(
+            SettingsToggleItem(
+                {
+                    var filterExists = false
+
+                    FilterDatabaseHelper(view.context).getAllFilters().forEach {
+                        if(it.filterType == "artist" && it.filter == "monstercat"){
+                            filterExists = true
+                        }
+                    }
+
+                    filterExists
+                },
+                true,
+                view.context.getString(R.string.skipSongsMonstercat),
+                null
+            ) { value, _ ->
+                if (value) {
+                    FilterDatabaseHelper(view.context).insertFilter("artist", "monstercat")
+                } else {
+                    val removeIds = ArrayList<Int>()
+
+                    FilterDatabaseHelper(view.context).getAllFilters().forEach {
+                        if(it.filterType == "artist" && it.filter == "monstercat"){
+                            removeIds.add(it.id)
+                        }
+                    }
+
+                    removeIds.forEach {
+                        FilterDatabaseHelper(view.context).removeFilter(it)
+                    }
+                }
+
+                applyFilterSettings(view.context)
+
+                value
+            }
+        )
+
+        itemAdapter.add(
+            SettingsToggleItem(
+                {
+                    var filterExists = false
+
+                    FilterDatabaseHelper(view.context).getAllFilters().forEach {
+                        if(it.filterType == "special" && it.filter == "explicit"){
+                            filterExists = true
+                        }
+                    }
+
+                    filterExists
+                },
+                true,
+                view.context.getString(R.string.skipExplicitSongs),
+                null
+            ) { value, _ ->
+                if (value) {
+                    FilterDatabaseHelper(view.context).insertFilter("special", "explicit")
+                } else {
+                    val removeIds = ArrayList<Int>()
+
+                    FilterDatabaseHelper(view.context).getAllFilters().forEach {
+                        if(it.filterType == "special" && it.filter == "explicit"){
+                            removeIds.add(it.id)
+                        }
+                    }
+
+                    removeIds.forEach {
+                        FilterDatabaseHelper(view.context).removeFilter(it)
+                    }
+                }
+
+                applyFilterSettings(view.context)
+
+                value
+            }
+        )
+
+        itemAdapter.add(
+            SettingsToggleItem(
+                {
+                    settings.getBoolean(view.context.getString(R.string.hideToBeSkippedSetting))
+                },
+                true,
+                view.context.getString(R.string.hideToBeSkipped),
+                null
+            ) { value, _ ->
+                settings.setBoolean(view.context.getString(R.string.hideToBeSkippedSetting), value)
                 applyFilterSettings(view.context)
                 value
             }
-
-        itemAdapter.add(
-            SettingsToggleItem(
-                view.context.getString(R.string.blockNonCreatorFriendlySetting),
-                true,
-                view.context.getString(R.string.dontPlayNotCreatorFriendly),
-                null,
-                changeSetting
-            )
         )
 
-        itemAdapter.add(
-            SettingsToggleItem(
-                view.context.getString(R.string.skipMonstercatSongsSetting),
-                true,
-                view.context.getString(R.string.skipSongsMonstercat),
-                null,
-                changeSetting
-            )
-        )
+        itemAdapter.add(SettingsButtonItem("Adjust filters") {
+            openFilterSettings()
+        })
 
         itemAdapter.add(
             SettingsToggleItem(
-                view.context.getString(R.string.skipExplicitSongsSetting),
-                true,
-                view.context.getString(R.string.skipExplicitSongs),
-                null,
-                changeSetting
-            )
-        )
-
-        itemAdapter.add(
-            SettingsToggleItem(
-                view.context.getString(R.string.hideToBeSkippedSetting),
-                true,
-                view.context.getString(R.string.hideToBeSkipped),
-                null,
-                changeSetting
-            )
-        )
-
-        itemAdapter.add(
-            SettingsToggleItem(
-                view.context.getString(R.string.playRelatedSetting),
+                {
+                    settings.getBoolean(view.context.getString(R.string.playRelatedSetting))
+                },
                 true,
                 view.context.getString(R.string.playRelatedAfter),
                 view.context.getString(R.string.customApiSupportsPlayingRelatedSongsSetting)
-            ) { setting, value, _ ->
+            ) { value, _ ->
                 playRelatedSongsAfterPlaylistFinished = value
-                settings.setBoolean(setting, value)
+                settings.setBoolean(view.context.getString(R.string.playRelatedSetting), value)
                 value
             }
         )
@@ -409,41 +522,53 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page() {
             )
         )
 
-        val changeSetting: (setting: String, value: Boolean, switch: SwitchMaterial) -> Boolean =
-            { setting, value, _ ->
-                settings.setBoolean(setting, value)
-                value
-            }
-
         itemAdapter.add(
             SettingsToggleItem(
-                view.context.getString(R.string.disableAudioFocusSetting),
+                {
+                    settings.getBoolean(view.context.getString(R.string.disableAudioFocusSetting))
+                },
                 true,
                 view.context.getString(R.string.disableAudioFocusSwitch),
                 null,
-                changeSetting
+                { value, _ ->
+                    settings.setBoolean(
+                        view.context.getString(R.string.disableAudioFocusSetting),
+                        value
+                    )
+                    value
+                }
             )
         )
 
         itemAdapter.add(
             SettingsToggleItem(
-                context.getString(R.string.saveCoverImagesToCacheSetting),
+                {
+                    settings.getBoolean(context.getString(R.string.saveCoverImagesToCacheSetting))
+                },
                 true,
                 context.getString(R.string.saveCoverImagesToCache),
                 null,
-                changeSetting
+                { value, _ ->
+                    settings.setBoolean(
+                        context.getString(R.string.saveCoverImagesToCacheSetting),
+                        value
+                    )
+                    value
+                }
             )
         )
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             itemAdapter.add(
                 SettingsToggleItem(
-                    context.getString(R.string.darkThemeSetting),
+                    {
+                        settings.getBoolean(context.getString(R.string.darkThemeSetting))
+                    },
                     true,
                     context.getString(R.string.darkThemeSwitch),
                     null
-                ) { setting, value, _ ->
-                    settings.setBoolean(setting, value)
+                ) { value, _ ->
+                    settings.setBoolean(context.getString(R.string.darkThemeSetting), value)
 
                     if (value) {
                         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
@@ -457,15 +582,17 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page() {
 
         itemAdapter.add(
             SettingsToggleItem(
-                context.getString(R.string.downloadTypeSetting),
+                {
+                    settings.getString(context.getString(R.string.downloadTypeSetting))
+                },
                 "flac",
                 context.getString(R.string.downloadFlacInsteadMp3),
                 null
-            ) { setting, value, _ ->
+            ) { value, _ ->
                 if (value) {
-                    settings.setString(setting, "flac")
+                    settings.setString(context.getString(R.string.downloadTypeSetting), "flac")
                 } else {
-                    settings.setString(setting, "mp3_320")
+                    settings.setString(context.getString(R.string.downloadTypeSetting), "mp3_320")
                 }
 
                 return@SettingsToggleItem value
@@ -473,45 +600,74 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page() {
 
         itemAdapter.add(
             SettingsToggleItem(
-                context.getString(R.string.useCustomApiForCoverImagesSetting),
+                {
+                    settings.getBoolean(context.getString(R.string.useCustomApiForCoverImagesSetting))
+                },
                 true,
                 context.getString(R.string.useCustomApiForCoverImages),
-                context.getString(R.string.customApiSupportsV1Setting), changeSetting
+                context.getString(R.string.customApiSupportsV1Setting), { value, _ ->
+                    settings.setBoolean(
+                        context.getString(R.string.useCustomApiForCoverImagesSetting),
+                        value
+                    )
+                    value
+                }
             )
         )
 
         itemAdapter.add(
             SettingsToggleItem(
-                context.getString(R.string.useCustomApiForSearchSetting),
+                {
+                    settings.getBoolean(context.getString(R.string.useCustomApiForSearchSetting))
+                },
                 true,
                 context.getString(R.string.useCustomApiForSearch),
-                context.getString(R.string.customApiSupportsV1Setting), changeSetting
+                context.getString(R.string.customApiSupportsV1Setting), { value, _ ->
+                    settings.setBoolean(
+                        context.getString(R.string.useCustomApiForSearchSetting),
+                        value
+                    )
+                    value
+                }
             )
         )
 
         itemAdapter.add(
             SettingsToggleItem(
-                context.getString(R.string.useCustomApiForCatalogAndAlbumViewSetting),
+                {
+                    settings.getBoolean(context.getString(R.string.useCustomApiForCatalogAndAlbumViewSetting))
+                },
                 true,
                 context.getString(R.string.useCustomApi),
-                context.getString(R.string.customApiSupportsV1Setting), changeSetting
+                context.getString(R.string.customApiSupportsV1Setting), { value, _ ->
+                    settings.setBoolean(
+                        context.getString(R.string.useCustomApiForCatalogAndAlbumViewSetting),
+                        value
+                    )
+                    value
+                }
             )
         )
 
         itemAdapter.add(
             SettingsToggleItem(
-                context.getString(R.string.useCustomApiForEverythingSetting),
+                {
+                    settings.getBoolean(context.getString(R.string.useCustomApiForEverythingSetting))
+                },
                 true,
                 context.getString(R.string.useCustomApiForEverything),
                 context.getString(R.string.customApiSupportsV2Setting)
-            ) { setting, value, switch ->
+            ) { value, switch ->
                 if (value) {
                     //check for custom api features
 
                     genericScope.launch {
                         checkCustomApiFeatures(context, {
                             switch.isChecked = true
-                            settings.setBoolean(setting, true)
+                            settings.setBoolean(
+                                context.getString(R.string.useCustomApiForEverythingSetting),
+                                true
+                            )
                             displaySnackBar(
                                 view,
                                 context.getString(R.string.customApiEnabledMsg),
@@ -520,7 +676,10 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page() {
 
                         }, {
                             switch.isChecked = false
-                            settings.setBoolean(setting, false)
+                            settings.setBoolean(
+                                context.getString(R.string.useCustomApiForEverythingSetting),
+                                false
+                            )
                             displaySnackBar(
                                 view,
                                 context.getString(R.string.customApiEnableError),
@@ -532,7 +691,10 @@ class SettingsPage(private val closeSettings: () -> Unit) : Page() {
 
                     true
                 } else {
-                    settings.setBoolean(setting, false)
+                    settings.setBoolean(
+                        context.getString(R.string.useCustomApiForEverythingSetting),
+                        false
+                    )
                     false
                 }
             })

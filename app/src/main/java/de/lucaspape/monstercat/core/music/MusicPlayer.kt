@@ -9,6 +9,7 @@ import android.media.session.MediaSession
 import android.support.v4.media.session.MediaSessionCompat
 import com.google.android.exoplayer2.SimpleExoPlayer
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.core.database.helper.FilterDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.core.database.objects.Song
 import de.lucaspape.monstercat.core.music.notification.startPlayerService
@@ -167,20 +168,18 @@ fun applyPlayerSettings(context: Context) {
 }
 
 fun applyFilterSettings(context: Context){
-    val settings = Settings.getSettings(context)
-
     filters = HashMap()
 
-    if(settings.getBoolean(context.getString(R.string.skipMonstercatSongsSetting)) == true){
-        addArtistToFilters("Monstercat")
-    }
+    val filterDatabaseHelper = FilterDatabaseHelper(context)
 
-    if(settings.getBoolean(context.getString(R.string.blockNonCreatorFriendlySetting)) == true){
-        addSpecialFilter("creatorFriendly")
-    }
-
-    if(settings.getBoolean(context.getString(R.string.skipExplicitSongsSetting)) == true){
-        addSpecialFilter("explicit")
+    filterDatabaseHelper.getAllFilters().let {
+        it.forEach { filter ->
+            when(filter.filterType){
+                "special" -> addSpecialFilter(filter.filter)
+                "artist" -> addArtistToFilters(filter.filter)
+                "title" -> addTitleFilter(filter.filter)
+            }
+        }
     }
 }
 

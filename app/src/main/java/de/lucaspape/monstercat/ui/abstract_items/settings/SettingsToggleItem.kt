@@ -8,11 +8,11 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.util.Settings
 
 class SettingsToggleItem(
-    val setting: String,
+    val checkValue: () -> Any?,
     val trueValue: Any,
     val itemText: String,
     val requiredApiFeature: String?,
-    val onSwitchChange: (setting: String, value: Boolean, switch: SwitchMaterial) -> Boolean
+    val onSwitchChange: (value: Boolean, switch: SwitchMaterial) -> Boolean
 ) : AbstractItem<SettingsToggleItem.ViewHolder>() {
     override val type: Int = 3006
 
@@ -36,17 +36,17 @@ class SettingsToggleItem(
                     .getBoolean(item.requiredApiFeature) != true
             ) {
                 alertItemSwitch.isEnabled = false
-                item.onSwitchChange(item.setting, false, alertItemSwitch)
+                item.onSwitchChange(false, alertItemSwitch)
             } else {
                 alertItemSwitch.isEnabled = true
             }
 
             if (item.trueValue is Boolean) {
                 alertItemSwitch.isChecked =
-                    Settings.getSettings(context).getBoolean(item.setting) == item.trueValue
+                    item.checkValue() == item.trueValue
             } else if (item.trueValue is String) {
                 alertItemSwitch.isChecked =
-                    Settings.getSettings(context).getString(item.setting) == item.trueValue
+                    item.checkValue() == item.trueValue
             }
         }
 

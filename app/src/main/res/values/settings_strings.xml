@@ -10,7 +10,6 @@
     <string name="secondaryCoverResolutionSetting" translatable="false">secondaryCoverResolution</string>
     <string name="darkThemeSetting" translatable="false">darkTheme</string>
     <string name="downloadTypeSetting" translatable="false">downloadType</string>
-    <string name="skipMonstercatSongsSetting" translatable="false">skipMonstercatSongs</string>
     <string name="crossfadeTimeSetting" translatable="false">crossfadeTime</string>
     <string name="albumViewSelectedSetting" translatable="false">albumViewSelected</string>
     <string name="privacyPolicySetting" translatable="false">privacypolicy</string>
@@ -25,11 +24,9 @@
     <string name="customDownloadUrlSetting" translatable="false">customDownloadUrl</string>
     <string name="customStreamUrlSetting" translatable="false">customStreamUrl</string>
     <string name="enabledPushNotificationTopicsSetting" translatable="false">enabledPushNotificationTopics</string>
-    <string name="blockNonCreatorFriendlySetting" translatable="false">blockNonCreatorFriendly</string>
     <string name="customApiSupportsPlayingRelatedSongsSetting" translatable="false">customApiSupportsPlayingRelatedSongs</string>
     <string name="useCustomApiForSearchSetting" translatable="false">useCustomApiForSearch</string>
     <string name="useCustomApiForCoverImagesSetting" translatable="false">useCustomApiForCoverImages</string>
     <string name="useCustomApiForEverythingSetting" translatable="false">useCustomApiForEverything</string>
-    <string name="skipExplicitSongsSetting" translatable="false">skipExplicitSongs</string>
     <string name="hideToBeSkippedSetting" translatable="false">hideToBeSkipped</string>
 </resources>
