@@ -52,4 +52,6 @@
     <string name="comingUp">Coming Up</string>
     <string name="relatedSongsComingUp">Similar Songs Coming Up</string>
     <string name="publicPlaylists">Monstercat Playlists</string>
+    <string name="addFilter">Add filter</string>
+    <string name="title">Title</string>
 </resources>

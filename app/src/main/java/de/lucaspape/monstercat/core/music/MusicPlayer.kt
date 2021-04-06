@@ -615,16 +615,6 @@ fun pushToPriorityQueue(songId: String){
     prioritySongQueue.push(songId)
 }
 
-fun addToQueue(context: Context, songId: String, ignoreFilters:Boolean){
-    if(ignoreFilters){
-        songQueue.add(songId)
-    }else{
-        SongDatabaseHelper(context).getSong(songId)?.let {
-            addToQueue(it)
-        }
-    }
-}
-
 fun addToQueue(context: Context, songId: String){
     SongDatabaseHelper(context).getSong(songId)?.let {
         addToQueue(it)

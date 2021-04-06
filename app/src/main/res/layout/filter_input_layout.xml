@@ -14,7 +14,7 @@
         android:layout_marginEnd="10dp"
         android:autofillHints=""
         android:ems="10"
-        android:hint="Title"
+        android:hint="@string/title"
         android:inputType="text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

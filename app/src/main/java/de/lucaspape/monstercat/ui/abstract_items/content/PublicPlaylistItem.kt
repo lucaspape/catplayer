@@ -4,15 +4,12 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.ImageView
-import android.widget.TextView
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
 import com.squareup.picasso.Target
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.core.database.helper.GenreDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.PublicPlaylistDatabaseHelper
 import de.lucaspape.monstercat.core.download.ImageReceiverInterface
-import de.lucaspape.monstercat.core.download.downloadCoverIntoImageReceiver
 import de.lucaspape.monstercat.core.download.downloadImageUrlIntoImageReceiver
 
 open class PublicPlaylistItem(

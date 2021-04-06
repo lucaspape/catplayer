@@ -20,7 +20,7 @@
             android:layout_height="50dp"
             android:layout_gravity="start"
             android:background="@null"
-            android:contentDescription="Add filter"
+            android:contentDescription="@string/addFilter"
             android:src="@drawable/ic_add_24dp" />
     </androidx.appcompat.widget.Toolbar>
 

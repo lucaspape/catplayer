@@ -1,7 +1,6 @@
 package de.lucaspape.monstercat.core.util
 
 import android.content.Context
-import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.*
 import de.lucaspape.monstercat.core.database.objects.Mood
 import de.lucaspape.monstercat.core.database.objects.PublicPlaylist

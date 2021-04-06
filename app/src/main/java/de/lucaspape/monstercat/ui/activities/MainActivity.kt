@@ -551,7 +551,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun openQueue() {
         openPage(
-            QueuePage() {
+            QueuePage {
                 findViewById<BottomNavigationView>(R.id.nav_view).selectedItemId =
                     R.id.navigation_home
             }

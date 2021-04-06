@@ -5,10 +5,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
-import de.lucaspape.monstercat.core.database.objects.Album
 import de.lucaspape.monstercat.core.database.objects.Filter
-import de.lucaspape.monstercat.core.database.objects.Item
-import de.lucaspape.monstercat.core.database.objects.ManualPlaylist
 
 class FilterDatabaseHelper(context:Context):
     SQLiteOpenHelper(

@@ -5,7 +5,7 @@ import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
 import de.lucaspape.monstercat.R
 
-open class SpacerItem() :
+open class SpacerItem :
     AbstractItem<SpacerItem.ViewHolder>() {
     override val type: Int = 4003
 

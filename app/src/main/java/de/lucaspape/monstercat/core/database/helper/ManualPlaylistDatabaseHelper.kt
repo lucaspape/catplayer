@@ -2,12 +2,9 @@ package de.lucaspape.monstercat.core.database.helper
 
 import android.content.ContentValues
 import android.content.Context
-import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
-import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
 import de.lucaspape.monstercat.core.database.objects.ManualPlaylist
-import java.lang.IndexOutOfBoundsException
 
 class ManualPlaylistDatabaseHelper(context: Context) :
     SQLiteOpenHelper(

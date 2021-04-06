@@ -4,11 +4,9 @@ import android.view.View
 import android.widget.ImageButton
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.ui.pages.recycler.FiltersRecyclerPage
-import de.lucaspape.monstercat.ui.pages.recycler.QueueRecyclerPage
 import de.lucaspape.monstercat.ui.pages.util.Page
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
 import de.lucaspape.monstercat.ui.pages.util.addFilter
-import de.lucaspape.monstercat.ui.pages.util.createPlaylist
 
 class FilterPage(private val closeFilter: () -> Unit) : Page() {
     constructor() : this({})

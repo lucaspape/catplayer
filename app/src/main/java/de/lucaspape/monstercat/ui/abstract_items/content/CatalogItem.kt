@@ -27,7 +27,6 @@ import de.lucaspape.monstercat.core.music.addToPriorityQueue
 import de.lucaspape.monstercat.ui.*
 import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListHeaderItem
 import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListItem
-import java.io.File
 
 open class CatalogItem(
     val songId: String

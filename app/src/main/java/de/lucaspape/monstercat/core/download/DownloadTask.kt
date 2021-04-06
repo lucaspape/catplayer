@@ -10,7 +10,6 @@ import de.lucaspape.monstercat.core.util.downloadFile
 import de.lucaspape.monstercat.core.util.wifiConnected
 import de.lucaspape.monstercat.core.music.util.BackgroundService
 import de.lucaspape.monstercat.core.util.Settings
-import java.io.File
 import java.lang.Exception
 import java.lang.IndexOutOfBoundsException
 import java.lang.ref.WeakReference

@@ -28,7 +28,6 @@ import de.lucaspape.monstercat.ui.pages.util.openPlaylist
 import de.lucaspape.monstercat.ui.pages.util.playPlaylistNextAsync
 import de.lucaspape.monstercat.ui.pages.util.renamePlaylist
 import de.lucaspape.monstercat.ui.pages.util.togglePlaylistPublicStateAsync
-import java.io.File
 
 open class PlaylistItem(
     val playlistId: String
