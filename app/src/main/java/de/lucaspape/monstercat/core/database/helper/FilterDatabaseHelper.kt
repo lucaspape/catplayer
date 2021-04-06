@@ -18,7 +18,7 @@ class FilterDatabaseHelper(context:Context):
         val DATABASE_VERSION = 1001
 
         @JvmStatic
-        private val DATABASE_NAME = "genre_db"
+        private val DATABASE_NAME = "filter_db"
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
