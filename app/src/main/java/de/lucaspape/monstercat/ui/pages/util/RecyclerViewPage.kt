@@ -262,10 +262,12 @@ abstract class RecyclerViewPage {
         }
     }
 
-    fun removeItem(position: Int) {
+    fun removeItem(position: Int, callback:()->Unit) {
         scope.launch {
             withContext(Dispatchers.Main) {
                 itemAdapter.remove(position)
+
+                callback()
             }
         }
     }

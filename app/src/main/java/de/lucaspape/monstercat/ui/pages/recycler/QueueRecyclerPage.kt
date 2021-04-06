@@ -9,6 +9,7 @@ import de.lucaspape.monstercat.ui.abstract_items.content.QueueItem
 import de.lucaspape.monstercat.ui.abstract_items.util.HeaderTextItem
 import de.lucaspape.monstercat.ui.pages.util.Item
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
+import java.lang.IndexOutOfBoundsException
 import kotlin.collections.ArrayList
 import kotlin.random.Random
 
@@ -35,41 +36,45 @@ class QueueRecyclerPage : RecyclerViewPage() {
         viewData: List<GenericItem>,
         itemIndex: Int
     ) {
-        val item = viewData[itemIndex]
+        try{
+            val item = viewData[itemIndex]
 
-        if (item is QueueItem) {
-            when (lookupTable[itemIndex]) {
-                "priority" -> {
-                    indexLookupTable["priority-${item.songId}"]?.let {
-                        if (prioritySongQueue[it] == item.songId) {
-                            removeFromPriorityQueue(it)
+            if (item is QueueItem) {
+                when (lookupTable[itemIndex]) {
+                    "priority" -> {
+                        indexLookupTable["priority-${item.songId}"]?.let {
+                            if (prioritySongQueue[it] == item.songId) {
+                                removeFromPriorityQueue(it)
+                            }
+                        }
+                    }
+                    "queue" -> {
+                        indexLookupTable["queue-${item.songId}"]?.let {
+                            if (songQueue[it] == item.songId) {
+                                removeFromQueue(it)
+                            }
+                        }
+                    }
+                    "related" -> {
+                        indexLookupTable["related-${item.songId}"]?.let {
+                            if (relatedSongQueue[it] == item.songId) {
+                                removeFromRelatedQueue(it)
+                            }
                         }
                     }
                 }
-                "queue" -> {
-                    indexLookupTable["queue-${item.songId}"]?.let {
-                        if (songQueue[it] == item.songId) {
-                            removeFromQueue(it)
-                        }
-                    }
-                }
-                "related" -> {
-                    indexLookupTable["related-${item.songId}"]?.let {
-                        if (relatedSongQueue[it] == item.songId) {
-                            removeFromRelatedQueue(it)
-                        }
+
+                removeItem(itemIndex) {
+                    if (shuffle) {
+                        saveRecyclerViewPosition(view.context)
+                        reload(view)
+                    } else {
+                        generateLookupTable()
                     }
                 }
             }
-
-            removeItem(itemIndex)
-
-            if(shuffle){
-                saveRecyclerViewPosition(view.context)
-                reload(view)
-            }else{
-                generateLookupTable()
-            }
+        }catch (e: IndexOutOfBoundsException){
+            reload(view)
         }
     }
 
