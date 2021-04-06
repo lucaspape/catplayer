@@ -138,11 +138,7 @@ abstract class RecyclerViewPage {
         withContext(Dispatchers.Main) {
             recyclerView = view.findViewById(R.id.recyclerView)
 
-            itemAdapter = ItemAdapter()
-            headerAdapter = ItemAdapter()
-            footerAdapter = ItemAdapter()
-
-            itemHeaderOffset = 0
+            clear()
 
             fastAdapter = FastAdapter.with(listOf(headerAdapter, itemAdapter, footerAdapter))
 
@@ -260,6 +256,8 @@ abstract class RecyclerViewPage {
         }
     }
 
+    private var databaseItemCount = 0
+
     private suspend fun addItem(item: GenericItem) {
         withContext(Dispatchers.Main) {
             itemAdapter.add(item)
@@ -287,6 +285,7 @@ abstract class RecyclerViewPage {
             footerAdapter.clear()
 
             itemHeaderOffset = 0
+            databaseItemCount = 0
         }
     }
 
@@ -319,6 +318,8 @@ abstract class RecyclerViewPage {
                             itemToAbstractItem(view, item)?.let {
                                 addItem(it)
                             }
+
+                            databaseItemCount++
                         }
 
                         getHeader(view.context)?.let {
@@ -395,7 +396,7 @@ abstract class RecyclerViewPage {
                     load(
                         view.context,
                         false,
-                        itemAdapter.adapterItemCount,
+                        databaseItemCount,
                         displayLoading = {},
                         callback = { itemList ->
                             scope.launch {
@@ -404,6 +405,8 @@ abstract class RecyclerViewPage {
                                         itemToAbstractItem(view, item)?.let {
                                             addItem(it)
                                         }
+
+                                        databaseItemCount++
                                     }
 
                                     withContext(Dispatchers.Main) {
