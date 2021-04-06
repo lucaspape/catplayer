@@ -19,4 +19,5 @@
     <string name="pickLinkToShare">选择一个链接分享：</string>
     <string name="pickApp">选择应用：</string>
     <string name="loadingRelatedSongs">加载类似的歌曲</string>
+    <string name="openYoutubeLiveStreamInBrowser">无法播放YouTube直播应用内。 在浏览器中打开？</string>
 </resources>

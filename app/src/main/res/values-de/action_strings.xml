@@ -27,11 +27,13 @@
     <string name="playRelatedAfter">Spiele ähnliche Lieder nach dem Abspielen (benutzt custom API)</string>
     <string name="saveCoverImagesToCache">Speicher Titelbilder in den Cache</string>
     <string name="setCustomApiUrl">Setze custom API URL</string>
-    <string name="dontPlayNotCreatorFriendly">Spiele keine non-creator-friendly Lieder ab</string>
+    <string name="dontPlayNotCreatorFriendly">Überspringe non-creator-friendly Lieder</string>
     <string name="logout">Abmelden</string>
     <string name="useCustomApiForEverything">Ersetze alles mit custom API</string>
     <string name="useCustomApiForCoverImages">Schnellerer Titelbild Download (benutzt custom API)</string>
     <string name="useCustomApiForSearch">Bessere Suche (benutzt custom API)</string>
     <string name="deleteDownload">Lösche Download</string>
     <string name="resetDatabase">Datenbank zurücksetzen</string>
+    <string name="skipExplicitSongs">Überspringe Explizite Lieder</string>
+    <string name="hideToBeSkipped">Verstecke Lieder die übersprungen werden</string>
 </resources>

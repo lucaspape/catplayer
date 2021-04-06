@@ -43,4 +43,9 @@
     <string name="contextMenu">Контекстное меню</string>
     <string name="yourPlaylists">Ваши Плейлисты</string>
     <string name="volume">объем</string>
+    <string name="streams">Прямые трансляции</string>
+    <string name="genres">Жанры</string>
+    <string name="comingUp">Следующие песни</string>
+    <string name="relatedSongsComingUp">Похожие песни</string>
+    <string name="publicPlaylists">Плейлисты Monstercat</string>
 </resources>

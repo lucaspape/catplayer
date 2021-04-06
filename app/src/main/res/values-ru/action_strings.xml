@@ -27,11 +27,13 @@
     <string name="playRelatedAfter">Воспроизвести похожие песни после завершения воспроизведения (использует custom API)</string>
     <string name="saveCoverImagesToCache">Сохранить изображения обложек в кеш</string>
     <string name="setCustomApiUrl">Установить URL custom API</string>
-    <string name="dontPlayNotCreatorFriendly">Не включайте песни, не creator friendly</string>
+    <string name="dontPlayNotCreatorFriendly">Пропускать песни, не предназначенные для авторов</string>
     <string name="logout">Выйти</string>
     <string name="useCustomApiForEverything">Замени все на custom API</string>
     <string name="useCustomApiForCoverImages">FБолее быстрая загрузка изображений обложек (использует custom API) </string>
     <string name="useCustomApiForSearch">Расширенный поиск (использует custom API)</string>
     <string name="deleteDownload">Удалить скачивание</string>
     <string name="resetDatabase">Сбросить базу данных</string>
+    <string name="skipExplicitSongs">Пропускать непристойные песни</string>
+    <string name="hideToBeSkipped">Скрыть песни, которые автоматически пропускаются</string>
 </resources>

@@ -19,4 +19,5 @@
     <string name="pickLinkToShare">Выберите ссылку, которой хотите поделиться</string>
     <string name="pickApp">Выберите приложение:</string>
     <string name="loadingRelatedSongs">Загрузка похожих песен</string>
+    <string name="openYoutubeLiveStreamInBrowser">Невозможно воспроизвести прямую трансляцию YouTube в приложении. Открыть в браузере?</string>
 </resources>

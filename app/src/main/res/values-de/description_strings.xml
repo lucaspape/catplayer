@@ -43,4 +43,9 @@
     <string name="contextMenu">Kontextmenu</string>
     <string name="yourPlaylists">Deine Playlisten</string>
     <string name="volume">Lautstärke</string>
+    <string name="streams">Livestreams</string>
+    <string name="genres">Genres</string>
+    <string name="comingUp">Nächste Lieder</string>
+    <string name="relatedSongsComingUp">Ähnliche Lieder</string>
+    <string name="publicPlaylists">Monstercat Playlisten</string>
 </resources>

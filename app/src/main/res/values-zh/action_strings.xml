@@ -34,4 +34,6 @@
     <string name="useCustomApiForSearch">高级搜索（使用自定义API）</string>
     <string name="deleteDownload">删除下载</string>
     <string name="resetDatabase">重置数据库</string>
+    <string name="skipExplicitSongs">跳过露骨的歌曲</string>
+    <string name="hideToBeSkipped">隐藏自动跳过的歌曲</string>
 </resources>

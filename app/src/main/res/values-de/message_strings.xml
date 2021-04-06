@@ -19,4 +19,5 @@
     <string name="pickLinkToShare">Wähle einen Link zum Teilen:</string>
     <string name="pickApp">Wähle App:</string>
     <string name="loadingRelatedSongs">Lade ähnliche Lieder</string>
+    <string name="openYoutubeLiveStreamInBrowser">Kann YouTube livestream nicht in-app abspielen. Im Browser öffnen?</string>
 </resources>

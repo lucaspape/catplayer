@@ -30,8 +30,8 @@
     <string name="downloadNotificationDescription">Download Notification for Catplayer</string>
     <string name="musicNotificationChannelName">Player Notification</string>
     <string name="musicNotificationDescription">Player Notification for Catplayer</string>
-    <string name="relatedNotificationChannelName">Loading related songs notification</string>
-    <string name="relatedNotificationChannelDescription">Loading related songs can take a few seconds</string>
+    <string name="relatedNotificationChannelName">Loading similar songs notification</string>
+    <string name="relatedNotificationChannelDescription">Loading similar songs can take a few seconds</string>
     <string name="playlistId">Playlist ID</string>
     <string name="back">Back</string>
     <string name="accountSettings">Account Settings</string>
@@ -44,12 +44,12 @@
     <string name="yourPlaylists">Your playlists</string>
     <string name="volume">Volume</string>
     <string name="queueDescription">Queue</string>
-    <string name="streams">Streams</string>
+    <string name="streams">Livestreams</string>
     <string name="moods">Moods</string>
     <string name="genres">Genres</string>
     <string name="greatestHits">Greatest Hits</string>
     <string name="queue">Queue</string>
     <string name="comingUp">Coming Up</string>
-    <string name="relatedSongsComingUp">Related Songs Coming Up</string>
-    <string name="publicPlaylists">Public Playlists</string>
+    <string name="relatedSongsComingUp">Similar Songs Coming Up</string>
+    <string name="publicPlaylists">Monstercat Playlists</string>
 </resources>

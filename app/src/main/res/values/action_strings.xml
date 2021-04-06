@@ -24,7 +24,7 @@
     <string name="sharePlaylist">Share playlist</string>
     <string name="openPlaylistInApp">Open playlist in browser</string>
     <string name="useCustomApi">Use custom API for catalog-view and album-view</string>
-    <string name="playRelatedAfter">Play related songs after playback finished (uses custom API)</string>
+    <string name="playRelatedAfter">Play similar songs after playback finished (uses custom API)</string>
     <string name="saveCoverImagesToCache">Save cover images to cache</string>
     <string name="setCustomApiUrl">Set custom API URL</string>
     <string name="dontPlayNotCreatorFriendly">Skip non-creator-friendly songs</string>
