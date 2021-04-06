@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.View
 import com.mikepenz.fastadapter.GenericItem
 import de.lucaspape.monstercat.core.database.helper.FilterDatabaseHelper
+import de.lucaspape.monstercat.core.music.applyFilterSettings
 import de.lucaspape.monstercat.ui.abstract_items.content.FilterItem
 import de.lucaspape.monstercat.ui.pages.util.Item
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
@@ -20,7 +21,9 @@ class FiltersRecyclerPage : RecyclerViewPage() {
             FilterDatabaseHelper(view.context).removeFilter(item.filter.id)
         }
 
-        removeItem(itemIndex) {}
+        removeItem(itemIndex) {
+            applyFilterSettings(view.context)
+        }
     }
 
     override suspend fun itemToAbstractItem(view: View, item: Item): GenericItem? {

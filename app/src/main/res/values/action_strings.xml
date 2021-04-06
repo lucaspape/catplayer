@@ -36,4 +36,6 @@
     <string name="resetDatabase">Reset Database</string>
     <string name="skipExplicitSongs">Skip explicit songs</string>
     <string name="hideToBeSkipped">Visually hide skip-songs</string>
+    <string name="addTitleFilter">Add title filter</string>
+    <string name="addArtistFilter">Add artist filter</string>
 </resources>

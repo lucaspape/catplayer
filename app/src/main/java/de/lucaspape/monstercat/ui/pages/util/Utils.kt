@@ -31,7 +31,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
 import java.lang.IndexOutOfBoundsException
 import java.util.*
 import kotlin.collections.ArrayList
@@ -759,11 +758,11 @@ fun playSongsFromViewDataAsync(
 fun addFilter(view:View, callback: () -> Unit){
     val alertListItem = arrayListOf(
         AlertListItem(
-            "Artist Filter",
+            view.context.getString(R.string.addArtistFilter),
             emptyDrawable
         ),
         AlertListItem(
-            "Title Filter",
+            view.context.getString(R.string.addTitleFilter),
             emptyDrawable
         )
     )
@@ -774,7 +773,7 @@ fun addFilter(view:View, callback: () -> Unit){
         alertListItem
     ) { _: Int, item: AlertListItem ->
         MaterialAlertDialogBuilder(view.context).apply {
-            val artistFilter = item.itemText == "Artist Filter"
+            val artistFilter = item.itemText == view.context.getString(R.string.addArtistFilter)
 
             val layoutInflater =
                 context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
@@ -790,9 +789,9 @@ fun addFilter(view:View, callback: () -> Unit){
             }
 
             if (artistFilter) {
-                setTitle("Add artist filter")
+                setTitle(view.context.getString(R.string.addArtistFilter))
             } else {
-                setTitle("Add title filter")
+                setTitle(view.context.getString(R.string.addTitleFilter))
             }
 
             setPositiveButton(context.getString(R.string.ok)) { _, _ ->
@@ -803,6 +802,8 @@ fun addFilter(view:View, callback: () -> Unit){
                 }else{
                     FilterDatabaseHelper(view.context).insertFilter("title", filter)
                 }
+
+                applyFilterSettings(view.context)
 
                 callback()
             }
