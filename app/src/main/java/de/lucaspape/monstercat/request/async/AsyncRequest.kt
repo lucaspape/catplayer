@@ -490,7 +490,6 @@ suspend fun loadRelatedTracks(
     context: Context,
     trackIdArray: ArrayList<String>,
     excludeIdArray: ArrayList<String>,
-    skipMC: Boolean,
     finishedCallback: (relatedIdArray: ArrayList<String>?) -> Unit,
     errorCallback: () -> Unit
 ) {
@@ -500,7 +499,7 @@ suspend fun loadRelatedTracks(
         val volleyQueue =
             getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
-        newLoadRelatedTracksRequest(context, trackIdArray, excludeIdArray, skipMC, {
+        newLoadRelatedTracksRequest(context, trackIdArray, excludeIdArray, {
             try {
                 val relatedJsonArray = it.getJSONArray("results")
 

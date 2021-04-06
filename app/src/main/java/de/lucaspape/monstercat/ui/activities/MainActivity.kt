@@ -198,27 +198,24 @@ class MainActivity : AppCompatActivity() {
 
         setupMusicPlayer(
             { context, callback, errorCallback ->
-                Settings.getSettings(context)
-                    .getBoolean(context.getString(R.string.skipMonstercatSongsSetting))?.let {
-                        genericScope.launch {
-                            val relatedTo = if(history.size > 0){
-                                history
-                            }else{
-                                playlist
-                            }
-
-                            loadRelatedTracks(
-                                context, relatedTo, playlist, it,
-                                finishedCallback = { relatedIdArray ->
-                                    relatedIdArray?.let {
-                                        callback(relatedIdArray)
-                                    }
-                                },
-                                errorCallback = {
-                                    errorCallback()
-                                })
-                        }
+                genericScope.launch {
+                    val relatedTo = if (history.size > 0) {
+                        history
+                    } else {
+                        playlist
                     }
+
+                    loadRelatedTracks(
+                        context, relatedTo, playlist,
+                        finishedCallback = { relatedIdArray ->
+                            relatedIdArray?.let {
+                                callback(relatedIdArray)
+                            }
+                        },
+                        errorCallback = {
+                            errorCallback()
+                        })
+                }
             },
             { context: Context, msg: String ->
                 displayInfo(context, msg)
@@ -340,11 +337,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         var value = currentPage?.onPageBackPressed()
-        if(value == null){
+        if (value == null) {
             value = true
         }
 
-        if(value){
+        if (value) {
             finish()
         }
     }
@@ -444,7 +441,7 @@ class MainActivity : AppCompatActivity() {
                 playButton.setImageURI(playButtonDrawable.toUri())
             }
         }
-        
+
         playingChangedCallback()
 
         coverBitmapChangedCallback = {
@@ -460,9 +457,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         loadingRelatedChangedCallback = {
-            if(loadingRelatedSongs){
+            if (loadingRelatedSongs) {
                 showLoadingRelatedNotification(this)
-            }else{
+            } else {
                 hideLoadingRelatedSongsNotification(this)
             }
         }
