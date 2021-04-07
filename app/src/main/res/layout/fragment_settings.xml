@@ -7,7 +7,7 @@
     android:parentActivityName=".MainActivity">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/settingsRecyclerView"
+        android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:contentDescription="@string/contentView"

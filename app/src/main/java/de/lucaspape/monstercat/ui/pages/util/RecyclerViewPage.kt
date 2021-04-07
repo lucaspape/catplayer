@@ -4,12 +4,15 @@ import android.annotation.SuppressLint
 import android.content.Context
 
 import android.view.View
+import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import androidx.annotation.CallSuper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.google.android.material.switchmaterial.SwitchMaterial
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.GenericItem
 import com.mikepenz.fastadapter.adapters.ItemAdapter
@@ -21,6 +24,10 @@ import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
 import de.lucaspape.monstercat.ui.abstract_items.content.FilterItem
 import de.lucaspape.monstercat.ui.abstract_items.content.PlaylistItem
 import de.lucaspape.monstercat.ui.abstract_items.content.QueueItem
+import de.lucaspape.monstercat.ui.abstract_items.settings.SettingsButtonItem
+import de.lucaspape.monstercat.ui.abstract_items.settings.SettingsLoginItem
+import de.lucaspape.monstercat.ui.abstract_items.settings.SettingsProfileItem
+import de.lucaspape.monstercat.ui.abstract_items.settings.SettingsToggleItem
 import de.lucaspape.monstercat.ui.abstract_items.util.HeaderTextItem
 import de.lucaspape.monstercat.ui.abstract_items.util.ProgressItem
 import de.lucaspape.monstercat.ui.abstract_items.util.SpacerItem
@@ -240,6 +247,51 @@ abstract class RecyclerViewPage {
                 ) {
                     scope.launch {
                         onDownloadButtonClick(view.context, item, v as ImageButton)
+                    }
+                }
+            })
+
+            //settings stuff
+
+            fastAdapter?.addEventHook(object : ClickEventHook<GenericItem>() {
+                override fun onBind(viewHolder: RecyclerView.ViewHolder): View? {
+                    return when (viewHolder) {
+                        is SettingsToggleItem.ViewHolder -> {
+                            viewHolder.alertItemSwitch
+                        }
+                        is SettingsButtonItem.ViewHolder -> {
+                            viewHolder.button
+                        }
+                        is SettingsLoginItem.ViewHolder -> {
+                            viewHolder.button
+                        }
+                        is SettingsProfileItem.ViewHolder -> {
+                            viewHolder.button
+                        }
+                        else -> null
+                    }
+                }
+
+                override fun onClick(
+                    v: View,
+                    position: Int,
+                    fastAdapter: FastAdapter<GenericItem>,
+                    item: GenericItem
+                ) {
+                    if (item is SettingsToggleItem && v is SwitchMaterial) {
+                        v.isChecked = item.onSwitchChange(v.isChecked)
+                    } else if (item is SettingsButtonItem && v is Button) {
+                        item.onClick()
+                    } else if (item is SettingsLoginItem) {
+                        val usernameTextInput = view.findViewById<EditText>(R.id.settings_usernameInput)
+                        val passwordTextInput = view.findViewById<EditText>(R.id.settings_passwordInput)
+
+                        item.onLogin(
+                            usernameTextInput.text.toString(),
+                            passwordTextInput.text.toString()
+                        )
+                    } else if (item is SettingsProfileItem) {
+                        item.onLogout()
                     }
                 }
             })
