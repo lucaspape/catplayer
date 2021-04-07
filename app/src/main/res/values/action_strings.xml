@@ -13,7 +13,7 @@
     <string name="no">No</string>
     <string name="shareAlbum">Share album…</string>
     <string name="openAlbumInApp">Open album in app…</string>
-    <string name="skipSongsMonstercat">Skip songs from monstercat (e.g. COTW)</string>
+    <string name="skipSongsMonstercat">Filter songs from monstercat (e.g. COTW)</string>
     <string name="addToQueue">Add to queue</string>
     <string name="addAlbumToQueue">Add album to queue</string>
     <string name="retry">Retry</string>
@@ -27,15 +27,15 @@
     <string name="playRelatedAfter">Play similar songs after playback finished (uses custom API)</string>
     <string name="saveCoverImagesToCache">Save cover images to cache</string>
     <string name="setCustomApiUrl">Set custom API URL</string>
-    <string name="dontPlayNotCreatorFriendly">Skip non-creator-friendly songs</string>
+    <string name="dontPlayNotCreatorFriendly">Filter non-creator-friendly songs</string>
     <string name="logout">Logout</string>
     <string name="useCustomApiForEverything">Replace everything with custom API</string>
     <string name="useCustomApiForCoverImages">Faster cover images download (uses custom API)</string>
     <string name="useCustomApiForSearch">Advanced search (uses custom API)</string>
     <string name="deleteDownload">Delete download</string>
     <string name="resetDatabase">Reset Database</string>
-    <string name="skipExplicitSongs">Skip explicit songs</string>
-    <string name="hideToBeSkipped">Visually hide skip-songs</string>
+    <string name="skipExplicitSongs">Filter explicit songs</string>
+    <string name="hideToBeSkipped">Visually hide filtered songs</string>
     <string name="addTitleFilter">Add title filter</string>
     <string name="addArtistFilter">Add artist filter</string>
 </resources>
