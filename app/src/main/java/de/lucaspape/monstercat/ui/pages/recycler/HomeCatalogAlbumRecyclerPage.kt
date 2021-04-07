@@ -7,6 +7,7 @@ import de.lucaspape.monstercat.core.database.helper.ItemDatabaseHelper
 import de.lucaspape.monstercat.core.database.objects.Album
 import de.lucaspape.monstercat.request.async.loadAlbum
 import de.lucaspape.monstercat.ui.pages.util.Item
+import de.lucaspape.monstercat.ui.pages.util.StringItem
 import de.lucaspape.monstercat.ui.pages.util.loadAlbumTracks
 
 class HomeCatalogAlbumRecyclerPage(
@@ -36,7 +37,7 @@ class HomeCatalogAlbumRecyclerPage(
                     val itemList = ArrayList<Item>()
 
                     for (albumItem in albumItemList) {
-                        itemList.add(Item(null, albumItem.songId))
+                        itemList.add(StringItem(null, albumItem.songId))
                     }
 
                     callback(itemList)
@@ -76,7 +77,7 @@ class HomeCatalogAlbumRecyclerPage(
                         val itemList = ArrayList<Item>()
 
                         for (albumItem in albumItemList) {
-                            itemList.add(Item(null, albumItem.songId))
+                            itemList.add(StringItem(null, albumItem.songId))
                         }
 
                         callback(itemList)
