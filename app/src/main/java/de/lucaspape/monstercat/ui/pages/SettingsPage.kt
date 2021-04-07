@@ -71,10 +71,6 @@ class SettingsPage(
         addCustomApiButton(view)
         addResetDatabaseButton(view)
 
-        loggedInStateChangedListeners.add(LoggedInStateChangedListener({
-            onCreate(view)
-        }, true))
-
         itemAdapter.add(SpacerItem())
     }
 

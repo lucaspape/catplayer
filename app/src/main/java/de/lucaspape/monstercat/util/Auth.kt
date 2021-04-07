@@ -20,9 +20,6 @@ import de.lucaspape.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import de.lucaspape.monstercat.core.util.Settings
 import okhttp3.HttpUrl
 import org.json.JSONException
-import java.util.*
-import kotlin.ConcurrentModificationException
-import kotlin.collections.ArrayList
 
 var loggedIn = false
     private set
@@ -35,28 +32,6 @@ var offline = false
 
 var username = ""
     private set
-
-var loggedInStateChangedListeners = ArrayList<LoggedInStateChangedListener>()
-
-private fun runCallbacks(){
-    try {
-        val iterator = loggedInStateChangedListeners.iterator()
-
-        while(iterator.hasNext()){
-            val listener = iterator.next()
-
-            listener.run()
-
-            loggedInStateChangedListeners.removeIf { it.removeOnCalled &&  it.listenerId == listener.listenerId }
-        }
-    }catch (e: ConcurrentModificationException){
-
-    }
-}
-
-class LoggedInStateChangedListener(val run: () -> Unit, val removeOnCalled: Boolean){
-    val listenerId = UUID.randomUUID().toString()
-}
 
 private fun getSid(context: Context): String {
     val cookieJar =
@@ -215,21 +190,15 @@ class Auth {
                 cid = getCid(context)
 
                 loginSuccess()
-
-                runCallbacks()
             } else {
                 loggedIn = false
                 loginFailed()
-
-                runCallbacks()
             }
         }, {
             waitingForLogin = false
             loggedIn = false
             offline = true
             loginFailed()
-
-            runCallbacks()
         }))
     }
 
@@ -244,7 +213,5 @@ class Auth {
         SharedPrefsCookiePersistor(context).clear()
         
         connectSid = ""
-
-        runCallbacks()
     }
 }

@@ -14,6 +14,7 @@ import de.lucaspape.monstercat.core.util.Settings
 import de.lucaspape.monstercat.request.async.loadSongList
 import de.lucaspape.monstercat.ui.pages.util.Item
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
+import de.lucaspape.monstercat.ui.pages.util.StringItem
 import de.lucaspape.monstercat.ui.pages.util.playSongsFromViewDataAsync
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -124,20 +125,24 @@ open class HomeCatalogRecyclerPage : RecyclerViewPage() {
     }
 
     override suspend fun itemToAbstractItem(view: View, item: Item): GenericItem? {
-        val hideToBeSkipped = Settings.getSettings(view.context).getBoolean(view.context.getString(R.string.hideToBeSkippedSetting))
+        if(item is StringItem){
+            val hideToBeSkipped = Settings.getSettings(view.context).getBoolean(view.context.getString(R.string.hideToBeSkippedSetting))
 
-        if(hideToBeSkipped == true){
-            val songDatabaseHelper = SongDatabaseHelper(view.context)
+            if(hideToBeSkipped == true){
+                val songDatabaseHelper = SongDatabaseHelper(view.context)
 
-            songDatabaseHelper.getSong(item.itemId)?.let{
-                if(!filter(it)){
-                    return CatalogItem(item.itemId)
+                songDatabaseHelper.getSong(item.itemId)?.let{
+                    if(!filter(it)){
+                        return CatalogItem(item.itemId)
+                    }
                 }
-            }
 
-            return null
+                return null
+            }else{
+                return CatalogItem(item.itemId)
+            }
         }else{
-            return CatalogItem(item.itemId)
+            return null
         }
     }
 
@@ -161,7 +166,7 @@ open class HomeCatalogRecyclerPage : RecyclerViewPage() {
                 val itemList = ArrayList<Item>()
 
                 for (song in songList) {
-                    itemList.add(Item(song.songId, null))
+                    itemList.add(StringItem(null, song.songId))
                 }
 
                 callback(itemList)

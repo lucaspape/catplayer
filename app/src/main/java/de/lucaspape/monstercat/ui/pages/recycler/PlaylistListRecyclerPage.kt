@@ -10,10 +10,7 @@ import de.lucaspape.monstercat.core.database.helper.PlaylistDatabaseHelper
 import de.lucaspape.monstercat.request.async.loadPlaylists
 import de.lucaspape.monstercat.ui.abstract_items.content.PlaylistItem
 import de.lucaspape.monstercat.ui.offlineDrawable
-import de.lucaspape.monstercat.ui.pages.util.Item
-import de.lucaspape.monstercat.ui.pages.util.deleteDownloadedPlaylistTracks
-import de.lucaspape.monstercat.ui.pages.util.downloadPlaylistAsync
-import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
+import de.lucaspape.monstercat.ui.pages.util.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -95,8 +92,12 @@ class PlaylistListRecyclerPage(private val loadPlaylist: (playlistId: String) ->
         }
     }
 
-    override suspend fun itemToAbstractItem(view: View, item: Item): GenericItem {
-        return PlaylistItem(item.itemId)
+    override suspend fun itemToAbstractItem(view: View, item: Item): GenericItem? {
+        return if(item is StringItem){
+            PlaylistItem(item.itemId)
+        }else{
+            null
+        }
     }
 
     override suspend fun load(
@@ -116,7 +117,7 @@ class PlaylistListRecyclerPage(private val loadPlaylist: (playlistId: String) ->
                 val itemList = ArrayList<Item>()
 
                 for (playlist in playlists) {
-                    itemList.add(Item(playlist.playlistId, null))
+                    itemList.add(StringItem(null, playlist.playlistId))
                 }
 
                 callback(itemList)

@@ -36,7 +36,7 @@ class HomeCatalogAlbumRecyclerPage(
                     val itemList = ArrayList<Item>()
 
                     for (albumItem in albumItemList) {
-                        itemList.add(Item(albumItem.songId, null))
+                        itemList.add(Item(null, albumItem.songId))
                     }
 
                     callback(itemList)
@@ -76,7 +76,7 @@ class HomeCatalogAlbumRecyclerPage(
                         val itemList = ArrayList<Item>()
 
                         for (albumItem in albumItemList) {
-                            itemList.add(Item(albumItem.songId, null))
+                            itemList.add(Item(null, albumItem.songId))
                         }
 
                         callback(itemList)

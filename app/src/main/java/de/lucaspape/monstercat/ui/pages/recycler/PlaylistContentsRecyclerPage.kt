@@ -50,7 +50,7 @@ open class PlaylistContentsRecyclerPage(private val playlistId: String) :
                     val itemList = ArrayList<Item>()
 
                     for (i in (playlistItems.size - 1 downTo 0)) {
-                        itemList.add(Item(playlistItems[i].songId, null))
+                        itemList.add(Item(null, playlistItems[i].songId))
                     }
 
                     callback(itemList)

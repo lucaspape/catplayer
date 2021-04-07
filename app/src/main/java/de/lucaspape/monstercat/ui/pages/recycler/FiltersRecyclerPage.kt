@@ -8,6 +8,7 @@ import de.lucaspape.monstercat.core.music.applyFilterSettings
 import de.lucaspape.monstercat.ui.abstract_items.content.FilterItem
 import de.lucaspape.monstercat.ui.pages.util.Item
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
+import de.lucaspape.monstercat.ui.pages.util.StringItem
 
 class FiltersRecyclerPage : RecyclerViewPage() {
     override suspend fun onMenuButtonClick(
@@ -27,8 +28,10 @@ class FiltersRecyclerPage : RecyclerViewPage() {
     }
 
     override suspend fun itemToAbstractItem(view: View, item: Item): GenericItem? {
-        FilterDatabaseHelper(view.context).getFilterFromId(Integer.parseInt(item.itemId))?.let{
-            return FilterItem(it)
+        if(item is StringItem){
+            FilterDatabaseHelper(view.context).getFilterFromId(Integer.parseInt(item.itemId))?.let{
+                return FilterItem(it)
+            }
         }
 
         return null
@@ -50,7 +53,7 @@ class FiltersRecyclerPage : RecyclerViewPage() {
             val itemList = ArrayList<Item>()
 
             for(filter in filters){
-                itemList.add(Item(filter.id.toString(), null))
+                itemList.add(StringItem(null, filter.id.toString()))
             }
 
             callback(itemList)

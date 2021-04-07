@@ -9,6 +9,7 @@ import de.lucaspape.monstercat.ui.abstract_items.content.QueueItem
 import de.lucaspape.monstercat.ui.abstract_items.util.HeaderTextItem
 import de.lucaspape.monstercat.ui.pages.util.Item
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
+import de.lucaspape.monstercat.ui.pages.util.StringItem
 import java.lang.IndexOutOfBoundsException
 import kotlin.collections.ArrayList
 import kotlin.random.Random
@@ -20,11 +21,15 @@ class QueueRecyclerPage : RecyclerViewPage() {
         }
     }
 
-    override suspend fun itemToAbstractItem(view: View, item: Item): GenericItem {
-        return if (item.typeId == "separator") {
-            HeaderTextItem(item.itemId)
-        } else {
-            QueueItem(item.itemId)
+    override suspend fun itemToAbstractItem(view: View, item: Item): GenericItem? {
+        return if(item is StringItem){
+            if (item.typeId == "separator") {
+                HeaderTextItem(item.itemId)
+            } else {
+                QueueItem(item.itemId)
+            }
+        }else{
+            null
         }
     }
 
@@ -177,10 +182,10 @@ class QueueRecyclerPage : RecyclerViewPage() {
             prioritySongQueue.forEach { queue.add(it) }
 
             if (queue.size > 0) {
-                content.add(Item(context.getString(R.string.queue), "separator"))
+                content.add(StringItem("separator", context.getString(R.string.queue)))
 
                 for (songId in queue) {
-                    content.add(Item(songId, "item"))
+                    content.add(StringItem("item", songId))
                 }
             }
 
@@ -188,11 +193,11 @@ class QueueRecyclerPage : RecyclerViewPage() {
             songQueue.forEach { queue.add(it) }
 
             if (queue.size > 0) {
-                content.add(Item(context.getString(R.string.comingUp), "separator"))
+                content.add(StringItem("separator", context.getString(R.string.comingUp)))
 
                 if (!shuffle) {
                     for (songId in queue) {
-                        content.add(Item(songId, "item"))
+                        content.add(StringItem("item", songId))
                     }
                 } else {
                     var nextRandom = Random(randomSeed).nextInt(queue.size)
@@ -200,7 +205,7 @@ class QueueRecyclerPage : RecyclerViewPage() {
                     while (queue.size > 0) {
                         val songId = queue[nextRandom]
 
-                        content.add(Item(songId, "item"))
+                        content.add(StringItem("item", songId))
 
                         queue.removeAt(nextRandom)
                         if (queue.size > 0) {
@@ -214,11 +219,11 @@ class QueueRecyclerPage : RecyclerViewPage() {
             relatedSongQueue.forEach { queue.add(it) }
 
             if (queue.size > 0) {
-                content.add(Item(context.getString(R.string.relatedSongsComingUp), "separator"))
+                content.add(StringItem("separator", context.getString(R.string.relatedSongsComingUp)))
 
                 if (!shuffle) {
                     for (songId in queue) {
-                        content.add(Item(songId, "item"))
+                        content.add(StringItem("item", songId))
                     }
                 } else {
                     var nextRandom = Random(relatedRandomSeed).nextInt(queue.size)
@@ -226,7 +231,7 @@ class QueueRecyclerPage : RecyclerViewPage() {
                     while (queue.size > 0) {
                         val songId = queue[nextRandom]
 
-                        content.add(Item(songId, "item"))
+                        content.add(StringItem("item", songId))
 
                         queue.removeAt(nextRandom)
                         if (queue.size > 0) {

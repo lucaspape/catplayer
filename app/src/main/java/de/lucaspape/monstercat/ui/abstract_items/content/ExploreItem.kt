@@ -15,6 +15,7 @@ import de.lucaspape.monstercat.request.async.*
 import de.lucaspape.monstercat.ui.pages.recycler.HomeCatalogRecyclerPage
 import de.lucaspape.monstercat.ui.pages.util.Item
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
+import de.lucaspape.monstercat.ui.pages.util.StringItem
 import de.lucaspape.monstercat.ui.pages.util.playSongsFromViewDataAsync
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -101,23 +102,27 @@ class ExploreItem(
                 override suspend fun itemToAbstractItem(
                     view: View,
                     item: Item
-                ): GenericItem {
-                    return when (item.typeId) {
-                        "mood" -> {
-                            MoodItem(item.itemId)
+                ): GenericItem? {
+                    if(item is StringItem){
+                        return when (item.typeId) {
+                            "mood" -> {
+                                MoodItem(item.itemId)
+                            }
+                            "genre" -> {
+                                GenreItem(item.itemId)
+                            }
+                            "stream" -> {
+                                StreamItem(item.itemId)
+                            }
+                            "public-playlist" -> {
+                                PublicPlaylistItem(item.itemId)
+                            }
+                            else -> {
+                                CatalogItem(item.itemId)
+                            }
                         }
-                        "genre" -> {
-                            GenreItem(item.itemId)
-                        }
-                        "stream" -> {
-                            StreamItem(item.itemId)
-                        }
-                        "public-playlist" -> {
-                            PublicPlaylistItem(item.itemId)
-                        }
-                        else -> {
-                            CatalogItem(item.itemId)
-                        }
+                    }else{
+                        return null
                     }
                 }
 
@@ -149,7 +154,7 @@ class ExploreItem(
                                         val itemArray = ArrayList<Item>()
 
                                         for (mood in results) {
-                                            itemArray.add(Item(mood.moodId, "mood"))
+                                            itemArray.add(StringItem("mood", mood.moodId))
                                         }
 
                                         callback(itemArray)
@@ -166,7 +171,7 @@ class ExploreItem(
                                         val itemArray = ArrayList<Item>()
 
                                         for (genre in results) {
-                                            itemArray.add(Item(genre.genreId, "genre"))
+                                            itemArray.add(StringItem("genre", genre.genreId))
                                         }
 
                                         callback(itemArray)
@@ -189,7 +194,7 @@ class ExploreItem(
                                         val items = playlistItemDatabaseHelper.getAllData(true)
 
                                         for (playlistItem in items) {
-                                            itemArray.add(Item(playlistItem.songId, null))
+                                            itemArray.add(StringItem(null, playlistItem.songId))
                                         }
 
                                         callback(itemArray)
@@ -209,7 +214,7 @@ class ExploreItem(
                                         val streams = streamDatabaseHelper.getAllStreams()
 
                                         for (stream in streams) {
-                                            itemArray.add(Item(stream.name, "stream"))
+                                            itemArray.add(StringItem("stream", stream.name))
                                         }
 
                                         callback(itemArray)
@@ -227,7 +232,7 @@ class ExploreItem(
                                         val itemArray = ArrayList<Item>()
 
                                         for (publicPlaylist in results) {
-                                            itemArray.add(Item(publicPlaylist.playlistId, "public-playlist"))
+                                            itemArray.add(StringItem("public-playlist", publicPlaylist.playlistId))
                                         }
 
                                         callback(itemArray)

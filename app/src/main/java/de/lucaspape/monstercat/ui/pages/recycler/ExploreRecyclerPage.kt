@@ -8,6 +8,7 @@ import de.lucaspape.monstercat.core.database.helper.*
 import de.lucaspape.monstercat.ui.abstract_items.content.ExploreItem
 import de.lucaspape.monstercat.ui.abstract_items.util.HeaderTextItem
 import de.lucaspape.monstercat.ui.pages.util.Item
+import de.lucaspape.monstercat.ui.pages.util.StringItem
 
 open class ExploreRecyclerPage(
     val openMood: (moodId: String) -> Unit,
@@ -21,35 +22,39 @@ open class ExploreRecyclerPage(
     private var currentGenreId = ""
     private var currentPublicPlaylistId = ""
 
-    override suspend fun itemToAbstractItem(view: View, item: Item): GenericItem {
-        return if (item.typeId == "separator") {
-            HeaderTextItem(item.itemId)
-        } else {
-            ExploreItem(item.itemId, {
-                currentMoodId = it
-                currentGenreId = ""
-                currentPublicPlaylistId = ""
+    override suspend fun itemToAbstractItem(view: View, item: Item): GenericItem? {
+        if(item is StringItem){
+            return if (item.typeId == "separator") {
+                HeaderTextItem(item.itemId)
+            } else {
+                ExploreItem(item.itemId, {
+                    currentMoodId = it
+                    currentGenreId = ""
+                    currentPublicPlaylistId = ""
 
-                saveData()
+                    saveData()
 
-                openMood(it)
-            }, {
-                currentMoodId = ""
-                currentGenreId = it
-                currentPublicPlaylistId = ""
+                    openMood(it)
+                }, {
+                    currentMoodId = ""
+                    currentGenreId = it
+                    currentPublicPlaylistId = ""
 
-                saveData()
+                    saveData()
 
-                openGenre(it)
-            }, {
-                currentMoodId = ""
-                currentGenreId = ""
-                currentPublicPlaylistId = it
+                    openGenre(it)
+                }, {
+                    currentMoodId = ""
+                    currentGenreId = ""
+                    currentPublicPlaylistId = it
 
-                saveData()
+                    saveData()
 
-                openPublicPlaylist(it)
-            })
+                    openPublicPlaylist(it)
+                })
+            }
+        }else{
+            return null
         }
     }
 
@@ -64,20 +69,20 @@ open class ExploreRecyclerPage(
         if (skip == 0) {
             val items = ArrayList<Item>()
 
-            items.add(Item(context.getString(R.string.streams), "separator"))
-            items.add(Item("stream", "item"))
+            items.add(StringItem("separator", context.getString(R.string.streams)))
+            items.add(StringItem("item", "stream"))
 
-            items.add(Item(context.getString(R.string.publicPlaylists), "separator"))
-            items.add(Item("public-playlists", "item"))
+            items.add(StringItem("separator", context.getString(R.string.publicPlaylists)))
+            items.add(StringItem("item", "public-playlists"))
 
-            items.add(Item(context.getString(R.string.moods), "separator"))
-            items.add(Item("mood", "item"))
+            items.add(StringItem("separator", context.getString(R.string.moods)))
+            items.add(StringItem("item", "mood"))
 
-            items.add(Item(context.getString(R.string.genres), "separator"))
-            items.add(Item("genre", "item"))
+            items.add(StringItem("separator", context.getString(R.string.genres)))
+            items.add(StringItem("genre", "item"))
 
-            items.add(Item(context.getString(R.string.greatestHits), "separator"))
-            items.add(Item("greatest-hits", "item"))
+            items.add(StringItem("separator", context.getString(R.string.greatestHits)))
+            items.add(StringItem("item", "greatest-hits"))
 
             callback(items)
         } else {

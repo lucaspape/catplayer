@@ -33,7 +33,8 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
-class Item(val itemId: String, val typeId: String?)
+open class Item(open val typeId: String?, open val itemId: Any)
+class StringItem(override val typeId: String?, override val itemId:String): Item(typeId, itemId)
 
 abstract class RecyclerViewPage {
     companion object {
