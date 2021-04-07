@@ -6,6 +6,7 @@ import android.widget.SearchView
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.request.async.loadTitleSearch
 import de.lucaspape.monstercat.ui.pages.util.Item
+import de.lucaspape.monstercat.ui.pages.util.StringItem
 import kotlin.collections.ArrayList
 
 class SearchRecyclerPage(
@@ -65,7 +66,7 @@ class SearchRecyclerPage(
                     val itemList = ArrayList<Item>()
 
                     for (id in searchResults) {
-                        itemList.add(Item(null, id))
+                        itemList.add(StringItem(null, id))
                     }
 
                     callback(itemList)

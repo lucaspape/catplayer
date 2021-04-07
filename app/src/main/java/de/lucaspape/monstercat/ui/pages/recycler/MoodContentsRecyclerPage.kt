@@ -6,6 +6,7 @@ import de.lucaspape.monstercat.core.database.helper.ItemDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.MoodDatabaseHelper
 import de.lucaspape.monstercat.request.async.loadMood
 import de.lucaspape.monstercat.ui.pages.util.Item
+import de.lucaspape.monstercat.ui.pages.util.StringItem
 
 class MoodContentsRecyclerPage(private val moodId: String) :
     PlaylistContentsRecyclerPage(moodId) {
@@ -35,7 +36,7 @@ class MoodContentsRecyclerPage(private val moodId: String) :
                 val itemList = ArrayList<Item>()
 
                 for (i in (playlistItems.size - 1 downTo 0)) {
-                    itemList.add(Item(null, playlistItems[i].songId))
+                    itemList.add(StringItem(null, playlistItems[i].songId))
                 }
 
                 callback(itemList)

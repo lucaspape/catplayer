@@ -6,6 +6,7 @@ import de.lucaspape.monstercat.core.database.helper.ItemDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.PublicPlaylistDatabaseHelper
 import de.lucaspape.monstercat.request.async.loadPlaylistTracks
 import de.lucaspape.monstercat.ui.pages.util.Item
+import de.lucaspape.monstercat.ui.pages.util.StringItem
 
 class PublicPlaylistContentsRecyclerPage(private val publicPlaylistId: String) :
     PlaylistContentsRecyclerPage(publicPlaylistId) {
@@ -35,7 +36,7 @@ class PublicPlaylistContentsRecyclerPage(private val publicPlaylistId: String) :
                 val itemList = ArrayList<Item>()
 
                 for (i in (playlistItems.size - 1 downTo 0)) {
-                    itemList.add(Item(null, playlistItems[i].songId))
+                    itemList.add(StringItem(null, playlistItems[i].songId))
                 }
 
                 callback(itemList)

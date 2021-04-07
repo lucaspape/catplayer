@@ -6,6 +6,7 @@ import de.lucaspape.monstercat.core.database.helper.GenreDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.ItemDatabaseHelper
 import de.lucaspape.monstercat.request.async.loadGenre
 import de.lucaspape.monstercat.ui.pages.util.Item
+import de.lucaspape.monstercat.ui.pages.util.StringItem
 
 class GenreContentsRecyclerPage(private val genreId: String) :
     PlaylistContentsRecyclerPage(genreId) {
@@ -38,7 +39,7 @@ class GenreContentsRecyclerPage(private val genreId: String) :
                     val itemList = ArrayList<Item>()
 
                     for (i in (playlistItems.size - 1 downTo 0)) {
-                        itemList.add(Item(null, playlistItems[i].songId))
+                        itemList.add(StringItem(null, playlistItems[i].songId))
                     }
 
                     callback(itemList)
