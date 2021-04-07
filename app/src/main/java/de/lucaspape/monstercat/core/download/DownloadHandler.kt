@@ -111,7 +111,7 @@ fun downloadImageUrlIntoImageReceiver(
         if (cacheFile.exists()) {
             val bitmap = BitmapFactory.decodeFile(cacheFile.absolutePath)
 
-            val scaledBitmap = if(bitmap.width != resolution || bitmap.height != resolution){
+            val scaledBitmap = if(bitmap != null && bitmap.width != resolution || bitmap.height != resolution){
                 val tempBitmap = Bitmap.createScaledBitmap(bitmap, resolution, resolution, false)
 
                 saveBitmapAsync(tempBitmap, cacheFile)
