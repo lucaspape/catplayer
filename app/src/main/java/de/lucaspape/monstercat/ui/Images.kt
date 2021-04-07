@@ -1,33 +1,8 @@
 package de.lucaspape.monstercat.ui
 
-import android.content.Context
-import de.lucaspape.monstercat.core.download.fallbackFile
-import de.lucaspape.monstercat.core.download.fallbackFileLow
-import java.io.File
-
 /**
  * Yes this is kinda ugly but it works so i dont give a shit
  */
-
-//var fallbackFile = File("")
-//var fallbackFileLow = File("")
-
-var fallbackBlackFile = File("")
-var fallbackBlackFileLow = File("")
-var fallbackWhiteFile = File("")
-var fallbackWhiteFileLow = File("")
-
-private const val fallbackImagesFileFormat = "jpg"
-
-fun setFallbackCoverFiles(context: Context) {
-    fallbackFile = File("${context.dataDir}/fallback.$fallbackImagesFileFormat")
-    fallbackFileLow = File("${context.dataDir}/fallback_low.$fallbackImagesFileFormat")
-
-    fallbackBlackFile = File("${context.dataDir}/fallback_black.$fallbackImagesFileFormat")
-    fallbackBlackFileLow = File("${context.dataDir}/fallback_black_low.$fallbackImagesFileFormat")
-    fallbackWhiteFile = File("${context.dataDir}/fallback_white.$fallbackImagesFileFormat")
-    fallbackWhiteFileLow = File("${context.dataDir}/fallback_white_low.$fallbackImagesFileFormat")
-}
 
 const val DRAWABLE_URI = "android.resource://de.lucaspape.monstercat/drawable"
 
@@ -51,6 +26,8 @@ const val emptyDrawable = "$DRAWABLE_URI/ic_empty_24dp"
 var moreButtonDrawable = "$DRAWABLE_URI/ic_more_vert_24dp"
 const val pawDrawable = "$DRAWABLE_URI/gold_paw"
 const val explicitDrawable = "$DRAWABLE_URI/explicit"
+var fallbackDrawable = "$DRAWABLE_URI/artwork_fallback_white"
+var fallbackLowDrawable = "$DRAWABLE_URI/artwork_fallback_white_low"
 
 const val offlineDrawableBlack =
     "$DRAWABLE_URI/ic_offline_pin_black_24dp"
@@ -84,6 +61,8 @@ private const val addPlaylistDrawableBlack =
 private const val backButtonDrawableBlack =
     "$DRAWABLE_URI/ic_arrow_back_black_24dp"
 const val moreButtonDrawableBlack = "$DRAWABLE_URI/ic_more_vert_black_24dp"
+private const val fallbackDrawableBlack = "$DRAWABLE_URI/artwork_fallback_black"
+private const val fallbackLowDrawableBlack = "$DRAWABLE_URI/artwork_fallback_black_low"
 
 private const val offlineDrawableWhite =
     "$DRAWABLE_URI/ic_offline_pin_white_24dp"
@@ -117,6 +96,8 @@ private const val addPlaylistDrawableWhite =
 private const val backButtonDrawableWhite =
     "$DRAWABLE_URI/ic_arrow_back_white_24"
 private const val moreButtonDrawableWhite = "$DRAWABLE_URI/ic_more_vert_white_24dp"
+private const val fallbackDrawableWhite = "$DRAWABLE_URI/artwork_fallback_white"
+private const val fallbackLowDrawableWhite = "$DRAWABLE_URI/artwork_fallback_white_low"
 
 fun switchDrawablesToWhite() {
     offlineDrawable =
@@ -150,6 +131,8 @@ fun switchDrawablesToWhite() {
         addPlaylistDrawableWhite
     backButtonDrawable = backButtonDrawableWhite
     moreButtonDrawable = moreButtonDrawableWhite
+    fallbackDrawable = fallbackDrawableBlack
+    fallbackLowDrawable = fallbackLowDrawableBlack
 }
 
 fun switchDrawablesToBlack() {
@@ -184,4 +167,6 @@ fun switchDrawablesToBlack() {
         addPlaylistDrawableBlack
     backButtonDrawable = backButtonDrawableBlack
     moreButtonDrawable = moreButtonDrawableBlack
+    fallbackDrawable = fallbackDrawableWhite
+    fallbackLowDrawable = fallbackLowDrawableWhite
 }

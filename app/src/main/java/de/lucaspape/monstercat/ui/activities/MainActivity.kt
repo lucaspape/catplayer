@@ -58,11 +58,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setFallbackCoverFiles(this)
-
         checkPermissions()
-
-        downloadFallbackCoverImagesAsync(this) { changeTheme() }
 
         changeTheme()
 
@@ -276,19 +272,9 @@ class MainActivity : AppCompatActivity() {
             if (darkMode) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
 
-                if (fallbackBlackFile.exists() && fallbackBlackFileLow.exists()) {
-                    fallbackBlackFile.copyTo(fallbackFile, true)
-                    fallbackBlackFileLow.copyTo(fallbackFileLow, true)
-                }
-
                 switchDrawablesToWhite()
             } else {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-
-                if (fallbackWhiteFile.exists() && fallbackWhiteFileLow.exists()) {
-                    fallbackWhiteFile.copyTo(fallbackFile, true)
-                    fallbackWhiteFileLow.copyTo(fallbackFileLow, true)
-                }
 
                 switchDrawablesToBlack()
             }
