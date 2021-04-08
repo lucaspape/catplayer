@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name" translatable="false">Catplayer</string>
+    <string name="zero_progress" translatable="false">0:00</string>
 </resources>

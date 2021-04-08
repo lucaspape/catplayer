@@ -21,7 +21,8 @@
             android:layout_margin="10dp"
             app:layout_constraintBottom_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="parent" />
+            app:layout_constraintTop_toBottomOf="parent"
+            android:contentDescription="@string/alertListImage" />
 
         <TextView
             android:id="@+id/alertItemText"

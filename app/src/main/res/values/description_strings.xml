@@ -66,4 +66,6 @@
     <string name="useCustomApiDescription">Replaces catalog view and album view with custom API, mostly not recommended</string>
     <string name="playRelatedDescription">The custom API will provide songs that are similar to the ones played after playback finished. It does this based on song tags, title, artist and genre.</string>
     <string name="filterDescription">You can add custom filters. If a song title or artist contains the text specified in the filter it will be automatically skipped. If enabled it will also be hidden. If you actively tap on a song or add it to queue it wont be skipped!</string>
+    <string name="explicitDescription">Song is explicit</string>
+    <string name="alertListImage">Image</string>
 </resources>

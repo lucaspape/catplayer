@@ -29,7 +29,7 @@
             android:layout_height="50dp"
             android:layout_gravity="end"
             android:background="@null"
-            android:contentDescription="Info"
+            android:contentDescription="@string/information"
             android:src="@drawable/ic_baseline_info_24" />
     </androidx.appcompat.widget.Toolbar>
 
