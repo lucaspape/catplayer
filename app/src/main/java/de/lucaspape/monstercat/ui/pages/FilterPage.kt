@@ -7,6 +7,7 @@ import de.lucaspape.monstercat.ui.pages.recycler.FiltersRecyclerPage
 import de.lucaspape.monstercat.ui.pages.util.Page
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
 import de.lucaspape.monstercat.ui.pages.util.addFilter
+import de.lucaspape.monstercat.ui.showInformation
 
 class FilterPage(private val closeFilter: () -> Unit) : Page() {
     constructor() : this({})
@@ -39,6 +40,10 @@ class FilterPage(private val closeFilter: () -> Unit) : Page() {
             addFilter(view) {
                 filterPageObject?.reload(view)
             }
+        }
+
+        view.findViewById<ImageButton>(R.id.informationButton).setOnClickListener {
+            showInformation(view, view.context.getString(R.string.filterDescription))
         }
     }
 }

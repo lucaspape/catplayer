@@ -22,6 +22,15 @@
             android:background="@null"
             android:contentDescription="@string/addFilter"
             android:src="@drawable/ic_add_24dp" />
+
+        <ImageButton
+            android:id="@+id/informationButton"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="end"
+            android:background="@null"
+            android:contentDescription="Info"
+            android:src="@drawable/ic_baseline_info_24" />
     </androidx.appcompat.widget.Toolbar>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout

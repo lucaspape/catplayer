@@ -1,11 +1,14 @@
 package de.lucaspape.monstercat.ui
 
 import android.content.Context
+import android.content.DialogInterface
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -101,5 +104,23 @@ fun displayAlertDialogList(
         }
 
         false
+    }
+}
+
+fun showInformation(view: View, information:String){
+    view.findViewById<ImageButton>(R.id.informationButton).setOnClickListener {
+        MaterialAlertDialogBuilder(view.context).apply {
+            setTitle(view.context.getString(R.string.information))
+            setPositiveButton(view.context.getString(R.string.ok), null)
+            setMessage(information)
+        }.create().run {
+            show()
+
+            val textColorTypedValue = TypedValue()
+            context.theme.resolveAttribute(R.attr.colorOnSurface, textColorTypedValue, true)
+
+            val positiveButton = getButton(DialogInterface.BUTTON_POSITIVE)
+            positiveButton.setTextColor(textColorTypedValue.data)
+        }
     }
 }

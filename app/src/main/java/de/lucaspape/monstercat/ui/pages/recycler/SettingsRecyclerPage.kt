@@ -9,7 +9,6 @@ import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.mikepenz.fastadapter.GenericItem
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.*
@@ -25,6 +24,7 @@ import de.lucaspape.monstercat.ui.displayInfo
 import de.lucaspape.monstercat.ui.pages.util.Item
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
 import de.lucaspape.monstercat.ui.pages.util.StringItem
+import de.lucaspape.monstercat.ui.showInformation
 import de.lucaspape.monstercat.util.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -140,19 +140,7 @@ class SettingsRecyclerPage(private val openFilterSettings: () -> Unit) : Recycle
         val item = viewData[itemIndex]
 
         if(item is SettingsToggleItem && item.description != null){
-            MaterialAlertDialogBuilder(view.context).apply {
-                setTitle("Information")
-                setPositiveButton(view.context.getString(R.string.ok), null)
-                setMessage(item.description)
-            }.create().run {
-                show()
-
-                val textColorTypedValue = TypedValue()
-                context.theme.resolveAttribute(R.attr.colorOnSurface, textColorTypedValue, true)
-
-                val positiveButton = getButton(DialogInterface.BUTTON_POSITIVE)
-                positiveButton.setTextColor(textColorTypedValue.data)
-            }
+            showInformation(view, item.description)
         }
     }
 
