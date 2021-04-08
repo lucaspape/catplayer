@@ -16,10 +16,23 @@ class SettingsToggleItem(
     val onSwitchChange: (value: Boolean) -> Boolean,
     val description: String?
 ) : AbstractItem<SettingsToggleItem.ViewHolder>() {
-    override val type: Int = 3006
+    override val type: Int
+        get() {
+            return if(description != null){
+                3006
+            }else{
+                30012
+            }
+        }
 
     override val layoutRes: Int
-        get() = R.layout.settings_switch_item
+        get(){
+            return if(description != null){
+                R.layout.settings_switch_item_description
+            }else{
+                R.layout.settings_switch_item
+            }
+        }
 
     override fun getViewHolder(v: View): ViewHolder {
         return ViewHolder(
@@ -29,16 +42,10 @@ class SettingsToggleItem(
 
     class ViewHolder(view: View) : FastAdapter.ViewHolder<SettingsToggleItem>(view) {
         val alertItemSwitch: SwitchMaterial = view.findViewById(R.id.alertItemSwitch)
-        val informationButton: ImageButton = view.findViewById(R.id.informationButton)
+        val informationButton: ImageButton? = view.findViewById(R.id.informationButton)
         private val context = view.context
 
         override fun bindView(item: SettingsToggleItem, payloads: List<Any>) {
-            if(item.description == null){
-                informationButton.visibility = View.GONE
-            }else{
-                informationButton.visibility = View.VISIBLE
-            }
-
             alertItemSwitch.text = item.itemText
 
             if (item.requiredApiFeature != null && Settings.getSettings(context)

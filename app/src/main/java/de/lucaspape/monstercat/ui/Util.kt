@@ -108,11 +108,19 @@ fun displayAlertDialogList(
 }
 
 fun showInformation(view: View, information: String) {
-    MaterialAlertDialogBuilder(view.context).apply {
+    try {
+        alertDialog?.cancel()
+    } catch (e: IllegalArgumentException) {
+
+    }
+
+    alertDialog = MaterialAlertDialogBuilder(view.context).apply {
         setTitle(view.context.getString(R.string.information))
         setPositiveButton(view.context.getString(R.string.ok), null)
         setMessage(information)
-    }.create().run {
+    }.create()
+
+    alertDialog?.run {
         show()
 
         val textColorTypedValue = TypedValue()
