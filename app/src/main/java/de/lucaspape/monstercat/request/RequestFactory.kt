@@ -378,65 +378,69 @@ fun newLoadRelatedTracksRequest(
     errorCallback: (error: VolleyError) -> Unit
 ): com.android.volley.toolbox.JsonObjectRequest? {
     try{
-        val jsonObject = JSONObject()
-        val trackJsonArray = JSONArray()
-        val excludeJsonArray = JSONArray()
+        if(trackIdArray.isNotEmpty() || excludeIdArray.isNotEmpty()){
+            val jsonObject = JSONObject()
+            val trackJsonArray = JSONArray()
+            val excludeJsonArray = JSONArray()
 
-        val startIndex = if (trackIdArray.size >= 10) {
-            trackIdArray.size - 10
-        } else {
-            0
-        }
-
-        for (i in (startIndex until trackIdArray.size)) {
-            val trackObject = JSONObject()
-            trackObject.put("id", trackIdArray[i])
-            trackJsonArray.put(trackObject)
-        }
-
-        for (trackId in trackIdArray) {
-            val trackObject = JSONObject()
-            trackObject.put("id", trackId)
-            excludeJsonArray.put(trackObject)
-        }
-
-        for (trackId in excludeIdArray) {
-            val trackObject = JSONObject()
-            trackObject.put("id", trackId)
-            excludeJsonArray.put(trackObject)
-        }
-
-        jsonObject.put("tracks", trackJsonArray)
-        jsonObject.put("exclude", excludeJsonArray)
-
-        val settings = Settings.getSettings(context)
-
-        val relatedTracksUrl =
-            if (settings.getBoolean(context.getString(R.string.playRelatedSetting)) == true && settings.getBoolean(
-                    context.getString(R.string.customApiSupportsV1Setting)
-                ) == true
-            ) {
-                settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v1/related"
+            val startIndex = if (trackIdArray.size >= 10) {
+                trackIdArray.size - 10
             } else {
-                return null
+                0
             }
 
-        val loadRelatedTracksRequest = com.android.volley.toolbox.JsonObjectRequest(
-            Request.Method.POST,
-            relatedTracksUrl,
-            jsonObject,
-            Response.Listener(callback),
-            Response.ErrorListener(errorCallback)
-        )
+            for (i in (startIndex until trackIdArray.size)) {
+                val trackObject = JSONObject()
+                trackObject.put("id", trackIdArray[i])
+                trackJsonArray.put(trackObject)
+            }
 
-        loadRelatedTracksRequest.retryPolicy =
-            DefaultRetryPolicy(
-                20000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+            for (trackId in trackIdArray) {
+                val trackObject = JSONObject()
+                trackObject.put("id", trackId)
+                excludeJsonArray.put(trackObject)
+            }
+
+            for (trackId in excludeIdArray) {
+                val trackObject = JSONObject()
+                trackObject.put("id", trackId)
+                excludeJsonArray.put(trackObject)
+            }
+
+            jsonObject.put("tracks", trackJsonArray)
+            jsonObject.put("exclude", excludeJsonArray)
+
+            val settings = Settings.getSettings(context)
+
+            val relatedTracksUrl =
+                if (settings.getBoolean(context.getString(R.string.playRelatedSetting)) == true && settings.getBoolean(
+                        context.getString(R.string.customApiSupportsV1Setting)
+                    ) == true
+                ) {
+                    settings.getString(context.getString(R.string.customApiBaseUrlSetting)) + "v1/related"
+                } else {
+                    return null
+                }
+
+            val loadRelatedTracksRequest = com.android.volley.toolbox.JsonObjectRequest(
+                Request.Method.POST,
+                relatedTracksUrl,
+                jsonObject,
+                Response.Listener(callback),
+                Response.ErrorListener(errorCallback)
             )
 
-        return loadRelatedTracksRequest
+            loadRelatedTracksRequest.retryPolicy =
+                DefaultRetryPolicy(
+                    20000,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+                )
+
+            return loadRelatedTracksRequest
+        }else{
+            return null
+        }
     }catch (e: ConcurrentModificationException){
         return null
     }

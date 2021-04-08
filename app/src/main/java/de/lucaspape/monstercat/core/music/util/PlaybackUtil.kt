@@ -14,6 +14,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.lang.IndexOutOfBoundsException
 import java.util.*
 import kotlin.math.log
 
@@ -208,7 +209,13 @@ fun runSeekBarUpdate(context: Context, prepareNext: Boolean, crossFade: Boolean)
 
             //add current song to history after 30 seconds
             if(currentPosition > 30*1000){
-                history.add(currentSongId)
+                try {
+                    if(history[history.size-1] != currentSongId){
+                        history.add(currentSongId)
+                    }
+                }catch (e: IndexOutOfBoundsException){
+                    history.add(currentSongId)
+                }
             }
 
             if (crossFade) {
