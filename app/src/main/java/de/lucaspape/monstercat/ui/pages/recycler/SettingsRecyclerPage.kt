@@ -250,7 +250,7 @@ class SettingsRecyclerPage(private val openFilterSettings: () -> Unit) : Recycle
             var filterExists = false
 
             FilterDatabaseHelper(context).getAllFilters().forEach {
-                if (it.filterType == "artist" && it.filter == "monstercat") {
+                if (it.filterType == "artist" && it.filter.equals("monstercat", ignoreCase = true)) {
                     filterExists = true
                 }
             }
@@ -263,7 +263,7 @@ class SettingsRecyclerPage(private val openFilterSettings: () -> Unit) : Recycle
                 val removeIds = ArrayList<Int>()
 
                 FilterDatabaseHelper(context).getAllFilters().forEach {
-                    if (it.filterType == "artist" && it.filter == "monstercat") {
+                    if (it.filterType == "artist" && it.filter.equals("monstercat", ignoreCase = true)) {
                         removeIds.add(it.id)
                     }
                 }
