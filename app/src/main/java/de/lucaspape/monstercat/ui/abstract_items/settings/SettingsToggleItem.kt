@@ -1,6 +1,7 @@
 package de.lucaspape.monstercat.ui.abstract_items.settings
 
 import android.view.View
+import android.widget.ImageButton
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
@@ -28,9 +29,16 @@ class SettingsToggleItem(
 
     class ViewHolder(view: View) : FastAdapter.ViewHolder<SettingsToggleItem>(view) {
         val alertItemSwitch: SwitchMaterial = view.findViewById(R.id.alertItemSwitch)
+        val informationButton: ImageButton = view.findViewById(R.id.informationButton)
         private val context = view.context
 
         override fun bindView(item: SettingsToggleItem, payloads: List<Any>) {
+            if(item.description == null){
+                informationButton.visibility = View.GONE
+            }else{
+                informationButton.visibility = View.VISIBLE
+            }
+
             alertItemSwitch.text = item.itemText
 
             if (item.requiredApiFeature != null && Settings.getSettings(context)

@@ -1,9 +1,9 @@
 package de.lucaspape.monstercat.core.database.objects
 
 data class Item(val databaseId: String, val id: Long, val songId: String) {
-    val TABLE_NAME = "\"" + databaseId + "_item\""
-    val CREATE_TABLE =
-        "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
+    val tableName = "\"" + databaseId + "_item\""
+    val createTable =
+        "CREATE TABLE IF NOT EXISTS " + tableName + " (" +
                 COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 COLUMN_SONG_ID + " TEXT" +
                 ")"

@@ -61,7 +61,7 @@
     <string name="hideToBeSkippedDescription">Songs which are filtered are also visually hidden</string>
     <string name="disableAudioFocusDescription">Plays music at the same time as another audio app (like YouTube)</string>
     <string name="saveCoverImagesToCacheDescription">You should disable this if your device has not enough RAM</string>
-    <string name="useCustomApiForCoverDownloadDescription">The custom API heavily caches the cover images, for common resolutions it is therefore very fast</string>
+    <string name="useCustomApiForCoverDownloadDescription">The custom API heavily caches the cover images for common resolutions, it can be therefore very fast. If you change the cover resolution it is faster to disable this</string>
     <string name="useCustomApiForSearchDescription">The custom API can provide more accurate search results</string>
     <string name="useCustomApiDescription">Replaces catalog view and album view with custom API, mostly not recommended</string>
     <string name="playRelatedDescription">The custom API will provide songs that are similar to the ones played after playback finished. It does this based on song tags, title, artist and genre.</string>

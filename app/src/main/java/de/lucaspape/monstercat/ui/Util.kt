@@ -62,10 +62,10 @@ fun displayAlertDialogList(
 
     try {
         alertDialog?.cancel()
-    }catch (e: IllegalArgumentException){
+    } catch (e: IllegalArgumentException) {
 
     }
-    
+
     alertDialog = alertDialogBuilder.create()
 
     alertDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -107,20 +107,18 @@ fun displayAlertDialogList(
     }
 }
 
-fun showInformation(view: View, information:String){
-    view.findViewById<ImageButton>(R.id.informationButton).setOnClickListener {
-        MaterialAlertDialogBuilder(view.context).apply {
-            setTitle(view.context.getString(R.string.information))
-            setPositiveButton(view.context.getString(R.string.ok), null)
-            setMessage(information)
-        }.create().run {
-            show()
+fun showInformation(view: View, information: String) {
+    MaterialAlertDialogBuilder(view.context).apply {
+        setTitle(view.context.getString(R.string.information))
+        setPositiveButton(view.context.getString(R.string.ok), null)
+        setMessage(information)
+    }.create().run {
+        show()
 
-            val textColorTypedValue = TypedValue()
-            context.theme.resolveAttribute(R.attr.colorOnSurface, textColorTypedValue, true)
+        val textColorTypedValue = TypedValue()
+        context.theme.resolveAttribute(R.attr.colorOnSurface, textColorTypedValue, true)
 
-            val positiveButton = getButton(DialogInterface.BUTTON_POSITIVE)
-            positiveButton.setTextColor(textColorTypedValue.data)
-        }
+        val positiveButton = getButton(DialogInterface.BUTTON_POSITIVE)
+        positiveButton.setTextColor(textColorTypedValue.data)
     }
 }

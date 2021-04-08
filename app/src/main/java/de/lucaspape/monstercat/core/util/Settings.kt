@@ -97,7 +97,6 @@ class Settings {
         val defaultSaveCoverImagesToCache = true
         val defaultVolume = 1.0f
         val defaultCustomApiBaseUrl = "https://api.lucaspape.de/monstercat/"
-        val defaultSkipSongsFromMonstercat = true
         val defaultUseCustomApiForRelatedSongs = true
         val defaultUseCustomApiForCoverImages = true
         val defaultUseCustomApiForSearch = true

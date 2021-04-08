@@ -162,6 +162,7 @@ fun downloadImageUrlIntoImageReceiver(
     }
 }
 
+@Suppress("DEPRECATION")
 fun saveBitmapAsync(bitmap: Bitmap, outputFile: File) {
     BackgroundAsync {
         FileOutputStream(outputFile).use { out ->

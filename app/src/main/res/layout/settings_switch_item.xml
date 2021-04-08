@@ -12,6 +12,19 @@
             android:textColor="?android:attr/textColorPrimary"
             android:textSize="16sp"
             android:textStyle="normal"
+            android:layout_marginEnd="60dp"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/informationButton"/>
+
+        <ImageButton
+            android:id="@+id/informationButton"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="end"
+            android:background="@null"
+            android:contentDescription="@string/information"
+            android:src="@drawable/ic_baseline_info_24"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -203,6 +203,9 @@ abstract class RecyclerViewPage {
                         is FilterItem.ViewHolder -> {
                             viewHolder.titleMenuButton
                         }
+                        is SettingsToggleItem.ViewHolder -> {
+                            viewHolder.informationButton
+                        }
                         else -> null
                     }
                 }

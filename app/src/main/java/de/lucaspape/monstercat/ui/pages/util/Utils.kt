@@ -322,7 +322,7 @@ fun renamePlaylist(view: View, playlistId: String) {
                 context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
             val playlistNameInputLayout =
-                layoutInflater.inflate(R.layout.playlistname_input_layout, null)
+                layoutInflater.inflate(R.layout.playlistname_input_layout, view.findViewById(R.id.recyclerView), false)
 
             val playlistNameEditText =
                 playlistNameInputLayout.findViewById<EditText>(R.id.playlistNameInput)
@@ -446,7 +446,7 @@ fun createPlaylist(view: View) {
                     context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
                 val playlistNameInputLayout =
-                    layoutInflater.inflate(R.layout.playlistname_input_layout, null)
+                    layoutInflater.inflate(R.layout.playlistname_input_layout, view.findViewById(R.id.recyclerView), false)
 
                 val playlistNameEditText =
                     playlistNameInputLayout.findViewById<EditText>(R.id.playlistNameInput)
@@ -779,7 +779,7 @@ fun addFilter(view:View, callback: () -> Unit){
                 context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
             val filterInputLayout =
-                layoutInflater.inflate(R.layout.filter_input_layout, null)
+                layoutInflater.inflate(R.layout.filter_input_layout, view.findViewById(R.id.recyclerView), false)
 
             val filterEditText =
                 filterInputLayout.findViewById<EditText>(R.id.filter_input)

@@ -29,7 +29,7 @@ class ItemDatabaseHelper(private val context: Context, private var databaseId: S
                 databaseId,
                 0,
                 ""
-            ).TABLE_NAME
+            ).tableName
         )
         onCreate(db)
     }
@@ -40,7 +40,7 @@ class ItemDatabaseHelper(private val context: Context, private var databaseId: S
                 databaseId,
                 0,
                 ""
-            ).CREATE_TABLE)
+            ).createTable)
 
         val settings = Settings.getSettings(context)
 
@@ -56,7 +56,7 @@ class ItemDatabaseHelper(private val context: Context, private var databaseId: S
                 databaseId,
                 0,
                 ""
-            ).CREATE_TABLE)
+            ).createTable)
     }
 
     fun reCreateTable() {
@@ -67,7 +67,7 @@ class ItemDatabaseHelper(private val context: Context, private var databaseId: S
                 databaseId,
                 0,
                 ""
-            ).TABLE_NAME
+            ).tableName
         )
         onCreate(db)
     }
@@ -78,7 +78,7 @@ class ItemDatabaseHelper(private val context: Context, private var databaseId: S
                 databaseId,
                 0,
                 ""
-            ).TABLE_NAME
+            ).tableName
         )
         onCreate(db)
     }
@@ -95,7 +95,7 @@ class ItemDatabaseHelper(private val context: Context, private var databaseId: S
                 databaseId,
                 0,
                 ""
-            ).TABLE_NAME, null, values)
+            ).tableName, null, values)
         db.close()
         return id
     }
@@ -109,7 +109,7 @@ class ItemDatabaseHelper(private val context: Context, private var databaseId: S
                     databaseId,
                     0,
                     ""
-                ).TABLE_NAME, arrayOf(
+                ).tableName, arrayOf(
                     Item.COLUMN_ID,
                     Item.COLUMN_SONG_ID
                 ),
@@ -153,7 +153,7 @@ class ItemDatabaseHelper(private val context: Context, private var databaseId: S
             databaseId,
             0,
             ""
-        ).TABLE_NAME + " ORDER BY " +
+        ).tableName + " ORDER BY " +
                 Item.COLUMN_ID + " " + sort
 
         val db = writableDatabase
@@ -185,7 +185,7 @@ class ItemDatabaseHelper(private val context: Context, private var databaseId: S
             databaseId,
             0,
             ""
-        ).TABLE_NAME + " ORDER BY " +
+        ).tableName + " ORDER BY " +
                 Item.COLUMN_ID + " ASC LIMIT $skip,$limit"
 
         val db = writableDatabase

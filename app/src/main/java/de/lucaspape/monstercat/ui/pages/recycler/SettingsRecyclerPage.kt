@@ -130,17 +130,19 @@ class SettingsRecyclerPage(private val openFilterSettings: () -> Unit) : Recycle
         }
     }
 
-    override suspend fun onItemLongClick(
+    override suspend fun onMenuButtonClick(
         view: View,
         viewData: List<GenericItem>,
         itemIndex: Int
     ) {
-        super.onItemLongClick(view, viewData, itemIndex)
+        super.onMenuButtonClick(view, viewData, itemIndex)
 
         val item = viewData[itemIndex]
 
         if(item is SettingsToggleItem && item.description != null){
-            showInformation(view, item.description)
+            withContext(Dispatchers.Main){
+                showInformation(view, item.description)
+            }
         }
     }
 
