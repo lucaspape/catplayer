@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.mikepenz.fastadapter.GenericItem
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.*
@@ -37,7 +38,8 @@ class ToggleData(
     val trueValue: Any,
     val itemText: String,
     val requiredApiFeature: String?,
-    val onSwitchChange: (value: Boolean) -> Boolean
+    val onSwitchChange: (value: Boolean) -> Boolean,
+    val description: String?
 )
 
 class ButtonItem(override val typeId: String?, override val itemId: ButtonData) :
@@ -95,7 +97,8 @@ class SettingsRecyclerPage(private val openFilterSettings: () -> Unit) : Recycle
                         item.itemId.trueValue,
                         item.itemId.itemText,
                         item.itemId.requiredApiFeature,
-                        item.itemId.onSwitchChange
+                        item.itemId.onSwitchChange,
+                        item.itemId.description
                     )
                 } else {
                     null
@@ -123,6 +126,32 @@ class SettingsRecyclerPage(private val openFilterSettings: () -> Unit) : Recycle
             }
             else -> {
                 null
+            }
+        }
+    }
+
+    override suspend fun onItemLongClick(
+        view: View,
+        viewData: List<GenericItem>,
+        itemIndex: Int
+    ) {
+        super.onItemLongClick(view, viewData, itemIndex)
+
+        val item = viewData[itemIndex]
+
+        if(item is SettingsToggleItem && item.description != null){
+            MaterialAlertDialogBuilder(view.context).apply {
+                setTitle("Information")
+                setPositiveButton(view.context.getString(R.string.ok), null)
+                setMessage(item.description)
+            }.create().run {
+                show()
+
+                val textColorTypedValue = TypedValue()
+                context.theme.resolveAttribute(R.attr.colorOnSurface, textColorTypedValue, true)
+
+                val positiveButton = getButton(DialogInterface.BUTTON_POSITIVE)
+                positiveButton.setTextColor(textColorTypedValue.data)
             }
         }
     }
@@ -225,7 +254,7 @@ class SettingsRecyclerPage(private val openFilterSettings: () -> Unit) : Recycle
             applyFilterSettings(context)
 
             value
-        })))
+        }, context.getString(R.string.skipCreatorFriendlyDescription))))
 
         content.add(ToggleItem("toggle", ToggleData({
             var filterExists = false
@@ -257,7 +286,7 @@ class SettingsRecyclerPage(private val openFilterSettings: () -> Unit) : Recycle
             applyFilterSettings(context)
 
             value
-        })))
+        }, context.getString(R.string.skipMonstercatDescription))))
 
         content.add(ToggleItem("toggle", ToggleData({
             var filterExists = false
@@ -289,7 +318,7 @@ class SettingsRecyclerPage(private val openFilterSettings: () -> Unit) : Recycle
             applyFilterSettings(context)
 
             value
-        })))
+        }, context.getString(R.string.skipExplicitDescription))))
 
         val settings = Settings.getSettings(context)
 
@@ -300,7 +329,7 @@ class SettingsRecyclerPage(private val openFilterSettings: () -> Unit) : Recycle
             settings.setBoolean(context.getString(R.string.hideToBeSkippedSetting), value)
             applyFilterSettings(context)
             value
-        })))
+        }, context.getString(R.string.hideToBeSkippedDescription))))
 
         content.add(ButtonItem("button", ButtonData("Adjust Filters", openFilterSettings)))
 
@@ -317,7 +346,7 @@ class SettingsRecyclerPage(private val openFilterSettings: () -> Unit) : Recycle
                         playRelatedSongsAfterPlaylistFinished = value
                         settings.setBoolean(context.getString(R.string.playRelatedSetting), value)
                         value
-                    })
+                    }, context.getString(R.string.playRelatedDescription))
             )
         )
 
@@ -397,7 +426,7 @@ class SettingsRecyclerPage(private val openFilterSettings: () -> Unit) : Recycle
                 value
             )
             value
-        })))
+        }, null)))
 
         content.add(ToggleItem("toggle", ToggleData({
             settings.getBoolean(context.getString(R.string.downloadOverMobileSetting))
@@ -407,7 +436,7 @@ class SettingsRecyclerPage(private val openFilterSettings: () -> Unit) : Recycle
                 value
             )
             value
-        })))
+        }, null)))
 
         content.add(ToggleItem("toggle", ToggleData({
             settings.getString(context.getString(R.string.downloadCoversOverMobileSetting))
@@ -417,7 +446,7 @@ class SettingsRecyclerPage(private val openFilterSettings: () -> Unit) : Recycle
                 value
             )
             value
-        })))
+        },null)))
 
         settings.getInt(context.getString(R.string.primaryCoverResolutionSetting))
             ?.let { orig ->
@@ -472,7 +501,7 @@ class SettingsRecyclerPage(private val openFilterSettings: () -> Unit) : Recycle
                 value
             )
             value
-        })))
+        }, context.getString(R.string.disableAudioFocusDescription))))
 
         content.add(ToggleItem("toggle", ToggleData({
             settings.getBoolean(context.getString(R.string.saveCoverImagesToCacheSetting))
@@ -482,7 +511,7 @@ class SettingsRecyclerPage(private val openFilterSettings: () -> Unit) : Recycle
                 value
             )
             value
-        })))
+        }, context.getString(R.string.saveCoverImagesToCacheDescription))))
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             content.add(ToggleItem("toggle", ToggleData({
@@ -497,7 +526,7 @@ class SettingsRecyclerPage(private val openFilterSettings: () -> Unit) : Recycle
                 }
 
                 value
-            })))
+            }, null)))
         }
 
         content.add(ToggleItem("toggle", ToggleData({
@@ -510,7 +539,7 @@ class SettingsRecyclerPage(private val openFilterSettings: () -> Unit) : Recycle
             }
 
             value
-        })))
+        }, null)))
 
         content.add(
             ToggleItem(
@@ -527,7 +556,7 @@ class SettingsRecyclerPage(private val openFilterSettings: () -> Unit) : Recycle
                             value
                         )
                         value
-                    })
+                    }, context.getString(R.string.useCustomApiForCoverDownloadDescription))
             )
         )
 
@@ -546,7 +575,7 @@ class SettingsRecyclerPage(private val openFilterSettings: () -> Unit) : Recycle
                             value
                         )
                         value
-                    })
+                    }, context.getString(R.string.useCustomApiForSearchDescription))
             )
         )
 
@@ -565,7 +594,7 @@ class SettingsRecyclerPage(private val openFilterSettings: () -> Unit) : Recycle
                             value
                         )
                         value
-                    })
+                    }, context.getString(R.string.useCustomApiDescription))
             )
         )
 
