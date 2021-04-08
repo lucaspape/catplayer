@@ -494,7 +494,7 @@ suspend fun loadRelatedTracks(
     errorCallback: () -> Unit
 ) {
     withContext(Dispatchers.Default) {
-        var result: ArrayList<String>? = ArrayList()
+        val result: ArrayList<String> = ArrayList()
 
         val volleyQueue =
             getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
@@ -511,10 +511,10 @@ suspend fun loadRelatedTracks(
                         context
                     )
 
-                    result?.add(trackObject.getString("id"))
+                    result.add(trackObject.getString("id"))
                 }
             } catch (e: JSONException) {
-                result = null
+                errorCallback()
             }
 
             finishedCallback(result)
