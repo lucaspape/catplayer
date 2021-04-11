@@ -339,11 +339,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun registerListeners() {
-        findViewById<ImageButton>(R.id.playButton).setOnClickListener {
+        findViewById<ImageButton>(R.id.playButton)?.setOnClickListener {
             toggleMusic(this)
         }
 
-        findViewById<androidx.appcompat.widget.Toolbar>(R.id.musicBar).setOnClickListener {
+        findViewById<androidx.appcompat.widget.Toolbar>(R.id.musicBar)?.setOnClickListener {
             startActivity(
                 Intent(applicationContext, PlayerFullscreenActivity::class.java)
             )
@@ -370,6 +370,88 @@ class MainActivity : AppCompatActivity() {
                 }
                 false
             })
+
+        val playButton = findViewById<ImageButton>(R.id.fullScreenPlay)
+        val backButton = findViewById<ImageButton>(R.id.fullscreenPrev)
+        val nextButton = findViewById<ImageButton>(R.id.fullscreenNext)
+        val shuffleButton = findViewById<ImageButton>(R.id.fullscreenShuffle)
+        val loopButton = findViewById<ImageButton>(R.id.fullscreenLoop)
+        val fullscreenMenuButton = findViewById<ImageButton>(R.id.fullscreenMenuButton)
+
+        if (shuffle) {
+            shuffleButton?.setImageResource(R.drawable.ic_shuffle_green_24dp)
+        } else {
+            shuffleButton?.setImageResource(R.drawable.ic_shuffle_24dp)
+        }
+
+        when {
+            loop -> {
+                loopButton?.setImageResource(R.drawable.ic_repeat_green_24dp)
+            }
+            loopSingle -> {
+                loopButton?.setImageResource(R.drawable.ic_repeat_one_green_24dp)
+            }
+            else -> {
+                loopButton?.setImageResource(R.drawable.ic_repeat_24dp)
+            }
+        }
+
+        playButton?.setOnClickListener {
+            toggleMusic(this)
+        }
+
+        nextButton?.setOnClickListener {
+            next(this)
+        }
+
+        backButton?.setOnClickListener {
+            previous(this)
+        }
+
+        shuffleButton?.setOnClickListener {
+            if (shuffle) {
+                shuffle = false
+                shuffleButton.setImageResource(R.drawable.ic_shuffle_24dp)
+            } else {
+                shuffle = true
+                shuffleButton.setImageResource(R.drawable.ic_shuffle_green_24dp)
+            }
+        }
+
+        loopButton?.setOnClickListener {
+            when {
+                loop -> {
+                    loop = false
+
+                    loopSingle = true
+
+                    loopButton.setImageResource(R.drawable.ic_repeat_one_green_24dp)
+                }
+                loopSingle -> {
+                    loopSingle = false
+                    loopButton.setImageResource(R.drawable.ic_repeat_24dp)
+                }
+                else -> {
+                    loop = true
+                    loopButton.setImageResource(R.drawable.ic_repeat_green_24dp)
+                }
+            }
+        }
+
+        fullscreenMenuButton?.setOnClickListener {
+            //TODO CatalogItem.showContextMenu(this, arrayListOf(currentSongId), 0)
+        }
+
+        val titleTextView = findViewById<TextView>(R.id.fullscreenTitle)
+        val artistTextView = findViewById<TextView>(R.id.fullscreenArtist)
+
+        titleTextView?.setOnClickListener {
+            //TODO onSearch(titleTextView.text.toString())
+        }
+
+        artistTextView?.setOnClickListener {
+            //TODO onSearch(artistTextView.text.toString())
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -380,27 +462,41 @@ class MainActivity : AppCompatActivity() {
         val playButton = findViewById<ImageButton>(R.id.playButton)
         val musicBar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.musicBar)
 
+        val titleTextViewFullscreen = findViewById<TextView>(R.id.fullscreenTitle)
+        val artistTextViewFullscreen = findViewById<TextView>(R.id.fullscreenArtist)
+        val seekbarFullscreen = findViewById<SeekBar>(R.id.fullscreenSeekBar)
+        val barCoverImageFullscreen = findViewById<ImageView>(R.id.fullscreenAlbumImage)
+        val playButtonFullscreen = findViewById<ImageButton>(R.id.fullScreenPlay)
+
+        val songTimePassedFullscreen = findViewById<TextView>(R.id.songTimePassed)
+        val songTimeMaxFullscreen = findViewById<TextView>(R.id.songTimeMax)
+
         titleChangedCallback = {
             val titleWithArtist = "${de.lucaspape.monstercat.core.music.util.title} - $artist"
-            titleTextView.text = titleWithArtist
+            titleTextView?.text = titleWithArtist
+            titleTextViewFullscreen?.text = de.lucaspape.monstercat.core.music.util.title
+            artistTextViewFullscreen?.text = artist
 
-            musicBar.isVisible = de.lucaspape.monstercat.core.music.util.title.isNotEmpty()
-            barCoverImage.isVisible = de.lucaspape.monstercat.core.music.util.title.isNotEmpty()
-            playButton.isVisible = de.lucaspape.monstercat.core.music.util.title.isNotEmpty()
+            musicBar?.isVisible = de.lucaspape.monstercat.core.music.util.title.isNotEmpty()
+            barCoverImage?.isVisible = de.lucaspape.monstercat.core.music.util.title.isNotEmpty()
+            playButton?.isVisible = de.lucaspape.monstercat.core.music.util.title.isNotEmpty()
         }
 
-        musicBar.isVisible = de.lucaspape.monstercat.core.music.util.title.isNotEmpty()
-        barCoverImage.isVisible = de.lucaspape.monstercat.core.music.util.title.isNotEmpty()
-        playButton.isVisible = de.lucaspape.monstercat.core.music.util.title.isNotEmpty()
+        musicBar?.isVisible = de.lucaspape.monstercat.core.music.util.title.isNotEmpty()
+        barCoverImage?.isVisible = de.lucaspape.monstercat.core.music.util.title.isNotEmpty()
+        playButton?.isVisible = de.lucaspape.monstercat.core.music.util.title.isNotEmpty()
 
         val titleWithArtist = "${de.lucaspape.monstercat.core.music.util.title} - $artist"
-        titleTextView.text = titleWithArtist
+        titleTextView?.text = titleWithArtist
+        titleTextViewFullscreen?.text = de.lucaspape.monstercat.core.music.util.title
+        artistTextViewFullscreen?.text = artist
 
         artistChangedCallback = titleChangedCallback
 
-        seekbar.progress = currentPosition.toInt()
+        seekbar?.progress = currentPosition.toInt()
+        seekbarFullscreen?.progress = currentPosition.toInt()
 
-        seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        seekbarFullscreen?.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 if (fromUser)
                     exoPlayer?.seekTo(progress.toLong())
@@ -416,36 +512,66 @@ class MainActivity : AppCompatActivity() {
         seekbar.setOnTouchListener { _, _ -> true }
 
         currentPositionChangedCallback = {
-            seekbar.progress = currentPosition.toInt()
+            seekbar?.progress = currentPosition.toInt()
+            seekbarFullscreen?.progress = currentPosition.toInt()
+
+            val minutes = currentPosition / 60000
+            val seconds = (currentPosition % 60000) / 1000
+
+            val text = if (seconds < 10) {
+                "$minutes:0$seconds"
+            } else {
+                "$minutes:$seconds"
+            }
+
+            songTimePassedFullscreen?.text = text
         }
 
         durationChangedCallback = {
-            seekbar.max = duration.toInt()
+            seekbar?.max = duration.toInt()
+            seekbarFullscreen?.max = duration.toInt()
+
+            val minutes = duration / 60000
+            val seconds = (duration % 60000) / 1000
+
+            val text = if (seconds < 10) {
+                "$minutes:0$seconds"
+            } else {
+                "$minutes:$seconds"
+            }
+
+            songTimeMaxFullscreen?.text = text
         }
 
-        barCoverImage.setImageBitmap(coverBitmap)
+        barCoverImage?.setImageBitmap(coverBitmap)
+        barCoverImageFullscreen?.setImageBitmap(coverBitmap)
 
         playingChangedCallback = {
             if (visiblePlaying) {
-                playButton.setImageURI(pauseButtonDrawable.toUri())
+                playButton?.setImageURI(pauseButtonDrawable.toUri())
+                playButtonFullscreen?.setImageURI(pauseButtonDrawable.toUri())
 
             } else {
-                playButton.setImageURI(playButtonDrawable.toUri())
+                playButton?.setImageURI(playButtonDrawable.toUri())
+                playButtonFullscreen?.setImageURI(playButtonDrawable.toUri())
             }
         }
 
         playingChangedCallback()
 
         coverBitmapChangedCallback = {
-            barCoverImage.setImageBitmap(coverBitmap)
+            barCoverImage?.setImageBitmap(coverBitmap)
+            barCoverImageFullscreen?.setImageBitmap(coverBitmap)
         }
 
         coverDrawableChangedCallback = {
-            barCoverImage.setImageDrawable(coverDrawable)
+            barCoverImage?.setImageDrawable(coverDrawable)
+            barCoverImageFullscreen?.setImageDrawable(coverDrawable)
         }
 
         setTagCallback = { target ->
-            barCoverImage.tag = target
+            barCoverImage?.tag = target
+            barCoverImageFullscreen?.tag = target
         }
 
         loadingRelatedChangedCallback = {
