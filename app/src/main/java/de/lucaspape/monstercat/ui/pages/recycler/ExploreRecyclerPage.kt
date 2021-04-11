@@ -79,7 +79,7 @@ open class ExploreRecyclerPage(
             items.add(StringItem("item", "mood"))
 
             items.add(StringItem("separator", context.getString(R.string.genres)))
-            items.add(StringItem("genre", "item"))
+            items.add(StringItem("item", "genre"))
 
             items.add(StringItem("separator", context.getString(R.string.greatestHits)))
             items.add(StringItem("item", "greatest-hits"))
