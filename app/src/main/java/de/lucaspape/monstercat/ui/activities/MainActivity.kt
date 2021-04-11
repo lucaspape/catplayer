@@ -45,6 +45,43 @@ var lastOpenPage: String? = null
 
 val genericScope = CoroutineScope(Dispatchers.Default)
 
+fun login(context: Context) {
+    val settings = Settings.getSettings(context)
+
+    //login
+    if (!loggedIn) {
+        Auth().checkLogin(context, {
+            //login success
+            println(context.getString(R.string.loginSuccessfulMsg))
+
+            //create the MusicPlayer.kt mediasession
+            createMediaSession(context, true)
+        }, {
+            //login failed, retrieve new SID
+
+            val sUsername = settings.getString(context.getString(R.string.emailSetting))
+            val sPassword = settings.getString(context.getString(R.string.passwordSetting))
+
+            sUsername?.let { username ->
+                sPassword?.let { password ->
+                    //login to monstercat
+                    Auth().login(context, username, password, {
+                        println(context.getString(R.string.loginSuccessfulMsg))
+
+                        //create the MusicPlayer.kt mediasession
+                        createMediaSession(context, true)
+                    }, {
+                        displayInfo(context, context.getString(R.string.loginFailedMsg))
+
+                        //create the MusicPlayer.kt mediasession
+                        createMediaSession(context, true)
+                    })
+                }
+            }
+        })
+    }
+}
+
 /**
  * Main activity
  */
@@ -80,7 +117,7 @@ class MainActivity : AppCompatActivity() {
 
         applyPlayerSettings(this)
 
-        login()
+        login(this)
 
         setContentView(R.layout.activity_main)
 
@@ -119,43 +156,6 @@ class MainActivity : AppCompatActivity() {
             != PackageManager.PERMISSION_GRANTED
         ) {
             displayInfo(this, getString(R.string.noInternetAccessError))
-        }
-    }
-
-    private fun login() {
-        val settings = Settings.getSettings(this)
-
-        //login
-        if (!loggedIn) {
-            Auth().checkLogin(this, {
-                //login success
-                println(getString(R.string.loginSuccessfulMsg))
-
-                //create the MusicPlayer.kt mediasession
-                createMediaSession(this)
-            }, {
-                //login failed, retrieve new SID
-
-                val sUsername = settings.getString(getString(R.string.emailSetting))
-                val sPassword = settings.getString(getString(R.string.passwordSetting))
-
-                sUsername?.let { username ->
-                    sPassword?.let { password ->
-                        //login to monstercat
-                        Auth().login(this, username, password, {
-                            println(getString(R.string.loginSuccessfulMsg))
-
-                            //create the MusicPlayer.kt mediasession
-                            createMediaSession(this)
-                        }, {
-                            displayInfo(this, getString(R.string.loginFailedMsg))
-
-                            //create the MusicPlayer.kt mediasession
-                            createMediaSession(this)
-                        })
-                    }
-                }
-            })
         }
     }
 

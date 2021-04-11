@@ -17,6 +17,9 @@ import de.lucaspape.monstercat.core.music.notification.stopPlayerService
 import de.lucaspape.monstercat.core.music.save.PlayerSaveState
 import de.lucaspape.monstercat.core.music.util.*
 import de.lucaspape.monstercat.core.util.Settings
+import de.lucaspape.monstercat.ui.activities.MainActivity
+import de.lucaspape.monstercat.ui.activities.login
+import de.lucaspape.monstercat.util.loggedIn
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
@@ -132,20 +135,24 @@ class NoisyReceiver : BroadcastReceiver() {
 /**
  * Create mediaSession and listen for callbacks (pause, play buttons on headphones etc.)
  */
-fun createMediaSession(context: Context) {
+fun createMediaSession(context: Context, force:Boolean) {
     if (!sessionCreated || mediaSession == null) {
-        PlayerSaveState.restore(context, false)
+        if(!loggedIn || !force){
+            login(context)
+        }else{
+            PlayerSaveState.restore(context, false)
 
-        mediaSession = MediaSessionCompat.fromMediaSession(
-            context,
-            MediaSession(context, "de.lucaspape.monstercat.core.music")
-        )
+            mediaSession = MediaSessionCompat.fromMediaSession(
+                context,
+                MediaSession(context, "de.lucaspape.monstercat.core.music")
+            )
 
-        mediaSession?.setCallback(MediaSessionCallback(context))
+            mediaSession?.setCallback(MediaSessionCallback(context))
 
-        mediaSession?.isActive = true
+            mediaSession?.isActive = true
 
-        sessionCreated = true
+            sessionCreated = true
+        }
     }
 }
 

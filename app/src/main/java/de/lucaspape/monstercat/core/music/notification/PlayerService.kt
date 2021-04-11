@@ -19,7 +19,7 @@ class PlayerService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         //make sure session is started
-        createMediaSession(applicationContext)
+        createMediaSession(applicationContext, false)
 
         //register receiver which checks if headphones unplugged
         applicationContext.registerReceiver(noisyReceiver, IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY))
