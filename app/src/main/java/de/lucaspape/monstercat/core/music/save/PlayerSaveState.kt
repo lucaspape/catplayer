@@ -56,7 +56,7 @@ data class PlayerSaveState(
                                 prioritySongQueue = playerSaveState.prioritySongQueue
 
                                 playerSaveState.progress?.let { progress ->
-                                    currentPosition = progress.toInt()
+                                    currentPosition = progress
 
                                     playSong(
                                         context, currentSongId,
@@ -67,7 +67,7 @@ data class PlayerSaveState(
                                 }
 
                                 playerSaveState.duration?.let { sDuration ->
-                                    duration = sDuration.toInt()
+                                    duration = sDuration
                                 }
                             } catch (e: ClassNotFoundException) {
                                 delete(context)
@@ -89,30 +89,32 @@ data class PlayerSaveState(
 
         @JvmStatic
         fun save(context: Context) {
-            val objectOutputStream =
-                ObjectOutputStream(FileOutputStream(File(context.cacheDir.toString() + "/player_state.obj")))
+            if(restored){
+                val objectOutputStream =
+                    ObjectOutputStream(FileOutputStream(File(context.cacheDir.toString() + "/player_state.obj")))
 
-            val playerSaveState =
-                PlayerSaveState(
-                    loop,
-                    loopSingle,
-                    shuffle,
-                    crossfade,
-                    playlist,
-                    playlistIndex,
-                    nextRandom,
-                    songQueue,
-                    prioritySongQueue,
-                    exoPlayer?.currentPosition,
-                    exoPlayer?.duration
-                )
+                val playerSaveState =
+                    PlayerSaveState(
+                        loop,
+                        loopSingle,
+                        shuffle,
+                        crossfade,
+                        playlist,
+                        playlistIndex,
+                        nextRandom,
+                        songQueue,
+                        prioritySongQueue,
+                        currentPosition,
+                        duration
+                    )
 
-            try {
-                objectOutputStream.writeObject(playerSaveState)
-                objectOutputStream.flush()
-                objectOutputStream.close()
-            } catch (e: ConcurrentModificationException) {
+                try {
+                    objectOutputStream.writeObject(playerSaveState)
+                    objectOutputStream.flush()
+                    objectOutputStream.close()
+                } catch (e: ConcurrentModificationException) {
 
+                }
             }
         }
 

@@ -198,13 +198,13 @@ fun runSeekBarUpdate(context: Context, prepareNext: Boolean, crossFade: Boolean)
 
     val updateSeekBar = object : Runnable {
         override fun run() {
-            exoPlayer?.duration?.toInt()?.let {
+            exoPlayer?.duration?.let {
                 duration = it
             }
 
-            exoPlayer?.currentPosition?.toInt()?.let {
+            exoPlayer?.currentPosition?.let {
                 currentPosition = it
-                setPlayerState(it.toLong())
+                setPlayerState(it)
             }
 
             //add current song to history after 30 seconds

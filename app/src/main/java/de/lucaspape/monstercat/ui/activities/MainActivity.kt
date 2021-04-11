@@ -130,6 +130,9 @@ class MainActivity : AppCompatActivity() {
             Auth().checkLogin(this, {
                 //login success
                 println(getString(R.string.loginSuccessfulMsg))
+
+                //create the MusicPlayer.kt mediasession
+                createMediaSession(this)
             }, {
                 //login failed, retrieve new SID
 
@@ -141,8 +144,14 @@ class MainActivity : AppCompatActivity() {
                         //login to monstercat
                         Auth().login(this, username, password, {
                             println(getString(R.string.loginSuccessfulMsg))
+
+                            //create the MusicPlayer.kt mediasession
+                            createMediaSession(this)
                         }, {
                             displayInfo(this, getString(R.string.loginFailedMsg))
+
+                            //create the MusicPlayer.kt mediasession
+                            createMediaSession(this)
                         })
                     }
                 }
@@ -218,9 +227,6 @@ class MainActivity : AppCompatActivity() {
             },
             Intent(this, MainActivity::class.java)
         )
-
-        //create the MusicPlayer.kt mediasession
-        createMediaSession(this)
 
         //update notification after restart of activity (screen orientation change etc)
         if (exoPlayer?.isPlaying == true) {
@@ -392,7 +398,7 @@ class MainActivity : AppCompatActivity() {
 
         artistChangedCallback = titleChangedCallback
 
-        seekbar.progress = currentPosition
+        seekbar.progress = currentPosition.toInt()
 
         seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
@@ -410,11 +416,11 @@ class MainActivity : AppCompatActivity() {
         seekbar.setOnTouchListener { _, _ -> true }
 
         currentPositionChangedCallback = {
-            seekbar.progress = currentPosition
+            seekbar.progress = currentPosition.toInt()
         }
 
         durationChangedCallback = {
-            seekbar.max = duration
+            seekbar.max = duration.toInt()
         }
 
         barCoverImage.setImageBitmap(coverBitmap)

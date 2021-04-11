@@ -42,16 +42,16 @@ var artist = ""
         artistChangedCallback()
     }
 
-var currentPosition = 0
-    set(newInt) {
-        field = newInt
+var currentPosition:Long = 0
+    set(newLong) {
+        field = newLong
 
         currentPositionChangedCallback()
     }
 
-var duration = 0
-    set(newInt) {
-        field = newInt
+var duration:Long = 0
+    set(newLong) {
+        field = newLong
 
         setSongMetadata()
 

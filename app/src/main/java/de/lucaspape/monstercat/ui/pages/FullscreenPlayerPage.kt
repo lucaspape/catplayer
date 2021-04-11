@@ -45,7 +45,7 @@ class FullscreenPlayerPage(
             artistTextView.text = artist
         }
 
-        seekbar.progress = currentPosition
+        seekbar.progress = currentPosition.toInt()
 
         seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
@@ -61,7 +61,7 @@ class FullscreenPlayerPage(
         })
 
         currentPositionChangedCallback = {
-            seekbar.progress = currentPosition
+            seekbar.progress = currentPosition.toInt()
 
             val minutes = currentPosition / 60000
             val seconds = (currentPosition % 60000) / 1000
@@ -76,7 +76,7 @@ class FullscreenPlayerPage(
         }
 
         durationChangedCallback = {
-            seekbar.max = duration
+            seekbar.max = duration.toInt()
 
             val minutes = duration / 60000
             val seconds = (duration % 60000) / 1000
