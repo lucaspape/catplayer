@@ -349,6 +349,12 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
+        findViewById<ImageView>(R.id.fullscreenAlbumImage)?.setOnClickListener {
+            startActivity(
+                Intent(applicationContext, PlayerFullscreenActivity::class.java)
+            )
+        }
+
         findViewById<BottomNavigationView>(R.id.nav_view).setOnNavigationItemSelectedListener(
             BottomNavigationView.OnNavigationItemSelectedListener { item ->
                 when (item.itemId) {
@@ -376,7 +382,6 @@ class MainActivity : AppCompatActivity() {
         val nextButton = findViewById<ImageButton>(R.id.fullscreenNext)
         val shuffleButton = findViewById<ImageButton>(R.id.fullscreenShuffle)
         val loopButton = findViewById<ImageButton>(R.id.fullscreenLoop)
-        val fullscreenMenuButton = findViewById<ImageButton>(R.id.fullscreenMenuButton)
 
         if (shuffle) {
             shuffleButton?.setImageResource(R.drawable.ic_shuffle_green_24dp)
@@ -438,19 +443,15 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        fullscreenMenuButton?.setOnClickListener {
-            //TODO CatalogItem.showContextMenu(this, arrayListOf(currentSongId), 0)
-        }
-
         val titleTextView = findViewById<TextView>(R.id.fullscreenTitle)
         val artistTextView = findViewById<TextView>(R.id.fullscreenArtist)
 
         titleTextView?.setOnClickListener {
-            //TODO onSearch(titleTextView.text.toString())
+            openSearch(titleTextView.text.toString())
         }
 
         artistTextView?.setOnClickListener {
-            //TODO onSearch(artistTextView.text.toString())
+            openSearch(artistTextView.text.toString())
         }
     }
 
@@ -509,7 +510,7 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        seekbar.setOnTouchListener { _, _ -> true }
+        seekbar?.setOnTouchListener { _, _ -> true }
 
         currentPositionChangedCallback = {
             seekbar?.progress = currentPosition.toInt()

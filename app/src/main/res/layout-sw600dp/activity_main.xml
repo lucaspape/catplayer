@@ -17,22 +17,10 @@
         app:layout_constraintEnd_toStartOf="@id/container"
         android:layout_marginBottom="70dp">
 
-        <ImageButton
-            android:id="@+id/fullscreenMenuButton"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginEnd="5dp"
-            android:layout_marginTop="5dp"
-            android:background="@null"
-            android:contentDescription="@string/contextMenu"
-            android:src="@drawable/ic_more_vert_24dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <ImageView
             android:id="@+id/fullscreenAlbumImage"
-            android:layout_width="500dp"
-            android:layout_height="500dp"
+            android:layout_width="400dp"
+            android:layout_height="400dp"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="64dp"
             android:layout_marginRight="10dp"
