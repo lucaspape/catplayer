@@ -21,8 +21,7 @@ import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListHeaderItem
 import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListItem
 
 open class AlbumItem(
-    val albumId: String,
-    horizontal: Boolean
+    val albumId: String
 ) : AbstractItem<AlbumItem.ViewHolder>() {
 
     companion object {
@@ -87,11 +86,7 @@ open class AlbumItem(
 
     override val type: Int = 10001
 
-    override val layoutRes = if (horizontal) {
-        R.layout.list_album_horizontal
-    } else {
-        R.layout.list_album
-    }
+    override val layoutRes = R.layout.list_album
 
     override fun getViewHolder(v: View): ViewHolder {
         return ViewHolder(

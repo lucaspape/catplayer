@@ -65,10 +65,7 @@ class HomeAlbumRecyclerPage(private val onSingleAlbumLoad: (albumId: String, alb
 
     override suspend fun itemToAbstractItem(view: View, item: Item): GenericItem? {
         return if(item is StringItem){
-            AlbumItem(
-                item.itemId,
-                (view.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
-            )
+            AlbumItem(item.itemId)
         }else{
             null
         }
@@ -103,14 +100,6 @@ class HomeAlbumRecyclerPage(private val onSingleAlbumLoad: (albumId: String, alb
 
     override fun clearDatabase(context: Context) {
         AlbumDatabaseHelper(context).reCreateTable(context, false)
-    }
-
-    override fun getOrientation(view: View): Int {
-        return if(view.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE){
-            LinearLayout.HORIZONTAL
-        }else{
-            LinearLayout.VERTICAL
-        }
     }
 
     override fun restore(data: HashMap<String, String>?): Boolean {
