@@ -29,4 +29,5 @@
     <string name="useCustomApiForCoverImagesSetting" translatable="false">useCustomApiForCoverImages</string>
     <string name="useCustomApiForEverythingSetting" translatable="false">useCustomApiForEverything</string>
     <string name="hideToBeSkippedSetting" translatable="false">hideToBeSkipped</string>
+    <string name="streamLossLessSetting" translatable="false">streamLossLess</string>
 </resources>

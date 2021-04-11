@@ -520,6 +520,15 @@ class SettingsRecyclerPage(private val openFilterSettings: () -> Unit) : Recycle
         }
 
         content.add(ToggleItem("toggle", ToggleData({
+            settings.getBoolean(context.getString(R.string.streamLossLessSetting))
+        }, true, context.getString(R.string.streamLossLess), null, {
+            value: Boolean ->
+            settings.setBoolean(context.getString(R.string.streamLossLessSetting), value)
+
+            value
+        }, context.getString(R.string.streamLossLessDescription))))
+
+        content.add(ToggleItem("toggle", ToggleData({
             settings.getString(context.getString(R.string.downloadTypeSetting))
         }, "flac", context.getString(R.string.downloadFlacInsteadMp3), null, { value: Boolean ->
             if (value) {

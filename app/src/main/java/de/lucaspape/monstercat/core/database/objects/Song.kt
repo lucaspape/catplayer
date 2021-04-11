@@ -128,21 +128,38 @@ data class Song(
         }
     }
 
-    fun deleteDownload(context: Context){
-        File(downloadLocation(context)).delete()
-    }
-
-    private fun streamUrl(context: Context): String {
-        return if (
-            Settings.getSettings(context)
+    private fun lossLessStreamingUrl(context: Context): String {
+        return if (Settings.getSettings(context)
                 .getBoolean(context.getString(R.string.useCustomApiForEverythingSetting)) == true && Settings.getSettings(
                 context
             ).getBoolean(context.getString(R.string.customApiSupportsV1Setting)) == true
         ) {
             Settings.getSettings(context)
-                .getString(context.getString(R.string.customStreamUrlSetting)) + albumId + "/track-stream/" + songId
+                .getString(context.getString(R.string.customDownloadUrlSetting)) + albumId + "/track-download/" + songId + "?format=" + "wav"
         } else {
-            context.getString(R.string.trackContentUrl) + albumId + "/track-stream/" + songId
+            context.getString(R.string.trackContentUrl) + albumId + "/track-download/" + songId + "?format=" + "wav"
+        }
+    }
+
+    fun deleteDownload(context: Context){
+        File(downloadLocation(context)).delete()
+    }
+
+    private fun streamUrl(context: Context): String {
+        return if(Settings.getSettings(context).getBoolean(context.getString(R.string.streamLossLessSetting)) == true && isDownloadable){
+            lossLessStreamingUrl(context)
+        }else{
+            if (
+                Settings.getSettings(context)
+                    .getBoolean(context.getString(R.string.useCustomApiForEverythingSetting)) == true && Settings.getSettings(
+                    context
+                ).getBoolean(context.getString(R.string.customApiSupportsV1Setting)) == true
+            ) {
+                Settings.getSettings(context)
+                    .getString(context.getString(R.string.customStreamUrlSetting)) + albumId + "/track-stream/" + songId
+            } else {
+                context.getString(R.string.trackContentUrl) + albumId + "/track-stream/" + songId
+            }
         }
     }
 

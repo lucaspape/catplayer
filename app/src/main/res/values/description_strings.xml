@@ -68,4 +68,7 @@
     <string name="filterDescription">You can add custom filters. If a song title or artist contains the text specified in the filter (not case sensitive), it will be automatically skipped. If enabled, it will also be hidden. If you actively tap on a song or add it to queue it wont be skipped! Example: add "Extended" as title filter, all extended mixes will be automatically skipped.</string>
     <string name="explicitDescription">Song is explicit</string>
     <string name="alertListImage">Image</string>
+    <string name="streamLossLess">Stream WAV instead of MP3</string>
+    <string name="streamLossLessDescription">Works only if you have Monstercat Gold and if the song is downloadable, otherwise it will fallback to MP3. Warning: this has huge data usage!</string>
+
 </resources>
