@@ -20,12 +20,14 @@
 
         <ImageView
             android:id="@+id/fullscreenAlbumImage"
-            android:layout_width="0dp"
-            android:layout_height="300dp"
+            android:layout_width="400dp"
+            android:layout_height="0dp"
             android:contentDescription="@string/fullscreenAlbumImage"
             app:layout_constraintBottom_toTopOf="@+id/fullscreenTitle"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.492"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_music_video_black_24dp" />
 
         <ImageButton
@@ -94,7 +96,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:textColor="?attr/colorOnSurface"
-            android:textSize="18sp"
+            android:textSize="28sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@+id/fullscreenArtist"
             app:layout_constraintEnd_toEndOf="parent"
@@ -111,7 +113,7 @@
             android:layout_marginStart="10dp"
             android:layout_marginBottom="10dp"
             android:textColor="?attr/colorOnSurface"
-            android:textSize="16sp"
+            android:textSize="22sp"
             app:layout_constraintBottom_toTopOf="@+id/fullscreenSeekBar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
