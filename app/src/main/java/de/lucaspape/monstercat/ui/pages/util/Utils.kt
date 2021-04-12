@@ -672,9 +672,9 @@ fun addFilterUI(view: View, callback: () -> Unit) {
         }
 
         val hint = if (artistFilter) {
-            "Artist"
+            view.context.getString(R.string.artist)
         } else {
-            "Title"
+            view.context.getString(R.string.title)
         }
 
         showInputAlert(

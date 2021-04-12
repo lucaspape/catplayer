@@ -54,6 +54,7 @@
     <string name="publicPlaylists">Monstercat Playlists</string>
     <string name="addFilter">Add filter</string>
     <string name="title">Title</string>
+    <string name="artist">Artist</string>
     <string name="information">Information</string>
     <string name="skipCreatorFriendlyDescription">Adds a filter that skips songs which are not "creator friendly"</string>
     <string name="skipMonstercatDescription">Adds an artist filter for songs by Monstercat (like Call of the Wild Podcast)</string>
