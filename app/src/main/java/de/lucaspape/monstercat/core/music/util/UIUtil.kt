@@ -194,7 +194,7 @@ private fun setSongMetadata() {
         val mediaMetadata = MediaMetadataCompat.Builder()
         mediaMetadata.putString(MediaMetadata.METADATA_KEY_ARTIST, artist)
         mediaMetadata.putString(MediaMetadata.METADATA_KEY_TITLE, title)
-        mediaMetadata.putLong(MediaMetadata.METADATA_KEY_DURATION, duration.toLong())
+        mediaMetadata.putLong(MediaMetadata.METADATA_KEY_DURATION, duration)
 
         coverBitmap?.let {
             mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, it)
