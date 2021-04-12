@@ -207,6 +207,10 @@ fun runSeekBarUpdate(context: Context, prepareNext: Boolean, crossFade: Boolean)
                         lastLyricsLoadedId = currentSongId
                     }, {
                         lastLyricsLoadedId = currentSongId
+
+                        lyrics = "This song doesnt have lyrics yet"
+                        lyricText = emptyArray()
+                        lyricTimeCodes = emptyArray()
                     })
                 }
             }

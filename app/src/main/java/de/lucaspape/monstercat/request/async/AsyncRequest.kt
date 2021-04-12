@@ -1114,15 +1114,30 @@ suspend fun loadLyrics(
 
         requestQueue.add(newLoadLyricsRequest(context, songId,
             {
-                val timeCodeArray = it.getJSONArray("timecodes")
-                val textArray = it.getJSONArray("text")
+                val result = it.getJSONObject("result")
 
-                val newLyricTimeCodes = Array(timeCodeArray.length()){0}
-                val newLyricText = Array(timeCodeArray.length()){""}
+                var keys = result.keys()
 
-                for(i in (0 until timeCodeArray.length())){
-                    newLyricTimeCodes[i] = timeCodeArray.getString(i).toInt()
-                    newLyricText[i] = textArray.getString(i)
+                //idk how to get length, so ima do this
+
+                var size = 0
+
+                for(key in keys){
+                    size++
+                }
+
+                val newLyricTimeCodes = Array(size){0}
+                val newLyricText = Array(size){""}
+
+                var index = 0
+
+                keys = result.keys()
+
+                for(key in keys){
+                    newLyricTimeCodes[index] = key.toInt()
+                    newLyricText[index] = result.getString(key)
+
+                    index++
                 }
 
                 lyricTimeCodes = newLyricTimeCodes
