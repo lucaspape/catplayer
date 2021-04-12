@@ -137,7 +137,7 @@ class NoisyReceiver : BroadcastReceiver() {
  */
 fun createMediaSession(context: Context, force:Boolean) {
     if (!sessionCreated || mediaSession == null) {
-        if(!loggedIn || !force){
+        if(!loggedIn && !force){
             login(context)
         }else{
             PlayerSaveState.restore(context, false)
