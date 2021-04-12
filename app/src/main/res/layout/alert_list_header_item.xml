@@ -23,7 +23,7 @@
         android:layout_margin="10dp"
         android:layout_marginStart="10dp"
         android:textColor="@color/white"
-        android:textSize="22sp"
+        android:textSize="28sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
