@@ -6,6 +6,8 @@ import de.lucaspape.monstercat.core.database.helper.*
 import de.lucaspape.monstercat.core.database.objects.Genre
 import de.lucaspape.monstercat.core.database.objects.Mood
 import de.lucaspape.monstercat.core.database.objects.PublicPlaylist
+import de.lucaspape.monstercat.core.music.util.lyricText
+import de.lucaspape.monstercat.core.music.util.lyricTimeCodes
 import de.lucaspape.monstercat.core.util.*
 import de.lucaspape.monstercat.request.*
 import de.lucaspape.monstercat.core.util.Settings
@@ -90,7 +92,10 @@ suspend fun checkCustomApiFeatures(
             try {
                 settings.setBoolean(context.getString(R.string.customApiSupportsV1Setting), false)
                 settings.setBoolean(context.getString(R.string.customApiSupportsV2Setting), false)
-                settings.setBoolean(context.getString(R.string.customApiSupportsPlayingRelatedSongsSetting), false)
+                settings.setBoolean(
+                    context.getString(R.string.customApiSupportsPlayingRelatedSongsSetting),
+                    false
+                )
 
                 val apiVersionsArray = it.getJSONArray("api_versions")
 
@@ -127,7 +132,10 @@ suspend fun checkCustomApiFeatures(
         }, {
             settings.setBoolean(context.getString(R.string.customApiSupportsV1Setting), false)
             settings.setBoolean(context.getString(R.string.customApiSupportsV2Setting), false)
-            settings.setBoolean(context.getString(R.string.customApiSupportsPlayingRelatedSongsSetting), false)
+            settings.setBoolean(
+                context.getString(R.string.customApiSupportsPlayingRelatedSongsSetting),
+                false
+            )
 
             errorCallback()
         }))
@@ -962,7 +970,7 @@ suspend fun loadLiveStreams(
                     context,
                     context.getString(R.string.connectApiHost)
                 )
-            
+
             val request = newLoadLivestreamsRequest(context,
                 {
                     val songDatabaseHelper = SongDatabaseHelper(context)
@@ -999,9 +1007,9 @@ suspend fun loadLiveStreams(
                     errorCallback()
                 })
 
-            if(request != null){
+            if (request != null) {
                 queue.add(request)
-            }else{
+            } else {
                 errorCallback()
             }
         }
@@ -1035,7 +1043,9 @@ suspend fun loadPublicPlaylists(
             publicPlaylistDatabaseHelper.reCreateTable(context, false)
 
             newLoadPublicPlaylistsRequest(context, { jsonObject ->
-                val playlistsArray = jsonObject.getJSONObject("Menu").getJSONArray("Sections").getJSONObject(0).getJSONArray("Items")
+                val playlistsArray =
+                    jsonObject.getJSONObject("Menu").getJSONArray("Sections").getJSONObject(0)
+                        .getJSONArray("Items")
 
                 for (i in (0 until playlistsArray.length())) {
                     parsePublicPlaylistIntoDB(
@@ -1062,7 +1072,7 @@ suspend fun loadAlbumTracks(
     finishedCallback: (trackIds: ArrayList<String>) -> Unit,
     errorCallback: () -> Unit
 ) {
-    withContext(Dispatchers.Default){
+    withContext(Dispatchers.Default) {
         val albumRequestQueue =
             getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
@@ -1075,7 +1085,13 @@ suspend fun loadAlbumTracks(
 
             AlbumDatabaseHelper(context).getAlbumFromMcId(mcID)?.let { album ->
                 for (i in (0 until jsonArray.length())) {
-                    idArray.add(parseAlbumSongToDB(jsonArray.getJSONObject(i), album.albumId, context))
+                    idArray.add(
+                        parseAlbumSongToDB(
+                            jsonArray.getJSONObject(i),
+                            album.albumId,
+                            context
+                        )
+                    )
                 }
             }
 
@@ -1083,5 +1099,38 @@ suspend fun loadAlbumTracks(
         }, {
             errorCallback()
         }))
+    }
+}
+
+suspend fun loadLyrics(
+    context: Context,
+    songId: String,
+    finishedCallback: () -> Unit,
+    errorCallback: () -> Unit
+) {
+    withContext(Dispatchers.Main) {
+        val requestQueue =
+            getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+
+        requestQueue.add(newLoadLyricsRequest(context, songId,
+            {
+                val timeCodeArray = it.getJSONArray("timecodes")
+                val textArray = it.getJSONArray("text")
+
+                val newLyricTimeCodes = Array(timeCodeArray.length()){0}
+                val newLyricText = Array(timeCodeArray.length()){""}
+
+                for(i in (0 until timeCodeArray.length())){
+                    newLyricTimeCodes[i] = timeCodeArray.getString(i).toInt()
+                    newLyricText[i] = textArray.getString(i)
+                }
+
+                lyricTimeCodes = newLyricTimeCodes
+                lyricText = newLyricText
+
+                finishedCallback()
+        }, {
+            errorCallback()
+            }))
     }
 }

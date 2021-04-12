@@ -266,6 +266,14 @@ class ViewPagerAdapter(private val context:Context): PagerAdapter() {
             1 -> {
                 val item = layoutInflater.inflate(R.layout.fullscreen_lyrics_item, container, false)
 
+                val fullscreenLyricsView = item.findViewById<TextView>(R.id.fullscreenLyrics)
+
+                fullscreenLyricsView.text = lyrics
+
+                lyricsChangedCallback = {
+                    fullscreenLyricsView.text = lyrics
+                }
+
                 Objects.requireNonNull(container).addView(item)
 
                 item
