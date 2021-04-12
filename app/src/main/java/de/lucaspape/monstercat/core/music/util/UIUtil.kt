@@ -27,6 +27,7 @@ var artistBitmapChangedCallback = {}
 var artistDrawableChangedCallback = {}
 var setTagCallback = { _: Target -> }
 var loadingRelatedChangedCallback = {}
+var lyricsChangedCallback = {}
 
 var title = ""
     set(newString) {
@@ -97,6 +98,15 @@ var loadingRelatedSongs = false
         field = newBoolean
         loadingRelatedChangedCallback()
     }
+
+var lyrics = "This song doesnt have lyrics yet"
+    set(newString) {
+        field = newString
+        lyricsChangedCallback()
+    }
+
+var lyricTimeCodes = emptyArray<Int>()
+var lyricText = emptyArray<String>()
 
 fun setCover(context: Context, songId: String, callback: (bitmap: Bitmap) -> Unit) {
     SongDatabaseHelper(context).getSong(songId)?.let { song ->
@@ -194,7 +204,7 @@ private fun setSongMetadata() {
         val mediaMetadata = MediaMetadataCompat.Builder()
         mediaMetadata.putString(MediaMetadata.METADATA_KEY_ARTIST, artist)
         mediaMetadata.putString(MediaMetadata.METADATA_KEY_TITLE, title)
-        mediaMetadata.putLong(MediaMetadata.METADATA_KEY_DURATION, duration.toLong())
+        mediaMetadata.putLong(MediaMetadata.METADATA_KEY_DURATION, duration)
 
         coverBitmap?.let {
             mediaMetadata.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, it)

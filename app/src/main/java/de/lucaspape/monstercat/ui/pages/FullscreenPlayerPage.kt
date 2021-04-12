@@ -1,8 +1,13 @@
 package de.lucaspape.monstercat.ui.pages
 
+import android.content.Context
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.*
 import androidx.core.net.toUri
+import androidx.viewpager.widget.PagerAdapter
+import androidx.viewpager.widget.ViewPager
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.music.*
 import de.lucaspape.monstercat.core.music.notification.hideLoadingRelatedSongsNotification
@@ -12,6 +17,7 @@ import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
 import de.lucaspape.monstercat.ui.pages.util.Page
 import de.lucaspape.monstercat.ui.pauseButtonDrawable
 import de.lucaspape.monstercat.ui.playButtonDrawable
+import java.util.*
 
 class FullscreenPlayerPage(
     private val onSearch: (searchString: String?) -> Unit,
@@ -28,7 +34,7 @@ class FullscreenPlayerPage(
         val titleTextView = view.findViewById<TextView>(R.id.fullscreenTitle)
         val artistTextView = view.findViewById<TextView>(R.id.fullscreenArtist)
         val seekbar = view.findViewById<SeekBar>(R.id.fullscreenSeekBar)
-        val barCoverImage = view.findViewById<ImageView>(R.id.fullscreenAlbumImage)
+        //val barCoverImage = view.findViewById<ImageView>(R.id.fullscreenAlbumImage)
         val playButton = view.findViewById<ImageButton>(R.id.fullScreenPlay)
 
         val songTimePassed = view.findViewById<TextView>(R.id.songTimePassed)
@@ -90,8 +96,6 @@ class FullscreenPlayerPage(
             songTimeMax.text = text
         }
 
-        barCoverImage.setImageBitmap(coverBitmap)
-
         playingChangedCallback = {
             if (visiblePlaying) {
                 playButton.setImageURI(pauseButtonDrawable.toUri())
@@ -102,18 +106,6 @@ class FullscreenPlayerPage(
         }
 
         playingChangedCallback()
-
-        coverBitmapChangedCallback = {
-            barCoverImage.setImageBitmap(coverBitmap)
-        }
-
-        coverDrawableChangedCallback = {
-            barCoverImage.setImageDrawable(coverDrawable)
-        }
-
-        setTagCallback = { target ->
-            barCoverImage.tag = target
-        }
 
         loadingRelatedChangedCallback = {
             if(loadingRelatedSongs){
@@ -212,6 +204,9 @@ class FullscreenPlayerPage(
         artistTextView.setOnClickListener {
             onSearch(artistTextView.text.toString())
         }
+
+        val viewPager = view.findViewById<ViewPager>(R.id.fullscreenViewPager)
+        viewPager.adapter = ViewPagerAdapter(view.context)
     }
 
     override fun onBackPressed(view: View):Boolean {
@@ -230,4 +225,62 @@ class FullscreenPlayerPage(
     }
 
     override val pageName: String = fullscreenPlayerPageName
+}
+
+class ViewPagerAdapter(private val context:Context): PagerAdapter() {
+    override fun getCount(): Int {
+        return 2
+    }
+
+    override fun isViewFromObject(view: View, `object`: Any): Boolean {
+        return view == `object` as LinearLayout
+    }
+
+    override fun instantiateItem(container: ViewGroup, position: Int): Any {
+        val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+
+        return when (position) {
+            0 -> {
+                val item = layoutInflater.inflate(R.layout.fullscreen_image_item, container, false)
+
+                val fullscreenImageView = item.findViewById<ImageView>(R.id.fullscreenAlbumImage)
+
+                fullscreenImageView?.setImageBitmap(coverBitmap)
+
+                coverBitmapChangedCallback = {
+                    fullscreenImageView?.setImageBitmap(coverBitmap)
+                }
+
+                coverDrawableChangedCallback = {
+                    fullscreenImageView?.setImageDrawable(coverDrawable)
+                }
+
+                setTagCallback = { target ->
+                    fullscreenImageView?.tag = target
+                }
+
+                Objects.requireNonNull(container).addView(item)
+
+                item
+            }
+            1 -> {
+                val item = layoutInflater.inflate(R.layout.fullscreen_lyrics_item, container, false)
+
+                val fullscreenLyricsView = item.findViewById<TextView>(R.id.fullscreenLyrics)
+
+                fullscreenLyricsView.text = lyrics
+
+                lyricsChangedCallback = {
+                    fullscreenLyricsView.text = lyrics
+                }
+
+                Objects.requireNonNull(container).addView(item)
+
+                item
+            }
+            else -> {
+                layoutInflater.inflate(R.layout.fullscreen_image_item, container, false)
+            }
+        }
+    }
 }

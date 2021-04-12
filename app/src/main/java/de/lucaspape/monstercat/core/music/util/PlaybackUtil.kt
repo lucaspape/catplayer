@@ -10,6 +10,7 @@ import de.lucaspape.monstercat.core.database.helper.StreamDatabaseHelper
 import de.lucaspape.monstercat.core.music.*
 import de.lucaspape.monstercat.core.music.notification.updateNotification
 import de.lucaspape.monstercat.core.util.Settings
+import de.lucaspape.monstercat.request.async.loadLyrics
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -190,6 +191,8 @@ fun playStream(
 private var seekBarUpdateHandler = Handler(Looper.getMainLooper())
 var currentSeekBarUpdateHandlerId = ""
 
+var lastLyricsLoadedId = ""
+
 fun runSeekBarUpdate(context: Context, prepareNext: Boolean, crossFade: Boolean) {
     val id = UUID.randomUUID().toString()
     currentSeekBarUpdateHandlerId = id
@@ -198,6 +201,20 @@ fun runSeekBarUpdate(context: Context, prepareNext: Boolean, crossFade: Boolean)
 
     val updateSeekBar = object : Runnable {
         override fun run() {
+            if (lastLyricsLoadedId != currentSongId) {
+                scope.launch {
+                    loadLyrics(context, currentSongId, {
+                        lastLyricsLoadedId = currentSongId
+                    }, {
+                        lastLyricsLoadedId = currentSongId
+
+                        lyrics = "This song doesnt have lyrics yet"
+                        lyricText = emptyArray()
+                        lyricTimeCodes = emptyArray()
+                    })
+                }
+            }
+
             exoPlayer?.duration?.let {
                 duration = it
             }
@@ -207,13 +224,29 @@ fun runSeekBarUpdate(context: Context, prepareNext: Boolean, crossFade: Boolean)
                 setPlayerState(it)
             }
 
+            try {
+                var timeCodeIndex = 0
+
+                for ((index, value) in lyricTimeCodes.withIndex()) {
+                    if (value * 1000 < currentPosition) {
+                        timeCodeIndex = index
+                    }
+                }
+
+
+                lyrics = lyricText[timeCodeIndex]
+            } catch (e: IndexOutOfBoundsException) {
+
+            }
+
+
             //add current song to history after 30 seconds
-            if(currentPosition > 30*1000){
+            if (currentPosition > 30 * 1000) {
                 try {
-                    if(history[history.size-1] != currentSongId){
+                    if (history[history.size - 1] != currentSongId) {
                         history.add(currentSongId)
                     }
-                }catch (e: IndexOutOfBoundsException){
+                } catch (e: IndexOutOfBoundsException) {
                     history.add(currentSongId)
                 }
             }

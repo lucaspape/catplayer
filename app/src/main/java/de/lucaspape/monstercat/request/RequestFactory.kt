@@ -831,6 +831,22 @@ fun newLoadPublicPlaylistsRequest(
     )
 }
 
+fun newLoadLyricsRequest(context: Context, songId:String, callback: (response: JSONObject) -> Unit, errorCallback: (error: VolleyError?) -> Unit):StringRequest{
+    val requestUrl = "https://api.lucaspape.de/monstercat/v1/static/lyrics/$songId.json"
+
+    return StringRequest(
+        Request.Method.GET, requestUrl,
+        {
+            try {
+                callback(JSONObject(getCharacterFromUnicode(it, false)))
+            } catch (e: JSONException) {
+                errorCallback(null)
+            }
+
+        }, Response.ErrorListener(errorCallback)
+    )
+}
+
 //custom api doesnt have this problem, umlauts are shown wrong
 fun getCharacterFromUnicode(unicodeChar: String, customApi: Boolean): String {
     return if (!customApi) {
