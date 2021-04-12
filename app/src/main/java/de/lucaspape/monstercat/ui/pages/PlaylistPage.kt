@@ -7,7 +7,7 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.ui.pages.recycler.PlaylistContentsRecyclerPage
 import de.lucaspape.monstercat.ui.pages.recycler.PlaylistListRecyclerPage
 import de.lucaspape.monstercat.ui.pages.util.RecyclerViewPage
-import de.lucaspape.monstercat.ui.pages.util.createPlaylist
+import de.lucaspape.monstercat.ui.pages.util.createPlaylistUI
 
 class PlaylistPage(
     private val playlistId: String?,
@@ -97,7 +97,7 @@ class PlaylistPage(
     private fun registerListeners(view: View) {
         //create new playlist button
         view.findViewById<ImageButton>(R.id.newPlaylistButton).setOnClickListener {
-            createPlaylist(view)
+            createPlaylistUI(view)
         }
     }
 }

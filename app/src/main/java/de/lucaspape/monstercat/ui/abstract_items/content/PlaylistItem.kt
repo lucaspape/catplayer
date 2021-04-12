@@ -22,12 +22,7 @@ import de.lucaspape.monstercat.ui.*
 import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListHeaderItem
 import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListItem
 import de.lucaspape.monstercat.core.util.BackgroundAsync
-import de.lucaspape.monstercat.ui.pages.util.deletePlaylist
-import de.lucaspape.monstercat.ui.pages.util.downloadPlaylistAsync
-import de.lucaspape.monstercat.ui.pages.util.openPlaylist
-import de.lucaspape.monstercat.ui.pages.util.playPlaylistNextAsync
-import de.lucaspape.monstercat.ui.pages.util.renamePlaylist
-import de.lucaspape.monstercat.ui.pages.util.togglePlaylistPublicStateAsync
+import de.lucaspape.monstercat.ui.pages.util.*
 
 open class PlaylistItem(
     val playlistId: String
@@ -111,10 +106,10 @@ open class PlaylistItem(
                             )
                         }
                         view.context.getString(R.string.delete) -> {
-                            deletePlaylist(view, id, deletePlaylistCallback)
+                            deletePlaylistUI(view, id, deletePlaylistCallback)
                         }
                         view.context.getString(R.string.renamePlaylist) -> {
-                            renamePlaylist(view, id)
+                            renamePlaylistUI(view, id)
                         }
                         view.context.getString(R.string.makePlaylistPrivate) -> {
                             togglePlaylistPublicStateAsync(

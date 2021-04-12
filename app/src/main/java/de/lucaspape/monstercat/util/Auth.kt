@@ -18,6 +18,7 @@ import de.lucaspape.persistentcookiejar.PersistentCookieJar
 import de.lucaspape.persistentcookiejar.cache.SetCookieCache
 import de.lucaspape.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import de.lucaspape.monstercat.core.util.Settings
+import de.lucaspape.monstercat.ui.showInputAlert
 import okhttp3.HttpUrl
 import org.json.JSONException
 import java.util.*
@@ -38,23 +39,23 @@ var username = ""
 
 var loggedInStateChangedListeners = ArrayList<LoggedInStateChangedListener>()
 
-private fun runCallbacks(){
+private fun runCallbacks() {
     try {
         val iterator = loggedInStateChangedListeners.iterator()
 
-        while(iterator.hasNext()){
+        while (iterator.hasNext()) {
             val listener = iterator.next()
 
             listener.run()
 
-            loggedInStateChangedListeners.removeIf { it.removeOnCalled &&  it.listenerId == listener.listenerId }
+            loggedInStateChangedListeners.removeIf { it.removeOnCalled && it.listenerId == listener.listenerId }
         }
-    }catch (e: ConcurrentModificationException){
+    } catch (e: ConcurrentModificationException) {
 
     }
 }
 
-class LoggedInStateChangedListener(val run: () -> Unit, val removeOnCalled: Boolean){
+class LoggedInStateChangedListener(val run: () -> Unit, val removeOnCalled: Boolean) {
     val listenerId = UUID.randomUUID().toString()
 }
 
@@ -77,7 +78,7 @@ private fun getSid(context: Context): String {
     return sid
 }
 
-private fun getCid(context: Context): String{
+private fun getCid(context: Context): String {
     val cookieJar =
         PersistentCookieJar(SetCookieCache(), SharedPrefsCookiePersistor(context))
 
@@ -143,42 +144,29 @@ class Auth {
         loginFailed: () -> Unit
     ) {
         try {
-            val alertDialogBuilder = AlertDialog.Builder(context)
-            alertDialogBuilder.setTitle(context.getString(R.string.twoFaCode))
-
-            val layoutInflater =
-                context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-            val twoFAInputView = layoutInflater.inflate(R.layout.two_fa_input_layout, null)
-
-            alertDialogBuilder.setView(twoFAInputView)
-            alertDialogBuilder.setCancelable(false)
-
-            alertDialogBuilder.setPositiveButton(context.getString(R.string.ok)) { _, _ ->
+            showInputAlert(
+                context,
+                false,
+                R.layout.two_fa_input_layout,
+                R.id.twoFAInput,
+                null,
+                context.getString(R.string.twoFaCode),
+                null,
+                null
+            ) {
                 //post token to API
-
-                val twoFAEditText = twoFAInputView.findViewById<EditText>(R.id.twoFAInput)
-                val twoFACode = twoFAEditText.text.toString()
 
                 val twoFAQueue =
                     getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
 
-                twoFAQueue.add(newTwoFaRequest(context, twoFACode, {
+                twoFAQueue.add(newTwoFaRequest(context, it, {
                     //all good
                     checkLogin(context, loginSuccess, loginFailed)
                 }, {
                     checkLogin(context, loginSuccess, loginFailed)
                 }))
             }
-
-            val dialog = alertDialogBuilder.create()
-            dialog.show()
-
-            val typedValue = TypedValue()
-            context.theme.resolveAttribute(R.attr.colorOnSurface, typedValue, true)
-
-            val positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE)
-            positiveButton.setTextColor(typedValue.data)
-        }catch (e: WindowManager.BadTokenException){
+        } catch (e: WindowManager.BadTokenException) {
             checkLogin(context, loginSuccess, loginFailed)
         }
     }
@@ -202,7 +190,7 @@ class Auth {
             username = try {
                 val userObject = it.getJSONObject("user")
                 userObject.getString("email")
-            } catch (e: JSONException){
+            } catch (e: JSONException) {
                 ""
             }
 
@@ -233,7 +221,7 @@ class Auth {
         }))
     }
 
-    fun logout(context: Context){
+    fun logout(context: Context) {
         waitingForLogin = false
         loggedIn = false
 
@@ -242,7 +230,7 @@ class Auth {
         settings.setString(context.getString(R.string.passwordSetting), "")
 
         SharedPrefsCookiePersistor(context).clear()
-        
+
         connectSid = ""
 
         runCallbacks()

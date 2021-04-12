@@ -6,9 +6,9 @@ import de.lucaspape.monstercat.core.database.helper.AlbumDatabaseHelper
 import de.lucaspape.monstercat.core.database.helper.ItemDatabaseHelper
 import de.lucaspape.monstercat.core.database.objects.Album
 import de.lucaspape.monstercat.request.async.loadAlbum
+import de.lucaspape.monstercat.request.async.loadAlbumTracks
 import de.lucaspape.monstercat.ui.pages.util.Item
 import de.lucaspape.monstercat.ui.pages.util.StringItem
-import de.lucaspape.monstercat.ui.pages.util.loadAlbumTracks
 
 class HomeCatalogAlbumRecyclerPage(
     private val albumId: String?,

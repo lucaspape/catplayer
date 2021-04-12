@@ -18,15 +18,15 @@ import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.core.database.objects.Song
 import de.lucaspape.monstercat.core.download.addDownloadSong
 import de.lucaspape.monstercat.core.download.downloadCoverIntoImageReceiver
-import de.lucaspape.monstercat.ui.pages.util.addSongToPlaylist
 import de.lucaspape.monstercat.ui.pages.util.deletePlaylistSong
-import de.lucaspape.monstercat.ui.pages.util.openAlbum
 import de.lucaspape.monstercat.core.download.ImageReceiverInterface
 import de.lucaspape.monstercat.core.download.preDownloadCallbacks
 import de.lucaspape.monstercat.core.music.addToPriorityQueue
 import de.lucaspape.monstercat.ui.*
 import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListHeaderItem
 import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListItem
+import de.lucaspape.monstercat.ui.pages.util.addSongToPlaylistUI
+import de.lucaspape.monstercat.ui.pages.util.openAlbumUI
 
 open class CatalogItem(
     val songId: String
@@ -117,16 +117,16 @@ open class CatalogItem(
                         ) {}
                         view.context.getString(R.string.deleteDownload) -> song.deleteDownload(view.context)
                         view.context.getString(R.string.addToQueue) -> addToPriorityQueue(id)
-                        view.context.getString(R.string.addToPlaylist) -> addSongToPlaylist(
+                        view.context.getString(R.string.addToPlaylist) -> addSongToPlaylistUI(
                             view,
                             song.songId
                         )
-                        view.context.getString(R.string.shareAlbum) -> openAlbum(
+                        view.context.getString(R.string.shareAlbum) -> openAlbumUI(
                             view,
                             song.mcAlbumId,
                             true
                         )
-                        view.context.getString(R.string.openAlbumInApp) -> openAlbum(
+                        view.context.getString(R.string.openAlbumInApp) -> openAlbumUI(
                             view,
                             song.mcAlbumId,
                             false
@@ -219,12 +219,12 @@ open class CatalogItem(
                         }
                         view.context.getString(R.string.shareAlbum) -> {
 
-                            openAlbum(view, song.mcAlbumId, true)
+                            openAlbumUI(view, song.mcAlbumId, true)
 
                         }
                         view.context.getString(R.string.openAlbumInApp) -> {
 
-                            openAlbum(view, song.mcAlbumId, false)
+                            openAlbumUI(view, song.mcAlbumId, false)
                         }
                     }
 

@@ -15,8 +15,6 @@ import de.lucaspape.monstercat.core.database.helper.*
 import de.lucaspape.monstercat.core.download.addDownloadSong
 import de.lucaspape.monstercat.core.music.*
 import de.lucaspape.monstercat.core.music.next
-import de.lucaspape.monstercat.core.util.parseAlbumSongToDB
-import de.lucaspape.monstercat.core.util.parseAlbumToDB
 import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListItem
 import de.lucaspape.monstercat.ui.abstract_items.util.HeaderTextItem
 import de.lucaspape.monstercat.request.async.*
@@ -37,57 +35,31 @@ import kotlin.collections.ArrayList
 
 private val scope = CoroutineScope(Dispatchers.Default)
 
-fun loadAlbumTracks(
-    context: Context,
-    mcID: String,
-    finishedCallback: (trackIds: ArrayList<String>) -> Unit,
-    errorCallback: () -> Unit
-) {
-    val albumRequestQueue =
-        getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
-
-    albumRequestQueue.add(newLoadAlbumRequest(context, mcID, {
-        parseAlbumToDB(it.getJSONObject("release"), context)
-
-        val jsonArray = it.getJSONArray("tracks")
-
-        val idArray = ArrayList<String>()
-
-        AlbumDatabaseHelper(context).getAlbumFromMcId(mcID)?.let { album ->
-            for (i in (0 until jsonArray.length())) {
-                idArray.add(parseAlbumSongToDB(jsonArray.getJSONObject(i), album.albumId, context))
-            }
-        }
-
-        finishedCallback(idArray)
-    }, {
-        errorCallback()
-    }))
-}
-
 /**
  * Play an entire album after the current song
  */
 fun playAlbumNext(view: View, mcID: String) {
-    loadAlbumTracks(
-        view.context,
-        mcID,
-        finishedCallback = { idArray ->
-            addToPriorityQueue(idArray[0])
+    scope.launch {
+        loadAlbumTracks(
+            view.context,
+            mcID,
+            finishedCallback = { idArray ->
+                addToPriorityQueue(idArray[0])
 
-            for (i in (1 until idArray.size)) {
-                addToPriorityQueue(idArray[i])
-            }
-        },
-        errorCallback = {
-            displaySnackBar(
-                view,
-                view.context.getString(R.string.errorRetrieveAlbumData),
-                view.context.getString(R.string.retry)
-            ) {
-                playAlbumNext(view, mcID)
-            }
-        })
+                for (i in (1 until idArray.size)) {
+                    addToPriorityQueue(idArray[i])
+                }
+            },
+            errorCallback = {
+                displaySnackBar(
+                    view,
+                    view.context.getString(R.string.errorRetrieveAlbumData),
+                    view.context.getString(R.string.retry)
+                ) {
+                    playAlbumNext(view, mcID)
+                }
+            })
+    }
 }
 
 fun playPlaylistNextAsync(context: Context, playlistId: String) {
@@ -151,14 +123,12 @@ fun downloadPlaylistAsync(view: View, playlistId: String, downloadFinished: () -
 /**
  * Deletes downloaded playlist tracks
  */
-fun deleteDownloadedPlaylistTracks(
+fun deleteDownloadedPlaylistTracksUI(
     context: Context,
     playlistId: String,
     deleteFinished: () -> Unit
 ) {
-    val alertDialogBuilder = MaterialAlertDialogBuilder(context)
-    alertDialogBuilder.setTitle(context.getString(R.string.deletePlaylistDownloadedTracksMsg))
-    alertDialogBuilder.setPositiveButton(context.getString(R.string.yes)) { _, _ ->
+    showConfirmationAlert(context, context.getString(R.string.deletePlaylistDownloadedTracksMsg)) {
         val playlistItemDatabaseHelper = ItemDatabaseHelper(context, playlistId)
         val playlistItemList = playlistItemDatabaseHelper.getAllData(true)
 
@@ -172,52 +142,40 @@ fun deleteDownloadedPlaylistTracks(
 
         deleteFinished()
     }
-
-    alertDialogBuilder.setNegativeButton(context.getString(R.string.no)) { _, _ -> }
-
-    val dialog = alertDialogBuilder.create()
-    dialog.show()
-
-    val typedValue = TypedValue()
-    context.theme.resolveAttribute(R.attr.colorOnSurface, typedValue, true)
-
-    val positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE)
-    positiveButton.setTextColor(typedValue.data)
-
-    val negativeButton = dialog.getButton(DialogInterface.BUTTON_NEGATIVE)
-    negativeButton.setTextColor(typedValue.data)
 }
 
 /**
  * Download an entire album
  */
 fun downloadAlbum(view: View, mcID: String) {
-    loadAlbumTracks(
-        view.context,
-        mcID,
-        finishedCallback = { idArray ->
-            val databaseHelper = SongDatabaseHelper(view.context)
+    scope.launch {
+        loadAlbumTracks(
+            view.context,
+            mcID,
+            finishedCallback = { idArray ->
+                val databaseHelper = SongDatabaseHelper(view.context)
 
-            for (id in idArray) {
-                val song = databaseHelper.getSong(id)
-                song?.songId?.let { addDownloadSong(view.context, it) {} }
-            }
-        },
-        errorCallback = {
-            displaySnackBar(
-                view,
-                view.context.getString(R.string.errorRetrieveAlbumData),
-                view.context.getString(R.string.retry)
-            ) {
-                downloadAlbum(view, mcID)
-            }
-        })
+                for (id in idArray) {
+                    val song = databaseHelper.getSong(id)
+                    song?.songId?.let { addDownloadSong(view.context, it) {} }
+                }
+            },
+            errorCallback = {
+                displaySnackBar(
+                    view,
+                    view.context.getString(R.string.errorRetrieveAlbumData),
+                    view.context.getString(R.string.retry)
+                ) {
+                    downloadAlbum(view, mcID)
+                }
+            })
+    }
 }
 
 /**
  * Add single song to playlist, will ask for playlist with alertDialog TODO check if logged in
  */
-fun addSongToPlaylist(view: View, songId: String) {
+fun addSongToPlaylistUI(view: View, songId: String) {
     scope.launch {
         loadPlaylists(view.context,
             forceReload = false,
@@ -283,7 +241,7 @@ fun addSongToPlaylist(view: View, songId: String) {
                     view.context.getString(R.string.errorLoadingPlaylists),
                     view.context.getString(R.string.retry)
                 ) {
-                    addSongToPlaylist(
+                    addSongToPlaylistUI(
                         view,
                         songId
                     )
@@ -313,48 +271,23 @@ private fun addSongToPlaylistAsync(view: View, playlistId: String, songId: Strin
     }
 }
 
-fun renamePlaylist(view: View, playlistId: String) {
+fun renamePlaylistUI(view: View, playlistId: String) {
     if (loggedIn) {
-        val context = view.context
-
-        MaterialAlertDialogBuilder(context).apply {
-            val layoutInflater =
-                context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-
-            val playlistNameInputLayout =
-                layoutInflater.inflate(R.layout.playlistname_input_layout, view.findViewById(R.id.recyclerView), false)
-
-            val playlistNameEditText =
-                playlistNameInputLayout.findViewById<EditText>(R.id.playlistNameInput)
-
-            PlaylistDatabaseHelper(view.context).getPlaylist(playlistId)?.let {
-                playlistNameEditText.text = SpannableStringBuilder(it.playlistName)
-            }
-
-            setTitle(context.getString(R.string.renamePlaylist))
-
-            setPositiveButton(context.getString(R.string.ok)) { _, _ ->
-                val playlistName = playlistNameEditText.text.toString()
-                renamePlaylistAsync(
-                    view,
-                    playlistId,
-                    playlistName
-                )
-            }
-
-            setView(playlistNameInputLayout)
-            setCancelable(true)
-        }.create().run {
-            show()
-
-            val typedValue = TypedValue()
-            context.theme.resolveAttribute(R.attr.colorOnSurface, typedValue, true)
-
-            val positiveButton = getButton(DialogInterface.BUTTON_POSITIVE)
-            positiveButton.setTextColor(typedValue.data)
-
-            val negativeButton = getButton(DialogInterface.BUTTON_NEGATIVE)
-            negativeButton.setTextColor(typedValue.data)
+        showInputAlert(
+            view.context,
+            true,
+            R.layout.playlistname_input_layout,
+            R.id.playlistNameInput,
+            view.findViewById(R.id.recyclerView),
+            view.context.getString(R.string.renamePlaylist),
+            PlaylistDatabaseHelper(view.context).getPlaylist(playlistId)?.playlistName,
+            view.context.getString(R.string.playlistName)
+        ) {
+            renamePlaylistAsync(
+                view,
+                playlistId,
+                it
+            )
         }
     } else {
         displaySnackBar(view, view.context.getString(R.string.errorNotLoggedIn), null) {}
@@ -419,7 +352,7 @@ fun togglePlaylistPublicStateAsync(view: View, playlistId: String) {
 /**
  * Create a new playlist, will ask for name with alertDialog
  */
-fun createPlaylist(view: View) {
+fun createPlaylistUI(view: View) {
     if (loggedIn) {
         val context = view.context
 
@@ -441,55 +374,33 @@ fun createPlaylist(view: View) {
         ) { _: Int, item: AlertListItem ->
             val addPlaylist = item.itemText == context.getString(R.string.addPlaylistId)
 
-            MaterialAlertDialogBuilder(context).apply {
-                val layoutInflater =
-                    context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            val title = if (addPlaylist) {
+                context.getString(R.string.addPlaylistId)
+            } else {
+                context.getString(R.string.createPlaylist)
+            }
 
-                val playlistNameInputLayout =
-                    layoutInflater.inflate(R.layout.playlistname_input_layout, view.findViewById(R.id.recyclerView), false)
-
-                val playlistNameEditText =
-                    playlistNameInputLayout.findViewById<EditText>(R.id.playlistNameInput)
-
+            showInputAlert(
+                context,
+                true,
+                R.layout.playlistname_input_layout,
+                R.id.playlistNameInput,
+                view.findViewById(R.id.recyclerView),
+                title,
+                null,
+                context.getString(R.string.playlistName)
+            ) {
                 if (addPlaylist) {
-                    playlistNameEditText.hint = context.getString(R.string.playlistId)
-                }
-
-                if (addPlaylist) {
-                    setTitle(context.getString(R.string.addPlaylistId))
+                    addPlaylist(
+                        view,
+                        it
+                    )
                 } else {
-                    setTitle(context.getString(R.string.createPlaylist))
+                    createPlaylistAsync(
+                        view,
+                        it
+                    )
                 }
-
-                setPositiveButton(context.getString(R.string.ok)) { _, _ ->
-                    val playlistName = playlistNameEditText.text.toString()
-
-                    if (addPlaylist) {
-                        addPlaylist(
-                            view,
-                            playlistName
-                        )
-                    } else {
-                        createPlaylistAsync(
-                            view,
-                            playlistName
-                        )
-                    }
-                }
-
-                setView(playlistNameInputLayout)
-                setCancelable(true)
-            }.create().run {
-                show()
-
-                val typedValue = TypedValue()
-                context.theme.resolveAttribute(R.attr.colorOnSurface, typedValue, true)
-
-                val positiveButton = getButton(DialogInterface.BUTTON_POSITIVE)
-                positiveButton.setTextColor(typedValue.data)
-
-                val negativeButton = getButton(DialogInterface.BUTTON_NEGATIVE)
-                negativeButton.setTextColor(typedValue.data)
             }
         }
     } else {
@@ -524,30 +435,16 @@ private fun createPlaylistAsync(view: View, playlistName: String) {
 /**
  * Delete playlist with given playlistId
  */
-fun deletePlaylist(view: View, playlistId: String, callback: () -> Unit) {
-    val context = view.context
-    val alertDialogBuilder = MaterialAlertDialogBuilder(context)
-    alertDialogBuilder.setTitle(context.getString(R.string.deletePlaylistMsg))
-    alertDialogBuilder.setPositiveButton(context.getString(R.string.yes)) { _, _ ->
+fun deletePlaylistUI(view: View, playlistId: String, callback: () -> Unit) {
+    showConfirmationAlert(
+        view.context, view.context.getString(R.string.deletePlaylistMsg),
+    ) {
         deletePlaylistAsync(
             view,
             playlistId,
-            callback
+            callback,
         )
     }
-    alertDialogBuilder.setNegativeButton(context.getString(R.string.no)) { _, _ -> }
-
-    val dialog = alertDialogBuilder.create()
-    dialog.show()
-
-    val typedValue = TypedValue()
-    context.theme.resolveAttribute(R.attr.colorOnSurface, typedValue, true)
-
-    val positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE)
-    positiveButton.setTextColor(typedValue.data)
-
-    val negativeButton = dialog.getButton(DialogInterface.BUTTON_NEGATIVE)
-    negativeButton.setTextColor(typedValue.data)
 }
 
 private fun deletePlaylistAsync(view: View, playlistId: String, callback: () -> Unit) {
@@ -625,7 +522,7 @@ fun deletePlaylistSong(
     }
 }
 
-fun openAlbum(view: View, albumMcId: String, share: Boolean) {
+fun openAlbumUI(view: View, albumMcId: String, share: Boolean) {
     val context = view.context
     val volleyRequestQueue =
         getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
@@ -691,7 +588,7 @@ fun openAlbum(view: View, albumMcId: String, share: Boolean) {
             context.getString(R.string.errorRetrieveAlbumData),
             context.getString(R.string.retry)
         ) {
-            openAlbum(
+            openAlbumUI(
                 view,
                 albumMcId,
                 share
@@ -755,7 +652,7 @@ fun playSongsFromViewDataAsync(
     }, {}).execute()
 }
 
-fun addFilter(view:View, callback: () -> Unit){
+fun addFilterUI(view: View, callback: () -> Unit) {
     val alertListItem = arrayListOf(
         AlertListItem(
             view.context.getString(R.string.addArtistFilter),
@@ -772,55 +669,39 @@ fun addFilter(view:View, callback: () -> Unit){
         HeaderTextItem(""),
         alertListItem
     ) { _: Int, item: AlertListItem ->
-        MaterialAlertDialogBuilder(view.context).apply {
-            val artistFilter = item.itemText == view.context.getString(R.string.addArtistFilter)
+        val artistFilter = item.itemText == view.context.getString(R.string.addArtistFilter)
 
-            val layoutInflater =
-                context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val title = if (artistFilter) {
+            view.context.getString(R.string.addArtistFilter)
+        } else {
+            view.context.getString(R.string.addTitleFilter)
+        }
 
-            val filterInputLayout =
-                layoutInflater.inflate(R.layout.filter_input_layout, view.findViewById(R.id.recyclerView), false)
+        val hint = if (artistFilter) {
+            "Artist"
+        } else {
+            "Title"
+        }
 
-            val filterEditText =
-                filterInputLayout.findViewById<EditText>(R.id.filter_input)
-
+        showInputAlert(
+            view.context,
+            true,
+            R.layout.filter_input_layout,
+            R.id.filter_input,
+            view.findViewById(R.id.recyclerView),
+            title,
+            null,
+            hint
+        ) {
             if (artistFilter) {
-                filterEditText.hint = "Artist"
-            }
-
-            if (artistFilter) {
-                setTitle(view.context.getString(R.string.addArtistFilter))
+                FilterDatabaseHelper(view.context).insertFilter("artist", it)
             } else {
-                setTitle(view.context.getString(R.string.addTitleFilter))
+                FilterDatabaseHelper(view.context).insertFilter("title", it)
             }
 
-            setPositiveButton(context.getString(R.string.ok)) { _, _ ->
-                val filter = filterEditText.text.toString()
+            applyFilterSettings(view.context)
 
-                if(artistFilter){
-                    FilterDatabaseHelper(view.context).insertFilter("artist", filter)
-                }else{
-                    FilterDatabaseHelper(view.context).insertFilter("title", filter)
-                }
-
-                applyFilterSettings(view.context)
-
-                callback()
-            }
-
-            setView(filterInputLayout)
-            setCancelable(true)
-        }.create().run {
-            show()
-
-            val typedValue = TypedValue()
-            context.theme.resolveAttribute(R.attr.colorOnSurface, typedValue, true)
-
-            val positiveButton = getButton(DialogInterface.BUTTON_POSITIVE)
-            positiveButton.setTextColor(typedValue.data)
-
-            val negativeButton = getButton(DialogInterface.BUTTON_NEGATIVE)
-            negativeButton.setTextColor(typedValue.data)
+            callback()
         }
     }
 }

@@ -1055,3 +1055,33 @@ suspend fun loadPublicPlaylists(
         }
     }
 }
+
+suspend fun loadAlbumTracks(
+    context: Context,
+    mcID: String,
+    finishedCallback: (trackIds: ArrayList<String>) -> Unit,
+    errorCallback: () -> Unit
+) {
+    withContext(Dispatchers.Default){
+        val albumRequestQueue =
+            getAuthorizedRequestQueue(context, context.getString(R.string.connectApiHost))
+
+        albumRequestQueue.add(newLoadAlbumRequest(context, mcID, {
+            parseAlbumToDB(it.getJSONObject("release"), context)
+
+            val jsonArray = it.getJSONArray("tracks")
+
+            val idArray = ArrayList<String>()
+
+            AlbumDatabaseHelper(context).getAlbumFromMcId(mcID)?.let { album ->
+                for (i in (0 until jsonArray.length())) {
+                    idArray.add(parseAlbumSongToDB(jsonArray.getJSONObject(i), album.albumId, context))
+                }
+            }
+
+            finishedCallback(idArray)
+        }, {
+            errorCallback()
+        }))
+    }
+}

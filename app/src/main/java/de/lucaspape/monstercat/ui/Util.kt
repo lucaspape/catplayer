@@ -4,10 +4,13 @@ import android.content.Context
 import android.content.DialogInterface
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.text.SpannableStringBuilder
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -128,5 +131,90 @@ fun showInformation(view: View, information: String) {
 
         val positiveButton = getButton(DialogInterface.BUTTON_POSITIVE)
         positiveButton.setTextColor(textColorTypedValue.data)
+    }
+}
+
+fun showConfirmationAlert(context: Context, title: String, onConfirmation: () -> Unit) {
+    val alertDialogBuilder = MaterialAlertDialogBuilder(context)
+    alertDialogBuilder.setTitle(title)
+    alertDialogBuilder.setPositiveButton(context.getString(R.string.yes)) { _, _ ->
+        onConfirmation()
+    }
+
+    alertDialogBuilder.setNegativeButton(context.getString(R.string.no)) { _, _ -> }
+
+    val dialog = alertDialogBuilder.create()
+    dialog.show()
+
+    val typedValue = TypedValue()
+    context.theme.resolveAttribute(R.attr.colorOnSurface, typedValue, true)
+
+    val positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE)
+    positiveButton.setTextColor(typedValue.data)
+
+    val negativeButton = dialog.getButton(DialogInterface.BUTTON_NEGATIVE)
+    negativeButton.setTextColor(typedValue.data)
+}
+
+fun showInputAlert(
+    context: Context,
+    cancelable: Boolean,
+    layoutId: Int,
+    editTextLayoutId: Int,
+    rootView: ViewGroup?,
+    title: String,
+    startText: String?,
+    hint: String?,
+    onConfirmation: (text: String) -> Unit
+) {
+    MaterialAlertDialogBuilder(context).apply {
+        val layoutInflater =
+            context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+
+        val inflatedLayout = if (rootView != null) {
+
+            layoutInflater.inflate(
+                layoutId,
+                rootView,
+                false
+            )
+        } else {
+            layoutInflater.inflate(
+                layoutId,
+                null
+            )
+        }
+
+
+        val editTextLayout =
+            inflatedLayout.findViewById<EditText>(editTextLayoutId)
+
+        startText?.let {
+            editTextLayout.text = SpannableStringBuilder(it)
+        }
+
+        hint?.let {
+            editTextLayout.hint = it
+        }
+
+        setTitle(title)
+
+        setPositiveButton(context.getString(R.string.ok)) { _, _ ->
+            onConfirmation(editTextLayout.text.toString())
+        }
+
+        setView(inflatedLayout)
+        setCancelable(cancelable)
+    }.create().run {
+        show()
+
+        val typedValue = TypedValue()
+        context.theme.resolveAttribute(R.attr.colorOnSurface, typedValue, true)
+
+        val positiveButton = getButton(DialogInterface.BUTTON_POSITIVE)
+        positiveButton.setTextColor(typedValue.data)
+
+        val negativeButton = getButton(DialogInterface.BUTTON_NEGATIVE)
+        negativeButton.setTextColor(typedValue.data)
     }
 }

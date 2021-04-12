@@ -13,12 +13,12 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.AlbumDatabaseHelper
 import de.lucaspape.monstercat.core.download.downloadCoverIntoImageReceiver
 import de.lucaspape.monstercat.ui.pages.util.downloadAlbum
-import de.lucaspape.monstercat.ui.pages.util.openAlbum
 import de.lucaspape.monstercat.ui.pages.util.playAlbumNext
 import de.lucaspape.monstercat.core.download.ImageReceiverInterface
 import de.lucaspape.monstercat.ui.*
 import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListHeaderItem
 import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListItem
+import de.lucaspape.monstercat.ui.pages.util.openAlbumUI
 
 open class AlbumItem(
     val albumId: String
@@ -72,8 +72,8 @@ open class AlbumItem(
                             view,
                             id
                         )
-                        view.context.getString(R.string.shareAlbum) -> openAlbum(view, id, true)
-                        view.context.getString(R.string.openAlbumInApp) -> openAlbum(
+                        view.context.getString(R.string.shareAlbum) -> openAlbumUI(view, id, true)
+                        view.context.getString(R.string.openAlbumInApp) -> openAlbumUI(
                             view,
                             id,
                             false

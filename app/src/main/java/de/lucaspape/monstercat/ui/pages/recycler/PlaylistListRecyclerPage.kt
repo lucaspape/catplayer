@@ -70,7 +70,7 @@ class PlaylistListRecyclerPage(private val loadPlaylist: (playlistId: String) ->
         if (item is PlaylistItem) {
             withContext(Dispatchers.Main){
                 if (item.getDownloadStatus(context) == offlineDrawable) {
-                    deleteDownloadedPlaylistTracks(
+                    deleteDownloadedPlaylistTracksUI(
                         context,
                         item.playlistId
                     ) {
