@@ -211,6 +211,10 @@ class FullscreenPlayerPage(
 
         val viewPager = view.findViewById<ViewPager>(R.id.fullscreenViewPager)
         viewPager.adapter = ViewPagerAdapter(view.context)
+
+        view.findViewById<Button>(R.id.fullscreenLyricsButton).setOnClickListener {
+            viewPager.currentItem = 1
+        }
     }
 
     override fun onBackPressed(view: View):Boolean {

@@ -71,5 +71,5 @@
     <string name="alertListImage">Image</string>
     <string name="streamLossLess">Stream WAV instead of MP3</string>
     <string name="streamLossLessDescription">Works only if you have Monstercat Gold and if the song is downloadable, otherwise it will fallback to MP3. Warning: this has huge data usage!</string>
-
+    <string name="lyrics">Lyrics</string>
 </resources>
