@@ -50,19 +50,19 @@ fun login(context: Context) {
 
     //login
     if (!loggedIn) {
-        Auth().checkLogin(context, {
-            //login success
-            println(context.getString(R.string.loginSuccessfulMsg))
+        val sUsername = settings.getString(context.getString(R.string.emailSetting))
+        val sPassword = settings.getString(context.getString(R.string.passwordSetting))
 
-            //create the MusicPlayer.kt mediasession
-            createMediaSession(context, true)
-        }, {
-            //login failed, retrieve new SID
+        if ((sUsername != null && sPassword != null) && (sUsername != "" && sPassword != "")) {
+            Auth().checkLogin(context, {
+                //login success
+                println(context.getString(R.string.loginSuccessfulMsg))
 
-            val sUsername = settings.getString(context.getString(R.string.emailSetting))
-            val sPassword = settings.getString(context.getString(R.string.passwordSetting))
+                //create the MusicPlayer.kt mediasession
+                createMediaSession(context, true)
+            }, {
+                //login failed, retrieve new SID
 
-            if(sUsername != null && sPassword != null){
                 //login to monstercat
                 Auth().login(context, sUsername, sPassword, {
                     println(context.getString(R.string.loginSuccessfulMsg))
@@ -75,11 +75,11 @@ fun login(context: Context) {
                     //create the MusicPlayer.kt mediasession
                     createMediaSession(context, true)
                 })
-            }else{
-                //create the MusicPlayer.kt mediasession
-                createMediaSession(context, true)
-            }
-        })
+
+            })
+        } else {
+            createMediaSession(context, true)
+        }
     }
 }
 

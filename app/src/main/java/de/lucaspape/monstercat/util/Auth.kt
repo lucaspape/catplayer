@@ -1,12 +1,7 @@
 package de.lucaspape.monstercat.util
 
-import android.app.AlertDialog
 import android.content.Context
-import android.content.DialogInterface
-import android.util.TypedValue
-import android.view.LayoutInflater
 import android.view.WindowManager
-import android.widget.EditText
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.music.cid
 import de.lucaspape.monstercat.core.music.connectSid
@@ -224,6 +219,7 @@ class Auth {
     fun logout(context: Context) {
         waitingForLogin = false
         loggedIn = false
+        offline = false
 
         val settings = Settings.getSettings(context)
         settings.setString(context.getString(R.string.emailSetting), "")
