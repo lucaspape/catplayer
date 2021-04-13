@@ -19,4 +19,5 @@
     <string name="errorPlaybackNotAllowed">Playback not allowed (check settings for playback over mobile data and playback of non creator friendly songs)</string>
     <string name="noPlaylistFound">No playlist found</string>
     <string name="notOnline">Not Online!</string>
+    <string name="noLyricsAvailable">This song doesn\'t have lyrics yet</string>
 </resources>

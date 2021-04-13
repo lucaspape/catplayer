@@ -54,8 +54,10 @@ fun newAddToPlaylistRequest(
         Response.ErrorListener(errorCallback)
     )
 
-    request.retryPolicy = DefaultRetryPolicy(10000,DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+    request.retryPolicy = DefaultRetryPolicy(
+        10000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+    )
 
     return request
 }
@@ -229,8 +231,10 @@ fun newDeletePlaylistTrackRequest(
         Response.ErrorListener(errorCallback)
     )
 
-    request.retryPolicy = DefaultRetryPolicy(10000,DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+    request.retryPolicy = DefaultRetryPolicy(
+        10000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+    )
 
     return request
 }
@@ -377,8 +381,8 @@ fun newLoadRelatedTracksRequest(
     callback: (response: JSONObject) -> Unit,
     errorCallback: (error: VolleyError) -> Unit
 ): com.android.volley.toolbox.JsonObjectRequest? {
-    try{
-        if(trackIdArray.isNotEmpty() || excludeIdArray.isNotEmpty()){
+    try {
+        if (trackIdArray.isNotEmpty() || excludeIdArray.isNotEmpty()) {
             val jsonObject = JSONObject()
             val trackJsonArray = JSONArray()
             val excludeJsonArray = JSONArray()
@@ -438,10 +442,10 @@ fun newLoadRelatedTracksRequest(
                 )
 
             return loadRelatedTracksRequest
-        }else{
+        } else {
             return null
         }
-    }catch (e: ConcurrentModificationException){
+    } catch (e: ConcurrentModificationException) {
         return null
     }
 }
@@ -701,7 +705,7 @@ fun newLoadMoodRequest(
             }, Response.ErrorListener(errorCallback)
         )
     }
-    
+
     return null
 }
 
@@ -781,7 +785,7 @@ fun newLoadLivestreamsRequest(
     context: Context,
     callback: (response: JSONObject) -> Unit,
     errorCallback: (error: VolleyError?) -> Unit
-):StringRequest? {
+): StringRequest? {
     val settings = Settings.getSettings(context)
 
     val requestUrl = if (settings.getBoolean(
@@ -793,7 +797,7 @@ fun newLoadLivestreamsRequest(
         return null
     }
 
-    val request =  StringRequest(
+    val request = StringRequest(
         Request.Method.GET, requestUrl,
         {
             try {
@@ -804,10 +808,12 @@ fun newLoadLivestreamsRequest(
 
         }, Response.ErrorListener(errorCallback)
     )
-    
-    request.retryPolicy = DefaultRetryPolicy(10000,DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
-    
+
+    request.retryPolicy = DefaultRetryPolicy(
+        10000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+    )
+
     return request
 }
 
@@ -831,8 +837,13 @@ fun newLoadPublicPlaylistsRequest(
     )
 }
 
-fun newLoadLyricsRequest(context: Context, songId:String, callback: (response: String) -> Unit, errorCallback: (error: VolleyError?) -> Unit):StringRequest{
-    val requestUrl = "https://api.lucaspape.de/monstercat/v1/lyrics/$songId"
+fun newLoadLyricsRequest(
+    context: Context,
+    songId: String,
+    callback: (response: String) -> Unit,
+    errorCallback: (error: VolleyError?) -> Unit
+): StringRequest {
+    val requestUrl = context.getString(R.string.lyricsUrl) + songId
 
     return StringRequest(
         Request.Method.GET, requestUrl,

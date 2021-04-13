@@ -33,4 +33,6 @@
     <string name="officialPlaylistsUrl" translatable="false">https://connect.monstercat.com/v2/menu-code/official_playlists</string>
 
     <string name="livestreamUserAgent" translatable="false">Mozilla/5.0 (X11; Linux x86_64; rv:85.0) Gecko/20100101 Firefox/85.0</string>
+
+    <string name="lyricsUrl" translatable="false">https://api.lucaspape.de/monstercat/v1/lyrics/</string>
 </resources>

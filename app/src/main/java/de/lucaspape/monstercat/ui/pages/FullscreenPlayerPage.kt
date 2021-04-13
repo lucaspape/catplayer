@@ -28,17 +28,17 @@ class FullscreenPlayerPage(
     private val closeFullscreen: () -> Unit
 ) : Page() {
 
-    constructor() : this({},{})
+    constructor() : this({}, {})
 
-    companion object{
-        @JvmStatic val fullscreenPlayerPageName = "fullscreen-player"
+    companion object {
+        @JvmStatic
+        val fullscreenPlayerPageName = "fullscreen-player"
     }
 
     private fun bindPlayerUICallbacks(view: View) {
         val titleTextView = view.findViewById<TextView>(R.id.fullscreenTitle)
         val artistTextView = view.findViewById<TextView>(R.id.fullscreenArtist)
         val seekbar = view.findViewById<SeekBar>(R.id.fullscreenSeekBar)
-        //val barCoverImage = view.findViewById<ImageView>(R.id.fullscreenAlbumImage)
         val playButton = view.findViewById<ImageButton>(R.id.fullScreenPlay)
 
         val songTimePassed = view.findViewById<TextView>(R.id.songTimePassed)
@@ -112,9 +112,9 @@ class FullscreenPlayerPage(
         playingChangedCallback()
 
         loadingRelatedChangedCallback = {
-            if(loadingRelatedSongs){
+            if (loadingRelatedSongs) {
                 showLoadingRelatedNotification(view.context)
-            }else{
+            } else {
                 hideLoadingRelatedSongsNotification(view.context)
             }
         }
@@ -217,7 +217,7 @@ class FullscreenPlayerPage(
         }
     }
 
-    override fun onBackPressed(view: View):Boolean {
+    override fun onBackPressed(view: View): Boolean {
         closeFullscreen()
         return false
     }
@@ -235,7 +235,7 @@ class FullscreenPlayerPage(
     override val pageName: String = fullscreenPlayerPageName
 }
 
-class ViewPagerAdapter(private val context:Context): PagerAdapter() {
+class ViewPagerAdapter(private val context: Context) : PagerAdapter() {
     override fun getCount(): Int {
         return 2
     }
@@ -245,7 +245,8 @@ class ViewPagerAdapter(private val context:Context): PagerAdapter() {
     }
 
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
-        val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val layoutInflater =
+            context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
         return when (position) {
             0 -> {
@@ -276,10 +277,10 @@ class ViewPagerAdapter(private val context:Context): PagerAdapter() {
 
                 val fullscreenLyricsView = item.findViewById<TextView>(R.id.fullscreenLyrics)
 
-                fullscreenLyricsView.text = getSpannableLyricText()
+                fullscreenLyricsView.text = getSpannableLyricText(context)
 
                 lyricsChangedCallback = {
-                    fullscreenLyricsView.text = getSpannableLyricText()
+                    fullscreenLyricsView.text = getSpannableLyricText(context)
                 }
 
                 Objects.requireNonNull(container).addView(item)
@@ -292,31 +293,34 @@ class ViewPagerAdapter(private val context:Context): PagerAdapter() {
         }
     }
 
-    private fun getSpannableLyricText():Spanned{
-        val previousLyric = try{
-            lyricTextArray[currentLyricsIndex-1].replace("\n", "<br><br>")
-        }catch (e: IndexOutOfBoundsException){
+    private fun getSpannableLyricText(context: Context): Spanned {
+        val previousLyric = try {
+            lyricTextArray[currentLyricsIndex - 1].replace("\n", "<br><br>")
+        } catch (e: IndexOutOfBoundsException) {
             ""
         }
 
-        var currentLyric = try{
+        var currentLyric = try {
             lyricTextArray[currentLyricsIndex].replace("\n", "<br><br>")
-        }catch(e: IndexOutOfBoundsException){
+        } catch (e: IndexOutOfBoundsException) {
             ""
         }
 
-        val nextLyric = try{
-            lyricTextArray[currentLyricsIndex+1].replace("\n", "<br><br>")
-        }catch(e: IndexOutOfBoundsException){
+        val nextLyric = try {
+            lyricTextArray[currentLyricsIndex + 1].replace("\n", "<br><br>")
+        } catch (e: IndexOutOfBoundsException) {
             ""
         }
 
-        if(previousLyric == "" && currentLyric == "" && nextLyric == ""){
-            currentLyric = "This song doesn't have lyrics yet"
-        }else if((currentLyric != "" && previousLyric != "") || (currentLyric != "" && nextLyric != "")){
+        if (previousLyric == "" && currentLyric == "" && nextLyric == "") {
+            currentLyric = context.getString(R.string.noLyricsAvailable)
+        } else if ((currentLyric != "" && previousLyric != "") || (currentLyric != "" && nextLyric != "")) {
             currentLyric = "<h1>$currentLyric</h1>"
         }
 
-        return HtmlCompat.fromHtml("$previousLyric <br> $currentLyric <br> $nextLyric", HtmlCompat.FROM_HTML_MODE_LEGACY)
+        return HtmlCompat.fromHtml(
+            "$previousLyric <br> $currentLyric <br> $nextLyric",
+            HtmlCompat.FROM_HTML_MODE_LEGACY
+        )
     }
 }
