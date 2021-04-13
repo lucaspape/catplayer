@@ -62,21 +62,22 @@ fun login(context: Context) {
             val sUsername = settings.getString(context.getString(R.string.emailSetting))
             val sPassword = settings.getString(context.getString(R.string.passwordSetting))
 
-            sUsername?.let { username ->
-                sPassword?.let { password ->
-                    //login to monstercat
-                    Auth().login(context, username, password, {
-                        println(context.getString(R.string.loginSuccessfulMsg))
+            if(sUsername != null && sPassword != null){
+                //login to monstercat
+                Auth().login(context, sUsername, sPassword, {
+                    println(context.getString(R.string.loginSuccessfulMsg))
 
-                        //create the MusicPlayer.kt mediasession
-                        createMediaSession(context, true)
-                    }, {
-                        displayInfo(context, context.getString(R.string.loginFailedMsg))
+                    //create the MusicPlayer.kt mediasession
+                    createMediaSession(context, true)
+                }, {
+                    displayInfo(context, context.getString(R.string.loginFailedMsg))
 
-                        //create the MusicPlayer.kt mediasession
-                        createMediaSession(context, true)
-                    })
-                }
+                    //create the MusicPlayer.kt mediasession
+                    createMediaSession(context, true)
+                })
+            }else{
+                //create the MusicPlayer.kt mediasession
+                createMediaSession(context, true)
             }
         })
     }
