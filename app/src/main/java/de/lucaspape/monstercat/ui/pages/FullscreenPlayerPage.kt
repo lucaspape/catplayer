@@ -1,11 +1,13 @@
 package de.lucaspape.monstercat.ui.pages
 
 import android.content.Context
+import android.text.Spanned
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.core.net.toUri
+import androidx.core.text.HtmlCompat
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import de.lucaspape.monstercat.R
@@ -17,6 +19,7 @@ import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
 import de.lucaspape.monstercat.ui.pages.util.Page
 import de.lucaspape.monstercat.ui.pauseButtonDrawable
 import de.lucaspape.monstercat.ui.playButtonDrawable
+import java.lang.IndexOutOfBoundsException
 import java.util.*
 
 class FullscreenPlayerPage(
@@ -268,10 +271,10 @@ class ViewPagerAdapter(private val context:Context): PagerAdapter() {
 
                 val fullscreenLyricsView = item.findViewById<TextView>(R.id.fullscreenLyrics)
 
-                fullscreenLyricsView.text = lyrics
+                fullscreenLyricsView.text = getSpannableLyricText()
 
                 lyricsChangedCallback = {
-                    fullscreenLyricsView.text = lyrics
+                    fullscreenLyricsView.text = getSpannableLyricText()
                 }
 
                 Objects.requireNonNull(container).addView(item)
@@ -282,5 +285,33 @@ class ViewPagerAdapter(private val context:Context): PagerAdapter() {
                 layoutInflater.inflate(R.layout.fullscreen_image_item, container, false)
             }
         }
+    }
+
+    private fun getSpannableLyricText():Spanned{
+        val previousLyric = try{
+            lyricTextArray[currentLyricsIndex-1].replace("\n", "<br><br>")
+        }catch (e: IndexOutOfBoundsException){
+            ""
+        }
+
+        var currentLyric = try{
+            lyricTextArray[currentLyricsIndex].replace("\n", "<br><br>")
+        }catch(e: IndexOutOfBoundsException){
+            ""
+        }
+
+        val nextLyric = try{
+            lyricTextArray[currentLyricsIndex+1].replace("\n", "<br><br>")
+        }catch(e: IndexOutOfBoundsException){
+            ""
+        }
+
+        if(previousLyric == "" && currentLyric == "" && nextLyric == ""){
+            currentLyric = "This song doesn't have lyrics yet"
+        }else if((currentLyric != "" && previousLyric != "") || (currentLyric != "" && nextLyric != "")){
+            currentLyric = "<h1>$currentLyric</h1>"
+        }
+
+        return HtmlCompat.fromHtml("$previousLyric <br> $currentLyric <br> $nextLyric", HtmlCompat.FROM_HTML_MODE_LEGACY)
     }
 }

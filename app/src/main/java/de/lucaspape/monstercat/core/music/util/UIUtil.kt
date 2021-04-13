@@ -14,6 +14,7 @@ import de.lucaspape.monstercat.core.download.downloadCoverIntoImageReceiver
 import de.lucaspape.monstercat.core.download.ImageReceiverInterface
 import de.lucaspape.monstercat.core.download.downloadArtistImageIntoImageReceiver
 import de.lucaspape.monstercat.core.music.*
+import java.lang.IndexOutOfBoundsException
 import java.lang.RuntimeException
 
 var titleChangedCallback = {}
@@ -99,13 +100,16 @@ var loadingRelatedSongs = false
         loadingRelatedChangedCallback()
     }
 
-var lyrics = "This song doesnt have lyrics yet"
-    set(newString) {
-        field = newString
-        lyricsChangedCallback()
-    }
+var currentLyricsIndex = 0
+    set(value) {
+        val changed = field != value
 
-var lyricsText = ""
+        field = value
+
+        if(changed){
+            lyricsChangedCallback()
+        }
+    }
 
 var lyricTimeCodesArray = emptyArray<Int>()
 var lyricTextArray = emptyArray<String>()

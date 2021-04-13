@@ -161,21 +161,6 @@ fun playSong(
                 }
             }
         }
-
-        if (lastLyricsLoadedId != songId) {
-            scope.launch {
-                loadLyrics(context, currentSongId, {
-                    lastLyricsLoadedId = songId
-                }, {
-                    lastLyricsLoadedId = songId
-
-                    lyrics = ""
-                    lyricsText = "This song doesnt have lyrics yet"
-                    lyricTextArray = emptyArray()
-                    lyricTimeCodesArray = emptyArray()
-                })
-            }
-        }
     }
 
     if (exoPlayerSongId != songId) {
@@ -206,7 +191,8 @@ fun playStream(
 private var seekBarUpdateHandler = Handler(Looper.getMainLooper())
 var currentSeekBarUpdateHandlerId = ""
 
-var lastLyricsLoadedId = ""
+var loadedLyricsId = ""
+var loadingLyrics = false
 
 fun runSeekBarUpdate(context: Context, prepareNext: Boolean, crossFade: Boolean) {
     val id = UUID.randomUUID().toString()
@@ -225,7 +211,9 @@ fun runSeekBarUpdate(context: Context, prepareNext: Boolean, crossFade: Boolean)
                 setPlayerState(it)
             }
 
-            if(lastLyricsLoadedId == currentSongId){
+            if(loadedLyricsId == currentSongId){
+                //calculate current timecode
+
                 try {
                     var timeCodeIndex = 0
 
@@ -235,13 +223,33 @@ fun runSeekBarUpdate(context: Context, prepareNext: Boolean, crossFade: Boolean)
                         }
                     }
 
-
-                    lyrics = lyricTextArray[timeCodeIndex]
+                   currentLyricsIndex = timeCodeIndex
                 } catch (e: IndexOutOfBoundsException) {
-                    lyrics = lyricsText
+                    currentLyricsIndex = 0
                 }
             }else{
-                lyricsText = "This song doesnt have lyrics yet"
+                //load lyrics
+
+                if(!loadingLyrics){
+                    loadingLyrics = true
+
+                    scope.launch {
+                        loadLyrics(context, currentSongId, {
+                            loadedLyricsId = it
+
+                            loadingLyrics = false
+                        }, {
+                            loadedLyricsId = it
+
+                            currentLyricsIndex = 0
+                            lyricTextArray = emptyArray()
+                            lyricTimeCodesArray = emptyArray()
+
+                            loadingLyrics = false
+                        })
+                    }
+                }
+
             }
 
             //add current song to history after 30 seconds

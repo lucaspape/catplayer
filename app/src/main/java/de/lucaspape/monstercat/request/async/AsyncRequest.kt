@@ -1104,8 +1104,8 @@ suspend fun loadAlbumTracks(
 suspend fun loadLyrics(
     context: Context,
     songId: String,
-    finishedCallback: () -> Unit,
-    errorCallback: () -> Unit
+    finishedCallback: (songId:String) -> Unit,
+    errorCallback: (songId:String) -> Unit
 ) {
     withContext(Dispatchers.Main) {
         val requestQueue =
@@ -1114,7 +1114,7 @@ suspend fun loadLyrics(
         requestQueue.add(newLoadLyricsRequest(context, songId,
             {
                 try {
-                    val jsonObject = JSONObject(it)
+                    val jsonObject = JSONObject(getCharacterFromUnicode(it, true))
 
                     val result = jsonObject.getJSONObject("result")
 
@@ -1145,12 +1145,13 @@ suspend fun loadLyrics(
                     lyricTimeCodesArray = newLyricTimeCodes
                     lyricTextArray = newLyricText
                 }catch (e: JSONException){
-                    lyricsText = it
+                    lyricTimeCodesArray = arrayOf(0)
+                    lyricTextArray = arrayOf(getCharacterFromUnicode(it, false))
                 }
 
-                finishedCallback()
+                finishedCallback(songId)
             }, {
-            errorCallback()
+            errorCallback(songId)
             }))
     }
 }
