@@ -6,8 +6,7 @@ import de.lucaspape.monstercat.core.database.helper.*
 import de.lucaspape.monstercat.core.database.objects.Genre
 import de.lucaspape.monstercat.core.database.objects.Mood
 import de.lucaspape.monstercat.core.database.objects.PublicPlaylist
-import de.lucaspape.monstercat.core.music.util.lyricText
-import de.lucaspape.monstercat.core.music.util.lyricTimeCodes
+import de.lucaspape.monstercat.core.music.util.*
 import de.lucaspape.monstercat.core.util.*
 import de.lucaspape.monstercat.request.*
 import de.lucaspape.monstercat.core.util.Settings
@@ -1114,37 +1113,43 @@ suspend fun loadLyrics(
 
         requestQueue.add(newLoadLyricsRequest(context, songId,
             {
-                val result = it.getJSONObject("result")
+                try {
+                    val jsonObject = JSONObject(it)
 
-                var keys = result.keys()
+                    val result = jsonObject.getJSONObject("result")
 
-                //idk how to get length, so ima do this
+                    var keys = result.keys()
 
-                var size = 0
+                    //idk how to get length, so ima do this
 
-                for(key in keys){
-                    size++
+                    var size = 0
+
+                    for(key in keys){
+                        size++
+                    }
+
+                    val newLyricTimeCodes = Array(size){0}
+                    val newLyricText = Array(size){""}
+
+                    var index = 0
+
+                    keys = result.keys()
+
+                    for(key in keys){
+                        newLyricTimeCodes[index] = key.toInt()
+                        newLyricText[index] = result.getString(key)
+
+                        index++
+                    }
+
+                    lyricTimeCodesArray = newLyricTimeCodes
+                    lyricTextArray = newLyricText
+                }catch (e: JSONException){
+                    lyricsText = it
                 }
-
-                val newLyricTimeCodes = Array(size){0}
-                val newLyricText = Array(size){""}
-
-                var index = 0
-
-                keys = result.keys()
-
-                for(key in keys){
-                    newLyricTimeCodes[index] = key.toInt()
-                    newLyricText[index] = result.getString(key)
-
-                    index++
-                }
-
-                lyricTimeCodes = newLyricTimeCodes
-                lyricText = newLyricText
 
                 finishedCallback()
-        }, {
+            }, {
             errorCallback()
             }))
     }
