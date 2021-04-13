@@ -101,17 +101,18 @@ var loadingRelatedSongs = false
 
 var currentLyricsIndex = 0
     set(value) {
-        val changed = field != value
-
         field = value
 
-        if(changed){
-            lyricsChangedCallback()
-        }
+        lyricsChangedCallback()
     }
 
 var lyricTimeCodesArray = emptyArray<Int>()
 var lyricTextArray = emptyArray<String>()
+    set(value) {
+        field = value
+
+        lyricsChangedCallback()
+    }
 
 fun setCover(context: Context, songId: String, callback: (bitmap: Bitmap) -> Unit) {
     SongDatabaseHelper(context).getSong(songId)?.let { song ->

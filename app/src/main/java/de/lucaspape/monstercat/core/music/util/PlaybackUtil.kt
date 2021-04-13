@@ -223,7 +223,10 @@ fun runSeekBarUpdate(context: Context, prepareNext: Boolean, crossFade: Boolean)
                         }
                     }
 
-                   currentLyricsIndex = timeCodeIndex
+                    if(currentLyricsIndex != timeCodeIndex){
+                        currentLyricsIndex = timeCodeIndex
+                    }
+
                 } catch (e: IndexOutOfBoundsException) {
                     currentLyricsIndex = 0
                 }
