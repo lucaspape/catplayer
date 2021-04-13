@@ -161,6 +161,21 @@ fun playSong(
                 }
             }
         }
+
+        if (lastLyricsLoadedId != songId) {
+            scope.launch {
+                loadLyrics(context, currentSongId, {
+                    lastLyricsLoadedId = songId
+                }, {
+                    lastLyricsLoadedId = songId
+
+                    lyrics = ""
+                    lyricsText = "This song doesnt have lyrics yet"
+                    lyricTextArray = emptyArray()
+                    lyricTimeCodesArray = emptyArray()
+                })
+            }
+        }
     }
 
     if (exoPlayerSongId != songId) {
@@ -201,20 +216,6 @@ fun runSeekBarUpdate(context: Context, prepareNext: Boolean, crossFade: Boolean)
 
     val updateSeekBar = object : Runnable {
         override fun run() {
-            if (lastLyricsLoadedId != currentSongId) {
-                scope.launch {
-                    loadLyrics(context, currentSongId, {
-                        lastLyricsLoadedId = currentSongId
-                    }, {
-                        lastLyricsLoadedId = currentSongId
-
-                        lyrics = "This song doesnt have lyrics yet"
-                        lyricText = emptyArray()
-                        lyricTimeCodes = emptyArray()
-                    })
-                }
-            }
-
             exoPlayer?.duration?.let {
                 duration = it
             }
@@ -224,21 +225,24 @@ fun runSeekBarUpdate(context: Context, prepareNext: Boolean, crossFade: Boolean)
                 setPlayerState(it)
             }
 
-            try {
-                var timeCodeIndex = 0
+            if(lastLyricsLoadedId == currentSongId){
+                try {
+                    var timeCodeIndex = 0
 
-                for ((index, value) in lyricTimeCodes.withIndex()) {
-                    if (value * 1000 < currentPosition) {
-                        timeCodeIndex = index
+                    for ((index, value) in lyricTimeCodesArray.withIndex()) {
+                        if (value * 1000 < currentPosition) {
+                            timeCodeIndex = index
+                        }
                     }
+
+
+                    lyrics = lyricTextArray[timeCodeIndex]
+                } catch (e: IndexOutOfBoundsException) {
+                    lyrics = lyricsText
                 }
-
-
-                lyrics = lyricText[timeCodeIndex]
-            } catch (e: IndexOutOfBoundsException) {
-
+            }else{
+                lyricsText = "This song doesnt have lyrics yet"
             }
-
 
             //add current song to history after 30 seconds
             if (currentPosition > 30 * 1000) {

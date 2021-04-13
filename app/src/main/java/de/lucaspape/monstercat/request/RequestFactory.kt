@@ -831,17 +831,13 @@ fun newLoadPublicPlaylistsRequest(
     )
 }
 
-fun newLoadLyricsRequest(context: Context, songId:String, callback: (response: JSONObject) -> Unit, errorCallback: (error: VolleyError?) -> Unit):StringRequest{
-    val requestUrl = "https://api.lucaspape.de/monstercat/v1/static/lyrics/$songId.json"
+fun newLoadLyricsRequest(context: Context, songId:String, callback: (response: String) -> Unit, errorCallback: (error: VolleyError?) -> Unit):StringRequest{
+    val requestUrl = "https://api.lucaspape.de/monstercat/v1/lyrics/$songId"
 
     return StringRequest(
         Request.Method.GET, requestUrl,
         {
-            try {
-                callback(JSONObject(getCharacterFromUnicode(it, false)))
-            } catch (e: JSONException) {
-                errorCallback(null)
-            }
+            callback(it)
 
         }, Response.ErrorListener(errorCallback)
     )

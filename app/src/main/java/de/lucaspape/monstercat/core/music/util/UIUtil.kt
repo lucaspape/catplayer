@@ -105,8 +105,10 @@ var lyrics = "This song doesnt have lyrics yet"
         lyricsChangedCallback()
     }
 
-var lyricTimeCodes = emptyArray<Int>()
-var lyricText = emptyArray<String>()
+var lyricsText = ""
+
+var lyricTimeCodesArray = emptyArray<Int>()
+var lyricTextArray = emptyArray<String>()
 
 fun setCover(context: Context, songId: String, callback: (bitmap: Bitmap) -> Unit) {
     SongDatabaseHelper(context).getSong(songId)?.let { song ->
