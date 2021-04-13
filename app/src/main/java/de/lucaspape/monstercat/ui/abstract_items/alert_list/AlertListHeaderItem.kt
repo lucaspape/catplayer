@@ -12,7 +12,7 @@ import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.download.ImageReceiverInterface
 import de.lucaspape.monstercat.core.download.downloadCoverIntoImageReceiver
 
-open class AlertListHeaderItem(private val headerText: String, private val albumId: String) :
+open class AlertListHeaderItem(private val headerText: String, private val albumId: String?) :
     AbstractItem<AlertListHeaderItem.ViewHolder>() {
     override val type: Int = 2001
 
@@ -33,23 +33,25 @@ open class AlertListHeaderItem(private val headerText: String, private val album
         override fun bindView(item: AlertListHeaderItem, payloads: List<Any>) {
             headerItemText.text = item.headerText
 
-            downloadCoverIntoImageReceiver(context, object : ImageReceiverInterface {
-                override fun setBitmap(id: String, bitmap: Bitmap?) {
-                    if (id == item.albumId) {
-                        headerItemImage.setImageBitmap(bitmap)
+            item.albumId?.let {
+                downloadCoverIntoImageReceiver(context, object : ImageReceiverInterface {
+                    override fun setBitmap(id: String, bitmap: Bitmap?) {
+                        if (id == item.albumId) {
+                            headerItemImage.setImageBitmap(bitmap)
+                        }
                     }
-                }
 
-                override fun setDrawable(id: String, drawable: Drawable?) {
-                    if (id == item.albumId) {
-                        headerItemImage.setImageDrawable(drawable)
+                    override fun setDrawable(id: String, drawable: Drawable?) {
+                        if (id == item.albumId) {
+                            headerItemImage.setImageDrawable(drawable)
+                        }
                     }
-                }
 
-                override fun setTag(target: Target) {
-                    headerItemImage.tag = target
-                }
-            }, item.albumId, false)
+                    override fun setTag(target: Target) {
+                        headerItemImage.tag = target
+                    }
+                }, item.albumId, false)
+            }
         }
 
         override fun unbindView(item: AlertListHeaderItem) {

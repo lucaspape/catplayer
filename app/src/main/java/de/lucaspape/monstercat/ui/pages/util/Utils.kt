@@ -18,6 +18,7 @@ import de.lucaspape.monstercat.ui.*
 import de.lucaspape.monstercat.ui.abstract_items.content.CatalogItem
 import de.lucaspape.monstercat.util.*
 import de.lucaspape.monstercat.core.util.BackgroundAsync
+import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListHeaderItem
 import de.lucaspape.monstercat.ui.pages.HomePage.Companion.addSongsTaskId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -556,7 +557,7 @@ fun openAlbumUI(view: View, albumMcId: String, share: Boolean) {
 
         displayAlertDialogList(
             context,
-            HeaderTextItem(title), itemArray
+            AlertListHeaderItem(title, null), itemArray
         ) { position, _ ->
             urlArray[position].let { url ->
                 if (share) {
