@@ -52,8 +52,12 @@ var currentPosition:Long = 0
 
 var duration:Long = 0
     set(newLong) {
-        field = newLong
-
+        if(newLong > 0){
+            field = newLong
+        }else{
+            field = 0
+        }
+        
         setSongMetadata()
 
         durationChangedCallback()
