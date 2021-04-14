@@ -207,8 +207,9 @@ fun addSongToPlaylistUI(view: View, songId: String) {
 
                             displayAlertDialogList(
                                 view.context,
-                                HeaderTextItem(
-                                    view.context.getString(R.string.pickPlaylistMsg)
+                                AlertListHeaderItem(
+                                    view.context.getString(R.string.pickPlaylistMsg),
+                                    null
                                 ),
                                 alertListItems
                             ) { position, _ ->
