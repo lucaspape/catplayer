@@ -35,6 +35,8 @@ class FullscreenPlayerPage(
         val fullscreenPlayerPageName = "fullscreen-player"
     }
 
+    var lastPageSelect:Long = 0
+
     private fun bindPlayerUICallbacks(view: View) {
         val titleTextView = view.findViewById<TextView>(R.id.fullscreenTitle)
         val artistTextView = view.findViewById<TextView>(R.id.fullscreenArtist)
@@ -44,16 +46,54 @@ class FullscreenPlayerPage(
         val songTimePassed = view.findViewById<TextView>(R.id.songTimePassed)
         val songTimeMax = view.findViewById<TextView>(R.id.songTimeMax)
 
+        val viewPager = view.findViewById<ViewPager>(R.id.fullscreenViewPager)
+
         titleChangedCallback = {
             titleTextView.text = title
+
+            viewPager?.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+                override fun onPageScrolled(
+                    position: Int,
+                    positionOffset: Float,
+                    positionOffsetPixels: Int
+                ) {
+
+                }
+
+                override fun onPageSelected(position: Int) {
+                    if(System.currentTimeMillis() - lastPageSelect  > 200){
+                        lastPageSelect = System.currentTimeMillis()
+
+                        when (position) {
+                            0 -> {
+                                previous(view.context)
+                            }
+
+                            2 -> {
+                                next(view.context)
+                            }
+
+                        }
+                    }
+                }
+
+                override fun onPageScrollStateChanged(state: Int) {
+
+                }
+
+            })
+
+            viewPager.adapter = FullscreenViewPagerAdapter(view.context)
+            viewPager.currentItem = 1
         }
 
-        titleTextView.text = title
-        artistTextView.text = artist
+        titleChangedCallback()
 
         artistChangedCallback = {
             artistTextView.text = artist
         }
+
+        artistChangedCallback()
 
         seekbar.progress = currentPosition.toInt()
 
@@ -208,13 +248,6 @@ class FullscreenPlayerPage(
         artistTextView.setOnClickListener {
             onSearch(artistTextView.text.toString())
         }
-
-        val viewPager = view.findViewById<ViewPager>(R.id.fullscreenViewPager)
-        viewPager.adapter = ViewPagerAdapter(view.context)
-
-        view.findViewById<Button>(R.id.fullscreenLyricsButton).setOnClickListener {
-            viewPager.currentItem = 1
-        }
     }
 
     override fun onBackPressed(view: View): Boolean {
@@ -235,9 +268,9 @@ class FullscreenPlayerPage(
     override val pageName: String = fullscreenPlayerPageName
 }
 
-class ViewPagerAdapter(private val context: Context) : PagerAdapter() {
+class FullscreenViewPagerAdapter(private val context: Context) : PagerAdapter() {
     override fun getCount(): Int {
-        return 2
+        return 3
     }
 
     override fun isViewFromObject(view: View, `object`: Any): Boolean {
@@ -248,12 +281,16 @@ class ViewPagerAdapter(private val context: Context) : PagerAdapter() {
         val layoutInflater =
             context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
-        return when (position) {
+        val item = layoutInflater.inflate(R.layout.fullscreen_image_item, container, false)
+        val fullscreenImageView = item.findViewById<ImageView>(R.id.fullscreenAlbumImage)
+        val fullscreenLyricsView = item.findViewById<TextView>(R.id.fullscreenLyrics)
+
+        when (position) {
             0 -> {
-                val item = layoutInflater.inflate(R.layout.fullscreen_image_item, container, false)
 
-                val fullscreenImageView = item.findViewById<ImageView>(R.id.fullscreenAlbumImage)
+            }
 
+            1 -> {
                 fullscreenImageView?.setImageBitmap(coverBitmap)
 
                 coverBitmapChangedCallback = {
@@ -268,29 +305,17 @@ class ViewPagerAdapter(private val context: Context) : PagerAdapter() {
                     fullscreenImageView?.tag = target
                 }
 
-                Objects.requireNonNull(container).addView(item)
-
-                item
-            }
-            1 -> {
-                val item = layoutInflater.inflate(R.layout.fullscreen_lyrics_item, container, false)
-
-                val fullscreenLyricsView = item.findViewById<TextView>(R.id.fullscreenLyrics)
-
-                fullscreenLyricsView.text = getSpannableLyricText(context)
-
                 lyricsChangedCallback = {
                     fullscreenLyricsView.text = getSpannableLyricText(context)
                 }
-
-                Objects.requireNonNull(container).addView(item)
-
-                item
             }
-            else -> {
-                layoutInflater.inflate(R.layout.fullscreen_image_item, container, false)
+            2 -> {
+
             }
         }
+
+        Objects.requireNonNull(container).addView(item)
+        return item
     }
 
     private fun getSpannableLyricText(context: Context): Spanned {
@@ -319,8 +344,12 @@ class ViewPagerAdapter(private val context: Context) : PagerAdapter() {
         }
 
         return HtmlCompat.fromHtml(
-            "$previousLyric <br> $currentLyric <br> $nextLyric",
+            "Lyrics: <br> $previousLyric <br> $currentLyric <br> $nextLyric",
             HtmlCompat.FROM_HTML_MODE_LEGACY
         )
+    }
+
+    override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
+        Objects.requireNonNull(container).removeView(`object` as View)
     }
 }

@@ -484,7 +484,7 @@ class MainActivity : AppCompatActivity() {
         val songTimeMaxFullscreen = findViewById<TextView>(R.id.songTimeMax)
 
         titleChangedCallback = {
-            viewPager?.adapter = ViewPagerAdapter(this) {
+            viewPager?.adapter = SongTitleViewPagerAdapter(this) {
                 startActivity(
                     Intent(applicationContext, PlayerFullscreenActivity::class.java)
                 )
@@ -723,7 +723,7 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
-class ViewPagerAdapter(private val context: Context, private val openFullscreenView:()->Unit) : PagerAdapter() {
+class SongTitleViewPagerAdapter(private val context: Context, private val openFullscreenView:()->Unit) : PagerAdapter() {
     override fun getCount(): Int {
         return 3
     }
