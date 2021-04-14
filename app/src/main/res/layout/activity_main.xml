@@ -45,22 +45,16 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <TextView
-        android:id="@+id/songCurrentText"
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/currentSongTextViewPager"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="30dp"
         android:layout_marginStart="10dp"
-        android:textSize="16sp"
-        android:text=""
-        android:textColor="?android:attr/textColorPrimary"
+        android:layout_marginTop="5dp"
         app:layout_constraintBottom_toBottomOf="@+id/musicBar"
         app:layout_constraintEnd_toStartOf="@+id/playButton"
         app:layout_constraintStart_toEndOf="@+id/barCoverImage"
-        app:layout_constraintTop_toTopOf="@+id/musicBar"
-        android:ellipsize="marquee"
-        android:marqueeRepeatLimit="marquee_forever"
-        android:scrollHorizontally="true"
-        android:singleLine="true"/>
+        app:layout_constraintTop_toTopOf="@+id/musicBar" />
 
     <ImageButton
         android:id="@+id/playButton"

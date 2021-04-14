@@ -11,15 +11,22 @@ import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
 import android.util.TypedValue
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.*
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
+import androidx.viewpager.widget.PagerAdapter
+import androidx.viewpager.widget.ViewPager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import de.lucaspape.monstercat.R
+import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.core.download.*
 import de.lucaspape.monstercat.core.music.*
 import de.lucaspape.monstercat.core.music.notification.hideLoadingRelatedSongsNotification
@@ -39,6 +46,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.*
 
 var downloadServiceIntent: Intent? = null
 var lastOpenPage: String? = null
@@ -456,9 +464,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    var lastPageSelect:Long = 0
+
     @SuppressLint("ClickableViewAccessibility")
     fun bindPlayerUICallbacks() {
-        val titleTextView = findViewById<TextView>(R.id.songCurrentText)
+        val viewPager = findViewById<ViewPager>(R.id.currentSongTextViewPager)
         val seekbar = findViewById<SeekBar>(R.id.seekBar)
         val barCoverImage = findViewById<ImageView>(R.id.barCoverImage)
         val playButton = findViewById<ImageButton>(R.id.playButton)
@@ -474,26 +484,60 @@ class MainActivity : AppCompatActivity() {
         val songTimeMaxFullscreen = findViewById<TextView>(R.id.songTimeMax)
 
         titleChangedCallback = {
-            val titleWithArtist = "${de.lucaspape.monstercat.core.music.util.title} - $artist"
-            titleTextView?.text = titleWithArtist
+            viewPager?.adapter = ViewPagerAdapter(this) {
+                startActivity(
+                    Intent(applicationContext, PlayerFullscreenActivity::class.java)
+                )
+            }
+
+            viewPager?.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+                override fun onPageScrolled(
+                    position: Int,
+                    positionOffset: Float,
+                    positionOffsetPixels: Int
+                ) {
+
+                }
+
+                override fun onPageSelected(position: Int) {
+                    if(System.currentTimeMillis() - lastPageSelect  > 200){
+                        lastPageSelect = System.currentTimeMillis()
+
+                        when (position) {
+                            0 -> {
+                                previous(this@MainActivity)
+                            }
+
+                            2 -> {
+                                next(this@MainActivity)
+                            }
+
+                        }
+                    }
+                }
+
+                override fun onPageScrollStateChanged(state: Int) {
+
+                }
+
+            })
+
+            viewPager.currentItem = 1
+
             titleTextViewFullscreen?.text = de.lucaspape.monstercat.core.music.util.title
             artistTextViewFullscreen?.text = artist
 
-            musicBar?.isVisible = de.lucaspape.monstercat.core.music.util.title.isNotEmpty()
-            barCoverImage?.isVisible = de.lucaspape.monstercat.core.music.util.title.isNotEmpty()
-            playButton?.isVisible = de.lucaspape.monstercat.core.music.util.title.isNotEmpty()
+            val visible = de.lucaspape.monstercat.core.music.util.title.isNotEmpty()
+
+            musicBar?.isVisible = visible
+            barCoverImage?.isVisible = visible
+            playButton?.isVisible = visible
+            viewPager?.isVisible = visible
         }
 
-        musicBar?.isVisible = de.lucaspape.monstercat.core.music.util.title.isNotEmpty()
-        barCoverImage?.isVisible = de.lucaspape.monstercat.core.music.util.title.isNotEmpty()
-        playButton?.isVisible = de.lucaspape.monstercat.core.music.util.title.isNotEmpty()
-
-        val titleWithArtist = "${de.lucaspape.monstercat.core.music.util.title} - $artist"
-        titleTextView?.text = titleWithArtist
-        titleTextViewFullscreen?.text = de.lucaspape.monstercat.core.music.util.title
-        artistTextViewFullscreen?.text = artist
-
         artistChangedCallback = titleChangedCallback
+
+        titleChangedCallback()
 
         seekbar?.progress = currentPosition.toInt()
         seekbarFullscreen?.progress = currentPosition.toInt()
@@ -676,5 +720,58 @@ class MainActivity : AppCompatActivity() {
                     R.id.navigation_home
             }
         )
+    }
+}
+
+class ViewPagerAdapter(private val context: Context, private val openFullscreenView:()->Unit) : PagerAdapter() {
+    override fun getCount(): Int {
+        return 3
+    }
+
+    override fun isViewFromObject(view: View, `object`: Any): Boolean {
+        return view == `object` as ConstraintLayout
+    }
+
+    override fun instantiateItem(container: ViewGroup, position: Int): Any {
+        val layoutInflater =
+            context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+
+        val item = layoutInflater.inflate(R.layout.currentsong_item, container, false)
+
+        val songTextView = item.findViewById<TextView>(R.id.currentSongText)
+
+        songTextView.setOnClickListener {
+            openFullscreenView()
+        }
+
+        when (position) {
+            0 -> {
+                SongDatabaseHelper(context).getSong(previousSongId)?.let {
+                    val titleWithArtist = "${it.shownTitle} - ${it.artist}"
+
+                    songTextView.text = titleWithArtist
+                }
+            }
+            1 -> {
+                val titleWithArtist = "$title - $artist"
+
+                songTextView.text = titleWithArtist
+            }
+            2 -> {
+                SongDatabaseHelper(context).getSong(nextSongId)?.let {
+                    val titleWithArtist = "${it.shownTitle} - ${it.artist}"
+
+                    songTextView.text = titleWithArtist
+                }
+            }
+        }
+
+        Objects.requireNonNull(container).addView(item)
+
+        return item
+    }
+
+    override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
+        Objects.requireNonNull(container).removeView(`object` as View)
     }
 }

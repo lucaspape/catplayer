@@ -17,7 +17,6 @@ import de.lucaspape.monstercat.core.music.notification.stopPlayerService
 import de.lucaspape.monstercat.core.music.save.PlayerSaveState
 import de.lucaspape.monstercat.core.music.util.*
 import de.lucaspape.monstercat.core.util.Settings
-import de.lucaspape.monstercat.ui.activities.MainActivity
 import de.lucaspape.monstercat.ui.activities.login
 import de.lucaspape.monstercat.util.loggedIn
 import java.util.*
@@ -249,7 +248,7 @@ fun resume(context: Context) {
         context, currentSongId,
         showNotification = true,
         playWhenReady = true,
-        progress = currentPosition.toLong()
+        progress = currentPosition
     )
 
     PlayerSaveState.save(context)
@@ -419,6 +418,15 @@ private fun previousSong(): String {
         ""
     }
 }
+
+val previousSongId: String
+    get() {
+        return try {
+            playlist[playlistIndex-1]
+        }catch (e: java.lang.IndexOutOfBoundsException){
+            ""
+        }
+    }
 
 /**
  * Return next song without making changes to vars, only for prediction
