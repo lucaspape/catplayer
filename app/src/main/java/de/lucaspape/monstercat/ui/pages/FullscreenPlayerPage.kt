@@ -344,7 +344,7 @@ class FullscreenViewPagerAdapter(private val context: Context) : PagerAdapter() 
         }
 
         return HtmlCompat.fromHtml(
-            "Lyrics: <br> $previousLyric <br> $currentLyric <br> $nextLyric",
+            context.getString(R.string.lyrics) + ": <br> $previousLyric <br> $currentLyric <br> $nextLyric",
             HtmlCompat.FROM_HTML_MODE_LEGACY
         )
     }
