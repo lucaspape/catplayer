@@ -308,6 +308,8 @@ class FullscreenViewPagerAdapter(private val context: Context) : PagerAdapter() 
                 lyricsChangedCallback = {
                     fullscreenLyricsView.text = getSpannableLyricText(context)
                 }
+
+                lyricsChangedCallback()
             }
             2 -> {
 
