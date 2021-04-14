@@ -57,7 +57,7 @@ var duration:Long = 0
         }else{
             field = 0
         }
-        
+
         setSongMetadata()
 
         durationChangedCallback()
