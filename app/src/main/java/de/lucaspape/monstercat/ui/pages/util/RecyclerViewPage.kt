@@ -41,7 +41,7 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 open class Item(open val typeId: String?, open val itemId: Any)
-class StringItem(override val typeId: String?, override val itemId:String): Item(typeId, itemId)
+class StringItem(override val typeId: String?, override val itemId: String) : Item(typeId, itemId)
 
 abstract class RecyclerViewPage {
     companion object {
@@ -151,7 +151,7 @@ abstract class RecyclerViewPage {
             fastAdapter = FastAdapter.with(listOf(headerAdapter, itemAdapter, footerAdapter))
 
             recyclerView?.layoutManager =
-                LinearLayoutManager(view.context, getOrientation(view), false)
+                WrappedLinearLayoutManager(view.context, getOrientation(view), false)
 
             recyclerView?.adapter = fastAdapter
 
@@ -286,8 +286,10 @@ abstract class RecyclerViewPage {
                     } else if (item is SettingsButtonItem && v is Button) {
                         item.onClick()
                     } else if (item is SettingsLoginItem) {
-                        val usernameTextInput = view.findViewById<EditText>(R.id.settings_usernameInput)
-                        val passwordTextInput = view.findViewById<EditText>(R.id.settings_passwordInput)
+                        val usernameTextInput =
+                            view.findViewById<EditText>(R.id.settings_usernameInput)
+                        val passwordTextInput =
+                            view.findViewById<EditText>(R.id.settings_passwordInput)
 
                         item.onLogin(
                             usernameTextInput.text.toString(),
@@ -320,7 +322,7 @@ abstract class RecyclerViewPage {
         }
     }
 
-    fun removeItem(position: Int, callback:()->Unit) {
+    fun removeItem(position: Int, callback: () -> Unit) {
         scope.launch {
             withContext(Dispatchers.Main) {
                 itemAdapter.remove(position)

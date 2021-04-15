@@ -22,6 +22,7 @@ import com.mikepenz.fastadapter.GenericItem
 import com.mikepenz.fastadapter.adapters.ItemAdapter
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.ui.abstract_items.alert_list.AlertListItem
+import de.lucaspape.monstercat.ui.pages.util.WrappedLinearLayoutManager
 
 fun displayInfo(context: Context, msg: String) {
     Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
@@ -77,7 +78,7 @@ fun displayAlertDialogList(
 
     val recyclerView = alertListLayout.findViewById<RecyclerView>(R.id.alertDialogList)
     recyclerView.layoutManager =
-        LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        WrappedLinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
 
     val headerAdapter = ItemAdapter<GenericItem>()
     val itemAdapter = ItemAdapter<AlertListItem>()
