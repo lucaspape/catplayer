@@ -522,7 +522,7 @@ class MainActivity : AppCompatActivity() {
 
             })
 
-            viewPager.currentItem = 1
+            viewPager?.currentItem = 1
 
             titleTextViewFullscreen?.text = de.lucaspape.monstercat.core.music.util.title
             artistTextViewFullscreen?.text = artist
