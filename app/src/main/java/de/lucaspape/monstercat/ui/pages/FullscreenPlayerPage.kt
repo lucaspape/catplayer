@@ -336,15 +336,19 @@ class FullscreenViewPagerAdapter(private val context: Context) : PagerAdapter() 
         }
 
         if (previousLyric == "" && currentLyric == "" && nextLyric == "") {
-            currentLyric = context.getString(R.string.noLyricsAvailable)
+            currentLyric = ""
         } else if ((currentLyric != "" && previousLyric != "") || (currentLyric != "" && nextLyric != "")) {
             currentLyric = "<h1>$currentLyric</h1>"
         }
 
-        return HtmlCompat.fromHtml(
-            context.getString(R.string.lyrics) + ": <br> $previousLyric <br> $currentLyric <br> $nextLyric",
-            HtmlCompat.FROM_HTML_MODE_LEGACY
-        )
+        if(currentLyric != ""){
+            return HtmlCompat.fromHtml(
+                context.getString(R.string.lyrics) + ": <br> $previousLyric <br> $currentLyric <br> $nextLyric",
+                HtmlCompat.FROM_HTML_MODE_LEGACY
+            )
+        }else{
+            return HtmlCompat.fromHtml("", HtmlCompat.FROM_HTML_MODE_LEGACY)
+        }
     }
 
     override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
