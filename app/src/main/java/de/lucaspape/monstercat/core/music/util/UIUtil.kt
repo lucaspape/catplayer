@@ -274,3 +274,18 @@ private fun setSongMetadata() {
         println("Failed to set song metadata.")
     }
 }
+
+fun refreshUI(){
+    titleChangedCallback()
+    artistChangedCallback()
+    currentPositionChangedCallback()
+    durationChangedCallback()
+    coverDrawableChangedCallback()
+    coverBitmapChangedCallback()
+    artistDrawableChangedCallback()
+    artistBitmapChangedCallback()
+    playingChangedCallback()
+    loadingRelatedChangedCallback()
+    lyricsChangedCallback()
+    lyricsChangedCallback()
+}

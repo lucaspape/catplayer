@@ -87,13 +87,9 @@ class FullscreenPlayerPage(
             viewPager.currentItem = 1
         }
 
-        titleChangedCallback()
-
         artistChangedCallback = {
             artistTextView.text = artist
         }
-
-        artistChangedCallback()
 
         seekbar.progress = currentPosition.toInt()
 
@@ -149,8 +145,6 @@ class FullscreenPlayerPage(
             }
         }
 
-        playingChangedCallback()
-
         loadingRelatedChangedCallback = {
             if (loadingRelatedSongs) {
                 showLoadingRelatedNotification(view.context)
@@ -158,6 +152,8 @@ class FullscreenPlayerPage(
                 hideLoadingRelatedSongsNotification(view.context)
             }
         }
+
+        refreshUI()
     }
 
     private fun registerListeners(view: View) {

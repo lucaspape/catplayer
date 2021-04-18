@@ -538,8 +538,6 @@ class MainActivity : AppCompatActivity() {
 
         artistChangedCallback = titleChangedCallback
 
-        titleChangedCallback()
-
         seekbar?.progress = currentPosition.toInt()
         seekbarFullscreen?.progress = currentPosition.toInt()
 
@@ -604,8 +602,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        playingChangedCallback()
-
         coverBitmapChangedCallback = {
             barCoverImage?.setImageBitmap(coverBitmap)
             barCoverImageFullscreen?.setImageBitmap(coverBitmap)
@@ -628,6 +624,8 @@ class MainActivity : AppCompatActivity() {
                 hideLoadingRelatedSongsNotification(this)
             }
         }
+
+        refreshUI()
     }
 
     private fun openPage(page: Page) {
