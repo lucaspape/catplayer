@@ -1,6 +1,8 @@
 package de.lucaspape.monstercat.core.music.util
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.audio.AudioAttributes
@@ -8,6 +10,7 @@ import de.lucaspape.monstercat.core.database.helper.StreamDatabaseHelper
 import de.lucaspape.monstercat.core.music.*
 import de.lucaspape.monstercat.core.music.notification.startPlayerService
 import de.lucaspape.monstercat.core.music.notification.updateNotification
+import de.lucaspape.monstercat.util.Listener
 import java.util.*
 
 fun getAudioAttributes(): AudioAttributes {
@@ -19,9 +22,36 @@ fun getAudioAttributes(): AudioAttributes {
 
 var currentListenerId = ""
 
-fun getPlayerListener(context: Context, songId: String, crossFade:Boolean): Player.EventListener {
+var playerPositionChangedListeners = ArrayList<Listener>()
+
+private fun runPositionChangedListeners(context: Context, songId: String) {
+    val stream = StreamDatabaseHelper(context).getStream(songId)
+
+    if(stream == null){
+        try {
+            val iterator = playerPositionChangedListeners.iterator()
+
+            while (iterator.hasNext()) {
+                val listener = iterator.next()
+
+                listener.run()
+
+                playerPositionChangedListeners.removeIf { it.removeOnCalled && it.listenerId == listener.listenerId }
+            }
+        } catch (e: ConcurrentModificationException) {
+
+        }
+    }else{
+        duration = 0
+        currentPosition = 0
+    }
+}
+
+fun getPlayerListener(context: Context, songId: String): Player.EventListener {
     val id = UUID.randomUUID().toString()
     currentListenerId = id
+
+    runPlayerLoop(context, songId)
 
     return object : Player.EventListener {
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
@@ -40,17 +70,34 @@ fun getPlayerListener(context: Context, songId: String, crossFade:Boolean): Play
                     ) {
                         updateNotification(context, songId, it)
                     }
-                    
-                    val stream = StreamDatabaseHelper(context).getStream(songId)
-
-                    if(stream == null){
-                        runSeekBarUpdate(context, prepareNext = true, crossFade)
-                    }else{
-                        duration = 0
-                        currentPosition = 0
-                    }
                 }
             }
         }
     }
 }
+
+private var seekBarUpdateHandler = Handler(Looper.getMainLooper())
+var currentSeekBarUpdateHandlerId = ""
+
+var loadedLyricsId = ""
+var loadingLyrics = false
+
+private fun runPlayerLoop(context: Context, songId: String) {
+    val id = UUID.randomUUID().toString()
+    currentSeekBarUpdateHandlerId = id
+
+    seekBarUpdateHandler = Handler(Looper.getMainLooper())
+
+    val updateSeekBar = object : Runnable {
+        override fun run() {
+            runPositionChangedListeners(context, songId)
+
+            if (id == currentSeekBarUpdateHandlerId) {
+                seekBarUpdateHandler.postDelayed(this, 100)
+            }
+        }
+    }
+
+    seekBarUpdateHandler.postDelayed(updateSeekBar, 100)
+}
+

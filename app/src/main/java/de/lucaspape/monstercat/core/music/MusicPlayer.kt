@@ -17,13 +17,20 @@ import de.lucaspape.monstercat.core.music.notification.stopPlayerService
 import de.lucaspape.monstercat.core.music.save.PlayerSaveState
 import de.lucaspape.monstercat.core.music.util.*
 import de.lucaspape.monstercat.core.util.Settings
+import de.lucaspape.monstercat.request.async.loadLyrics
 import de.lucaspape.monstercat.ui.activities.login
+import de.lucaspape.monstercat.util.Listener
 import de.lucaspape.monstercat.util.loggedIn
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.math.log
 import kotlin.random.Random
+
+val scope = CoroutineScope(Dispatchers.Default)
 
 //main exoPlayer
 var exoPlayer: SimpleExoPlayer? = null
@@ -65,7 +72,7 @@ var playlistIndex = 0
 //songs that are played longer than 30 seconds are saved in here. Used for related songs
 var history = ArrayList<String>()
 
-var playlistChangedCallback:()->Unit = {}
+var playlistChangedCallback: () -> Unit = {}
 
 //nextRandom needs to be prepared before next playing to allow crossfade
 var nextRandom = -1
@@ -109,6 +116,7 @@ var openMainActivityIntent = Intent()
 private var filters = HashMap<String, ArrayList<String>>()
 
 fun setupMusicPlayer(
+    context: Context,
     sRetrieveRelatedSongs: (context: Context, callback: (relatedSongs: ArrayList<String>) -> Unit, errorCallback: () -> Unit) -> Unit,
     sDisplayInfo: (context: Context, msg: String) -> Unit,
     sOpenMainActivityIntent: Intent
@@ -116,6 +124,8 @@ fun setupMusicPlayer(
     retrieveRelatedSongs = sRetrieveRelatedSongs
     displayInfo = sDisplayInfo
     openMainActivityIntent = sOpenMainActivityIntent
+
+    setupPlayerListeners(context)
 }
 
 /**
@@ -134,11 +144,11 @@ class NoisyReceiver : BroadcastReceiver() {
 /**
  * Create mediaSession and listen for callbacks (pause, play buttons on headphones etc.)
  */
-fun createMediaSession(context: Context, force:Boolean) {
+fun createMediaSession(context: Context, force: Boolean) {
     if (!sessionCreated || mediaSession == null) {
-        if(!loggedIn && !force){
+        if (!loggedIn && !force) {
             login(context)
-        }else{
+        } else {
             PlayerSaveState.restore(context, false)
 
             mediaSession = MediaSessionCompat.fromMediaSession(
@@ -173,20 +183,133 @@ fun applyPlayerSettings(context: Context) {
     applyFilterSettings(context)
 }
 
-fun applyFilterSettings(context: Context){
+fun applyFilterSettings(context: Context) {
     filters = HashMap()
 
     val filterDatabaseHelper = FilterDatabaseHelper(context)
 
     filterDatabaseHelper.getAllFilters().let {
         it.forEach { filter ->
-            when(filter.filterType){
+            when (filter.filterType) {
                 "special" -> addSpecialFilter(filter.filter)
                 "artist" -> addArtistToFilters(filter.filter)
                 "title" -> addTitleFilter(filter.filter)
             }
         }
     }
+}
+
+fun setupPlayerListeners(context: Context) {
+    val positionListener = Listener({
+        exoPlayer?.duration?.let {
+            duration = it
+        }
+
+        exoPlayer?.currentPosition?.let {
+            currentPosition = it
+            setPlayerState(it)
+        }
+    }, false)
+
+    val lyricsListener = Listener({
+        if (loadedLyricsId == currentSongId) {
+            //calculate current timecode
+
+            try {
+                var timeCodeIndex = 0
+
+                for ((index, value) in lyricTimeCodesArray.withIndex()) {
+                    if (value * 1000 < currentPosition) {
+                        timeCodeIndex = index
+                    }
+                }
+
+                if (currentLyricsIndex != timeCodeIndex) {
+                    currentLyricsIndex = timeCodeIndex
+                }
+
+            } catch (e: java.lang.IndexOutOfBoundsException) {
+                currentLyricsIndex = 0
+            }
+        } else {
+            //load lyrics
+
+            if (!loadingLyrics) {
+                loadingLyrics = true
+
+                scope.launch {
+                    loadLyrics(context, currentSongId, {
+                        loadedLyricsId = it
+
+                        loadingLyrics = false
+                    }, {
+                        loadedLyricsId = it
+
+                        currentLyricsIndex = 0
+                        lyricTextArray = emptyArray()
+                        lyricTimeCodesArray = emptyArray()
+
+                        loadingLyrics = false
+                    })
+                }
+            }
+
+        }
+    }, false)
+
+    val crossFadeListener = Listener({
+        val timeLeft = duration - currentPosition
+
+        if (timeLeft < duration / 2 && exoPlayer?.isPlaying == true) {
+            if (nextSongId != "") {
+                prepareSong(context, nextSongId, {}, {})
+            } else if (playRelatedSongsAfterPlaylistFinished) {
+                loadRelatedSongs(context, playAfter = false)
+            }
+        }
+
+        if (timeLeft < crossfade && exoPlayer?.isPlaying == true && nextSongId == preparedExoPlayerSongId) {
+            if (timeLeft >= 1) {
+                val crossVolume = 1 - log(
+                    100 - ((crossfade.toFloat() - timeLeft) / crossfade * 100),
+                    100.toFloat()
+                )
+
+                val higherVolume = crossVolume * volume
+                val lowerVolume = volume - higherVolume
+
+                if (higherVolume > 0.toFloat() && higherVolume.isFinite()) {
+                    preparedExoPlayer?.audioComponent?.volume = higherVolume
+                }
+
+                if (lowerVolume > 0.toFloat() && lowerVolume.isFinite()) {
+                    exoPlayer?.audioComponent?.volume = lowerVolume
+                }
+            }
+
+            preparedExoPlayer?.playWhenReady = true
+        } else if (exoPlayer?.isPlaying == false) {
+            preparedExoPlayer?.playWhenReady = false
+        }
+    }, false)
+
+    val historyListener = Listener({
+        //add current song to history after 30 seconds
+        if (currentPosition > 30 * 1000) {
+            try {
+                if (history[history.size - 1] != currentSongId) {
+                    history.add(currentSongId)
+                }
+            } catch (e: java.lang.IndexOutOfBoundsException) {
+                history.add(currentSongId)
+            }
+        }
+    }, false)
+
+    playerPositionChangedListeners.add(crossFadeListener)
+    playerPositionChangedListeners.add(historyListener)
+    playerPositionChangedListeners.add(positionListener)
+    playerPositionChangedListeners.add(lyricsListener)
 }
 
 /**
@@ -422,8 +545,8 @@ private fun previousSong(): String {
 val previousSongId: String
     get() {
         return try {
-            playlist[playlistIndex-1]
-        }catch (e: java.lang.IndexOutOfBoundsException){
+            playlist[playlistIndex - 1]
+        } catch (e: java.lang.IndexOutOfBoundsException) {
             ""
         }
     }
@@ -539,7 +662,7 @@ fun clearRelatedSongs() {
     loadedRelatedHash = -1
 }
 
-var lastLoad:Long = 0
+var lastLoad: Long = 0
 
 /**
  * Fetch songs which are related to songs in playlist
@@ -559,7 +682,7 @@ fun loadRelatedSongs(context: Context, playAfter: Boolean) {
 
             it.forEach { songId ->
                 songDatabaseHelper.getSong(songId)?.let { song ->
-                    if(!filter(song)){
+                    if (!filter(song)) {
                         filteredList.add(songId)
                     }
                 }
@@ -582,12 +705,12 @@ fun loadRelatedSongs(context: Context, playAfter: Boolean) {
     }
 }
 
-fun filter(song:Song):Boolean{
+fun filter(song: Song): Boolean {
     var filter = false
 
     filters["artists"]?.let {
         it.forEach { filterArtist ->
-            if(song.artist.contains(filterArtist, ignoreCase = true)){
+            if (song.artist.contains(filterArtist, ignoreCase = true)) {
                 filter = true
             }
         }
@@ -595,7 +718,7 @@ fun filter(song:Song):Boolean{
 
     filters["titles"]?.let {
         it.forEach { filterTitle ->
-            if(song.shownTitle.contains(filterTitle, ignoreCase = true)){
+            if (song.shownTitle.contains(filterTitle, ignoreCase = true)) {
                 filter = true
             }
         }
@@ -603,15 +726,15 @@ fun filter(song:Song):Boolean{
 
     filters["special"]?.let {
         it.forEach { special ->
-            when(special){
+            when (special) {
                 "creatorFriendly" -> {
-                    if(!song.creatorFriendly){
+                    if (!song.creatorFriendly) {
                         filter = true
                     }
                 }
 
                 "explicit" -> {
-                    if(song.explicit){
+                    if (song.explicit) {
                         filter = true
                     }
                 }
@@ -622,44 +745,44 @@ fun filter(song:Song):Boolean{
     return filter
 }
 
-fun addToPriorityQueue(songId:String){
+fun addToPriorityQueue(songId: String) {
     prioritySongQueue.add(songId)
 }
 
-fun pushToPriorityQueue(songId: String){
+fun pushToPriorityQueue(songId: String) {
     prioritySongQueue.push(songId)
 }
 
-fun addToQueue(context: Context, songId: String){
+fun addToQueue(context: Context, songId: String) {
     SongDatabaseHelper(context).getSong(songId)?.let {
         addToQueue(it)
     }
 }
 
-fun addToQueue(song:Song){
-    if(!filter(song)){
+fun addToQueue(song: Song) {
+    if (!filter(song)) {
         songQueue.add(song.songId)
     }
 }
 
-fun removeFromPriorityQueue(index:Int){
+fun removeFromPriorityQueue(index: Int) {
     prioritySongQueue.removeAt(index)
 }
 
-fun removeFromQueue(index:Int){
+fun removeFromQueue(index: Int) {
     songQueue.removeAt(index)
     nextRandom = -1
 }
 
-fun removeFromRelatedQueue(index:Int){
+fun removeFromRelatedQueue(index: Int) {
     relatedSongQueue.removeAt(index)
     nextRelatedRandom = -1
 }
 
-private fun addArtistToFilters(artistName:String){
+private fun addArtistToFilters(artistName: String) {
     var artistFilters = filters["artists"]
 
-    if(artistFilters == null){
+    if (artistFilters == null) {
         artistFilters = ArrayList()
     }
 
@@ -668,10 +791,10 @@ private fun addArtistToFilters(artistName:String){
     filters["artists"] = artistFilters
 }
 
-private fun addTitleFilter(title:String){
+private fun addTitleFilter(title: String) {
     var titleFilters = filters["titles"]
 
-    if(titleFilters == null){
+    if (titleFilters == null) {
         titleFilters = ArrayList()
     }
 
@@ -680,10 +803,10 @@ private fun addTitleFilter(title:String){
     filters["titles"] = titleFilters
 }
 
-private fun addSpecialFilter(specialFilter:String){
+private fun addSpecialFilter(specialFilter: String) {
     var specialFilters = filters["special"]
 
-    if(specialFilters == null){
+    if (specialFilters == null) {
         specialFilters = ArrayList()
     }
 

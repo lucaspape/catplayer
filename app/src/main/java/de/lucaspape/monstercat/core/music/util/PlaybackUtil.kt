@@ -1,8 +1,6 @@
 package de.lucaspape.monstercat.core.music.util
 
 import android.content.Context
-import android.os.Handler
-import android.os.Looper
 import com.google.android.exoplayer2.SimpleExoPlayer
 import de.lucaspape.monstercat.R
 import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
@@ -10,22 +8,15 @@ import de.lucaspape.monstercat.core.database.helper.StreamDatabaseHelper
 import de.lucaspape.monstercat.core.music.*
 import de.lucaspape.monstercat.core.music.notification.updateNotification
 import de.lucaspape.monstercat.core.util.Settings
-import de.lucaspape.monstercat.request.async.loadLyrics
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.lang.IndexOutOfBoundsException
-import java.util.*
-import kotlin.math.log
 
 //songId of song which is prepared in exoPlayer
 var exoPlayerSongId = ""
 
 //songId of song which is prepared in nextExoPlayer
 var preparedExoPlayerSongId = ""
-
-private val scope = CoroutineScope(Dispatchers.Default)
 
 fun prepareSong(
     context: Context,
@@ -133,8 +124,7 @@ fun playSong(
         exoPlayer?.addListener(
             getPlayerListener(
                 context,
-                songId,
-                true
+                songId
             )
         )
 
@@ -186,129 +176,4 @@ fun playStream(
     addToPriorityQueue(streamName)
     next(context)
     currentSeekBarUpdateHandlerId = ""
-}
-
-private var seekBarUpdateHandler = Handler(Looper.getMainLooper())
-var currentSeekBarUpdateHandlerId = ""
-
-var loadedLyricsId = ""
-var loadingLyrics = false
-
-fun runSeekBarUpdate(context: Context, prepareNext: Boolean, crossFade: Boolean) {
-    val id = UUID.randomUUID().toString()
-    currentSeekBarUpdateHandlerId = id
-
-    seekBarUpdateHandler = Handler(Looper.getMainLooper())
-
-    val updateSeekBar = object : Runnable {
-        override fun run() {
-            exoPlayer?.duration?.let {
-                duration = it
-            }
-
-            exoPlayer?.currentPosition?.let {
-                currentPosition = it
-                setPlayerState(it)
-            }
-
-            if(loadedLyricsId == currentSongId){
-                //calculate current timecode
-
-                try {
-                    var timeCodeIndex = 0
-
-                    for ((index, value) in lyricTimeCodesArray.withIndex()) {
-                        if (value * 1000 < currentPosition) {
-                            timeCodeIndex = index
-                        }
-                    }
-
-                    if(currentLyricsIndex != timeCodeIndex){
-                        currentLyricsIndex = timeCodeIndex
-                    }
-
-                } catch (e: IndexOutOfBoundsException) {
-                    currentLyricsIndex = 0
-                }
-            }else{
-                //load lyrics
-
-                if(!loadingLyrics){
-                    loadingLyrics = true
-
-                    scope.launch {
-                        loadLyrics(context, currentSongId, {
-                            loadedLyricsId = it
-
-                            loadingLyrics = false
-                        }, {
-                            loadedLyricsId = it
-
-                            currentLyricsIndex = 0
-                            lyricTextArray = emptyArray()
-                            lyricTimeCodesArray = emptyArray()
-
-                            loadingLyrics = false
-                        })
-                    }
-                }
-
-            }
-
-            //add current song to history after 30 seconds
-            if (currentPosition > 30 * 1000) {
-                try {
-                    if (history[history.size - 1] != currentSongId) {
-                        history.add(currentSongId)
-                    }
-                } catch (e: IndexOutOfBoundsException) {
-                    history.add(currentSongId)
-                }
-            }
-
-            if (crossFade) {
-                val timeLeft = duration - currentPosition
-
-                if (prepareNext) {
-                    if (timeLeft < duration / 2 && exoPlayer?.isPlaying == true) {
-                        if (nextSongId != "") {
-                            prepareSong(context, nextSongId, {}, {})
-                        } else if (playRelatedSongsAfterPlaylistFinished) {
-                            loadRelatedSongs(context, playAfter = false)
-                        }
-                    }
-                }
-
-                if (timeLeft < crossfade && exoPlayer?.isPlaying == true && nextSongId == preparedExoPlayerSongId) {
-                    if (timeLeft >= 1) {
-                        val crossVolume = 1 - log(
-                            100 - ((crossfade.toFloat() - timeLeft) / crossfade * 100),
-                            100.toFloat()
-                        )
-
-                        val higherVolume = crossVolume * volume
-                        val lowerVolume = volume - higherVolume
-
-                        if (higherVolume > 0.toFloat() && higherVolume.isFinite()) {
-                            preparedExoPlayer?.audioComponent?.volume = higherVolume
-                        }
-
-                        if (lowerVolume > 0.toFloat() && lowerVolume.isFinite()) {
-                            exoPlayer?.audioComponent?.volume = lowerVolume
-                        }
-                    }
-
-                    preparedExoPlayer?.playWhenReady = true
-                } else if (exoPlayer?.isPlaying == false) {
-                    preparedExoPlayer?.playWhenReady = false
-                }
-            }
-
-            if (id == currentSeekBarUpdateHandlerId) {
-                seekBarUpdateHandler.postDelayed(this, 100)
-            }
-        }
-    }
-
-    seekBarUpdateHandler.postDelayed(updateSeekBar, 100)
 }

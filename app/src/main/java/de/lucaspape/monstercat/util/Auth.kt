@@ -32,7 +32,7 @@ var offline = false
 var username = ""
     private set
 
-var loggedInStateChangedListeners = ArrayList<LoggedInStateChangedListener>()
+var loggedInStateChangedListeners = ArrayList<Listener>()
 
 private fun runCallbacks() {
     try {
@@ -50,7 +50,7 @@ private fun runCallbacks() {
     }
 }
 
-class LoggedInStateChangedListener(val run: () -> Unit, val removeOnCalled: Boolean) {
+class Listener(val run: () -> Unit, val removeOnCalled: Boolean) {
     val listenerId = UUID.randomUUID().toString()
 }
 

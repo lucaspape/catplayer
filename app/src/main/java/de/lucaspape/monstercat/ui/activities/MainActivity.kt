@@ -211,6 +211,7 @@ class MainActivity : AppCompatActivity() {
         bindPlayerUICallbacks()
 
         setupMusicPlayer(
+            this,
             { context, callback, errorCallback ->
                 genericScope.launch {
                     val relatedTo = if (history.size > 0) {

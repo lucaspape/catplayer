@@ -27,7 +27,7 @@ class SettingsPage(
         settingsPageObject = SettingsRecyclerPage(openFilterSettings)
         settingsPageObject?.onCreate(view)
 
-        loggedInStateChangedListeners.add(LoggedInStateChangedListener({
+        loggedInStateChangedListeners.add(Listener({
             settingsPageObject?.reload(view)
         }, false))
     }
