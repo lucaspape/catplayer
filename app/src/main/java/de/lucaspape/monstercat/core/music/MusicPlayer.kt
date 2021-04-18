@@ -36,6 +36,7 @@ val scope = CoroutineScope(Dispatchers.Default)
 var exoPlayer: SimpleExoPlayer? = null
     set(value) {
         currentListenerId = ""
+
         field?.playWhenReady = false
         field?.release()
         field?.stop()
@@ -272,7 +273,7 @@ fun setupPlayerListeners(context: Context) {
                     }
                 }
 
-                if (timeLeft < crossfade && exoPlayer?.isPlaying == true && nextSongId == preparedExoPlayerSongId) {
+                if (timeLeft in 200 until crossfade && exoPlayer?.isPlaying == true && nextSongId == preparedExoPlayerSongId) {
                     val crossVolume = 1 - log(
                         100 - ((crossfade.toFloat() - timeLeft) / crossfade * 100),
                         100.toFloat()
@@ -289,10 +290,12 @@ fun setupPlayerListeners(context: Context) {
                         exoPlayer?.audioComponent?.volume = lowerVolume
                     }
 
-                    preparedExoPlayer?.playWhenReady = nextSongId == preparedExoPlayerSongId
+                    preparedExoPlayer?.playWhenReady = true
                 } else if (exoPlayer?.isPlaying == false) {
                     preparedExoPlayer?.playWhenReady = false
                 }
+            } else {
+                preparedExoPlayer?.playWhenReady = false
             }
         }, false)
 
