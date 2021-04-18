@@ -31,83 +31,131 @@ var lyricsChangedCallback = {}
 
 var title = ""
     set(newString) {
+        val changed = newString != field
+
         field = newString
 
-        titleChangedCallback()
+        if(changed){
+            titleChangedCallback()
+        }
     }
 
 var artist = ""
     set(newString) {
+        val changed = newString != field
+
         field = newString
 
-        artistChangedCallback()
+        if(changed){
+            artistChangedCallback()
+        }
     }
 
 var currentPosition:Long = 0
     set(newLong) {
+        val changed = newLong != field
+
         field = newLong
 
-        currentPositionChangedCallback()
+        if(changed){
+            currentPositionChangedCallback()
+        }
     }
 
 var duration:Long = 0
     set(newLong) {
-        if(newLong > 0){
-            field = newLong
+        val changed = newLong != field
+
+        field = if(newLong > 0){
+            newLong
         }else{
-            field = 0
+            0
         }
 
-        setSongMetadata()
+        if(changed){
+            setSongMetadata()
 
-        durationChangedCallback()
+            durationChangedCallback()
+        }
     }
 
 var coverBitmap: Bitmap? = null
     set(newBitmap) {
+        val changed = newBitmap != field
+
         field = newBitmap
 
-        setSongMetadata()
+        if(changed){
+            setSongMetadata()
 
-        coverBitmapChangedCallback()
+            coverBitmapChangedCallback()
+        }
     }
 
 var coverDrawable: Drawable? = null
     set(newDrawable) {
+        val changed = newDrawable != field
+
         field = newDrawable
 
-        coverDrawableChangedCallback()
+        if(changed){
+            coverDrawableChangedCallback()
+        }
     }
 
 var artistBitmap: Bitmap? = null
     set(newBitmap) {
+        val changed = newBitmap != field
+
         field = newBitmap
-        artistBitmapChangedCallback()
+
+        if(changed){
+            artistBitmapChangedCallback()
+        }
     }
 
 var artistDrawable: Drawable? = null
     set(newDrawable) {
+        val changed = newDrawable != field
+
         field = newDrawable
-        artistDrawableChangedCallback()
+
+        if(changed){
+            artistDrawableChangedCallback()
+        }
     }
 
 var visiblePlaying = false
     set(newBoolean) {
+        val changed = newBoolean != field
+
         field = newBoolean
-        playingChangedCallback()
+
+        if(changed){
+            playingChangedCallback()
+        }
     }
 
 var loadingRelatedSongs = false
     set(newBoolean) {
+        val changed = newBoolean != field
+
         field = newBoolean
-        loadingRelatedChangedCallback()
+
+        if(changed){
+            loadingRelatedChangedCallback()
+        }
     }
 
 var currentLyricsIndex = 0
     set(value) {
+        val changed = value != field
+
         field = value
 
-        lyricsChangedCallback()
+        if(changed){
+            lyricsChangedCallback()
+        }
     }
 
 var lyricTimeCodesArray = emptyArray<Int>()
