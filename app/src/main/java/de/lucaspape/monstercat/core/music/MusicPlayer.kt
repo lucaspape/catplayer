@@ -199,117 +199,123 @@ fun applyFilterSettings(context: Context) {
     }
 }
 
+private var listenersSetup = false
+
 fun setupPlayerListeners(context: Context) {
-    val positionListener = Listener({
-        exoPlayer?.duration?.let {
-            duration = it
-        }
+    if (!listenersSetup) {
+        val positionListener = Listener({
+            exoPlayer?.duration?.let {
+                duration = it
+            }
 
-        exoPlayer?.currentPosition?.let {
-            currentPosition = it
-            setPlayerState(it)
-        }
-    }, false)
+            exoPlayer?.currentPosition?.let {
+                currentPosition = it
+                setPlayerState(it)
+            }
+        }, false)
 
-    val lyricsListener = Listener({
-        if (loadedLyricsId == currentSongId) {
-            //calculate current timecode
+        val lyricsListener = Listener({
+            if (loadedLyricsId == currentSongId) {
+                //calculate current timecode
 
-            try {
-                var timeCodeIndex = 0
+                try {
+                    var timeCodeIndex = 0
 
-                for ((index, value) in lyricTimeCodesArray.withIndex()) {
-                    if (value * 1000 < currentPosition) {
-                        timeCodeIndex = index
+                    for ((index, value) in lyricTimeCodesArray.withIndex()) {
+                        if (value * 1000 < currentPosition) {
+                            timeCodeIndex = index
+                        }
+                    }
+
+                    if (currentLyricsIndex != timeCodeIndex) {
+                        currentLyricsIndex = timeCodeIndex
+                    }
+
+                } catch (e: java.lang.IndexOutOfBoundsException) {
+                    currentLyricsIndex = 0
+                }
+            } else {
+                //load lyrics
+
+                if (!loadingLyrics) {
+                    loadingLyrics = true
+
+                    scope.launch {
+                        loadLyrics(context, currentSongId, {
+                            loadedLyricsId = it
+
+                            loadingLyrics = false
+                        }, {
+                            loadedLyricsId = it
+
+                            currentLyricsIndex = 0
+                            lyricTextArray = emptyArray()
+                            lyricTimeCodesArray = emptyArray()
+
+                            loadingLyrics = false
+                        })
                     }
                 }
 
-                if (currentLyricsIndex != timeCodeIndex) {
-                    currentLyricsIndex = timeCodeIndex
+            }
+        }, false)
+
+        val crossFadeListener = Listener({
+            if (duration >= 1 && currentPosition >= 1) {
+                val timeLeft = duration - currentPosition
+
+                if (timeLeft < duration / 2 && exoPlayer?.isPlaying == true) {
+                    if (nextSongId != "") {
+                        prepareSong(context, nextSongId, {}, {})
+                    } else if (playRelatedSongsAfterPlaylistFinished) {
+                        loadRelatedSongs(context, playAfter = false)
+                    }
                 }
 
-            } catch (e: java.lang.IndexOutOfBoundsException) {
-                currentLyricsIndex = 0
-            }
-        } else {
-            //load lyrics
+                if (timeLeft < crossfade && exoPlayer?.isPlaying == true && nextSongId == preparedExoPlayerSongId) {
+                    val crossVolume = 1 - log(
+                        100 - ((crossfade.toFloat() - timeLeft) / crossfade * 100),
+                        100.toFloat()
+                    )
 
-            if (!loadingLyrics) {
-                loadingLyrics = true
+                    val higherVolume = crossVolume * volume
+                    val lowerVolume = volume - higherVolume
 
-                scope.launch {
-                    loadLyrics(context, currentSongId, {
-                        loadedLyricsId = it
+                    if (higherVolume > 0.toFloat() && higherVolume.isFinite()) {
+                        preparedExoPlayer?.audioComponent?.volume = higherVolume
+                    }
 
-                        loadingLyrics = false
-                    }, {
-                        loadedLyricsId = it
+                    if (lowerVolume > 0.toFloat() && lowerVolume.isFinite()) {
+                        exoPlayer?.audioComponent?.volume = lowerVolume
+                    }
 
-                        currentLyricsIndex = 0
-                        lyricTextArray = emptyArray()
-                        lyricTimeCodesArray = emptyArray()
-
-                        loadingLyrics = false
-                    })
+                    preparedExoPlayer?.playWhenReady = nextSongId == preparedExoPlayerSongId
+                } else if (exoPlayer?.isPlaying == false) {
+                    preparedExoPlayer?.playWhenReady = false
                 }
             }
+        }, false)
 
-        }
-    }, false)
-
-    val crossFadeListener = Listener({
-        val timeLeft = duration - currentPosition
-
-        if (timeLeft < duration / 2 && exoPlayer?.isPlaying == true) {
-            if (nextSongId != "") {
-                prepareSong(context, nextSongId, {}, {})
-            } else if (playRelatedSongsAfterPlaylistFinished) {
-                loadRelatedSongs(context, playAfter = false)
-            }
-        }
-
-        if (timeLeft < crossfade && exoPlayer?.isPlaying == true && nextSongId == preparedExoPlayerSongId) {
-            if (timeLeft >= 1) {
-                val crossVolume = 1 - log(
-                    100 - ((crossfade.toFloat() - timeLeft) / crossfade * 100),
-                    100.toFloat()
-                )
-
-                val higherVolume = crossVolume * volume
-                val lowerVolume = volume - higherVolume
-
-                if (higherVolume > 0.toFloat() && higherVolume.isFinite()) {
-                    preparedExoPlayer?.audioComponent?.volume = higherVolume
-                }
-
-                if (lowerVolume > 0.toFloat() && lowerVolume.isFinite()) {
-                    exoPlayer?.audioComponent?.volume = lowerVolume
-                }
-            }
-
-            preparedExoPlayer?.playWhenReady = true
-        } else if (exoPlayer?.isPlaying == false) {
-            preparedExoPlayer?.playWhenReady = false
-        }
-    }, false)
-
-    val historyListener = Listener({
-        //add current song to history after 30 seconds
-        if (currentPosition > 30 * 1000) {
-            try {
-                if (history[history.size - 1] != currentSongId) {
+        val historyListener = Listener({
+            //add current song to history after 30 seconds
+            if (currentPosition > 30 * 1000) {
+                try {
+                    if (history[history.size - 1] != currentSongId) {
+                        history.add(currentSongId)
+                    }
+                } catch (e: java.lang.IndexOutOfBoundsException) {
                     history.add(currentSongId)
                 }
-            } catch (e: java.lang.IndexOutOfBoundsException) {
-                history.add(currentSongId)
             }
-        }
-    }, false)
+        }, false)
 
-    playerPositionChangedListeners.add(crossFadeListener)
-    playerPositionChangedListeners.add(historyListener)
-    playerPositionChangedListeners.add(positionListener)
-    playerPositionChangedListeners.add(lyricsListener)
+        playerPositionChangedListeners.add(crossFadeListener)
+        playerPositionChangedListeners.add(historyListener)
+        playerPositionChangedListeners.add(positionListener)
+        playerPositionChangedListeners.add(lyricsListener)
+
+        listenersSetup = true
+    }
 }
 
 /**
