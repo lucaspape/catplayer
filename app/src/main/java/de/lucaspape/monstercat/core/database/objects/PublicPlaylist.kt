@@ -1,6 +1,6 @@
 package de.lucaspape.monstercat.core.database.objects
 
-data class PublicPlaylist(
+class PublicPlaylist(
     val id: Int,
     val playlistId: String,
     val playlistName: String

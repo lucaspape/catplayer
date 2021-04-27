@@ -1,6 +1,6 @@
 package de.lucaspape.monstercat.core.database.objects
 
-data class Item(val databaseId: String, val id: Long, val songId: String) {
+class Item(val databaseId: String, val id: Long, val songId: String) {
     val tableName = "\"" + databaseId + "_item\""
     val createTable =
         "CREATE TABLE IF NOT EXISTS " + tableName + " (" +

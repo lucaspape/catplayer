@@ -1,6 +1,6 @@
 package de.lucaspape.monstercat.core.database.objects
 
-data class Genre(
+class Genre(
     val id: Int,
     val genreId: String,
     val name:String

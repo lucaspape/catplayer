@@ -1,6 +1,6 @@
 package de.lucaspape.monstercat.core.database.objects
 
-data class ManualPlaylist(
+class ManualPlaylist(
     val id: Int,
     val playlistId: String
 ) {

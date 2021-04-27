@@ -1,6 +1,6 @@
 package de.lucaspape.monstercat.core.database.objects
 
-data class Album(
+class Album(
     val id: Int,
     val albumId: String,
     private val title: String,

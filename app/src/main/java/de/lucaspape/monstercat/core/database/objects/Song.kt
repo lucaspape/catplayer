@@ -15,7 +15,7 @@ import de.lucaspape.monstercat.core.util.wifiConnected
 import de.lucaspape.monstercat.core.util.Settings
 import java.io.File
 
-data class Song(
+class Song(
     val songId: String,
     private val title: String,
     private val version: String,

@@ -1,6 +1,6 @@
 package de.lucaspape.monstercat.core.database.objects
 
-data class Filter(val id:Int, val filterType:String, val filter:String) {
+class Filter(val id:Int, val filterType:String, val filter:String) {
     companion object {
         @JvmStatic
         val TABLE_NAME = "filter"

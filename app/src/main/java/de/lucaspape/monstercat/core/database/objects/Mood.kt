@@ -1,6 +1,6 @@
 package de.lucaspape.monstercat.core.database.objects
 
-data class Mood(
+class Mood(
     val id: Int,
     val moodId: String,
     val uri: String,

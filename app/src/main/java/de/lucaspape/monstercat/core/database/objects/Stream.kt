@@ -14,7 +14,7 @@ import de.lucaspape.monstercat.request.TwitchJsonObjectRequest
 import de.lucaspape.monstercat.request.TwitchStringRequest
 import org.json.JSONObject
 
-data class Stream(
+class Stream(
     val id: Int,
     val streamUrl: String,
     val coverUrl: String,
