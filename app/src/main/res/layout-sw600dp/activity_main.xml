@@ -18,15 +18,14 @@
         app:layout_constraintEnd_toStartOf="@id/container"
         android:layout_marginBottom="70dp">
 
-        <ImageView
-            android:id="@+id/fullscreenAlbumImage"
+        <androidx.viewpager.widget.ViewPager
             android:layout_width="0dp"
             android:layout_height="300dp"
-            android:contentDescription="@string/fullscreenAlbumImage"
+            android:id="@+id/fullscreenViewPager"
             app:layout_constraintBottom_toTopOf="@+id/fullscreenTitle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:srcCompat="@drawable/ic_music_video_black_24dp" />
+         />
 
         <ImageButton
             android:id="@+id/fullScreenPlay"

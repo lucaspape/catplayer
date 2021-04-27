@@ -11,22 +11,16 @@ import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
 import android.util.TypedValue
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.*
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
-import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import de.lucaspape.monstercat.R
-import de.lucaspape.monstercat.core.database.helper.SongDatabaseHelper
 import de.lucaspape.monstercat.core.download.*
 import de.lucaspape.monstercat.core.music.*
 import de.lucaspape.monstercat.core.music.notification.hideLoadingRelatedSongsNotification
@@ -40,6 +34,8 @@ import de.lucaspape.monstercat.util.*
 import de.lucaspape.monstercat.core.util.Settings
 import de.lucaspape.monstercat.request.async.checkCustomApiFeatures
 import de.lucaspape.monstercat.request.async.loadRelatedTracks
+import de.lucaspape.monstercat.ui.activities.util.CoverImageViewPagerAdapter
+import de.lucaspape.monstercat.ui.activities.util.SongTitleViewPagerAdapter
 import de.lucaspape.monstercat.ui.pages.*
 import de.lucaspape.monstercat.ui.pages.util.Page
 import kotlinx.coroutines.CoroutineScope
@@ -465,7 +461,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    var lastPageSelect:Long = 0
+    var lastPageSelect: Long = 0
 
     @SuppressLint("ClickableViewAccessibility")
     fun bindPlayerUICallbacks() {
@@ -478,7 +474,8 @@ class MainActivity : AppCompatActivity() {
         val titleTextViewFullscreen = findViewById<TextView>(R.id.fullscreenTitle)
         val artistTextViewFullscreen = findViewById<TextView>(R.id.fullscreenArtist)
         val seekbarFullscreen = findViewById<SeekBar>(R.id.fullscreenSeekBar)
-        val barCoverImageFullscreen = findViewById<ImageView>(R.id.fullscreenAlbumImage)
+        // val barCoverImageFullscreen = findViewById<ImageView>(R.id.fullscreenAlbumImage)
+        val fullscreenViewPager = findViewById<ViewPager>(R.id.fullscreenViewPager)
         val playButtonFullscreen = findViewById<ImageButton>(R.id.fullScreenPlay)
 
         val songTimePassedFullscreen = findViewById<TextView>(R.id.songTimePassed)
@@ -501,7 +498,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 override fun onPageSelected(position: Int) {
-                    if(System.currentTimeMillis() - lastPageSelect  > 200){
+                    if (System.currentTimeMillis() - lastPageSelect > 200) {
                         lastPageSelect = System.currentTimeMillis()
 
                         when (position) {
@@ -524,6 +521,46 @@ class MainActivity : AppCompatActivity() {
             })
 
             viewPager?.currentItem = 1
+
+            fullscreenViewPager?.adapter = CoverImageViewPagerAdapter(this) {
+                startActivity(
+                    Intent(applicationContext, PlayerFullscreenActivity::class.java)
+                )
+            }
+
+            fullscreenViewPager?.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+                override fun onPageScrolled(
+                    position: Int,
+                    positionOffset: Float,
+                    positionOffsetPixels: Int
+                ) {
+
+                }
+
+                override fun onPageSelected(position: Int) {
+                    if (System.currentTimeMillis() - lastPageSelect > 200) {
+                        lastPageSelect = System.currentTimeMillis()
+
+                        when (position) {
+                            0 -> {
+                                previous(this@MainActivity)
+                            }
+
+                            2 -> {
+                                next(this@MainActivity)
+                            }
+
+                        }
+                    }
+                }
+
+                override fun onPageScrollStateChanged(state: Int) {
+
+                }
+
+            })
+
+            fullscreenViewPager?.currentItem = 1
 
             titleTextViewFullscreen?.text = de.lucaspape.monstercat.core.music.util.title
             artistTextViewFullscreen?.text = artist
@@ -589,7 +626,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         barCoverImage?.setImageBitmap(coverBitmap)
-        barCoverImageFullscreen?.setImageBitmap(coverBitmap)
 
         playingChangedCallback = {
             if (visiblePlaying) {
@@ -604,17 +640,14 @@ class MainActivity : AppCompatActivity() {
 
         coverBitmapChangedCallback = {
             barCoverImage?.setImageBitmap(coverBitmap)
-            barCoverImageFullscreen?.setImageBitmap(coverBitmap)
         }
 
         coverDrawableChangedCallback = {
             barCoverImage?.setImageDrawable(coverDrawable)
-            barCoverImageFullscreen?.setImageDrawable(coverDrawable)
         }
 
         setTagCallback = { target ->
             barCoverImage?.tag = target
-            barCoverImageFullscreen?.tag = target
         }
 
         loadingRelatedChangedCallback = {
@@ -719,58 +752,5 @@ class MainActivity : AppCompatActivity() {
                     R.id.navigation_home
             }
         )
-    }
-}
-
-class SongTitleViewPagerAdapter(private val context: Context, private val openFullscreenView:()->Unit) : PagerAdapter() {
-    override fun getCount(): Int {
-        return 3
-    }
-
-    override fun isViewFromObject(view: View, `object`: Any): Boolean {
-        return view == `object` as ConstraintLayout
-    }
-
-    override fun instantiateItem(container: ViewGroup, position: Int): Any {
-        val layoutInflater =
-            context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-
-        val item = layoutInflater.inflate(R.layout.currentsong_item, container, false)
-
-        val songTextView = item.findViewById<TextView>(R.id.currentSongText)
-
-        songTextView.setOnClickListener {
-            openFullscreenView()
-        }
-
-        when (position) {
-            0 -> {
-                SongDatabaseHelper(context).getSong(previousSongId)?.let {
-                    val titleWithArtist = "${it.shownTitle} - ${it.artist}"
-
-                    songTextView.text = titleWithArtist
-                }
-            }
-            1 -> {
-                val titleWithArtist = "$title - $artist"
-
-                songTextView.text = titleWithArtist
-            }
-            2 -> {
-                SongDatabaseHelper(context).getSong(nextSongId)?.let {
-                    val titleWithArtist = "${it.shownTitle} - ${it.artist}"
-
-                    songTextView.text = titleWithArtist
-                }
-            }
-        }
-
-        Objects.requireNonNull(container).addView(item)
-
-        return item
-    }
-
-    override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
-        Objects.requireNonNull(container).removeView(`object` as View)
     }
 }
