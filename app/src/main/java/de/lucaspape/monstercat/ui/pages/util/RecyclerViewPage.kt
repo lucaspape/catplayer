@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 
 import android.view.View
+import android.view.ViewTreeObserver
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
@@ -393,7 +394,7 @@ abstract class RecyclerViewPage {
                                 EndlessRecyclerOnScrollListener(footerAdapter) {
                                 override fun onLoadMore(currentPage: Int) {
                                     scrollListener?.disable()
-                                    loadNext(view)
+                                    loadNext(view, false)
                                 }
                             }
 
@@ -410,13 +411,13 @@ abstract class RecyclerViewPage {
 
                             swipeRefreshLayout?.isRefreshing = false
 
-                            restoreRecyclerViewPosition(view.context)
-
                             currentLoaderId = ""
 
                             if (getOrientation(view) == LinearLayout.VERTICAL) {
                                 footerAdapter.add(SpacerItem())
                             }
+
+                            restoreRecyclerViewPosition(view)
                         }
                     }
                 }
@@ -440,7 +441,7 @@ abstract class RecyclerViewPage {
         }
     }
 
-    private fun loadNext(view: View) {
+    private fun loadNext(view: View, restorePosition: Boolean) {
         val id = UUID.randomUUID().toString()
 
         if (currentLoaderId.isEmpty()) {
@@ -477,6 +478,10 @@ abstract class RecyclerViewPage {
                                         if (getOrientation(view) == LinearLayout.VERTICAL) {
                                             footerAdapter.add(SpacerItem())
                                         }
+
+                                        if (restorePosition) {
+                                            restoreRecyclerViewPosition(view)
+                                        }
                                     }
                                 }
                             }
@@ -489,7 +494,7 @@ abstract class RecyclerViewPage {
                                 errorMessage,
                                 view.context.getString(R.string.retry)
                             ) {
-                                loadNext(view)
+                                loadNext(view, false)
                             }
 
                             currentLoaderId = ""
@@ -513,13 +518,24 @@ abstract class RecyclerViewPage {
         settings.setInt("$id-topView", 0)
     }
 
-    private fun restoreRecyclerViewPosition(context: Context) {
+    private fun restoreRecyclerViewPosition(view: View) {
         recyclerView?.let {
-            val settings = Settings.getSettings(context)
+            val settings = Settings.getSettings(view.context)
             settings.getInt("$id-positionIndex")?.let { positionIndex ->
                 settings.getInt("$id-topView")?.let { topView ->
-                    val layoutManager = it.layoutManager as LinearLayoutManager
-                    layoutManager.scrollToPositionWithOffset(positionIndex, topView)
+                    if (positionIndex > databaseItemCount) {
+                        loadNext(view, true)
+                    } else {
+                        recyclerView?.viewTreeObserver?.addOnGlobalLayoutListener(object :
+                            ViewTreeObserver.OnGlobalLayoutListener {
+                            override fun onGlobalLayout() {
+                                val layoutManager = it.layoutManager as LinearLayoutManager
+                                layoutManager.scrollToPositionWithOffset(positionIndex, topView)
+                                
+                                recyclerView?.viewTreeObserver?.removeOnGlobalLayoutListener(this)
+                            }
+                        })
+                    }
                 }
             }
         }
