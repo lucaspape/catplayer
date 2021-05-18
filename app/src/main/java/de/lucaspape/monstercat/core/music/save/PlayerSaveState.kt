@@ -42,42 +42,46 @@ data class PlayerSaveState(
 
                         try {
                             try {
-                                val playerSaveState =
-                                    objectInputStream.readObject() as PlayerSaveState
+                                try {
+                                    val playerSaveState =
+                                        objectInputStream.readObject() as PlayerSaveState
 
-                                loop = playerSaveState.loop
-                                loopSingle = playerSaveState.loopSingle
-                                shuffle = playerSaveState.shuffle
-                                crossfade = playerSaveState.crossfade
-                                playlist = playerSaveState.playlist
-                                playlistIndex = playerSaveState.playlistIndex
-                                nextRandom = playerSaveState.nextRandom
-                                songQueue = playerSaveState.songQueue
-                                prioritySongQueue = playerSaveState.prioritySongQueue
+                                    loop = playerSaveState.loop
+                                    loopSingle = playerSaveState.loopSingle
+                                    shuffle = playerSaveState.shuffle
+                                    crossfade = playerSaveState.crossfade
+                                    playlist = playerSaveState.playlist
+                                    playlistIndex = playerSaveState.playlistIndex
+                                    nextRandom = playerSaveState.nextRandom
+                                    songQueue = playerSaveState.songQueue
+                                    prioritySongQueue = playerSaveState.prioritySongQueue
 
-                                playerSaveState.progress?.let { progress ->
-                                    currentPosition = progress
+                                    playerSaveState.progress?.let { progress ->
+                                        currentPosition = progress
 
-                                    playSong(
-                                        context, currentSongId,
-                                        showNotification = false,
-                                        playWhenReady = false,
-                                        progress = progress
-                                    )
+                                        playSong(
+                                            context, currentSongId,
+                                            showNotification = false,
+                                            playWhenReady = false,
+                                            progress = progress
+                                        )
+                                    }
+
+                                    playerSaveState.duration?.let { sDuration ->
+                                        duration = sDuration
+                                    }
+                                } catch (e: ClassNotFoundException) {
+                                    delete(context)
                                 }
 
-                                playerSaveState.duration?.let { sDuration ->
-                                    duration = sDuration
-                                }
-                            } catch (e: ClassNotFoundException) {
+                            } catch (e: TypeCastException) {
                                 delete(context)
                             }
-
-                        } catch (e: TypeCastException) {
+                        } catch (e: StreamCorruptedException) {
                             delete(context)
                         }
                     } catch (e: EOFException) {
-
+                        delete(context)
                     }
                 } catch (e: FileNotFoundException) {
 
@@ -89,7 +93,7 @@ data class PlayerSaveState(
 
         @JvmStatic
         fun save(context: Context) {
-            if(restored){
+            if (restored) {
                 val objectOutputStream =
                     ObjectOutputStream(FileOutputStream(File(context.cacheDir.toString() + "/player_state.obj")))
 
@@ -119,7 +123,7 @@ data class PlayerSaveState(
         }
 
         @JvmStatic
-        fun delete(context: Context){
+        fun delete(context: Context) {
             try {
                 File("${context.cacheDir}/player_state.obj").delete()
             } catch (e: FileNotFoundException) {
