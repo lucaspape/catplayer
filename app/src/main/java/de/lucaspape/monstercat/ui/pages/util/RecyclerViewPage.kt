@@ -531,7 +531,7 @@ abstract class RecyclerViewPage {
                             override fun onGlobalLayout() {
                                 val layoutManager = it.layoutManager as LinearLayoutManager
                                 layoutManager.scrollToPositionWithOffset(positionIndex, topView)
-                                
+
                                 recyclerView?.viewTreeObserver?.removeOnGlobalLayoutListener(this)
                             }
                         })

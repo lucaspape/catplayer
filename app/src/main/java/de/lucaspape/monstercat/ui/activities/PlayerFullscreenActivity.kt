@@ -12,10 +12,14 @@ class PlayerFullscreenActivity : AppCompatActivity() {
         intent.putExtra("search", search)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(intent)
+
+        finish()
     }, {
         val intent = Intent(this, MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(intent)
+
+        finish()
     })
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,8 +31,6 @@ class PlayerFullscreenActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        super.onBackPressed()
-
         fullscreenPlayerPage.onBackPressed(window.decorView.rootView)
     }
 }

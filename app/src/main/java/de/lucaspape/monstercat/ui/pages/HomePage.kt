@@ -18,7 +18,7 @@ class HomePage(
     private val openSettings: () -> Unit,
     private val openQueue: () -> Unit,
     private var albumMcId: String?,
-    private val resetPosition: Boolean
+    private var resetPosition: Boolean
 ) :
     Page() {
 
@@ -37,12 +37,14 @@ class HomePage(
 
     private var resetData = false
     
-    private var exitOnAppButton = true
+    private var exitOnAppButton = false
 
     override fun onBackPressed(view: View): Boolean {
         return if(!exitOnAppButton){
             resetData = true
             setupSpinner(view)
+
+            resetPosition = true
 
             if (!registerListeners(view)) {
                 catalogView(view)
@@ -89,6 +91,8 @@ class HomePage(
             homePageObject?.resetSaveData()
         }
 
+        resetPosition = false
+
         homePageObject?.onCreate(view)
     }
 
@@ -99,10 +103,13 @@ class HomePage(
                 albumId,
                 albumMcId
             )
+
         if (resetPosition) {
             homePageObject?.resetRecyclerViewSavedPosition(view.context)
             homePageObject?.resetSaveData()
         }
+
+        resetPosition = false
 
         if (resetData) {
             homePageObject?.resetSaveData()

@@ -335,6 +335,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         var value = currentPage?.onPageBackPressed()
+
         if (value == null) {
             value = true
         }
@@ -350,15 +351,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<androidx.appcompat.widget.Toolbar>(R.id.musicBar)?.setOnClickListener {
-            startActivity(
-                Intent(applicationContext, PlayerFullscreenActivity::class.java)
-            )
+            openFullscreenActivity()
         }
 
         findViewById<ImageView>(R.id.fullscreenAlbumImage)?.setOnClickListener {
-            startActivity(
-                Intent(applicationContext, PlayerFullscreenActivity::class.java)
-            )
+            openFullscreenActivity()
         }
 
         findViewById<BottomNavigationView>(R.id.nav_view).setOnNavigationItemSelectedListener(
@@ -483,9 +480,7 @@ class MainActivity : AppCompatActivity() {
 
         titleChangedCallback = {
             viewPager?.adapter = SongTitleViewPagerAdapter(this) {
-                startActivity(
-                    Intent(applicationContext, PlayerFullscreenActivity::class.java)
-                )
+                openFullscreenActivity()
             }
 
             viewPager?.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
@@ -523,9 +518,7 @@ class MainActivity : AppCompatActivity() {
             viewPager?.currentItem = 1
 
             fullscreenViewPager?.adapter = CoverImageViewPagerAdapter(this) {
-                startActivity(
-                    Intent(applicationContext, PlayerFullscreenActivity::class.java)
-                )
+                openFullscreenActivity()
             }
 
             fullscreenViewPager?.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
@@ -752,5 +745,13 @@ class MainActivity : AppCompatActivity() {
                     R.id.navigation_home
             }
         )
+    }
+
+    private fun openFullscreenActivity(){
+        startActivity(
+            Intent(applicationContext, PlayerFullscreenActivity::class.java)
+        )
+
+        finish()
     }
 }
