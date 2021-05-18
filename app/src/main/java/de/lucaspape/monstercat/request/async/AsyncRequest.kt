@@ -1146,7 +1146,7 @@ suspend fun loadLyrics(
                     lyricTextArray = newLyricText
                 }catch (e: JSONException){
                     lyricTimeCodesArray = arrayOf(0)
-                    lyricTextArray = arrayOf(getCharacterFromUnicode(it, false))
+                    lyricTextArray = arrayOf(getCharacterFromUnicode(it, true))
                 }
 
                 finishedCallback(songId)
